@@ -20,6 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.LabelPageQuery;
 import io.github.pnoker.center.manager.service.LabelService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
@@ -55,18 +56,15 @@ public class LabelController {
      * @return Label
      */
     @PostMapping("/add")
-    public R<Label> add(@Validated(Insert.class) @RequestBody Label label,
-                        @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<String> add(@Validated(Insert.class) @RequestBody Label label,
+                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             label.setTenantId(tenantId);
-            Label add = labelService.add(label);
-            if (ObjectUtil.isNotNull(add)) {
-                return R.ok(add);
-            }
+            labelService.add(label);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -76,9 +74,10 @@ public class LabelController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            return labelService.delete(id) ? R.ok() : R.fail();
+            labelService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -92,18 +91,15 @@ public class LabelController {
      * @return Label
      */
     @PostMapping("/update")
-    public R<Label> update(@Validated(Update.class) @RequestBody Label label,
-                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody Label label,
+                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             label.setTenantId(tenantId);
-            Label update = labelService.update(label);
-            if (ObjectUtil.isNotNull(update)) {
-                return R.ok(update);
-            }
+            labelService.update(label);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -134,7 +130,7 @@ public class LabelController {
      */
     @PostMapping("/list")
     public R<Page<Label>> list(@RequestBody(required = false) LabelPageQuery labelPageQuery,
-                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(labelPageQuery)) {
                 labelPageQuery = new LabelPageQuery();

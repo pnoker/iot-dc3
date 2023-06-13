@@ -26,8 +26,9 @@ import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.UserPassword;
 import io.github.pnoker.common.utils.DecodeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -51,38 +52,38 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     @Transactional
-    public UserPassword add(UserPassword userPassword) {
-        userPassword.setLoginPassword(DecodeUtil.md5(userPassword.getLoginPassword()));
+    public void add(UserPassword entityDO) {
+        entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
         // 插入 userPassword 数据，并返回插入后的 userPassword
-        if (userPasswordMapper.insert(userPassword) > 0) {
-            return userPasswordMapper.selectById(userPassword.getId());
+        if (userPasswordMapper.insert(entityDO) < 1) {
+            throw new AddException("The user password add failed: {}", entityDO.toString());
         }
-
-        throw new AddException("The user password add failed: {}", userPassword.toString());
     }
 
     @Override
     @Transactional
-    public Boolean delete(String id) {
+    public void delete(String id) {
         UserPassword userPassword = selectById(id);
         if (ObjectUtil.isNull(userPassword)) {
-            throw new NotFoundException();
+            throw new NotFoundException("The user password does not exist");
         }
-        return userPasswordMapper.deleteById(id) > 0;
+
+        if (userPasswordMapper.deleteById(id) < 1) {
+            throw new DeleteException("The user password delete failed");
+        }
     }
 
     @Override
-    public UserPassword update(UserPassword userPassword) {
-        UserPassword selectById = selectById(userPassword.getId());
+    public void update(UserPassword entityDO) {
+        UserPassword selectById = selectById(entityDO.getId());
         if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException();
         }
-        userPassword.setLoginPassword(DecodeUtil.md5(userPassword.getLoginPassword()));
-        userPassword.setUpdateTime(null);
-        if (userPasswordMapper.updateById(userPassword) > 0) {
-            return userPasswordMapper.selectById(userPassword.getId());
+        entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
+        entityDO.setOperateTime(null);
+        if (userPasswordMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The user password update failed");
         }
-        throw new ServiceException("The user password update failed");
     }
 
     @Override
@@ -91,25 +92,23 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public Page<UserPassword> list(UserPasswordPageQuery userPasswordPageQuery) {
-        if (ObjectUtil.isNull(userPasswordPageQuery.getPage())) {
-            userPasswordPageQuery.setPage(new Pages());
+    public Page<UserPassword> list(UserPasswordPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return userPasswordMapper.selectPage(userPasswordPageQuery.getPage().convert(), fuzzyQuery(userPasswordPageQuery));
+        return userPasswordMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
     @Override
-    public Boolean restPassword(String id) {
+    public void restPassword(String id) {
         UserPassword userPassword = selectById(id);
         if (ObjectUtil.isNotNull(userPassword)) {
             userPassword.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
-            return ObjectUtil.isNotNull(update(userPassword));
+            update(userPassword);
         }
-        return false;
     }
 
-    @Override
-    public LambdaQueryWrapper<UserPassword> fuzzyQuery(UserPasswordPageQuery userPasswordPageQuery) {
+    private LambdaQueryWrapper<UserPassword> fuzzyQuery(UserPasswordPageQuery query) {
         return Wrappers.<UserPassword>query().lambda();
     }
 

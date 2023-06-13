@@ -15,9 +15,10 @@
 #
 
 driver:
-  name: Lwm2mDriver
+  tenant: default
+  name: Lwm2m协议驱动
+  code: Lwm2mDriver
   type: DRIVER
-  project: @project.artifactId@
   remark: @project.description@
   custom:
     coap:
@@ -26,6 +27,7 @@ driver:
       port: 5684
   schedule:
     # 数据读取定时任务 需开启才能看到数据
+    # 定时读数据
     read:
       enable: false
       corn: '0/30 * * * * ?'
@@ -37,20 +39,22 @@ driver:
     - display-name: 消息上行
       attribute-name: messageUp
       attribute-type-flag: STRING
-      value: /19/0/0
+      default-value: /19/0/0
       remark: 消息上行资源对象
     - display-name: 消息下行
       attribute-name: messageDown
       attribute-type-flag: STRING
-      value: /19/1/0
+      default-value: /19/1/0
       remark: 消息下行资源对象
     - display-name: 命令下行
       attribute-name: execDown
       attribute-type-flag: STRING
-      value: /19/2/0
+      default-value: /19/2/0
       remark: 命令下行资源对象
 
 spring:
+  application:
+    name: @project.artifactId@
   profiles:
     active:
       - ${NODE_ENV:dev}

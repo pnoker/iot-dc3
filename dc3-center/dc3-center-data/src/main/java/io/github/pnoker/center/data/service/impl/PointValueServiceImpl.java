@@ -20,6 +20,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.data.PointValueQuery;
 import io.github.pnoker.api.center.manager.PagePointQueryDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.center.manager.PointDTO;
@@ -29,6 +30,7 @@ import io.github.pnoker.api.common.PageDTO;
 import io.github.pnoker.center.data.entity.vo.query.PointValuePageQuery;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
@@ -161,14 +163,30 @@ public class PointValueServiceImpl implements PointValueService {
         return pointValuePage;
     }
 
+    @Override
+    public PointValue latest(PointValueQuery request) {
+        final String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + request.getDeviceId() + SymbolConstant.DOT;
+        return redisUtil.getKey(prefix + request.getPointId());
+    }
+
+    /**
+     * Query to DTO
+     *
+     * @param pageQuery PointValuePageQuery
+     * @return PointDTO Builder
+     */
     private static PointDTO.Builder buildDTOByQuery(PointValuePageQuery pageQuery) {
         PointDTO.Builder builder = PointDTO.newBuilder();
 
         if (CharSequenceUtil.isNotEmpty(pageQuery.getPointName())) {
             builder.setPointName(pageQuery.getPointName());
         }
+        builder.setPointTypeFlagValue(DefaultConstant.DEFAULT_INT);
+        builder.setRwFlagValue(DefaultConstant.DEFAULT_INT);
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
             builder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));
+        } else {
+            builder.setEnableFlagValue(DefaultConstant.DEFAULT_INT);
         }
         return builder;
     }

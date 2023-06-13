@@ -19,7 +19,6 @@
             "minimum": -999999,
             "maximum": 999999,
             "multiple": 1,
-            "accrue": false,
             "format": "%.3f",
             "unit": "-"
           },
@@ -31,7 +30,6 @@
             "minimum": -999999,
             "maximum": 999999,
             "multiple": 1,
-            "accrue": false,
             "format": "%.3f",
             "unit": "-"
           },
@@ -43,7 +41,6 @@
             "minimum": -999999,
             "maximum": 999999,
             "multiple": 1,
-            "accrue": false,
             "format": "%.3f",
             "unit": "-"
           },
@@ -55,7 +52,6 @@
             "minimum": -999999,
             "maximum": 999999,
             "multiple": 1,
-            "accrue": false,
             "format": "%.3f",
             "unit": "-"
           },
@@ -67,7 +63,6 @@
             "minimum": -999999,
             "maximum": 999999,
             "multiple": 1,
-            "accrue": false,
             "format": "%.3f",
             "unit": "-"
           },
@@ -79,7 +74,6 @@
             "minimum": -999999,
             "maximum": 999999,
             "multiple": 1,
-            "accrue": false,
             "format": "%.3f",
             "unit": "-"
           }

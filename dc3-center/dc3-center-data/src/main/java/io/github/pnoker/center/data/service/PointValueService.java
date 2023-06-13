@@ -17,6 +17,7 @@
 package io.github.pnoker.center.data.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.data.PointValueQuery;
 import io.github.pnoker.center.data.entity.vo.query.PointValuePageQuery;
 import io.github.pnoker.common.entity.point.PointValue;
 
@@ -58,4 +59,5 @@ public interface PointValueService {
      */
     Page<PointValue> list(PointValuePageQuery pointValuePageQuery);
 
+    PointValue latest(PointValueQuery request);
 }

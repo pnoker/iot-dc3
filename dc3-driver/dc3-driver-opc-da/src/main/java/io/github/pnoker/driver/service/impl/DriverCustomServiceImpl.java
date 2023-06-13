@@ -18,18 +18,18 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.entity.driver.AttributeInfo;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.sdk.DriverContext;
-import io.github.pnoker.common.sdk.service.DriverCustomService;
-import io.github.pnoker.common.sdk.service.DriverService;
-import io.github.pnoker.common.sdk.utils.DriverUtil;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.driver.sdk.DriverContext;
+import io.github.pnoker.driver.sdk.service.DriverCustomService;
+import io.github.pnoker.driver.sdk.service.DriverSenderService;
+import io.github.pnoker.driver.sdk.utils.DriverUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.JIVariant;
@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
-import static io.github.pnoker.common.sdk.utils.DriverUtil.attribute;
+import static io.github.pnoker.driver.sdk.utils.DriverUtil.attribute;
 
 /**
  * @author pnoker
@@ -58,7 +58,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverContext driverContext;
     @Resource
-    private DriverService driverService;
+    private DriverSenderService driverSenderService;
 
     /**
      * Opc Da Server Map
@@ -68,37 +68,46 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         /*
-        TODO: 仅供参考
-        可自定义实现
+        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!!
+        你可以在此处执行一些特定的初始化逻辑，驱动在启动的时候会自动执行该方法。
         */
         connectMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
     public void schedule() {
-
         /*
-        TODO:设备状态
-        上传设备状态，可自行灵活拓展，不一定非要在schedule()接口中实现，也可以在read中实现设备状态的设置；
-        你可以通过某种判断机制确定设备的状态，然后通过driverService.deviceEventSender接口将设备状态交给SDK管理。
+        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!!
+        上传设备状态，可自行灵活拓展，不一定非要在schedule()接口中实现，你可以：
+        - 在read中实现设备状态的判断；
+        - 在自定义定时任务中实现设备状态的判断；
+        - 通过某种判断机制实现设备状态的判断。
 
-        设备状态（StatusEnum）如下：
-        ONLINE:在线
-        OFFLINE:离线
-        MAINTAIN:维护
-        FAULT:故障
+        最后通过 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理，其中设备状态（StatusEnum）：
+        - ONLINE:在线
+        - OFFLINE:离线
+        - MAINTAIN:维护
+        - FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverService.deviceStatusSender(id, DriverStatusEnum.ONLINE));
+        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE));
     }
 
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+        /*
+        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+         */
         Server server = getConnector(device.getId(), driverInfo);
         return readValue(server, pointInfo);
     }
 
     @Override
     public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+        /*
+        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+         */
         Server server = getConnector(device.getId(), driverInfo);
         return writeValue(server, pointInfo, value);
     }
@@ -136,7 +145,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * 获取 Opc Da Item
      *
      * @param server    Server
-     * @param pointInfo Point Info Map
+     * @param pointInfo Point Attribute Config Map
      * @return Item
      * @throws NotConnectedException   NotConnectedException
      * @throws JIException             JIException

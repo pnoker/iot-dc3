@@ -20,6 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DictionaryPageQuery;
 import io.github.pnoker.center.manager.service.DictionaryService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
@@ -52,7 +53,7 @@ public class DictionaryController {
      */
     @PostMapping("/driver")
     public R<Page<Dictionary>> driverDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery,
-                                                @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                                                @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
                 dictionaryPageQuery = new DictionaryPageQuery();
@@ -77,7 +78,7 @@ public class DictionaryController {
      */
     @PostMapping("/profile")
     public R<Page<Dictionary>> profileDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery,
-                                                 @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                                                 @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
                 dictionaryPageQuery = new DictionaryPageQuery();
@@ -102,7 +103,7 @@ public class DictionaryController {
      */
     @PostMapping("/device")
     public R<Page<Dictionary>> deviceDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery,
-                                                @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                                                @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
                 dictionaryPageQuery = new DictionaryPageQuery();
@@ -127,7 +128,7 @@ public class DictionaryController {
      */
     @PostMapping("/point")
     public R<Page<Dictionary>> pointDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery,
-                                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+                                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
                 dictionaryPageQuery = new DictionaryPageQuery();

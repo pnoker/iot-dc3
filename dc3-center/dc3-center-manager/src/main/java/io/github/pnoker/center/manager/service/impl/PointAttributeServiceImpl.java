@@ -25,9 +25,7 @@ import io.github.pnoker.center.manager.entity.query.PointAttributePageQuery;
 import io.github.pnoker.center.manager.mapper.PointAttributeMapper;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.PointAttribute;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,15 +50,14 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public PointAttribute add(PointAttribute pointAttribute) {
+    public void add(PointAttribute entityDO) {
         try {
-            selectByNameAndDriverId(pointAttribute.getAttributeName(), pointAttribute.getDriverId());
+            selectByNameAndDriverId(entityDO.getAttributeName(), entityDO.getDriverId());
             throw new DuplicateException("The point attribute already exists");
         } catch (NotFoundException notFoundException) {
-            if (pointAttributeMapper.insert(pointAttribute) > 0) {
-                return pointAttributeMapper.selectById(pointAttribute.getId());
+            if (pointAttributeMapper.insert(entityDO) < 1) {
+                throw new AddException("The point attribute {} add failed", entityDO.getAttributeName());
             }
-            throw new ServiceException("The point attribute add failed");
         }
     }
 
@@ -68,25 +65,27 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public Boolean delete(String id) {
-        selectById(id);
-        return pointAttributeMapper.deleteById(id) > 0;
+    public void delete(String id) {
+        PointAttribute pointAttribute = selectById(id);
+        if (ObjectUtil.isNull(pointAttribute)) {
+            throw new NotFoundException("The point attribute does not exist");
+        }
+
+        if (pointAttributeMapper.deleteById(id) < 1) {
+            throw new DeleteException("The point attribute delete failed");
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PointAttribute update(PointAttribute pointAttribute) {
-        selectById(pointAttribute.getId());
-        pointAttribute.setUpdateTime(null);
-        if (pointAttributeMapper.updateById(pointAttribute) > 0) {
-            PointAttribute select = pointAttributeMapper.selectById(pointAttribute.getId());
-            pointAttribute.setAttributeName(select.getAttributeName());
-            pointAttribute.setDriverId(select.getDriverId());
-            return select;
+    public void update(PointAttribute entityDO) {
+        selectById(entityDO.getId());
+        entityDO.setOperateTime(null);
+        if (pointAttributeMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The point attribute update failed");
         }
-        throw new ServiceException("The point attribute update failed");
     }
 
     /**
@@ -121,12 +120,14 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public List<PointAttribute> selectByDriverId(String driverId) {
+    public List<PointAttribute> selectByDriverId(String driverId, boolean throwException) {
         PointAttributePageQuery pointAttributePageQuery = new PointAttributePageQuery();
         pointAttributePageQuery.setDriverId(driverId);
         List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(fuzzyQuery(pointAttributePageQuery));
-        if (ObjectUtil.isNull(pointAttributes) || pointAttributes.isEmpty()) {
-            throw new NotFoundException();
+        if (throwException) {
+            if (ObjectUtil.isNull(pointAttributes) || pointAttributes.isEmpty()) {
+                throw new NotFoundException();
+            }
         }
         return pointAttributes;
     }
@@ -135,24 +136,20 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public Page<PointAttribute> list(PointAttributePageQuery pointAttributePageQuery) {
-        if (ObjectUtil.isNull(pointAttributePageQuery.getPage())) {
-            pointAttributePageQuery.setPage(new Pages());
+    public Page<PointAttribute> list(PointAttributePageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return pointAttributeMapper.selectPage(pointAttributePageQuery.getPage().convert(), fuzzyQuery(pointAttributePageQuery));
+        return pointAttributeMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributePageQuery pointAttributePageQuery) {
+    private LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributePageQuery query) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
-        if (ObjectUtil.isNotNull(pointAttributePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributePageQuery.getAttributeName()), PointAttribute::getAttributeName, pointAttributePageQuery.getAttributeName());
-            queryWrapper.like(CharSequenceUtil.isNotBlank(pointAttributePageQuery.getDisplayName()), PointAttribute::getDisplayName, pointAttributePageQuery.getDisplayName());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointAttributePageQuery.getAttributeTypeFlag()), PointAttribute::getAttributeTypeFlag, pointAttributePageQuery.getAttributeTypeFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pointAttributePageQuery.getDriverId()), PointAttribute::getDriverId, pointAttributePageQuery.getDriverId());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getAttributeName()), PointAttribute::getAttributeName, query.getAttributeName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getDisplayName()), PointAttribute::getDisplayName, query.getDisplayName());
+            queryWrapper.eq(ObjectUtil.isNotNull(query.getAttributeTypeFlag()), PointAttribute::getAttributeTypeFlag, query.getAttributeTypeFlag());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDriverId()), PointAttribute::getDriverId, query.getDriverId());
         }
         return queryWrapper;
     }

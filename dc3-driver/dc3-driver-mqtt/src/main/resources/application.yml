@@ -15,11 +15,13 @@
 #
 
 driver:
-  name: MqttDriver
+  tenant: default
+  name: Mqtt驱动
+  code: MqttDriver
   type: DRIVER
-  project: @project.artifactId@
   remark: @project.description@
   schedule:
+    # 定时读数据
     read:
       enable: false
       corn: '0/30 * * * * ?'
@@ -30,38 +32,17 @@ driver:
     - display-name: 指令Topic
       attribute-name: commandTopic
       attribute-type-flag: STRING
-      value: commandTopic
+      default-value: commandTopic
       remark: 测点/设备接收下行指令的Mqtt主题
     - display-name: 指令Qos
       attribute-name: commandQos
       attribute-type-flag: INT
-      value: 2
+      default-value: 2
       remark: 测点/设备接收下行指令的Mqtt主题的Qos
-  mqtt:
-    url: ssl://dc3-rabbitmq:8883
-    auth-type: X509
-    username: dc3
-    password: dc3
-    ca-crt: classpath:/certs/ca.crt
-    client-key-pass: dc3-client
-    client-key: classpath:/certs/client.key
-    client-crt: classpath:/certs/client.crt
-    client: ${spring.application.name}
-    receive-topics:
-      - qos: 1
-        name: driver/${spring.application.name}/device/+
-      - qos: 1
-        name: driver/${spring.application.name}/gateway/+
-    default-send-topic:
-      qos: 1
-      name: default/${spring.application.name}
-    keep-alive: 15
-    completion-timeout: 3000
-    batch:
-      speed: ${MQTT_BATCH_SPEED:100}
-      interval: ${MQTT_BATCH_INTERVAL:5}
 
 spring:
+  application:
+    name: @project.artifactId@
   profiles:
     active:
       - ${NODE_ENV:dev}

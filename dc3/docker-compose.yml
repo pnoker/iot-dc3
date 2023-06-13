@@ -21,12 +21,12 @@ services:
     build:
       context: ../dc3-gateway/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2023.4.0.dev
     restart: on-failure
     ports:
       - '8000:8000'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -45,12 +45,12 @@ services:
     build:
       context: ../dc3-center/dc3-center-auth/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2023.4.0.dev
     restart: on-failure
     ports:
       - '8300:8300'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
@@ -69,12 +69,12 @@ services:
     build:
       context: ../dc3-center/dc3-center-manager/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2023.4.0.dev
     restart: on-failure
     ports:
       - '8400:8400'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
@@ -93,12 +93,12 @@ services:
     build:
       context: ../dc3-center/dc3-center-data/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2023.4.0.dev
     restart: on-failure
     ports:
       - '8500:8500'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
@@ -117,12 +117,10 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-virtual/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2023.4.0.dev
     restart: on-failure
-    ports:
-      - '8600:8600'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
     volumes:
@@ -141,12 +139,10 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-plcs7/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:2023.4.0.dev
     restart: on-failure
-    ports:
-      - '8601:8601'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-plcs7
     hostname: dc3-driver-plcs7
     volumes:
@@ -165,12 +161,10 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-opc-da/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:2023.4.0.dev
     restart: on-failure
-    ports:
-      - '8602:8602'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
     volumes:
@@ -189,12 +183,10 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-opc-ua/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:2023.4.0.dev
     restart: on-failure
-    ports:
-      - '8603:8603'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
     volumes:
@@ -213,12 +205,13 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-listening-virtual/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:2023.4.0.dev
     restart: on-failure
     ports:
-      - '8700:8700'
+      - '6270:6270'
+      - '6271:6271'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
     volumes:
@@ -237,14 +230,13 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-dtu-yeecom/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-dtu-yeecom:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-dtu-yeecom:2023.4.0.dev
     restart: on-failure
     ports:
-      - '8702:8702'
       - '9001:9001'
       - '9002:9002'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-dtu-yeecom
     hostname: dc3-driver-dtu-yeecom
     volumes:
@@ -259,16 +251,39 @@ services:
         aliases:
           - dc3-driver-dtu-yeecom
 
+  lwm2m:
+    build:
+      context: ../dc3-driver/dc3-driver-lwm2m/
+      dockerfile: ./Dockerfile
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-lwm2m:2023.4.0.dev
+    restart: on-failure
+    ports:
+      - '5683:5683'
+      - '5684:5684'
+    environment:
+      - NODE_ENV=test
+    container_name: dc3-driver-lwm2m
+    hostname: dc3-driver-lwm2m
+    volumes:
+      - logs:/dc3-driver/dc3-driver-lwm2m/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-lwm2m
+
   mqtt:
     build:
       context: ../dc3-driver/dc3-driver-mqtt/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2023.4.0.dev
     restart: on-failure
-    ports:
-      - '8701:8701'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
@@ -283,16 +298,36 @@ services:
         aliases:
           - dc3-driver-mqtt
 
+  edge-gateway:
+    build:
+      context: ../dc3-driver/dc3-driver-edge-gateway/
+      dockerfile: ./Dockerfile
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-edge-gateway:2023.4.0.dev
+    restart: on-failure
+    environment:
+      - NODE_ENV=test
+    container_name: dc3-driver-edge-gateway
+    hostname: dc3-driver-edge-gateway
+    volumes:
+      - logs:/dc3-driver/dc3-driver-edge-gateway/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-edge-gateway
+
   modbus-tcp:
     build:
       context: ../dc3-driver/dc3-driver-modbus-tcp/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2023.4.0.dev
     restart: on-failure
-    ports:
-      - '8604:8604'
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
@@ -307,20 +342,18 @@ services:
         aliases:
           - dc3-driver-modbus-tcp
 
-  edge-gateway:
+  weather-amap:
     build:
-      context: ../dc3-driver/dc3-driver-edge-gateway/
+      context: ../dc3-driver/dc3-driver-weather-amap/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-edge-gateway:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-weather-amap:2023.4.0.dev
     restart: on-failure
-    ports:
-      - '8702:8702'
     environment:
-      - NODE_ENV=dev
-    container_name: dc3-driver-edge-gateway
-    hostname: dc3-driver-edge-gateway
+      - NODE_ENV=test
+    container_name: dc3-driver-weather-amap
+    hostname: dc3-driver-weather-amap
     volumes:
-      - logs:/dc3-driver/dc3-driver-edge-gateway/dc3/logs
+      - logs:/dc3-driver/dc3-driver-weather-amap/dc3/logs
     logging:
       driver: json-file
       options:
@@ -329,7 +362,7 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-driver-edge-gateway
+          - dc3-driver-weather-amap
 
 volumes:
   logs:

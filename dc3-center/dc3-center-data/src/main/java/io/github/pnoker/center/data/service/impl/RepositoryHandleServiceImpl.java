@@ -41,6 +41,8 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
 
     @Value("${data.point.sava.influxdb.enable}")
     private Boolean enableInfluxdb;
+    @Value("${data.point.sava.tdengine.enable}")
+    private Boolean enableTDengine;
     @Value("${data.point.sava.opentsdb.enable}")
     private Boolean enableOpentsdb;
     @Value("${data.point.sava.elasticsearch.enable}")
@@ -61,7 +63,14 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
 
         // 保存单个数据到 Influxdb
         if (Boolean.TRUE.equals(enableInfluxdb)) {
-            // nothing to do
+            RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.INFLUXDB);
+            savePointValueToRepository(pointValue, repositoryService);
+        }
+
+        // 保存单个数据到 TDengine
+        if (Boolean.TRUE.equals(enableTDengine)) {
+            RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.TDENGINE);
+            savePointValueToRepository(pointValue, repositoryService);
         }
 
         // 保存单个数据到 Opentsdb
@@ -83,23 +92,30 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
 
         group.forEach((deviceId, values) -> {
             // 保存批量数据到 Redis & Mongo
-            savePointValuesToRepository(deviceId, pointValues, redisRepositoryService, mongoRepositoryService);
+            savePointValuesToRepository(deviceId, values, redisRepositoryService, mongoRepositoryService);
 
             // 保存批量数据到 Influxdb
             if (Boolean.TRUE.equals(enableInfluxdb)) {
-                // nothing to do
+                RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.INFLUXDB);
+                savePointValuesToRepository(deviceId, values, repositoryService);
+            }
+
+            // 保存批量数据到 tdengine
+            if (Boolean.TRUE.equals(enableTDengine)) {
+                RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.INFLUXDB);
+                savePointValuesToRepository(deviceId, values, repositoryService);
             }
 
             // 保存批量数据到 Opentsdb
             if (Boolean.TRUE.equals(enableOpentsdb)) {
                 RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_OPENTSDB);
-                savePointValuesToRepository(deviceId, pointValues, repositoryService);
+                savePointValuesToRepository(deviceId, values, repositoryService);
             }
 
             // 保存批量数据到 Elasticsearch
             if (Boolean.TRUE.equals(enableElasticsearch)) {
                 RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_ELASTICSEARCH);
-                savePointValuesToRepository(deviceId, pointValues, repositoryService);
+                savePointValuesToRepository(deviceId, values, repositoryService);
             }
         });
     }

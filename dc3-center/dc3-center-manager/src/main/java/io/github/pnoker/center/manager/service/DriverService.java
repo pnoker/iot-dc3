@@ -18,8 +18,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.enums.DriverTypeFlagEnum;
-import io.github.pnoker.common.model.Driver;
+import io.github.pnoker.common.model.DriverDO;
 
 import java.util.List;
 import java.util.Set;
@@ -30,34 +29,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverService extends Service<Driver, DriverPageQuery> {
-
-    /**
-     * 根据 驱动ServiceName 查询 驱动
-     *
-     * @param serviceName Driver Service Name
-     * @return Driver
-     */
-    Driver selectByServiceName(String serviceName);
-
-    /**
-     * 根据 驱动 Host 、 Port 查询 驱动
-     *
-     * @param type     Driver Type
-     * @param host     Driver Service Host
-     * @param port     Driver Service Port
-     * @param tenantId 租户ID
-     * @return Driver
-     */
-    Driver selectByHostPort(DriverTypeFlagEnum type, String host, Integer port, String tenantId);
-
-    /**
-     * 根据 驱动Id 查询 驱动
-     *
-     * @param deviceId 设备ID
-     * @return Driver
-     */
-    Driver selectByDeviceId(String deviceId);
+public interface DriverService extends Service<DriverDO, DriverPageQuery> {
 
     /**
      * 根据 驱动Id集 查询 驱动集
@@ -65,7 +37,17 @@ public interface DriverService extends Service<Driver, DriverPageQuery> {
      * @param ids Driver ID Array
      * @return Driver Array
      */
-    List<Driver> selectByIds(Set<String> ids);
+    List<DriverDO> selectByIds(Set<String> ids);
+
+    /**
+     * 根据 驱动ServiceName 查询 驱动
+     *
+     * @param serviceName    驱动服务名称
+     * @param tenantId       租户ID
+     * @param throwException Throw Exception
+     * @return Driver
+     */
+    DriverDO selectByServiceName(String serviceName, String tenantId, boolean throwException);
 
     /**
      * 根据 模版Id 查询 驱动集
@@ -73,6 +55,15 @@ public interface DriverService extends Service<Driver, DriverPageQuery> {
      * @param profileId Profile ID
      * @return Driver Array
      */
-    List<Driver> selectByProfileId(String profileId);
+    List<DriverDO> selectByProfileId(String profileId);
 
+    /**
+     * 根据 驱动Id 查询 驱动
+     *
+     * @param deviceId 设备ID
+     * @return Driver
+     */
+    DriverDO selectByDeviceId(String deviceId);
+
+    Long count();
 }

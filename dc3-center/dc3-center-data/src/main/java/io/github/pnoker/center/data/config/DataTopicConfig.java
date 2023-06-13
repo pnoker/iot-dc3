@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.config;
 
-import io.github.pnoker.common.config.TopicConfig;
+import io.github.pnoker.common.config.ExchangeConfig;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass(TopicConfig.class)
+@ConditionalOnClass(ExchangeConfig.class)
 public class DataTopicConfig {
 
     @Resource
@@ -57,10 +57,12 @@ public class DataTopicConfig {
 
     @Bean
     Binding driverEventBinding(Queue driverEventQueue) {
-        return BindingBuilder
+        Binding binding = BindingBuilder
                 .bind(driverEventQueue)
                 .to(eventExchange)
                 .with(RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + SymbolConstant.ASTERISK);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        return binding;
     }
 
     @Bean
@@ -73,10 +75,12 @@ public class DataTopicConfig {
 
     @Bean
     Binding deviceEventBinding(Queue deviceEventQueue) {
-        return BindingBuilder
+        Binding binding = BindingBuilder
                 .bind(deviceEventQueue)
                 .to(eventExchange)
                 .with(RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + SymbolConstant.ASTERISK);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        return binding;
     }
 
     @Bean
@@ -89,10 +93,12 @@ public class DataTopicConfig {
 
     @Bean
     Binding pointValueBinding(Queue pointValueQueue) {
-        return BindingBuilder
+        Binding binding = BindingBuilder
                 .bind(pointValueQueue)
                 .to(valueExchange)
                 .with(RabbitConstant.ROUTING_POINT_VALUE_PREFIX + SymbolConstant.ASTERISK);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        return binding;
     }
 
 }

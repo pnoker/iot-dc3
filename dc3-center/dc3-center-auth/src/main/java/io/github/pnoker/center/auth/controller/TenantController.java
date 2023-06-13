@@ -54,16 +54,13 @@ public class TenantController {
      * @return {@link Tenant}
      */
     @PostMapping("/add")
-    public R<Tenant> add(@Validated(Insert.class) @RequestBody Tenant tenant) {
+    public R<String> add(@Validated(Insert.class) @RequestBody Tenant tenant) {
         try {
-            Tenant add = tenantService.add(tenant);
-            if (ObjectUtil.isNotNull(add)) {
-                return R.ok(add);
-            }
+            tenantService.add(tenant);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -73,9 +70,10 @@ public class TenantController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            return tenantService.delete(id) ? R.ok() : R.fail();
+            tenantService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -92,17 +90,14 @@ public class TenantController {
      * @return {@link Tenant}
      */
     @PostMapping("/update")
-    public R<Tenant> update(@Validated(Update.class) @RequestBody Tenant tenant) {
+    public R<String> update(@Validated(Update.class) @RequestBody Tenant tenant) {
         try {
             tenant.setTenantName(null);
-            Tenant update = tenantService.update(tenant);
-            if (ObjectUtil.isNotNull(update)) {
-                return R.ok(update);
-            }
+            tenantService.update(tenant);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**

@@ -35,6 +35,7 @@
 
 ```yaml
 schedule:
+    # 定时读数据
     read:
       enable: true
       corn: '0/30 * * * * ?'

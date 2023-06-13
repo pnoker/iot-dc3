@@ -22,7 +22,6 @@
         dd.id,
         dd.device_name,
         dd.device_code,
-        dd.multi_flag,
         dd.driver_id,
         dd.group_id,
         dd.enable_flag,
@@ -33,7 +32,7 @@
         dd.create_time,
         dd.operator_id,
         dd.operator_name,
-        dd.update_time,
+        dd.operate_time,
         dd.deleted
         from dc3_device dd
         <if test="profileId != null and profileId != ''">

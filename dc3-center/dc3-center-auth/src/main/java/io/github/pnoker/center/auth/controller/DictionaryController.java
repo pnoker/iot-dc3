@@ -18,6 +18,7 @@ package io.github.pnoker.center.auth.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.service.DictionaryService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
@@ -70,7 +71,7 @@ public class DictionaryController {
      * @return 字典列表
      */
     @GetMapping("/user")
-    public R<List<Dictionary>> userDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<List<Dictionary>> userDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             List<Dictionary> dictionaryList = dictionaryService.userDictionary(tenantId);
             if (ObjectUtil.isNotNull(dictionaryList)) {
@@ -89,7 +90,7 @@ public class DictionaryController {
      * @return 字典列表
      */
     @GetMapping("/black_ip")
-    public R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             List<Dictionary> dictionaryList = dictionaryService.blackIpDictionary(tenantId);
             if (ObjectUtil.isNotNull(dictionaryList)) {

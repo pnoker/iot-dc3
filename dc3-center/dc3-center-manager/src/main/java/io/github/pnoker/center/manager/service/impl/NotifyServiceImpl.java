@@ -53,8 +53,8 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public void notifyDriverProfile(MetadataCommandTypeEnum command, Profile profile) {
         try {
-            List<Driver> drivers = driverService.selectByProfileId(profile.getId());
-            drivers.forEach(driver -> {
+            List<DriverDO> entityDOS = driverService.selectByProfileId(profile.getId());
+            entityDOS.forEach(driver -> {
                 DriverMetadataDTO entityDTO = new DriverMetadataDTO(
                         MetadataTypeEnum.PROFILE,
                         command,
@@ -73,8 +73,8 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public void notifyDriverPoint(MetadataCommandTypeEnum command, Point point) {
         try {
-            List<Driver> drivers = driverService.selectByProfileId(point.getProfileId());
-            drivers.forEach(driver -> {
+            List<DriverDO> entityDOS = driverService.selectByProfileId(point.getProfileId());
+            entityDOS.forEach(driver -> {
                 DriverMetadataDTO entityDTO = new DriverMetadataDTO(
                         MetadataTypeEnum.POINT,
                         command,
@@ -93,13 +93,13 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public void notifyDriverDevice(MetadataCommandTypeEnum command, Device device) {
         try {
-            Driver driver = driverService.selectById(device.getDriverId());
+            DriverDO entityDO = driverService.selectById(device.getDriverId());
             DriverMetadataDTO entityDTO = new DriverMetadataDTO(
                     MetadataTypeEnum.DEVICE,
                     command,
                     JsonUtil.toJsonString(device)
             );
-            notifyDriver(driver, entityDTO);
+            notifyDriver(entityDO, entityDTO);
         } catch (Exception e) {
             log.error("Notify driver {} device: {}", command, e.getMessage());
         }
@@ -109,15 +109,15 @@ public class NotifyServiceImpl implements NotifyService {
      * {@inheritDoc}
      */
     @Override
-    public void notifyDriverDriverInfo(MetadataCommandTypeEnum command, DriverInfo driverInfo) {
+    public void notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfig driverAttributeConfig) {
         try {
-            Driver driver = driverService.selectByDeviceId(driverInfo.getDeviceId());
+            DriverDO entityDO = driverService.selectByDeviceId(driverAttributeConfig.getDeviceId());
             DriverMetadataDTO entityDTO = new DriverMetadataDTO(
-                    MetadataTypeEnum.DRIVER_INFO,
+                    MetadataTypeEnum.DRIVER_ATTRIBUTE_CONFIG,
                     command,
-                    JsonUtil.toJsonString(driverInfo)
+                    JsonUtil.toJsonString(driverAttributeConfig)
             );
-            notifyDriver(driver, entityDTO);
+            notifyDriver(entityDO, entityDTO);
         } catch (Exception e) {
             log.error("Notify driver {} driverInfo: {}", command, e.getMessage());
         }
@@ -127,15 +127,15 @@ public class NotifyServiceImpl implements NotifyService {
      * {@inheritDoc}
      */
     @Override
-    public void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointInfo pointInfo) {
+    public void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointAttributeConfig pointAttributeConfig) {
         try {
-            Driver driver = driverService.selectByDeviceId(pointInfo.getDeviceId());
+            DriverDO entityDO = driverService.selectByDeviceId(pointAttributeConfig.getDeviceId());
             DriverMetadataDTO entityDTO = new DriverMetadataDTO(
-                    MetadataTypeEnum.POINT_INFO,
+                    MetadataTypeEnum.POINT_ATTRIBUTE_CONFIG,
                     command,
-                    JsonUtil.toJsonString(pointInfo)
+                    JsonUtil.toJsonString(pointAttributeConfig)
             );
-            notifyDriver(driver, entityDTO);
+            notifyDriver(entityDO, entityDTO);
         } catch (Exception e) {
             log.error("Notify driver {} pointInfo: {}", command, e.getMessage());
         }
@@ -144,12 +144,12 @@ public class NotifyServiceImpl implements NotifyService {
     /**
      * notify driver
      *
-     * @param driver    Driver
+     * @param entityDO  Driver
      * @param entityDTO DriverMetadataDTO
      */
-    private void notifyDriver(Driver driver, DriverMetadataDTO entityDTO) {
-        log.info("Notify driver[{}]: {}", driver.getServiceName(), entityDTO);
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA, RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driver.getServiceName(), entityDTO);
+    private void notifyDriver(DriverDO entityDO, DriverMetadataDTO entityDTO) {
+        log.info("Notify driver[{}]: {}", entityDO.getServiceName(), entityDTO);
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA, RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + entityDO.getServiceName(), entityDTO);
     }
 
 }

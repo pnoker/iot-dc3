@@ -26,7 +26,7 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.gateway.entity.bean.TokenRequestHeader;
+import io.github.pnoker.gateway.entity.bo.RequestHeaderBO;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -66,7 +66,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
         private static AuthenticGatewayFilter gatewayFilter;
 
         @GrpcClient(AuthServiceConstant.SERVICE_NAME)
-        private UserApiGrpc.UserApiBlockingStub userApiBlockingStub;
+        private UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub;
         @GrpcClient(AuthServiceConstant.SERVICE_NAME)
         private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
         @GrpcClient(AuthServiceConstant.SERVICE_NAME)
@@ -99,21 +99,22 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request user header");
                 }
 
-                RUserDTO rUserDTO = gatewayFilter.userApiBlockingStub.selectByName(NameQuery.newBuilder().setName(user).build());
+                RUserLoginDTO rUserDTO = gatewayFilter.userLoginApiBlockingStub.selectByName(NameQuery.newBuilder().setName(user).build());
                 if (!rUserDTO.getResult().getOk() || !EnableFlagDTOEnum.ENABLE.equals(rUserDTO.getData().getEnableFlag())) {
                     throw new UnAuthorizedException("Invalid request user header");
                 }
 
                 String tokenHeader = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
-                TokenRequestHeader token = JsonUtil.parseObject(DecodeUtil.decode(tokenHeader), TokenRequestHeader.class);
-                if (ObjectUtil.isEmpty(token) || !CharSequenceUtil.isAllNotEmpty(token.getSalt(), token.getToken())) {
+                RequestHeaderBO entityBO = JsonUtil.parseObject(DecodeUtil.decode(tokenHeader), RequestHeaderBO.class);
+                if (ObjectUtil.isEmpty(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
                     throw new UnAuthorizedException("Invalid request token header");
                 }
 
-                LoginQuery login = LoginQuery.newBuilder().setTenant(rTenantDTO.getData().getTenantCode())
+                LoginQuery login = LoginQuery.newBuilder()
+                        .setTenant(rTenantDTO.getData().getTenantCode())
                         .setName(rUserDTO.getData().getLoginName())
-                        .setSalt(token.getSalt())
-                        .setToken(token.getToken()).build();
+                        .setSalt(entityBO.getSalt())
+                        .setToken(entityBO.getToken()).build();
                 RTokenDTO rTokenDTO = gatewayFilter.tokenApiBlockingStub.checkTokenValid(login);
                 if (!rTokenDTO.getResult().getOk()) {
                     throw new UnAuthorizedException("Invalid request token header");

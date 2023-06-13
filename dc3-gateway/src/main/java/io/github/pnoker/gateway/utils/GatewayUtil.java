@@ -70,7 +70,7 @@ public class GatewayUtil {
      */
     public static String getRequestHeader(ServerHttpRequest request, String key) {
         String header = request.getHeaders().getFirst(key);
-        if (!CharSequenceUtil.isNotBlank(header)) {
+        if (!CharSequenceUtil.isNotEmpty(header)) {
             throw new NotFoundException("Invalid request header of " + key);
         }
         return header;
