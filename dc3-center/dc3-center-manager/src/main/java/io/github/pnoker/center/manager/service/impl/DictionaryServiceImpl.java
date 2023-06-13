@@ -23,13 +23,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DictionaryPageQuery;
 import io.github.pnoker.center.manager.entity.query.PointPageQuery;
-import io.github.pnoker.center.manager.mapper.*;
+import io.github.pnoker.center.manager.mapper.DeviceMapper;
+import io.github.pnoker.center.manager.mapper.DriverMapper;
+import io.github.pnoker.center.manager.mapper.ProfileMapper;
 import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Dictionary;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Driver;
+import io.github.pnoker.common.model.DriverDO;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.model.Profile;
 import lombok.extern.slf4j.Slf4j;
@@ -49,28 +51,24 @@ import java.util.stream.Collectors;
 public class DictionaryServiceImpl implements DictionaryService {
 
     @Resource
-    private PointService pointService;
-
-    @Resource
     private DriverMapper driverMapper;
-    @Resource
-    private DriverAttributeMapper driverAttributeMapper;
-    @Resource
-    private PointAttributeMapper pointAttributeMapper;
     @Resource
     private ProfileMapper profileMapper;
     @Resource
     private DeviceMapper deviceMapper;
+
+    @Resource
+    private PointService pointService;
 
     @Override
     public Page<Dictionary> driverDictionary(DictionaryPageQuery dictionaryPageQuery) {
         if (ObjectUtil.isNull(dictionaryPageQuery.getPage())) {
             dictionaryPageQuery.setPage(new Pages());
         }
-        LambdaQueryWrapper<Driver> queryWrapper = Wrappers.<Driver>query().lambda();
-        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getLabel()), Driver::getDriverName, dictionaryPageQuery.getLabel());
-        queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getTenantId()), Driver::getTenantId, dictionaryPageQuery.getTenantId());
-        Page<Driver> driverPage = driverMapper.selectPage(dictionaryPageQuery.getPage().convert(), queryWrapper);
+        LambdaQueryWrapper<DriverDO> queryWrapper = Wrappers.<DriverDO>query().lambda();
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getLabel()), DriverDO::getDriverName, dictionaryPageQuery.getLabel());
+        queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getTenantId()), DriverDO::getTenantId, dictionaryPageQuery.getTenantId());
+        Page<DriverDO> driverPage = driverMapper.selectPage(dictionaryPageQuery.getPage().convert(), queryWrapper);
         List<Dictionary> dictionaryList = driverPage.getRecords().parallelStream().map(driver -> {
             Dictionary dictionary = new Dictionary();
             dictionary.setLabel(driver.getDriverName());
@@ -89,7 +87,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             dictionaryPageQuery.setPage(new Pages());
         }
         LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        queryWrapper.like(CharSequenceUtil.isNotBlank(dictionaryPageQuery.getLabel()), Device::getDeviceName, dictionaryPageQuery.getLabel());
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getLabel()), Device::getDeviceName, dictionaryPageQuery.getLabel());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getParentValue1()), Device::getDriverId, dictionaryPageQuery.getParentValue1());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getTenantId()), Device::getTenantId, dictionaryPageQuery.getTenantId());
         Page<Device> devicePage = deviceMapper.selectPage(dictionaryPageQuery.getPage().convert(), queryWrapper);

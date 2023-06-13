@@ -20,7 +20,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-driver</artifactId>
-        <version>2023.2.2</version>
+        <version>2023.4.4</version>
     </parent>
 
     <artifactId>dc3-driver-modbus-tcp</artifactId>
@@ -30,37 +30,11 @@
 
     <dependencies>
 
-        <!-- Modbus -->
         <dependency>
-            <groupId>com.infiniteautomation</groupId>
-            <artifactId>modbus4j</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
 
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>ias-snapshots</id>
-            <name>Infinite Automation Snapshot Repository</name>
-            <url>https://maven.mangoautomation.net/repository/ias-snapshot</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>ias-releases</id>
-            <name>Infinite Automation Release Repository</name>
-            <url>https://maven.mangoautomation.net/repository/ias-release</url>
-        </repository>
-    </repositories>
 
 </project>

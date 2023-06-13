@@ -26,9 +26,7 @@ import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Tenant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,36 +47,36 @@ public class TenantServiceImpl implements TenantService {
     private TenantMapper tenantMapper;
 
     @Override
-    public Tenant add(Tenant tenant) {
-        Tenant select = selectByCode(tenant.getTenantName());
+    public void add(Tenant entityDO) {
+        Tenant select = selectByCode(entityDO.getTenantName());
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The tenant already exists");
         }
-        if (tenantMapper.insert(tenant) > 0) {
-            return tenantMapper.selectById(tenant.getId());
+
+        if (tenantMapper.insert(entityDO) < 1) {
+            throw new AddException("The tenant {} add failed", entityDO.getTenantName());
         }
-        throw new ServiceException("The tenant add failed");
     }
 
     @Override
-    public Boolean delete(String id) {
+    public void delete(String id) {
         Tenant tenant = selectById(id);
         if (ObjectUtil.isNull(tenant)) {
-            throw new NotFoundException();
+            throw new NotFoundException("The tenant does not exist");
         }
-        return tenantMapper.deleteById(id) > 0;
+
+        if (tenantMapper.deleteById(id) < 1) {
+            throw new DeleteException("The tenant delete failed");
+        }
     }
 
     @Override
-    public Tenant update(Tenant tenant) {
-        tenant.setTenantName(null);
-        tenant.setUpdateTime(null);
-        if (tenantMapper.updateById(tenant) > 0) {
-            Tenant select = tenantMapper.selectById(tenant.getId());
-            tenant.setTenantName(select.getTenantName());
-            return select;
+    public void update(Tenant entityDO) {
+        entityDO.setTenantName(null);
+        entityDO.setOperateTime(null);
+        if (tenantMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The tenant update failed");
         }
-        throw new ServiceException("The tenant update failed");
     }
 
     @Override
@@ -96,18 +94,17 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Page<Tenant> list(TenantPageQuery tenantPageQuery) {
-        if (ObjectUtil.isNull(tenantPageQuery.getPage())) {
-            tenantPageQuery.setPage(new Pages());
+    public Page<Tenant> list(TenantPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return tenantMapper.selectPage(tenantPageQuery.getPage().convert(), fuzzyQuery(tenantPageQuery));
+        return tenantMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    @Override
-    public LambdaQueryWrapper<Tenant> fuzzyQuery(TenantPageQuery tenantPageQuery) {
+    private LambdaQueryWrapper<Tenant> fuzzyQuery(TenantPageQuery query) {
         LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
-        if (ObjectUtil.isNotNull(tenantPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(tenantPageQuery.getTenantName()), Tenant::getTenantName, tenantPageQuery.getTenantName());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getTenantName()), Tenant::getTenantName, query.getTenantName());
         }
         return queryWrapper;
     }

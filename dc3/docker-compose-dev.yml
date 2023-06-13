@@ -17,8 +17,39 @@
 version: '3'
 
 services:
+  register:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:4.0.0-nacos
+    restart: on-failure
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9555:9555"
+    environment:
+      - PREFER_HOST_MODE=hostname
+      - MODE=standalone
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - JVM_XMS=512m
+      - JVM_XMX=512m
+      - JVM_XMN=256m
+      - JVM_MS=128m
+      - JVM_MMS=256m
+    container_name: dc3-center-register
+    hostname: dc3-center-register
+    depends_on:
+      - mysql
+    volumes:
+      - logs:/home/nacos/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-center-register
   mysql:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.4.0.dev
     restart: on-failure
     ports:
       - '33306:3306'
@@ -39,7 +70,7 @@ services:
           - dc3-mysql
 
   mongo:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.4.0.dev
     restart: on-failure
     ports:
       - '37017:27017'
@@ -59,7 +90,7 @@ services:
           - dc3-mongo
 
   redis:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.4.0.dev
     restart: on-failure
     ports:
       - '36379:6379'
@@ -78,7 +109,7 @@ services:
           - dc3-redis
 
   rabbitmq:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.2.2.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.4.0.dev
     restart: on-failure
     ports:
       - '5672:5672'
@@ -100,33 +131,8 @@ services:
         aliases:
           - dc3-rabbitmq
 
-  register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.1.9.nacos.dev
-    restart: on-failure
-    ports:
-      - "8848:8848"
-      - "9848:9848"
-      - "9555:9555"
-    environment:
-      - PREFER_HOST_MODE=hostname
-      - MODE=standalone
-      - SPRING_DATASOURCE_PLATFORM=mysql
-    container_name: dc3-center-register
-    hostname: dc3-center-register
-    volumes:
-      - logs:/home/nacos/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: '20m'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-center-register
-
   portainer:
-    image: portainer/portainer:alpine
+    image: portainer/portainer:1.24.2
     command: -H unix:///var/run/docker.sock
     restart: on-failure
     ports:

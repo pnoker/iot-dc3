@@ -15,9 +15,10 @@
 #
 
 driver:
-  name: ListeningVirtualDriver
+  tenant: default
+  name: 模拟Tcp/Udp驱动
+  code: ListeningVirtualDriver
   type: DRIVER
-  project: @project.artifactId@
   remark: @project.description@
   custom:
     tcp:
@@ -25,6 +26,7 @@ driver:
     udp:
       port: 6271
   schedule:
+    # 定时读数据
     read:
       enable: false
       corn: '0/30 * * * * ?'
@@ -35,25 +37,27 @@ driver:
     - display-name: 关键字
       attribute-name: key
       attribute-type-flag: STRING
-      value: 62
+      default-value: 62
       remark: 报文关键字
     - display-name: 起始字节
       attribute-name: start
       attribute-type-flag: INT
-      value: 0
+      default-value: 0
       remark: 起始字节，包含该字节
     - display-name: 结束字节
       attribute-name: end
       attribute-type-flag: INT
-      value: 8
+      default-value: 8
       remark: 结束字节，不包含该字节
     - display-name: 类型
       attribute-name: type
       attribute-type-flag: STRING
-      value: string
+      default-value: string
       remark: 解析类型，short、int、long、float、double、boolean、string
 
 spring:
+  application:
+    name: @project.artifactId@
   profiles:
     active:
       - ${NODE_ENV:dev}

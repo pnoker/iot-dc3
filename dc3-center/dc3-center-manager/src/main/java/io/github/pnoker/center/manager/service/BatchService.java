@@ -29,9 +29,10 @@ public interface BatchService {
     /**
      * 获取驱动元数据
      *
-     * @param serviceName Driver Service Name
+     * @param serviceName 驱动服务名称
+     * @param tenantId    租户ID
      * @return DriverMetadata
      */
-    DriverMetadata batchDriverMetadata(String serviceName);
+    DriverMetadata batchDriverMetadata(String serviceName, String tenantId);
 
 }

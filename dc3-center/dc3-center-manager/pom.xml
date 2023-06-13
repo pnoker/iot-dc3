@@ -20,7 +20,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>2023.2.2</version>
+        <version>2023.4.4</version>
     </parent>
 
     <artifactId>dc3-center-manager</artifactId>
@@ -42,6 +42,13 @@
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
+        <!-- DC3 Api Data -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-data</artifactId>
+        </dependency>
+
+
         <!-- DC3 Common RabbitMQ -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -58,6 +65,12 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-redis</artifactId>
+        </dependency>
+
+        <!-- DC3 Common Mongo -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-mongo</artifactId>
         </dependency>
 
     </dependencies>

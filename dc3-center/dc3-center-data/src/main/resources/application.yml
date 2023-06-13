@@ -46,6 +46,8 @@ data:
     sava:
       influxdb:
         enable: false
+      tdengine:
+        enable: false
       opentsdb:
         enable: false
         host: dc3-opentsdb
@@ -56,9 +58,5 @@ data:
         port: 9200
 
 logging:
-  level:
-    io.github.pnoker: DEBUG
-    io.github.pnoker.center.data.service.job: INFO
-    io.github.pnoker.center.data.service.rabbit: INFO
   file:
     name: dc3/logs/center/data/${spring.application.name}.log

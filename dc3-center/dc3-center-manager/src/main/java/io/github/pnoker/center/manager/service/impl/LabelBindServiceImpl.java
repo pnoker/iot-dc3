@@ -25,8 +25,10 @@ import io.github.pnoker.center.manager.entity.query.LabelBindPageQuery;
 import io.github.pnoker.center.manager.mapper.LabelBindMapper;
 import io.github.pnoker.center.manager.service.LabelBindService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,33 +52,37 @@ public class LabelBindServiceImpl implements LabelBindService {
      * {@inheritDoc}
      */
     @Override
-    public LabelBind add(LabelBind labelBind) {
-        if (labelBindMapper.insert(labelBind) > 0) {
-            return labelBindMapper.selectById(labelBind.getId());
+    public void add(LabelBind entityDO) {
+        if (labelBindMapper.insert(entityDO) < 1) {
+            throw new AddException("The label bind add failed");
         }
-        throw new ServiceException("The label bind add failed");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Boolean delete(String id) {
-        selectById(id);
-        return labelBindMapper.deleteById(id) > 0;
+    public void delete(String id) {
+        LabelBind labelBind = selectById(id);
+        if (ObjectUtil.isNull(labelBind)) {
+            throw new NotFoundException("The label bind does not exist");
+        }
+
+        if (labelBindMapper.deleteById(id) < 1) {
+            throw new DeleteException("The label bind delete failed");
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LabelBind update(LabelBind labelBind) {
-        selectById(labelBind.getId());
-        labelBind.setUpdateTime(null);
-        if (labelBindMapper.updateById(labelBind) > 0) {
-            return labelBindMapper.selectById(labelBind.getId());
+    public void update(LabelBind entityDO) {
+        selectById(entityDO.getId());
+        entityDO.setOperateTime(null);
+        if (labelBindMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The label bind update failed");
         }
-        throw new ServiceException("The label bind update failed");
     }
 
     /**
@@ -95,22 +101,18 @@ public class LabelBindServiceImpl implements LabelBindService {
      * {@inheritDoc}
      */
     @Override
-    public Page<LabelBind> list(LabelBindPageQuery labelBindPageQuery) {
-        if (ObjectUtil.isNull(labelBindPageQuery.getPage())) {
-            labelBindPageQuery.setPage(new Pages());
+    public Page<LabelBind> list(LabelBindPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return labelBindMapper.selectPage(labelBindPageQuery.getPage().convert(), fuzzyQuery(labelBindPageQuery));
+        return labelBindMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindPageQuery labelBindPageQuery) {
+    private LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindPageQuery query) {
         LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
-        if (ObjectUtil.isNotNull(labelBindPageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelBindPageQuery.getLabelId()), LabelBind::getLabelId, labelBindPageQuery.getLabelId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelBindPageQuery.getEntityId()), LabelBind::getEntityId, labelBindPageQuery.getEntityId());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getLabelId()), LabelBind::getLabelId, query.getLabelId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getEntityId()), LabelBind::getEntityId, query.getEntityId());
         }
         return queryWrapper;
     }

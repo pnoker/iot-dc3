@@ -27,8 +27,7 @@ import io.github.pnoker.center.manager.mapper.LabelMapper;
 import io.github.pnoker.center.manager.service.LabelBindService;
 import io.github.pnoker.center.manager.service.LabelService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Label;
 import io.github.pnoker.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
@@ -56,19 +55,18 @@ public class LabelServiceImpl implements LabelService {
      * {@inheritDoc}
      */
     @Override
-    public Label add(Label label) {
-        selectByName(label.getLabelName(), label.getTenantId());
-        if (labelMapper.insert(label) > 0) {
-            return labelMapper.selectById(label.getId());
+    public void add(Label entityDO) {
+        selectByName(entityDO.getLabelName(), entityDO.getTenantId());
+        if (labelMapper.insert(entityDO) < 1) {
+            throw new AddException("The label {} add failed", entityDO.getLabelName());
         }
-        throw new ServiceException("The label add failed");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Boolean delete(String id) {
+    public void delete(String id) {
         LabelBindPageQuery labelBindPageQuery = new LabelBindPageQuery();
         labelBindPageQuery.setLabelId(id);
         Page<LabelBind> labelBindPage = labelBindService.list(labelBindPageQuery);
@@ -77,24 +75,24 @@ public class LabelServiceImpl implements LabelService {
         }
         Label label = selectById(id);
         if (ObjectUtil.isNull(label)) {
-            throw new NotFoundException();
+            throw new NotFoundException("The label does not exist");
         }
-        return labelMapper.deleteById(id) > 0;
+
+        if (labelMapper.deleteById(id) < 1) {
+            throw new DeleteException("The label delete failed");
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Label update(Label label) {
-        selectById(label.getId());
-        label.setUpdateTime(null);
-        if (labelMapper.updateById(label) > 0) {
-            Label select = labelMapper.selectById(label.getId());
-            label.setLabelName(select.getLabelName());
-            return select;
+    public void update(Label entityDO) {
+        selectById(entityDO.getId());
+        entityDO.setOperateTime(null);
+        if (labelMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The label update failed");
         }
-        throw new ServiceException("The label update failed");
     }
 
     /**
@@ -129,23 +127,19 @@ public class LabelServiceImpl implements LabelService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Label> list(LabelPageQuery labelPageQuery) {
-        if (ObjectUtil.isNull(labelPageQuery.getPage())) {
-            labelPageQuery.setPage(new Pages());
+    public Page<Label> list(LabelPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return labelMapper.selectPage(labelPageQuery.getPage().convert(), fuzzyQuery(labelPageQuery));
+        return labelMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LambdaQueryWrapper<Label> fuzzyQuery(LabelPageQuery labelPageQuery) {
+    private LambdaQueryWrapper<Label> fuzzyQuery(LabelPageQuery query) {
         LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
-        if (ObjectUtil.isNotNull(labelPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(labelPageQuery.getLabelName()), Label::getLabelName, labelPageQuery.getLabelName());
-            queryWrapper.eq(CharSequenceUtil.isNotBlank(labelPageQuery.getColor()), Label::getColor, labelPageQuery.getColor());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(labelPageQuery.getTenantId()), Label::getTenantId, labelPageQuery.getTenantId());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getLabelName()), Label::getLabelName, query.getLabelName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getColor()), Label::getColor, query.getColor());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), Label::getTenantId, query.getTenantId());
         }
         return queryWrapper;
     }

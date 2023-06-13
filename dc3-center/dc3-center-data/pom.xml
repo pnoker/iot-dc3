@@ -20,7 +20,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>2023.2.2</version>
+        <version>2023.4.4</version>
     </parent>
 
     <artifactId>dc3-center-data</artifactId>
@@ -30,14 +30,6 @@
     </description>
 
     <dependencies>
-
-        <!-- Spring Configuration-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <scope>compile</scope>
-            <optional>true</optional>
-        </dependency>
 
         <!-- Elasticsearch -->
         <dependency>
@@ -84,6 +76,18 @@
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-redis</artifactId>
         </dependency>
+
+        <!-- DC3 Common Influx -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-influx</artifactId>
+        </dependency>
+
+        <!-- DC3 Common tdengine -->
+        <!--<dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-tdengine</artifactId>
+        </dependency>-->
 
         <!-- DC3 Common Quartz -->
         <dependency>

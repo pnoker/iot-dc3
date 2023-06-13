@@ -32,7 +32,7 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 {
-  "deviceId": "1638973565432291330",
-  "pointId": "1638973497627172866",
-  "value": 10
+  "deviceId": "1659206052405596161",
+  "pointId": "1659205955026440194",
+  "value": 22
 }

@@ -8,6 +8,7 @@
 .vscode
 .settings
 .project
+.DS_Store
 
 dc3-api
 dc3-common

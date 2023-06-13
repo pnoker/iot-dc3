@@ -57,16 +57,13 @@ public class DriverAttributeController {
      * @return DriverAttribute
      */
     @PostMapping("/add")
-    public R<DriverAttribute> add(@Validated(Insert.class) @RequestBody DriverAttribute driverAttribute) {
+    public R<String> add(@Validated(Insert.class) @RequestBody DriverAttribute driverAttribute) {
         try {
-            DriverAttribute add = driverAttributeService.add(driverAttribute);
-            if (ObjectUtil.isNotNull(add)) {
-                return R.ok(add);
-            }
+            driverAttributeService.add(driverAttribute);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -76,9 +73,10 @@ public class DriverAttributeController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            return driverAttributeService.delete(id) ? R.ok() : R.fail();
+            driverAttributeService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -91,16 +89,13 @@ public class DriverAttributeController {
      * @return DriverAttribute
      */
     @PostMapping("/update")
-    public R<DriverAttribute> update(@Validated(Update.class) @RequestBody DriverAttribute driverAttribute) {
+    public R<String> update(@Validated(Update.class) @RequestBody DriverAttribute driverAttribute) {
         try {
-            DriverAttribute update = driverAttributeService.update(driverAttribute);
-            if (ObjectUtil.isNotNull(update)) {
-                return R.ok(update);
-            }
+            driverAttributeService.update(driverAttribute);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -131,7 +126,7 @@ public class DriverAttributeController {
     @GetMapping("/driver_id/{id}")
     public R<List<DriverAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
         try {
-            List<DriverAttribute> select = driverAttributeService.selectByDriverId(id);
+            List<DriverAttribute> select = driverAttributeService.selectByDriverId(id, true);
             if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }

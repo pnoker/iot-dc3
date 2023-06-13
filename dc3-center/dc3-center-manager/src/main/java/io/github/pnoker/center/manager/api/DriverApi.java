@@ -28,14 +28,13 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.Driver;
+import io.github.pnoker.common.model.DriverDO;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -58,7 +57,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
 
         DriverPageQuery pageQuery = buildPageQuery(request);
 
-        Page<Driver> driverPage = driverService.list(pageQuery);
+        Page<DriverDO> driverPage = driverService.list(pageQuery);
         if (ObjectUtil.isNull(driverPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -91,8 +90,8 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
         RDriverDTO.Builder builder = RDriverDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
-        Driver driver = driverService.selectByDeviceId(request.getDeviceId());
-        if (ObjectUtil.isNull(driver)) {
+        DriverDO entityDO = driverService.selectByDeviceId(request.getDeviceId());
+        if (ObjectUtil.isNull(entityDO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getMessage());
@@ -101,7 +100,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
 
-            DriverDTO driverDTO = buildDTOByDO(driver);
+            DriverDTO driverDTO = buildDTOByDO(entityDO);
 
             builder.setData(driverDTO);
         }
@@ -112,12 +111,35 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
     }
 
     /**
+     * DTO to Query
+     *
+     * @param request PageDriverQueryDTO
+     * @return DriverPageQuery
+     */
+    private DriverPageQuery buildPageQuery(PageDriverQueryDTO request) {
+        DriverPageQuery pageQuery = new DriverPageQuery();
+        Pages pages = new Pages();
+        pages.setCurrent(request.getPage().getCurrent());
+        pages.setSize(request.getPage().getSize());
+        pageQuery.setPage(pages);
+
+        DriverDTO driver = request.getDriver();
+        pageQuery.setDriverName(driver.getDriverName());
+        pageQuery.setServiceName(driver.getServiceName());
+        pageQuery.setServiceHost(driver.getServiceHost());
+        pageQuery.setTenantId(driver.getTenantId());
+        pageQuery.setDriverTypeFlag(DriverTypeFlagEnum.ofName(driver.getDriverTypeFlag().name()));
+        pageQuery.setEnableFlag(EnableFlagEnum.ofName(driver.getEnableFlag().name()));
+        return pageQuery;
+    }
+
+    /**
      * DO to DTO
      *
      * @param entityDO Driver
      * @return DriverDTO
      */
-    private DriverDTO buildDTOByDO(Driver entityDO) {
+    private DriverDTO buildDTOByDO(DriverDO entityDO) {
         DriverDTO.Builder builder = DriverDTO.newBuilder();
         BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
@@ -126,28 +148,8 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
         builder.setServiceName(entityDO.getServiceName());
         builder.setDriverTypeFlag(DriverTypeFlagDTOEnum.valueOf(entityDO.getDriverTypeFlag().name()));
         builder.setServiceHost(entityDO.getServiceHost());
-        builder.setServicePort(entityDO.getServicePort());
         builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
         builder.setTenantId(entityDO.getTenantId());
         return builder.build();
     }
-
-    private DriverPageQuery buildPageQuery(PageDriverQueryDTO request) {
-        DriverPageQuery pageQuery = new DriverPageQuery();
-        Pages pages = new Pages();
-        pages.setCurrent(request.getPage().getCurrent());
-        pages.setSize(request.getPage().getSize());
-        pageQuery.setPage(pages);
-
-        pageQuery.setDriverName(Optional.of(request.getDriver().getDriverName()).orElse(null));
-        pageQuery.setServiceName(Optional.of(request.getDriver().getServiceName()).orElse(null));
-        pageQuery.setServiceHost(Optional.of(request.getDriver().getServiceHost()).orElse(null));
-        pageQuery.setServicePort(Optional.of(request.getDriver().getServicePort()).orElse(null));
-        pageQuery.setDriverTypeFlag(DriverTypeFlagEnum.ofName(request.getDriver().getDriverTypeFlag().name()));
-        pageQuery.setEnableFlag(EnableFlagEnum.ofName(request.getDriver().getEnableFlag().name()));
-        pageQuery.setTenantId(Optional.of(request.getDriver().getTenantId()).orElse(null));
-
-        return pageQuery;
-    }
-
 }

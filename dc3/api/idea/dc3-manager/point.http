@@ -16,7 +16,6 @@
 
 ### --------------------- Point ---------------------
 ### 新增 Point
-#/manager/point/add
 POST http://{{dc3-manager}}/manager/point/add
 Accept: */*
 Content-Type: application/json
@@ -30,7 +29,6 @@ Cache-Control: no-cache
   "minimum": -999999,
   "maximum": 999999,
   "multiple": 1,
-  "accrue": 0,
   "format": "%.3f",
   "unit": "mm",
   "profileId": -1,
@@ -39,7 +37,6 @@ Cache-Control: no-cache
 
 
 ### 修改 Point
-#/manager/point/update
 POST http://{{dc3-manager}}/manager/point/update
 Accept: */*
 Content-Type: application/json
@@ -54,7 +51,6 @@ Cache-Control: no-cache
   "minimum": -999999,
   "maximum": 999999,
   "multiple": 1,
-  "accrue": 0,
   "format": "%.3f",
   "unit": "mm",
   "profileId": -1,
@@ -63,7 +59,6 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 Point
-#/manager/point/id/:id
 GET http://{{dc3-manager}}/manager/point/id/1
 Accept: */*
 Cache-Control: no-cache
@@ -71,7 +66,6 @@ Cache-Control: no-cache
 
 
 ### 分页查询 Point
-#/manager/point/list，支持name模糊查询，type\rw\accrue\profileId精准查询
 POST http://{{dc3-manager}}/manager/point/list
 Accept: */*
 Content-Type: application/json
@@ -92,7 +86,6 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 Point
-#/manager/point/delete/:id
 POST http://{{dc3-manager}}/manager/point/delete/1
 Accept: */*
 Content-Type: application/json
@@ -101,7 +94,6 @@ Cache-Control: no-cache
 
 ### --------------------- Point Attribute ---------------------
 ### 新增 PointAttribute
-#/manager/point_attribute/add
 POST http://{{dc3-manager}}/manager/point_attribute/add
 Accept: */*
 Content-Type: application/json
@@ -118,7 +110,6 @@ Cache-Control: no-cache
 
 
 ### 修改 PointAttribute
-#/manager/point_attribute/update
 POST http://{{dc3-manager}}/manager/point_attribute/update
 Accept: */*
 Content-Type: application/json
@@ -136,7 +127,6 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 PointAttribute
-#/manager/point_attribute/id/:id
 GET http://{{dc3-manager}}/manager/point_attribute/id/1
 Accept: */*
 Cache-Control: no-cache
@@ -144,7 +134,6 @@ Cache-Control: no-cache
 
 
 ### 分页查询 PointAttribute
-#/manager/point_attribute/list，支持displayName模糊查询，name\type\driverId精准查询
 POST http://{{dc3-manager}}/manager/point_attribute/list
 Accept: */*
 Content-Type: application/json
@@ -165,17 +154,15 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 PointAttribute
-#/manager/point_attribute/delete/:id
 POST http://{{dc3-manager}}/manager/point_attribute/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
 
 
-### --------------------- Point Info ---------------------
+### --------------------- Point Attribute Config ---------------------
 ### 新增 PointInfo
-#/manager/point_info/add
-POST http://{{dc3-manager}}/manager/point_info/add
+POST http://{{dc3-manager}}/manager/point_attribute_config/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -190,8 +177,7 @@ Cache-Control: no-cache
 
 
 ### 修改 PointInfo
-#/manager/point_info/update
-POST http://{{dc3-manager}}/manager/point_info/update
+POST http://{{dc3-manager}}/manager/point_attribute_config/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -207,16 +193,14 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 PointInfo
-#/manager/point_info/id/:id
-GET http://{{dc3-manager}}/manager/point_info/id/1
+GET http://{{dc3-manager}}/manager/point_attribute_config/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 
 ### 分页查询 PointInfo
-#/manager/point_info/list，支持pointAttributeId\deviceId\pointId精准查询
-POST http://{{dc3-manager}}/manager/point_info/list
+POST http://{{dc3-manager}}/manager/point_attribute_config/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -235,8 +219,7 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 PointInfo
-#/manager/point_info/delete/:id
-POST http://{{dc3-manager}}/manager/point_info/delete/1
+POST http://{{dc3-manager}}/manager/point_attribute_config/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

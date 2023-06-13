@@ -20,12 +20,12 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.UserPageQuery;
+import io.github.pnoker.center.auth.entity.query.UserDto;
 import io.github.pnoker.center.auth.mapper.UserMapper;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.User;
 import lombok.extern.slf4j.Slf4j;
@@ -49,45 +49,80 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User add(User user) {
-        // 判断登录名称是否存在
-        User selectByLoginName = selectByLoginName(user.getLoginName(), false);
-        if (ObjectUtil.isNotNull(selectByLoginName)) {
-            throw new DuplicateException("The user already exists with login name: {}", user.getLoginName());
+    public void add(User entityDO) {
+        // 判断用户是否存在
+        User selectByUserName = selectByUserName(entityDO.getUserName(), false);
+        if (ObjectUtil.isNotNull(selectByUserName)) {
+            throw new DuplicateException("The user already exists with username: {}", entityDO.getUserName());
+        }
+
+        // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用
+        if (CharSequenceUtil.isNotEmpty(entityDO.getPhone())) {
+            User selectByPhone = selectByPhone(entityDO.getPhone(), false);
+            if (ObjectUtil.isNotNull(selectByPhone)) {
+                throw new DuplicateException("The user already exists with phone: {}", entityDO.getPhone());
+            }
+        }
+
+        // 判断 email 是否存在，如果有 email 不为空，检查该 email 是否被占用
+        if (CharSequenceUtil.isNotEmpty(entityDO.getEmail())) {
+            User selectByEmail = selectByEmail(entityDO.getEmail(), false);
+            if (ObjectUtil.isNotNull(selectByEmail)) {
+                throw new DuplicateException("The user already exists with email: {}", entityDO.getEmail());
+            }
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userMapper.insert(user) > 0) {
-            return userMapper.selectById(user.getId());
+        if (userMapper.insert(entityDO) < 1) {
+            throw new AddException("The user add failed: {}", entityDO.toString());
         }
-
-        throw new AddException("The user add failed: {}", user.toString());
     }
 
     @Override
     @Transactional
-    public Boolean delete(String id) {
+    public void delete(String id) {
         User user = selectById(id);
         if (ObjectUtil.isNull(user)) {
-            throw new NotFoundException();
+            throw new NotFoundException("The user does not exist");
         }
-        return userMapper.deleteById(id) > 0;
+
+        if (userMapper.deleteById(id) < 1) {
+            throw new DeleteException("The user delete failed");
+        }
     }
 
     @Override
-    public User update(User user) {
-        User selectById = selectById(user.getId());
-        if (ObjectUtil.isNull(selectById)) {
-            throw new NotFoundException();
+    public void update(User entityDO) {
+        User selectById = selectById(entityDO.getId());
+        // 判断 phone 是否修改
+        if (CharSequenceUtil.isNotEmpty(entityDO.getPhone())) {
+            if (!entityDO.getPhone().equals(selectById.getPhone())) {
+                User selectByPhone = selectByPhone(entityDO.getPhone(), false);
+                if (ObjectUtil.isNotNull(selectByPhone)) {
+                    throw new DuplicateException("The user already exists with phone {}", entityDO.getPhone());
+                }
+            }
+        } else {
+            entityDO.setPhone(null);
         }
-        user.setLoginName(null);
-        user.setUpdateTime(null);
-        if (userMapper.updateById(user) > 0) {
-            User select = userMapper.selectById(user.getId());
-            user.setLoginName(select.getLoginName());
-            return select;
+
+        // 判断 email 是否修改
+        if (CharSequenceUtil.isNotEmpty(entityDO.getEmail())) {
+            if (!entityDO.getEmail().equals(selectById.getEmail())) {
+                User selectByEmail = selectByEmail(entityDO.getEmail(), false);
+                if (ObjectUtil.isNotNull(selectByEmail)) {
+                    throw new DuplicateException("The user already exists with email {}", entityDO.getEmail());
+                }
+            }
+        } else {
+            entityDO.setEmail(null);
         }
-        throw new ServiceException("The user update failed");
+
+        entityDO.setUserName(null);
+        entityDO.setOperateTime(null);
+        if (userMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The user update failed");
+        }
     }
 
     @Override
@@ -95,51 +130,72 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectById(id);
     }
 
-    @Override
-    public Page<User> list(UserPageQuery userPageQuery) {
-        if (ObjectUtil.isNull(userPageQuery.getPage())) {
-            userPageQuery.setPage(new Pages());
-        }
-        return userMapper.selectPage(userPageQuery.getPage().convert(), fuzzyQuery(userPageQuery));
-    }
-
-    @Override
-    public User selectByLoginName(String loginName, boolean throwException) {
-        if (CharSequenceUtil.isEmpty(loginName)) {
+    public User selectByUserName(String userName, boolean throwException) {
+        if (CharSequenceUtil.isEmpty(userName)) {
             if (throwException) {
-                throw new EmptyException("The login name is empty");
+                throw new EmptyException("The name is empty");
             }
             return null;
         }
 
+        return selectByKey(User::getUserName, userName, throwException);
+    }
+
+    @Override
+    public User selectByPhone(String phone, boolean throwException) {
+        if (CharSequenceUtil.isEmpty(phone)) {
+            if (throwException) {
+                throw new EmptyException("The phone is empty");
+            }
+            return null;
+        }
+
+        return selectByKey(User::getPhone, phone, throwException);
+    }
+
+    @Override
+    public User selectByEmail(String email, boolean throwException) {
+        if (CharSequenceUtil.isEmpty(email)) {
+            if (throwException) {
+                throw new EmptyException("The phone is empty");
+            }
+            return null;
+        }
+
+        return selectByKey(User::getEmail, email, throwException);
+    }
+
+    @Override
+    public Page<User> list(UserDto queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
+        }
+        return userMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+    }
+
+    private LambdaQueryWrapper<User> fuzzyQuery(UserDto query) {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        queryWrapper.eq(User::getLoginName, loginName);
-        queryWrapper.eq(User::getEnableFlag, EnableFlagEnum.ENABLE);
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getNickName()), User::getNickName, query.getNickName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getUserName()), User::getUserName, query.getUserName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getPhone()), User::getPhone, query.getPhone());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getEmail()), User::getEmail, query.getEmail());
+        }
+        return queryWrapper;
+    }
+
+    private User selectByKey(SFunction<User, ?> key, String value, boolean throwException) {
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
+        queryWrapper.eq(key, value);
         queryWrapper.last("limit 1");
         User user = userMapper.selectOne(queryWrapper);
         if (ObjectUtil.isNull(user)) {
-            throw new NotFoundException();
+            if (throwException) {
+                throw new NotFoundException();
+            }
+            return null;
         }
         return user;
-    }
-
-    @Override
-    public Boolean checkLoginNameValid(String loginName) {
-        User user = selectByLoginName(loginName, false);
-        if (ObjectUtil.isNotNull(user)) {
-            return EnableFlagEnum.ENABLE.equals(user.getEnableFlag());
-        }
-
-        return false;
-    }
-
-    @Override
-    public LambdaQueryWrapper<User> fuzzyQuery(UserPageQuery userPageQuery) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        if (ObjectUtil.isNotNull(userPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(userPageQuery.getLoginName()), User::getLoginName, userPageQuery.getLoginName());
-        }
-        return queryWrapper;
     }
 
 }

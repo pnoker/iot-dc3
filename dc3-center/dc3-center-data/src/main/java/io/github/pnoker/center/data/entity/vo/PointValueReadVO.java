@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.entity.vo;
 
-import io.github.pnoker.common.valid.Insert;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

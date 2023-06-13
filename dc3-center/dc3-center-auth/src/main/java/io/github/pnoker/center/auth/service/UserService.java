@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.query.UserPageQuery;
+import io.github.pnoker.center.auth.entity.query.UserDto;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.model.User;
 
@@ -26,22 +26,32 @@ import io.github.pnoker.common.model.User;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface UserService extends Service<User, UserPageQuery> {
+public interface UserService extends Service<User, UserDto> {
 
     /**
-     * 根据登录名称查询用户
+     * 根据用户名查询用户
      *
-     * @param loginName      登录名称
+     * @param userName       用户名称
      * @param throwException Throw Exception
      * @return User
      */
-    User selectByLoginName(String loginName, boolean throwException);
+    User selectByUserName(String userName, boolean throwException);
 
     /**
-     * 判断登录名称是否有效
+     * 根据手机号查询用户
      *
-     * @param loginName 登录名称
-     * @return Boolean
+     * @param phone          Phone
+     * @param throwException Throw Exception
+     * @return User
      */
-    Boolean checkLoginNameValid(String loginName);
+    User selectByPhone(String phone, boolean throwException);
+
+    /**
+     * 根据邮箱查询用户
+     *
+     * @param email          Email
+     * @param throwException Throw Exception
+     * @return UserExt
+     */
+    User selectByEmail(String email, boolean throwException);
 }

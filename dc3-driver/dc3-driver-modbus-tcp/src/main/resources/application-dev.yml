@@ -15,23 +15,24 @@
 #
 
 # Development environment, customizable configuration
-# Development environment, customizable configuration
 driver:
   schedule:
+    # 定时读数据
     read:
       corn: '0/5 * * * * ?'
 
 spring:
-  #当开启env和group时，需要本地启动auth，manager和data服务
+  # 当开启env和group时，需要本地启动auth，manager和data服务
   env: dev
   group: ${user.name}
   rabbitmq:
-    # Customize Rabbitmq configuration
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
     host: ${RABBITMQ_HOST:dc3-rabbitmq}
     port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:dc3}
+    password: ${RABBITMQ_PASSWORD:dc3}
 
-# Log config
 logging:
   level:
     io.github.pnoker: DEBUG
-    io.github.pnoker.common.sdk: DEBUG
+    io.github.pnoker.driver.sdk: DEBUG

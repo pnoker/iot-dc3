@@ -25,9 +25,7 @@ import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
 import io.github.pnoker.center.manager.mapper.GroupMapper;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Group;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,17 +49,15 @@ public class GroupServiceImpl implements GroupService {
     /**
      * {@inheritDoc}
      */
-    //todo 分组逻辑需要调整，同时支持驱动、模版、位号、设备，分组只是一种UI上的显示逻辑，不影响实际数据采集
     @Override
-    public Group add(Group group) {
+    public void add(Group entityDO) {
         try {
-            selectByName(group.getGroupName(), group.getTenantId());
+            selectByName(entityDO.getGroupName(), entityDO.getTenantId());
             throw new DuplicateException("The device group already exists");
         } catch (NotFoundException notFoundException) {
-            if (groupMapper.insert(group) > 0) {
-                return groupMapper.selectById(group.getId());
+            if (groupMapper.insert(entityDO) < 1) {
+                throw new AddException("The group {} add failed", entityDO.getGroupName());
             }
-            throw new ServiceException("The group add failed");
         }
     }
 
@@ -69,24 +65,27 @@ public class GroupServiceImpl implements GroupService {
      * {@inheritDoc}
      */
     @Override
-    public Boolean delete(String id) {
-        selectById(id);
-        return groupMapper.deleteById(id) > 0;
+    public void delete(String id) {
+        Group group = selectById(id);
+        if (ObjectUtil.isNull(group)) {
+            throw new NotFoundException("The group does not exist");
+        }
+
+        if (groupMapper.deleteById(id) < 1) {
+            throw new DeleteException("The group delete failed");
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Group update(Group group) {
-        selectById(group.getId());
-        group.setUpdateTime(null);
-        if (groupMapper.updateById(group) > 0) {
-            Group select = groupMapper.selectById(group.getId());
-            group.setGroupName(select.getGroupName());
-            return select;
+    public void update(Group entityDO) {
+        selectById(entityDO.getId());
+        entityDO.setOperateTime(null);
+        if (groupMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The group update failed");
         }
-        throw new ServiceException("The group update failed");
     }
 
     /**
@@ -120,22 +119,18 @@ public class GroupServiceImpl implements GroupService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Group> list(GroupPageQuery groupPageQuery) {
-        if (ObjectUtil.isNull(groupPageQuery.getPage())) {
-            groupPageQuery.setPage(new Pages());
+    public Page<Group> list(GroupPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return groupMapper.selectPage(groupPageQuery.getPage().convert(), fuzzyQuery(groupPageQuery));
+        return groupMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LambdaQueryWrapper<Group> fuzzyQuery(GroupPageQuery groupPageQuery) {
+    private LambdaQueryWrapper<Group> fuzzyQuery(GroupPageQuery query) {
         LambdaQueryWrapper<Group> queryWrapper = Wrappers.<Group>query().lambda();
-        if (ObjectUtil.isNotNull(groupPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotBlank(groupPageQuery.getGroupName()), Group::getGroupName, groupPageQuery.getGroupName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(groupPageQuery.getTenantId()), Group::getTenantId, groupPageQuery.getTenantId());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getGroupName()), Group::getGroupName, query.getGroupName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), Group::getTenantId, query.getTenantId());
         }
         return queryWrapper;
     }

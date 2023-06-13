@@ -15,7 +15,6 @@
 #
 
 ### 新增 BlackIp
-#/auth/black_ip/add
 POST http://{{dc3-auth}}/auth/black_ip/add
 Accept: */*
 Content-Type: application/json
@@ -29,7 +28,6 @@ X-Auth-Tenant-Id: -1
 
 
 ### 修改 BlackIp
-#/auth/black_ip/update
 POST http://{{dc3-auth}}/auth/black_ip/update
 Accept: */*
 Content-Type: application/json
@@ -45,14 +43,12 @@ X-Auth-Tenant-Id: -1
 
 
 ### 根据 ID 查询 BlackIp
-#/auth/black_ip/id/:id
 GET http://{{dc3-auth}}/auth/black_ip/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 ### 根据 Ip 查询 BlackIp
-#/auth/user/ip/:ip
 GET http://{{dc3-auth}}/auth/black_ip/ip/127.0.0.1
 Accept: */*
 Cache-Control: no-cache
@@ -60,7 +56,6 @@ X-Auth-Tenant-Id:-1
 
 
 ### 分页查询 BlackIp
-#/auth/black_ip/list，支持ip模糊查询
 POST http://{{dc3-auth}}/auth/black_ip/list
 Accept: */*
 Content-Type: application/json
@@ -83,7 +78,6 @@ X-Auth-Tenant-Id:-1
 
 
 ### 查询 BlackIp 是否存在并有效
-#/auth/black_ip/check/:ip
 GET http://{{dc3-auth}}/auth/black_ip/check/192.168.0.1
 Accept: */*
 Cache-Control: no-cache
@@ -91,7 +85,6 @@ X-Auth-Tenant-Id:-1
 
 
 ### 根据 ID 删除 BlackIp
-#/auth/black_ip/delete/:id
 POST http://{{dc3-auth}}/auth/black_ip/delete/1383257757074976769
 Accept: */*
 Content-Type: application/json

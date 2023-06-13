@@ -15,11 +15,13 @@
 #
 
 driver:
-  name: PlcS7Driver
+  tenant: default
+  name: PlcS7驱动
+  code: PlcS7Driver
   type: DRIVER
-  project: @project.artifactId@
   remark: @project.description@
   schedule:
+    # 定时读数据
     read:
       enable: true
       corn: '0/30 * * * * ?'
@@ -30,36 +32,38 @@ driver:
     - display-name: 主机
       attribute-name: host
       attribute-type-flag: STRING
-      value: 192.168.0.20
+      default-value: 192.168.0.20
       remark: Ip
     - display-name: 端口
       attribute-name: port
       attribute-type-flag: INT
-      value: 102
+      default-value: 102
       remark: Port
   point-attribute:
     - display-name: DB序号
       attribute-name: dbNum
       attribute-type-flag: INT
-      value: 0
+      default-value: 0
       remark: 数据块号，从 0 开始计数
     - display-name: 字偏移
       attribute-name: byteOffset
       attribute-type-flag: INT
-      value: 0
+      default-value: 0
       remark: 字偏移
     - display-name: 位偏移
       attribute-name: bitOffset
       attribute-type-flag: INT
-      value: 0
+      default-value: 0
       remark: 位偏移
     - display-name: 数据块长度
       attribute-name: blockSize
       attribute-type-flag: INT
-      value: 8
+      default-value: 8
       remark: 数据块长度
 
 spring:
+  application:
+    name: @project.artifactId@
   profiles:
     active:
       - ${NODE_ENV:dev}

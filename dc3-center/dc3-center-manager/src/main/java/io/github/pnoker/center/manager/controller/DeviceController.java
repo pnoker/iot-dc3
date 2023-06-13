@@ -20,21 +20,23 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
-import io.github.pnoker.center.manager.service.NotifyService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.driver.MetadataConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.model.Device;
+import io.github.pnoker.common.utils.RequestUtil;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,9 +57,6 @@ public class DeviceController {
     @Resource
     private DeviceService deviceService;
 
-    @Resource
-    private NotifyService notifyService;
-
     /**
      * 新增 Device
      *
@@ -66,19 +65,14 @@ public class DeviceController {
      * @return Device
      */
     @PostMapping("/add")
-    public R<Device> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<String> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             device.setTenantId(tenantId);
-            Device add = deviceService.add(device);
-            if (ObjectUtil.isNotNull(add)) {
-                // 通知驱动新增设备
-                notifyService.notifyDriverDevice(MetadataCommandTypeEnum.ADD, add);
-                return R.ok(add);
-            }
+            deviceService.add(device);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -88,18 +82,13 @@ public class DeviceController {
      * @return 是否删除
      */
     @PostMapping("/delete/{id}")
-    public R<Boolean> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Device device = deviceService.selectById(id);
-            if (ObjectUtil.isNotNull(device) && deviceService.delete(id)) {
-                // 通知驱动删除设备
-                notifyService.notifyDriverDevice(MetadataCommandTypeEnum.DELETE, device);
-                return R.ok();
-            }
+            deviceService.delete(id);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -110,19 +99,14 @@ public class DeviceController {
      * @return Device
      */
     @PostMapping("/update")
-    public R<Device> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             device.setTenantId(tenantId);
-            Device update = deviceService.update(device);
-            if (ObjectUtil.isNotNull(update)) {
-                // 通知驱动更新设备
-                notifyService.notifyDriverDevice(MetadataCommandTypeEnum.UPDATE, update);
-                return R.ok(update);
-            }
+            deviceService.update(device);
+            return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -169,7 +153,7 @@ public class DeviceController {
      * @return Page Of Device
      */
     @PostMapping("/list")
-    public R<Page<Device>> list(@RequestBody(required = false) DevicePageQuery devicePageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = "-1") String tenantId) {
+    public R<Page<Device>> list(@RequestBody(required = false) DevicePageQuery devicePageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
         try {
             if (ObjectUtil.isEmpty(devicePageQuery)) {
                 devicePageQuery = new DevicePageQuery();
@@ -183,6 +167,42 @@ public class DeviceController {
             return R.fail(e.getMessage());
         }
         return R.fail();
+    }
+
+    /**
+     * 导入 Device
+     *
+     * @param device   Device
+     * @param tenantId 租户ID
+     * @return Device
+     */
+    @PostMapping("/import")
+    public R<String> importDevice(@Validated(Update.class) Device device, @RequestParam("file") MultipartFile multipartFile, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+        try {
+            device.setTenantId(tenantId);
+            deviceService.importDevice(device, multipartFile);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+        return R.ok();
+    }
+
+    /**
+     * 导入 Device 模板
+     *
+     * @param device   Device
+     * @param tenantId 租户ID
+     * @return Device
+     */
+    @PostMapping("/import/template")
+    public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+        try {
+            device.setTenantId(tenantId);
+            Path filePath = deviceService.generateImportTemplate(device);
+            return RequestUtil.responseFile(filePath);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

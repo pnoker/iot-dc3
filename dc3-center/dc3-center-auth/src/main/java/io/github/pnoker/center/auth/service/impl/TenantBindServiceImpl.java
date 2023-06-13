@@ -25,8 +25,10 @@ import io.github.pnoker.center.auth.entity.query.TenantBindPageQuery;
 import io.github.pnoker.center.auth.mapper.TenantBindMapper;
 import io.github.pnoker.center.auth.service.TenantBindService;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.TenantBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,27 +49,31 @@ public class TenantBindServiceImpl implements TenantBindService {
     private TenantBindMapper tenantBindMapper;
 
     @Override
-    public TenantBind add(TenantBind tenantBind) {
-        if (tenantBindMapper.insert(tenantBind) > 0) {
-            return tenantBindMapper.selectById(tenantBind.getId());
+    public void add(TenantBind entityDO) {
+        if (tenantBindMapper.insert(entityDO) < 1) {
+            throw new AddException("The tenant bind add failed");
         }
-        throw new ServiceException("The tenant bind add failed");
     }
 
     @Override
-    public Boolean delete(String id) {
-        selectById(id);
-        return tenantBindMapper.deleteById(id) > 0;
+    public void delete(String id) {
+        TenantBind tenantBind = selectById(id);
+        if (ObjectUtil.isNull(tenantBind)) {
+            throw new NotFoundException("The tenant bind does not exist");
+        }
+
+        if (tenantBindMapper.deleteById(id) < 1) {
+            throw new DeleteException("The tenant bind delete failed");
+        }
     }
 
     @Override
-    public TenantBind update(TenantBind tenantBind) {
-        selectById(tenantBind.getId());
-        tenantBind.setUpdateTime(null);
-        if (tenantBindMapper.updateById(tenantBind) > 0) {
-            return tenantBindMapper.selectById(tenantBind.getId());
+    public void update(TenantBind entityDO) {
+        selectById(entityDO.getId());
+        entityDO.setOperateTime(null);
+        if (tenantBindMapper.updateById(entityDO) < 1) {
+            throw new UpdateException("The tenant bind update failed");
         }
-        throw new ServiceException("The tenant bind update failed");
     }
 
     @Override
@@ -89,19 +95,18 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public Page<TenantBind> list(TenantBindPageQuery tenantBindPageQuery) {
-        if (ObjectUtil.isNull(tenantBindPageQuery.getPage())) {
-            tenantBindPageQuery.setPage(new Pages());
+    public Page<TenantBind> list(TenantBindPageQuery queryDTO) {
+        if (ObjectUtil.isNull(queryDTO.getPage())) {
+            queryDTO.setPage(new Pages());
         }
-        return tenantBindMapper.selectPage(tenantBindPageQuery.getPage().convert(), fuzzyQuery(tenantBindPageQuery));
+        return tenantBindMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    @Override
-    public LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindPageQuery tenantBindPageQuery) {
+    private LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindPageQuery query) {
         LambdaQueryWrapper<TenantBind> queryWrapper = Wrappers.<TenantBind>query().lambda();
-        if (ObjectUtil.isNotNull(tenantBindPageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(tenantBindPageQuery.getTenantId()), TenantBind::getTenantId, tenantBindPageQuery.getTenantId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(tenantBindPageQuery.getUserId()), TenantBind::getUserId, tenantBindPageQuery.getUserId());
+        if (ObjectUtil.isNotNull(query)) {
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), TenantBind::getTenantId, query.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getUserId()), TenantBind::getUserId, query.getUserId());
         }
         return queryWrapper;
     }
