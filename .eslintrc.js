@@ -82,6 +82,7 @@ module.exports = {
         'no-unused-vars': 'error',
         'no-v-model-argument': 'off',
         'no-case-declarations': 'off',
+        'eol-last': 'off',
         'no-console': 'off',
         'no-redeclare': 'off',
     },
