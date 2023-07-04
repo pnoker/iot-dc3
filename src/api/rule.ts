@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-import { Hide, Histogram, List, Management, Promotion, View, Connection } from '@element-plus/icons-vue'
-import element from 'element-plus'
-import 'element-plus/dist/index.css'
-import './element-variables.scss'
-import locale from 'element-plus/es/locale/lang/zh-cn'
+import request from '@/config/axios'
 
-export default (app: any) => {
-    const Icons = [Hide, Histogram, List, Management, Promotion, View, Connection]
-    Icons.forEach((icon) => {
-        app.component(icon.name, icon)
+export const getFlowsList = (flowsQuery : any) =>
+    request<R>({
+        url: "api/v3/manager/ruleengine/flowsList",
+        method: 'post',
+        data:flowsQuery
     })
-    app.use(element, { locale })
-}
+

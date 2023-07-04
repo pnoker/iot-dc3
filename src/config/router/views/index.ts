@@ -66,6 +66,15 @@ const routes: RouteRecordRaw = {
             },
             component: () => import('@/views/point/value/PointValue.vue'),
         },
+        {
+            name: 'ruleEngine',
+            path: '/rule_engine',
+            meta: {
+                icon: 'Connection',
+                title: '规则编排',
+            },
+            component: () => import('@/views/ruleengine/RuleEngine.vue'),
+        },
     ],
 }
 
