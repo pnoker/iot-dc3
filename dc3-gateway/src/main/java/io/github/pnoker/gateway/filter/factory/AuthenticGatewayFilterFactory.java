@@ -93,7 +93,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                     throw new UnAuthorizedException("Invalid request tenant header");
                 }
 
-                String userHeader = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_USER);
+                String userHeader = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
                 String user = DecodeUtil.byteToString(DecodeUtil.decode(userHeader));
                 if (ObjectUtil.isEmpty(user)) {
                     throw new UnAuthorizedException("Invalid request user header");
@@ -125,6 +125,7 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
                             httpHeader.set(RequestConstant.Header.X_AUTH_TENANT_ID, rTenantDTO.getData().getBase().getId());
                             httpHeader.set(RequestConstant.Header.X_AUTH_TENANT, rTenantDTO.getData().getTenantName());
                             httpHeader.set(RequestConstant.Header.X_AUTH_USER_ID, rUserDTO.getData().getBase().getId());
+                            httpHeader.set(RequestConstant.Header.X_AUTH_NICK, rUserDTO.getData().getLoginName());
                             httpHeader.set(RequestConstant.Header.X_AUTH_USER, rUserDTO.getData().getLoginName());
                         }
                 ).build();
