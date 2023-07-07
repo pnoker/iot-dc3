@@ -42,9 +42,9 @@ request.interceptors.request.use(
             headers[CommonConstant.TENANT_HEADER] = encode(tenant)
         }
 
-        const user = getStorage(CommonConstant.USER_HEADER)
+        const user = getStorage(CommonConstant.LOGIN_HEADER)
         if (!isNull(user)) {
-            headers[CommonConstant.USER_HEADER] = encode(user)
+            headers[CommonConstant.LOGIN_HEADER] = encode(user)
         }
 
         const token = getStorage(CommonConstant.TOKEN_HEADER)
