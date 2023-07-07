@@ -29,7 +29,7 @@ import io.github.pnoker.common.model.User;
 public interface UserService extends Service<User, UserDto> {
 
     /**
-     * 根据用户名查询用户
+     * 根据用户名称查询用户
      *
      * @param userName       用户名称
      * @param throwException Throw Exception
