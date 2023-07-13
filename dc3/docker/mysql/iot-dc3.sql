@@ -98,7 +98,7 @@ create table dc3_user
 (
     id            bigint unsigned auto_increment primary key                               not null comment '主键ID',
     nick_name     varchar(128) default ''                                                  not null comment '用户昵称，加密存储',
-    user_name     varchar(128) default ''                                                  not null comment '用户名，加密存储',
+    user_name     varchar(128) default ''                                                  not null comment '用户名称，加密存储',
     phone         varchar(32)  default ''                                                  not null comment '手机号，加密存储',
     email         varchar(128) default ''                                                  not null comment '邮箱，加密存储',
     social_ext    json                                                                     not null comment '社交相关拓展信息，加密存储',
