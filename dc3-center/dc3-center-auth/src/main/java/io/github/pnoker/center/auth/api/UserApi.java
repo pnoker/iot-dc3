@@ -18,17 +18,17 @@ package io.github.pnoker.center.auth.api;
 
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.auth.NameQuery;
-import io.github.pnoker.api.center.auth.RUserLoginDTO;
-import io.github.pnoker.api.center.auth.UserLoginApiGrpc;
-import io.github.pnoker.api.center.auth.UserLoginDTO;
+import io.github.pnoker.api.center.auth.IdQuery;
+import io.github.pnoker.api.center.auth.RUserDTO;
+import io.github.pnoker.api.center.auth.UserApiGrpc;
+import io.github.pnoker.api.center.auth.UserDTO;
 import io.github.pnoker.api.common.BaseDTO;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.RDTO;
-import io.github.pnoker.center.auth.service.UserLoginService;
+import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.utils.BuilderUtil;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.UserLogin;
+import io.github.pnoker.common.model.User;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -36,23 +36,23 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import javax.annotation.Resource;
 
 /**
- * UserLogin Api
+ * User Api
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @GrpcService
-public class UserLoginApi extends UserLoginApiGrpc.UserLoginApiImplBase {
+public class UserApi extends UserApiGrpc.UserApiImplBase {
 
     @Resource
-    private UserLoginService userLoginService;
+    private UserService userService;
 
     @Override
-    public void selectByName(NameQuery request, StreamObserver<RUserLoginDTO> responseObserver) {
-        RUserLoginDTO.Builder builder = RUserLoginDTO.newBuilder();
+    public void selectById(IdQuery request, StreamObserver<RUserDTO> responseObserver) {
+        RUserDTO.Builder builder = RUserDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
-        UserLogin select = userLoginService.selectByLoginName(request.getName(), false);
+        User select = userService.selectById(request.getId());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -61,7 +61,7 @@ public class UserLoginApi extends UserLoginApiGrpc.UserLoginApiImplBase {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
-            UserLoginDTO user = buildDTOByDO(select);
+            UserDTO user = buildDTOByDO(select);
             builder.setData(user);
         }
 
@@ -74,17 +74,19 @@ public class UserLoginApi extends UserLoginApiGrpc.UserLoginApiImplBase {
     /**
      * DO to DTO
      *
-     * @param entityDO UserLogin
-     * @return UserLoginDTO
+     * @param entityDO User
+     * @return UserDTO
      */
-    private UserLoginDTO buildDTOByDO(UserLogin entityDO) {
-        UserLoginDTO.Builder builder = UserLoginDTO.newBuilder();
+    private UserDTO buildDTOByDO(User entityDO) {
+        UserDTO.Builder builder = UserDTO.newBuilder();
         BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
-        builder.setLoginName(entityDO.getLoginName());
-        builder.setUserId(entityDO.getUserId());
-        builder.setUserPasswordId(entityDO.getUserPasswordId());
-        builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
+        builder.setNickName(entityDO.getNickName());
+        builder.setUserName(entityDO.getUserName());
+        builder.setPhone(entityDO.getPhone());
+        builder.setEmail(entityDO.getEmail());
+        builder.setSocialExt(entityDO.getSocialExt());
+        builder.setIdentityExt(entityDO.getIdentityExt());
         return builder.build();
     }
 }

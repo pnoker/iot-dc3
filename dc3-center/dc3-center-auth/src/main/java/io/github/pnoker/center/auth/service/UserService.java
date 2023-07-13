@@ -51,7 +51,7 @@ public interface UserService extends Service<User, UserDto> {
      *
      * @param email          Email
      * @param throwException Throw Exception
-     * @return UserExt
+     * @return User
      */
     User selectByEmail(String email, boolean throwException);
 }
