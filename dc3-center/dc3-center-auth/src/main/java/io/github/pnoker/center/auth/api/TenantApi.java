@@ -26,7 +26,7 @@ import io.github.pnoker.api.common.BaseDTO;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.RDTO;
 import io.github.pnoker.center.auth.service.TenantService;
-import io.github.pnoker.center.auth.utils.BuilderUtil;
+import io.github.pnoker.common.utils.BuilderUtil;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.model.Tenant;
 import io.grpc.stub.StreamObserver;
