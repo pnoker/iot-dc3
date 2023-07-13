@@ -16,6 +16,6 @@
 
 export default {
     TENANT_HEADER: 'X-Auth-Tenant',
-    USER_HEADER: 'X-Auth-User',
+    USER_LOGIN: 'X-Auth-Login',
     TOKEN_HEADER: 'X-Auth-Token',
 }

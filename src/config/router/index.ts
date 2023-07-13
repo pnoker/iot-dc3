@@ -41,7 +41,7 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
 
     if (to.path !== '/login') {
         const tenant = getStorage(CommonConstant.TENANT_HEADER)
-        const user = getStorage(CommonConstant.USER_HEADER)
+        const user = getStorage(CommonConstant.USER_LOGIN)
         const token = getStorage(CommonConstant.TOKEN_HEADER)
 
         if (isNull(tenant) || isNull(user) || isNull(token)) {
