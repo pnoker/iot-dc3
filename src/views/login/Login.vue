@@ -1,5 +1,5 @@
 <!--
-  - Copyright 2022 Pnoker All Rights Reserved
+  - Copyright 2016-present the original author or authors.
   -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
@@ -58,7 +58,56 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script setup lang="ts">
+import { reactive, ref, unref } from 'vue'
+import { FormInstance, FormRules } from 'element-plus'
+import { Box, Lock, User } from '@element-plus/icons-vue'
+
+import { useStore } from 'vuex'
+
+import Particles from '@/components/particles/particles.vue'
+
+const store = useStore()
+// 定义表单引用
+const formDataRef = ref<FormInstance>()
+
+// 定义响应式数据
+const tenant = store.getters['auth/getTenant'] || 'default'
+const name = store.getters['auth/getName'] || 'pnoker'
+const reactiveData = reactive({
+    isHide: 'View',
+    passwordType: 'password',
+    formData: {
+        tenant: tenant,
+        name: name,
+        password: 'dc3dc3dc3',
+    },
+})
+
+// 定义表单校验规则
+const formRule = reactive<FormRules>({
+    tenant: [{ required: true, message: '请输入租户名', trigger: 'blur' }],
+    name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+    password: [
+        { required: true, message: '请输入密码', trigger: 'blur' },
+        { min: 6, message: '密码长度最少为6位', trigger: 'blur' },
+    ],
+})
+
+// 显示、隐藏密码
+const showPassword = () => {
+    reactiveData.passwordType === '' ? (reactiveData.passwordType = 'password') : (reactiveData.passwordType = '')
+    reactiveData.isHide === 'View' ? (reactiveData.isHide = 'Hide') : (reactiveData.isHide = 'View')
+}
+
+// 登录
+const handleLogin = () => {
+    const form = unref(formDataRef)
+    form?.validate((valid) => {
+        if (valid) store.dispatch('auth/login', reactiveData.formData)
+    })
+}
+</script>
 
 <style lang="scss">
 @import '@/views/login/style.scss';

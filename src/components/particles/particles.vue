@@ -1,5 +1,5 @@
 <!--
-  - Copyright 2022 Pnoker All Rights Reserved
+  - Copyright 2016-present the original author or authors.
   -
   - Licensed under the Apache License, Version 2.0 (the "License");
   - you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ class ShaderProgram {
                     // nothing to do
                 },
             },
-            options
+            options,
         )
         const uniforms = Object.assign(
             {
@@ -84,7 +84,7 @@ class ShaderProgram {
                     value: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
                 },
             },
-            options.uniforms
+            options.uniforms,
         )
         const buffers = Object.assign(
             {
@@ -97,7 +97,7 @@ class ShaderProgram {
                     data: [],
                 },
             },
-            options.buffers
+            options.buffers,
         )
         const camera = Object.assign(
             {
@@ -108,7 +108,7 @@ class ShaderProgram {
                 z: 100,
                 perspective: true,
             },
-            options.camera
+            options.camera,
         )
         const canvas = document.createElement('canvas')
         const gl = canvas.getContext('webgl', {
