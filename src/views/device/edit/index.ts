@@ -160,7 +160,7 @@ export default defineComponent({
                 })
         }
 
-        const driverCurrentChange = (current) => {
+        const driverCurrentChange = (current: number) => {
             reactiveData.driverPage.current = current
             driverDictionary()
         }
@@ -187,7 +187,7 @@ export default defineComponent({
                 })
         }
 
-        const profileCurrentChange = (current) => {
+        const profileCurrentChange = (current: number) => {
             reactiveData.driverPage.current = current
             profileDictionary()
         }
@@ -231,7 +231,7 @@ export default defineComponent({
                 })
         }
 
-        const changeAttribute = (driverId) => {
+        const changeAttribute = (driverId: string) => {
             if (isNull(driverId)) {
                 return
             }
@@ -282,7 +282,7 @@ export default defineComponent({
             getDriverInfoByDeviceId(reactiveData.id)
                 .then((res) => {
                     const formData = reactiveData.driverFormData
-                    res.data.data.forEach((info) => {
+                    res.data.data.forEach((info: { driverAttributeId: string | number; id: any; configValue: any }) => {
                         formData[reactiveData.driverAttributeTable[info.driverAttributeId]] = {
                             id: info.id,
                             configValue: info.configValue,
@@ -300,7 +300,7 @@ export default defineComponent({
         const pointInfo = () => {
             getPointByDeviceId(reactiveData.id)
                 .then((res) => {
-                    reactiveData.pointInfoData = res.data.data.map((point) => {
+                    reactiveData.pointInfoData = res.data.data.map((point: { id: any; pointName: any }) => {
                         const pointInfo = {
                             id: point.id,
                             pointName: point.pointName,
@@ -318,7 +318,7 @@ export default defineComponent({
 
                     getPointInfoByDeviceId(reactiveData.id)
                         .then((res) => {
-                            res.data.data.forEach((info) => {
+                            res.data.data.forEach((info: { pointId: any; pointAttributeId: string | number; id: any; configValue: any }) => {
                                 reactiveData.pointInfoData.forEach((pointInfo) => {
                                     if (pointInfo.id === info.pointId) {
                                         pointInfo[reactiveData.pointAttributeTable[info.pointAttributeId]] = {
@@ -369,17 +369,17 @@ export default defineComponent({
 
                         driverInfo.id
                             ? updateDriverInfo(driverInfo)
-                                  .then((res) => loadFormData(driverInfo))
+                                  .then(() => loadFormData(driverInfo))
                                   .catch(() => {
                                       // nothing to do
                                   })
                             : addDriverInfo(driverInfo)
-                                  .then((res) => loadFormData(driverInfo))
+                                  .then(() => loadFormData(driverInfo))
                                   .catch(() => {
                                       // nothing to do
                                   })
 
-                        function loadFormData(res) {
+                        function loadFormData(res: { id: any; driverAttributeId?: any; deviceId?: string; configValue: any }) {
                             driverFormData[attribute.attributeName] = {
                                 id: res.id,
                                 configValue: res.configValue,
@@ -406,17 +406,17 @@ export default defineComponent({
 
                         pointInfo.id
                             ? updatePointInfo(pointInfo)
-                                  .then((res) => loadFormData(pointInfo))
+                                  .then(() => loadFormData(pointInfo))
                                   .catch(() => {
                                       // nothing to do
                                   })
                             : addPointInfo(pointInfo)
-                                  .then((res) => loadFormData(pointInfo))
+                                  .then(() => loadFormData(pointInfo))
                                   .catch(() => {
                                       // nothing to do
                                   })
 
-                        function loadFormData(res) {
+                        function loadFormData(res: { id: any; pointAttributeId?: any; deviceId?: string; pointId?: any; configValue: any }) {
                             reactiveData.pointInfoData.forEach((pointInfo) => {
                                 if (pointInfo.id === reactiveData.pointFormData.id) {
                                     pointInfo[attribute.attributeName] = {
@@ -433,7 +433,7 @@ export default defineComponent({
             })
         }
 
-        const selectPoint = (row) => {
+        const selectPoint = (row: { [x: string]: { id: null; configValue: string }; id: any }) => {
             reactiveData.pointAttributes.forEach((attribute) => {
                 if (!row[attribute.attributeName]) {
                     row[attribute.attributeName] = {
@@ -496,7 +496,7 @@ export default defineComponent({
             reactiveData.pointFormData = JSON.parse(JSON.stringify(reactiveData.oldPointFormData))
         }
 
-        const changeActive = (step) => {
+        const changeActive = (step: number) => {
             const query = route.query
             router.push({ query: { ...query, active: step } }).catch(() => {
                 // nothing to do
