@@ -33,25 +33,25 @@ const auth = {
     },
     getters: {
         getTenant: () => {
-            return getStorage(CommonConstant.TENANT_HEADER)
+            return getStorage(CommonConstant.X_AUTH_TENANT)
         },
         getName: () => {
-            return getStorage(CommonConstant.LOGIN_HEADER)
+            return getStorage(CommonConstant.X_AUTH_LOGIN)
         },
     },
     mutations: {
         setToken: (state: any, login: any) => {
-            setStorage(CommonConstant.TENANT_HEADER, login.tenant)
-            setStorage(CommonConstant.LOGIN_HEADER, login.name)
-            setStorage(CommonConstant.TOKEN_HEADER, { salt: login.salt, token: login.token })
+            setStorage(CommonConstant.X_AUTH_TENANT, login.tenant)
+            setStorage(CommonConstant.X_AUTH_LOGIN, login.name)
+            setStorage(CommonConstant.X_AUTH_TOKEN, { salt: login.salt, token: login.token })
 
             state.tenant = login.tenant
             state.name = login.name
         },
         removeToken: () => {
-            removeStorage(CommonConstant.TENANT_HEADER)
-            removeStorage(CommonConstant.LOGIN_HEADER)
-            removeStorage(CommonConstant.TOKEN_HEADER)
+            removeStorage(CommonConstant.X_AUTH_TENANT)
+            removeStorage(CommonConstant.X_AUTH_LOGIN)
+            removeStorage(CommonConstant.X_AUTH_TOKEN)
         },
     },
     actions: {

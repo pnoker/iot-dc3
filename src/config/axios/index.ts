@@ -37,26 +37,26 @@ request.interceptors.request.use(
             return config
         }
 
-        const tenant = getStorage(CommonConstant.TENANT_HEADER)
+        const tenant = getStorage(CommonConstant.X_AUTH_TENANT)
         if (!isNull(tenant)) {
-            headers[CommonConstant.TENANT_HEADER] = encode(tenant)
+            headers[CommonConstant.X_AUTH_TENANT] = encode(tenant)
         }
 
-        const user = getStorage(CommonConstant.LOGIN_HEADER)
-        if (!isNull(user)) {
-            headers[CommonConstant.LOGIN_HEADER] = encode(user)
+        const login = getStorage(CommonConstant.X_AUTH_LOGIN)
+        if (!isNull(login)) {
+            headers[CommonConstant.X_AUTH_LOGIN] = encode(login)
         }
 
-        const token = getStorage(CommonConstant.TOKEN_HEADER)
+        const token = getStorage(CommonConstant.X_AUTH_TOKEN)
         if (!isNull(token)) {
-            headers[CommonConstant.TOKEN_HEADER] = encode(JSON.stringify(token))
+            headers[CommonConstant.X_AUTH_TOKEN] = encode(JSON.stringify(token))
         }
 
         return config
     },
     (error: any) => {
         return Promise.reject(error)
-    }
+    },
 )
 
 request.interceptors.response.use(
@@ -76,7 +76,7 @@ request.interceptors.response.use(
     },
     (error: any) => {
         return Promise.reject(error)
-    }
+    },
 )
 
 export default request

@@ -40,9 +40,9 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
     NProgress.start()
 
     if (to.path !== '/login') {
-        const tenant = getStorage(CommonConstant.TENANT_HEADER)
-        const user = getStorage(CommonConstant.LOGIN_HEADER)
-        const token = getStorage(CommonConstant.TOKEN_HEADER)
+        const tenant = getStorage(CommonConstant.X_AUTH_TENANT)
+        const user = getStorage(CommonConstant.X_AUTH_LOGIN)
+        const token = getStorage(CommonConstant.X_AUTH_TOKEN)
 
         if (isNull(tenant) || isNull(user) || isNull(token)) {
             logout()
