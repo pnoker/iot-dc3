@@ -21,8 +21,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.PointPageQuery;
 import io.github.pnoker.center.manager.service.PointService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.Point;
@@ -49,7 +48,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping(ManagerServiceConstant.POINT_URL_PREFIX)
-public class PointController {
+public class PointController implements Controller {
 
     @Resource
     private PointService pointService;
@@ -57,15 +56,13 @@ public class PointController {
     /**
      * 新增 Point
      *
-     * @param point    Point
-     * @param tenantId 租户ID
+     * @param point Point
      * @return Point
      */
     @PostMapping("/add")
-    public R<Point> add(@Validated(Insert.class) @RequestBody Point point,
-                        @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Point> add(@Validated(Insert.class) @RequestBody Point point) {
         try {
-            point.setTenantId(tenantId);
+            point.setTenantId(getTenantId());
             pointService.add(point);
             return R.ok();
         } catch (Exception e) {
@@ -92,14 +89,13 @@ public class PointController {
     /**
      * 修改 Point
      *
-     * @param point    Point
-     * @param tenantId 租户ID
+     * @param point Point
      * @return Point
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Point point, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody Point point) {
         try {
-            point.setTenantId(tenantId);
+            point.setTenantId(getTenantId());
             pointService.update(point);
             return R.ok();
         } catch (Exception e) {
@@ -185,17 +181,15 @@ public class PointController {
      * 模糊分页查询 Point
      *
      * @param pointPageQuery Point Dto
-     * @param tenantId       租户ID
      * @return Page Of Point
      */
     @PostMapping("/list")
-    public R<Page<Point>> list(@RequestBody(required = false) PointPageQuery pointPageQuery,
-                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Page<Point>> list(@RequestBody(required = false) PointPageQuery pointPageQuery) {
         try {
             if (ObjectUtil.isEmpty(pointPageQuery)) {
                 pointPageQuery = new PointPageQuery();
             }
-            pointPageQuery.setTenantId(tenantId);
+            pointPageQuery.setTenantId(getTenantId());
             Page<Point> page = pointService.list(pointPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);

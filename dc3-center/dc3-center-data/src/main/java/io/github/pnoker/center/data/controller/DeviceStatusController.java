@@ -18,8 +18,7 @@ package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.query.DevicePageQuery;
 import io.github.pnoker.center.data.service.DeviceStatusService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +37,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(DataServiceConstant.DEVICE_STATUS_URL_PREFIX)
-public class DeviceStatusController {
+public class DeviceStatusController implements Controller {
 
     @Resource
     private DeviceStatusService deviceStatusService;
@@ -51,9 +50,9 @@ public class DeviceStatusController {
      * @return Map String:String
      */
     @PostMapping("/device")
-    public R<Map<String, String>> deviceStatus(@RequestBody(required = false) DevicePageQuery devicePageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Map<String, String>> deviceStatus(@RequestBody(required = false) DevicePageQuery devicePageQuery) {
         try {
-            devicePageQuery.setTenantId(tenantId);
+            devicePageQuery.setTenantId(getTenantId());
             Map<String, String> statuses = deviceStatusService.device(devicePageQuery);
             return R.ok(statuses);
         } catch (Exception e) {

@@ -20,8 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
 import io.github.pnoker.center.manager.service.GroupService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.Group;
@@ -43,7 +42,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 @RestController
 @RequestMapping(ManagerServiceConstant.GROUP_URL_PREFIX)
-public class GroupController {
+public class GroupController implements Controller {
 
     @Resource
     private GroupService groupService;
@@ -51,15 +50,13 @@ public class GroupController {
     /**
      * 新增 Group
      *
-     * @param group    Group
-     * @param tenantId 租户ID
+     * @param group Group
      * @return Group
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Group group,
-                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> add(@Validated(Insert.class) @RequestBody Group group) {
         try {
-            group.setTenantId(tenantId);
+            group.setTenantId(getTenantId());
             groupService.add(group);
             return R.ok();
         } catch (Exception e) {
@@ -86,15 +83,13 @@ public class GroupController {
     /**
      * 修改 Group
      *
-     * @param group    Group
-     * @param tenantId 租户ID
+     * @param group Group
      * @return Group
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Group group,
-                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody Group group) {
         try {
-            group.setTenantId(tenantId);
+            group.setTenantId(getTenantId());
             groupService.update(group);
             return R.ok();
         } catch (Exception e) {
@@ -125,17 +120,15 @@ public class GroupController {
      * 模糊分页查询 Group
      *
      * @param groupPageQuery Group Dto
-     * @param tenantId       租户ID
      * @return Page Of Group
      */
     @PostMapping("/list")
-    public R<Page<Group>> list(@RequestBody(required = false) GroupPageQuery groupPageQuery,
-                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Page<Group>> list(@RequestBody(required = false) GroupPageQuery groupPageQuery) {
         try {
             if (ObjectUtil.isEmpty(groupPageQuery)) {
                 groupPageQuery = new GroupPageQuery();
             }
-            groupPageQuery.setTenantId(tenantId);
+            groupPageQuery.setTenantId(getTenantId());
             Page<Group> page = groupService.list(groupPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);

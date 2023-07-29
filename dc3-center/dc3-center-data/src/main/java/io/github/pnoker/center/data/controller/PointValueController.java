@@ -20,6 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.vo.query.PointValuePageQuery;
 import io.github.pnoker.center.data.service.PointValueService;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.point.PointValue;
@@ -40,7 +41,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping(DataServiceConstant.VALUE_URL_PREFIX)
-public class PointValueController {
+public class PointValueController implements Controller {
 
     @Resource
     private PointValueService pointValueService;

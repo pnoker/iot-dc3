@@ -17,6 +17,7 @@
 package io.github.pnoker.center.manager.controller;
 
 import io.github.pnoker.center.manager.service.IndexService;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.dto.DataStatisticsDTO;
 import io.github.pnoker.common.dto.WeatherDeviceStatisticsDTO;
@@ -38,7 +39,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(value = ManagerServiceConstant.INDEX_URL_PREFIX)
-public class IndexController {
+public class IndexController implements Controller {
 
     @Resource
     IndexService indexService;

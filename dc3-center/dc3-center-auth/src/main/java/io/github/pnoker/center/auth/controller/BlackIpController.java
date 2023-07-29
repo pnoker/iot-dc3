@@ -20,6 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.query.BlackIpPageQuery;
 import io.github.pnoker.center.auth.service.BlackIpService;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
@@ -42,7 +43,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 @RestController
 @RequestMapping(value = AuthServiceConstant.BLACK_IP_URL_PREFIX)
-public class BlackIpController {
+public class BlackIpController implements Controller {
 
     @Resource
     private BlackIpService blackIpService;

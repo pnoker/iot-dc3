@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
         // 判断用户是否存在
         User selectByUserName = selectByUserName(entityDO.getUserName(), false);
         if (ObjectUtil.isNotNull(selectByUserName)) {
-            throw new DuplicateException("The user already exists with username: {}", entityDO.getUserName());
+            throw new DuplicateException("The user already exists with userName: {}", entityDO.getUserName());
         }
 
         // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用

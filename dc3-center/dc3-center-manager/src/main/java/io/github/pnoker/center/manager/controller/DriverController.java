@@ -20,8 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.center.manager.service.DriverService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.DriverDO;
@@ -48,7 +47,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping(ManagerServiceConstant.DRIVER_URL_PREFIX)
-public class DriverController {
+public class DriverController implements Controller {
 
     @Resource
     private DriverService driverService;
@@ -57,13 +56,12 @@ public class DriverController {
      * 新增 Driver
      *
      * @param entityDO Driver
-     * @param tenantId 租户ID
      * @return Driver
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody DriverDO entityDO, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> add(@Validated(Insert.class) @RequestBody DriverDO entityDO) {
         try {
-            entityDO.setTenantId(tenantId);
+            entityDO.setTenantId(getTenantId());
             driverService.add(entityDO);
             return R.ok();
         } catch (Exception e) {
@@ -91,14 +89,12 @@ public class DriverController {
      * 修改 Driver
      *
      * @param entityDO Driver
-     * @param tenantId 租户ID
      * @return Driver
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody DriverDO entityDO,
-                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody DriverDO entityDO) {
         try {
-            entityDO.setTenantId(tenantId);
+            entityDO.setTenantId(getTenantId());
             driverService.update(entityDO);
             return R.ok();
         } catch (Exception e) {
@@ -146,10 +142,9 @@ public class DriverController {
      * @return Driver
      */
     @GetMapping("/service/{serviceName}")
-    public R<DriverDO> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName,
-                                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<DriverDO> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
         try {
-            DriverDO select = driverService.selectByServiceName(serviceName, tenantId, true);
+            DriverDO select = driverService.selectByServiceName(serviceName, getTenantId(), true);
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -160,17 +155,15 @@ public class DriverController {
      * 模糊分页查询 Driver
      *
      * @param driverPageQuery Driver Dto
-     * @param tenantId        租户ID
      * @return Page Of Driver
      */
     @PostMapping("/list")
-    public R<Page<DriverDO>> list(@RequestBody(required = false) DriverPageQuery driverPageQuery,
-                                  @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Page<DriverDO>> list(@RequestBody(required = false) DriverPageQuery driverPageQuery) {
         try {
             if (ObjectUtil.isEmpty(driverPageQuery)) {
                 driverPageQuery = new DriverPageQuery();
             }
-            driverPageQuery.setTenantId(tenantId);
+            driverPageQuery.setTenantId(getTenantId());
             Page<DriverDO> page = driverService.list(driverPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
