@@ -20,8 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.Device;
@@ -52,7 +51,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping(ManagerServiceConstant.DEVICE_URL_PREFIX)
-public class DeviceController {
+public class DeviceController implements Controller {
 
     @Resource
     private DeviceService deviceService;
@@ -60,14 +59,13 @@ public class DeviceController {
     /**
      * 新增 Device
      *
-     * @param device   Device
-     * @param tenantId 租户ID
+     * @param device Device
      * @return Device
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> add(@Validated(Insert.class) @RequestBody Device device) {
         try {
-            device.setTenantId(tenantId);
+            device.setTenantId(getTenantId());
             deviceService.add(device);
             return R.ok();
         } catch (Exception e) {
@@ -94,14 +92,13 @@ public class DeviceController {
     /**
      * 修改 Device
      *
-     * @param device   Device
-     * @param tenantId 租户ID
+     * @param device Device
      * @return Device
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody Device device) {
         try {
-            device.setTenantId(tenantId);
+            device.setTenantId(getTenantId());
             deviceService.update(device);
             return R.ok();
         } catch (Exception e) {
@@ -148,17 +145,16 @@ public class DeviceController {
     /**
      * 模糊分页查询 Device
      *
-     * @param tenantId        租户ID
      * @param devicePageQuery 设备和分页参数
      * @return Page Of Device
      */
     @PostMapping("/list")
-    public R<Page<Device>> list(@RequestBody(required = false) DevicePageQuery devicePageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Page<Device>> list(@RequestBody(required = false) DevicePageQuery devicePageQuery) {
         try {
             if (ObjectUtil.isEmpty(devicePageQuery)) {
                 devicePageQuery = new DevicePageQuery();
             }
-            devicePageQuery.setTenantId(tenantId);
+            devicePageQuery.setTenantId(getTenantId());
             Page<Device> page = deviceService.list(devicePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
@@ -172,14 +168,13 @@ public class DeviceController {
     /**
      * 导入 Device
      *
-     * @param device   Device
-     * @param tenantId 租户ID
+     * @param device Device
      * @return Device
      */
     @PostMapping("/import")
-    public R<String> importDevice(@Validated(Update.class) Device device, @RequestParam("file") MultipartFile multipartFile, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> importDevice(@Validated(Update.class) Device device, @RequestParam("file") MultipartFile multipartFile) {
         try {
-            device.setTenantId(tenantId);
+            device.setTenantId(getTenantId());
             deviceService.importDevice(device, multipartFile);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -190,14 +185,13 @@ public class DeviceController {
     /**
      * 导入 Device 模板
      *
-     * @param device   Device
-     * @param tenantId 租户ID
+     * @param device Device
      * @return Device
      */
     @PostMapping("/import/template")
-    public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody Device device, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody Device device) {
         try {
-            device.setTenantId(tenantId);
+            device.setTenantId(getTenantId());
             Path filePath = deviceService.generateImportTemplate(device);
             return RequestUtil.responseFile(filePath);
         } catch (Exception e) {

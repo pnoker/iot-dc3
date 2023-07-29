@@ -20,6 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.PointAttributeConfig;
@@ -42,7 +43,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(ManagerServiceConstant.POINT_ATTRIBUTE_CONFIG_URL_PREFIX)
-public class PointAttributeConfigController {
+public class PointAttributeConfigController implements Controller {
 
     @Resource
     private PointAttributeConfigService pointAttributeConfigService;

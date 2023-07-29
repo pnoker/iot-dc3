@@ -19,6 +19,7 @@ package io.github.pnoker.center.auth.controller;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
 import io.github.pnoker.center.auth.service.TokenService;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.auth.Login;
@@ -45,7 +46,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping(AuthServiceConstant.TOKEN_URL_PREFIX)
-public class TokenController {
+public class TokenController implements Controller {
 
     @Resource
     private TokenService tokenService;

@@ -20,8 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.LabelPageQuery;
 import io.github.pnoker.center.manager.service.LabelService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.Label;
@@ -43,7 +42,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 @RestController
 @RequestMapping(ManagerServiceConstant.LABEL_URL_PREFIX)
-public class LabelController {
+public class LabelController implements Controller {
 
     @Resource
     private LabelService labelService;
@@ -51,15 +50,13 @@ public class LabelController {
     /**
      * 新增 Label
      *
-     * @param label    Label
-     * @param tenantId 租户ID
+     * @param label Label
      * @return Label
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Label label,
-                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> add(@Validated(Insert.class) @RequestBody Label label) {
         try {
-            label.setTenantId(tenantId);
+            label.setTenantId(getTenantId());
             labelService.add(label);
             return R.ok();
         } catch (Exception e) {
@@ -86,15 +83,13 @@ public class LabelController {
     /**
      * 修改 Label
      *
-     * @param label    Label
-     * @param tenantId 租户ID
+     * @param label Label
      * @return Label
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Label label,
-                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody Label label) {
         try {
-            label.setTenantId(tenantId);
+            label.setTenantId(getTenantId());
             labelService.update(label);
             return R.ok();
         } catch (Exception e) {
@@ -125,17 +120,15 @@ public class LabelController {
      * 模糊分页查询 Label
      *
      * @param labelPageQuery Label Dto
-     * @param tenantId       租户ID
      * @return Page Of Label
      */
     @PostMapping("/list")
-    public R<Page<Label>> list(@RequestBody(required = false) LabelPageQuery labelPageQuery,
-                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Page<Label>> list(@RequestBody(required = false) LabelPageQuery labelPageQuery) {
         try {
             if (ObjectUtil.isEmpty(labelPageQuery)) {
                 labelPageQuery = new LabelPageQuery();
             }
-            labelPageQuery.setTenantId(tenantId);
+            labelPageQuery.setTenantId(getTenantId());
             Page<Label> page = labelService.list(labelPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);

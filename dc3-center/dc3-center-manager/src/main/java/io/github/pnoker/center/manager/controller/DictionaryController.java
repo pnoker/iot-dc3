@@ -20,13 +20,15 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DictionaryPageQuery;
 import io.github.pnoker.center.manager.service.DictionaryService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.Dictionary;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
@@ -39,7 +41,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping(ManagerServiceConstant.DICTIONARY_URL_PREFIX)
-public class DictionaryController {
+public class DictionaryController implements Controller {
 
     @Resource
     private DictionaryService dictionaryService;
@@ -48,17 +50,15 @@ public class DictionaryController {
      * 查询驱动 Dictionary
      *
      * @param dictionaryPageQuery DictionaryDto
-     * @param tenantId            租户ID
      * @return Page Of Dictionary
      */
     @PostMapping("/driver")
-    public R<Page<Dictionary>> driverDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery,
-                                                @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Page<Dictionary>> driverDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery) {
         try {
             if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
                 dictionaryPageQuery = new DictionaryPageQuery();
             }
-            dictionaryPageQuery.setTenantId(tenantId);
+            dictionaryPageQuery.setTenantId(getTenantId());
             Page<Dictionary> page = dictionaryService.driverDictionary(dictionaryPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
@@ -73,17 +73,15 @@ public class DictionaryController {
      * 查询模板 Dictionary
      *
      * @param dictionaryPageQuery DictionaryDto
-     * @param tenantId            租户ID
      * @return Page Of Dictionary
      */
     @PostMapping("/profile")
-    public R<Page<Dictionary>> profileDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery,
-                                                 @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Page<Dictionary>> profileDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery) {
         try {
             if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
                 dictionaryPageQuery = new DictionaryPageQuery();
             }
-            dictionaryPageQuery.setTenantId(tenantId);
+            dictionaryPageQuery.setTenantId(getTenantId());
             Page<Dictionary> page = dictionaryService.profileDictionary(dictionaryPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
@@ -98,17 +96,15 @@ public class DictionaryController {
      * 查询设备 Dictionary
      *
      * @param dictionaryPageQuery DictionaryDto
-     * @param tenantId            租户ID
      * @return Page Of Dictionary
      */
     @PostMapping("/device")
-    public R<Page<Dictionary>> deviceDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery,
-                                                @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Page<Dictionary>> deviceDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery) {
         try {
             if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
                 dictionaryPageQuery = new DictionaryPageQuery();
             }
-            dictionaryPageQuery.setTenantId(tenantId);
+            dictionaryPageQuery.setTenantId(getTenantId());
             Page<Dictionary> page = dictionaryService.deviceDictionary(dictionaryPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
@@ -123,17 +119,15 @@ public class DictionaryController {
      * 查询位号 Dictionary
      *
      * @param dictionaryPageQuery DictionaryDto
-     * @param tenantId            租户ID
      * @return Page Of Dictionary
      */
     @PostMapping("/point")
-    public R<Page<Dictionary>> pointDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery,
-                                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Page<Dictionary>> pointDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery) {
         try {
             if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
                 dictionaryPageQuery = new DictionaryPageQuery();
             }
-            dictionaryPageQuery.setTenantId(tenantId);
+            dictionaryPageQuery.setTenantId(getTenantId());
             Page<Dictionary> page = dictionaryService.pointDictionary(dictionaryPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);

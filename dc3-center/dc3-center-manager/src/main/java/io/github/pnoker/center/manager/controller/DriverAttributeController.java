@@ -21,6 +21,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DriverAttributePageQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -45,7 +46,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(ManagerServiceConstant.DRIVER_ATTRIBUTE_URL_PREFIX)
-public class DriverAttributeController {
+public class DriverAttributeController implements Controller {
 
     @Resource
     private DriverAttributeService driverAttributeService;

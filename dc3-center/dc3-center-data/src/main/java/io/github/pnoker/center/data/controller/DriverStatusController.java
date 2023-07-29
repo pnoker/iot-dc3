@@ -18,12 +18,14 @@ package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.query.DriverPageQuery;
 import io.github.pnoker.center.data.service.DriverStatusService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.Map;
@@ -37,7 +39,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(DataServiceConstant.DRIVER_STATUS_URL_PREFIX)
-public class DriverStatusController {
+public class DriverStatusController implements Controller {
 
     @Resource
     private DriverStatusService driverStatusService;
@@ -50,9 +52,9 @@ public class DriverStatusController {
      * @return Map String:String
      */
     @PostMapping("/driver")
-    public R<Map<String, String>> driverStatus(@RequestBody(required = false) DriverPageQuery driverPageQuery, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Map<String, String>> driverStatus(@RequestBody(required = false) DriverPageQuery driverPageQuery) {
         try {
-            driverPageQuery.setTenantId(tenantId);
+            driverPageQuery.setTenantId(getTenantId());
             Map<String, String> statuses = driverStatusService.driver(driverPageQuery);
             return R.ok(statuses);
         } catch (Exception e) {

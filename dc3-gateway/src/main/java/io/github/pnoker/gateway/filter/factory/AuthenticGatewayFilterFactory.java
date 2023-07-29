@@ -23,13 +23,14 @@ import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.bo.RequestHeaderBO;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.gateway.entity.bo.RequestHeaderBO;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -84,71 +85,87 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
             ServerHttpRequest request = exchange.getRequest();
 
             try {
-                String tenantHeader = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
-                String tenant = DecodeUtil.byteToString(DecodeUtil.decode(tenantHeader));
-                if (ObjectUtil.isEmpty(tenant)) {
-                    throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-                }
+                // Tenant, Login
+                RTenantDTO rTenantDTO = getTenantDTO(request);
+                RUserLoginDTO rUserLoginDTO = getLoginDTO(request);
 
-                RTenantDTO rTenantDTO = gatewayFilter.tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(tenant).build());
-                if (!rTenantDTO.getResult().getOk() || !EnableFlagDTOEnum.ENABLE.equals(rTenantDTO.getData().getEnableFlag())) {
-                    throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-                }
+                // Check Token Valid
+                checkTokenValid(request, rTenantDTO, rUserLoginDTO);
 
-                String userHeader = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
-                String user = DecodeUtil.byteToString(DecodeUtil.decode(userHeader));
-                if (ObjectUtil.isEmpty(user)) {
-                    throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-                }
-
-                RUserLoginDTO rUserLoginDTO = gatewayFilter.userLoginApiBlockingStub.selectByName(NameQuery.newBuilder().setName(user).build());
-                if (!rUserLoginDTO.getResult().getOk() || !EnableFlagDTOEnum.ENABLE.equals(rUserLoginDTO.getData().getEnableFlag())) {
-                    throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-                }
-
-                RUserDTO rUserDTO = gatewayFilter.userApiBlockingStub.selectById(IdQuery.newBuilder().setId(rUserLoginDTO.getData().getBase().getId()).build());
-                if (!rUserDTO.getResult().getOk()) {
-                    throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-                }
-
-                String tokenHeader = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
-                RequestHeaderBO entityBO = JsonUtil.parseObject(DecodeUtil.decode(tokenHeader), RequestHeaderBO.class);
-                if (ObjectUtil.isEmpty(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
-                    throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-                }
-
-                LoginQuery login = LoginQuery.newBuilder()
-                        .setTenant(rTenantDTO.getData().getTenantCode())
-                        .setName(rUserLoginDTO.getData().getLoginName())
-                        .setSalt(entityBO.getSalt())
-                        .setToken(entityBO.getToken()).build();
-                RTokenDTO rTokenDTO = gatewayFilter.tokenApiBlockingStub.checkTokenValid(login);
-                if (!rTokenDTO.getResult().getOk()) {
-                    throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-                }
-
-                ServerHttpRequest build = request.mutate().headers(
-                        httpHeader -> {
-                            httpHeader.set(RequestConstant.Header.X_AUTH_TENANT_ID, rTenantDTO.getData().getBase().getId());
-                            httpHeader.set(RequestConstant.Header.X_AUTH_TENANT, rTenantDTO.getData().getTenantName());
-                            httpHeader.set(RequestConstant.Header.X_AUTH_USER_ID, rUserLoginDTO.getData().getBase().getId());
-                            httpHeader.set(RequestConstant.Header.X_AUTH_NICK, rUserDTO.getData().getNickName());
-                            httpHeader.set(RequestConstant.Header.X_AUTH_USER, rUserDTO.getData().getUserName());
-                        }
-                ).build();
+                // Header
+                ServerHttpRequest build = request.mutate().headers(headers -> {
+                    RequestHeaderBO.UserHeader entityBO = getUserDTO(rUserLoginDTO, rTenantDTO);
+                    headers.set(RequestConstant.Header.X_AUTH_USER, DecodeUtil.byteToString(DecodeUtil.encode(JsonUtil.toJsonBytes(entityBO))));
+                }).build();
 
                 exchange.mutate().request(build).build();
             } catch (Exception e) {
+                log.error(e.getMessage(), e);
                 ServerHttpResponse response = exchange.getResponse();
                 response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
-                log.error(e.getMessage(), e);
-
                 DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(e.getMessage())));
                 return response.writeWith(Mono.just(dataBuffer));
             }
 
             return chain.filter(exchange);
+        }
+
+        @NotNull
+        private static RTenantDTO getTenantDTO(ServerHttpRequest request) {
+            String tenant = DecodeUtil.byteToString(DecodeUtil.decode(GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT)));
+            if (ObjectUtil.isEmpty(tenant)) {
+                throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+            }
+
+            RTenantDTO entityDTO = gatewayFilter.tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(tenant).build());
+            if (!entityDTO.getResult().getOk() || !EnableFlagDTOEnum.ENABLE.equals(entityDTO.getData().getEnableFlag())) {
+                throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+            }
+            return entityDTO;
+        }
+
+        @NotNull
+        private static RUserLoginDTO getLoginDTO(ServerHttpRequest request) {
+            String user = DecodeUtil.byteToString(DecodeUtil.decode(GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN)));
+            if (ObjectUtil.isEmpty(user)) {
+                throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+            }
+
+            RUserLoginDTO entityDTO = gatewayFilter.userLoginApiBlockingStub.selectByName(NameQuery.newBuilder().setName(user).build());
+            if (!entityDTO.getResult().getOk() || !EnableFlagDTOEnum.ENABLE.equals(entityDTO.getData().getEnableFlag())) {
+                throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+            }
+            return entityDTO;
+        }
+
+        @NotNull
+        private static RequestHeaderBO.UserHeader getUserDTO(RUserLoginDTO rUserLoginDTO, RTenantDTO rTenantDTO) {
+            RUserDTO entityDTO = gatewayFilter.userApiBlockingStub.selectById(IdQuery.newBuilder().setId(rUserLoginDTO.getData().getBase().getId()).build());
+            if (!entityDTO.getResult().getOk()) {
+                throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+            }
+
+            RequestHeaderBO.UserHeader entityBO = new RequestHeaderBO.UserHeader();
+            entityBO.setUserId(entityDTO.getData().getBase().getId());
+            entityBO.setNickName(entityDTO.getData().getNickName());
+            entityBO.setUserName(entityDTO.getData().getUserName());
+            entityBO.setTenantId(rTenantDTO.getData().getBase().getId());
+            return entityBO;
+        }
+
+        private static void checkTokenValid(ServerHttpRequest request, RTenantDTO rTenantDTO, RUserLoginDTO rUserLoginDTO) {
+            String token = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
+            RequestHeaderBO.TokenHeader entityBO = JsonUtil.parseObject(DecodeUtil.decode(token), RequestHeaderBO.TokenHeader.class);
+            if (ObjectUtil.isEmpty(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
+                throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+            }
+
+            LoginQuery login = LoginQuery.newBuilder().setTenant(rTenantDTO.getData().getTenantCode()).setName(rUserLoginDTO.getData().getLoginName()).setSalt(entityBO.getSalt()).setToken(entityBO.getToken()).build();
+            RTokenDTO entityDTO = gatewayFilter.tokenApiBlockingStub.checkTokenValid(login);
+            if (!entityDTO.getResult().getOk()) {
+                throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+            }
         }
     }
 

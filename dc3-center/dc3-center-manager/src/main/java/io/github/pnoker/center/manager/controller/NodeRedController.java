@@ -12,6 +12,7 @@ import io.github.pnoker.center.manager.mapper.NodeRedFlowsMapper;
 import io.github.pnoker.center.manager.mapper.NodeRedLibraryMapper;
 import io.github.pnoker.center.manager.mapper.NodeRedSettingsMapper;
 import io.github.pnoker.center.manager.service.NodeRedService;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.NodeRedCredentials;
 import io.github.pnoker.common.model.NodeRedFlows;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping({"/manager/ruleengine"})
-public class NodeRedController {
+public class NodeRedController implements Controller {
     private static final Logger log = LoggerFactory.getLogger(NodeRedController.class);
     @Resource
     NodeRedFlowsMapper nodeRedFlowsMapper;

@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.query.UserLoginPageQuery;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.center.auth.service.UserPasswordService;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
@@ -43,7 +44,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 @RestController
 @RequestMapping(AuthServiceConstant.USER_URL_PREFIX)
-public class UserLoginController {
+public class UserLoginController implements Controller {
 
     @Resource
     private UserLoginService userLoginService;

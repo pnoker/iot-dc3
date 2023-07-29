@@ -20,8 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
 import io.github.pnoker.center.manager.service.ProfileService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.Profile;
@@ -48,7 +47,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping(ManagerServiceConstant.PROFILE_URL_PREFIX)
-public class ProfileController {
+public class ProfileController implements Controller {
 
     @Resource
     private ProfileService profileService;
@@ -56,15 +55,13 @@ public class ProfileController {
     /**
      * 新增 Profile
      *
-     * @param profile  Profile
-     * @param tenantId 租户ID
+     * @param profile Profile
      * @return Profile
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Profile profile,
-                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> add(@Validated(Insert.class) @RequestBody Profile profile) {
         try {
-            profile.setTenantId(tenantId);
+            profile.setTenantId(getTenantId());
             profileService.add(profile);
             return R.ok();
         } catch (Exception e) {
@@ -91,15 +88,13 @@ public class ProfileController {
     /**
      * 修改 Profile
      *
-     * @param profile  Profile
-     * @param tenantId 租户ID
+     * @param profile Profile
      * @return Profile
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Profile profile,
-                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<String> update(@Validated(Update.class) @RequestBody Profile profile) {
         try {
-            profile.setTenantId(tenantId);
+            profile.setTenantId(getTenantId());
             profileService.update(profile);
             return R.ok();
         } catch (Exception e) {
@@ -166,17 +161,15 @@ public class ProfileController {
      * 模糊分页查询 Profile
      *
      * @param profilePageQuery Profile Dto
-     * @param tenantId         租户ID
      * @return Page Of Profile
      */
     @PostMapping("/list")
-    public R<Page<Profile>> list(@RequestBody(required = false) ProfilePageQuery profilePageQuery,
-                                 @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<Page<Profile>> list(@RequestBody(required = false) ProfilePageQuery profilePageQuery) {
         try {
             if (ObjectUtil.isEmpty(profilePageQuery)) {
                 profilePageQuery = new ProfilePageQuery();
             }
-            profilePageQuery.setTenantId(tenantId);
+            profilePageQuery.setTenantId(getTenantId());
             Page<Profile> page = profileService.list(profilePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);

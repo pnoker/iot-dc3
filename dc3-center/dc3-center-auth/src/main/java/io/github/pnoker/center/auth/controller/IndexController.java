@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.controller;
 
+import io.github.pnoker.common.base.Controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 //@RequestMapping(value = AuthServiceConstant.INDEX_URL_PREFIX)
-public class IndexController {
+public class IndexController implements Controller {
 
     /**
      * ping

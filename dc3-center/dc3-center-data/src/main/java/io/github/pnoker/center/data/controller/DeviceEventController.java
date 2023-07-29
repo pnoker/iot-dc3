@@ -20,6 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.vo.query.DeviceEventPageQuery;
 import io.github.pnoker.center.data.service.EventService;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.entity.DeviceEvent;
 import io.github.pnoker.common.entity.R;
@@ -40,7 +41,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping(DataServiceConstant.DEVICE_EVENT_URL_PREFIX)
-public class DeviceEventController {
+public class DeviceEventController implements Controller {
 
     @Resource
     private EventService eventService;

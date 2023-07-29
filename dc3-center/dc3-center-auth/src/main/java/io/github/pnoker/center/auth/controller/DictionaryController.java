@@ -18,14 +18,12 @@ package io.github.pnoker.center.auth.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.service.DictionaryService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.Dictionary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,7 +39,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(AuthServiceConstant.DICTIONARY_URL_PREFIX)
-public class DictionaryController {
+public class DictionaryController implements Controller {
 
     @Resource
     private DictionaryService dictionaryService;
@@ -67,13 +65,12 @@ public class DictionaryController {
     /**
      * 查询用户字典列表
      *
-     * @param tenantId 租户ID
      * @return 字典列表
      */
     @GetMapping("/user")
-    public R<List<Dictionary>> userDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<List<Dictionary>> userDictionary() {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.userDictionary(tenantId);
+            List<Dictionary> dictionaryList = dictionaryService.userDictionary(getTenantId());
             if (ObjectUtil.isNotNull(dictionaryList)) {
                 return R.ok(dictionaryList);
             }
@@ -86,13 +83,12 @@ public class DictionaryController {
     /**
      * 查询 Ip 黑名单字典列表
      *
-     * @param tenantId 租户ID
      * @return 字典列表
      */
     @GetMapping("/black_ip")
-    public R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public R<List<Dictionary>> blackIpDictionary() {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.blackIpDictionary(tenantId);
+            List<Dictionary> dictionaryList = dictionaryService.blackIpDictionary(getTenantId());
             if (ObjectUtil.isNotNull(dictionaryList)) {
                 return R.ok(dictionaryList);
             }
