@@ -100,7 +100,7 @@ export default defineComponent({
             })
         }
 
-        const openFlows = (id : string)=>{
+        const openFlows = (id: string) => {
             window.open(import.meta.env.APP_RULES_PATH + id)
         }
 

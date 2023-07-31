@@ -15,16 +15,16 @@
  */
 
 import blankCard from '@/components/card/blank/BlankCard.vue'
-import { computed, reactive, ref ,defineComponent } from 'vue'
+import { computed, reactive, ref, defineComponent } from 'vue'
 import ruleengineTool from './tool/RuleengineTool.vue'
 import ruleengineCard from './card/RuleengineCard.vue'
-import { Order } from '@/config/types';
-import { getFlowsList } from '@/api/rule';
+import { Order } from '@/config/types'
+import { getFlowsList } from '@/api/rule'
 export default defineComponent({
     components: {
         blankCard,
         ruleengineTool,
-        ruleengineCard
+        ruleengineCard,
     },
     props: {
         embedded: {
@@ -35,7 +35,6 @@ export default defineComponent({
         },
     },
     setup(props) {
-
         // 定义响应式数据
         const reactiveData = reactive({
             loading: true,
@@ -52,7 +51,7 @@ export default defineComponent({
                 orders: [] as Order[],
             },
         })
-        
+
         const hasData = computed(() => {
             return !reactiveData.loading && reactiveData.listData?.length < 1
         })
@@ -61,20 +60,20 @@ export default defineComponent({
             reactiveData.loading = true
             getFlowsList({
                 page: reactiveData.page,
-                ...reactiveData.query
+                ...reactiveData.query,
             }).then((res) => {
                 const data = res.data.data
                 reactiveData.page.total = data.total
                 reactiveData.listData = data.records
                 reactiveData.loading = false
-            });
-        };
+            })
+        }
 
         list()
 
         return {
             hasData,
-            reactiveData
+            reactiveData,
         }
-    }
-});
+    },
+})

@@ -65,7 +65,7 @@ const routes: RouteRecordRaw = {
                 title: '数据',
             },
             component: () => import('@/views/point/value/PointValue.vue'),
-        },
+        } /* 
         {
             name: 'ruleEngine',
             path: '/rule_engine',
@@ -74,7 +74,7 @@ const routes: RouteRecordRaw = {
                 title: '规则编排',
             },
             component: () => import('@/views/ruleengine/RuleEngine.vue'),
-        },
+        }, */,
     ],
 }
 

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
+import { Order } from '@/config/types'
 import { Plus, Refresh, RefreshRight, Search, Sort, Upload } from '@element-plus/icons-vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { defineComponent, reactive, ref, unref } from 'vue'
-import { Dictionary, Order } from '@/config/types'
 
 export default defineComponent({
     name: 'RuleengineTool',

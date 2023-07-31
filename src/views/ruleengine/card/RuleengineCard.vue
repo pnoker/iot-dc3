@@ -18,10 +18,13 @@
     <div class="things-card">
         <el-card shadow="hover">
             <div class="things-card-content">
-                <div class="things-card__header" :class="{
-                    'header-enable': 'ENABLE' === data.enableFlag,
-                    'header-disable': 'ENABLE' !== data.enableFlag,
-                }">
+                <div
+                    class="things-card__header"
+                    :class="{
+                        'header-enable': 'ENABLE' === data.enableFlag,
+                        'header-disable': 'ENABLE' !== data.enableFlag,
+                    }"
+                >
                     <div class="things-card-header-icon">
                         <img :src="icon" :alt="data.flowLabel" />
                     </div>
@@ -57,7 +60,6 @@
                         </ul>
                     </div>
                 </div>
-
             </div>
         </el-card>
     </div>

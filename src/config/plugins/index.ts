@@ -29,6 +29,6 @@ export default (app: any) => {
             '|___|\\____/|____|    /_______  /\\______  /______  /\n' +
             '                             \\/        \\/       \\/\n' +
             'https://doc.dc3.site\n' +
-            'IoT DC3 Web V2023.2.3 Pnoker Authors'
+            'IoT DC3 Web V2023.2.3 Pnoker Authors',
     )
 }

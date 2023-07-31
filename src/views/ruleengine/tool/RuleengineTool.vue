@@ -14,7 +14,7 @@
   - limitations under the License.
   -->
 
-  <template>
+<template>
     <div class="tool-card">
         <el-card :shadow="embedded == '' ? 'hover' : 'never'">
             <el-form ref="formDataRef" class="tool-card-body" :model="reactiveData.formData" :rules="formRule" :inline="true">
