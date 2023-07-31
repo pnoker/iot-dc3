@@ -35,5 +35,6 @@ spring:
   cloud:
     nacos:
       discovery:
+        ip: ${NODE_HOST:}
         group: ${spring.group}
         watch-delay: 5000
