@@ -1,11 +1,11 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 1999-2018 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -260,6 +260,10 @@ VALUES ('dc3', '$2a$10$wM3B4eTqtsbD0GQzPcSdnOVFCTY/eB1VTJqnLbQWq/Xk/PVyCz13i', T
 
 INSERT INTO roles (username, role)
 VALUES ('dc3', 'ROLE_ADMIN');
+
+INSERT INTO tenant_info (`id`, `kp`, `tenant_id`, `tenant_name`, `tenant_desc`, `create_source`, `gmt_create`,
+                         `gmt_modified`)
+VALUES (1, '1', 'dev', 'dev', 'dev', 'nacos', 1689147723706, 1689147723706);
 
 SET
 FOREIGN_KEY_CHECKS = 1;

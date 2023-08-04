@@ -1,22 +1,5 @@
-/*
- * Copyright 2016-present the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -28,7 +11,7 @@ import io.github.pnoker.center.manager.mapper.NodeRedFlowsMapper;
 import io.github.pnoker.center.manager.mapper.NodeRedLibraryMapper;
 import io.github.pnoker.center.manager.mapper.NodeRedSettingsMapper;
 import io.github.pnoker.center.manager.service.NodeRedService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.model.NodeRedCredentials;
 import io.github.pnoker.common.model.NodeRedFlows;
@@ -41,13 +24,14 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping({"/manager/ruleengine"})
-public class NodeRedController implements Controller {
+@RequestMapping(ManagerServiceConstant.RULEENGINE_URL_PREFIX)
+public class NodeRedController {
     private static final Logger log = LoggerFactory.getLogger(NodeRedController.class);
     @Resource
     NodeRedFlowsMapper nodeRedFlowsMapper;
@@ -67,7 +51,8 @@ public class NodeRedController implements Controller {
 
     @GetMapping({"flows"})
     public R<JSONArray> getFlows(String id, HttpServletRequest request, HttpServletResponse response) {
-        List<NodeRedFlows> nodeRedFlows = nodeRedFlowsMapper.selectList(new LambdaQueryWrapper<NodeRedFlows>().eq(StrUtil.isNotBlank(id) && !id.equals("DC3"), NodeRedFlows::getFlowId, id));
+        List<NodeRedFlows> nodeRedFlows = nodeRedFlowsMapper.selectList(new LambdaQueryWrapper<NodeRedFlows>()
+                .eq(!id.equals("DC3"), NodeRedFlows::getFlowId, id));
         List<JSONObject> collect = nodeRedFlows.stream().map(NodeRedFlows::getJsonData).map(JSONObject::parseObject).collect(Collectors.toList());
         return R.ok(new JSONArray(collect));
     }
@@ -86,6 +71,7 @@ public class NodeRedController implements Controller {
                 nodeRedFlows.setFlowLabel(json.getString("label"));
                 nodeRedFlows.setFlowType(json.getString("type"));
                 nodeRedFlows.setFlowDisabled(json.getBooleanValue("disabled", false) ? 1 : 0);
+                nodeRedFlows.setOperateTime(new Date());
                 nodeRedFlowsMapper.insert(nodeRedFlows);
             });
             return R.ok();
