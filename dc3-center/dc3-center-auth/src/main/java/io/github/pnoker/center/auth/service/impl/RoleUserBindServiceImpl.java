@@ -74,17 +74,17 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     }
 
     @Override
-    public void add(RoleUserBind entityDo) {
+    public void add(RoleUserBind entityDO) {
         //todo check if exists
-        if (roleUserBindMapper.insert(entityDo) < 1) {
+        if (roleUserBindMapper.insert(entityDO) < 1) {
             throw new AddException("The role user bind add failed");
         }
     }
 
     @Override
-    public void update(RoleUserBind entityDo) {
-        selectById(entityDo.getId());
-        if (roleUserBindMapper.updateById(entityDo) < 1) {
+    public void update(RoleUserBind entityDO) {
+        selectById(entityDO.getId());
+        if (roleUserBindMapper.updateById(entityDO) < 1) {
             throw new UpdateException("The role user bind update failed");
         }
     }

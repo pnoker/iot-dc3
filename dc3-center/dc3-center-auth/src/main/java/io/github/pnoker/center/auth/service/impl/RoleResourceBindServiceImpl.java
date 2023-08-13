@@ -55,9 +55,9 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     private ResourceMapper resourceMapper;
 
     @Override
-    public void add(RoleResourceBind entityDo) {
+    public void add(RoleResourceBind entityDO) {
         //todo check if exists
-        if (bindMapper.insert(entityDo) < 1) {
+        if (bindMapper.insert(entityDO) < 1) {
             throw new AddException("The tenant bind add failed");
         }
     }
@@ -71,9 +71,9 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public void update(RoleResourceBind entityDo) {
-        selectById(entityDo.getId());
-        if (bindMapper.updateById(entityDo) < 1) {
+    public void update(RoleResourceBind entityDO) {
+        selectById(entityDO.getId());
+        if (bindMapper.updateById(entityDO) < 1) {
             throw new UpdateException("The role resource bind update failed");
         }
     }
