@@ -48,7 +48,7 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public void add(BlackIp entityDO) {
-        BlackIp select = selectByIp(entityDO.getIp(), false);
+        BlackIp select = selectByIp(entityDO.getIp());
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The ip already exists in the blacklist");
         }
@@ -85,15 +85,12 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public BlackIp selectByIp(String ip, boolean throwException) {
+    public BlackIp selectByIp(String ip) {
         LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
         queryWrapper.eq(BlackIp::getIp, ip);
+        queryWrapper.eq(BlackIp::getEnableFlag, EnableFlagEnum.ENABLE);
         queryWrapper.last("limit 1");
-        BlackIp blackIp = blackIpMapper.selectOne(queryWrapper);
-        if (throwException && ObjectUtil.isNull(blackIp)) {
-            throw new NotFoundException();
-        }
-        return blackIp;
+        return blackIpMapper.selectOne(queryWrapper);
     }
 
     @Override
@@ -106,11 +103,8 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public Boolean checkBlackIpValid(String ip) {
-        BlackIp blackIp = selectByIp(ip, false);
-        if (ObjectUtil.isNotNull(blackIp)) {
-            return EnableFlagEnum.ENABLE.equals(blackIp.getEnableFlag());
-        }
-        return false;
+        BlackIp blackIp = selectByIp(ip);
+        return ObjectUtil.isNotNull(blackIp);
     }
 
     private LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpPageQuery query) {

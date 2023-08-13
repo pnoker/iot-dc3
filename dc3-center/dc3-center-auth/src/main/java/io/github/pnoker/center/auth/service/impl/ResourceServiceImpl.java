@@ -46,9 +46,9 @@ public class ResourceServiceImpl implements ResourceService {
 
 
     @Override
-    public void add(Resource entityDo) {
+    public void add(Resource entityDO) {
         //todo check if exists
-        if (resourceMapper.insert(entityDo) < 1) {
+        if (resourceMapper.insert(entityDO) < 1) {
             throw new AddException("The resource add failed");
         }
     }
@@ -62,9 +62,9 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public void update(Resource entityDo) {
-        selectById(entityDo.getId());
-        if (resourceMapper.updateById(entityDo) < 1) {
+    public void update(Resource entityDO) {
+        selectById(entityDO.getId());
+        if (resourceMapper.updateById(entityDO) < 1) {
             throw new UpdateException("The resource update failed");
         }
     }

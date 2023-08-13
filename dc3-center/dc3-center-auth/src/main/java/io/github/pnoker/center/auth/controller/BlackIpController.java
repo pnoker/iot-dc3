@@ -128,7 +128,7 @@ public class BlackIpController implements Controller {
     @GetMapping("/ip/{ip}")
     public R<BlackIp> selectByIp(@NotNull @PathVariable(value = "ip") String ip) {
         try {
-            BlackIp select = blackIpService.selectByIp(ip, false);
+            BlackIp select = blackIpService.selectByIp(ip);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
