@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ public class TokenServiceImpl implements TokenService {
             return token;
         }
         updateUserLimit(userName, tenant.getId(), true);
-        throw new ServiceException("Invalid userName、password、tenant");
+        throw new ServiceException("租户、用户信息不匹配");
     }
 
     @Override
