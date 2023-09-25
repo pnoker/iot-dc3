@@ -74,7 +74,7 @@ public class TokenServiceImpl implements TokenService {
         if (ObjectUtil.isNull(tenant)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.DOUBLE_COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
+        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
         String salt = redisUtil.getKey(redisSaltKey);
         if (CharSequenceUtil.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
@@ -99,11 +99,11 @@ public class TokenServiceImpl implements TokenService {
             throw new NotFoundException("租户、用户信息不匹配");
         }
         UserPassword userPassword = userPasswordService.selectById(userLogin.getUserPasswordId());
-        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.DOUBLE_COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
+        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
         String redisSaltValue = redisUtil.getKey(redisSaltKey);
         String md5Password = DecodeUtil.md5(userPassword.getLoginPassword() + redisSaltValue);
         if (CharSequenceUtil.isNotEmpty(redisSaltValue) && redisSaltValue.equals(salt) && md5Password.equals(password)) {
-            String redisTokenKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.DOUBLE_COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
+            String redisTokenKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
             String token = KeyUtil.generateToken(userName, redisSaltValue, tenant.getId());
             redisUtil.setKey(redisTokenKey, token, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
             return token;
@@ -118,7 +118,7 @@ public class TokenServiceImpl implements TokenService {
         if (ObjectUtil.isNull(tenant)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.DOUBLE_COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
+        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
         String redisToken = redisUtil.getKey(redisKey);
         if (CharSequenceUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
@@ -137,7 +137,7 @@ public class TokenServiceImpl implements TokenService {
         if (ObjectUtil.isNull(tenant)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.DOUBLE_COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
+        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
         redisUtil.deleteKey(redisKey);
         return true;
     }
@@ -149,7 +149,7 @@ public class TokenServiceImpl implements TokenService {
      * @param tenantId 租户ID
      */
     private void checkUserLimit(String userName, String tenantId) {
-        String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.DOUBLE_COLON + userName + SymbolConstant.HASHTAG + tenantId;
+        String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantId;
         UserLimit limit = redisUtil.getKey(redisKey);
         if (ObjectUtil.isNotNull(limit) && limit.getTimes() >= 5) {
             Date now = new Date();
@@ -171,7 +171,7 @@ public class TokenServiceImpl implements TokenService {
      */
     private UserLimit updateUserLimit(String userName, String tenantId, boolean expireTime) {
         int amount = TimeoutConstant.USER_LIMIT_TIMEOUT;
-        String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.DOUBLE_COLON + userName + SymbolConstant.HASHTAG + tenantId;
+        String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantId;
         UserLimit userLimit = redisUtil.getKey(redisKey);
         UserLimit limit = Optional.ofNullable(userLimit).orElse(new UserLimit(0, new Date()));
         limit.setTimes(limit.getTimes() + 1);

@@ -114,6 +114,12 @@
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
+        <!-- DC3 Public -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-public</artifactId>
+        </dependency>
+
         <!-- DC3 Api Auth -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
