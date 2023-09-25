@@ -21,8 +21,8 @@ driver:
     read:
       corn: '0/5 * * * * ?'
   mqtt:
-    url: ${MQTT_BROKER_URL:ssl://dc3-rabbitmq:8883}
-    auth-type: X509
+    url: ${MQTT_BROKER_URL:tcp://dc3-rabbitmq:1883}
+    auth-type: USERNAME
     username: dc3
     password: dc3
     receive-topics:
