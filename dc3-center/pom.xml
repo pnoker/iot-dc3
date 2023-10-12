@@ -72,10 +72,10 @@
             <artifactId>grpc-spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- DC3 Center Register Client Starter -->
+        <!-- DC3 Common Register -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-starter-center-register-nacos-client</artifactId>
+            <artifactId>dc3-common-register</artifactId>
         </dependency>
 
         <!-- DC3 Common Web -->
