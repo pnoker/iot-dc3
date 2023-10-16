@@ -31,7 +31,7 @@
 
     <dependencies>
 
-        <!-- Eclipse Milo SDK Client -->
+        <!-- OPC UA 相关 -->
         <dependency>
             <groupId>org.eclipse.milo</groupId>
             <artifactId>sdk-client</artifactId>
