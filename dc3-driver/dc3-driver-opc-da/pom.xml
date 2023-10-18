@@ -31,7 +31,7 @@
 
     <dependencies>
 
-        <!-- Java Interop 相关 -->
+        <!-- Java COM 相关 -->
         <dependency>
             <groupId>org.jinterop</groupId>
             <artifactId>j-interop</artifactId>
