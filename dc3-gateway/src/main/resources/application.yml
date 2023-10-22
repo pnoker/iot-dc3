@@ -46,9 +46,6 @@ spring:
       add-mappings: false
   redis:
     database: 0
-  cache:
-    redis:
-      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:12H}
   cloud:
     gateway:
       loadbalancer:
