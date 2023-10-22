@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.generator;
+package io.github.pnoker.center.data.generator;
 
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
@@ -28,7 +28,7 @@ import io.github.pnoker.common.MybatisUtil;
  * <p>
  * 注意：
  * <p>
- * 当前配置仅用于 dc3-center-auth 服务模块，如果需要用于其他模块请重新配置 path 参数。
+ * 当前配置仅用于 dc3-center-data 服务模块，如果需要用于其他模块请重新配置 path 参数。
  *
  * @author pnoker
  * @since 2022.1.0
@@ -39,7 +39,7 @@ public class MybatisGenerator {
     }
 
     public static void generator() {
-        String path = System.getProperty("user.dir") + "/dc3-center/dc3-center-auth/src/main";
+        String path = System.getProperty("user.dir") + "/dc3-center/dc3-center-data/src/main";
         FastAutoGenerator.create(
                         "jdbc:mysql://dc3-mysql:33306/dc3?useSSL=false",
                         "root",
@@ -48,14 +48,14 @@ public class MybatisGenerator {
                 .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
                 .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
                 .packageConfig(builder -> builder
-                        .parent("io.github.pnoker.center.auth")
+                        .parent("io.github.pnoker.center.data")
                         .entity("entity.model")
                         .service("service")
                         .serviceImpl("service.impl")
                         .mapper("mapper")
                         .pathInfo(ImmutableMap.of(
-                                OutputFile.service, path + "/java/io/github/pnoker/center/auth/service",
-                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/center/auth/service/impl",
+                                OutputFile.service, path + "/java/io/github/pnoker/center/data/service",
+                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/center/data/service/impl",
                                 OutputFile.xml, path + "/resources/mapping"))
                 ).templateConfig(builder -> builder.disable(TemplateType.CONTROLLER))
                 .templateEngine(new VelocityTemplateEngine())
