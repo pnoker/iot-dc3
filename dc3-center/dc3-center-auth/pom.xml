@@ -31,10 +31,10 @@
 
     <dependencies>
 
-        <!-- Knife Open Api -->
+        <!--Spring Security OAuth2-->
         <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-openapi3-spring-boot-starter</artifactId>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
         </dependency>
 
         <!-- DC3 Api -->
