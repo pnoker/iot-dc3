@@ -16,6 +16,15 @@
 
 # Test environment, customizable configuration
 spring:
+  redis:
+    host: ${REDIS_HOST:dc3-redis}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:dc3}
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:15M}
+  cloud:
+    nacos:
+      server-addr: ${NACOS_HOST:dc3-center-register}:${NACOS_PORT:8848}
+      discovery:
+        namespace: ${NODE_ENV:test}

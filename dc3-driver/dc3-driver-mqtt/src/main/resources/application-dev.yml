@@ -23,19 +23,15 @@ driver:
   mqtt:
     url: ${MQTT_BROKER_URL:tcp://dc3-rabbitmq:1883}
     auth-type: USERNAME
-    username: dc3
-    password: dc3
+    username: ${MQTT_USERNAME:dc3}
+    password: ${MQTT_PASSWORD:dc3}
+    topic-prefix: dc3/${driver.tenant}/${spring.application.name}/
     receive-topics:
       - qos: 1
         name: data
     default-send-topic:
       qos: 1
       name: command
-    keep-alive: 15
-    completion-timeout: 3000
-    batch:
-      speed: ${MQTT_BATCH_SPEED:100}
-      interval: ${MQTT_BATCH_INTERVAL:5}
 
 spring:
   # 当开启env和group时，需要本地启动auth，manager和data服务

@@ -74,12 +74,12 @@
             <artifactId>dc3-common-mongo</artifactId>
         </dependency>
 
+        <!--待移除-->
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
             <version>2.0.25</version>
         </dependency>
-
     </dependencies>
 
 </project>
