@@ -14,8 +14,51 @@
 # limitations under the License.
 #
 
-# Product environment, customizable configuration
+# Pre-release environment, customizable configuration
 spring:
+  datasource:
+    dynamic:
+      datasource:
+        master:
+          url: jdbc:mysql://${DB_HOST:dc3-mysql}:${MYSQL_PORT:3306}/${DB_NAME:dc3_data}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:dc3}
+  rabbitmq:
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
+    host: ${RABBITMQ_HOST:dc3-rabbitmq}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:dc3}
+    password: ${RABBITMQ_PASSWORD:dc3}
+  redis:
+    host: ${REDIS_HOST:dc3-redis}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:dc3}
+  data:
+    mongodb:
+      host: ${MONGO_HOST:dc3-mongo}
+      port: ${MONGO_PORT:27017}
+      database: ${MONGO_DATABASE:dc3}
+      username: ${MONGO_USERNAME:dc3}
+      password: ${MONGO_PASSWORD:dc3}
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:12H}
+  cloud:
+    nacos:
+      server-addr: ${NACOS_HOST:dc3-center-register}:${NACOS_PORT:8848}
+      discovery:
+        namespace: ${NODE_ENV:pre}
+
+data:
+  point:
+    sava:
+      influxdb:
+        enable: false
+      opentsdb:
+        enable: false
+        host: dc3-opentsdb
+        port: 4242
+      elasticsearch:
+        enable: false
+        host: dc3-elasticsearch
+        port: 9200

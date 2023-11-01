@@ -14,12 +14,12 @@
 # limitations under the License.
 #
 
-# Development environment, customizable configuration
+# Pre-release environment, customizable configuration
 driver:
   schedule:
     # 定时读数据
     read:
-      corn: '0/5 * * * * ?'
+      corn: '0 0/15 * * * ?'
   mqtt:
     url: ${MQTT_BROKER_URL:tcp://dc3-rabbitmq:1883}
     auth-type: USERNAME
@@ -34,17 +34,9 @@ driver:
       name: command
 
 spring:
-  # 当开启env和group时，需要本地启动auth，manager和data服务
-  env: dev
-  group: ${user.name}
   rabbitmq:
     virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
     host: ${RABBITMQ_HOST:dc3-rabbitmq}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:dc3}
     password: ${RABBITMQ_PASSWORD:dc3}
-
-logging:
-  level:
-    io.github.pnoker: DEBUG
-    io.github.pnoker.driver.sdk: DEBUG

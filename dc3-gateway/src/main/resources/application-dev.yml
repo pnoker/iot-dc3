@@ -27,6 +27,8 @@ spring:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}
   cloud:
     nacos:
+      server-addr: ${NACOS_HOST:dc3-center-register}:${NACOS_PORT:8848}
       discovery:
+        ip: ${NODE_HOST:}
         group: ${spring.group}
-        watch-delay: 5000
+        namespace: ${NODE_ENV:dev}

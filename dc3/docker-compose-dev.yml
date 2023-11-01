@@ -49,7 +49,7 @@ services:
         aliases:
           - dc3-center-register
   mysql:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.4.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.11.0.dev
     restart: on-failure
     ports:
       - '33306:3306'
