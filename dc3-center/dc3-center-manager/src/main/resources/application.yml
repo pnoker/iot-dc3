@@ -40,8 +40,5 @@ spring:
     database: 2
 
 logging:
-  level:
-    io.github.pnoker: DEBUG
-    #io.github.pnoker.center.manager.service.rabbit: INFO
   file:
     name: dc3/logs/center/manager/${spring.application.name}.log

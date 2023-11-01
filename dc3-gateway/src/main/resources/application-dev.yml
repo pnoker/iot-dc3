@@ -32,3 +32,7 @@ spring:
         ip: ${NODE_HOST:}
         group: ${spring.group}
         namespace: ${NODE_ENV:dev}
+
+logging:
+  level:
+    io.github.pnoker: DEBUG
