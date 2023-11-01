@@ -124,7 +124,5 @@ spring:
             #   fallbackUri: 'forward:/fallback'
 
 logging:
-  level:
-    io.github.pnoker: DEBUG
   file:
     name: dc3/logs/gateway/${spring.application.name}.log

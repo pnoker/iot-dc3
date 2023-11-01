@@ -31,7 +31,5 @@ spring:
     database: 1
 
 logging:
-  level:
-    io.github.pnoker: DEBUG
   file:
     name: dc3/logs/center/auth/${spring.application.name}.log
