@@ -113,7 +113,7 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     @Transactional
-    public void delete(String id) {
+    public void delete(Long id) {
         Device device = selectById(id);
         if (ObjectUtil.isNull(device)) {
             throw new NotFoundException("The device does not exist");
@@ -169,7 +169,7 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
-    public Device selectById(String id) {
+    public Device selectById(Long id) {
         Device device = deviceMapper.selectById(id);
         if (ObjectUtil.isNull(device)) {
             throw new NotFoundException();

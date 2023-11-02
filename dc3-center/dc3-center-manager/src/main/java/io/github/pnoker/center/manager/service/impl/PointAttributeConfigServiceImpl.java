@@ -85,7 +85,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         PointAttributeConfig pointAttributeConfig = selectById(id);
         if (ObjectUtil.isNull(pointAttributeConfig)) {
             throw new NotFoundException("The point attribute config does not exist");
@@ -129,7 +129,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public PointAttributeConfig selectById(String id) {
+    public PointAttributeConfig selectById(Long id) {
         PointAttributeConfig pointAttributeConfig = pointAttributeConfigMapper.selectById(id);
         if (ObjectUtil.isNull(pointAttributeConfig)) {
             throw new NotFoundException();

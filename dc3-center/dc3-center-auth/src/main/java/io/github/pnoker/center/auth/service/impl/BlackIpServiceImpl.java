@@ -59,7 +59,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         BlackIp blackIp = selectById(id);
         if (ObjectUtil.isNull(blackIp)) {
             throw new NotFoundException("The ip does not exist in the blacklist");
@@ -80,7 +80,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public BlackIp selectById(String id) {
+    public BlackIp selectById(Long id) {
         return blackIpMapper.selectById(id);
     }
 

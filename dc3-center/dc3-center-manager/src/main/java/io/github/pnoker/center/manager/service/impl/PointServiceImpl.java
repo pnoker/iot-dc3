@@ -83,7 +83,7 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         Point point = selectById(id);
         if (ObjectUtil.isNull(point)) {
             throw new NotFoundException("The point does not exist");
@@ -126,7 +126,7 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public Point selectById(String id) {
+    public Point selectById(Long id) {
         Point point = pointMapper.selectById(id);
         if (ObjectUtil.isNull(point)) {
             throw new NotFoundException();

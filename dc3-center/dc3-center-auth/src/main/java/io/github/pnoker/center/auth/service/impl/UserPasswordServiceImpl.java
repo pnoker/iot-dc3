@@ -87,7 +87,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public UserPassword selectById(String id) {
+    public UserPassword selectById(Long id) {
         return userPasswordMapper.selectById(id);
     }
 

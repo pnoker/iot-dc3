@@ -65,7 +65,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         DriverAttribute driverAttribute = selectById(id);
         if (ObjectUtil.isNull(driverAttribute)) {
             throw new NotFoundException("The driver attribute does not exist");
@@ -92,7 +92,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public DriverAttribute selectById(String id) {
+    public DriverAttribute selectById(Long id) {
         DriverAttribute driverAttribute = driverAttributeMapper.selectById(id);
         if (ObjectUtil.isNull(driverAttribute)) {
             throw new NotFoundException();

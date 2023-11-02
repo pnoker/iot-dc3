@@ -78,7 +78,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      * {@inheritDoc}
      */
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         DriverAttributeConfig driverAttributeConfig = selectById(id);
         if (ObjectUtil.isNull(driverAttributeConfig)) {
             throw new NotFoundException("The driver attribute config does not exist");
@@ -121,7 +121,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      * {@inheritDoc}
      */
     @Override
-    public DriverAttributeConfig selectById(String id) {
+    public DriverAttributeConfig selectById(Long id) {
         DriverAttributeConfig driverAttributeConfig = driverAttributeConfigMapper.selectById(id);
         if (ObjectUtil.isNull(driverAttributeConfig)) {
             throw new NotFoundException();

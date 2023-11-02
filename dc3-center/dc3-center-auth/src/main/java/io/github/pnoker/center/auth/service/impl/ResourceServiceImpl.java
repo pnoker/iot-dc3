@@ -54,7 +54,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         selectById(id);
         if (resourceMapper.deleteById(id) < 1) {
             throw new DeleteException("The resource delete failed");
@@ -70,7 +70,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public Resource selectById(String id) {
+    public Resource selectById(Long id) {
         Resource resource = resourceMapper.selectById(id);
         if (ObjectUtil.isNull(resource)) {
             throw new NotFoundException();
