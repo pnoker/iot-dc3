@@ -16,7 +16,6 @@
 
 package io.github.pnoker.gateway.config;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.common.entity.R;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +64,7 @@ public class ExceptionConfig implements ErrorWebExceptionHandler {
             DataBufferFactory bufferFactory = response.bufferFactory();
             try {
                 return bufferFactory.wrap(objectMapper.writeValueAsBytes(R.fail(throwable.getMessage())));
-            } catch (JsonProcessingException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return bufferFactory.wrap(new byte[0]);
             }

@@ -41,7 +41,7 @@ public class MybatisGenerator {
     public static void generator() {
         String path = System.getProperty("user.dir") + "/dc3-center/dc3-center-auth/src/main";
         FastAutoGenerator.create(
-                        "jdbc:mysql://dc3-mysql:33306/dc3?useSSL=false",
+                        "jdbc:mysql://dc3-mysql:33306/dc3_auth?useSSL=false",
                         "root",
                         "dc3"
                 )
