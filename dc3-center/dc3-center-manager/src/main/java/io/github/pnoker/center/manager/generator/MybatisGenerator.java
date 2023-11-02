@@ -51,12 +51,12 @@ public class MybatisGenerator {
                 .packageConfig(builder -> builder
                         .parent("io.github.pnoker.center.manager")
                         .entity("entity.model")
-                        .service("service")
-                        .serviceImpl("service.impl")
+                        .service("manager")
+                        .serviceImpl("manager.impl")
                         .mapper("mapper")
                         .pathInfo(ImmutableMap.of(
-                                OutputFile.service, path + "/java/io/github/pnoker/center/manager/service",
-                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/center/manager/service/impl",
+                                OutputFile.service, path + "/java/io/github/pnoker/center/manager/manager",
+                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/center/manager/manager/impl",
                                 OutputFile.xml, path + "/resources/mapping"))
                 ).templateConfig(builder -> builder.disable(TemplateType.CONTROLLER))
                 .templateEngine(new VelocityTemplateEngine())
