@@ -89,7 +89,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public UserLogin selectById(String id) {
+    public UserLogin selectById(Long id) {
         return userLoginMapper.selectById(id);
     }
 

@@ -56,7 +56,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         TenantBind tenantBind = selectById(id);
         if (ObjectUtil.isNull(tenantBind)) {
             throw new NotFoundException("The tenant bind does not exist");
@@ -77,7 +77,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public TenantBind selectById(String id) {
+    public TenantBind selectById(Long id) {
         TenantBind tenantBind = tenantBindMapper.selectById(id);
         if (ObjectUtil.isNull(tenantBind)) {
             throw new NotFoundException();

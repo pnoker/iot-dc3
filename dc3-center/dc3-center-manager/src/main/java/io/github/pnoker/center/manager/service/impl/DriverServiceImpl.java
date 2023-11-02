@@ -77,7 +77,7 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         DriverDO entityDO = selectById(id);
         if (ObjectUtil.isNull(entityDO)) {
             throw new NotFoundException("The driver does not exist");
@@ -104,7 +104,7 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public DriverDO selectById(String id) {
+    public DriverDO selectById(Long id) {
         DriverDO entityDO = driverMapper.selectById(id);
         if (ObjectUtil.isNull(entityDO)) {
             throw new NotFoundException();

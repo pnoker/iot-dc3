@@ -57,7 +57,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
 
     @Override
-    public RoleUserBind selectById(String id) {
+    public RoleUserBind selectById(Long id) {
         RoleUserBind roleUserBind = roleUserBindMapper.selectById(id);
         if (ObjectUtil.isNull(roleUserBind)) {
             throw new NotFoundException();
@@ -90,7 +90,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         selectById(id);
         if (roleUserBindMapper.deleteById(id) < 1) {
             throw new DeleteException("The role user bind delete failed");

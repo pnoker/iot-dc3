@@ -65,7 +65,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         PointAttribute pointAttribute = selectById(id);
         if (ObjectUtil.isNull(pointAttribute)) {
             throw new NotFoundException("The point attribute does not exist");
@@ -92,7 +92,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public PointAttribute selectById(String id) {
+    public PointAttribute selectById(Long id) {
         PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
         if (ObjectUtil.isNull(pointAttribute)) {
             throw new NotFoundException();

@@ -59,7 +59,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         Tenant tenant = selectById(id);
         if (ObjectUtil.isNull(tenant)) {
             throw new NotFoundException("The tenant does not exist");
@@ -80,7 +80,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Tenant selectById(String id) {
+    public Tenant selectById(Long id) {
         return tenantMapper.selectById(id);
     }
 

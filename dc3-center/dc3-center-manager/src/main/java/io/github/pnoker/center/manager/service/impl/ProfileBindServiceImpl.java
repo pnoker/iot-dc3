@@ -67,7 +67,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         ProfileBind profileBind = selectById(id);
         if (ObjectUtil.isNull(profileBind)) {
             throw new NotFoundException("The profile bind does not exist");
@@ -115,7 +115,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public ProfileBind selectById(String id) {
+    public ProfileBind selectById(Long id) {
         ProfileBind profileBind = profileBindMapper.selectById(id);
         if (ObjectUtil.isNull(profileBind)) {
             throw new NotFoundException();

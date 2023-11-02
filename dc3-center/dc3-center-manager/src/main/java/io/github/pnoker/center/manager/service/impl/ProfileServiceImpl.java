@@ -76,7 +76,7 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         try {
             pointService.selectByProfileId(id);
             throw new ServiceException("The profile already bound by the point");
@@ -107,7 +107,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Profile selectById(String id) {
+    public Profile selectById(Long id) {
         Profile profile = profileMapper.selectById(id);
         if (ObjectUtil.isNull(profile)) {
             throw new NotFoundException();

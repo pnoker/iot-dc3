@@ -63,7 +63,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(Long id) {
         selectById(id);
         if (bindMapper.deleteById(id) < 1) {
             throw new DeleteException("The role resource bind delete failed");
@@ -79,7 +79,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public RoleResourceBind selectById(String id) {
+    public RoleResourceBind selectById(Long id) {
         RoleResourceBind bind = bindMapper.selectById(id);
         if (ObjectUtil.isNull(bind)) {
             throw new NotFoundException();
