@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.generator.config.TemplateType;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.google.common.collect.ImmutableMap;
 import io.github.pnoker.common.MybatisUtil;
+import io.github.pnoker.common.base.Service;
 
 /**
  * 自动代码生成工具
@@ -63,7 +64,9 @@ public class MybatisGenerator {
                 .strategyConfig(builder -> builder
                         // 仅修改 addInclude 为代生成代表明即可
                         .addInclude(
-                                "dc3_user"
+                                "dc3_group",
+                                "dc3_label",
+                                "dc3_label_bind"
                         )
                 ).execute();
     }
