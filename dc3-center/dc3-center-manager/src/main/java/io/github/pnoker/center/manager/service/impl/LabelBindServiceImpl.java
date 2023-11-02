@@ -21,15 +21,15 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.model.LabelBindDO;
 import io.github.pnoker.center.manager.entity.query.LabelBindPageQuery;
-import io.github.pnoker.center.manager.mapper.LabelBindMapper;
+import io.github.pnoker.center.manager.manager.LabelBindManager;
 import io.github.pnoker.center.manager.service.LabelBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
-import io.github.pnoker.common.model.LabelBind;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -46,14 +46,14 @@ import javax.annotation.Resource;
 public class LabelBindServiceImpl implements LabelBindService {
 
     @Resource
-    private LabelBindMapper labelBindMapper;
+    private LabelBindManager labelBindManager;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void add(LabelBind entityDO) {
-        if (labelBindMapper.insert(entityDO) < 1) {
+    public void add(LabelBindDO entityDO) {
+        if (!labelBindManager.save(entityDO)) {
             throw new AddException("The label bind add failed");
         }
     }
@@ -62,13 +62,13 @@ public class LabelBindServiceImpl implements LabelBindService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(String id) {
-        LabelBind labelBind = selectById(id);
+    public void delete(Long id) {
+        LabelBindDO labelBind = selectById(id);
         if (ObjectUtil.isNull(labelBind)) {
             throw new NotFoundException("The label bind does not exist");
         }
 
-        if (labelBindMapper.deleteById(id) < 1) {
+        if (!labelBindManager.removeById(id)) {
             throw new DeleteException("The label bind delete failed");
         }
     }
@@ -77,10 +77,10 @@ public class LabelBindServiceImpl implements LabelBindService {
      * {@inheritDoc}
      */
     @Override
-    public void update(LabelBind entityDO) {
+    public void update(LabelBindDO entityDO) {
         selectById(entityDO.getId());
         entityDO.setOperateTime(null);
-        if (labelBindMapper.updateById(entityDO) < 1) {
+        if (!labelBindManager.updateById(entityDO)) {
             throw new UpdateException("The label bind update failed");
         }
     }
@@ -89,8 +89,8 @@ public class LabelBindServiceImpl implements LabelBindService {
      * {@inheritDoc}
      */
     @Override
-    public LabelBind selectById(String id) {
-        LabelBind labelBind = labelBindMapper.selectById(id);
+    public LabelBindDO selectById(Long id) {
+        LabelBindDO labelBind = labelBindManager.getById(id);
         if (ObjectUtil.isNull(labelBind)) {
             throw new NotFoundException();
         }
@@ -101,18 +101,18 @@ public class LabelBindServiceImpl implements LabelBindService {
      * {@inheritDoc}
      */
     @Override
-    public Page<LabelBind> list(LabelBindPageQuery queryDTO) {
+    public Page<LabelBindDO> list(LabelBindPageQuery queryDTO) {
         if (ObjectUtil.isNull(queryDTO.getPage())) {
             queryDTO.setPage(new Pages());
         }
-        return labelBindMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return labelBindManager.page(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
     }
 
-    private LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindPageQuery query) {
-        LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
+    private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindPageQuery query) {
+        LambdaQueryWrapper<LabelBindDO> queryWrapper = Wrappers.<LabelBindDO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getLabelId()), LabelBind::getLabelId, query.getLabelId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getEntityId()), LabelBind::getEntityId, query.getEntityId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getLabelId()), LabelBindDO::getLabelId, query.getLabelId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getEntityId()), LabelBindDO::getEntityId, query.getEntityId());
         }
         return queryWrapper;
     }
