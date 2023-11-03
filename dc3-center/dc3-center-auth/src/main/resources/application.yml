@@ -16,6 +16,11 @@
 
 server:
   port: ${SERVER_PORT:8300}
+  servlet:
+    context-path: /auth
+  undertow:
+    accesslog:
+      dir: dc3/logs/center/auth/undertow
 
 grpc:
   server:

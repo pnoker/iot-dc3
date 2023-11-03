@@ -160,7 +160,7 @@ services:
           - dc3-driver-virtual
 
   register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:2023.4.0.demo
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-register:2023.4.0.demo
     restart: always
     environment:
       - PREFER_HOST_MODE=hostname
@@ -172,11 +172,11 @@ services:
       - JVM_MS=128m
       - JVM_MMS=256m
     container_name: dc3-demo-center-register
-    hostname: dc3-center-register
+    hostname: dc3-register
     depends_on:
       - mysql
     volumes:
-      - demo_logs:/dc3-center/dc3-center-register/dc3/logs
+      - demo_logs:/dc3-center/dc3-register/dc3/logs
     logging:
       driver: json-file
       options:
@@ -185,7 +185,7 @@ services:
     networks:
       dc3demonet:
         aliases:
-          - dc3-center-register
+          - dc3-register
 
   mysql:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.4.0.demo
