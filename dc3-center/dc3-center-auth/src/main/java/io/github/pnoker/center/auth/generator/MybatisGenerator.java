@@ -50,18 +50,17 @@ public class MybatisGenerator {
                 .packageConfig(builder -> builder
                         .parent("io.github.pnoker.center.auth")
                         .entity("entity.model")
-                        .service("service")
-                        .serviceImpl("service.impl")
+                        .service("manager")
+                        .serviceImpl("manager.impl")
                         .mapper("mapper")
                         .pathInfo(ImmutableMap.of(
-                                OutputFile.service, path + "/java/io/github/pnoker/center/auth/service",
-                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/center/auth/service/impl",
+                                OutputFile.service, path + "/java/io/github/pnoker/center/auth/manager",
+                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/center/auth/manager/impl",
                                 OutputFile.xml, path + "/resources/mapping"))
                 ).templateConfig(builder -> builder.disable(TemplateType.CONTROLLER))
                 .templateEngine(new VelocityTemplateEngine())
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder
-                        // 仅修改 addInclude 为代生成代表明即可
                         .addInclude(
                                 "dc3_user"
                         )

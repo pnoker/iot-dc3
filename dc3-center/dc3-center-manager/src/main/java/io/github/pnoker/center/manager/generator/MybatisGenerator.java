@@ -62,7 +62,6 @@ public class MybatisGenerator {
                 .templateEngine(new VelocityTemplateEngine())
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder
-                        // 仅修改 addInclude 为代生成代表明即可
                         .addInclude(
                                 "dc3_group",
                                 "dc3_label",
