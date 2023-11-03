@@ -71,7 +71,7 @@ services:
           - dc3-mysql
 
   mongo:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.4.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.11.0.dev
     restart: on-failure
     ports:
       - '37017:27017'
@@ -91,7 +91,7 @@ services:
           - dc3-mongo
 
   redis:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.4.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.11.0.dev
     restart: on-failure
     ports:
       - '36379:6379'
