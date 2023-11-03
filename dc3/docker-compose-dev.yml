@@ -18,7 +18,7 @@ version: '3'
 
 services:
   register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:4.0.0-nacos
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-register:2023.11.0.dev
     restart: on-failure
     ports:
       - "8848:8848"
@@ -33,8 +33,8 @@ services:
       - JVM_XMN=256m
       - JVM_MS=128m
       - JVM_MMS=256m
-    container_name: dc3-center-register
-    hostname: dc3-center-register
+    container_name: dc3-register
+    hostname: dc3-register
     depends_on:
       - mysql
     volumes:
@@ -47,7 +47,7 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-center-register
+          - dc3-register
   mysql:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.11.0.dev
     restart: on-failure

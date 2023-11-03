@@ -34,7 +34,7 @@ import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 
 /**
- * 设备 Controller
+ * 分组 Controller
  *
  * @author pnoker
  * @since 2022.1.0
