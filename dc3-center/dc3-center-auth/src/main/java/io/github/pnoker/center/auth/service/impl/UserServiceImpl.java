@@ -49,39 +49,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void add(User entityDO) {
+    public void add(User entityBO) {
         // 判断用户是否存在
-        User selectByUserName = selectByUserName(entityDO.getUserName(), false);
+        User selectByUserName = selectByUserName(entityBO.getUserName(), false);
         if (ObjectUtil.isNotNull(selectByUserName)) {
-            throw new DuplicateException("The user already exists with userName: {}", entityDO.getUserName());
+            throw new DuplicateException("The user already exists with userName: {}", entityBO.getUserName());
         }
 
         // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用
-        if (CharSequenceUtil.isNotEmpty(entityDO.getPhone())) {
-            User selectByPhone = selectByPhone(entityDO.getPhone(), false);
+        if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
+            User selectByPhone = selectByPhone(entityBO.getPhone(), false);
             if (ObjectUtil.isNotNull(selectByPhone)) {
-                throw new DuplicateException("The user already exists with phone: {}", entityDO.getPhone());
+                throw new DuplicateException("The user already exists with phone: {}", entityBO.getPhone());
             }
         }
 
         // 判断 email 是否存在，如果有 email 不为空，检查该 email 是否被占用
-        if (CharSequenceUtil.isNotEmpty(entityDO.getEmail())) {
-            User selectByEmail = selectByEmail(entityDO.getEmail(), false);
+        if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
+            User selectByEmail = selectByEmail(entityBO.getEmail(), false);
             if (ObjectUtil.isNotNull(selectByEmail)) {
-                throw new DuplicateException("The user already exists with email: {}", entityDO.getEmail());
+                throw new DuplicateException("The user already exists with email: {}", entityBO.getEmail());
             }
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userMapper.insert(entityDO) < 1) {
-            throw new AddException("The user add failed: {}", entityDO.toString());
+        if (userMapper.insert(entityBO) < 1) {
+            throw new AddException("The user add failed: {}", entityBO.toString());
         }
     }
 
     @Override
     @Transactional
     public void delete(String id) {
-        User user = selectById(id);
+        User user = get(id);
         if (ObjectUtil.isNull(user)) {
             throw new NotFoundException("The user does not exist");
         }
@@ -92,41 +92,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(User entityDO) {
-        User selectById = selectById(entityDO.getId());
+    public void update(User entityBO) {
+        User selectById = get(entityBO.getId());
         // 判断 phone 是否修改
-        if (CharSequenceUtil.isNotEmpty(entityDO.getPhone())) {
-            if (!entityDO.getPhone().equals(selectById.getPhone())) {
-                User selectByPhone = selectByPhone(entityDO.getPhone(), false);
+        if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
+            if (!entityBO.getPhone().equals(selectById.getPhone())) {
+                User selectByPhone = selectByPhone(entityBO.getPhone(), false);
                 if (ObjectUtil.isNotNull(selectByPhone)) {
-                    throw new DuplicateException("The user already exists with phone {}", entityDO.getPhone());
+                    throw new DuplicateException("The user already exists with phone {}", entityBO.getPhone());
                 }
             }
         } else {
-            entityDO.setPhone(null);
+            entityBO.setPhone(null);
         }
 
         // 判断 email 是否修改
-        if (CharSequenceUtil.isNotEmpty(entityDO.getEmail())) {
-            if (!entityDO.getEmail().equals(selectById.getEmail())) {
-                User selectByEmail = selectByEmail(entityDO.getEmail(), false);
+        if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
+            if (!entityBO.getEmail().equals(selectById.getEmail())) {
+                User selectByEmail = selectByEmail(entityBO.getEmail(), false);
                 if (ObjectUtil.isNotNull(selectByEmail)) {
-                    throw new DuplicateException("The user already exists with email {}", entityDO.getEmail());
+                    throw new DuplicateException("The user already exists with email {}", entityBO.getEmail());
                 }
             }
         } else {
-            entityDO.setEmail(null);
+            entityBO.setEmail(null);
         }
 
-        entityDO.setUserName(null);
-        entityDO.setOperateTime(null);
-        if (userMapper.updateById(entityDO) < 1) {
+        entityBO.setUserName(null);
+        entityBO.setOperateTime(null);
+        if (userMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The user update failed");
         }
     }
 
     @Override
-    public User selectById(Long id) {
+    public User get(Long id) {
         return userMapper.selectById(id);
     }
 
@@ -166,11 +166,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> list(UserDto queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<User> list(UserDto entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return userMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return userMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<User> fuzzyQuery(UserDto query) {

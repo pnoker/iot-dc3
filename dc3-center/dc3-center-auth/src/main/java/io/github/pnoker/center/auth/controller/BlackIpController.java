@@ -109,7 +109,7 @@ public class BlackIpController implements Controller {
     @GetMapping("/id/{id}")
     public R<BlackIp> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            BlackIp select = blackIpService.selectById(id);
+            BlackIp select = blackIpService.get(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }

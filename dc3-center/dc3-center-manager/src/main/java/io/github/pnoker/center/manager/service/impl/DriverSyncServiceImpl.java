@@ -121,7 +121,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
             log.debug("Driver does not registered, adding {} ", entityDO);
             driverService.add(entityDO);
         }
-        return driverService.selectById(entityDO.getId());
+        return driverService.get(entityDO.getId());
     }
 
     /**

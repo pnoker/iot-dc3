@@ -46,31 +46,31 @@ public class ResourceServiceImpl implements ResourceService {
 
 
     @Override
-    public void add(Resource entityDO) {
+    public void add(Resource entityBO) {
         //todo check if exists
-        if (resourceMapper.insert(entityDO) < 1) {
+        if (resourceMapper.insert(entityBO) < 1) {
             throw new AddException("The resource add failed");
         }
     }
 
     @Override
     public void delete(Long id) {
-        selectById(id);
+        get(id);
         if (resourceMapper.deleteById(id) < 1) {
             throw new DeleteException("The resource delete failed");
         }
     }
 
     @Override
-    public void update(Resource entityDO) {
-        selectById(entityDO.getId());
-        if (resourceMapper.updateById(entityDO) < 1) {
+    public void update(Resource entityBO) {
+        get(entityBO.getId());
+        if (resourceMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The resource update failed");
         }
     }
 
     @Override
-    public Resource selectById(Long id) {
+    public Resource get(Long id) {
         Resource resource = resourceMapper.selectById(id);
         if (ObjectUtil.isNull(resource)) {
             throw new NotFoundException();
@@ -79,11 +79,11 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public Page<Resource> list(ResourcePageQuery pageQuery) {
-        if (ObjectUtil.isNull(pageQuery.getPage())) {
-            pageQuery.setPage(new Pages());
+    public Page<Resource> list(ResourcePageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return resourceMapper.selectPage(pageQuery.getPage().convert(), buildQueryWrapper(pageQuery));
+        return resourceMapper.selectPage(entityQuery.getPage().page(), buildQueryWrapper(entityQuery));
     }
 
     private LambdaQueryWrapper<Resource> buildQueryWrapper(ResourcePageQuery pageQuery) {

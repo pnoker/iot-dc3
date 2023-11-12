@@ -49,15 +49,15 @@ public class TenantBindServiceImpl implements TenantBindService {
     private TenantBindMapper tenantBindMapper;
 
     @Override
-    public void add(TenantBind entityDO) {
-        if (tenantBindMapper.insert(entityDO) < 1) {
+    public void add(TenantBind entityBO) {
+        if (tenantBindMapper.insert(entityBO) < 1) {
             throw new AddException("The tenant bind add failed");
         }
     }
 
     @Override
     public void delete(Long id) {
-        TenantBind tenantBind = selectById(id);
+        TenantBind tenantBind = get(id);
         if (ObjectUtil.isNull(tenantBind)) {
             throw new NotFoundException("The tenant bind does not exist");
         }
@@ -68,16 +68,16 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public void update(TenantBind entityDO) {
-        selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (tenantBindMapper.updateById(entityDO) < 1) {
+    public void update(TenantBind entityBO) {
+        get(entityBO.getId());
+        entityBO.setOperateTime(null);
+        if (tenantBindMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The tenant bind update failed");
         }
     }
 
     @Override
-    public TenantBind selectById(Long id) {
+    public TenantBind get(Long id) {
         TenantBind tenantBind = tenantBindMapper.selectById(id);
         if (ObjectUtil.isNull(tenantBind)) {
             throw new NotFoundException();
@@ -95,11 +95,11 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public Page<TenantBind> list(TenantBindPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<TenantBind> list(TenantBindPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return tenantBindMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return tenantBindMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<TenantBind> fuzzyQuery(TenantBindPageQuery query) {

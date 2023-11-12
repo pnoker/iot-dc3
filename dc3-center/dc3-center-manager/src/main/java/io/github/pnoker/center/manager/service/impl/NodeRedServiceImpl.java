@@ -45,7 +45,7 @@ public class NodeRedServiceImpl implements NodeRedService {
             nodeRedFlowsPageQuery.setPage(new Pages());
         }
 
-        return nodeRedFlowsMapper.selectPage(nodeRedFlowsPageQuery.getPage().convert(), fuzzyFlowsQuery(nodeRedFlowsPageQuery));
+        return nodeRedFlowsMapper.selectPage(nodeRedFlowsPageQuery.getPage().page(), fuzzyFlowsQuery(nodeRedFlowsPageQuery));
     }
 
     private LambdaQueryWrapper<NodeRedFlows> fuzzyFlowsQuery(NodeRedFlowsPageQuery query) {

@@ -27,13 +27,17 @@ import io.github.pnoker.center.manager.manager.GroupManager;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 /**
+ * <p>
  * GroupService Impl
+ * </p>
  *
  * @author pnoker
  * @since 2022.1.0
@@ -50,14 +54,13 @@ public class GroupServiceImpl implements GroupService {
      * {@inheritDoc}
      */
     @Override
-    public void add(GroupDO entityDO) {
-        try {
-            selectByName(entityDO.getGroupName(), entityDO.getTenantId());
-            throw new DuplicateException("The device group already exists");
-        } catch (NotFoundException notFoundException) {
-            if (!groupManager.save(entityDO)) {
-                throw new AddException("The group {} add failed", entityDO.getGroupName());
-            }
+    public void add(GroupDO entityBO) {
+        Optional<GroupDO> groupDO = selectByName(entityBO.getGroupName(), entityBO.getTenantId());
+        if (groupDO.isPresent()) {
+            throw new DuplicateException("The group[name={}] already exists", entityBO.getGroupName());
+        }
+        if (!groupManager.save(entityBO)) {
+            throw new AddException("The group[name={}] add failed", entityBO.getGroupName());
         }
     }
 
@@ -66,13 +69,12 @@ public class GroupServiceImpl implements GroupService {
      */
     @Override
     public void delete(Long id) {
-        GroupDO group = selectById(id);
-        if (ObjectUtil.isNull(group)) {
-            throw new NotFoundException("The group does not exist");
+        Optional<GroupDO> groupDO = selectById(id);
+        if (!groupDO.isPresent()) {
+            throw new NotFoundException("The group[id={}] does not exist", id);
         }
-
         if (!groupManager.removeById(id)) {
-            throw new DeleteException("The group delete failed");
+            throw new DeleteException("The group[id={}] delete failed", id);
         }
     }
 
@@ -80,11 +82,14 @@ public class GroupServiceImpl implements GroupService {
      * {@inheritDoc}
      */
     @Override
-    public void update(GroupDO entityDO) {
-        selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (!groupManager.updateById(entityDO)) {
-            throw new UpdateException("The group update failed");
+    public void update(GroupDO entityBO) {
+        Optional<GroupDO> groupDO = selectById(entityBO.getId());
+        if (!groupDO.isPresent()) {
+            throw new NotFoundException("The group[id={}] does not exist", entityBO.getId());
+        }
+        entityBO.setOperateTime(null);
+        if (!groupManager.updateById(entityBO)) {
+            throw new UpdateException("The group[id={}] update failed", entityBO.getId());
         }
     }
 
@@ -92,38 +97,30 @@ public class GroupServiceImpl implements GroupService {
      * {@inheritDoc}
      */
     @Override
-    public GroupDO selectById(Long id) {
-        GroupDO group = groupManager.getById(id);
-        if (ObjectUtil.isNull(group)) {
-            throw new NotFoundException();
-        }
-        return group;
+    public Optional<GroupDO> selectById(Long id) {
+        return groupManager.getOptById(id);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public GroupDO selectByName(String name, Long tenantId) {
+    public Optional<GroupDO> selectByName(String name, Long tenantId) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.<GroupDO>query().lambda();
         queryWrapper.eq(GroupDO::getGroupName, name);
         queryWrapper.last("limit 1");
-        GroupDO group = groupManager.getOne(queryWrapper);
-        if (ObjectUtil.isNull(group)) {
-            throw new NotFoundException();
-        }
-        return group;
+        return groupManager.getOneOpt(queryWrapper);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<GroupDO> list(GroupPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<GroupDO> list(GroupPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return groupManager.page(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return groupManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupPageQuery query) {

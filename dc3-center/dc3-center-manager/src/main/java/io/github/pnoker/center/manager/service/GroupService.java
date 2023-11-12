@@ -20,20 +20,35 @@ import io.github.pnoker.center.manager.entity.model.GroupDO;
 import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
 import io.github.pnoker.common.base.Service;
 
+import java.util.Optional;
+
 /**
+ * <p>
  * Group Interface
+ * </p>
  *
  * @author pnoker
  * @since 2022.1.0
  */
 public interface GroupService extends Service<GroupDO, GroupPageQuery> {
     /**
-     * 根据分组 NAME 查询
+     * <p>
+     * 通过 ID 查询
+     * </p>
+     *
+     * @param id ID
+     * @return Entity of BO
+     */
+    Optional<GroupDO> selectById(Long id);
+
+
+    /**
+     * 根据分组名称查询
      *
      * @param name     分组名称
      * @param tenantId 租户ID
-     * @return Group
+     * @return Optional Group
      */
-    GroupDO selectByName(String name, Long tenantId);
+    Optional<GroupDO> selectByName(String name, Long tenantId);
 
 }

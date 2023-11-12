@@ -64,17 +64,17 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public void add(Point entityDO) {
+    public void add(Point entityBO) {
         try {
-            selectByNameAndProfileId(entityDO.getPointName(), entityDO.getProfileId());
+            selectByNameAndProfileId(entityBO.getPointName(), entityBO.getProfileId());
             throw new DuplicateException("The point already exists in the profile");
         } catch (NotFoundException notFoundException) {
-            if (pointMapper.insert(entityDO) < 1) {
-                throw new AddException("The point {} add failed", entityDO.getPointName());
+            if (pointMapper.insert(entityBO) < 1) {
+                throw new AddException("The point {} add failed", entityBO.getPointName());
             }
 
             // 通知驱动新增
-            Point point = pointMapper.selectById(entityDO.getId());
+            Point point = pointMapper.selectById(entityBO.getId());
             notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, point);
         }
     }
@@ -84,7 +84,7 @@ public class PointServiceImpl implements PointService {
      */
     @Override
     public void delete(Long id) {
-        Point point = selectById(id);
+        Point point = get(id);
         if (ObjectUtil.isNull(point)) {
             throw new NotFoundException("The point does not exist");
         }
@@ -100,25 +100,25 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public void update(Point entityDO) {
-        Point old = selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (!old.getProfileId().equals(entityDO.getProfileId()) || !old.getPointName().equals(entityDO.getPointName())) {
+    public void update(Point entityBO) {
+        Point old = get(entityBO.getId());
+        entityBO.setOperateTime(null);
+        if (!old.getProfileId().equals(entityBO.getProfileId()) || !old.getPointName().equals(entityBO.getPointName())) {
             try {
-                selectByNameAndProfileId(entityDO.getPointName(), entityDO.getProfileId());
+                selectByNameAndProfileId(entityBO.getPointName(), entityBO.getProfileId());
                 throw new DuplicateException("The point already exists");
             } catch (NotFoundException ignored) {
                 // nothing to do
             }
         }
 
-        if (pointMapper.updateById(entityDO) < 1) {
+        if (pointMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The point update failed");
         }
 
-        Point select = pointMapper.selectById(entityDO.getId());
-        entityDO.setPointName(select.getPointName());
-        entityDO.setProfileId(select.getProfileId());
+        Point select = pointMapper.selectById(entityBO.getId());
+        entityBO.setPointName(select.getPointName());
+        entityBO.setProfileId(select.getProfileId());
         notifyService.notifyDriverPoint(MetadataCommandTypeEnum.UPDATE, select);
     }
 
@@ -126,7 +126,7 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public Point selectById(Long id) {
+    public Point get(Long id) {
         Point point = pointMapper.selectById(id);
         if (ObjectUtil.isNull(point)) {
             throw new NotFoundException();
@@ -211,11 +211,11 @@ public class PointServiceImpl implements PointService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Point> list(PointPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<Point> list(PointPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return pointMapper.selectPageWithDevice(queryDTO.getPage().convert(), customFuzzyQuery(queryDTO), queryDTO.getDeviceId());
+        return pointMapper.selectPageWithDevice(entityQuery.getPage().page(), customFuzzyQuery(entityQuery), entityQuery.getDeviceId());
     }
 
     /**

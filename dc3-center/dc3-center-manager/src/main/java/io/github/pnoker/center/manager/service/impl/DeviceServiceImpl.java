@@ -93,16 +93,16 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
-    public void add(Device entityDO) {
-        if (deviceMapper.insert(entityDO) < 1) {
-            throw new AddException("The device {} add failed", entityDO.getDeviceName());
+    public void add(Device entityBO) {
+        if (deviceMapper.insert(entityBO) < 1) {
+            throw new AddException("The device {} add failed", entityBO.getDeviceName());
         }
 
-        addProfileBind(entityDO.getId(), entityDO.getProfileIds());
+        addProfileBind(entityBO.getId(), entityBO.getProfileIds());
 
         // 通知驱动新增
-        Device device = deviceMapper.selectById(entityDO.getId());
-        List<Profile> profiles = profileService.selectByDeviceId(entityDO.getId());
+        Device device = deviceMapper.selectById(entityBO.getId());
+        List<Profile> profiles = profileService.selectByDeviceId(entityBO.getId());
         // ?/pnoker 同步给驱动的设备需要profile id set吗
         device.setProfileIds(profiles.stream().map(Profile::getId).collect(Collectors.toSet()));
         notifyService.notifyDriverDevice(MetadataCommandTypeEnum.ADD, device);
@@ -114,7 +114,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Transactional
     public void delete(Long id) {
-        Device device = selectById(id);
+        Device device = get(id);
         if (ObjectUtil.isNull(device)) {
             throw new NotFoundException("The device does not exist");
         }
@@ -135,11 +135,11 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
-    public void update(Device entityDO) {
-        selectById(entityDO.getId());
+    public void update(Device entityBO) {
+        get(entityBO.getId());
 
-        Set<String> newProfileIds = ObjectUtil.isNotNull(entityDO.getProfileIds()) ? entityDO.getProfileIds() : new HashSet<>();
-        Set<String> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityDO.getId());
+        Set<String> newProfileIds = ObjectUtil.isNotNull(entityBO.getProfileIds()) ? entityBO.getProfileIds() : new HashSet<>();
+        Set<String> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityBO.getId());
 
         // 新增的模板
         Set<String> add = new HashSet<>(newProfileIds);
@@ -149,18 +149,18 @@ public class DeviceServiceImpl implements DeviceService {
         Set<String> delete = new HashSet<>(oldProfileIds);
         delete.removeAll(newProfileIds);
 
-        addProfileBind(entityDO.getId(), add);
-        delete.forEach(profileId -> profileBindService.deleteByDeviceIdAndProfileId(entityDO.getId(), profileId));
+        addProfileBind(entityBO.getId(), add);
+        delete.forEach(profileId -> profileBindService.deleteByDeviceIdAndProfileId(entityBO.getId(), profileId));
 
-        entityDO.setOperateTime(null);
+        entityBO.setOperateTime(null);
 
-        if (deviceMapper.updateById(entityDO) < 1) {
+        if (deviceMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The device update failed");
         }
 
-        Device select = deviceMapper.selectById(entityDO.getId());
+        Device select = deviceMapper.selectById(entityBO.getId());
         select.setProfileIds(newProfileIds);
-        entityDO.setDeviceName(select.getDeviceName());
+        entityBO.setDeviceName(select.getDeviceName());
         // 通知驱动更新设备
         notifyService.notifyDriverDevice(MetadataCommandTypeEnum.UPDATE, select);
     }
@@ -169,7 +169,7 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
-    public Device selectById(Long id) {
+    public Device get(Long id) {
         Device device = deviceMapper.selectById(id);
         if (ObjectUtil.isNull(device)) {
             throw new NotFoundException();
@@ -235,11 +235,11 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
-    public Page<Device> list(DevicePageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<Device> list(DevicePageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return deviceMapper.selectPageWithProfile(queryDTO.getPage().convert(), customFuzzyQuery(queryDTO), queryDTO.getProfileId());
+        return deviceMapper.selectPageWithProfile(entityQuery.getPage().page(), customFuzzyQuery(entityQuery), entityQuery.getProfileId());
     }
 
     private LambdaQueryWrapper<Device> fuzzyQuery(DevicePageQuery query) {
@@ -555,7 +555,7 @@ public class DeviceServiceImpl implements DeviceService {
 
         profileIds.forEach(profileId -> {
             try {
-                profileService.selectById(profileId);
+                profileService.get(profileId);
                 profileBindService.add(new ProfileBind(profileId, deviceId));
 
                 List<Point> points = pointService.selectByProfileId(profileId);

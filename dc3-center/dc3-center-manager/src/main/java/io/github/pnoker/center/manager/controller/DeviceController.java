@@ -115,7 +115,7 @@ public class DeviceController implements Controller {
     @GetMapping("/id/{id}")
     public R<Device> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Device select = deviceService.selectById(id);
+            Device select = deviceService.get(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }

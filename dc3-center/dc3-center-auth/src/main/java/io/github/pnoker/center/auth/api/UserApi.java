@@ -51,7 +51,7 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
     public void selectById(IdQuery request, StreamObserver<RUserDTO> responseObserver) {
         RUserDTO.Builder builder = RUserDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
-        User select = userService.selectById(request.getId());
+        User select = userService.get(request.getId());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

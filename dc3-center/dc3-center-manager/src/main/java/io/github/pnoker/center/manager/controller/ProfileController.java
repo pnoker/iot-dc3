@@ -111,7 +111,7 @@ public class ProfileController implements Controller {
     @GetMapping("/id/{id}")
     public R<Profile> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Profile select = profileService.selectById(id);
+            Profile select = profileService.get(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }

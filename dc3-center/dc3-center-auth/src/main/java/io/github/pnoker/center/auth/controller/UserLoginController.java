@@ -129,7 +129,7 @@ public class UserLoginController implements Controller {
     @GetMapping("/id/{id}")
     public R<UserLogin> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            UserLogin select = userLoginService.selectById(id);
+            UserLogin select = userLoginService.get(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }

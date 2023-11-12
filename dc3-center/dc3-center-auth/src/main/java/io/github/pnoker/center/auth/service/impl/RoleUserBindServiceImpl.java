@@ -57,7 +57,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
 
     @Override
-    public RoleUserBind selectById(Long id) {
+    public RoleUserBind get(Long id) {
         RoleUserBind roleUserBind = roleUserBindMapper.selectById(id);
         if (ObjectUtil.isNull(roleUserBind)) {
             throw new NotFoundException();
@@ -66,32 +66,32 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     }
 
     @Override
-    public Page<RoleUserBind> list(RoleUserBindPageQuery pageQuery) {
-        if (ObjectUtil.isNull(pageQuery.getPage())) {
-            pageQuery.setPage(new Pages());
+    public Page<RoleUserBind> list(RoleUserBindPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return roleUserBindMapper.selectPage(pageQuery.getPage().convert(), buildQueryWrapper(pageQuery));
+        return roleUserBindMapper.selectPage(entityQuery.getPage().page(), buildQueryWrapper(entityQuery));
     }
 
     @Override
-    public void add(RoleUserBind entityDO) {
+    public void add(RoleUserBind entityBO) {
         //todo check if exists
-        if (roleUserBindMapper.insert(entityDO) < 1) {
+        if (roleUserBindMapper.insert(entityBO) < 1) {
             throw new AddException("The role user bind add failed");
         }
     }
 
     @Override
-    public void update(RoleUserBind entityDO) {
-        selectById(entityDO.getId());
-        if (roleUserBindMapper.updateById(entityDO) < 1) {
+    public void update(RoleUserBind entityBO) {
+        get(entityBO.getId());
+        if (roleUserBindMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The role user bind update failed");
         }
     }
 
     @Override
     public void delete(Long id) {
-        selectById(id);
+        get(id);
         if (roleUserBindMapper.deleteById(id) < 1) {
             throw new DeleteException("The role user bind delete failed");
         }
