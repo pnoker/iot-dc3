@@ -106,7 +106,7 @@ public class LabelController implements Controller {
     @GetMapping("/id/{id}")
     public R<Label> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Label select = labelService.selectById(id);
+            Label select = labelService.get(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }

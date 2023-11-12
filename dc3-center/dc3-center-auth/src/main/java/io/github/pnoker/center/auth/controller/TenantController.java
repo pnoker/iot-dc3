@@ -110,7 +110,7 @@ public class TenantController implements Controller {
     @GetMapping("/id/{id}")
     public R<Tenant> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Tenant select = tenantService.selectById(id);
+            Tenant select = tenantService.get(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }

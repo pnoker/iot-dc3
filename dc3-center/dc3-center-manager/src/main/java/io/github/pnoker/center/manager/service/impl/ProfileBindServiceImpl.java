@@ -52,12 +52,12 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public void add(ProfileBind entityDO) {
+    public void add(ProfileBind entityBO) {
         try {
-            selectByDeviceIdAndProfileId(entityDO.getDeviceId(), entityDO.getProfileId());
+            selectByDeviceIdAndProfileId(entityBO.getDeviceId(), entityBO.getProfileId());
             throw new DuplicateException("The profile bind already exists");
         } catch (NotFoundException notFoundException) {
-            if (profileBindMapper.insert(entityDO) < 1) {
+            if (profileBindMapper.insert(entityBO) < 1) {
                 throw new AddException("The profile bind add failed");
             }
         }
@@ -68,7 +68,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public void delete(Long id) {
-        ProfileBind profileBind = selectById(id);
+        ProfileBind profileBind = get(id);
         if (ObjectUtil.isNull(profileBind)) {
             throw new NotFoundException("The profile bind does not exist");
         }
@@ -103,10 +103,10 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public void update(ProfileBind entityDO) {
-        selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (profileBindMapper.updateById(entityDO) < 1) {
+    public void update(ProfileBind entityBO) {
+        get(entityBO.getId());
+        entityBO.setOperateTime(null);
+        if (profileBindMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The profile bind update failed");
         }
     }
@@ -115,7 +115,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public ProfileBind selectById(Long id) {
+    public ProfileBind get(Long id) {
         ProfileBind profileBind = profileBindMapper.selectById(id);
         if (ObjectUtil.isNull(profileBind)) {
             throw new NotFoundException();
@@ -166,11 +166,11 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public Page<ProfileBind> list(ProfileBindPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<ProfileBind> list(ProfileBindPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return profileBindMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return profileBindMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<ProfileBind> fuzzyQuery(ProfileBindPageQuery query) {

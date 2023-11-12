@@ -50,13 +50,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public void add(DriverAttribute entityDO) {
+    public void add(DriverAttribute entityBO) {
         try {
-            selectByNameAndDriverId(entityDO.getAttributeName(), entityDO.getDriverId());
+            selectByNameAndDriverId(entityBO.getAttributeName(), entityBO.getDriverId());
             throw new DuplicateException("The driver attribute already exists");
         } catch (NotFoundException notFoundException) {
-            if (driverAttributeMapper.insert(entityDO) < 1) {
-                throw new AddException("The driver attribute {} add failed", entityDO.getDisplayName());
+            if (driverAttributeMapper.insert(entityBO) < 1) {
+                throw new AddException("The driver attribute {} add failed", entityBO.getDisplayName());
             }
         }
     }
@@ -66,7 +66,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      */
     @Override
     public void delete(Long id) {
-        DriverAttribute driverAttribute = selectById(id);
+        DriverAttribute driverAttribute = get(id);
         if (ObjectUtil.isNull(driverAttribute)) {
             throw new NotFoundException("The driver attribute does not exist");
         }
@@ -80,10 +80,10 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public void update(DriverAttribute entityDO) {
-        selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (driverAttributeMapper.updateById(entityDO) < 1) {
+    public void update(DriverAttribute entityBO) {
+        get(entityBO.getId());
+        entityBO.setOperateTime(null);
+        if (driverAttributeMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The driver attribute update failed");
         }
     }
@@ -92,7 +92,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public DriverAttribute selectById(Long id) {
+    public DriverAttribute get(Long id) {
         DriverAttribute driverAttribute = driverAttributeMapper.selectById(id);
         if (ObjectUtil.isNull(driverAttribute)) {
             throw new NotFoundException();
@@ -136,11 +136,11 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverAttribute> list(DriverAttributePageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<DriverAttribute> list(DriverAttributePageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return driverAttributeMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return driverAttributeMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributePageQuery query) {

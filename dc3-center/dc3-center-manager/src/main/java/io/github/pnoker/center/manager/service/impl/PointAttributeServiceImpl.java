@@ -50,13 +50,13 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public void add(PointAttribute entityDO) {
+    public void add(PointAttribute entityBO) {
         try {
-            selectByNameAndDriverId(entityDO.getAttributeName(), entityDO.getDriverId());
+            selectByNameAndDriverId(entityBO.getAttributeName(), entityBO.getDriverId());
             throw new DuplicateException("The point attribute already exists");
         } catch (NotFoundException notFoundException) {
-            if (pointAttributeMapper.insert(entityDO) < 1) {
-                throw new AddException("The point attribute {} add failed", entityDO.getAttributeName());
+            if (pointAttributeMapper.insert(entityBO) < 1) {
+                throw new AddException("The point attribute {} add failed", entityBO.getAttributeName());
             }
         }
     }
@@ -66,7 +66,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      */
     @Override
     public void delete(Long id) {
-        PointAttribute pointAttribute = selectById(id);
+        PointAttribute pointAttribute = get(id);
         if (ObjectUtil.isNull(pointAttribute)) {
             throw new NotFoundException("The point attribute does not exist");
         }
@@ -80,10 +80,10 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public void update(PointAttribute entityDO) {
-        selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (pointAttributeMapper.updateById(entityDO) < 1) {
+    public void update(PointAttribute entityBO) {
+        get(entityBO.getId());
+        entityBO.setOperateTime(null);
+        if (pointAttributeMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The point attribute update failed");
         }
     }
@@ -92,7 +92,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public PointAttribute selectById(Long id) {
+    public PointAttribute get(Long id) {
         PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
         if (ObjectUtil.isNull(pointAttribute)) {
             throw new NotFoundException();
@@ -136,11 +136,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public Page<PointAttribute> list(PointAttributePageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<PointAttribute> list(PointAttributePageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return pointAttributeMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return pointAttributeMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributePageQuery query) {

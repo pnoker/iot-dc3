@@ -55,31 +55,31 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     private ResourceMapper resourceMapper;
 
     @Override
-    public void add(RoleResourceBind entityDO) {
+    public void add(RoleResourceBind entityBO) {
         //todo check if exists
-        if (bindMapper.insert(entityDO) < 1) {
+        if (bindMapper.insert(entityBO) < 1) {
             throw new AddException("The tenant bind add failed");
         }
     }
 
     @Override
     public void delete(Long id) {
-        selectById(id);
+        get(id);
         if (bindMapper.deleteById(id) < 1) {
             throw new DeleteException("The role resource bind delete failed");
         }
     }
 
     @Override
-    public void update(RoleResourceBind entityDO) {
-        selectById(entityDO.getId());
-        if (bindMapper.updateById(entityDO) < 1) {
+    public void update(RoleResourceBind entityBO) {
+        get(entityBO.getId());
+        if (bindMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The role resource bind update failed");
         }
     }
 
     @Override
-    public RoleResourceBind selectById(Long id) {
+    public RoleResourceBind get(Long id) {
         RoleResourceBind bind = bindMapper.selectById(id);
         if (ObjectUtil.isNull(bind)) {
             throw new NotFoundException();
@@ -88,11 +88,11 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public Page<RoleResourceBind> list(RoleResourceBindPageQuery pageQuery) {
-        if (ObjectUtil.isNull(pageQuery.getPage())) {
-            pageQuery.setPage(new Pages());
+    public Page<RoleResourceBind> list(RoleResourceBindPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return bindMapper.selectPage(pageQuery.getPage().convert(), buildQueryWrapper(pageQuery));
+        return bindMapper.selectPage(entityQuery.getPage().page(), buildQueryWrapper(entityQuery));
     }
 
     @Override

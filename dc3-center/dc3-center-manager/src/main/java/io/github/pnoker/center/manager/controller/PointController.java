@@ -112,7 +112,7 @@ public class PointController implements Controller {
     @GetMapping("/id/{id}")
     public R<Point> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Point select = pointService.selectById(id);
+            Point select = pointService.get(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }

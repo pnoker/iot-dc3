@@ -68,7 +68,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         LambdaQueryWrapper<DriverDO> queryWrapper = Wrappers.<DriverDO>query().lambda();
         queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getLabel()), DriverDO::getDriverName, dictionaryPageQuery.getLabel());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getTenantId()), DriverDO::getTenantId, dictionaryPageQuery.getTenantId());
-        Page<DriverDO> driverPage = driverMapper.selectPage(dictionaryPageQuery.getPage().convert(), queryWrapper);
+        Page<DriverDO> driverPage = driverMapper.selectPage(dictionaryPageQuery.getPage().page(), queryWrapper);
         List<Dictionary> dictionaryList = driverPage.getRecords().parallelStream().map(driver -> {
             Dictionary dictionary = new Dictionary();
             dictionary.setLabel(driver.getDriverName());
@@ -90,7 +90,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getLabel()), Device::getDeviceName, dictionaryPageQuery.getLabel());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getParentValue1()), Device::getDriverId, dictionaryPageQuery.getParentValue1());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getTenantId()), Device::getTenantId, dictionaryPageQuery.getTenantId());
-        Page<Device> devicePage = deviceMapper.selectPage(dictionaryPageQuery.getPage().convert(), queryWrapper);
+        Page<Device> devicePage = deviceMapper.selectPage(dictionaryPageQuery.getPage().page(), queryWrapper);
         List<Dictionary> dictionaryList = devicePage.getRecords().parallelStream().map(profile -> {
             Dictionary dictionary = new Dictionary();
             dictionary.setLabel(profile.getDeviceName());
@@ -111,7 +111,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
         queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getLabel()), Profile::getProfileName, dictionaryPageQuery.getLabel());
         queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryPageQuery.getTenantId()), Profile::getTenantId, dictionaryPageQuery.getTenantId());
-        Page<Profile> profilePage = profileMapper.selectPage(dictionaryPageQuery.getPage().convert(), queryWrapper);
+        Page<Profile> profilePage = profileMapper.selectPage(dictionaryPageQuery.getPage().page(), queryWrapper);
         List<Dictionary> dictionaryList = profilePage.getRecords().parallelStream().map(profile -> {
             Dictionary dictionary = new Dictionary();
             dictionary.setLabel(profile.getProfileName());

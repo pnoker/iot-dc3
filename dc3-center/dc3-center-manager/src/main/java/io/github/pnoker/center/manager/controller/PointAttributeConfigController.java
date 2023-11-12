@@ -105,7 +105,7 @@ public class PointAttributeConfigController implements Controller {
     @GetMapping("/id/{id}")
     public R<PointAttributeConfig> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            PointAttributeConfig select = pointAttributeConfigService.selectById(id);
+            PointAttributeConfig select = pointAttributeConfigService.get(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }

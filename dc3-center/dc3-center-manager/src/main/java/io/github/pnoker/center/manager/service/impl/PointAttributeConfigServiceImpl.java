@@ -65,18 +65,18 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public void add(PointAttributeConfig entityDO) {
+    public void add(PointAttributeConfig entityBO) {
         try {
-            selectByAttributeIdAndDeviceIdAndPointId(entityDO.getPointAttributeId(), entityDO.getDeviceId(), entityDO.getPointId());
+            selectByAttributeIdAndDeviceIdAndPointId(entityBO.getPointAttributeId(), entityBO.getDeviceId(), entityBO.getPointId());
             throw new DuplicateException("The point attribute config already exists");
         } catch (NotFoundException notFoundException) {
-            if (pointAttributeConfigMapper.insert(entityDO) < 1) {
-                PointAttribute pointAttribute = pointAttributeMapper.selectById(entityDO.getPointAttributeId());
+            if (pointAttributeConfigMapper.insert(entityBO) < 1) {
+                PointAttribute pointAttribute = pointAttributeMapper.selectById(entityBO.getPointAttributeId());
                 throw new AddException("The point attribute config {} add failed", pointAttribute.getAttributeName());
             }
 
             // 通知驱动新增
-            PointAttributeConfig pointAttributeConfig = pointAttributeConfigMapper.selectById(entityDO.getId());
+            PointAttributeConfig pointAttributeConfig = pointAttributeConfigMapper.selectById(entityBO.getId());
             notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.ADD, pointAttributeConfig);
         }
     }
@@ -86,7 +86,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     @Override
     public void delete(Long id) {
-        PointAttributeConfig pointAttributeConfig = selectById(id);
+        PointAttributeConfig pointAttributeConfig = get(id);
         if (ObjectUtil.isNull(pointAttributeConfig)) {
             throw new NotFoundException("The point attribute config does not exist");
         }
@@ -102,26 +102,26 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public void update(PointAttributeConfig entityDO) {
-        PointAttributeConfig old = selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (!old.getPointAttributeId().equals(entityDO.getPointAttributeId()) || !old.getDeviceId().equals(entityDO.getDeviceId()) || !old.getPointId().equals(entityDO.getPointId())) {
+    public void update(PointAttributeConfig entityBO) {
+        PointAttributeConfig old = get(entityBO.getId());
+        entityBO.setOperateTime(null);
+        if (!old.getPointAttributeId().equals(entityBO.getPointAttributeId()) || !old.getDeviceId().equals(entityBO.getDeviceId()) || !old.getPointId().equals(entityBO.getPointId())) {
             try {
-                selectByAttributeIdAndDeviceIdAndPointId(entityDO.getPointAttributeId(), entityDO.getDeviceId(), entityDO.getPointId());
+                selectByAttributeIdAndDeviceIdAndPointId(entityBO.getPointAttributeId(), entityBO.getDeviceId(), entityBO.getPointId());
                 throw new DuplicateException("The point attribute config already exists");
             } catch (NotFoundException ignored) {
                 // nothing to do
             }
         }
 
-        if (pointAttributeConfigMapper.updateById(entityDO) < 1) {
+        if (pointAttributeConfigMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The point attribute config update failed");
         }
 
-        PointAttributeConfig select = pointAttributeConfigMapper.selectById(entityDO.getId());
-        entityDO.setPointAttributeId(select.getPointAttributeId());
-        entityDO.setDeviceId(select.getDeviceId());
-        entityDO.setPointId(select.getPointId());
+        PointAttributeConfig select = pointAttributeConfigMapper.selectById(entityBO.getId());
+        entityBO.setPointAttributeId(select.getPointAttributeId());
+        entityBO.setDeviceId(select.getDeviceId());
+        entityBO.setPointId(select.getPointId());
         notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, select);
     }
 
@@ -129,7 +129,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public PointAttributeConfig selectById(Long id) {
+    public PointAttributeConfig get(Long id) {
         PointAttributeConfig pointAttributeConfig = pointAttributeConfigMapper.selectById(id);
         if (ObjectUtil.isNull(pointAttributeConfig)) {
             throw new NotFoundException();
@@ -204,11 +204,11 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public Page<PointAttributeConfig> list(PointAttributeConfigPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<PointAttributeConfig> list(PointAttributeConfigPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return pointAttributeConfigMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return pointAttributeConfigMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<PointAttributeConfig> fuzzyQuery(PointAttributeConfigPageQuery query) {

@@ -52,18 +52,18 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     @Transactional
-    public void add(UserPassword entityDO) {
-        entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
+    public void add(UserPassword entityBO) {
+        entityBO.setLoginPassword(DecodeUtil.md5(entityBO.getLoginPassword()));
         // 插入 userPassword 数据，并返回插入后的 userPassword
-        if (userPasswordMapper.insert(entityDO) < 1) {
-            throw new AddException("The user password add failed: {}", entityDO.toString());
+        if (userPasswordMapper.insert(entityBO) < 1) {
+            throw new AddException("The user password add failed: {}", entityBO.toString());
         }
     }
 
     @Override
     @Transactional
     public void delete(String id) {
-        UserPassword userPassword = selectById(id);
+        UserPassword userPassword = get(id);
         if (ObjectUtil.isNull(userPassword)) {
             throw new NotFoundException("The user password does not exist");
         }
@@ -74,34 +74,34 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public void update(UserPassword entityDO) {
-        UserPassword selectById = selectById(entityDO.getId());
+    public void update(UserPassword entityBO) {
+        UserPassword selectById = get(entityBO.getId());
         if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException();
         }
-        entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
-        entityDO.setOperateTime(null);
-        if (userPasswordMapper.updateById(entityDO) < 1) {
+        entityBO.setLoginPassword(DecodeUtil.md5(entityBO.getLoginPassword()));
+        entityBO.setOperateTime(null);
+        if (userPasswordMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The user password update failed");
         }
     }
 
     @Override
-    public UserPassword selectById(Long id) {
+    public UserPassword get(Long id) {
         return userPasswordMapper.selectById(id);
     }
 
     @Override
-    public Page<UserPassword> list(UserPasswordPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<UserPassword> list(UserPasswordPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return userPasswordMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return userPasswordMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
     }
 
     @Override
     public void restPassword(String id) {
-        UserPassword userPassword = selectById(id);
+        UserPassword userPassword = get(id);
         if (ObjectUtil.isNotNull(userPassword)) {
             userPassword.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
             update(userPassword);

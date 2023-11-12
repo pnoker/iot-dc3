@@ -49,23 +49,23 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     @Transactional
-    public void add(UserLogin entityDO) {
+    public void add(UserLogin entityBO) {
         // 判断登录名称是否存在
-        UserLogin selectByLoginName = selectByLoginName(entityDO.getLoginName(), false);
+        UserLogin selectByLoginName = selectByLoginName(entityBO.getLoginName(), false);
         if (ObjectUtil.isNotNull(selectByLoginName)) {
-            throw new DuplicateException("The user already exists with login name: {}", entityDO.getLoginName());
+            throw new DuplicateException("The user already exists with login name: {}", entityBO.getLoginName());
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userLoginMapper.insert(entityDO) < 1) {
-            throw new AddException("The user add failed: {}", entityDO.toString());
+        if (userLoginMapper.insert(entityBO) < 1) {
+            throw new AddException("The user add failed: {}", entityBO.toString());
         }
     }
 
     @Override
     @Transactional
     public void delete(String id) {
-        UserLogin userLogin = selectById(id);
+        UserLogin userLogin = get(id);
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException("The user login does not exist");
         }
@@ -76,29 +76,29 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public void update(UserLogin entityDO) {
-        UserLogin selectById = selectById(entityDO.getId());
+    public void update(UserLogin entityBO) {
+        UserLogin selectById = get(entityBO.getId());
         if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException("The user login does not exist");
         }
-        entityDO.setLoginName(null);
-        entityDO.setOperateTime(null);
-        if (userLoginMapper.updateById(entityDO) < 1) {
+        entityBO.setLoginName(null);
+        entityBO.setOperateTime(null);
+        if (userLoginMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The user login update failed");
         }
     }
 
     @Override
-    public UserLogin selectById(Long id) {
+    public UserLogin get(Long id) {
         return userLoginMapper.selectById(id);
     }
 
     @Override
-    public Page<UserLogin> list(UserLoginPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<UserLogin> list(UserLoginPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return userLoginMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return userLoginMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
     }
 
     @Override

@@ -63,13 +63,13 @@ public class ProfileServiceImpl implements ProfileService {
     private NotifyService notifyService;
 
     @Override
-    public void add(Profile entityDO) {
+    public void add(Profile entityBO) {
         try {
-            selectByNameAndType(entityDO.getProfileName(), entityDO.getProfileTypeFlag(), entityDO.getTenantId());
+            selectByNameAndType(entityBO.getProfileName(), entityBO.getProfileTypeFlag(), entityBO.getTenantId());
             throw new DuplicateException("The profile already exists");
         } catch (NotFoundException notFoundException1) {
-            if (profileMapper.insert(entityDO) < 1) {
-                throw new AddException("The profile {} add failed", entityDO.getProfileName());
+            if (profileMapper.insert(entityBO) < 1) {
+                throw new AddException("The profile {} add failed", entityBO.getProfileName());
             }
         }
     }
@@ -81,7 +81,7 @@ public class ProfileServiceImpl implements ProfileService {
             pointService.selectByProfileId(id);
             throw new ServiceException("The profile already bound by the point");
         } catch (NotFoundException notFoundException2) {
-            Profile profile = selectById(id);
+            Profile profile = get(id);
             if (ObjectUtil.isNull(profile)) {
                 throw new NotFoundException("The profile does not exist");
             }
@@ -95,19 +95,19 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void update(Profile entityDO) {
-        selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (profileMapper.updateById(entityDO) < 1) {
+    public void update(Profile entityBO) {
+        get(entityBO.getId());
+        entityBO.setOperateTime(null);
+        if (profileMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The profile update failed");
         }
 
-        Profile update = profileMapper.selectById(entityDO.getId());
+        Profile update = profileMapper.selectById(entityBO.getId());
         notifyService.notifyDriverProfile(MetadataCommandTypeEnum.UPDATE, update);
     }
 
     @Override
-    public Profile selectById(Long id) {
+    public Profile get(Long id) {
         Profile profile = profileMapper.selectById(id);
         if (ObjectUtil.isNull(profile)) {
             throw new NotFoundException();
@@ -153,11 +153,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Page<Profile> list(ProfilePageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<Profile> list(ProfilePageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return profileMapper.selectPageWithDevice(queryDTO.getPage().convert(), customFuzzyQuery(queryDTO), queryDTO.getDeviceId());
+        return profileMapper.selectPageWithDevice(entityQuery.getPage().page(), customFuzzyQuery(entityQuery), entityQuery.getDeviceId());
     }
 
     private LambdaQueryWrapper<Profile> fuzzyQuery(ProfilePageQuery query) {

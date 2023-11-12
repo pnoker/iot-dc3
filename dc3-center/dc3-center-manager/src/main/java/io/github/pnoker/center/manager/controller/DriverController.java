@@ -111,7 +111,7 @@ public class DriverController implements Controller {
     @GetMapping("/id/{id}")
     public R<DriverDO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverDO select = driverService.selectById(id);
+            DriverDO select = driverService.get(id);
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());

@@ -98,7 +98,7 @@ public class TokenServiceImpl implements TokenService {
         if (ObjectUtil.isNull(tenantBind)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        UserPassword userPassword = userPasswordService.selectById(userLogin.getUserPasswordId());
+        UserPassword userPassword = userPasswordService.get(userLogin.getUserPasswordId());
         String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
         String redisSaltValue = redisUtil.getKey(redisSaltKey);
         String md5Password = DecodeUtil.md5(userPassword.getLoginPassword() + redisSaltValue);

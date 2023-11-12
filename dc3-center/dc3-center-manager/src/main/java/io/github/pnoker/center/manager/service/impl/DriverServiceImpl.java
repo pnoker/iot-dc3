@@ -62,14 +62,14 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public void add(DriverDO entityDO) {
-        boolean duplicate = checkDuplicate(entityDO);
+    public void add(DriverDO entityBO) {
+        boolean duplicate = checkDuplicate(entityBO);
         if (duplicate) {
             throw new DuplicateException("The driver already exists");
         }
 
-        if (driverMapper.insert(entityDO) < 1) {
-            throw new AddException("The driver {} add failed", entityDO.getDriverName());
+        if (driverMapper.insert(entityBO) < 1) {
+            throw new AddException("The driver {} add failed", entityBO.getDriverName());
         }
     }
 
@@ -78,7 +78,7 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public void delete(Long id) {
-        DriverDO entityDO = selectById(id);
+        DriverDO entityDO = get(id);
         if (ObjectUtil.isNull(entityDO)) {
             throw new NotFoundException("The driver does not exist");
         }
@@ -92,10 +92,10 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public void update(DriverDO entityDO) {
-        selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (driverMapper.updateById(entityDO) < 1) {
+    public void update(DriverDO entityBO) {
+        get(entityBO.getId());
+        entityBO.setOperateTime(null);
+        if (driverMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The driver update failed");
         }
     }
@@ -104,7 +104,7 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public DriverDO selectById(Long id) {
+    public DriverDO get(Long id) {
         DriverDO entityDO = driverMapper.selectById(id);
         if (ObjectUtil.isNull(entityDO)) {
             throw new NotFoundException();
@@ -116,11 +116,11 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverDO> list(DriverPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<DriverDO> list(DriverPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return driverMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return driverMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
     }
 
     /**
@@ -169,8 +169,8 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public DriverDO selectByDeviceId(String deviceId) {
-        Device device = deviceService.selectById(deviceId);
-        return selectById(device.getDriverId());
+        Device device = deviceService.get(deviceId);
+        return get(device.getDriverId());
     }
 
     @Override

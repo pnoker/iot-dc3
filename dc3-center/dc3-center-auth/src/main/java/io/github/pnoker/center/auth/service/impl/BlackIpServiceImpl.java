@@ -47,20 +47,20 @@ public class BlackIpServiceImpl implements BlackIpService {
     private BlackIpMapper blackIpMapper;
 
     @Override
-    public void add(BlackIp entityDO) {
-        BlackIp select = selectByIp(entityDO.getIp());
+    public void add(BlackIp entityBO) {
+        BlackIp select = selectByIp(entityBO.getIp());
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The ip already exists in the blacklist");
         }
 
-        if (blackIpMapper.insert(entityDO) < 1) {
-            throw new AddException("The ip {} add to the blacklist failed", entityDO.getIp());
+        if (blackIpMapper.insert(entityBO) < 1) {
+            throw new AddException("The ip {} add to the blacklist failed", entityBO.getIp());
         }
     }
 
     @Override
     public void delete(Long id) {
-        BlackIp blackIp = selectById(id);
+        BlackIp blackIp = get(id);
         if (ObjectUtil.isNull(blackIp)) {
             throw new NotFoundException("The ip does not exist in the blacklist");
         }
@@ -71,16 +71,16 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public void update(BlackIp entityDO) {
-        entityDO.setIp(null);
-        entityDO.setOperateTime(null);
-        if (blackIpMapper.updateById(entityDO) < 1) {
+    public void update(BlackIp entityBO) {
+        entityBO.setIp(null);
+        entityBO.setOperateTime(null);
+        if (blackIpMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The ip update failed in the blacklist");
         }
     }
 
     @Override
-    public BlackIp selectById(Long id) {
+    public BlackIp get(Long id) {
         return blackIpMapper.selectById(id);
     }
 
@@ -94,11 +94,11 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public Page<BlackIp> list(BlackIpPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<BlackIp> list(BlackIpPageQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return blackIpMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        return blackIpMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
     }
 
     @Override

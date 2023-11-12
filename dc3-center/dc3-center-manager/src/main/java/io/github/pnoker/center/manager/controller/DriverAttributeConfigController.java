@@ -105,7 +105,7 @@ public class DriverAttributeConfigController implements Controller {
     @GetMapping("/id/{id}")
     public R<DriverAttributeConfig> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverAttributeConfig select = driverAttributeConfigService.selectById(id);
+            DriverAttributeConfig select = driverAttributeConfigService.get(id);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }

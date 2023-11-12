@@ -82,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
             throw new NotFoundException("租户、用户信息不匹配");
         }
 
-        UserPassword userPassword = userPasswordService.selectById(userLogin.getUserPasswordId());
+        UserPassword userPassword = userPasswordService.get(userLogin.getUserPasswordId());
         if (ObjectUtil.isNull(userPassword)) {
             throw new NotFoundException("密码不存在，请先设置密码");
         }

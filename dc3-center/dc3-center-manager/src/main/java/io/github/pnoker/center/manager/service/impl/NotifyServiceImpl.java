@@ -93,7 +93,7 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public void notifyDriverDevice(MetadataCommandTypeEnum command, Device device) {
         try {
-            DriverDO entityDO = driverService.selectById(device.getDriverId());
+            DriverDO entityDO = driverService.get(device.getDriverId());
             DriverMetadataDTO entityDTO = new DriverMetadataDTO(
                     MetadataTypeEnum.DEVICE,
                     command,
