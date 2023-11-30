@@ -110,7 +110,7 @@ services:
           - dc3-redis
 
   rabbitmq:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.4.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.11.0.dev
     restart: on-failure
     ports:
       - '5672:5672'
