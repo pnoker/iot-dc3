@@ -39,7 +39,7 @@ services:
     depends_on:
       - mysql
     volumes:
-      - logs:/home/nacos/logs
+      - register_log:/home/nacos/logs
     logging:
       driver: json-file
       options:
@@ -59,7 +59,8 @@ services:
     container_name: dc3-mysql
     hostname: dc3-mysql
     volumes:
-      - mysql:/var/lib/mysql
+      - mysql_data:/data
+      - mysql_lib:/var/lib/mysql
     logging:
       driver: json-file
       options:
@@ -78,8 +79,8 @@ services:
     container_name: dc3-mongo
     hostname: dc3-mongo
     volumes:
-      - mongo_config:/data/configdb
       - mongo_db:/data/db
+      - mongo_config:/data/configdb
     logging:
       driver: json-file
       options:
@@ -98,7 +99,7 @@ services:
     container_name: dc3-redis
     hostname: dc3-redis
     volumes:
-      - redis:/data
+      - redis_data:/data
     logging:
       driver: json-file
       options:
@@ -121,7 +122,7 @@ services:
     container_name: dc3-rabbitmq
     hostname: dc3-rabbitmq
     volumes:
-      - rabbitmq:/var/lib/rabbitmq
+      - rabbitmq_lib:/var/lib/rabbitmq
     logging:
       driver: json-file
       options:
@@ -154,12 +155,13 @@ services:
           - dc3-portainer
 
 volumes:
-  logs:
-  mysql:
-  mongo_config:
+  register_log:
+  mysql_lib:
+  mysql_data:
   mongo_db:
-  redis:
-  rabbitmq:
+  mongo_config:
+  redis_data:
+  rabbitmq_lib:
   portainer:
 
 networks:
