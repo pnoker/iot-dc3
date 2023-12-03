@@ -19,7 +19,7 @@ version: '3'
 services:
   register:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-register:2023.11.0.dev
-    restart: on-failure
+    restart: always
     ports:
       - "8848:8848"
       - "9848:9848"
@@ -51,7 +51,7 @@ services:
           - dc3-register
   mysql:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.11.0.dev
-    restart: on-failure
+    restart: always
     ports:
       - '33306:3306'
     environment:
@@ -73,7 +73,7 @@ services:
 
   mongo:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.11.0.dev
-    restart: on-failure
+    restart: always
     ports:
       - '37017:27017'
     container_name: dc3-mongo
@@ -93,13 +93,13 @@ services:
 
   redis:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.11.0.dev
-    restart: on-failure
+    restart: always
     ports:
       - '36379:6379'
     container_name: dc3-redis
     hostname: dc3-redis
     volumes:
-      - redis_data:/data
+      - redis:/data
     logging:
       driver: json-file
       options:
@@ -112,17 +112,17 @@ services:
 
   rabbitmq:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.11.0.dev
-    restart: on-failure
+    restart: always
     ports:
       - '5672:5672'
-      - '1883:1883'
-      - '8883:8883'
+      - '2883:1883'
+      - '3883:8883'
       - '61613:61613'
       - '15672:15672'
     container_name: dc3-rabbitmq
     hostname: dc3-rabbitmq
     volumes:
-      - rabbitmq_lib:/var/lib/rabbitmq
+      - rabbitmq:/var/lib/rabbitmq
     logging:
       driver: json-file
       options:
@@ -133,10 +133,78 @@ services:
         aliases:
           - dc3-rabbitmq
 
+  emqx:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-emqx:2023.11.0.dev
+    restart: always
+    ports:
+      - '1883:1883'
+      - '8883:8883'
+      - '18083:18083'
+    environment:
+      - EMQX_NODE_NAME=dc3@dc3-emqx
+    container_name: dc3-emqx
+    hostname: dc3-emqx
+    depends_on:
+      - mysql
+    volumes:
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
+      - emqx_etc:/opt/emqx/etc
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-emqx
+
+
+  prometheus:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-prometheus:2023.11.0.dev
+    restart: always
+    ports:
+      - '9090:9090'
+    container_name: dc3-prometheus
+    hostname: dc3-prometheus
+    volumes:
+      - prometheus:/prometheus
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-prometheus
+
+  grafana:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-grafana:2023.11.0.dev
+    restart: always
+    ports:
+      - '3000:3000'
+    container_name: dc3-grafana
+    hostname: dc3-grafana
+    depends_on:
+      - mysql
+    volumes:
+      - grafana:/var/lib/grafana
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-grafana
+
   portainer:
     image: portainer/portainer:1.24.2
     command: -H unix:///var/run/docker.sock
-    restart: on-failure
+    restart: always
     ports:
       - '9000:9000'
     container_name: portainer
@@ -160,8 +228,13 @@ volumes:
   mysql_data:
   mongo_db:
   mongo_config:
-  redis_data:
-  rabbitmq_lib:
+  redis:
+  rabbitmq:
+  emqx_data:
+  emqx_log:
+  emqx_etc:
+  prometheus:
+  grafana:
   portainer:
 
 networks:
