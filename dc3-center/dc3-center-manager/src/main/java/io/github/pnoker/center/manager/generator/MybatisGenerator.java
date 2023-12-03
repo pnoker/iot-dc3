@@ -22,7 +22,6 @@ import com.baomidou.mybatisplus.generator.config.TemplateType;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.google.common.collect.ImmutableMap;
 import io.github.pnoker.common.MybatisUtil;
-import io.github.pnoker.common.base.Service;
 
 /**
  * 自动代码生成工具
