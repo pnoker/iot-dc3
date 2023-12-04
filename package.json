@@ -28,6 +28,7 @@
         "highlight.js": "^11.8.0",
         "js-base64": "^3.7.5",
         "js-cookie": "^3.0.5",
+        "json-bigint": "^1.0.0",
         "marked": "^5.1.1",
         "minimist": "^1.2.8",
         "mitt": "^3.0.1",

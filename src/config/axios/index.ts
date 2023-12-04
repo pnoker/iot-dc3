@@ -22,7 +22,9 @@ import { failMessage } from '@/utils/NotificationUtils'
 import { getStorage } from '@/utils/StorageUtils'
 import { isNull } from '@/utils/utils'
 import { encode } from 'js-base64'
+import JSONBigInt from 'json-bigint'
 
+const JSONBigIntStr = JSONBigInt({ storeAsString: true })
 const request: AxiosInstance = axios.create({
     timeout: 15000,
     withCredentials: true,
@@ -65,7 +67,9 @@ request.interceptors.response.use(
         const status = response.status || 401
         const responseType = response.config.responseType
 
-        if (ok || responseType === 'blob') return response
+        if (ok || responseType === 'blob') {
+            return JSONBigIntStr.parse(response)
+        }
 
         if (status === 401) {
             logout()
