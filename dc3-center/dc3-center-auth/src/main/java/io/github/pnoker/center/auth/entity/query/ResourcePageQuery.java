@@ -23,7 +23,7 @@ import lombok.*;
 
 /**
  * @author linys
- * @since 2023.04.02
+ * @since 2022.1.0
  */
 @Data
 @NoArgsConstructor

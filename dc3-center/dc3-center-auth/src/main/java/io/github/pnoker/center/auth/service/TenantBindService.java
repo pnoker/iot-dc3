@@ -35,5 +35,5 @@ public interface TenantBindService extends Service<TenantBind, TenantBindPageQue
      * @param userId   User ID
      * @return TenantBind
      */
-    TenantBind selectByTenantIdAndUserId(String tenantId, String userId);
+    TenantBind selectByTenantIdAndUserId(Long tenantId, Long userId);
 }

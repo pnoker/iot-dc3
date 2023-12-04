@@ -62,7 +62,7 @@ public class DriverController implements Controller {
     public R<String> add(@Validated(Insert.class) @RequestBody DriverDO entityDO) {
         try {
             entityDO.setTenantId(getTenantId());
-            driverService.add(entityDO);
+            driverService.save(entityDO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -78,7 +78,7 @@ public class DriverController implements Controller {
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            driverService.delete(id);
+            driverService.remove(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -86,7 +86,7 @@ public class DriverController implements Controller {
     }
 
     /**
-     * 修改 Driver
+     * 更新 Driver
      *
      * @param entityDO Driver
      * @return Driver
@@ -111,7 +111,7 @@ public class DriverController implements Controller {
     @GetMapping("/id/{id}")
     public R<DriverDO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverDO select = driverService.get(id);
+            DriverDO select = driverService.selectById(Long.parseLong(id));
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -125,11 +125,13 @@ public class DriverController implements Controller {
      * @return Map String:Driver
      */
     @PostMapping("/ids")
-    public R<Map<String, DriverDO>> selectByIds(@RequestBody Set<String> driverIds) {
+    public R<Map<Long, DriverDO>> selectByIds(@RequestBody Set<String> driverIds) {
         try {
-            List<DriverDO> entityDOS = driverService.selectByIds(driverIds);
-            Map<String, DriverDO> driverMap = entityDOS.stream().collect(Collectors.toMap(DriverDO::getId, Function.identity()));
+            Set<Long> collect = driverIds.stream().map(Long::parseLong).collect(Collectors.toSet());
+            List<DriverDO> entityDOS = driverService.selectByIds(collect);
+            Map<Long, DriverDO> driverMap = entityDOS.stream().collect(Collectors.toMap(DriverDO::getId, Function.identity()));
             return R.ok(driverMap);
+            // todo 返回 long id 前端无法解析
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -152,7 +154,7 @@ public class DriverController implements Controller {
     }
 
     /**
-     * 模糊分页查询 Driver
+     * 分页查询 Driver
      *
      * @param driverPageQuery Driver Dto
      * @return Page Of Driver
@@ -164,7 +166,7 @@ public class DriverController implements Controller {
                 driverPageQuery = new DriverPageQuery();
             }
             driverPageQuery.setTenantId(getTenantId());
-            Page<DriverDO> page = driverService.list(driverPageQuery);
+            Page<DriverDO> page = driverService.selectByPage(driverPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

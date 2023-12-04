@@ -42,7 +42,7 @@ Cache-Control: no-cache
 < ../../files/batch-import.json
 
 
-### 修改 Driver
+### 更新 Driver
 #/manager/driver/update
 POST http://{{dc3-manager}}/manager/driver/update
 Accept: */*

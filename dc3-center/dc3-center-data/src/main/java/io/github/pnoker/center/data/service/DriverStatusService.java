@@ -30,10 +30,10 @@ import java.util.Map;
 public interface DriverStatusService {
 
     /**
-     * 模糊分页查询 Driver 服务状态，同驱动模糊分页查询配套使用
+     * 分页查询 Driver 服务状态，同驱动分页查询配套使用
      *
      * @param driverPageQuery 驱动和分页参数
      * @return Map String:String
      */
-    Map<String, String> driver(DriverPageQuery driverPageQuery);
+    Map<Long, String> driver(DriverPageQuery driverPageQuery);
 }

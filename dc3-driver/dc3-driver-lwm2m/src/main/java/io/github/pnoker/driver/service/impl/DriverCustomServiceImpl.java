@@ -78,7 +78,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param device     Device
      * @param point      Point
      * @return
-     * @see Lwm2mServer#getObservationListener() 订阅资源
      */
     @Override
     public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
@@ -87,7 +86,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
         可以主动读取,也可以订阅资源
          */
-        return lwm2mServer.readValueByPath(device.getId(), attribute(pointInfo, "messageUp"));
+        return lwm2mServer.readValueByPath(String.valueOf(device.getId()), attribute(pointInfo, "messageUp"));
     }
 
     /**
@@ -108,8 +107,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          */
         if (StringUtils.nonEmptyString(attribute(pointInfo, "execDown"))) {
             //执行函数
-            return lwm2mServer.execute(device.getId(), attribute(pointInfo, "execDown"), value.getValue());
+            return lwm2mServer.execute(String.valueOf(device.getId()), attribute(pointInfo, "execDown"), value.getValue());
         }
-        return lwm2mServer.writeValueByPath(device.getId(), attribute(pointInfo, "messageDown"), value.getValue(), false);
+        return lwm2mServer.writeValueByPath(String.valueOf(device.getId()), attribute(pointInfo, "messageDown"), value.getValue(), false);
     }
 }

@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
 import io.github.pnoker.center.manager.mapper.ProfileMapper;
 import io.github.pnoker.center.manager.service.NotifyService;
@@ -34,6 +35,7 @@ import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Profile;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -63,12 +65,12 @@ public class ProfileServiceImpl implements ProfileService {
     private NotifyService notifyService;
 
     @Override
-    public void add(Profile entityBO) {
+    public void save(Profile entityBO) {
         try {
             selectByNameAndType(entityBO.getProfileName(), entityBO.getProfileTypeFlag(), entityBO.getTenantId());
             throw new DuplicateException("The profile already exists");
         } catch (NotFoundException notFoundException1) {
-            if (profileMapper.insert(entityBO) < 1) {
+            if (profileMapper.insert(null) < 1) {
                 throw new AddException("The profile {} add failed", entityBO.getProfileName());
             }
         }
@@ -76,12 +78,12 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Override
-    public void delete(Long id) {
+    public void remove(Long id) {
         try {
             pointService.selectByProfileId(id);
             throw new ServiceException("The profile already bound by the point");
         } catch (NotFoundException notFoundException2) {
-            Profile profile = get(id);
+            Profile profile = selectById(id);
             if (ObjectUtil.isNull(profile)) {
                 throw new NotFoundException("The profile does not exist");
             }
@@ -96,51 +98,49 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void update(Profile entityBO) {
-        get(entityBO.getId());
+        selectById(entityBO.getId());
         entityBO.setOperateTime(null);
-        if (profileMapper.updateById(entityBO) < 1) {
+        if (profileMapper.updateById(null) < 1) {
             throw new UpdateException("The profile update failed");
         }
 
-        Profile update = profileMapper.selectById(entityBO.getId());
-        notifyService.notifyDriverProfile(MetadataCommandTypeEnum.UPDATE, update);
+        ProfileDO update = profileMapper.selectById(entityBO.getId());
+        notifyService.notifyDriverProfile(MetadataCommandTypeEnum.UPDATE, entityBO);
     }
 
     @Override
-    public Profile get(Long id) {
-        Profile profile = profileMapper.selectById(id);
-        if (ObjectUtil.isNull(profile)) {
-            throw new NotFoundException();
-        }
-        return profile;
+    public Profile selectById(Long id) {
+        return null;
     }
 
     @Override
-    public Profile selectByNameAndType(String name, ProfileTypeFlagEnum type, String tenantId) {
-        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        queryWrapper.eq(Profile::getProfileName, name);
-        queryWrapper.eq(Profile::getProfileTypeFlag, type);
-        queryWrapper.eq(Profile::getTenantId, tenantId);
+    public Profile selectByNameAndType(String name, ProfileTypeFlagEnum type, Long tenantId) {
+        LambdaQueryWrapper<ProfileDO> queryWrapper = Wrappers.<ProfileDO>query().lambda();
+        queryWrapper.eq(ProfileDO::getProfileName, name);
+        queryWrapper.eq(ProfileDO::getProfileTypeFlag, type);
+        queryWrapper.eq(ProfileDO::getTenantId, tenantId);
         queryWrapper.last("limit 1");
-        Profile profile = profileMapper.selectOne(queryWrapper);
+        ProfileDO profile = profileMapper.selectOne(queryWrapper);
         if (ObjectUtil.isNull(profile)) {
             throw new NotFoundException();
         }
-        return profile;
+        return null;
+        //return profile;
     }
 
     @Override
-    public List<Profile> selectByIds(Set<String> ids) {
-        List<Profile> profiles = new ArrayList<>();
+    public List<Profile> selectByIds(Set<Long> ids) {
+        List<ProfileDO> profiles = new ArrayList<>();
         if (CollUtil.isNotEmpty(ids)) {
             profiles = profileMapper.selectBatchIds(ids);
         }
-        return profiles;
+        return null;
+        //return profiles;
     }
 
     @Override
-    public List<Profile> selectByDeviceId(String deviceId) {
-        Set<String> profileIds = profileBindService.selectProfileIdsByDeviceId(deviceId);
+    public List<Profile> selectByDeviceId(Long deviceId) {
+        Set<Long> profileIds = profileBindService.selectProfileIdsByDeviceId(deviceId);
         if (CollUtil.isNotEmpty(profileIds)) {
             return selectByIds(profileIds);
         }
@@ -153,34 +153,30 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Page<Profile> list(ProfilePageQuery entityQuery) {
+    public Page<Profile> selectByPage(ProfilePageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return profileMapper.selectPageWithDevice(entityQuery.getPage().page(), customFuzzyQuery(entityQuery), entityQuery.getDeviceId());
+        return profileMapper.selectPageWithDevice(PageUtil.page(entityQuery.getPage()), customFuzzyQuery(entityQuery), entityQuery.getDeviceId());
     }
 
     private LambdaQueryWrapper<Profile> fuzzyQuery(ProfilePageQuery query) {
         LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        if (ObjectUtil.isNotEmpty(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getProfileName()), Profile::getProfileName, query.getProfileName());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getProfileShareFlag()), Profile::getProfileShareFlag, query.getProfileShareFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getEnableFlag()), Profile::getEnableFlag, query.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), Profile::getTenantId, query.getTenantId());
-        }
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getProfileName()), Profile::getProfileName, query.getProfileName());
+        queryWrapper.eq(ObjectUtil.isNotEmpty(query.getProfileShareFlag()), Profile::getProfileShareFlag, query.getProfileShareFlag());
+        queryWrapper.eq(ObjectUtil.isNotEmpty(query.getEnableFlag()), Profile::getEnableFlag, query.getEnableFlag());
+        queryWrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), Profile::getTenantId, query.getTenantId());
         return queryWrapper;
     }
 
     private LambdaQueryWrapper<Profile> customFuzzyQuery(ProfilePageQuery profilePageQuery) {
         QueryWrapper<Profile> queryWrapper = Wrappers.query();
         queryWrapper.eq("dp.deleted", 0);
-        if (ObjectUtil.isNotNull(profilePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(profilePageQuery.getProfileName()), "dp.profile_name", profilePageQuery.getProfileName());
-            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileCode()), "dp.profile_code", profilePageQuery.getProfileCode());
-            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileShareFlag()), "dp.profile_share_flag", profilePageQuery.getProfileShareFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getEnableFlag()), "dp.enable_flag", profilePageQuery.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profilePageQuery.getTenantId()), "dp.tenant_id", profilePageQuery.getTenantId());
-        }
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(profilePageQuery.getProfileName()), "dp.profile_name", profilePageQuery.getProfileName());
+        queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileCode()), "dp.profile_code", profilePageQuery.getProfileCode());
+        queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileShareFlag()), "dp.profile_share_flag", profilePageQuery.getProfileShareFlag());
+        queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getEnableFlag()), "dp.enable_flag", profilePageQuery.getEnableFlag());
+        queryWrapper.eq(ObjectUtil.isNotEmpty(profilePageQuery.getTenantId()), "dp.tenant_id", profilePageQuery.getTenantId());
         return queryWrapper.lambda();
     }
 

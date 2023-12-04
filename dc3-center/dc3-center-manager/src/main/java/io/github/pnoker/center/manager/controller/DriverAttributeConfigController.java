@@ -57,7 +57,7 @@ public class DriverAttributeConfigController implements Controller {
     @PostMapping("/add")
     public R<String> add(@Validated(Insert.class) @RequestBody DriverAttributeConfig driverAttributeConfig) {
         try {
-            driverAttributeConfigService.add(driverAttributeConfig);
+            driverAttributeConfigService.save(driverAttributeConfig);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -73,7 +73,7 @@ public class DriverAttributeConfigController implements Controller {
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            driverAttributeConfigService.delete(id);
+            driverAttributeConfigService.remove(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -81,7 +81,7 @@ public class DriverAttributeConfigController implements Controller {
     }
 
     /**
-     * 修改 DriverInfo
+     * 更新 DriverInfo
      *
      * @param driverAttributeConfig DriverInfo
      * @return DriverInfo
@@ -105,7 +105,7 @@ public class DriverAttributeConfigController implements Controller {
     @GetMapping("/id/{id}")
     public R<DriverAttributeConfig> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverAttributeConfig select = driverAttributeConfigService.get(id);
+            DriverAttributeConfig select = driverAttributeConfigService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -126,7 +126,7 @@ public class DriverAttributeConfigController implements Controller {
     public R<DriverAttributeConfig> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") String deviceId,
                                                                    @NotNull @PathVariable(value = "attributeId") String attributeId) {
         try {
-            DriverAttributeConfig select = driverAttributeConfigService.selectByDeviceIdAndAttributeId(deviceId, attributeId);
+            DriverAttributeConfig select = driverAttributeConfigService.selectByDeviceIdAndAttributeId(Long.parseLong(deviceId), Long.parseLong(attributeId));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -143,7 +143,7 @@ public class DriverAttributeConfigController implements Controller {
      * @return DriverInfo Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<DriverAttributeConfig>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
+    public R<List<DriverAttributeConfig>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<DriverAttributeConfig> select = driverAttributeConfigService.selectByDeviceId(deviceId);
             if (ObjectUtil.isNotNull(select)) {
@@ -156,7 +156,7 @@ public class DriverAttributeConfigController implements Controller {
     }
 
     /**
-     * 模糊分页查询 DriverInfo
+     * 分页查询 DriverInfo
      *
      * @param driverInfoPageQuery DriverInfo Dto
      * @return Page Of DriverInfo
@@ -167,7 +167,7 @@ public class DriverAttributeConfigController implements Controller {
             if (ObjectUtil.isEmpty(driverInfoPageQuery)) {
                 driverInfoPageQuery = new DriverAttributeConfigPageQuery();
             }
-            Page<DriverAttributeConfig> page = driverAttributeConfigService.list(driverInfoPageQuery);
+            Page<DriverAttributeConfig> page = driverAttributeConfigService.selectByPage(driverInfoPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

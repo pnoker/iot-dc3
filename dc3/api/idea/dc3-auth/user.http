@@ -27,7 +27,7 @@ Cache-Control: no-cache
 }
 
 
-### 修改 User
+### 更新 User
 POST http://{{host}}/auth/userLogin/update
 Accept: */*
 Content-Type: application/json

@@ -24,7 +24,7 @@ import io.github.pnoker.common.model.UserLogin;
  * User Manage Service
  *
  * @author linys
- * @since 2023.04.02
+ * @since 2022.1.0
  */
 public interface AuthService {
 

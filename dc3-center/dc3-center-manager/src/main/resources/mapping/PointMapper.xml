@@ -17,7 +17,41 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.center.manager.mapper.PointMapper">
-    <select id="selectPageWithDevice" resultType="io.github.pnoker.common.model.Point">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="io.github.pnoker.center.manager.entity.model.PointDO">
+        <id column="id" property="id"/>
+        <result column="point_name" property="pointName"/>
+        <result column="point_code" property="pointCode"/>
+        <result column="point_type_flag" property="pointTypeFlag"/>
+        <result column="rw_flag" property="rwFlag"/>
+        <result column="base_value" property="baseValue"/>
+        <result column="multiple" property="multiple"/>
+        <result column="value_decimal" property="valueDecimal"/>
+        <result column="unit" property="unit"/>
+        <result column="profile_id" property="profileId"/>
+        <result column="alarm_notify_profile_id" property="alarmNotifyProfileId"/>
+        <result column="alarm_message_profile_id" property="alarmMessageProfileId"/>
+        <result column="group_id" property="groupId"/>
+        <result column="enable_flag" property="enableFlag"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="remark" property="remark"/>
+        <result column="creator_id" property="creatorId"/>
+        <result column="creator_name" property="creatorName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="operator_name" property="operatorName"/>
+        <result column="operate_time" property="operateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , point_name, point_code, point_type_flag, rw_flag, base_value, multiple, value_decimal, unit, profile_id, alarm_notify_profile_id, alarm_message_profile_id, group_id, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+    </sql>
+
+    <select id="selectPageWithDevice" resultType="io.github.pnoker.center.manager.entity.model.PointDO">
         select
         dp.id,
         dp.point_name,

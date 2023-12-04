@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -32,6 +31,7 @@ import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.model.DriverAttributeConfig;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +58,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     private NotifyService notifyService;
 
     @Override
-    public void add(DriverAttributeConfig entityBO) {
+    public void save(DriverAttributeConfig entityBO) {
         try {
             selectByDeviceIdAndAttributeId(entityBO.getDeviceId(), entityBO.getDriverAttributeId());
             throw new ServiceException("The driver attribute config already exists in the device");
@@ -78,8 +78,8 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      * {@inheritDoc}
      */
     @Override
-    public void delete(Long id) {
-        DriverAttributeConfig driverAttributeConfig = get(id);
+    public void remove(Long id) {
+        DriverAttributeConfig driverAttributeConfig = selectById(id);
         if (ObjectUtil.isNull(driverAttributeConfig)) {
             throw new NotFoundException("The driver attribute config does not exist");
         }
@@ -96,7 +96,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      */
     @Override
     public void update(DriverAttributeConfig entityBO) {
-        DriverAttributeConfig oldDriverAttributeConfig = get(entityBO.getId());
+        DriverAttributeConfig oldDriverAttributeConfig = selectById(entityBO.getId());
         entityBO.setOperateTime(null);
         if (!oldDriverAttributeConfig.getDriverAttributeId().equals(entityBO.getDriverAttributeId()) || !oldDriverAttributeConfig.getDeviceId().equals(entityBO.getDeviceId())) {
             try {
@@ -117,23 +117,16 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.UPDATE, select);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public DriverAttributeConfig get(Long id) {
-        DriverAttributeConfig driverAttributeConfig = driverAttributeConfigMapper.selectById(id);
-        if (ObjectUtil.isNull(driverAttributeConfig)) {
-            throw new NotFoundException();
-        }
-        return driverAttributeConfig;
+    public DriverAttributeConfig selectById(Long id) {
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DriverAttributeConfig selectByDeviceIdAndAttributeId(String deviceId, String driverAttributeId) {
+    public DriverAttributeConfig selectByDeviceIdAndAttributeId(Long deviceId, Long driverAttributeId) {
         DriverAttributeConfigPageQuery driverInfoPageQuery = new DriverAttributeConfigPageQuery();
         driverInfoPageQuery.setDriverAttributeId(driverAttributeId);
         driverInfoPageQuery.setDeviceId(deviceId);
@@ -150,7 +143,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      * {@inheritDoc}
      */
     @Override
-    public List<DriverAttributeConfig> selectByAttributeId(String driverAttributeId) {
+    public List<DriverAttributeConfig> selectByAttributeId(Long driverAttributeId) {
         DriverAttributeConfigPageQuery driverInfoPageQuery = new DriverAttributeConfigPageQuery();
         driverInfoPageQuery.setDriverAttributeId(driverAttributeId);
         List<DriverAttributeConfig> driverAttributeConfigs = driverAttributeConfigMapper.selectList(fuzzyQuery(driverInfoPageQuery));
@@ -164,7 +157,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      * {@inheritDoc}
      */
     @Override
-    public List<DriverAttributeConfig> selectByDeviceId(String deviceId) {
+    public List<DriverAttributeConfig> selectByDeviceId(Long deviceId) {
         DriverAttributeConfigPageQuery driverInfoPageQuery = new DriverAttributeConfigPageQuery();
         driverInfoPageQuery.setDeviceId(deviceId);
         List<DriverAttributeConfig> driverAttributeConfigs = driverAttributeConfigMapper.selectList(fuzzyQuery(driverInfoPageQuery));
@@ -178,18 +171,18 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverAttributeConfig> list(DriverAttributeConfigPageQuery entityQuery) {
+    public Page<DriverAttributeConfig> selectByPage(DriverAttributeConfigPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return driverAttributeConfigMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
+        return driverAttributeConfigMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<DriverAttributeConfig> fuzzyQuery(DriverAttributeConfigPageQuery query) {
         LambdaQueryWrapper<DriverAttributeConfig> queryWrapper = Wrappers.<DriverAttributeConfig>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDriverAttributeId()), DriverAttributeConfig::getDriverAttributeId, query.getDriverAttributeId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDeviceId()), DriverAttributeConfig::getDeviceId, query.getDeviceId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDriverAttributeId()), DriverAttributeConfig::getDriverAttributeId, query.getDriverAttributeId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDeviceId()), DriverAttributeConfig::getDeviceId, query.getDeviceId());
         }
         return queryWrapper;
     }

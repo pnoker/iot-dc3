@@ -18,12 +18,15 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.LabelPageQuery;
+import io.github.pnoker.center.manager.entity.bo.LabelBO;
+import io.github.pnoker.center.manager.entity.builder.LabelBuilder;
+import io.github.pnoker.center.manager.entity.query.LabelQuery;
+import io.github.pnoker.center.manager.entity.vo.LabelVO;
 import io.github.pnoker.center.manager.service.LabelService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.Label;
+import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -45,97 +48,98 @@ import javax.validation.constraints.NotNull;
 public class LabelController implements Controller {
 
     @Resource
+    private LabelBuilder labelBuilder;
+
+    @Resource
     private LabelService labelService;
 
     /**
-     * 新增 Label
+     * 新增
      *
-     * @param label Label
-     * @return Label
+     * @param entityVO {@link LabelVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Label label) {
+    public R<String> add(@Validated(Insert.class) @RequestBody LabelVO entityVO) {
         try {
-            label.setTenantId(getTenantId());
-            labelService.add(label);
-            return R.ok();
+            LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            labelService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     /**
-     * 根据 ID 删除 Label
+     * 删除
      *
-     * @param id 标签ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            labelService.delete(id);
-            return R.ok();
+            labelService.remove(id);
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     /**
-     * 修改 Label
+     * 更新
      *
-     * @param label Label
-     * @return Label
+     * @param entityVO {@link LabelVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Label label) {
+    public R<String> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
         try {
-            label.setTenantId(getTenantId());
-            labelService.update(label);
-            return R.ok();
+            LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            labelService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     /**
-     * 根据 ID 查询 Label
+     * 单个查询
      *
-     * @param id 标签ID
-     * @return Label
+     * @param id ID
+     * @return R of LabelVO
      */
     @GetMapping("/id/{id}")
-    public R<Label> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<LabelVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            Label select = labelService.get(id);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            LabelBO entityBO = labelService.selectById(id);
+            LabelVO entityVO = labelBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
-     * 模糊分页查询 Label
+     * 分页查询
      *
-     * @param labelPageQuery Label Dto
-     * @return Page Of Label
+     * @param entityQuery {@link LabelQuery}
+     * @return R Of LabelVO Page
      */
     @PostMapping("/list")
-    public R<Page<Label>> list(@RequestBody(required = false) LabelPageQuery labelPageQuery) {
+    public R<Page<LabelVO>> list(@RequestBody(required = false) LabelQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(labelPageQuery)) {
-                labelPageQuery = new LabelPageQuery();
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new LabelQuery();
             }
-            labelPageQuery.setTenantId(getTenantId());
-            Page<Label> page = labelService.list(labelPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<LabelBO> entityPageBO = labelService.selectByPage(entityQuery);
+            Page<LabelVO> entityPageVO = labelBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 }

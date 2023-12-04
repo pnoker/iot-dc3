@@ -57,7 +57,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
 
         DriverPageQuery pageQuery = buildPageQuery(request);
 
-        Page<DriverDO> driverPage = driverService.list(pageQuery);
+        Page<DriverDO> driverPage = driverService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(driverPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

@@ -33,5 +33,5 @@ public interface UserPasswordService extends Service<UserPassword, UserPasswordP
      *
      * @param id ID
      */
-    void restPassword(String id);
+    void restPassword(Long id);
 }

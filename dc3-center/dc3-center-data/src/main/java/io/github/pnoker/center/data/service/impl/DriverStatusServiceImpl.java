@@ -60,7 +60,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     private RedisUtil redisUtil;
 
     @Override
-    public Map<String, String> driver(DriverPageQuery pageQuery) {
+    public Map<Long, String> driver(DriverPageQuery pageQuery) {
         PageDTO.Builder page = PageDTO.newBuilder()
                 .setSize(pageQuery.getPage().getSize())
                 .setCurrent(pageQuery.getPage().getCurrent());
@@ -105,7 +105,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         } else {
             builder.setEnableFlagValue(DefaultConstant.DEFAULT_INT);
         }
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getTenantId())) {
+        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
             builder.setTenantId(pageQuery.getTenantId());
         }
 
@@ -118,9 +118,9 @@ public class DriverStatusServiceImpl implements DriverStatusService {
      * @param drivers DriverDTO Array
      * @return Status Map
      */
-    private Map<String, String> getStatusMap(List<DriverDTO> drivers) {
-        Map<String, String> statusMap = new HashMap<>(16);
-        Set<String> driverIds = drivers.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
+    private Map<Long, String> getStatusMap(List<DriverDTO> drivers) {
+        Map<Long, String> statusMap = new HashMap<>(16);
+        Set<Long> driverIds = drivers.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
         driverIds.forEach(id -> {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + id;
             String status = redisUtil.getKey(key);

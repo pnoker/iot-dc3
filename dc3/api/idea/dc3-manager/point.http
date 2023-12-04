@@ -36,7 +36,7 @@ Cache-Control: no-cache
 }
 
 
-### 修改 Point
+### 更新 Point
 POST http://{{dc3-manager}}/manager/point/update
 Accept: */*
 Content-Type: application/json
@@ -109,7 +109,7 @@ Cache-Control: no-cache
 }
 
 
-### 修改 PointAttribute
+### 更新 PointAttribute
 POST http://{{dc3-manager}}/manager/point_attribute/update
 Accept: */*
 Content-Type: application/json
@@ -176,7 +176,7 @@ Cache-Control: no-cache
 }
 
 
-### 修改 PointInfo
+### 更新 PointInfo
 POST http://{{dc3-manager}}/manager/point_attribute_config/update
 Accept: */*
 Content-Type: application/json

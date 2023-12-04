@@ -32,6 +32,24 @@
 
     <dependencies>
 
+        <!-- DC3 Api Manager -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-manager</artifactId>
+        </dependency>
+
+        <!-- DC3 Api Auth -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-auth</artifactId>
+        </dependency>
+
+        <!-- DC3 Api Data -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-data</artifactId>
+        </dependency>
+
         <!-- Elasticsearch -->
         <dependency>
             <groupId>co.elastic.clients</groupId>

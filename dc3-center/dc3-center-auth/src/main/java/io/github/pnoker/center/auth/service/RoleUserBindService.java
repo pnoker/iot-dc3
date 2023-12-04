@@ -27,7 +27,7 @@ import java.util.List;
  * role user mapper service
  *
  * @author linys
- * @since 2023.04.02
+ * @since 2022.1.0
  */
 public interface RoleUserBindService extends Service<RoleUserBind, RoleUserBindPageQuery> {
 
@@ -38,5 +38,5 @@ public interface RoleUserBindService extends Service<RoleUserBind, RoleUserBindP
      * @param userId   用户id
      * @return Role list
      */
-    List<Role> listRoleByTenantIdAndUserId(String tenantId, String userId);
+    List<Role> listRoleByTenantIdAndUserId(Long tenantId, Long userId);
 }

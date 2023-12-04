@@ -56,7 +56,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     private RedisUtil redisUtil;
 
     @Override
-    public Map<String, String> device(DevicePageQuery pageQuery) {
+    public Map<Long, String> device(DevicePageQuery pageQuery) {
         PageDTO.Builder page = PageDTO.newBuilder()
                 .setSize(pageQuery.getPage().getSize())
                 .setCurrent(pageQuery.getPage().getCurrent());
@@ -64,7 +64,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         PageDeviceQueryDTO.Builder query = PageDeviceQueryDTO.newBuilder()
                 .setPage(page)
                 .setDevice(builder);
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getProfileId())) {
+        if (ObjectUtil.isNotEmpty(pageQuery.getProfileId())) {
             query.setProfileId(pageQuery.getProfileId());
         }
         RPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.list(query.build());
@@ -78,7 +78,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     }
 
     @Override
-    public Map<String, String> deviceByProfileId(String profileId) {
+    public Map<Long, String> deviceByProfileId(Long profileId) {
         ByProfileQueryDTO query = ByProfileQueryDTO.newBuilder()
                 .setProfileId(profileId)
                 .build();
@@ -102,7 +102,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {
             builder.setDeviceName(pageQuery.getDeviceName());
         }
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverId())) {
+        if (ObjectUtil.isNotEmpty(pageQuery.getDriverId())) {
             builder.setDriverId(pageQuery.getDriverId());
         }
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
@@ -110,7 +110,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         } else {
             builder.setEnableFlagValue(DefaultConstant.DEFAULT_INT);
         }
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getTenantId())) {
+        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
             builder.setTenantId(pageQuery.getTenantId());
         }
         return builder;
@@ -122,9 +122,9 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
      * @param devices DeviceDTO Array
      * @return Status Map
      */
-    private Map<String, String> getStatusMap(List<DeviceDTO> devices) {
-        Map<String, String> statusMap = new HashMap<>(16);
-        Set<String> deviceIds = devices.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
+    private Map<Long, String> getStatusMap(List<DeviceDTO> devices) {
+        Map<Long, String> statusMap = new HashMap<>(16);
+        Set<Long> deviceIds = devices.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
         deviceIds.forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisUtil.getKey(key);

@@ -111,7 +111,7 @@ public class PointValueServiceImpl implements PointValueService {
         PagePointQueryDTO.Builder query = PagePointQueryDTO.newBuilder()
                 .setPage(page)
                 .setPoint(builder);
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceId())) {
+        if (ObjectUtil.isNotEmpty(pageQuery.getDeviceId())) {
             query.setDeviceId(pageQuery.getDeviceId());
         }
         RPagePointDTO rPagePointDTO = pointApiBlockingStub.list(query.build());
@@ -121,7 +121,7 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         List<PointDTO> points = rPagePointDTO.getData().getDataList();
-        List<String> pointIds = points.stream().map(p -> p.getBase().getId()).collect(Collectors.toList());
+        List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).collect(Collectors.toList());
         List<PointValue> pointValues = realtime(pageQuery.getDeviceId(), pointIds);
         if (CollUtil.isEmpty(pointValues)) {
             pointValues = latest(pageQuery.getDeviceId(), pointIds);
@@ -144,9 +144,9 @@ public class PointValueServiceImpl implements PointValueService {
 
         Criteria criteria = new Criteria();
         Query query = new Query(criteria);
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceId()))
+        if (ObjectUtil.isNotEmpty(pageQuery.getDeviceId()))
             criteria.and(FieldUtil.getField(PointValue::getDeviceId)).is(pageQuery.getDeviceId());
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getPointId()))
+        if (ObjectUtil.isNotEmpty(pageQuery.getPointId()))
             criteria.and(FieldUtil.getField(PointValue::getPointId)).is(pageQuery.getPointId());
 
         Pages pages = pageQuery.getPage();
@@ -154,7 +154,7 @@ public class PointValueServiceImpl implements PointValueService {
             criteria.and(FieldUtil.getField(PointValue::getCreateTime)).gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
         }
 
-        final String collection = CharSequenceUtil.isNotEmpty(pageQuery.getDeviceId()) ? StorageConstant.POINT_VALUE_PREFIX + pageQuery.getDeviceId() : PrefixConstant.POINT + SuffixConstant.VALUE;
+        final String collection = ObjectUtil.isNotEmpty(pageQuery.getDeviceId()) ? StorageConstant.POINT_VALUE_PREFIX + pageQuery.getDeviceId() : PrefixConstant.POINT + SuffixConstant.VALUE;
         long count = mongoTemplate.count(query, collection);
         query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
         query.with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValue::getCreateTime)));
@@ -191,7 +191,7 @@ public class PointValueServiceImpl implements PointValueService {
         return builder;
     }
 
-    public List<PointValue> realtime(String deviceId, List<String> pointIds) {
+    public List<PointValue> realtime(Long deviceId, List<Long> pointIds) {
         if (CollUtil.isEmpty(pointIds)) {
             return Collections.emptyList();
         }
@@ -202,7 +202,7 @@ public class PointValueServiceImpl implements PointValueService {
         return pointValues.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public List<PointValue> latest(String deviceId, List<String> pointIds) {
+    public List<PointValue> latest(Long deviceId, List<Long> pointIds) {
         if (CollUtil.isEmpty(pointIds)) {
             return Collections.emptyList();
         }
@@ -210,7 +210,7 @@ public class PointValueServiceImpl implements PointValueService {
         return pointIds.stream().map(pointId -> latestPointValue(deviceId, pointId)).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private PointValue latestPointValue(String deviceId, String pointId) {
+    private PointValue latestPointValue(Long deviceId, Long pointId) {
         Criteria criteria = new Criteria();
         Query query = new Query(criteria);
         criteria.and(FieldUtil.getField(PointValue::getPointId)).is(pointId);
@@ -219,7 +219,7 @@ public class PointValueServiceImpl implements PointValueService {
         return mongoTemplate.findOne(query, PointValue.class, StorageConstant.POINT_VALUE_PREFIX + deviceId);
     }
 
-    private List<String> historyPointValue(String deviceId, String pointId, int count) {
+    private List<String> historyPointValue(Long deviceId, Long pointId, int count) {
         Criteria criteria = new Criteria();
         Query query = new Query(criteria);
         criteria.and(FieldUtil.getField(PointValue::getDeviceId)).is(deviceId).and(FieldUtil.getField(PointValue::getPointId)).is(pointId);

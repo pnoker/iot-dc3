@@ -62,9 +62,18 @@ public class MybatisGenerator {
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder
                         .addInclude(
+                                "dc3_device",
+                                "dc3_driver",
+                                "dc3_driver_attribute",
+                                "dc3_driver_attribute_config",
                                 "dc3_group",
                                 "dc3_label",
-                                "dc3_label_bind"
+                                "dc3_label_bind",
+                                "dc3_point",
+                                "dc3_point_attribute",
+                                "dc3_point_attribute_config",
+                                "dc3_profile",
+                                "dc3_profile_bind"
                         )
                 ).execute();
     }

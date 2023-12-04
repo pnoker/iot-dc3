@@ -1,70 +1,44 @@
 package io.github.pnoker.center.manager.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotBlank;
 
 /**
- * <p>
- * 标签关联 VO
- * </p>
+ * LabelBind VO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-public class LabelBindVO implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * 主键ID
-     */
-    private Long id;
+@SuperBuilder
+@RequiredArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(title = "LabelBind", description = "标签绑定")
+public class LabelBindVO extends BaseVO {
 
     /**
      * 标签ID
      */
-    private Long labelId;
+    @Schema(description = "标签ID")
+    @NotBlank(message = "Label id can't be empty", groups = {Insert.class, Update.class})
+    private String labelId;
 
     /**
      * 实体ID
      */
-    private Long entityId;
-
-    /**
-     * 描述
-     */
-    private String remark;
-
-    /**
-     * 创建者ID
-     */
-    private Long creatorId;
-
-    /**
-     * 创建者名称
-     */
-    private String creatorName;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
-    /**
-     * 操作者ID
-     */
-    private Long operatorId;
-
-    /**
-     * 操作者名称
-     */
-    private String operatorName;
-
-    /**
-     * 操作时间
-     */
-    private LocalDateTime operateTime;
+    @Schema(description = "实体ID")
+    @NotBlank(message = "Entity id can't be empty", groups = {Insert.class, Update.class})
+    private String entityId;
 }

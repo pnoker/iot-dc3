@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.service.impl.repository;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.influxdb.client.BucketsApi;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApi;
@@ -60,7 +60,7 @@ public class InfluxServiceImpl implements RepositoryService, InitializingBean {
 
     @Override
     public void savePointValue(PointValue pointValue) throws IOException {
-        if (!CharSequenceUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+        if (!ObjectUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
             return;
         }
         ensurePointValueBucket();
@@ -77,8 +77,8 @@ public class InfluxServiceImpl implements RepositoryService, InitializingBean {
     }
 
     @Override
-    public void savePointValues(String deviceId, List<PointValue> pointValues) throws IOException {
-        if (CharSequenceUtil.isEmpty(deviceId)) {
+    public void savePointValues(Long deviceId, List<PointValue> pointValues) throws IOException {
+        if (ObjectUtil.isEmpty(deviceId)) {
             return;
         }
         ensurePointValueBucket();

@@ -31,6 +31,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.DriverDO;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -62,7 +63,7 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public void add(DriverDO entityBO) {
+    public void save(DriverDO entityBO) {
         boolean duplicate = checkDuplicate(entityBO);
         if (duplicate) {
             throw new DuplicateException("The driver already exists");
@@ -77,8 +78,8 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(Long id) {
-        DriverDO entityDO = get(id);
+    public void remove(Long id) {
+        DriverDO entityDO = selectById(id);
         if (ObjectUtil.isNull(entityDO)) {
             throw new NotFoundException("The driver does not exist");
         }
@@ -93,41 +94,34 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public void update(DriverDO entityBO) {
-        get(entityBO.getId());
+        selectById(entityBO.getId());
         entityBO.setOperateTime(null);
         if (driverMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The driver update failed");
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public DriverDO get(Long id) {
-        DriverDO entityDO = driverMapper.selectById(id);
-        if (ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException();
-        }
-        return entityDO;
+    public DriverDO selectById(Long id) {
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverDO> list(DriverPageQuery entityQuery) {
+    public Page<DriverDO> selectByPage(DriverPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return driverMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
+        return driverMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<DriverDO> selectByIds(Set<String> ids) {
+    public List<DriverDO> selectByIds(Set<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
@@ -138,7 +132,7 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public DriverDO selectByServiceName(String serviceName, String tenantId, boolean throwException) {
+    public DriverDO selectByServiceName(String serviceName, Long tenantId, boolean throwException) {
         LambdaQueryWrapper<DriverDO> queryWrapper = Wrappers.<DriverDO>query().lambda();
         queryWrapper.eq(DriverDO::getServiceName, serviceName);
         queryWrapper.eq(DriverDO::getTenantId, tenantId);
@@ -154,9 +148,9 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public List<DriverDO> selectByProfileId(String profileId) {
+    public List<DriverDO> selectByProfileId(Long profileId) {
         List<Device> devices = deviceService.selectByProfileId(profileId);
-        Set<String> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
+        Set<Long> driverIds = devices.stream().map(Device::getDriverId).collect(Collectors.toSet());
         List<DriverDO> entityDOList = selectByIds(driverIds);
         if (CollUtil.isEmpty(entityDOList)) {
             return Collections.emptyList();
@@ -168,9 +162,9 @@ public class DriverServiceImpl implements DriverService {
      * {@inheritDoc}
      */
     @Override
-    public DriverDO selectByDeviceId(String deviceId) {
-        Device device = deviceService.get(deviceId);
-        return get(device.getDriverId());
+    public DriverDO selectByDeviceId(Long deviceId) {
+        Device device = deviceService.selectById(deviceId);
+        return selectById(device.getDriverId());
     }
 
     @Override
@@ -197,7 +191,7 @@ public class DriverServiceImpl implements DriverService {
             queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getServiceHost()), DriverDO::getServiceHost, query.getServiceHost());
             queryWrapper.eq(ObjectUtil.isNotNull(query.getDriverTypeFlag()), DriverDO::getDriverTypeFlag, query.getDriverTypeFlag());
             queryWrapper.eq(ObjectUtil.isNotNull(query.getEnableFlag()), DriverDO::getEnableFlag, query.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), DriverDO::getTenantId, query.getTenantId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), DriverDO::getTenantId, query.getTenantId());
         }
         return queryWrapper;
     }

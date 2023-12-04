@@ -35,7 +35,7 @@ CREATE TABLE `config_info`
     `content`            longtext     NOT NULL COMMENT 'content',
     `md5`                varchar(32)           DEFAULT NULL COMMENT 'md5',
     `gmt_create`         datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `gmt_modified`       datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+    `gmt_modified`       datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     `src_user`           text COMMENT 'source user',
     `src_ip`             varchar(50)           DEFAULT NULL COMMENT 'source ip',
     `app_name`           varchar(128)          DEFAULT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE `config_info_aggr`
     `group_id`     varchar(128) NOT NULL COMMENT 'group_id',
     `datum_id`     varchar(255) NOT NULL COMMENT 'datum_id',
     `content`      longtext     NOT NULL COMMENT '内容',
-    `gmt_modified` datetime     NOT NULL COMMENT '修改时间',
+    `gmt_modified` datetime     NOT NULL COMMENT '更新时间',
     `app_name`     varchar(128) DEFAULT NULL,
     `tenant_id`    varchar(128) DEFAULT '' COMMENT '租户字段',
     PRIMARY KEY (`id`),
@@ -87,7 +87,7 @@ CREATE TABLE `config_info_beta`
     `beta_ips`           varchar(1024)         DEFAULT NULL COMMENT 'betaIps',
     `md5`                varchar(32)           DEFAULT NULL COMMENT 'md5',
     `gmt_create`         datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `gmt_modified`       datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+    `gmt_modified`       datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     `src_user`           text COMMENT 'source user',
     `src_ip`             varchar(50)           DEFAULT NULL COMMENT 'source ip',
     `tenant_id`          varchar(128)          DEFAULT '' COMMENT '租户字段',
@@ -113,7 +113,7 @@ CREATE TABLE `config_info_tag`
     `content`      longtext     NOT NULL COMMENT 'content',
     `md5`          varchar(32)           DEFAULT NULL COMMENT 'md5',
     `gmt_create`   datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `gmt_modified` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+    `gmt_modified` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     `src_user`     text COMMENT 'source user',
     `src_ip`       varchar(50)           DEFAULT NULL COMMENT 'source ip',
     PRIMARY KEY (`id`),
@@ -157,7 +157,7 @@ CREATE TABLE `group_capacity`
     `max_aggr_size`     int(10) unsigned NOT NULL DEFAULT '0' COMMENT '单个聚合数据的子配置大小上限，单位为字节，0表示使用默认值',
     `max_history_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最大变更历史数量',
     `gmt_create`        datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `gmt_modified`      datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+    `gmt_modified`      datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_group_id` (`group_id`)
 ) ENGINE = InnoDB
@@ -208,7 +208,7 @@ CREATE TABLE `tenant_capacity`
     `max_aggr_size`     int(10) unsigned NOT NULL DEFAULT '0' COMMENT '单个聚合数据的子配置大小上限，单位为字节，0表示使用默认值',
     `max_history_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '最大变更历史数量',
     `gmt_create`        datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `gmt_modified`      datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+    `gmt_modified`      datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_tenant_id` (`tenant_id`)
 ) ENGINE = InnoDB
@@ -225,7 +225,7 @@ CREATE TABLE `tenant_info`
     `tenant_desc`   varchar(256) DEFAULT NULL COMMENT 'tenant_desc',
     `create_source` varchar(32)  DEFAULT NULL COMMENT 'create_source',
     `gmt_create`    bigint(20) NOT NULL COMMENT '创建时间',
-    `gmt_modified`  bigint(20) NOT NULL COMMENT '修改时间',
+    `gmt_modified`  bigint(20) NOT NULL COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_tenant_info_kptenantid` (`kp`, `tenant_id`),
     KEY             `idx_tenant_id` (`tenant_id`)

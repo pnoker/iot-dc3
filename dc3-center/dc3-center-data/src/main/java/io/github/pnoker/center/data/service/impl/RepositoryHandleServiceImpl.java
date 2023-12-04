@@ -88,7 +88,7 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
 
     @Override
     public void save(List<PointValue> pointValues) {
-        final Map<String, List<PointValue>> group = pointValues.stream().collect(Collectors.groupingBy(PointValue::getDeviceId));
+        final Map<Long, List<PointValue>> group = pointValues.stream().collect(Collectors.groupingBy(PointValue::getDeviceId));
 
         group.forEach((deviceId, values) -> {
             // 保存批量数据到 Redis & Mongo
@@ -146,7 +146,7 @@ public class RepositoryHandleServiceImpl implements RepositoryHandleService {
      * @param pointValues        PointValue Array
      * @param repositoryServices RepositoryService Array
      */
-    private void savePointValuesToRepository(String deviceId, List<PointValue> pointValues, RepositoryService... repositoryServices) {
+    private void savePointValuesToRepository(Long deviceId, List<PointValue> pointValues, RepositoryService... repositoryServices) {
         for (RepositoryService repositoryService : repositoryServices) {
             threadPoolExecutor.execute(() -> {
                 try {

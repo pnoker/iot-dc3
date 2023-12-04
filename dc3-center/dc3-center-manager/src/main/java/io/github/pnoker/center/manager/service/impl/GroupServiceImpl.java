@@ -21,8 +21,10 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.bo.GroupBO;
+import io.github.pnoker.center.manager.entity.builder.GroupBuilder;
 import io.github.pnoker.center.manager.entity.model.GroupDO;
-import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
+import io.github.pnoker.center.manager.entity.query.GroupQuery;
 import io.github.pnoker.center.manager.manager.GroupManager;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -32,11 +34,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 /**
  * <p>
- * GroupService Impl
+ * Group Service Impl
  * </p>
  *
  * @author pnoker
@@ -47,20 +48,21 @@ import java.util.Optional;
 public class GroupServiceImpl implements GroupService {
 
     @Resource
+    private GroupBuilder groupBuilder;
+
+    @Resource
     private GroupManager groupManager;
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public void add(GroupDO entityBO) {
-        Optional<GroupDO> groupDO = selectByName(entityBO.getGroupName(), entityBO.getTenantId());
-        if (groupDO.isPresent()) {
-            throw new DuplicateException("The group[name={}] already exists", entityBO.getGroupName());
-        }
-        if (!groupManager.save(entityBO)) {
-            throw new AddException("The group[name={}] add failed", entityBO.getGroupName());
+    public void save(GroupBO entityBO) {
+        checkDuplicate(entityBO, false, true);
+
+        GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
+        if (!groupManager.save(entityDO)) {
+            throw new AddException("The group add failed");
         }
     }
 
@@ -68,68 +70,109 @@ public class GroupServiceImpl implements GroupService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(Long id) {
-        Optional<GroupDO> groupDO = selectById(id);
-        if (!groupDO.isPresent()) {
-            throw new NotFoundException("The group[id={}] does not exist", id);
-        }
-        if (!groupManager.removeById(id)) {
-            throw new DeleteException("The group[id={}] delete failed", id);
-        }
-    }
+    public void remove(Long id) {
+        getDOById(id, true);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void update(GroupDO entityBO) {
-        Optional<GroupDO> groupDO = selectById(entityBO.getId());
-        if (!groupDO.isPresent()) {
-            throw new NotFoundException("The group[id={}] does not exist", entityBO.getId());
-        }
-        entityBO.setOperateTime(null);
-        if (!groupManager.updateById(entityBO)) {
-            throw new UpdateException("The group[id={}] update failed", entityBO.getId());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<GroupDO> selectById(Long id) {
-        return groupManager.getOptById(id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<GroupDO> selectByName(String name, Long tenantId) {
+        // 删除分组之前需要检查该分组是否存在关联
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.<GroupDO>query().lambda();
-        queryWrapper.eq(GroupDO::getGroupName, name);
-        queryWrapper.last("limit 1");
-        return groupManager.getOneOpt(queryWrapper);
+        queryWrapper.eq(GroupDO::getParentGroupId, id);
+        long count = groupManager.count(queryWrapper);
+        if (count > 0) {
+            throw new AssociatedException("The group has been bound by another group");
+        }
+
+        if (!groupManager.removeById(id)) {
+            throw new DeleteException("The group delete failed");
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<GroupDO> list(GroupPageQuery entityQuery) {
+    public void update(GroupBO entityBO) {
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
+        GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!groupManager.updateById(entityDO)) {
+            throw new UpdateException("The group update failed");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GroupBO selectById(Long id) {
+        GroupDO entityDO = getDOById(id, true);
+        return groupBuilder.buildBOByDO(entityDO);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<GroupBO> selectByPage(GroupQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return groupManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<GroupDO> entityPageDO = groupManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return groupBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupPageQuery query) {
+    /**
+     * 构造模糊查询
+     *
+     * @param query {@link GroupQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupQuery query) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.<GroupDO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getGroupName()), GroupDO::getGroupName, query.getGroupName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), GroupDO::getTenantId, query.getTenantId());
-        }
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getGroupName()), GroupDO::getGroupName, query.getGroupName());
+        queryWrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), GroupDO::getTenantId, query.getTenantId());
         return queryWrapper;
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link GroupBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(GroupBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.<GroupDO>query().lambda();
+        queryWrapper.eq(GroupDO::getGroupName, entityBO.getGroupName());
+        queryWrapper.eq(GroupDO::getTenantId, entityBO.getTenantId());
+        queryWrapper.last("limit 1");
+        GroupDO one = groupManager.getOne(queryWrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("The group is duplicates");
+        }
+        return duplicate;
+    }
+
+    /**
+     * 根据 ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link GroupDO}
+     */
+    private GroupDO getDOById(Long id, boolean throwException) {
+        GroupDO entityDO = groupManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("The group not exist");
+        }
+        return entityDO;
     }
 
 }

@@ -27,15 +27,15 @@ import io.github.pnoker.center.auth.service.ResourceService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
-import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.Resource;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
  * @author linys
- * @since 2023.04.02
+ * @since 2022.1.0
  */
 @Slf4j
 @Service
@@ -46,7 +46,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 
     @Override
-    public void add(Resource entityBO) {
+    public void save(Resource entityBO) {
         //todo check if exists
         if (resourceMapper.insert(entityBO) < 1) {
             throw new AddException("The resource add failed");
@@ -54,8 +54,8 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public void delete(Long id) {
-        get(id);
+    public void remove(Long id) {
+        selectById(id);
         if (resourceMapper.deleteById(id) < 1) {
             throw new DeleteException("The resource delete failed");
         }
@@ -63,33 +63,29 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public void update(Resource entityBO) {
-        get(entityBO.getId());
+        selectById(entityBO.getId());
         if (resourceMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The resource update failed");
         }
     }
 
     @Override
-    public Resource get(Long id) {
-        Resource resource = resourceMapper.selectById(id);
-        if (ObjectUtil.isNull(resource)) {
-            throw new NotFoundException();
-        }
-        return resource;
+    public Resource selectById(Long id) {
+        return null;
     }
 
     @Override
-    public Page<Resource> list(ResourcePageQuery entityQuery) {
+    public Page<Resource> selectByPage(ResourcePageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return resourceMapper.selectPage(entityQuery.getPage().page(), buildQueryWrapper(entityQuery));
+        return resourceMapper.selectPage(PageUtil.page(entityQuery.getPage()), buildQueryWrapper(entityQuery));
     }
 
     private LambdaQueryWrapper<Resource> buildQueryWrapper(ResourcePageQuery pageQuery) {
         LambdaQueryWrapper<Resource> queryWrapper = Wrappers.<Resource>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getTenantId()), Resource::getTenantId, pageQuery.getTenantId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getTenantId()), Resource::getTenantId, pageQuery.getTenantId());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getParentResourceId()), Resource::getParentResourceId, pageQuery.getParentResourceId());
             queryWrapper.like(CharSequenceUtil.isNotEmpty(pageQuery.getResourceName()), Resource::getResourceName, pageQuery.getResourceName());
             queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceCode()), Resource::getResourceCode, pageQuery.getResourceCode());

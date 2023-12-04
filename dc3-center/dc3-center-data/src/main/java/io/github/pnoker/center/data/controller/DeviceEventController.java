@@ -47,7 +47,7 @@ public class DeviceEventController implements Controller {
     private EventService eventService;
 
     /**
-     * 模糊分页查询 DeviceEvent
+     * 分页查询 DeviceEvent
      *
      * @param deviceEventPageQuery DeviceEventDto
      * @return Page Of DeviceEvent

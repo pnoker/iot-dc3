@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DictionaryPageQuery;
+import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
 import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
@@ -49,17 +49,17 @@ public class DictionaryController implements Controller {
     /**
      * 查询驱动 Dictionary
      *
-     * @param dictionaryPageQuery DictionaryDto
+     * @param dictionaryQuery DictionaryDto
      * @return Page Of Dictionary
      */
     @PostMapping("/driver")
-    public R<Page<Dictionary>> driverDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery) {
+    public R<Page<Dictionary>> driverDictionary(@RequestBody(required = false) DictionaryQuery dictionaryQuery) {
         try {
-            if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
-                dictionaryPageQuery = new DictionaryPageQuery();
+            if (ObjectUtil.isEmpty(dictionaryQuery)) {
+                dictionaryQuery = new DictionaryQuery();
             }
-            dictionaryPageQuery.setTenantId(getTenantId());
-            Page<Dictionary> page = dictionaryService.driverDictionary(dictionaryPageQuery);
+            dictionaryQuery.setTenantId(getTenantId());
+            Page<Dictionary> page = dictionaryService.driverDictionary(dictionaryQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
@@ -72,17 +72,17 @@ public class DictionaryController implements Controller {
     /**
      * 查询模板 Dictionary
      *
-     * @param dictionaryPageQuery DictionaryDto
+     * @param dictionaryQuery DictionaryDto
      * @return Page Of Dictionary
      */
     @PostMapping("/profile")
-    public R<Page<Dictionary>> profileDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery) {
+    public R<Page<Dictionary>> profileDictionary(@RequestBody(required = false) DictionaryQuery dictionaryQuery) {
         try {
-            if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
-                dictionaryPageQuery = new DictionaryPageQuery();
+            if (ObjectUtil.isEmpty(dictionaryQuery)) {
+                dictionaryQuery = new DictionaryQuery();
             }
-            dictionaryPageQuery.setTenantId(getTenantId());
-            Page<Dictionary> page = dictionaryService.profileDictionary(dictionaryPageQuery);
+            dictionaryQuery.setTenantId(getTenantId());
+            Page<Dictionary> page = dictionaryService.profileDictionary(dictionaryQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
@@ -95,17 +95,17 @@ public class DictionaryController implements Controller {
     /**
      * 查询设备 Dictionary
      *
-     * @param dictionaryPageQuery DictionaryDto
+     * @param dictionaryQuery DictionaryDto
      * @return Page Of Dictionary
      */
     @PostMapping("/device")
-    public R<Page<Dictionary>> deviceDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery) {
+    public R<Page<Dictionary>> deviceDictionary(@RequestBody(required = false) DictionaryQuery dictionaryQuery) {
         try {
-            if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
-                dictionaryPageQuery = new DictionaryPageQuery();
+            if (ObjectUtil.isEmpty(dictionaryQuery)) {
+                dictionaryQuery = new DictionaryQuery();
             }
-            dictionaryPageQuery.setTenantId(getTenantId());
-            Page<Dictionary> page = dictionaryService.deviceDictionary(dictionaryPageQuery);
+            dictionaryQuery.setTenantId(getTenantId());
+            Page<Dictionary> page = dictionaryService.deviceDictionary(dictionaryQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
@@ -118,17 +118,17 @@ public class DictionaryController implements Controller {
     /**
      * 查询位号 Dictionary
      *
-     * @param dictionaryPageQuery DictionaryDto
+     * @param dictionaryQuery DictionaryDto
      * @return Page Of Dictionary
      */
     @PostMapping("/point")
-    public R<Page<Dictionary>> pointDictionary(@RequestBody(required = false) DictionaryPageQuery dictionaryPageQuery) {
+    public R<Page<Dictionary>> pointDictionary(@RequestBody(required = false) DictionaryQuery dictionaryQuery) {
         try {
-            if (ObjectUtil.isEmpty(dictionaryPageQuery)) {
-                dictionaryPageQuery = new DictionaryPageQuery();
+            if (ObjectUtil.isEmpty(dictionaryQuery)) {
+                dictionaryQuery = new DictionaryQuery();
             }
-            dictionaryPageQuery.setTenantId(getTenantId());
-            Page<Dictionary> page = dictionaryService.pointDictionary(dictionaryPageQuery);
+            dictionaryQuery.setTenantId(getTenantId());
+            Page<Dictionary> page = dictionaryService.pointDictionary(dictionaryQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

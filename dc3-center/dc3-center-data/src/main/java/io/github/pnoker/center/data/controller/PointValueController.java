@@ -69,7 +69,7 @@ public class PointValueController implements Controller {
     }
 
     /**
-     * 模糊分页查询 PointValue
+     * 分页查询 PointValue
      *
      * @param pointValuePageQuery 位号值和分页参数
      * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}

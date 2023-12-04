@@ -57,7 +57,7 @@ public class BlackIpController implements Controller {
     @PostMapping("/add")
     public R<String> add(@Validated(Insert.class) @RequestBody BlackIp blackIp) {
         try {
-            blackIpService.add(blackIp);
+            blackIpService.save(blackIp);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -73,7 +73,7 @@ public class BlackIpController implements Controller {
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            blackIpService.delete(id);
+            blackIpService.remove(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -81,10 +81,10 @@ public class BlackIpController implements Controller {
     }
 
     /**
-     * 修改 BlackIp
+     * 更新 BlackIp
      * <ol>
-     * <li>支持修改: Enable</li>
-     * <li>不支持修改: Ip</li>
+     * <li>支持更新: Enable</li>
+     * <li>不支持更新: Ip</li>
      * </ol>
      *
      * @param blackIp BlackIp
@@ -109,7 +109,7 @@ public class BlackIpController implements Controller {
     @GetMapping("/id/{id}")
     public R<BlackIp> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            BlackIp select = blackIpService.get(id);
+            BlackIp select = blackIpService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -139,7 +139,7 @@ public class BlackIpController implements Controller {
     }
 
     /**
-     * 模糊分页查询 BlackIp
+     * 分页查询 BlackIp
      *
      * @param blackIpPageQuery BlackIp和分页参数
      * @return 带分页的 {@link BlackIp}
@@ -150,7 +150,7 @@ public class BlackIpController implements Controller {
             if (ObjectUtil.isEmpty(blackIpPageQuery)) {
                 blackIpPageQuery = new BlackIpPageQuery();
             }
-            Page<BlackIp> page = blackIpService.list(blackIpPageQuery);
+            Page<BlackIp> page = blackIpService.selectByPage(blackIpPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

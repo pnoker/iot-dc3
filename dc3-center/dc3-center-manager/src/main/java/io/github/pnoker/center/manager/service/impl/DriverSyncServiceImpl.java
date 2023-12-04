@@ -119,9 +119,9 @@ public class DriverSyncServiceImpl implements DriverSyncService {
             driverService.update(entityDO);
         } catch (NotFoundException notFoundException1) {
             log.debug("Driver does not registered, adding {} ", entityDO);
-            driverService.add(entityDO);
+            driverService.save(entityDO);
         }
-        return driverService.get(entityDO.getId());
+        return driverService.selectById(entityDO.getId());
     }
 
     /**
@@ -154,7 +154,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
                 driverAttributeService.update(info);
             } else {
                 log.debug("Driver attribute does not registered, adding: {}", info);
-                driverAttributeService.add(info);
+                driverAttributeService.save(info);
             }
         }
 
@@ -166,7 +166,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
                     throw new ServiceException("The driver attribute(" + name + ") used by driver attribute config and cannot be deleted");
                 } catch (NotFoundException notFoundException) {
                     log.debug("Driver attribute is redundant, deleting: {}", oldDriverAttributeMap.get(name));
-                    driverAttributeService.delete(oldDriverAttributeMap.get(name).getId());
+                    driverAttributeService.remove(oldDriverAttributeMap.get(name).getId());
                 }
             }
         }
@@ -202,7 +202,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
                 pointAttributeService.update(attribute);
             } else {
                 log.debug("Point attribute registered, adding: {}", attribute);
-                pointAttributeService.add(attribute);
+                pointAttributeService.save(attribute);
             }
         }
 
@@ -214,7 +214,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
                     throw new ServiceException("The point attribute(" + name + ") used by point attribute config and cannot be deleted");
                 } catch (NotFoundException notFoundException1) {
                     log.debug("Point attribute is redundant, deleting: {}", oldPointAttributeMap.get(name));
-                    pointAttributeService.delete(oldPointAttributeMap.get(name).getId());
+                    pointAttributeService.remove(oldPointAttributeMap.get(name).getId());
                 }
             }
         }

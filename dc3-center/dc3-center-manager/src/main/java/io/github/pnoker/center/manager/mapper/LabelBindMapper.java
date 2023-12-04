@@ -9,7 +9,7 @@ import io.github.pnoker.center.manager.entity.model.LabelBindDO;
  * </p>
  *
  * @author pnoker
- * @since 2023-11-02
+ * @since 2022.1.0
  */
 public interface LabelBindMapper extends BaseMapper<LabelBindDO> {
 

@@ -60,7 +60,7 @@ public class PointAttributeController implements Controller {
     @PostMapping("/add")
     public R<PointAttribute> add(@Validated(Insert.class) @RequestBody PointAttribute pointAttribute) {
         try {
-            pointAttributeService.add(pointAttribute);
+            pointAttributeService.save(pointAttribute);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -76,7 +76,7 @@ public class PointAttributeController implements Controller {
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            pointAttributeService.delete(id);
+            pointAttributeService.remove(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -84,7 +84,7 @@ public class PointAttributeController implements Controller {
     }
 
     /**
-     * 修改 PointAttribute
+     * 更新 PointAttribute
      *
      * @param pointAttribute PointAttribute
      * @return PointAttribute
@@ -108,7 +108,7 @@ public class PointAttributeController implements Controller {
     @GetMapping("/id/{id}")
     public R<PointAttribute> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            PointAttribute select = pointAttributeService.get(id);
+            PointAttribute select = pointAttributeService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -127,7 +127,7 @@ public class PointAttributeController implements Controller {
     @GetMapping("/driver_id/{id}")
     public R<List<PointAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
         try {
-            List<PointAttribute> select = pointAttributeService.selectByDriverId(id, true);
+            List<PointAttribute> select = pointAttributeService.selectByDriverId(Long.parseLong(id), true);
             if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
@@ -140,7 +140,7 @@ public class PointAttributeController implements Controller {
     }
 
     /**
-     * 模糊分页查询 PointAttribute
+     * 分页查询 PointAttribute
      *
      * @param pointAttributePageQuery 位号属性和分页参数
      * @return Page Of PointAttribute
@@ -151,7 +151,7 @@ public class PointAttributeController implements Controller {
             if (ObjectUtil.isEmpty(pointAttributePageQuery)) {
                 pointAttributePageQuery = new PointAttributePageQuery();
             }
-            Page<PointAttribute> page = pointAttributeService.list(pointAttributePageQuery);
+            Page<PointAttribute> page = pointAttributeService.selectByPage(pointAttributePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

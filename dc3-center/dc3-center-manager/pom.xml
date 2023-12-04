@@ -49,7 +49,6 @@
             <artifactId>dc3-api-data</artifactId>
         </dependency>
 
-
         <!-- DC3 Common RabbitMQ -->
         <dependency>
             <groupId>io.github.pnoker</groupId>

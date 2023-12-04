@@ -41,7 +41,7 @@ public interface DictionaryService {
      * @param tenantId 租户ID
      * @return Dictionary Array
      */
-    List<Dictionary> userDictionary(String tenantId);
+    List<Dictionary> userDictionary(Long tenantId);
 
     /**
      * 获取 Ip 黑名单字典
@@ -49,6 +49,6 @@ public interface DictionaryService {
      * @param tenantId 租户ID
      * @return Dictionary Array
      */
-    List<Dictionary> blackIpDictionary(String tenantId);
+    List<Dictionary> blackIpDictionary(Long tenantId);
 
 }

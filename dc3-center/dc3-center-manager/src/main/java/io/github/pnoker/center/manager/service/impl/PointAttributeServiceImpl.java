@@ -27,6 +27,7 @@ import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.PointAttribute;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +51,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public void add(PointAttribute entityBO) {
+    public void save(PointAttribute entityBO) {
         try {
             selectByNameAndDriverId(entityBO.getAttributeName(), entityBO.getDriverId());
             throw new DuplicateException("The point attribute already exists");
@@ -65,8 +66,8 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(Long id) {
-        PointAttribute pointAttribute = get(id);
+    public void remove(Long id) {
+        PointAttribute pointAttribute = selectById(id);
         if (ObjectUtil.isNull(pointAttribute)) {
             throw new NotFoundException("The point attribute does not exist");
         }
@@ -81,30 +82,23 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      */
     @Override
     public void update(PointAttribute entityBO) {
-        get(entityBO.getId());
+        selectById(entityBO.getId());
         entityBO.setOperateTime(null);
         if (pointAttributeMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The point attribute update failed");
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public PointAttribute get(Long id) {
-        PointAttribute pointAttribute = pointAttributeMapper.selectById(id);
-        if (ObjectUtil.isNull(pointAttribute)) {
-            throw new NotFoundException();
-        }
-        return pointAttribute;
+    public PointAttribute selectById(Long id) {
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PointAttribute selectByNameAndDriverId(String name, String driverId) {
+    public PointAttribute selectByNameAndDriverId(String name, Long driverId) {
         LambdaQueryWrapper<PointAttribute> queryWrapper = Wrappers.<PointAttribute>query().lambda();
         queryWrapper.eq(PointAttribute::getAttributeName, name);
         queryWrapper.eq(PointAttribute::getDriverId, driverId);
@@ -120,7 +114,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public List<PointAttribute> selectByDriverId(String driverId, boolean throwException) {
+    public List<PointAttribute> selectByDriverId(Long driverId, boolean throwException) {
         PointAttributePageQuery pointAttributePageQuery = new PointAttributePageQuery();
         pointAttributePageQuery.setDriverId(driverId);
         List<PointAttribute> pointAttributes = pointAttributeMapper.selectList(fuzzyQuery(pointAttributePageQuery));
@@ -136,11 +130,11 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public Page<PointAttribute> list(PointAttributePageQuery entityQuery) {
+    public Page<PointAttribute> selectByPage(PointAttributePageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return pointAttributeMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
+        return pointAttributeMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<PointAttribute> fuzzyQuery(PointAttributePageQuery query) {
@@ -149,7 +143,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
             queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getAttributeName()), PointAttribute::getAttributeName, query.getAttributeName());
             queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getDisplayName()), PointAttribute::getDisplayName, query.getDisplayName());
             queryWrapper.eq(ObjectUtil.isNotNull(query.getAttributeTypeFlag()), PointAttribute::getAttributeTypeFlag, query.getAttributeTypeFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDriverId()), PointAttribute::getDriverId, query.getDriverId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDriverId()), PointAttribute::getDriverId, query.getDriverId());
         }
         return queryWrapper;
     }

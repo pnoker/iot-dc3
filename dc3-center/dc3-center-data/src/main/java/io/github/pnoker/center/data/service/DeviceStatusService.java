@@ -29,12 +29,12 @@ import java.util.Map;
 public interface DeviceStatusService {
 
     /**
-     * 模糊分页查询 Device 服务状态，同设备分页查询配套使用
+     * 分页查询 Device 服务状态，同设备分页查询配套使用
      *
      * @param devicePageQuery 设备和分页参数
      * @return Map String:String
      */
-    Map<String, String> device(DevicePageQuery devicePageQuery);
+    Map<Long, String> device(DevicePageQuery devicePageQuery);
 
     /**
      * 根据 模板ID 查询 Device 服务状态
@@ -42,5 +42,5 @@ public interface DeviceStatusService {
      * @param profileId Profile ID
      * @return Map String:String
      */
-    Map<String, String> deviceByProfileId(String profileId);
+    Map<Long, String> deviceByProfileId(Long profileId);
 }

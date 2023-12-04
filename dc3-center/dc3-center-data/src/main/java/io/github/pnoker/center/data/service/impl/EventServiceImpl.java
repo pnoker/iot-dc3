@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.vo.query.DeviceEventPageQuery;
@@ -103,10 +102,10 @@ public class EventServiceImpl implements EventService {
         if (ObjectUtil.isNull(deviceEventPageQuery)) {
             deviceEventPageQuery = new DeviceEventPageQuery();
         }
-        if (CharSequenceUtil.isNotEmpty(deviceEventPageQuery.getDeviceId())) {
+        if (ObjectUtil.isNotEmpty(deviceEventPageQuery.getDeviceId())) {
             criteria.and("deviceId").is(deviceEventPageQuery.getDeviceId());
         }
-        if (CharSequenceUtil.isNotEmpty(deviceEventPageQuery.getPointId())) {
+        if (ObjectUtil.isNotEmpty(deviceEventPageQuery.getPointId())) {
             criteria.and("pointId").is(deviceEventPageQuery.getPointId());
         }
 

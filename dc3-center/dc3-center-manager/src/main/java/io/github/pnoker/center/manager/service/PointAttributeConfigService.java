@@ -38,7 +38,7 @@ public interface PointAttributeConfigService extends Service<PointAttributeConfi
      * @param pointId          Point ID
      * @return PointInfo
      */
-    PointAttributeConfig selectByAttributeIdAndDeviceIdAndPointId(String pointAttributeId, String deviceId, String pointId);
+    PointAttributeConfig selectByAttributeIdAndDeviceIdAndPointId(Long pointAttributeId, Long deviceId, Long pointId);
 
     /**
      * 根据位号配置信息 ID 查询
@@ -46,7 +46,7 @@ public interface PointAttributeConfigService extends Service<PointAttributeConfi
      * @param pointAttributeId Point Attribute ID
      * @return PointInfo Array
      */
-    List<PointAttributeConfig> selectByAttributeId(String pointAttributeId);
+    List<PointAttributeConfig> selectByAttributeId(Long pointAttributeId);
 
     /**
      * 根据 设备 ID 查询
@@ -54,7 +54,7 @@ public interface PointAttributeConfigService extends Service<PointAttributeConfi
      * @param deviceId 设备ID
      * @return PointInfo Array
      */
-    List<PointAttributeConfig> selectByDeviceId(String deviceId);
+    List<PointAttributeConfig> selectByDeviceId(Long deviceId);
 
     /**
      * 根据 设备 ID 、 位号 ID 查询
@@ -63,5 +63,5 @@ public interface PointAttributeConfigService extends Service<PointAttributeConfi
      * @param pointId  位号ID
      * @return PointInfo Array
      */
-    List<PointAttributeConfig> selectByDeviceIdAndPointId(String deviceId, String pointId);
+    List<PointAttributeConfig> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
 }

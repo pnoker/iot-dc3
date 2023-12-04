@@ -115,7 +115,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
-        String deviceId = device.getId();
+        Long deviceId = device.getId();
         Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
         if (ObjectUtil.isNotNull(channel)) {
             channel.writeAndFlush(DecodeUtil.stringToByte(value.getValue()));

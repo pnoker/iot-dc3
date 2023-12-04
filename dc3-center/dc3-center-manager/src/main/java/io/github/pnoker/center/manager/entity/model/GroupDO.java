@@ -1,9 +1,6 @@
 package io.github.pnoker.center.manager.entity.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +13,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author pnoker
- * @since 2023-11-02
+ * @since 2022.1.0
  */
 @Getter
 @Setter
@@ -28,7 +25,7 @@ public class GroupDO implements Serializable {
     /**
      * 主键ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
@@ -112,6 +109,7 @@ public class GroupDO implements Serializable {
     /**
      * 逻辑删除标识,0:未删除,1:已删除
      */
-    @TableField("deleted")
+    @TableLogic
+    @TableField(value = "deleted", select = false)
     private Byte deleted;
 }

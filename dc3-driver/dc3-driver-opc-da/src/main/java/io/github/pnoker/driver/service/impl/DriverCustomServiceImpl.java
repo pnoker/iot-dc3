@@ -63,7 +63,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * Opc Da Server Map
      */
-    private Map<String, Server> connectMap;
+    private Map<Long, Server> connectMap;
 
     @Override
     public void initial() {
@@ -119,7 +119,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverInfo 驱动信息
      * @return Server
      */
-    private Server getConnector(String deviceId, Map<String, AttributeInfo> driverInfo) {
+    private Server getConnector(Long deviceId, Map<String, AttributeInfo> driverInfo) {
         log.debug("Opc Da Server Connection Info {}", JsonUtil.toJsonString(driverInfo));
         Server server = connectMap.get(deviceId);
         if (ObjectUtil.isNull(server)) {

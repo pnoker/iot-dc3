@@ -33,6 +33,6 @@ public interface BatchService {
      * @param tenantId    租户ID
      * @return DriverMetadata
      */
-    DriverMetadata batchDriverMetadata(String serviceName, String tenantId);
+    DriverMetadata batchDriverMetadata(String serviceName, Long tenantId);
 
 }

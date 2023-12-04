@@ -68,7 +68,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         modbusFactory = new ModbusFactory();
     }
 
-    private Map<String, ModbusMaster> connectMap;
+    private Map<Long, ModbusMaster> connectMap;
 
     @Override
     public void initial() {
@@ -124,7 +124,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverInfo 驱动信息
      * @return ModbusMaster
      */
-    private ModbusMaster getConnector(String deviceId, Map<String, AttributeInfo> driverInfo) {
+    private ModbusMaster getConnector(Long deviceId, Map<String, AttributeInfo> driverInfo) {
         log.debug("Modbus Tcp Connection Info: {}", JsonUtil.toJsonString(driverInfo));
         ModbusMaster modbusMaster = connectMap.get(deviceId);
         if (ObjectUtil.isNull(modbusMaster)) {

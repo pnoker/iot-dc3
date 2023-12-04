@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.service.impl.repository;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.google.common.collect.Lists;
 import io.github.pnoker.center.data.service.RepositoryService;
@@ -67,7 +66,7 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
 
     @Override
     public void savePointValue(PointValue pointValue) {
-        if (!CharSequenceUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+        if (!ObjectUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
             return;
         }
 
@@ -75,13 +74,13 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
     }
 
     @Override
-    public void savePointValues(String deviceId, List<PointValue> pointValues) {
-        if (CharSequenceUtil.isEmpty(deviceId)) {
+    public void savePointValues(Long deviceId, List<PointValue> pointValues) {
+        if (ObjectUtil.isEmpty(deviceId)) {
             return;
         }
 
         List<TsPointValue> tsPointValues = pointValues.stream()
-                .filter(pointValue -> CharSequenceUtil.isNotEmpty(pointValue.getPointId()))
+                .filter(pointValue -> ObjectUtil.isNotEmpty(pointValue.getPointId()))
                 .map(pointValue -> convertPointValues(StorageConstant.POINT_VALUE_PREFIX + deviceId, pointValue))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
@@ -96,7 +95,7 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
     }
 
     private List<TsPointValue> convertPointValues(String metric, PointValue pointValue) {
-        String point = pointValue.getPointId();
+        Long point = pointValue.getPointId();
         String value = pointValue.getValue();
         long timestamp = pointValue.getOriginTime().getTime();
 
@@ -104,12 +103,12 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
 
         TsPointValue tsValue = new TsPointValue(metric, value);
         tsValue.setTimestamp(timestamp);
-        tsValue.addTag("point", point).addTag("valueType", "value");
+        tsValue.addTag("point", point.toString()).addTag("valueType", "value");
         tsPointValues.add(tsValue);
 
         TsPointValue tsRawValue = new TsPointValue(metric, value);
         tsRawValue.setTimestamp(timestamp);
-        tsValue.addTag("point", point).addTag("valueType", "rawValue");
+        tsValue.addTag("point", point.toString()).addTag("valueType", "rawValue");
         tsPointValues.add(tsRawValue);
 
         return tsPointValues;

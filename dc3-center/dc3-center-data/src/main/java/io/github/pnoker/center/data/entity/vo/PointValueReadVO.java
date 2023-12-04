@@ -36,8 +36,8 @@ public class PointValueReadVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotBlank(message = "Driver id can't be empty")
-    private String deviceId;
+    private Long deviceId;
 
     @NotBlank(message = "Point id can't be empty")
-    private String pointId;
+    private Long pointId;
 }

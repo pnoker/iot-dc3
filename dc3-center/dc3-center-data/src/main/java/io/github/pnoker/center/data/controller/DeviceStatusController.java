@@ -50,10 +50,10 @@ public class DeviceStatusController implements Controller {
      * @return Map String:String
      */
     @PostMapping("/device")
-    public R<Map<String, String>> deviceStatus(@RequestBody(required = false) DevicePageQuery devicePageQuery) {
+    public R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DevicePageQuery devicePageQuery) {
         try {
             devicePageQuery.setTenantId(getTenantId());
-            Map<String, String> statuses = deviceStatusService.device(devicePageQuery);
+            Map<Long, String> statuses = deviceStatusService.device(devicePageQuery);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -68,11 +68,11 @@ public class DeviceStatusController implements Controller {
      * @return Map String:String
      */
     @GetMapping("/device/driver_id/{driverId}")
-    public R<Map<String, String>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") String driverId) {
+    public R<Map<Long, String>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             DevicePageQuery devicePageQuery = new DevicePageQuery();
             devicePageQuery.setDriverId(driverId);
-            Map<String, String> statuses = deviceStatusService.device(devicePageQuery);
+            Map<Long, String> statuses = deviceStatusService.device(devicePageQuery);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -87,9 +87,9 @@ public class DeviceStatusController implements Controller {
      * @return Map String:String
      */
     @GetMapping("/device/profile_id/{profileId}")
-    public R<Map<String, String>> deviceStatusByProfileId(@NotNull @PathVariable(value = "profileId") String profileId) {
+    public R<Map<Long, String>> deviceStatusByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
         try {
-            Map<String, String> statuses = deviceStatusService.deviceByProfileId(profileId);
+            Map<Long, String> statuses = deviceStatusService.deviceByProfileId(profileId);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());

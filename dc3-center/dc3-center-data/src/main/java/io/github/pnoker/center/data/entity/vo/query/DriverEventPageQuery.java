@@ -37,7 +37,7 @@ public class DriverEventPageQuery implements Serializable {
     /**
      * 驱动ID
      */
-    private String driverId;
+    private Long driverId;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

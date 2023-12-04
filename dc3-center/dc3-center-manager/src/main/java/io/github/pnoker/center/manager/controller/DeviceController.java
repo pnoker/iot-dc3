@@ -66,7 +66,7 @@ public class DeviceController implements Controller {
     public R<String> add(@Validated(Insert.class) @RequestBody Device device) {
         try {
             device.setTenantId(getTenantId());
-            deviceService.add(device);
+            deviceService.save(device);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -82,7 +82,7 @@ public class DeviceController implements Controller {
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            deviceService.delete(id);
+            deviceService.remove(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -90,7 +90,7 @@ public class DeviceController implements Controller {
     }
 
     /**
-     * 修改 Device
+     * 更新 Device
      *
      * @param device Device
      * @return Device
@@ -115,7 +115,7 @@ public class DeviceController implements Controller {
     @GetMapping("/id/{id}")
     public R<Device> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Device select = deviceService.get(id);
+            Device select = deviceService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -132,10 +132,11 @@ public class DeviceController implements Controller {
      * @return Map String:Device
      */
     @PostMapping("/ids")
-    public R<Map<String, Device>> selectByIds(@RequestBody Set<String> deviceIds) {
+    public R<Map<Long, Device>> selectByIds(@RequestBody Set<String> deviceIds) {
         try {
-            List<Device> devices = deviceService.selectByIds(deviceIds);
-            Map<String, Device> deviceMap = devices.stream().collect(Collectors.toMap(Device::getId, Function.identity()));
+            Set<Long> collect = deviceIds.stream().map(Long::parseLong).collect(Collectors.toSet());
+            List<Device> devices = deviceService.selectByIds(collect);
+            Map<Long, Device> deviceMap = devices.stream().collect(Collectors.toMap(Device::getId, Function.identity()));
             return R.ok(deviceMap);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -143,7 +144,7 @@ public class DeviceController implements Controller {
     }
 
     /**
-     * 模糊分页查询 Device
+     * 分页查询 Device
      *
      * @param devicePageQuery 设备和分页参数
      * @return Page Of Device
@@ -155,7 +156,7 @@ public class DeviceController implements Controller {
                 devicePageQuery = new DevicePageQuery();
             }
             devicePageQuery.setTenantId(getTenantId());
-            Page<Device> page = deviceService.list(devicePageQuery);
+            Page<Device> page = deviceService.selectByPage(devicePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

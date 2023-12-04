@@ -28,7 +28,7 @@ import io.github.pnoker.common.model.*;
 public interface NotifyService {
 
     /**
-     * 通知驱动 新增模板(ADD) / 删除模板(DELETE) / 修改模板(UPDATE)
+     * 通知驱动 新增模板(ADD) / 删除模板(DELETE) / 更新模板(UPDATE)
      *
      * @param command Operation Type
      * @param profile Profile
@@ -36,7 +36,7 @@ public interface NotifyService {
     void notifyDriverProfile(MetadataCommandTypeEnum command, Profile profile);
 
     /**
-     * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 修改位号(UPDATE)
+     * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 更新位号(UPDATE)
      *
      * @param command Operation Type
      * @param point   Point
@@ -44,7 +44,7 @@ public interface NotifyService {
     void notifyDriverPoint(MetadataCommandTypeEnum command, Point point);
 
     /**
-     * 通知驱动 新增设备(ADD) / 删除设备(DELETE) / 修改设备(UPDATE)
+     * 通知驱动 新增设备(ADD) / 删除设备(DELETE) / 更新设备(UPDATE)
      *
      * @param command Operation Type
      * @param device  Device

@@ -32,7 +32,7 @@ Cache-Control: no-cache
 }
 
 
-### 修改 DriverAttribute
+### 更新 DriverAttribute
 #/manager/driver_attribute/update
 POST http://{{dc3-manager}}/manager/driver_attribute/update
 Accept: */*

@@ -37,5 +37,5 @@ public class ProfilePageQuery extends Profile {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
-    private String deviceId;
+    private Long deviceId;
 }
