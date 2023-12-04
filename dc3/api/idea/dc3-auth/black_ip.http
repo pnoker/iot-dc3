@@ -27,7 +27,7 @@ X-Auth-Tenant-Id: -1
 }
 
 
-### 修改 BlackIp
+### 更新 BlackIp
 POST http://{{dc3-auth}}/auth/black_ip/update
 Accept: */*
 Content-Type: application/json

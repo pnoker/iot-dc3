@@ -63,7 +63,7 @@ public class PointController implements Controller {
     public R<Point> add(@Validated(Insert.class) @RequestBody Point point) {
         try {
             point.setTenantId(getTenantId());
-            pointService.add(point);
+            pointService.save(point);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -79,7 +79,7 @@ public class PointController implements Controller {
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            pointService.delete(id);
+            pointService.remove(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -87,7 +87,7 @@ public class PointController implements Controller {
     }
 
     /**
-     * 修改 Point
+     * 更新 Point
      *
      * @param point Point
      * @return Point
@@ -112,7 +112,7 @@ public class PointController implements Controller {
     @GetMapping("/id/{id}")
     public R<Point> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Point select = pointService.get(id);
+            Point select = pointService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -129,11 +129,12 @@ public class PointController implements Controller {
      * @return Map String:Point
      */
     @PostMapping("/ids")
-    public R<Map<String, Point>> selectByIds(@RequestBody Set<String> pointIds) {
+    public R<Map<Long, Point>> selectByIds(@RequestBody Set<Long> pointIds) {
         try {
             List<Point> points = pointService.selectByIds(pointIds);
-            Map<String, Point> pointMap = points.stream().collect(Collectors.toMap(Point::getId, Function.identity()));
+            Map<Long, Point> pointMap = points.stream().collect(Collectors.toMap(Point::getId, Function.identity()));
             return R.ok(pointMap);
+            // todo 返回id为 long，前端无法解析
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -146,7 +147,7 @@ public class PointController implements Controller {
      * @return Point Array
      */
     @GetMapping("/profile_id/{profileId}")
-    public R<List<Point>> selectByProfileId(@NotNull @PathVariable(value = "profileId") String profileId) {
+    public R<List<Point>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
         try {
             List<Point> select = pointService.selectByProfileId(profileId);
             if (CollUtil.isNotEmpty(select)) {
@@ -165,7 +166,7 @@ public class PointController implements Controller {
      * @return Point Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<Point>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
+    public R<List<Point>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<Point> select = pointService.selectByDeviceId(deviceId);
             if (CollUtil.isNotEmpty(select)) {
@@ -178,7 +179,7 @@ public class PointController implements Controller {
     }
 
     /**
-     * 模糊分页查询 Point
+     * 分页查询 Point
      *
      * @param pointPageQuery Point Dto
      * @return Page Of Point
@@ -190,7 +191,7 @@ public class PointController implements Controller {
                 pointPageQuery = new PointPageQuery();
             }
             pointPageQuery.setTenantId(getTenantId());
-            Page<Point> page = pointService.list(pointPageQuery);
+            Page<Point> page = pointService.selectByPage(pointPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
@@ -207,13 +208,14 @@ public class PointController implements Controller {
      * @return Map String:String
      */
     @PostMapping("/unit")
-    public R<Map<String, String>> unit(@RequestBody Set<String> pointIds) {
+    public R<Map<Long, String>> unit(@RequestBody Set<Long> pointIds) {
         try {
-            Map<String, String> units = pointService.unit(pointIds);
+            Map<Long, String> units = pointService.unit(pointIds);
             if (ObjectUtil.isNotNull(units)) {
-                Map<String, String> unitCodeMap = units.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                Map<Long, String> unitCodeMap = units.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                 return R.ok(unitCodeMap);
             }
+            // todo 返回id为 long，前端无法解析
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

@@ -30,9 +30,9 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
-import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.RoleResourceBind;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author linys
- * @since 2023.04.02
+ * @since 2022.1.0
  */
 @Slf4j
 @Service
@@ -55,7 +55,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     private ResourceMapper resourceMapper;
 
     @Override
-    public void add(RoleResourceBind entityBO) {
+    public void save(RoleResourceBind entityBO) {
         //todo check if exists
         if (bindMapper.insert(entityBO) < 1) {
             throw new AddException("The tenant bind add failed");
@@ -63,8 +63,8 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public void delete(Long id) {
-        get(id);
+    public void remove(Long id) {
+        selectById(id);
         if (bindMapper.deleteById(id) < 1) {
             throw new DeleteException("The role resource bind delete failed");
         }
@@ -72,31 +72,27 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
     @Override
     public void update(RoleResourceBind entityBO) {
-        get(entityBO.getId());
+        selectById(entityBO.getId());
         if (bindMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The role resource bind update failed");
         }
     }
 
     @Override
-    public RoleResourceBind get(Long id) {
-        RoleResourceBind bind = bindMapper.selectById(id);
-        if (ObjectUtil.isNull(bind)) {
-            throw new NotFoundException();
-        }
-        return bind;
+    public RoleResourceBind selectById(Long id) {
+        return null;
     }
 
     @Override
-    public Page<RoleResourceBind> list(RoleResourceBindPageQuery entityQuery) {
+    public Page<RoleResourceBind> selectByPage(RoleResourceBindPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return bindMapper.selectPage(entityQuery.getPage().page(), buildQueryWrapper(entityQuery));
+        return bindMapper.selectPage(PageUtil.page(entityQuery.getPage()), buildQueryWrapper(entityQuery));
     }
 
     @Override
-    public List<io.github.pnoker.common.model.Resource> listResourceByRoleId(String RoleId) {
+    public List<io.github.pnoker.common.model.Resource> listResourceByRoleId(Long RoleId) {
         LambdaQueryWrapper<RoleResourceBind> queryWrapper = Wrappers.<RoleResourceBind>query().lambda();
         queryWrapper.eq(RoleResourceBind::getRoleId, RoleId);
         List<RoleResourceBind> roleResourceBinds = bindMapper.selectList(queryWrapper);

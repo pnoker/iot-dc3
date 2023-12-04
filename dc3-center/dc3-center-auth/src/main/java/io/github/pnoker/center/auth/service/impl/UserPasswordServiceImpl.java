@@ -31,6 +31,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.model.UserPassword;
 import io.github.pnoker.common.utils.DecodeUtil;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +53,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     @Transactional
-    public void add(UserPassword entityBO) {
+    public void save(UserPassword entityBO) {
         entityBO.setLoginPassword(DecodeUtil.md5(entityBO.getLoginPassword()));
         // 插入 userPassword 数据，并返回插入后的 userPassword
         if (userPasswordMapper.insert(entityBO) < 1) {
@@ -62,8 +63,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     @Transactional
-    public void delete(String id) {
-        UserPassword userPassword = get(id);
+    public void remove(Long id) {
+        UserPassword userPassword = selectById(id);
         if (ObjectUtil.isNull(userPassword)) {
             throw new NotFoundException("The user password does not exist");
         }
@@ -75,7 +76,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     public void update(UserPassword entityBO) {
-        UserPassword selectById = get(entityBO.getId());
+        UserPassword selectById = selectById(entityBO.getId());
         if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException();
         }
@@ -87,21 +88,21 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public UserPassword get(Long id) {
-        return userPasswordMapper.selectById(id);
+    public UserPassword selectById(Long id) {
+        return null;
     }
 
     @Override
-    public Page<UserPassword> list(UserPasswordPageQuery entityQuery) {
+    public Page<UserPassword> selectByPage(UserPasswordPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return userPasswordMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
+        return userPasswordMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
     @Override
-    public void restPassword(String id) {
-        UserPassword userPassword = get(id);
+    public void restPassword(Long id) {
+        UserPassword userPassword = selectById(id);
         if (ObjectUtil.isNotNull(userPassword)) {
             userPassword.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
             update(userPassword);

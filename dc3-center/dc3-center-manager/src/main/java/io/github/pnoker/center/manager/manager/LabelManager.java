@@ -9,7 +9,7 @@ import io.github.pnoker.center.manager.entity.model.LabelDO;
  * </p>
  *
  * @author pnoker
- * @since 2023-11-02
+ * @since 2022.1.0
  */
 public interface LabelManager extends IService<LabelDO> {
 

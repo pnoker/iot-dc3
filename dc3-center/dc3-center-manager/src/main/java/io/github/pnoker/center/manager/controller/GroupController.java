@@ -18,12 +18,15 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
+import io.github.pnoker.center.manager.entity.bo.GroupBO;
+import io.github.pnoker.center.manager.entity.builder.GroupBuilder;
+import io.github.pnoker.center.manager.entity.query.GroupQuery;
+import io.github.pnoker.center.manager.entity.vo.GroupVO;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.Group;
+import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -45,98 +48,99 @@ import javax.validation.constraints.NotNull;
 public class GroupController implements Controller {
 
     @Resource
+    private GroupBuilder groupBuilder;
+
+    @Resource
     private GroupService groupService;
 
     /**
-     * 新增 Group
+     * 新增
      *
-     * @param group Group
-     * @return Group
+     * @param entityVO {@link GroupVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Group group) {
+    public R<String> add(@Validated(Insert.class) @RequestBody GroupVO entityVO) {
         try {
-            group.setTenantId(getTenantId());
-            groupService.add(group);
-            return R.ok();
+            entityVO.setTenantId(getTenantId());
+            GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
+            groupService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     /**
-     * 根据 ID 删除 Group
+     * 删除
      *
-     * @param id 分组ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            groupService.delete(id);
-            return R.ok();
+            groupService.remove(id);
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     /**
-     * 修改 Group
+     * 更新
      *
-     * @param group Group
-     * @return Group
+     * @param entityVO Group
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Group group) {
+    public R<String> update(@Validated(Update.class) @RequestBody GroupVO entityVO) {
         try {
-            group.setTenantId(getTenantId());
-            groupService.update(group);
-            return R.ok();
+            GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            groupService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     /**
-     * 根据 ID 查询 Group
+     * 单个查询
      *
-     * @param id 分组ID
-     * @return Group
+     * @param id ID
+     * @return R of GroupVO
      */
     @GetMapping("/id/{id}")
-    public R<Group> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<GroupVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            Group select = groupService.selectById(id);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            GroupBO entityBO = groupService.selectById(id);
+            GroupVO entityVO = groupBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
-     * 模糊分页查询 Group
+     * 分页查询
      *
-     * @param groupPageQuery Group Dto
-     * @return Page Of Group
+     * @param entityQuery {@link GroupQuery}
+     * @return R Of GroupVO Page
      */
     @PostMapping("/list")
-    public R<Page<Group>> list(@RequestBody(required = false) GroupPageQuery groupPageQuery) {
+    public R<Page<GroupVO>> list(@RequestBody(required = false) GroupQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(groupPageQuery)) {
-                groupPageQuery = new GroupPageQuery();
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new GroupQuery();
             }
-            groupPageQuery.setTenantId(getTenantId());
-            Page<Group> page = groupService.list(groupPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<GroupBO> entityPageBO = groupService.selectByPage(entityQuery);
+            Page<GroupVO> entityPageVO = groupBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
 }

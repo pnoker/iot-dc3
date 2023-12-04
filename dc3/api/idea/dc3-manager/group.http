@@ -15,8 +15,8 @@
 #
 
 ### 新增 Group
-#/manager/group/add
-POST http://{{dc3-manager}}/manager/group/add
+#/manager/groupBO/add
+POST http://{{dc3-manager}}/manager/groupBO/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -27,9 +27,9 @@ Cache-Control: no-cache
 }
 
 
-### 修改 Group
-#/manager/group/update
-POST http://{{dc3-manager}}/manager/group/update
+### 更新 Group
+#/manager/groupBO/update
+POST http://{{dc3-manager}}/manager/groupBO/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -42,16 +42,16 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 Group
-#/manager/group/id/:id
-GET http://{{dc3-manager}}/manager/group/id/-1
+#/manager/groupBO/id/:id
+GET http://{{dc3-manager}}/manager/groupBO/id/-1
 Accept: */*
 Cache-Control: no-cache
 
 
 
 ### 分页查询 Group
-#/manager/group/list，支持name模糊查询
-POST http://{{dc3-manager}}/manager/group/list
+#/manager/groupBO/list，支持name模糊查询
+POST http://{{dc3-manager}}/manager/groupBO/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -71,8 +71,8 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 Group
-#/manager/group/delete/:id
-POST http://{{dc3-manager}}/manager/group/delete/1
+#/manager/groupBO/delete/:id
+POST http://{{dc3-manager}}/manager/groupBO/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

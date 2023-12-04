@@ -58,7 +58,7 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
 
         PointPageQuery pageQuery = buildPageQuery(request);
 
-        Page<Point> pointPage = pointService.list(pageQuery);
+        Page<Point> pointPage = pointService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(pointPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

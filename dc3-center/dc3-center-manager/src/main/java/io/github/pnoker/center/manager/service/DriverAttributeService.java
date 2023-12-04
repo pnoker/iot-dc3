@@ -37,7 +37,7 @@ public interface DriverAttributeService extends Service<DriverAttribute, DriverA
      * @param driverId 驱动ID
      * @return DriverAttribute
      */
-    DriverAttribute selectByNameAndDriverId(String name, String driverId);
+    DriverAttribute selectByNameAndDriverId(String name, Long driverId);
 
     /**
      * 根据驱动 ID 查询
@@ -46,5 +46,5 @@ public interface DriverAttributeService extends Service<DriverAttribute, DriverA
      * @param throwException Throw Exception
      * @return DriverAttribute Array
      */
-    List<DriverAttribute> selectByDriverId(String driverId, boolean throwException);
+    List<DriverAttribute> selectByDriverId(Long driverId, boolean throwException);
 }

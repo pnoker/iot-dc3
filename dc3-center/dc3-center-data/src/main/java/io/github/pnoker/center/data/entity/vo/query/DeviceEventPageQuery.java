@@ -37,12 +37,12 @@ public class DeviceEventPageQuery implements Serializable {
     /**
      * 设备ID
      */
-    private String deviceId;
+    private Long deviceId;
 
     /**
      * 位号ID
      */
-    private String pointId;
+    private Long pointId;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

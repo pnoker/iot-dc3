@@ -59,7 +59,7 @@ public class TDengineServiceImpl implements RepositoryService, InitializingBean 
     }
 
     @Override
-    public void savePointValues(String deviceId, List<PointValue> pointValues) throws IOException {
+    public void savePointValues(Long deviceId, List<PointValue> pointValues) throws IOException {
         taosPointValueMapper.createDeviceTable(deviceId, pointValues.get(0).getPointId());
         taosPointValueMapper.batchInsert(pointValues.stream().map(TaosPointValue::new).collect(Collectors.toList()));
 

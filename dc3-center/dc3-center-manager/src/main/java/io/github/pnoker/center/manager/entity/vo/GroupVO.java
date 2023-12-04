@@ -1,90 +1,74 @@
 package io.github.pnoker.center.manager.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.GroupTypeFlagEnum;
+import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 /**
- * <p>
- * 分组 VO
- * </p>
+ * Group VO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-public class GroupVO implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * 主键ID
-     */
-    private Long id;
-
-    /**
-     * 父分组ID
-     */
-    private Long parentGroupId;
+@SuperBuilder
+@RequiredArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(title = "Group",description = "分组")
+public class GroupVO extends BaseVO {
 
     /**
      * 分组名称
      */
+    @Schema(description = "分组名称")
+    @NotBlank(message = "Group name can't be empty",
+            groups = {Insert.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid group name",
+            groups = {Insert.class, Update.class})
     private String groupName;
+
+    /**
+     * 父分组ID
+     */
+    @Schema(description = "分组父级ID")
+    private String parentGroupId;
 
     /**
      * 分组排序位置
      */
+    @Schema(description = "分组排序")
     private Integer position;
 
     /**
-     * 分组类型标识
+     * 分组标识
      */
-    private Byte groupTypeFlag;
+    @Schema(description = "分组标识")
+    private GroupTypeFlagEnum groupTypeFlag;
 
     /**
      * 使能标识
      */
-    private Byte enableFlag;
+    @Schema(description = "使能标识")
+    private EnableFlagEnum enableFlag;
 
     /**
      * 租户ID
      */
+    @Schema(description = "租户ID")
     private Long tenantId;
-
-    /**
-     * 描述
-     */
-    private String remark;
-
-    /**
-     * 创建者ID
-     */
-    private Long creatorId;
-
-    /**
-     * 创建者名称
-     */
-    private String creatorName;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
-    /**
-     * 操作者ID
-     */
-    private Long operatorId;
-
-    /**
-     * 操作者名称
-     */
-    private String operatorName;
-
-    /**
-     * 操作时间
-     */
-    private LocalDateTime operateTime;
 }

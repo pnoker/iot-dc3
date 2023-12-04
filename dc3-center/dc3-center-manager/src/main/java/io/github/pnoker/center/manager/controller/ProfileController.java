@@ -62,7 +62,7 @@ public class ProfileController implements Controller {
     public R<String> add(@Validated(Insert.class) @RequestBody Profile profile) {
         try {
             profile.setTenantId(getTenantId());
-            profileService.add(profile);
+            profileService.save(profile);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -78,7 +78,7 @@ public class ProfileController implements Controller {
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            profileService.delete(id);
+            profileService.remove(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -86,7 +86,7 @@ public class ProfileController implements Controller {
     }
 
     /**
-     * 修改 Profile
+     * 更新 Profile
      *
      * @param profile Profile
      * @return Profile
@@ -111,7 +111,7 @@ public class ProfileController implements Controller {
     @GetMapping("/id/{id}")
     public R<Profile> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Profile select = profileService.get(id);
+            Profile select = profileService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -128,11 +128,13 @@ public class ProfileController implements Controller {
      * @return Map String:Profile
      */
     @PostMapping("/ids")
-    public R<Map<String, Profile>> selectByIds(@RequestBody Set<String> profileIds) {
+    public R<Map<Long, Profile>> selectByIds(@RequestBody Set<String> profileIds) {
         try {
-            List<Profile> profiles = profileService.selectByIds(profileIds);
-            Map<String, Profile> profileMap = profiles.stream().collect(Collectors.toMap(Profile::getId, Function.identity()));
+            Set<Long> collect = profileIds.stream().map(Long::parseLong).collect(Collectors.toSet());
+            List<Profile> profiles = profileService.selectByIds(collect);
+            Map<Long, Profile> profileMap = profiles.stream().collect(Collectors.toMap(Profile::getId, Function.identity()));
             return R.ok(profileMap);
+            // todo   返回 long id 前端你无法解析
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -145,7 +147,7 @@ public class ProfileController implements Controller {
      * @return Profile Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<Profile>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
+    public R<List<Profile>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<Profile> select = profileService.selectByDeviceId(deviceId);
             if (ObjectUtil.isNotNull(select)) {
@@ -158,7 +160,7 @@ public class ProfileController implements Controller {
     }
 
     /**
-     * 模糊分页查询 Profile
+     * 分页查询 Profile
      *
      * @param profilePageQuery Profile Dto
      * @return Page Of Profile
@@ -170,7 +172,7 @@ public class ProfileController implements Controller {
                 profilePageQuery = new ProfilePageQuery();
             }
             profilePageQuery.setTenantId(getTenantId());
-            Page<Profile> page = profileService.list(profilePageQuery);
+            Page<Profile> page = profileService.selectByPage(profilePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

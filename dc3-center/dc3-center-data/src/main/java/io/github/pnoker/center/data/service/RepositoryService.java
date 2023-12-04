@@ -51,5 +51,5 @@ public interface RepositoryService {
      * @param pointValues PointValue Array
      * @throws IOException IOException
      */
-    void savePointValues(String deviceId, List<PointValue> pointValues) throws IOException;
+    void savePointValues(Long deviceId, List<PointValue> pointValues) throws IOException;
 }

@@ -60,7 +60,7 @@ public class DriverAttributeController implements Controller {
     @PostMapping("/add")
     public R<String> add(@Validated(Insert.class) @RequestBody DriverAttribute driverAttribute) {
         try {
-            driverAttributeService.add(driverAttribute);
+            driverAttributeService.save(driverAttribute);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -76,7 +76,7 @@ public class DriverAttributeController implements Controller {
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            driverAttributeService.delete(id);
+            driverAttributeService.remove(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -84,7 +84,7 @@ public class DriverAttributeController implements Controller {
     }
 
     /**
-     * 修改 DriverAttribute
+     * 更新 DriverAttribute
      *
      * @param driverAttribute DriverAttribute
      * @return DriverAttribute
@@ -108,7 +108,7 @@ public class DriverAttributeController implements Controller {
     @GetMapping("/id/{id}")
     public R<DriverAttribute> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverAttribute select = driverAttributeService.get(id);
+            DriverAttribute select = driverAttributeService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -127,7 +127,7 @@ public class DriverAttributeController implements Controller {
     @GetMapping("/driver_id/{id}")
     public R<List<DriverAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
         try {
-            List<DriverAttribute> select = driverAttributeService.selectByDriverId(id, true);
+            List<DriverAttribute> select = driverAttributeService.selectByDriverId(Long.parseLong(id), true);
             if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
@@ -140,7 +140,7 @@ public class DriverAttributeController implements Controller {
     }
 
     /**
-     * 模糊分页查询 DriverAttribute
+     * 分页查询 DriverAttribute
      *
      * @param driverAttributePageQuery DriverAttribute Dto
      * @return Page Of DriverAttribute
@@ -151,7 +151,7 @@ public class DriverAttributeController implements Controller {
             if (ObjectUtil.isEmpty(driverAttributePageQuery)) {
                 driverAttributePageQuery = new DriverAttributePageQuery();
             }
-            Page<DriverAttribute> page = driverAttributeService.list(driverAttributePageQuery);
+            Page<DriverAttribute> page = driverAttributeService.selectByPage(driverAttributePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

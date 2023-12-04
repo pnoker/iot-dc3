@@ -36,7 +36,6 @@ import lombok.experimental.SuperBuilder;
 @RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class UserLoginBO extends BaseBO {
 
     /**
@@ -47,7 +46,7 @@ public class UserLoginBO extends BaseBO {
     /**
      * 用户ID
      */
-    private String userId;
+    private Long userId;
 
     /**
      * 用户密码ID

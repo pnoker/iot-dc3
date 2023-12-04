@@ -24,7 +24,7 @@ import org.apache.ibatis.annotations.Mapper;
  * Role Mapper
  *
  * @author linys
- * @since 2023.04.02
+ * @since 2022.1.0
  */
 @Mapper
 public interface RoleMapper extends BaseMapper<Role> {

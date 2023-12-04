@@ -52,10 +52,10 @@ public class DriverStatusController implements Controller {
      * @return Map String:String
      */
     @PostMapping("/driver")
-    public R<Map<String, String>> driverStatus(@RequestBody(required = false) DriverPageQuery driverPageQuery) {
+    public R<Map<Long, String>> driverStatus(@RequestBody(required = false) DriverPageQuery driverPageQuery) {
         try {
             driverPageQuery.setTenantId(getTenantId());
-            Map<String, String> statuses = driverStatusService.driver(driverPageQuery);
+            Map<Long, String> statuses = driverStatusService.driver(driverPageQuery);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());

@@ -28,6 +28,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Tenant;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +48,7 @@ public class TenantServiceImpl implements TenantService {
     private TenantMapper tenantMapper;
 
     @Override
-    public void add(Tenant entityBO) {
+    public void save(Tenant entityBO) {
         Tenant select = selectByCode(entityBO.getTenantName());
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The tenant already exists");
@@ -59,8 +60,8 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public void delete(Long id) {
-        Tenant tenant = get(id);
+    public void remove(Long id) {
+        Tenant tenant = selectById(id);
         if (ObjectUtil.isNull(tenant)) {
             throw new NotFoundException("The tenant does not exist");
         }
@@ -80,8 +81,8 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Tenant get(Long id) {
-        return tenantMapper.selectById(id);
+    public Tenant selectById(Long id) {
+        return null;
     }
 
     @Override
@@ -94,11 +95,11 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Page<Tenant> list(TenantPageQuery entityQuery) {
+    public Page<Tenant> selectByPage(TenantPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return tenantMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
+        return tenantMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<Tenant> fuzzyQuery(TenantPageQuery query) {

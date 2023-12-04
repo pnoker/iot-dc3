@@ -64,7 +64,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * Plc Connector Map
      * 仅供参考
      */
-    private Map<String, MyS7Connector> s7ConnectorMap;
+    private Map<Long, MyS7Connector> s7ConnectorMap;
 
     @Data
     @NoArgsConstructor
@@ -154,7 +154,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverInfo DeviceInfo Map
      * @return S7Serializer
      */
-    private MyS7Connector getS7Connector(String deviceId, Map<String, AttributeInfo> driverInfo) {
+    private MyS7Connector getS7Connector(Long deviceId, Map<String, AttributeInfo> driverInfo) {
         MyS7Connector myS7Connector = s7ConnectorMap.get(deviceId);
         if (ObjectUtil.isNull(myS7Connector)) {
             myS7Connector = new MyS7Connector();

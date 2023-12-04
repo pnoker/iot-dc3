@@ -57,7 +57,7 @@ public class TenantController implements Controller {
     @PostMapping("/add")
     public R<String> add(@Validated(Insert.class) @RequestBody Tenant tenant) {
         try {
-            tenantService.add(tenant);
+            tenantService.save(tenant);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -73,7 +73,7 @@ public class TenantController implements Controller {
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            tenantService.delete(id);
+            tenantService.remove(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -81,10 +81,10 @@ public class TenantController implements Controller {
     }
 
     /**
-     * 根据 ID 修改租户
+     * 根据 ID 更新租户
      * <ol>
-     * <li>支持修改: Enable</li>
-     * <li>不支持修改: Name</li>
+     * <li>支持更新: Enable</li>
+     * <li>不支持更新: Name</li>
      * </ol>
      *
      * @param tenant Tenant
@@ -110,7 +110,7 @@ public class TenantController implements Controller {
     @GetMapping("/id/{id}")
     public R<Tenant> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Tenant select = tenantService.get(id);
+            Tenant select = tenantService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -140,7 +140,7 @@ public class TenantController implements Controller {
     }
 
     /**
-     * 模糊分页查询租户
+     * 分页查询租户
      *
      * @param tenantPageQuery 租户和分页参数
      * @return 带分页的 {@link Tenant}
@@ -151,7 +151,7 @@ public class TenantController implements Controller {
             if (ObjectUtil.isEmpty(tenantPageQuery)) {
                 tenantPageQuery = new TenantPageQuery();
             }
-            Page<Tenant> page = tenantService.list(tenantPageQuery);
+            Page<Tenant> page = tenantService.selectByPage(tenantPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

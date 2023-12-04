@@ -39,7 +39,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param profileId Profile ID
      * @return Point
      */
-    Point selectByNameAndProfileId(String name, String profileId);
+    Point selectByNameAndProfileId(String name, Long profileId);
 
     /**
      * 根据 设备Id 查询位号
@@ -47,7 +47,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param deviceId 设备ID
      * @return Point Array
      */
-    List<Point> selectByDeviceId(String deviceId);
+    List<Point> selectByDeviceId(Long deviceId);
 
     /**
      * 根据 模板Id 查询位号
@@ -55,7 +55,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param profileId Profile ID
      * @return Point Array
      */
-    List<Point> selectByProfileId(String profileId);
+    List<Point> selectByProfileId(Long profileId);
 
     /**
      * 根据 模板Id 集查询位号
@@ -64,7 +64,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param throwException Throw Exception
      * @return Point Array
      */
-    List<Point> selectByProfileIds(Set<String> profileIds, boolean throwException);
+    List<Point> selectByProfileIds(Set<Long> profileIds, boolean throwException);
 
     /**
      * 根据 设备Id集 查询设备
@@ -72,7 +72,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param ids Point ID Set
      * @return Point Array
      */
-    List<Point> selectByIds(Set<String> ids);
+    List<Point> selectByIds(Set<Long> ids);
 
     /**
      * 查询 位号单位
@@ -80,7 +80,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param pointIds Point ID Set
      * @return Map Long:Unit String
      */
-    Map<String, String> unit(Set<String> pointIds);
+    Map<Long, String> unit(Set<Long> pointIds);
 
     Long count();
 }

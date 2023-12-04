@@ -60,7 +60,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
 
         DevicePageQuery pageQuery = buildPageQuery(request);
 
-        Page<Device> devicePage = deviceService.list(pageQuery);
+        Page<Device> devicePage = deviceService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(devicePage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

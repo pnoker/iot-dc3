@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author pnoker
- * @since 2023-11-02
+ * @since 2022.1.0
  */
 @Getter
 @Setter
@@ -28,7 +28,7 @@ public class LabelBindDO implements Serializable {
     /**
      * 主键ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     /**

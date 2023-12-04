@@ -98,7 +98,7 @@ public class TokenServiceImpl implements TokenService {
         if (ObjectUtil.isNull(tenantBind)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        UserPassword userPassword = userPasswordService.get(userLogin.getUserPasswordId());
+        UserPassword userPassword = userPasswordService.selectById(userLogin.getUserPasswordId());
         String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
         String redisSaltValue = redisUtil.getKey(redisSaltKey);
         String md5Password = DecodeUtil.md5(userPassword.getLoginPassword() + redisSaltValue);
@@ -148,7 +148,7 @@ public class TokenServiceImpl implements TokenService {
      * @param userName 用户名称
      * @param tenantId 租户ID
      */
-    private void checkUserLimit(String userName, String tenantId) {
+    private void checkUserLimit(String userName, Long tenantId) {
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantId;
         UserLimit limit = redisUtil.getKey(redisKey);
         if (ObjectUtil.isNotNull(limit) && limit.getTimes() >= 5) {
@@ -169,7 +169,7 @@ public class TokenServiceImpl implements TokenService {
      * @param expireTime Expire Time
      * @return UserLimit
      */
-    private UserLimit updateUserLimit(String userName, String tenantId, boolean expireTime) {
+    private UserLimit updateUserLimit(String userName, Long tenantId, boolean expireTime) {
         int amount = TimeoutConstant.USER_LIMIT_TIMEOUT;
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantId;
         UserLimit userLimit = redisUtil.getKey(redisKey);

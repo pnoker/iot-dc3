@@ -37,8 +37,8 @@ import java.io.Serializable;
 public class PointValuePageQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String deviceId;
-    private String pointId;
+    private Long deviceId;
+    private Long pointId;
 
     /**
      * 位号名称

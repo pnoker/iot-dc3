@@ -79,8 +79,8 @@ public class IndexServiceImpl implements IndexService {
 
     @Override
     public List<WeatherDeviceStatisticsDTO> weatherDeviceList() {
-        DriverDO driverDO = driverService.selectByServiceName("default/dc3-driver-weather-amap", "1", false);
-        return deviceService.selectAllByDriverId(driverDO.getId(), "1").stream().map(device -> {
+        DriverDO driverDO = driverService.selectByServiceName("default/dc3-driver-weather-amap", 1L, false);
+        return deviceService.selectAllByDriverId(driverDO.getId(), 1L).stream().map(device -> {
             WeatherDeviceStatisticsDTO weatherDeviceStatisticsDTO = new WeatherDeviceStatisticsDTO();
             weatherDeviceStatisticsDTO.setDevice(device);
             weatherDeviceStatisticsDTO.setLocation(attributeConfigService.selectByDeviceId(device.getId()).get(0).getConfigValue());
@@ -89,7 +89,7 @@ public class IndexServiceImpl implements IndexService {
             status = ObjectUtil.isNotNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
             weatherDeviceStatisticsDTO.setStatus(status);
             PointValueQuery.Builder request = PointValueQuery.newBuilder();
-            request.setTenantId("1");
+            request.setTenantId(1L);
             request.setDeviceId(device.getId());
             request.setPointId(pointService.selectByDeviceId(device.getId()).get(0).getId());
             RPointValueDTO rPointValueDTO = pointValueApiStub.lastValue(request.build());

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author pnoker
- * @since 2023-11-02
+ * @since 2022.1.0
  */
 @Service
 public class LabelBindManagerImpl extends ServiceImpl<LabelBindMapper, LabelBindDO> implements LabelBindManager {

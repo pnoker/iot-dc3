@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.service.impl.repository;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
@@ -57,7 +56,7 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
 
     @Override
     public void savePointValue(PointValue pointValue) throws IOException {
-        if (!CharSequenceUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+        if (!ObjectUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
             return;
         }
 
@@ -70,15 +69,15 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
     }
 
     @Override
-    public void savePointValues(String deviceId, List<PointValue> pointValues) throws IOException {
-        if (CharSequenceUtil.isEmpty(deviceId)) {
+    public void savePointValues(Long deviceId, List<PointValue> pointValues) throws IOException {
+        if (ObjectUtil.isEmpty(deviceId)) {
             return;
         }
 
         final String index = StorageConstant.POINT_VALUE_PREFIX + deviceId;
         BulkRequest.Builder bulkRequestBuilder = new BulkRequest.Builder();
         pointValues.stream()
-                .filter(pointValue -> CharSequenceUtil.isNotEmpty(pointValue.getPointId()))
+                .filter(pointValue -> ObjectUtil.isNotNull(pointValue.getPointId()))
                 .forEach(pointValue -> bulkRequestBuilder.operations(operation -> operation
                         .index(builder -> builder
                                 .index(index)

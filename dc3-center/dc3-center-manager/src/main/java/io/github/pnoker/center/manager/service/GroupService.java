@@ -16,39 +16,16 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.model.GroupDO;
-import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
+import io.github.pnoker.center.manager.entity.bo.GroupBO;
+import io.github.pnoker.center.manager.entity.query.GroupQuery;
 import io.github.pnoker.common.base.Service;
 
-import java.util.Optional;
-
 /**
- * <p>
- * Group Interface
- * </p>
+ * Group Service Interface
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface GroupService extends Service<GroupDO, GroupPageQuery> {
-    /**
-     * <p>
-     * 通过 ID 查询
-     * </p>
-     *
-     * @param id ID
-     * @return Entity of BO
-     */
-    Optional<GroupDO> selectById(Long id);
-
-
-    /**
-     * 根据分组名称查询
-     *
-     * @param name     分组名称
-     * @param tenantId 租户ID
-     * @return Optional Group
-     */
-    Optional<GroupDO> selectByName(String name, Long tenantId);
+public interface GroupService extends Service<GroupBO, GroupQuery> {
 
 }

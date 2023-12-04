@@ -16,16 +16,16 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.model.LabelBindDO;
-import io.github.pnoker.center.manager.entity.query.LabelBindPageQuery;
+import io.github.pnoker.center.manager.entity.bo.LabelBindBO;
+import io.github.pnoker.center.manager.entity.query.LabelBindQuery;
 import io.github.pnoker.common.base.Service;
 
 /**
- * LabelBind Interface
+ * LabelBind Service Interface
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface LabelBindService extends Service<LabelBindDO, LabelBindPageQuery> {
+public interface LabelBindService extends Service<LabelBindBO, LabelBindQuery> {
 
 }

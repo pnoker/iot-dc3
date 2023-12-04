@@ -27,7 +27,7 @@ import java.util.List;
  * role resource bind service
  *
  * @author linys
- * @since 2023.04.02
+ * @since 2022.1.0
  */
 public interface RoleResourceBindService extends Service<RoleResourceBind, RoleResourceBindPageQuery> {
 
@@ -37,5 +37,5 @@ public interface RoleResourceBindService extends Service<RoleResourceBind, RoleR
      * @param roleId 角色id
      * @return 资源列表
      */
-    List<Resource> listResourceByRoleId(String roleId);
+    List<Resource> listResourceByRoleId(Long roleId);
 }

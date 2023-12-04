@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -27,6 +26,7 @@ import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.ProfileBind;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +52,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public void add(ProfileBind entityBO) {
+    public void save(ProfileBind entityBO) {
         try {
             selectByDeviceIdAndProfileId(entityBO.getDeviceId(), entityBO.getProfileId());
             throw new DuplicateException("The profile bind already exists");
@@ -67,8 +67,8 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(Long id) {
-        ProfileBind profileBind = get(id);
+    public void remove(Long id) {
+        ProfileBind profileBind = selectById(id);
         if (ObjectUtil.isNull(profileBind)) {
             throw new NotFoundException("The profile bind does not exist");
         }
@@ -82,7 +82,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public Boolean deleteByDeviceId(String deviceId) {
+    public Boolean deleteByDeviceId(Long deviceId) {
         ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
         profileBindPageQuery.setDeviceId(deviceId);
         return profileBindMapper.delete(fuzzyQuery(profileBindPageQuery)) > 0;
@@ -92,7 +92,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public Boolean deleteByDeviceIdAndProfileId(String deviceId, String profileId) {
+    public Boolean deleteByDeviceIdAndProfileId(Long deviceId, Long profileId) {
         ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
         profileBindPageQuery.setProfileId(profileId);
         profileBindPageQuery.setDeviceId(deviceId);
@@ -104,30 +104,23 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public void update(ProfileBind entityBO) {
-        get(entityBO.getId());
+        selectById(entityBO.getId());
         entityBO.setOperateTime(null);
         if (profileBindMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The profile bind update failed");
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public ProfileBind get(Long id) {
-        ProfileBind profileBind = profileBindMapper.selectById(id);
-        if (ObjectUtil.isNull(profileBind)) {
-            throw new NotFoundException();
-        }
-        return profileBind;
+    public ProfileBind selectById(Long id) {
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ProfileBind selectByDeviceIdAndProfileId(String deviceId, String profileId) {
+    public ProfileBind selectByDeviceIdAndProfileId(Long deviceId, Long profileId) {
         ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
         profileBindPageQuery.setDeviceId(deviceId);
         profileBindPageQuery.setProfileId(profileId);
@@ -144,7 +137,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> selectDeviceIdsByProfileId(String profileId) {
+    public Set<Long> selectDeviceIdsByProfileId(Long profileId) {
         ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
         profileBindPageQuery.setProfileId(profileId);
         List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindPageQuery));
@@ -155,7 +148,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> selectProfileIdsByDeviceId(String deviceId) {
+    public Set<Long> selectProfileIdsByDeviceId(Long deviceId) {
         ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
         profileBindPageQuery.setDeviceId(deviceId);
         List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindPageQuery));
@@ -166,18 +159,18 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public Page<ProfileBind> list(ProfileBindPageQuery entityQuery) {
+    public Page<ProfileBind> selectByPage(ProfileBindPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return profileBindMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
+        return profileBindMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<ProfileBind> fuzzyQuery(ProfileBindPageQuery query) {
         LambdaQueryWrapper<ProfileBind> queryWrapper = Wrappers.<ProfileBind>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getProfileId()), ProfileBind::getProfileId, query.getProfileId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDeviceId()), ProfileBind::getDeviceId, query.getDeviceId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getProfileId()), ProfileBind::getProfileId, query.getProfileId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDeviceId()), ProfileBind::getDeviceId, query.getDeviceId());
         }
         return queryWrapper;
     }

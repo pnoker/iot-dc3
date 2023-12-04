@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.LabelBind;
+import io.github.pnoker.center.manager.entity.bo.LabelBindBO;
 import lombok.*;
 
 /**
@@ -32,7 +32,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class LabelBindPageQuery extends LabelBind {
+public class LabelBindQuery extends LabelBindBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

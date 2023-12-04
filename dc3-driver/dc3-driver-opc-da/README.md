@@ -29,7 +29,7 @@
 
 ### OpcDa Point 配置
 
-- group ：item group
+- groupBO ：item groupBO
 - tag ：item name
 
 ### 定时采集配置

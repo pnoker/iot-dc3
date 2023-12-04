@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * 用户管理实现类
  *
  * @author linys
- * @since 2023.04.02
+ * @since 2022.1.0
  */
 @Slf4j
 @Service
@@ -82,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
             throw new NotFoundException("租户、用户信息不匹配");
         }
 
-        UserPassword userPassword = userPasswordService.get(userLogin.getUserPasswordId());
+        UserPassword userPassword = userPasswordService.selectById(userLogin.getUserPasswordId());
         if (ObjectUtil.isNull(userPassword)) {
             throw new NotFoundException("密码不存在，请先设置密码");
         }

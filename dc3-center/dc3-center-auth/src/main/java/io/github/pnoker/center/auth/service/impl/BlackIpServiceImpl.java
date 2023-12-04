@@ -28,6 +28,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.BlackIp;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +48,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     private BlackIpMapper blackIpMapper;
 
     @Override
-    public void add(BlackIp entityBO) {
+    public void save(BlackIp entityBO) {
         BlackIp select = selectByIp(entityBO.getIp());
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The ip already exists in the blacklist");
@@ -59,8 +60,8 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public void delete(Long id) {
-        BlackIp blackIp = get(id);
+    public void remove(Long id) {
+        BlackIp blackIp = selectById(id);
         if (ObjectUtil.isNull(blackIp)) {
             throw new NotFoundException("The ip does not exist in the blacklist");
         }
@@ -80,8 +81,8 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public BlackIp get(Long id) {
-        return blackIpMapper.selectById(id);
+    public BlackIp selectById(Long id) {
+        return null;
     }
 
     @Override
@@ -94,11 +95,11 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public Page<BlackIp> list(BlackIpPageQuery entityQuery) {
+    public Page<BlackIp> selectByPage(BlackIpPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return blackIpMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
+        return blackIpMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
     @Override

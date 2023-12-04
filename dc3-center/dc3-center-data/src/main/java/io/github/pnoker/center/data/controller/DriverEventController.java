@@ -47,7 +47,7 @@ public class DriverEventController implements Controller {
     private EventService eventService;
 
     /**
-     * 模糊分页查询 DriverEvent
+     * 分页查询 DriverEvent
      *
      * @param driverEventPageQuery DriverEventDto
      * @return Page Of DriverEvent

@@ -61,7 +61,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverSenderService driverSenderService;
 
-    private Map<String, OpcUaClient> connectMap;
+    private Map<Long, OpcUaClient> connectMap;
 
     @Override
     public void initial() {
@@ -118,7 +118,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverInfo 驱动信息
      * @return OpcUaClient
      */
-    private OpcUaClient getConnector(String deviceId, Map<String, AttributeInfo> driverInfo) {
+    private OpcUaClient getConnector(Long deviceId, Map<String, AttributeInfo> driverInfo) {
         log.debug("Opc Ua Server Connection Info {}", JsonUtil.toJsonString(driverInfo));
         OpcUaClient opcUaClient = connectMap.get(deviceId);
         if (ObjectUtil.isNull(opcUaClient)) {

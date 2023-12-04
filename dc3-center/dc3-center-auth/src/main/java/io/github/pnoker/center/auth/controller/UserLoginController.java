@@ -60,7 +60,7 @@ public class UserLoginController implements Controller {
     @PostMapping("/add")
     public R<String> add(@Validated(Insert.class) @RequestBody UserLogin userLogin) {
         try {
-            userLoginService.add(userLogin);
+            userLoginService.save(userLogin);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -76,7 +76,7 @@ public class UserLoginController implements Controller {
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
-            userLoginService.delete(id);
+            userLoginService.remove(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -84,10 +84,10 @@ public class UserLoginController implements Controller {
     }
 
     /**
-     * 修改用户
+     * 更新用户
      * <ol>
-     * <li>支持修改: Enable,Password</li>
-     * <li>不支持修改: Name</li>
+     * <li>支持更新: Enable,Password</li>
+     * <li>不支持更新: Name</li>
      * </ol>
      *
      * @param userLogin 用户
@@ -113,7 +113,7 @@ public class UserLoginController implements Controller {
     @PostMapping("/reset/{id}")
     public R<Boolean> restPassword(@NotNull @PathVariable(value = "id") String id) {
         try {
-            userPasswordService.restPassword(id);
+            userPasswordService.restPassword(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -129,7 +129,7 @@ public class UserLoginController implements Controller {
     @GetMapping("/id/{id}")
     public R<UserLogin> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            UserLogin select = userLoginService.get(id);
+            UserLogin select = userLoginService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -159,7 +159,7 @@ public class UserLoginController implements Controller {
     }
 
     /**
-     * 模糊分页查询 User
+     * 分页查询 User
      *
      * @param userPageQuery 用户和分页参数
      * @return 带分页的 {@link UserLogin}
@@ -170,7 +170,7 @@ public class UserLoginController implements Controller {
             if (ObjectUtil.isEmpty(userPageQuery)) {
                 userPageQuery = new UserLoginPageQuery();
             }
-            Page<UserLogin> page = userLoginService.list(userPageQuery);
+            Page<UserLogin> page = userLoginService.selectByPage(userPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

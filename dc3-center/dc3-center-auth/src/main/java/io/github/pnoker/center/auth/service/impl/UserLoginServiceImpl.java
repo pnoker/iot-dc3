@@ -28,6 +28,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.UserLogin;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +50,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     @Transactional
-    public void add(UserLogin entityBO) {
+    public void save(UserLogin entityBO) {
         // 判断登录名称是否存在
         UserLogin selectByLoginName = selectByLoginName(entityBO.getLoginName(), false);
         if (ObjectUtil.isNotNull(selectByLoginName)) {
@@ -64,8 +65,8 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     @Transactional
-    public void delete(String id) {
-        UserLogin userLogin = get(id);
+    public void remove(Long id) {
+        UserLogin userLogin = selectById(id);
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException("The user login does not exist");
         }
@@ -77,7 +78,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     public void update(UserLogin entityBO) {
-        UserLogin selectById = get(entityBO.getId());
+        UserLogin selectById = selectById(entityBO.getId());
         if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException("The user login does not exist");
         }
@@ -89,16 +90,16 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public UserLogin get(Long id) {
-        return userLoginMapper.selectById(id);
+    public UserLogin selectById(Long id) {
+        return null;
     }
 
     @Override
-    public Page<UserLogin> list(UserLoginPageQuery entityQuery) {
+    public Page<UserLogin> selectByPage(UserLoginPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return userLoginMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
+        return userLoginMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
     @Override

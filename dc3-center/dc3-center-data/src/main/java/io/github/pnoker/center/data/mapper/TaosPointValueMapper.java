@@ -34,7 +34,7 @@ public interface TaosPointValueMapper extends BaseMapper<TaosPointValue> {
     int createSuperTable();
 
     @Update("CREATE TABLE IF NOT EXISTS point_value_${deviceId} using point_value TAGS (#{deviceId},#{pointId})")
-    int createDeviceTable(@Param("deviceId") String deviceId, @Param("pointId") String pointId);
+    int createDeviceTable(@Param("deviceId") Long deviceId, @Param("pointId") Long pointId);
 
     @Insert("INSERT INTO point_value_${deviceId} (create_time,point_value,raw_value,origin_time) VALUES (#{createTime},#{pointValue},#{rawValue},#{originTime})")
     int insertOne(TaosPointValue taosPointValue);

@@ -20,18 +20,18 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.model.Device;
-import org.apache.ibatis.annotations.Mapper;
+import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * Mapper
+ * <p>
+ * 设备表 Mapper 接口
+ * </p>
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper
-public interface DeviceMapper extends BaseMapper<Device> {
+public interface DeviceMapper extends BaseMapper<DeviceDO> {
 
-    Page<Device> selectPageWithProfile(Page<Device> page, @Param(Constants.WRAPPER) Wrapper<Device> queryWrapper, @Param("profileId") String profileId);
+    Page<DeviceDO> selectPageWithProfile(Page<DeviceDO> page, @Param(Constants.WRAPPER) Wrapper<DeviceDO> queryWrapper, @Param("profileId") Long profileId);
 }

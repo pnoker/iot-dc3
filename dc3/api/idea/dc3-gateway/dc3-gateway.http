@@ -102,7 +102,7 @@ Cache-Control: no-cache
 < ../../files/batch-import.json
 
 
-### 修改 Driver
+### 更新 Driver
 #/api/v3/manager/driver/update
 POST http://{{dc3-gateway}}/api/v3/manager/driver/update
 Accept: */*
@@ -194,7 +194,7 @@ Cache-Control: no-cache
 }
 
 
-### 修改 DriverAttribute
+### 更新 DriverAttribute
 #/api/v3/manager/driver_attribute/update
 POST http://{{dc3-gateway}}/api/v3/manager/driver_attribute/update
 Accept: */*
@@ -264,7 +264,7 @@ Cache-Control: no-cache
 }
 
 
-### 修改 DriverInfo
+### 更新 DriverInfo
 POST http://{{dc3-gateway}}/api/v3/manager/driver_attribute_config/update
 Accept: */*
 Content-Type: application/json

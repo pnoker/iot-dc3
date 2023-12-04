@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -33,6 +32,7 @@ import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.model.PointAttributeConfig;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -65,7 +65,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public void add(PointAttributeConfig entityBO) {
+    public void save(PointAttributeConfig entityBO) {
         try {
             selectByAttributeIdAndDeviceIdAndPointId(entityBO.getPointAttributeId(), entityBO.getDeviceId(), entityBO.getPointId());
             throw new DuplicateException("The point attribute config already exists");
@@ -85,8 +85,8 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public void delete(Long id) {
-        PointAttributeConfig pointAttributeConfig = get(id);
+    public void remove(Long id) {
+        PointAttributeConfig pointAttributeConfig = selectById(id);
         if (ObjectUtil.isNull(pointAttributeConfig)) {
             throw new NotFoundException("The point attribute config does not exist");
         }
@@ -103,7 +103,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     @Override
     public void update(PointAttributeConfig entityBO) {
-        PointAttributeConfig old = get(entityBO.getId());
+        PointAttributeConfig old = selectById(entityBO.getId());
         entityBO.setOperateTime(null);
         if (!old.getPointAttributeId().equals(entityBO.getPointAttributeId()) || !old.getDeviceId().equals(entityBO.getDeviceId()) || !old.getPointId().equals(entityBO.getPointId())) {
             try {
@@ -125,23 +125,16 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, select);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public PointAttributeConfig get(Long id) {
-        PointAttributeConfig pointAttributeConfig = pointAttributeConfigMapper.selectById(id);
-        if (ObjectUtil.isNull(pointAttributeConfig)) {
-            throw new NotFoundException();
-        }
-        return pointAttributeConfig;
+    public PointAttributeConfig selectById(Long id) {
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PointAttributeConfig selectByAttributeIdAndDeviceIdAndPointId(String pointAttributeId, String deviceId, String pointId) {
+    public PointAttributeConfig selectByAttributeIdAndDeviceIdAndPointId(Long pointAttributeId, Long deviceId, Long pointId) {
         LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
         queryWrapper.eq(PointAttributeConfig::getPointAttributeId, pointAttributeId);
         queryWrapper.eq(PointAttributeConfig::getDeviceId, deviceId);
@@ -158,7 +151,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public List<PointAttributeConfig> selectByAttributeId(String pointAttributeId) {
+    public List<PointAttributeConfig> selectByAttributeId(Long pointAttributeId) {
         LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
         queryWrapper.eq(PointAttributeConfig::getPointAttributeId, pointAttributeId);
         List<PointAttributeConfig> pointAttributeConfigs = pointAttributeConfigMapper.selectList(queryWrapper);
@@ -172,10 +165,10 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public List<PointAttributeConfig> selectByDeviceId(String deviceId) {
+    public List<PointAttributeConfig> selectByDeviceId(Long deviceId) {
         LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
         List<Point> points = pointService.selectByDeviceId(deviceId);
-        Set<String> pointIds = points.stream().map(Point::getId).collect(Collectors.toSet());
+        Set<Long> pointIds = points.stream().map(Point::getId).collect(Collectors.toSet());
         queryWrapper.eq(PointAttributeConfig::getDeviceId, deviceId);
         queryWrapper.in(PointAttributeConfig::getPointId, pointIds);
         List<PointAttributeConfig> pointAttributeConfigs = pointAttributeConfigMapper.selectList(queryWrapper);
@@ -189,7 +182,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public List<PointAttributeConfig> selectByDeviceIdAndPointId(String deviceId, String pointId) {
+    public List<PointAttributeConfig> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
         LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
         queryWrapper.eq(PointAttributeConfig::getDeviceId, deviceId);
         queryWrapper.eq(PointAttributeConfig::getPointId, pointId);
@@ -204,19 +197,19 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      * {@inheritDoc}
      */
     @Override
-    public Page<PointAttributeConfig> list(PointAttributeConfigPageQuery entityQuery) {
+    public Page<PointAttributeConfig> selectByPage(PointAttributeConfigPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return pointAttributeConfigMapper.selectPage(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
+        return pointAttributeConfigMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
     private LambdaQueryWrapper<PointAttributeConfig> fuzzyQuery(PointAttributeConfigPageQuery query) {
         LambdaQueryWrapper<PointAttributeConfig> queryWrapper = Wrappers.<PointAttributeConfig>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getPointAttributeId()), PointAttributeConfig::getPointAttributeId, query.getPointAttributeId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDeviceId()), PointAttributeConfig::getDeviceId, query.getDeviceId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getPointId()), PointAttributeConfig::getPointId, query.getPointId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getPointAttributeId()), PointAttributeConfig::getPointAttributeId, query.getPointAttributeId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDeviceId()), PointAttributeConfig::getDeviceId, query.getDeviceId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getPointId()), PointAttributeConfig::getPointId, query.getPointId());
         }
         return queryWrapper;
     }

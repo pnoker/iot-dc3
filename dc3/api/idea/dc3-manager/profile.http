@@ -29,7 +29,7 @@ Cache-Control: no-cache
 }
 
 
-### 修改 Profile
+### 更新 Profile
 #/manager/profile/update
 POST http://{{dc3-manager}}/manager/profile/update
 Accept: */*

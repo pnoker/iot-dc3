@@ -16,25 +16,26 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.bo.LabelBO;
+import io.github.pnoker.center.manager.entity.builder.LabelBuilder;
 import io.github.pnoker.center.manager.entity.model.LabelBindDO;
 import io.github.pnoker.center.manager.entity.model.LabelDO;
-import io.github.pnoker.center.manager.entity.query.LabelPageQuery;
+import io.github.pnoker.center.manager.entity.query.LabelQuery;
 import io.github.pnoker.center.manager.manager.LabelBindManager;
 import io.github.pnoker.center.manager.manager.LabelManager;
 import io.github.pnoker.center.manager.service.LabelService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * LabelService Impl
@@ -47,8 +48,10 @@ import java.util.List;
 public class LabelServiceImpl implements LabelService {
 
     @Resource
-    private LabelManager labelManager;
+    private LabelBuilder labelBuilder;
 
+    @Resource
+    private LabelManager labelManager;
     @Resource
     private LabelBindManager labelBindManager;
 
@@ -56,10 +59,12 @@ public class LabelServiceImpl implements LabelService {
      * {@inheritDoc}
      */
     @Override
-    public void add(LabelDO entityBO) {
-        selectByName(entityBO.getLabelName(), entityBO.getTenantId());
-        if (!labelManager.save(entityBO)) {
-            throw new AddException("The label {} add failed", entityBO.getLabelName());
+    public void save(LabelBO entityBO) {
+        checkDuplicate(entityBO, false, true);
+
+        LabelDO entityDO = labelBuilder.buildDOByBO(entityBO);
+        if (!labelManager.save(entityDO)) {
+            throw new AddException("The label add failed");
         }
     }
 
@@ -67,16 +72,15 @@ public class LabelServiceImpl implements LabelService {
      * {@inheritDoc}
      */
     @Override
-    public void delete(Long id) {
+    public void remove(Long id) {
+        getDOById(id, true);
+
+        // 删除标签之前需要检查该标签是否存在关联
         LambdaQueryWrapper<LabelBindDO> queryWrapper = Wrappers.<LabelBindDO>query().lambda();
         queryWrapper.eq(LabelBindDO::getLabelId, id);
-        List<LabelBindDO> labelBindPage = labelBindManager.list(queryWrapper);
-        if (CollUtil.isNotEmpty(labelBindPage)) {
-            throw new ServiceException("The label already bound by the entity");
-        }
-        LabelDO label = get(id);
-        if (ObjectUtil.isNull(label)) {
-            throw new NotFoundException("The label does not exist");
+        long count = labelBindManager.count(queryWrapper);
+        if (count > 0) {
+            throw new AssociatedException("The label has been bound by another entity");
         }
 
         if (!labelManager.removeById(id)) {
@@ -88,10 +92,14 @@ public class LabelServiceImpl implements LabelService {
      * {@inheritDoc}
      */
     @Override
-    public void update(LabelDO entityBO) {
-        get(entityBO.getId());
-        entityBO.setOperateTime(null);
-        if (!labelManager.updateById(entityBO)) {
+    public void update(LabelBO entityBO) {
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
+        LabelDO entityDO = labelBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!labelManager.updateById(entityDO)) {
             throw new UpdateException("The label update failed");
         }
     }
@@ -100,49 +108,74 @@ public class LabelServiceImpl implements LabelService {
      * {@inheritDoc}
      */
     @Override
-    public LabelDO get(Long id) {
-        LabelDO label = labelManager.getById(id);
-        if (ObjectUtil.isNull(label)) {
-            throw new NotFoundException();
-        }
-        return label;
+    public LabelBO selectById(Long id) {
+        LabelDO entityDO = getDOById(id, false);
+        return labelBuilder.buildBOByDO(entityDO);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public LabelDO selectByName(String name, Long tenantId) {
-        LambdaQueryWrapper<LabelDO> queryWrapper = Wrappers.<LabelDO>query().lambda();
-        queryWrapper.eq(LabelDO::getLabelName, name);
-        queryWrapper.eq(LabelDO::getTenantId, tenantId);
-        queryWrapper.last("limit 1");
-        LabelDO label = labelManager.getOne(queryWrapper);
-        if (ObjectUtil.isNull(label)) {
-            throw new NotFoundException();
-        }
-        return label;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Page<LabelDO> list(LabelPageQuery entityQuery) {
+    public Page<LabelBO> selectByPage(LabelQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return labelManager.page(entityQuery.getPage().page(), fuzzyQuery(entityQuery));
+        Page<LabelDO> entityPageDO = labelManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return labelBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<LabelDO> fuzzyQuery(LabelPageQuery query) {
+    /**
+     * 构造模糊查询
+     *
+     * @param query {@link LabelQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<LabelDO> fuzzyQuery(LabelQuery query) {
         LambdaQueryWrapper<LabelDO> queryWrapper = Wrappers.<LabelDO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getLabelName()), LabelDO::getLabelName, query.getLabelName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getColor()), LabelDO::getColor, query.getColor());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), LabelDO::getTenantId, query.getTenantId());
-        }
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getLabelName()), LabelDO::getLabelName, query.getLabelName());
+        queryWrapper.eq(ObjectUtil.isNotNull(query.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, query.getEntityTypeFlag());
+        queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getColor()), LabelDO::getColor, query.getColor());
+        queryWrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), LabelDO::getTenantId, query.getTenantId());
         return queryWrapper;
     }
 
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link LabelBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(LabelBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<LabelDO> queryWrapper = Wrappers.<LabelDO>query().lambda();
+        queryWrapper.eq(LabelDO::getLabelName, entityBO.getLabelName());
+        queryWrapper.eq(LabelDO::getTenantId, entityBO.getTenantId());
+        queryWrapper.last("limit 1");
+        LabelDO one = labelManager.getOne(queryWrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("The label is duplicates");
+        }
+        return duplicate;
+    }
+
+    /**
+     * 根据 ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link LabelDO}
+     */
+    private LabelDO getDOById(Long id, boolean throwException) {
+        LabelDO entityDO = labelManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("The label does not exist");
+        }
+        return entityDO;
+    }
 }

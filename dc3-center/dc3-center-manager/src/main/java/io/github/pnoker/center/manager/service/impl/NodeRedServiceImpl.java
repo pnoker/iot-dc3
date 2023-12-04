@@ -25,6 +25,7 @@ import io.github.pnoker.center.manager.mapper.NodeRedFlowsMapper;
 import io.github.pnoker.center.manager.service.NodeRedService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.model.NodeRedFlows;
+import io.github.pnoker.common.utils.PageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class NodeRedServiceImpl implements NodeRedService {
             nodeRedFlowsPageQuery.setPage(new Pages());
         }
 
-        return nodeRedFlowsMapper.selectPage(nodeRedFlowsPageQuery.getPage().page(), fuzzyFlowsQuery(nodeRedFlowsPageQuery));
+        return nodeRedFlowsMapper.selectPage(PageUtil.page(nodeRedFlowsPageQuery.getPage()), fuzzyFlowsQuery(nodeRedFlowsPageQuery));
     }
 
     private LambdaQueryWrapper<NodeRedFlows> fuzzyFlowsQuery(NodeRedFlowsPageQuery query) {

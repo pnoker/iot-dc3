@@ -14,41 +14,35 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.query;
+package io.github.pnoker.center.manager.entity.bo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
-import lombok.AllArgsConstructor;
+import io.github.pnoker.common.entity.base.BaseBO;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
- * Device DTO
+ * LabelBind BO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class DictionaryPageQuery {
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
-
-    /**
-     * 父级 Value 值1
-     */
-    private String parentValue1;
+@SuperBuilder
+@RequiredArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class LabelBindBO extends BaseBO {
 
     /**
-     * 父级 Value 值1
+     * 标签ID
      */
-    private String parentValue2;
+    private String labelId;
 
-    private String value;
-    private String label;
-
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private String tenantId;
+    /**
+     * 实体ID
+     */
+    private String entityId;
 }

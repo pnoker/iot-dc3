@@ -221,7 +221,7 @@ public class Lwm2mServer {
             @Override
             public void registered(Registration registration, Registration previousReg, Collection<Observation> previousObservations) {
                 log.debug("new device {} registered", registration.getEndpoint());
-                driverSenderService.deviceStatusSender(registration.getEndpoint(), DeviceStatusEnum.ONLINE);
+                driverSenderService.deviceStatusSender(Long.valueOf(registration.getEndpoint()), DeviceStatusEnum.ONLINE);
             }
 
             /**
@@ -233,7 +233,7 @@ public class Lwm2mServer {
             @Override
             public void updated(RegistrationUpdate registrationUpdate, Registration updatedRegistration, Registration registration1) {
                 log.debug("device is still here:{}", updatedRegistration.getEndpoint());
-                driverSenderService.deviceStatusSender(updatedRegistration.getEndpoint(), DeviceStatusEnum.ONLINE);
+                driverSenderService.deviceStatusSender(Long.valueOf(updatedRegistration.getEndpoint()), DeviceStatusEnum.ONLINE);
             }
 
             /**
@@ -246,7 +246,7 @@ public class Lwm2mServer {
             @Override
             public void unregistered(Registration registration, Collection<Observation> observations, boolean expired, Registration newReg) {
                 log.debug("device left: " + registration.getEndpoint());
-                driverSenderService.deviceStatusSender(registration.getEndpoint(), DeviceStatusEnum.OFFLINE);
+                driverSenderService.deviceStatusSender(Long.valueOf(registration.getEndpoint()), DeviceStatusEnum.OFFLINE);
             }
 
 
