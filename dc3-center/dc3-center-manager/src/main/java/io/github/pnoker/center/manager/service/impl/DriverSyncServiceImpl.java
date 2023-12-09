@@ -22,6 +22,7 @@ import io.github.pnoker.api.center.auth.RTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
@@ -30,7 +31,6 @@ import io.github.pnoker.common.dto.DriverSyncUpDTO;
 import io.github.pnoker.common.entity.driver.DriverMetadata;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -179,22 +179,22 @@ public class DriverSyncServiceImpl implements DriverSyncService {
      * @param entityDO        Driver
      */
     private void registerPointAttribute(DriverSyncUpDTO driverSyncUpDTO, DriverBO entityDO) {
-        Map<String, PointAttribute> newPointAttributeMap = new HashMap<>(8);
+        Map<String, PointAttributeBO> newPointAttributeMap = new HashMap<>(8);
         if (ObjectUtil.isNotNull(driverSyncUpDTO.getPointAttributes()) && !driverSyncUpDTO.getPointAttributes().isEmpty()) {
             driverSyncUpDTO.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
         }
 
-        Map<String, PointAttribute> oldPointAttributeMap = new HashMap<>(8);
+        Map<String, PointAttributeBO> oldPointAttributeMap = new HashMap<>(8);
         try {
-            List<PointAttribute> byDriverId = pointAttributeService.selectByDriverId(entityDO.getId(), true);
+            List<PointAttributeBO> byDriverId = pointAttributeService.selectByDriverId(entityDO.getId(), true);
             byDriverId.forEach(pointAttribute -> oldPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do
         }
 
-        for (Map.Entry<String, PointAttribute> entry : newPointAttributeMap.entrySet()) {
+        for (Map.Entry<String, PointAttributeBO> entry : newPointAttributeMap.entrySet()) {
             String name = entry.getKey();
-            PointAttribute attribute = newPointAttributeMap.get(name);
+            PointAttributeBO attribute = newPointAttributeMap.get(name);
             attribute.setDriverId(entityDO.getId());
             if (oldPointAttributeMap.containsKey(name)) {
                 attribute.setId(oldPointAttributeMap.get(name).getId());
@@ -206,7 +206,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
             }
         }
 
-        for (Map.Entry<String, PointAttribute> entry : oldPointAttributeMap.entrySet()) {
+        for (Map.Entry<String, PointAttributeBO> entry : oldPointAttributeMap.entrySet()) {
             String name = entry.getKey();
             if (!newPointAttributeMap.containsKey(name)) {
                 try {

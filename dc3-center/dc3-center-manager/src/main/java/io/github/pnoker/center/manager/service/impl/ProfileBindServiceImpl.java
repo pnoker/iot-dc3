@@ -20,12 +20,12 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.ProfileBindPageQuery;
+import io.github.pnoker.center.manager.entity.query.ProfileBindBOPageQuery;
 import io.github.pnoker.center.manager.mapper.ProfileBindMapper;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.ProfileBind;
+import io.github.pnoker.center.manager.entity.bo.ProfileBindBO;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,7 +52,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public void save(ProfileBind entityBO) {
+    public void save(ProfileBindBO entityBO) {
         try {
             selectByDeviceIdAndProfileId(entityBO.getDeviceId(), entityBO.getProfileId());
             throw new DuplicateException("The profile bind already exists");
@@ -68,8 +68,8 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public void remove(Long id) {
-        ProfileBind profileBind = selectById(id);
-        if (ObjectUtil.isNull(profileBind)) {
+        ProfileBindBO profileBindBO = selectById(id);
+        if (ObjectUtil.isNull(profileBindBO)) {
             throw new NotFoundException("The profile bind does not exist");
         }
 
@@ -83,7 +83,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public Boolean deleteByDeviceId(Long deviceId) {
-        ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
+        ProfileBindBOPageQuery profileBindPageQuery = new ProfileBindBOPageQuery();
         profileBindPageQuery.setDeviceId(deviceId);
         return profileBindMapper.delete(fuzzyQuery(profileBindPageQuery)) > 0;
     }
@@ -93,7 +93,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public Boolean deleteByDeviceIdAndProfileId(Long deviceId, Long profileId) {
-        ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
+        ProfileBindBOPageQuery profileBindPageQuery = new ProfileBindBOPageQuery();
         profileBindPageQuery.setProfileId(profileId);
         profileBindPageQuery.setDeviceId(deviceId);
         return profileBindMapper.delete(fuzzyQuery(profileBindPageQuery)) > 0;
@@ -103,7 +103,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public void update(ProfileBind entityBO) {
+    public void update(ProfileBindBO entityBO) {
         selectById(entityBO.getId());
         entityBO.setOperateTime(null);
         if (profileBindMapper.updateById(entityBO) < 1) {
@@ -112,7 +112,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    public ProfileBind selectById(Long id) {
+    public ProfileBindBO selectById(Long id) {
         return null;
     }
 
@@ -120,17 +120,17 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      * {@inheritDoc}
      */
     @Override
-    public ProfileBind selectByDeviceIdAndProfileId(Long deviceId, Long profileId) {
-        ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
+    public ProfileBindBO selectByDeviceIdAndProfileId(Long deviceId, Long profileId) {
+        ProfileBindBOPageQuery profileBindPageQuery = new ProfileBindBOPageQuery();
         profileBindPageQuery.setDeviceId(deviceId);
         profileBindPageQuery.setProfileId(profileId);
-        LambdaQueryWrapper<ProfileBind> queryWrapper = fuzzyQuery(profileBindPageQuery);
+        LambdaQueryWrapper<ProfileBindBO> queryWrapper = fuzzyQuery(profileBindPageQuery);
         queryWrapper.last("limit 1");
-        ProfileBind profileBind = profileBindMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(profileBind)) {
+        ProfileBindBO profileBindBO = profileBindMapper.selectOne(queryWrapper);
+        if (ObjectUtil.isNull(profileBindBO)) {
             throw new NotFoundException();
         }
-        return profileBind;
+        return profileBindBO;
     }
 
     /**
@@ -138,10 +138,10 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public Set<Long> selectDeviceIdsByProfileId(Long profileId) {
-        ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
+        ProfileBindBOPageQuery profileBindPageQuery = new ProfileBindBOPageQuery();
         profileBindPageQuery.setProfileId(profileId);
-        List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindPageQuery));
-        return profileBinds.stream().map(ProfileBind::getDeviceId).collect(Collectors.toSet());
+        List<ProfileBindBO> profileBindBOS = profileBindMapper.selectList(fuzzyQuery(profileBindPageQuery));
+        return profileBindBOS.stream().map(ProfileBindBO::getDeviceId).collect(Collectors.toSet());
     }
 
     /**
@@ -149,28 +149,28 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public Set<Long> selectProfileIdsByDeviceId(Long deviceId) {
-        ProfileBindPageQuery profileBindPageQuery = new ProfileBindPageQuery();
+        ProfileBindBOPageQuery profileBindPageQuery = new ProfileBindBOPageQuery();
         profileBindPageQuery.setDeviceId(deviceId);
-        List<ProfileBind> profileBinds = profileBindMapper.selectList(fuzzyQuery(profileBindPageQuery));
-        return profileBinds.stream().map(ProfileBind::getProfileId).collect(Collectors.toSet());
+        List<ProfileBindBO> profileBindBOS = profileBindMapper.selectList(fuzzyQuery(profileBindPageQuery));
+        return profileBindBOS.stream().map(ProfileBindBO::getProfileId).collect(Collectors.toSet());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<ProfileBind> selectByPage(ProfileBindPageQuery entityQuery) {
+    public Page<ProfileBindBO> selectByPage(ProfileBindBOPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         return profileBindMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
-    private LambdaQueryWrapper<ProfileBind> fuzzyQuery(ProfileBindPageQuery query) {
-        LambdaQueryWrapper<ProfileBind> queryWrapper = Wrappers.<ProfileBind>query().lambda();
+    private LambdaQueryWrapper<ProfileBindBO> fuzzyQuery(ProfileBindBOPageQuery query) {
+        LambdaQueryWrapper<ProfileBindBO> queryWrapper = Wrappers.<ProfileBindBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getProfileId()), ProfileBind::getProfileId, query.getProfileId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDeviceId()), ProfileBind::getDeviceId, query.getDeviceId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getProfileId()), ProfileBindBO::getProfileId, query.getProfileId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDeviceId()), ProfileBindBO::getDeviceId, query.getDeviceId());
         }
         return queryWrapper;
     }

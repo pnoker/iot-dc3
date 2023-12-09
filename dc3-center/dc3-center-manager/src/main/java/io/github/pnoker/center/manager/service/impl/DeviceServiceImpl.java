@@ -23,9 +23,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.DeviceBO;
-import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
-import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.query.DeviceBOPageQuery;
 import io.github.pnoker.center.manager.manager.DeviceManager;
@@ -35,7 +33,6 @@ import io.github.pnoker.common.entity.base.Base;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.*;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import io.github.pnoker.common.utils.PoiUtil;
@@ -107,9 +104,9 @@ public class DeviceServiceImpl implements DeviceService {
 
         // 通知驱动新增
         DeviceBO deviceBO = deviceManager.getById(entityBO.getId());
-        List<Profile> profiles = profileService.selectByDeviceId(entityBO.getId());
+        List<ProfileBO> profileBOS = profileService.selectByDeviceId(entityBO.getId());
         // ?/pnoker 同步给驱动的设备需要profile id set吗
-        deviceBO.setProfileIds(profiles.stream().map(Profile::getId).collect(Collectors.toSet()));
+        deviceBO.setProfileIds(profileBOS.stream().map(ProfileBO::getId).collect(Collectors.toSet()));
         notifyService.notifyDriverDevice(MetadataCommandTypeEnum.ADD, deviceBO);
     }
 
@@ -264,13 +261,13 @@ public class DeviceServiceImpl implements DeviceService {
     @Transactional
     public void importDevice(DeviceBO deviceBO, MultipartFile multipartFile) {
         List<DriverAttributeBO> driverAttributeBOS = driverAttributeService.selectByDriverId(deviceBO.getDriverId(), false);
-        List<PointAttribute> pointAttributes = pointAttributeService.selectByDriverId(deviceBO.getDriverId(), false);
-        List<Point> points = pointService.selectByProfileIds(deviceBO.getProfileIds(), false);
+        List<PointAttributeBO> pointAttributeBOS = pointAttributeService.selectByDriverId(deviceBO.getDriverId(), false);
+        List<PointBO> pointBOS = pointService.selectByProfileIds(deviceBO.getProfileIds(), false);
 
         Workbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
         Sheet mainSheet = workbook.getSheet("设备导入");
 
-        if (!configIsEqual(driverAttributeBOS, pointAttributes, points, workbook)) {
+        if (!configIsEqual(driverAttributeBOS, pointAttributeBOS, pointBOS, workbook)) {
             throw new ImportException("The import template is formatted incorrectly");
         }
 
@@ -283,7 +280,7 @@ public class DeviceServiceImpl implements DeviceService {
             importDriverAttributeConfig(importDeviceBO, driverAttributeBOS, mainSheet, i);
 
             // 导入位号属性配置
-            importPointAttributeConfig(driverAttributeBOS, pointAttributes, points, mainSheet, i, importDeviceBO);
+            importPointAttributeConfig(driverAttributeBOS, pointAttributeBOS, pointBOS, mainSheet, i, importDeviceBO);
         }
     }
 
@@ -291,8 +288,8 @@ public class DeviceServiceImpl implements DeviceService {
     @SneakyThrows
     public Path generateImportTemplate(DeviceBO deviceBO) {
         List<DriverAttributeBO> driverAttributeBOS = driverAttributeService.selectByDriverId(deviceBO.getDriverId(), false);
-        List<PointAttribute> pointAttributes = pointAttributeService.selectByDriverId(deviceBO.getDriverId(), false);
-        List<Point> points = pointService.selectByProfileIds(deviceBO.getProfileIds(), false);
+        List<PointAttributeBO> pointAttributeBOS = pointAttributeService.selectByDriverId(deviceBO.getDriverId(), false);
+        List<PointBO> pointBOS = pointService.selectByProfileIds(deviceBO.getProfileIds(), false);
 
         Workbook workbook = new XSSFWorkbook();
         CellStyle cellStyle = PoiUtil.getCenterCellStyle(workbook);
@@ -302,12 +299,12 @@ public class DeviceServiceImpl implements DeviceService {
         mainSheet.setDefaultColumnWidth(25);
 
         // 设置配置工作表
-        configConfigSheet(driverAttributeBOS, pointAttributes, points, workbook);
+        configConfigSheet(driverAttributeBOS, pointAttributeBOS, pointBOS, workbook);
 
         // 设置说明
         Row remarkRow = mainSheet.createRow(0);
         PoiUtil.createCell(remarkRow, 0, "说明：请从第5行开始添加待导入的设备数据");
-        PoiUtil.mergedRegion(mainSheet, 0, 0, 0, 2 + driverAttributeBOS.size() + pointAttributes.size() * points.size() - 1);
+        PoiUtil.mergedRegion(mainSheet, 0, 0, 0, 2 + driverAttributeBOS.size() + pointAttributeBOS.size() * pointBOS.size() - 1);
 
         // 设置设备列
         Row titleRow = mainSheet.createRow(1);
@@ -320,7 +317,7 @@ public class DeviceServiceImpl implements DeviceService {
         // 设置驱动属性配置列
         configAttributeCell(driverAttributeBOS, mainSheet, titleRow, attributeRow, cellStyle);
         // 设置位号属性配置列
-        configPointCell(driverAttributeBOS, pointAttributes, points, mainSheet, titleRow, attributeRow, cellStyle);
+        configPointCell(driverAttributeBOS, pointAttributeBOS, pointBOS, mainSheet, titleRow, attributeRow, cellStyle);
 
         // 生成设备导入模板
         return generateTemplate(workbook);
@@ -404,20 +401,20 @@ public class DeviceServiceImpl implements DeviceService {
         return importAttributeConfig;
     }
 
-    private void importPointAttributeConfig(List<DriverAttributeBO> driverAttributeBOS, List<PointAttribute> pointAttributes, List<Point> points, Sheet mainSheet, int i, DeviceBO importDeviceBO) {
-        for (int j = 0; j < points.size(); j++) {
-            for (int k = 0; k < pointAttributes.size(); k++) {
-                PointAttributeConfig importAttributeConfig = getPointAttributeConfig(importDeviceBO, points.get(j), pointAttributes.get(k), mainSheet, i, 2 + driverAttributeBOS.size() + k * pointAttributes.size() + j);
+    private void importPointAttributeConfig(List<DriverAttributeBO> driverAttributeBOS, List<PointAttributeBO> pointAttributeBOS, List<PointBO> pointBOS, Sheet mainSheet, int i, DeviceBO importDeviceBO) {
+        for (int j = 0; j < pointBOS.size(); j++) {
+            for (int k = 0; k < pointAttributeBOS.size(); k++) {
+                PointAttributeConfigBO importAttributeConfig = getPointAttributeConfig(importDeviceBO, pointBOS.get(j), pointAttributeBOS.get(k), mainSheet, i, 2 + driverAttributeBOS.size() + k * pointAttributeBOS.size() + j);
                 pointAttributeConfigService.save(importAttributeConfig);
             }
         }
     }
 
-    private static PointAttributeConfig getPointAttributeConfig(DeviceBO deviceBO, Point point, PointAttribute pointAttribute, Sheet mainSheet, int rowIndex, int cellIndex) {
-        PointAttributeConfig importAttributeConfig = new PointAttributeConfig();
-        importAttributeConfig.setPointAttributeId(pointAttribute.getId());
+    private static PointAttributeConfigBO getPointAttributeConfig(DeviceBO deviceBO, PointBO pointBO, PointAttributeBO pointAttributeBO, Sheet mainSheet, int rowIndex, int cellIndex) {
+        PointAttributeConfigBO importAttributeConfig = new PointAttributeConfigBO();
+        importAttributeConfig.setPointAttributeId(pointAttributeBO.getId());
         importAttributeConfig.setDeviceId(deviceBO.getId());
-        importAttributeConfig.setPointId(point.getId());
+        importAttributeConfig.setPointId(pointBO.getId());
         String attributeValue = PoiUtil.getCellStringValue(mainSheet, rowIndex, cellIndex);
         importAttributeConfig.setConfigValue(attributeValue);
         importAttributeConfig.setTenantId(deviceBO.getTenantId());
@@ -429,11 +426,11 @@ public class DeviceServiceImpl implements DeviceService {
      * 判断配置数据是否一致
      *
      * @param driverAttributeBOS DriverAttribute Array
-     * @param pointAttributes    PointAttribute Array
-     * @param points             Point Array
+     * @param pointAttributeBOS    PointAttribute Array
+     * @param pointBOS             Point Array
      * @param workbook           Workbook
      */
-    private boolean configIsEqual(List<DriverAttributeBO> driverAttributeBOS, List<PointAttribute> pointAttributes, List<Point> points, Workbook workbook) {
+    private boolean configIsEqual(List<DriverAttributeBO> driverAttributeBOS, List<PointAttributeBO> pointAttributeBOS, List<PointBO> pointBOS, Workbook workbook) {
         Sheet configSheet = workbook.getSheet("配置（忽略）");
         String driverAttributesValueNew = JsonUtil.toJsonString(driverAttributeBOS);
         String driverAttributesValueOld = PoiUtil.getCellStringValue(configSheet, 0, 0);
@@ -441,13 +438,13 @@ public class DeviceServiceImpl implements DeviceService {
             return false;
         }
 
-        String pointAttributesValueNewd = JsonUtil.toJsonString(pointAttributes);
+        String pointAttributesValueNewd = JsonUtil.toJsonString(pointAttributeBOS);
         String pointAttributesValueOld = PoiUtil.getCellStringValue(configSheet, 1, 0);
         if (!pointAttributesValueNewd.equals(pointAttributesValueOld)) {
             return false;
         }
 
-        String pointsValueNew = JsonUtil.toJsonString(points);
+        String pointsValueNew = JsonUtil.toJsonString(pointBOS);
         String pointsValueOld = PoiUtil.getCellStringValue(configSheet, 2, 0);
 
         return pointsValueNew.equals(pointsValueOld);
@@ -478,44 +475,44 @@ public class DeviceServiceImpl implements DeviceService {
      * 设置配置工作表
      *
      * @param driverAttributeBOS DriverAttribute Array
-     * @param pointAttributes    PointAttribute Array
-     * @param points             Point Array
+     * @param pointAttributeBOS    PointAttribute Array
+     * @param pointBOS             Point Array
      * @param workbook           Workbook
      */
-    private void configConfigSheet(List<DriverAttributeBO> driverAttributeBOS, List<PointAttribute> pointAttributes, List<Point> points, Workbook workbook) {
+    private void configConfigSheet(List<DriverAttributeBO> driverAttributeBOS, List<PointAttributeBO> pointAttributeBOS, List<PointBO> pointBOS, Workbook workbook) {
         Sheet configSheet = workbook.createSheet("配置（忽略）");
         Row driverAttributesRow = configSheet.createRow(0);
         Row pointAttributesRow = configSheet.createRow(1);
         Row pointsRow = configSheet.createRow(2);
         PoiUtil.createCell(driverAttributesRow, 0, JsonUtil.toJsonString(driverAttributeBOS));
-        PoiUtil.createCell(pointAttributesRow, 0, JsonUtil.toJsonString(pointAttributes));
-        PoiUtil.createCell(pointsRow, 0, JsonUtil.toJsonString(points));
+        PoiUtil.createCell(pointAttributesRow, 0, JsonUtil.toJsonString(pointAttributeBOS));
+        PoiUtil.createCell(pointsRow, 0, JsonUtil.toJsonString(pointBOS));
     }
 
     /**
      * 设置位号属性配置列
      *
      * @param driverAttributeBOS DriverAttribute Array
-     * @param pointAttributes    PointAttribute Array
-     * @param points             Point  Array
+     * @param pointAttributeBOS    PointAttribute Array
+     * @param pointBOS             Point  Array
      * @param mainSheet          Main Sheet
      * @param titleRow           Title Row
      * @param attributeRow       Attribute Row
      * @param cellStyle          CellStyle
      */
-    private void configPointCell(List<DriverAttributeBO> driverAttributeBOS, List<PointAttribute> pointAttributes, List<Point> points, Sheet mainSheet, Row titleRow, Row attributeRow, CellStyle cellStyle) {
-        if (pointAttributes.isEmpty()) {
+    private void configPointCell(List<DriverAttributeBO> driverAttributeBOS, List<PointAttributeBO> pointAttributeBOS, List<PointBO> pointBOS, Sheet mainSheet, Row titleRow, Row attributeRow, CellStyle cellStyle) {
+        if (pointAttributeBOS.isEmpty()) {
             return;
         }
 
         Row pointRow = mainSheet.createRow(2);
         PoiUtil.createCellWithStyle(titleRow, 2 + driverAttributeBOS.size(), "位号属性配置", cellStyle);
-        PoiUtil.mergedRegion(mainSheet, 1, 1, 2 + driverAttributeBOS.size(), 2 + driverAttributeBOS.size() + pointAttributes.size() * points.size() - 1);
-        for (int i = 0; i < points.size(); i++) {
-            PoiUtil.createCellWithStyle(pointRow, 2 + driverAttributeBOS.size() + i * pointAttributes.size(), points.get(i).getPointName(), cellStyle);
-            PoiUtil.mergedRegion(mainSheet, 2, 2, 2 + driverAttributeBOS.size() + i * pointAttributes.size(), 2 + driverAttributeBOS.size() + i * pointAttributes.size() + pointAttributes.size() - 1);
-            for (int j = 0; j < pointAttributes.size(); j++) {
-                PoiUtil.createCellWithStyle(attributeRow, 2 + driverAttributeBOS.size() + i * pointAttributes.size() + j, pointAttributes.get(j).getDisplayName(), cellStyle);
+        PoiUtil.mergedRegion(mainSheet, 1, 1, 2 + driverAttributeBOS.size(), 2 + driverAttributeBOS.size() + pointAttributeBOS.size() * pointBOS.size() - 1);
+        for (int i = 0; i < pointBOS.size(); i++) {
+            PoiUtil.createCellWithStyle(pointRow, 2 + driverAttributeBOS.size() + i * pointAttributeBOS.size(), pointBOS.get(i).getPointName(), cellStyle);
+            PoiUtil.mergedRegion(mainSheet, 2, 2, 2 + driverAttributeBOS.size() + i * pointAttributeBOS.size(), 2 + driverAttributeBOS.size() + i * pointAttributeBOS.size() + pointAttributeBOS.size() - 1);
+            for (int j = 0; j < pointAttributeBOS.size(); j++) {
+                PoiUtil.createCellWithStyle(attributeRow, 2 + driverAttributeBOS.size() + i * pointAttributeBOS.size() + j, pointAttributeBOS.get(j).getDisplayName(), cellStyle);
             }
         }
     }
@@ -561,11 +558,11 @@ public class DeviceServiceImpl implements DeviceService {
         profileIds.forEach(profileId -> {
             try {
                 profileService.selectById(profileId);
-                profileBindService.save(new ProfileBind(profileId, deviceId));
+                profileBindService.save(new ProfileBindBO(profileId, deviceId));
 
-                List<Point> points = pointService.selectByProfileId(profileId);
+                List<PointBO> pointBOS = pointService.selectByProfileId(profileId);
                 // 通知驱动新增位号
-                points.forEach(point -> notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, point));
+                pointBOS.forEach(point -> notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, point));
             } catch (Exception ignored) {
                 // nothing to do
             }

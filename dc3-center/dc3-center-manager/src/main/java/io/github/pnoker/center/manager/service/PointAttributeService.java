@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.PointAttributePageQuery;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
+import io.github.pnoker.center.manager.entity.query.PointAttributeBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.PointAttribute;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointAttributeService extends Service<PointAttribute, PointAttributePageQuery> {
+public interface PointAttributeService extends Service<PointAttributeBO, PointAttributeBOPageQuery> {
     /**
      * 根据位号配置属性 NAME 和 驱动 ID 查询
      *
@@ -36,7 +36,7 @@ public interface PointAttributeService extends Service<PointAttribute, PointAttr
      * @param driverId 驱动ID
      * @return PointAttribute
      */
-    PointAttribute selectByNameAndDriverId(String name, Long driverId);
+    PointAttributeBO selectByNameAndDriverId(String name, Long driverId);
 
     /**
      * 根据驱动 ID 查询
@@ -45,5 +45,5 @@ public interface PointAttributeService extends Service<PointAttribute, PointAttr
      * @param throwException Throw Exception
      * @return PointAttribute Array
      */
-    List<PointAttribute> selectByDriverId(Long driverId, boolean throwException);
+    List<PointAttributeBO> selectByDriverId(Long driverId, boolean throwException);
 }

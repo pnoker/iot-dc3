@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.ProfileBindPageQuery;
+import io.github.pnoker.center.manager.entity.query.ProfileBindBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.ProfileBind;
+import io.github.pnoker.center.manager.entity.bo.ProfileBindBO;
 
 import java.util.Set;
 
@@ -28,7 +28,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface ProfileBindService extends Service<ProfileBind, ProfileBindPageQuery> {
+public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindBOPageQuery> {
 
     /**
      * 根据 设备ID 删除关联的模版映射
@@ -54,7 +54,7 @@ public interface ProfileBindService extends Service<ProfileBind, ProfileBindPage
      * @param profileId Profile ID
      * @return ProfileBind
      */
-    ProfileBind selectByDeviceIdAndProfileId(Long deviceId, Long profileId);
+    ProfileBindBO selectByDeviceIdAndProfileId(Long deviceId, Long profileId);
 
     /**
      * 根据 模版ID 查询关联的 设备ID 集合

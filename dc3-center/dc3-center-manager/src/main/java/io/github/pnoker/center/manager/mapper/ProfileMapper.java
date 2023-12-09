@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.model.ProfileDO;
-import io.github.pnoker.common.model.Profile;
+import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -34,5 +34,5 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface ProfileMapper extends BaseMapper<ProfileDO> {
 
-    Page<Profile> selectPageWithDevice(Page<Profile> page, @Param(Constants.WRAPPER) Wrapper<Profile> queryWrapper, @Param("deviceId") Long deviceId);
+    Page<ProfileBO> selectPageWithDevice(Page<ProfileBO> page, @Param(Constants.WRAPPER) Wrapper<ProfileBO> queryWrapper, @Param("deviceId") Long deviceId);
 }

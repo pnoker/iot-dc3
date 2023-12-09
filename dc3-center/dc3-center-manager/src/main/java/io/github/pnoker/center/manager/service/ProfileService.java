@@ -16,10 +16,10 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
+import io.github.pnoker.center.manager.entity.bo.ProfileBO;
+import io.github.pnoker.center.manager.entity.query.ProfileBOPageQuery;
 import io.github.pnoker.common.base.Service;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
-import io.github.pnoker.common.model.Profile;
 
 import java.util.List;
 import java.util.Set;
@@ -30,7 +30,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface ProfileService extends Service<Profile, ProfilePageQuery> {
+public interface ProfileService extends Service<ProfileBO, ProfileBOPageQuery> {
 
     /**
      * 根据 模板Name 查询模版
@@ -40,7 +40,7 @@ public interface ProfileService extends Service<Profile, ProfilePageQuery> {
      * @param tenantId 租户ID
      * @return Profile
      */
-    Profile selectByNameAndType(String name, ProfileTypeFlagEnum type, Long tenantId);
+    ProfileBO selectByNameAndType(String name, ProfileTypeFlagEnum type, Long tenantId);
 
     /**
      * 根据 模版Id集 查询模版
@@ -48,7 +48,7 @@ public interface ProfileService extends Service<Profile, ProfilePageQuery> {
      * @param ids Profile ID Set
      * @return Profile Array
      */
-    List<Profile> selectByIds(Set<Long> ids);
+    List<ProfileBO> selectByIds(Set<Long> ids);
 
     /**
      * 根据 设备Id 查询模版
@@ -56,7 +56,7 @@ public interface ProfileService extends Service<Profile, ProfilePageQuery> {
      * @param deviceId 设备ID
      * @return Profile Array
      */
-    List<Profile> selectByDeviceId(Long deviceId);
+    List<ProfileBO> selectByDeviceId(Long deviceId);
 
     Long count();
 }

@@ -22,10 +22,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
+import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
-import io.github.pnoker.center.manager.entity.query.PointPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointBOPageQuery;
 import io.github.pnoker.center.manager.manager.DriverManager;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.mapper.DriverMapper;
@@ -34,7 +35,6 @@ import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Dictionary;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -133,13 +133,13 @@ public class DictionaryServiceImpl implements DictionaryService {
         if (ObjectUtil.isNull(dictionaryQuery.getPages())) {
             dictionaryQuery.setPages(new Pages());
         }
-        PointPageQuery pointPageQuery = new PointPageQuery();
+        PointBOPageQuery pointPageQuery = new PointBOPageQuery();
         pointPageQuery.setPage(dictionaryQuery.getPages());
         pointPageQuery.setDeviceId(Long.parseLong(dictionaryQuery.getValue2()));
         pointPageQuery.setPointName(dictionaryQuery.getLabel());
         pointPageQuery.setProfileId(Long.parseLong(dictionaryQuery.getValue1()));
         pointPageQuery.setTenantId(dictionaryQuery.getTenantId());
-        Page<Point> pointPage = pointService.selectByPage(pointPageQuery);
+        Page<PointBO> pointPage = pointService.selectByPage(pointPageQuery);
         List<Dictionary> dictionaryList = pointPage.getRecords().parallelStream().map(profile -> {
             Dictionary dictionary = new Dictionary();
             dictionary.setLabel(profile.getPointName());

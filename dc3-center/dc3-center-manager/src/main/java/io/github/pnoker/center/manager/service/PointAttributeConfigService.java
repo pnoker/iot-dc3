@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.PointAttributeConfig;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointAttributeConfigService extends Service<PointAttributeConfig, PointAttributeConfigPageQuery> {
+public interface PointAttributeConfigService extends Service<PointAttributeConfigBO, PointAttributeConfigBOPageQuery> {
 
     /**
      * 根据位号配置信息 ID 、 设备 ID 、 位号 ID 查询
@@ -38,7 +38,7 @@ public interface PointAttributeConfigService extends Service<PointAttributeConfi
      * @param pointId          Point ID
      * @return PointInfo
      */
-    PointAttributeConfig selectByAttributeIdAndDeviceIdAndPointId(Long pointAttributeId, Long deviceId, Long pointId);
+    PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long pointAttributeId, Long deviceId, Long pointId);
 
     /**
      * 根据位号配置信息 ID 查询
@@ -46,7 +46,7 @@ public interface PointAttributeConfigService extends Service<PointAttributeConfi
      * @param pointAttributeId Point Attribute ID
      * @return PointInfo Array
      */
-    List<PointAttributeConfig> selectByAttributeId(Long pointAttributeId);
+    List<PointAttributeConfigBO> selectByAttributeId(Long pointAttributeId);
 
     /**
      * 根据 设备 ID 查询
@@ -54,7 +54,7 @@ public interface PointAttributeConfigService extends Service<PointAttributeConfi
      * @param deviceId 设备ID
      * @return PointInfo Array
      */
-    List<PointAttributeConfig> selectByDeviceId(Long deviceId);
+    List<PointAttributeConfigBO> selectByDeviceId(Long deviceId);
 
     /**
      * 根据 设备 ID 、 位号 ID 查询
@@ -63,5 +63,5 @@ public interface PointAttributeConfigService extends Service<PointAttributeConfi
      * @param pointId  位号ID
      * @return PointInfo Array
      */
-    List<PointAttributeConfig> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
+    List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
 }

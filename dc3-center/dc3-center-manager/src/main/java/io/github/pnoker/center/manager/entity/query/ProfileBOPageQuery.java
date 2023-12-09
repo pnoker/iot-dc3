@@ -18,11 +18,11 @@ package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.Point;
+import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 import lombok.*;
 
 /**
- * Point DTO
+ * Profile DTO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -32,7 +32,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class PointPageQuery extends Point {
+public class ProfileBOPageQuery extends ProfileBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

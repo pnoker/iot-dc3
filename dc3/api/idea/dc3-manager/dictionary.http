@@ -24,8 +24,8 @@ Cache-Control: no-cache
 {}
 
 ### 查询 Profile Dictionary
-#/manager/dictionary/profile
-POST http://{{dc3-manager}}/manager/dictionary/profile
+#/manager/dictionary/profileBO
+POST http://{{dc3-manager}}/manager/dictionary/profileBO
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -41,9 +41,9 @@ Cache-Control: no-cache
 
 {}
 
-### 查询 Point/profile Dictionary
-#/manager/dictionary/point
-POST http://{{dc3-manager}}/manager/dictionary/point
+### 查询 Point/profileBO Dictionary
+#/manager/dictionary/pointBO
+POST http://{{dc3-manager}}/manager/dictionary/pointBO
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

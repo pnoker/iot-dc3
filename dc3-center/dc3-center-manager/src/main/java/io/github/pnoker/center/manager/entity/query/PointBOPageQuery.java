@@ -18,11 +18,11 @@ package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.PointAttributeConfig;
+import io.github.pnoker.center.manager.entity.bo.PointBO;
 import lombok.*;
 
 /**
- * PointInfo DTO
+ * Point DTO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -32,8 +32,10 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class PointAttributeConfigPageQuery extends PointAttributeConfig {
+public class PointBOPageQuery extends PointBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    private Long deviceId;
 }

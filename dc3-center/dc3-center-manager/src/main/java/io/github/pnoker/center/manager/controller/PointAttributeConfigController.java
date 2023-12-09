@@ -18,12 +18,12 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigBOPageQuery;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.PointAttributeConfig;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -51,13 +51,13 @@ public class PointAttributeConfigController implements Controller {
     /**
      * 新增 PointInfo
      *
-     * @param pointAttributeConfig PointInfo
+     * @param pointAttributeConfigBO PointInfo
      * @return PointInfo
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody PointAttributeConfig pointAttributeConfig) {
+    public R<String> add(@Validated(Insert.class) @RequestBody PointAttributeConfigBO pointAttributeConfigBO) {
         try {
-            pointAttributeConfigService.save(pointAttributeConfig);
+            pointAttributeConfigService.save(pointAttributeConfigBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -83,13 +83,13 @@ public class PointAttributeConfigController implements Controller {
     /**
      * 更新 PointInfo
      *
-     * @param pointAttributeConfig PointInfo
+     * @param pointAttributeConfigBO PointInfo
      * @return PointInfo
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody PointAttributeConfig pointAttributeConfig) {
+    public R<String> update(@Validated(Update.class) @RequestBody PointAttributeConfigBO pointAttributeConfigBO) {
         try {
-            pointAttributeConfigService.update(pointAttributeConfig);
+            pointAttributeConfigService.update(pointAttributeConfigBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -103,9 +103,9 @@ public class PointAttributeConfigController implements Controller {
      * @return PointInfo
      */
     @GetMapping("/id/{id}")
-    public R<PointAttributeConfig> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<PointAttributeConfigBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            PointAttributeConfig select = pointAttributeConfigService.selectById(Long.parseLong(id));
+            PointAttributeConfigBO select = pointAttributeConfigService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -124,11 +124,11 @@ public class PointAttributeConfigController implements Controller {
      * @return PointInfo
      */
     @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}/point_id/{pointId}")
-    public R<PointAttributeConfig> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") String attributeId,
-                                                                            @NotNull @PathVariable(value = "deviceId") String deviceId,
-                                                                            @NotNull @PathVariable(value = "pointId") String pointId) {
+    public R<PointAttributeConfigBO> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") String attributeId,
+                                                                              @NotNull @PathVariable(value = "deviceId") String deviceId,
+                                                                              @NotNull @PathVariable(value = "pointId") String pointId) {
         try {
-            PointAttributeConfig select = pointAttributeConfigService.selectByAttributeIdAndDeviceIdAndPointId(Long.parseLong(attributeId), Long.parseLong(deviceId), Long.parseLong(pointId));
+            PointAttributeConfigBO select = pointAttributeConfigService.selectByAttributeIdAndDeviceIdAndPointId(Long.parseLong(attributeId), Long.parseLong(deviceId), Long.parseLong(pointId));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -146,10 +146,10 @@ public class PointAttributeConfigController implements Controller {
      * @return PointInfo
      */
     @GetMapping("/device_id/{deviceId}/point_id/{pointId}")
-    public R<List<PointAttributeConfig>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
-                                                                    @NotNull @PathVariable(value = "pointId") Long pointId) {
+    public R<List<PointAttributeConfigBO>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
+                                                                      @NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
-            List<PointAttributeConfig> select = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId, pointId);
+            List<PointAttributeConfigBO> select = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId, pointId);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -166,9 +166,9 @@ public class PointAttributeConfigController implements Controller {
      * @return PointInfo
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<PointAttributeConfig>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public R<List<PointAttributeConfigBO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<PointAttributeConfig> select = pointAttributeConfigService.selectByDeviceId(deviceId);
+            List<PointAttributeConfigBO> select = pointAttributeConfigService.selectByDeviceId(deviceId);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -185,12 +185,12 @@ public class PointAttributeConfigController implements Controller {
      * @return Page Of PointInfo
      */
     @PostMapping("/list")
-    public R<Page<PointAttributeConfig>> list(@RequestBody(required = false) PointAttributeConfigPageQuery pointInfoPageQuery) {
+    public R<Page<PointAttributeConfigBO>> list(@RequestBody(required = false) PointAttributeConfigBOPageQuery pointInfoPageQuery) {
         try {
             if (ObjectUtil.isEmpty(pointInfoPageQuery)) {
-                pointInfoPageQuery = new PointAttributeConfigPageQuery();
+                pointInfoPageQuery = new PointAttributeConfigBOPageQuery();
             }
-            Page<PointAttributeConfig> page = pointAttributeConfigService.selectByPage(pointInfoPageQuery);
+            Page<PointAttributeConfigBO> page = pointAttributeConfigService.selectByPage(pointInfoPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

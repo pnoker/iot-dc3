@@ -21,14 +21,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.*;
-import io.github.pnoker.center.manager.entity.query.PointPageQuery;
+import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.query.PointBOPageQuery;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.enums.RwFlagEnum;
-import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.utils.BuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -56,9 +56,9 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         RPagePointDTO.Builder builder = RPagePointDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
-        PointPageQuery pageQuery = buildPageQuery(request);
+        PointBOPageQuery pageQuery = buildPageQuery(request);
 
-        Page<Point> pointPage = pointService.selectByPage(pageQuery);
+        Page<PointBO> pointPage = pointService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(pointPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -92,8 +92,8 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
      * @param request PagePointQueryDTO
      * @return PointPageQuery
      */
-    private PointPageQuery buildPageQuery(PagePointQueryDTO request) {
-        PointPageQuery pageQuery = new PointPageQuery();
+    private PointBOPageQuery buildPageQuery(PagePointQueryDTO request) {
+        PointBOPageQuery pageQuery = new PointBOPageQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());
@@ -117,7 +117,7 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
      * @param entityDO Point
      * @return PointDTO
      */
-    private PointDTO buildDTOByDO(Point entityDO) {
+    private PointDTO buildDTOByDO(PointBO entityDO) {
         PointDTO.Builder builder = PointDTO.newBuilder();
         BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);

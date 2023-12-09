@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.PointPageQuery;
+import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.query.PointBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.Point;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointService extends Service<Point, PointPageQuery> {
+public interface PointService extends Service<PointBO, PointBOPageQuery> {
 
     /**
      * 根据 位号Name 、 模板Id 查询位号
@@ -39,7 +39,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param profileId Profile ID
      * @return Point
      */
-    Point selectByNameAndProfileId(String name, Long profileId);
+    PointBO selectByNameAndProfileId(String name, Long profileId);
 
     /**
      * 根据 设备Id 查询位号
@@ -47,7 +47,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param deviceId 设备ID
      * @return Point Array
      */
-    List<Point> selectByDeviceId(Long deviceId);
+    List<PointBO> selectByDeviceId(Long deviceId);
 
     /**
      * 根据 模板Id 查询位号
@@ -55,7 +55,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param profileId Profile ID
      * @return Point Array
      */
-    List<Point> selectByProfileId(Long profileId);
+    List<PointBO> selectByProfileId(Long profileId);
 
     /**
      * 根据 模板Id 集查询位号
@@ -64,7 +64,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param throwException Throw Exception
      * @return Point Array
      */
-    List<Point> selectByProfileIds(Set<Long> profileIds, boolean throwException);
+    List<PointBO> selectByProfileIds(Set<Long> profileIds, boolean throwException);
 
     /**
      * 根据 设备Id集 查询设备
@@ -72,7 +72,7 @@ public interface PointService extends Service<Point, PointPageQuery> {
      * @param ids Point ID Set
      * @return Point Array
      */
-    List<Point> selectByIds(Set<Long> ids);
+    List<PointBO> selectByIds(Set<Long> ids);
 
     /**
      * 查询 位号单位
