@@ -19,12 +19,12 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.PointPageQuery;
+import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.query.PointBOPageQuery;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -56,14 +56,14 @@ public class PointController implements Controller {
     /**
      * 新增 Point
      *
-     * @param point Point
+     * @param pointBO Point
      * @return Point
      */
     @PostMapping("/add")
-    public R<Point> add(@Validated(Insert.class) @RequestBody Point point) {
+    public R<PointBO> add(@Validated(Insert.class) @RequestBody PointBO pointBO) {
         try {
-            point.setTenantId(getTenantId());
-            pointService.save(point);
+            pointBO.setTenantId(getTenantId());
+            pointService.save(pointBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -89,14 +89,14 @@ public class PointController implements Controller {
     /**
      * 更新 Point
      *
-     * @param point Point
+     * @param pointBO Point
      * @return Point
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Point point) {
+    public R<String> update(@Validated(Update.class) @RequestBody PointBO pointBO) {
         try {
-            point.setTenantId(getTenantId());
-            pointService.update(point);
+            pointBO.setTenantId(getTenantId());
+            pointService.update(pointBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -110,9 +110,9 @@ public class PointController implements Controller {
      * @return Point
      */
     @GetMapping("/id/{id}")
-    public R<Point> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<PointBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Point select = pointService.selectById(Long.parseLong(id));
+            PointBO select = pointService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -129,10 +129,10 @@ public class PointController implements Controller {
      * @return Map String:Point
      */
     @PostMapping("/ids")
-    public R<Map<Long, Point>> selectByIds(@RequestBody Set<Long> pointIds) {
+    public R<Map<Long, PointBO>> selectByIds(@RequestBody Set<Long> pointIds) {
         try {
-            List<Point> points = pointService.selectByIds(pointIds);
-            Map<Long, Point> pointMap = points.stream().collect(Collectors.toMap(Point::getId, Function.identity()));
+            List<PointBO> pointBOS = pointService.selectByIds(pointIds);
+            Map<Long, PointBO> pointMap = pointBOS.stream().collect(Collectors.toMap(PointBO::getId, Function.identity()));
             return R.ok(pointMap);
             // todo 返回id为 long，前端无法解析
         } catch (Exception e) {
@@ -147,9 +147,9 @@ public class PointController implements Controller {
      * @return Point Array
      */
     @GetMapping("/profile_id/{profileId}")
-    public R<List<Point>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
+    public R<List<PointBO>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
         try {
-            List<Point> select = pointService.selectByProfileId(profileId);
+            List<PointBO> select = pointService.selectByProfileId(profileId);
             if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
@@ -166,9 +166,9 @@ public class PointController implements Controller {
      * @return Point Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<Point>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public R<List<PointBO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<Point> select = pointService.selectByDeviceId(deviceId);
+            List<PointBO> select = pointService.selectByDeviceId(deviceId);
             if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
@@ -185,13 +185,13 @@ public class PointController implements Controller {
      * @return Page Of Point
      */
     @PostMapping("/list")
-    public R<Page<Point>> list(@RequestBody(required = false) PointPageQuery pointPageQuery) {
+    public R<Page<PointBO>> list(@RequestBody(required = false) PointBOPageQuery pointPageQuery) {
         try {
             if (ObjectUtil.isEmpty(pointPageQuery)) {
-                pointPageQuery = new PointPageQuery();
+                pointPageQuery = new PointBOPageQuery();
             }
             pointPageQuery.setTenantId(getTenantId());
-            Page<Point> page = pointService.selectByPage(pointPageQuery);
+            Page<PointBO> page = pointService.selectByPage(pointPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

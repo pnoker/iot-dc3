@@ -38,6 +38,6 @@ public class PointValueReadVO implements Serializable {
     @NotBlank(message = "驱动ID不能为空")
     private Long deviceId;
 
-    @NotBlank(message = "Point id can't be empty")
+    @NotBlank(message = "位号ID不能为空")
     private Long pointId;
 }

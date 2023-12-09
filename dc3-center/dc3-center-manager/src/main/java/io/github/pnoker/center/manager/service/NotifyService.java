@@ -16,12 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.bo.DeviceBO;
-import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
-import io.github.pnoker.common.model.Point;
-import io.github.pnoker.common.model.PointAttributeConfig;
-import io.github.pnoker.common.model.Profile;
+import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 
 /**
  * Notify Interface
@@ -35,17 +32,17 @@ public interface NotifyService {
      * 通知驱动 新增模板(ADD) / 删除模板(DELETE) / 更新模板(UPDATE)
      *
      * @param command Operation Type
-     * @param profile Profile
+     * @param profileBO Profile
      */
-    void notifyDriverProfile(MetadataCommandTypeEnum command, Profile profile);
+    void notifyDriverProfile(MetadataCommandTypeEnum command, ProfileBO profileBO);
 
     /**
      * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 更新位号(UPDATE)
      *
      * @param command Operation Type
-     * @param point   Point
+     * @param pointBO   Point
      */
-    void notifyDriverPoint(MetadataCommandTypeEnum command, Point point);
+    void notifyDriverPoint(MetadataCommandTypeEnum command, PointBO pointBO);
 
     /**
      * 通知驱动 新增设备(ADD) / 删除设备(DELETE) / 更新设备(UPDATE)
@@ -67,8 +64,8 @@ public interface NotifyService {
      * 通知驱动 新增位号配置(ADD) / 删除位号配置(DELETE) / 更新位号配置(UPDATE)
      *
      * @param command              Operation Type
-     * @param pointAttributeConfig PointInfo
+     * @param pointAttributeConfigBO PointInfo
      */
-    void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointAttributeConfig pointAttributeConfig);
+    void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointAttributeConfigBO pointAttributeConfigBO);
 
 }

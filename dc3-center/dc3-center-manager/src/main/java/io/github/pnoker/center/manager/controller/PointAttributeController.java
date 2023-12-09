@@ -19,13 +19,13 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.PointAttributePageQuery;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
+import io.github.pnoker.center.manager.entity.query.PointAttributeBOPageQuery;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -54,13 +54,13 @@ public class PointAttributeController implements Controller {
     /**
      * 新增 PointAttribute
      *
-     * @param pointAttribute PointAttribute
+     * @param pointAttributeBO PointAttribute
      * @return PointAttribute
      */
     @PostMapping("/add")
-    public R<PointAttribute> add(@Validated(Insert.class) @RequestBody PointAttribute pointAttribute) {
+    public R<PointAttributeBO> add(@Validated(Insert.class) @RequestBody PointAttributeBO pointAttributeBO) {
         try {
-            pointAttributeService.save(pointAttribute);
+            pointAttributeService.save(pointAttributeBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -86,13 +86,13 @@ public class PointAttributeController implements Controller {
     /**
      * 更新 PointAttribute
      *
-     * @param pointAttribute PointAttribute
+     * @param pointAttributeBO PointAttribute
      * @return PointAttribute
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody PointAttribute pointAttribute) {
+    public R<String> update(@Validated(Update.class) @RequestBody PointAttributeBO pointAttributeBO) {
         try {
-            pointAttributeService.update(pointAttribute);
+            pointAttributeService.update(pointAttributeBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -106,9 +106,9 @@ public class PointAttributeController implements Controller {
      * @return PointAttribute
      */
     @GetMapping("/id/{id}")
-    public R<PointAttribute> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<PointAttributeBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            PointAttribute select = pointAttributeService.selectById(Long.parseLong(id));
+            PointAttributeBO select = pointAttributeService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -125,9 +125,9 @@ public class PointAttributeController implements Controller {
      * @return PointAttribute Array
      */
     @GetMapping("/driver_id/{id}")
-    public R<List<PointAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
+    public R<List<PointAttributeBO>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
         try {
-            List<PointAttribute> select = pointAttributeService.selectByDriverId(Long.parseLong(id), true);
+            List<PointAttributeBO> select = pointAttributeService.selectByDriverId(Long.parseLong(id), true);
             if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
@@ -146,12 +146,12 @@ public class PointAttributeController implements Controller {
      * @return Page Of PointAttribute
      */
     @PostMapping("/list")
-    public R<Page<PointAttribute>> list(@RequestBody(required = false) PointAttributePageQuery pointAttributePageQuery) {
+    public R<Page<PointAttributeBO>> list(@RequestBody(required = false) PointAttributeBOPageQuery pointAttributePageQuery) {
         try {
             if (ObjectUtil.isEmpty(pointAttributePageQuery)) {
-                pointAttributePageQuery = new PointAttributePageQuery();
+                pointAttributePageQuery = new PointAttributeBOPageQuery();
             }
-            Page<PointAttribute> page = pointAttributeService.selectByPage(pointAttributePageQuery);
+            Page<PointAttributeBO> page = pointAttributeService.selectByPage(pointAttributePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

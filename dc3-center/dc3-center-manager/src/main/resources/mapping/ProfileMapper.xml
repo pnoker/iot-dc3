@@ -44,7 +44,7 @@
         , profile_name, profile_code, profile_share_flag, profile_type_flag, group_id, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
-    <select id="selectPageWithDevice" resultType="io.github.pnoker.common.model.Profile">
+    <select id="selectPageWithDevice" resultType="io.github.pnoker.center.manager.entity.bo.ProfileBO">
         select dp.id,
         dp.profile_name,
         dp.profile_code,

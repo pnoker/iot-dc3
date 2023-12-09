@@ -390,8 +390,8 @@ drop table if exists dc3_point_attribute_config;
 create table dc3_point_attribute_config
 (
     id                 bigint unsigned auto_increment primary key not null comment '主键ID',
-    point_attribute_id bigint       default 0                    not null comment '位号配置ID',
-    config_value       varchar(128) default ''                   not null comment '位号配置值',
+    point_attribute_id bigint       default 0                    not null comment '位号属性ID',
+    config_value       varchar(128) default ''                   not null comment '位号属性配置值',
     device_id          bigint       default 0                    not null comment '设备ID',
     point_id           bigint       default 0                    not null comment '位号ID',
     enable_flag        tinyint(4) default 1 not null comment '使能标识',

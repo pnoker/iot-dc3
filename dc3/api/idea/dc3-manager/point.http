@@ -16,7 +16,7 @@
 
 ### --------------------- Point ---------------------
 ### 新增 Point
-POST http://{{dc3-manager}}/manager/point/add
+POST http://{{dc3-manager}}/manager/pointBO/add
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -37,7 +37,7 @@ Cache-Control: no-cache
 
 
 ### 更新 Point
-POST http://{{dc3-manager}}/manager/point/update
+POST http://{{dc3-manager}}/manager/pointBO/update
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -59,14 +59,14 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 查询 Point
-GET http://{{dc3-manager}}/manager/point/id/1
+GET http://{{dc3-manager}}/manager/pointBO/id/1
 Accept: */*
 Cache-Control: no-cache
 
 
 
 ### 分页查询 Point
-POST http://{{dc3-manager}}/manager/point/list
+POST http://{{dc3-manager}}/manager/pointBO/list
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -86,7 +86,7 @@ Cache-Control: no-cache
 
 
 ### 根据 ID 删除 Point
-POST http://{{dc3-manager}}/manager/point/delete/1
+POST http://{{dc3-manager}}/manager/pointBO/delete/1
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

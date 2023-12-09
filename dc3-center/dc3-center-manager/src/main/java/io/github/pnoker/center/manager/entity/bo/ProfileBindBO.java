@@ -14,33 +14,36 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.entity.vo;
+package io.github.pnoker.center.manager.entity.bo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Update;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
 
 /**
- * Point Value Write VO
+ * ProfileBind BO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class PointValueWriteVO implements Serializable {
-    private static final long serialVersionUID = 1L;
+@SuperBuilder
+@RequiredArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class ProfileBindBO extends BaseBO {
 
-    @NotBlank(message = "驱动ID不能为空")
+    /**
+     * 模版ID
+     */
+    private Long profileId;
+
+    /**
+     * 设备ID
+     */
     private Long deviceId;
-
-    @NotBlank(message = "位号ID不能为空")
-    private Long pointId;
-
-    @NotBlank(message = "Write value can't be empty")
-    private String value;
 }

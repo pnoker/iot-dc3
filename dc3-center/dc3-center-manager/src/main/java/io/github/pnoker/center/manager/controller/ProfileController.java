@@ -18,12 +18,12 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
+import io.github.pnoker.center.manager.entity.bo.ProfileBO;
+import io.github.pnoker.center.manager.entity.query.ProfileBOPageQuery;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.Profile;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -55,14 +55,14 @@ public class ProfileController implements Controller {
     /**
      * 新增 Profile
      *
-     * @param profile Profile
+     * @param profileBO Profile
      * @return Profile
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Profile profile) {
+    public R<String> add(@Validated(Insert.class) @RequestBody ProfileBO profileBO) {
         try {
-            profile.setTenantId(getTenantId());
-            profileService.save(profile);
+            profileBO.setTenantId(getTenantId());
+            profileService.save(profileBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -88,14 +88,14 @@ public class ProfileController implements Controller {
     /**
      * 更新 Profile
      *
-     * @param profile Profile
+     * @param profileBO Profile
      * @return Profile
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Profile profile) {
+    public R<String> update(@Validated(Update.class) @RequestBody ProfileBO profileBO) {
         try {
-            profile.setTenantId(getTenantId());
-            profileService.update(profile);
+            profileBO.setTenantId(getTenantId());
+            profileService.update(profileBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -109,9 +109,9 @@ public class ProfileController implements Controller {
      * @return Profile
      */
     @GetMapping("/id/{id}")
-    public R<Profile> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<ProfileBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Profile select = profileService.selectById(Long.parseLong(id));
+            ProfileBO select = profileService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -128,11 +128,11 @@ public class ProfileController implements Controller {
      * @return Map String:Profile
      */
     @PostMapping("/ids")
-    public R<Map<Long, Profile>> selectByIds(@RequestBody Set<String> profileIds) {
+    public R<Map<Long, ProfileBO>> selectByIds(@RequestBody Set<String> profileIds) {
         try {
             Set<Long> collect = profileIds.stream().map(Long::parseLong).collect(Collectors.toSet());
-            List<Profile> profiles = profileService.selectByIds(collect);
-            Map<Long, Profile> profileMap = profiles.stream().collect(Collectors.toMap(Profile::getId, Function.identity()));
+            List<ProfileBO> profileBOS = profileService.selectByIds(collect);
+            Map<Long, ProfileBO> profileMap = profileBOS.stream().collect(Collectors.toMap(ProfileBO::getId, Function.identity()));
             return R.ok(profileMap);
             // todo   返回 long id 前端你无法解析
         } catch (Exception e) {
@@ -147,9 +147,9 @@ public class ProfileController implements Controller {
      * @return Profile Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<Profile>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public R<List<ProfileBO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<Profile> select = profileService.selectByDeviceId(deviceId);
+            List<ProfileBO> select = profileService.selectByDeviceId(deviceId);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -166,13 +166,13 @@ public class ProfileController implements Controller {
      * @return Page Of Profile
      */
     @PostMapping("/list")
-    public R<Page<Profile>> list(@RequestBody(required = false) ProfilePageQuery profilePageQuery) {
+    public R<Page<ProfileBO>> list(@RequestBody(required = false) ProfileBOPageQuery profilePageQuery) {
         try {
             if (ObjectUtil.isEmpty(profilePageQuery)) {
-                profilePageQuery = new ProfilePageQuery();
+                profilePageQuery = new ProfileBOPageQuery();
             }
             profilePageQuery.setTenantId(getTenantId());
-            Page<Profile> page = profileService.selectByPage(profilePageQuery);
+            Page<ProfileBO> page = profileService.selectByPage(profilePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
