@@ -26,7 +26,7 @@ import io.github.pnoker.api.common.BaseDTO;
 import io.github.pnoker.api.common.RDTO;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.center.auth.entity.bo.UserBO;
 import io.github.pnoker.common.utils.BuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +51,7 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
     public void selectById(IdQuery request, StreamObserver<RUserDTO> responseObserver) {
         RUserDTO.Builder builder = RUserDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
-        User select = userService.selectById(request.getId());
+        UserBO select = userService.selectById(request.getId());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -76,7 +76,7 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
      * @param entityDO User
      * @return UserDTO
      */
-    private UserDTO buildDTOByDO(User entityDO) {
+    private UserDTO buildDTOByDO(UserBO entityDO) {
         UserDTO.Builder builder = UserDTO.newBuilder();
         BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);

@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.model.UserLogin;
+import io.github.pnoker.center.auth.entity.bo.UserLogin;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

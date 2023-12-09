@@ -18,7 +18,7 @@ package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.center.auth.entity.query.UserLoginPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.UserLogin;
+import io.github.pnoker.center.auth.entity.bo.UserLogin;
 
 /**
  * User Interface

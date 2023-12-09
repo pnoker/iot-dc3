@@ -18,13 +18,13 @@ package io.github.pnoker.center.auth.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.BlackIpPageQuery;
+import io.github.pnoker.center.auth.entity.query.BlackIpBOPageQuery;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.BlackIp;
+import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -51,13 +51,13 @@ public class BlackIpController implements Controller {
     /**
      * 新增 BlackIp
      *
-     * @param blackIp BlackIp
-     * @return {@link BlackIp}
+     * @param blackIpBO BlackIp
+     * @return {@link BlackIpBO}
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody BlackIp blackIp) {
+    public R<String> add(@Validated(Insert.class) @RequestBody BlackIpBO blackIpBO) {
         try {
-            blackIpService.save(blackIp);
+            blackIpService.save(blackIpBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -87,13 +87,13 @@ public class BlackIpController implements Controller {
      * <li>不支持更新: Ip</li>
      * </ol>
      *
-     * @param blackIp BlackIp
-     * @return {@link BlackIp}
+     * @param blackIpBO BlackIp
+     * @return {@link BlackIpBO}
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody BlackIp blackIp) {
+    public R<String> update(@Validated(Update.class) @RequestBody BlackIpBO blackIpBO) {
         try {
-            blackIpService.update(blackIp);
+            blackIpService.update(blackIpBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -104,12 +104,12 @@ public class BlackIpController implements Controller {
      * 根据 ID 查询 BlackIp
      *
      * @param id ID
-     * @return {@link BlackIp}
+     * @return {@link BlackIpBO}
      */
     @GetMapping("/id/{id}")
-    public R<BlackIp> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<BlackIpBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            BlackIp select = blackIpService.selectById(Long.parseLong(id));
+            BlackIpBO select = blackIpService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -123,12 +123,12 @@ public class BlackIpController implements Controller {
      * 根据 Ip 查询 BlackIp
      *
      * @param ip Black Ip
-     * @return {@link BlackIp}
+     * @return {@link BlackIpBO}
      */
     @GetMapping("/ip/{ip}")
-    public R<BlackIp> selectByIp(@NotNull @PathVariable(value = "ip") String ip) {
+    public R<BlackIpBO> selectByIp(@NotNull @PathVariable(value = "ip") String ip) {
         try {
-            BlackIp select = blackIpService.selectByIp(ip);
+            BlackIpBO select = blackIpService.selectByIp(ip);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -142,15 +142,15 @@ public class BlackIpController implements Controller {
      * 分页查询 BlackIp
      *
      * @param blackIpPageQuery BlackIp和分页参数
-     * @return 带分页的 {@link BlackIp}
+     * @return 带分页的 {@link BlackIpBO}
      */
     @PostMapping("/list")
-    public R<Page<BlackIp>> list(@RequestBody(required = false) BlackIpPageQuery blackIpPageQuery) {
+    public R<Page<BlackIpBO>> list(@RequestBody(required = false) BlackIpBOPageQuery blackIpPageQuery) {
         try {
             if (ObjectUtil.isEmpty(blackIpPageQuery)) {
-                blackIpPageQuery = new BlackIpPageQuery();
+                blackIpPageQuery = new BlackIpBOPageQuery();
             }
-            Page<BlackIp> page = blackIpService.selectByPage(blackIpPageQuery);
+            Page<BlackIpBO> page = blackIpService.selectByPage(blackIpPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

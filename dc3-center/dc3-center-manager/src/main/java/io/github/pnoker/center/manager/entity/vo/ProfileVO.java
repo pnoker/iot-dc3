@@ -51,6 +51,7 @@ public class ProfileVO extends BaseVO {
     /**
      * 模板名称
      */
+    @Schema(description = "模板名称")
     @NotBlank(message = "模版名称不能为空",
             groups = {Insert.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
@@ -61,30 +62,36 @@ public class ProfileVO extends BaseVO {
     /**
      * 模板编号
      */
+    @Schema(description = "模板编号")
     private String profileCode;
 
     /**
      * 模板共享类型标识
      */
+    @Schema(description = "模板共享类型标识")
     private ProfileShareFlagEnum profileShareFlag;
 
     /**
      * 模板类型标识
      */
+    @Schema(description = "模板类型标识")
     private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
      * 分组ID
      */
+    @Schema(description = "分组ID")
     private Long groupId;
 
     /**
      * 使能标识
      */
+    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
      * 租户ID
      */
+    @Schema(description = "租户ID")
     private Long tenantId;
 }

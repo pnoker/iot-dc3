@@ -18,7 +18,7 @@ package io.github.pnoker.center.auth.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.RoleResourceBind;
+import io.github.pnoker.center.auth.entity.bo.RoleUserBindBO;
 import lombok.*;
 
 /**
@@ -30,7 +30,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class RoleResourceBindPageQuery extends RoleResourceBind {
+public class RoleUserBindBOPageQuery extends RoleUserBindBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

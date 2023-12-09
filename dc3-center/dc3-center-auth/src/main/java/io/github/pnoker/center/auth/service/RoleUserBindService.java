@@ -16,10 +16,10 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.query.RoleUserBindPageQuery;
+import io.github.pnoker.center.auth.entity.query.RoleUserBindBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.Role;
-import io.github.pnoker.common.model.RoleUserBind;
+import io.github.pnoker.center.auth.entity.bo.RoleBO;
+import io.github.pnoker.center.auth.entity.bo.RoleUserBindBO;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import java.util.List;
  * @author linys
  * @since 2022.1.0
  */
-public interface RoleUserBindService extends Service<RoleUserBind, RoleUserBindPageQuery> {
+public interface RoleUserBindService extends Service<RoleUserBindBO, RoleUserBindBOPageQuery> {
 
     /**
      * 根据 租户id 和 用户id 查询
@@ -38,5 +38,5 @@ public interface RoleUserBindService extends Service<RoleUserBind, RoleUserBindP
      * @param userId   用户id
      * @return Role list
      */
-    List<Role> listRoleByTenantIdAndUserId(Long tenantId, Long userId);
+    List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId);
 }

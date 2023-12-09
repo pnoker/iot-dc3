@@ -36,7 +36,7 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 {
-  "tenant": "default",
+  "tenantBO": "default",
   "name": "pnoker",
   "salt": "dsb785i4ikx0h4wt",
   "password": "8f9812cee01121acb1f3cab6a08e58c4"

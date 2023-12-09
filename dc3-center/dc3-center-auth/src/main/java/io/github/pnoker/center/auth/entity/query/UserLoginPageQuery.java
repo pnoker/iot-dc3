@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.UserLogin;
+import io.github.pnoker.center.auth.entity.bo.UserLogin;
 import lombok.*;
 
 /**

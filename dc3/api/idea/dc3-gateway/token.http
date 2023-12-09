@@ -21,7 +21,7 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 {
-  "tenant": "default",
+  "tenantBO": "default",
   "name": "pnoker"
 }
 
@@ -33,7 +33,7 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 {
-  "tenant": "default",
+  "tenantBO": "default",
   "name": "pnoker",
   "salt": "t0jhimcpug4rfcbn",
   "password": "885f2748de9d57605dcb578ad51ac16a"
@@ -47,7 +47,7 @@ Content-Type: application/json
 Cache-Control: no-cache
 
 {
-  "tenant": "default",
+  "tenantBO": "default",
   "name": "pnoker",
   "salt": "t0jhimcpug4rfcbn",
   "token": "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJpby5naXRodWIucG5va2VyLmRjMy8xIiwic3ViIjoicG5va2VyIiwiaWF0IjoxNjk1MDIxODcxLCJleHAiOjE2OTUwNjUwNzF9.dAWQgVGhBbslZ-5FeqFww_uObEW0TMkyxmhpsGbFY9g"

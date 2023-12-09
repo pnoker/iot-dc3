@@ -36,7 +36,7 @@ CREATE TABLE `config_info`
     `md5`                varchar(32)           DEFAULT NULL COMMENT 'md5',
     `gmt_create`         datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `gmt_modified`       datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-    `src_user`           text COMMENT 'source user',
+    `src_user`           text COMMENT 'source userBO',
     `src_ip`             varchar(50)           DEFAULT NULL COMMENT 'source ip',
     `app_name`           varchar(128)          DEFAULT NULL,
     `tenant_id`          varchar(128)          DEFAULT '' COMMENT '租户字段',
@@ -88,7 +88,7 @@ CREATE TABLE `config_info_beta`
     `md5`                varchar(32)           DEFAULT NULL COMMENT 'md5',
     `gmt_create`         datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `gmt_modified`       datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-    `src_user`           text COMMENT 'source user',
+    `src_user`           text COMMENT 'source userBO',
     `src_ip`             varchar(50)           DEFAULT NULL COMMENT 'source ip',
     `tenant_id`          varchar(128)          DEFAULT '' COMMENT '租户字段',
     `encrypted_data_key` text         NOT NULL COMMENT '秘钥',
@@ -114,7 +114,7 @@ CREATE TABLE `config_info_tag`
     `md5`          varchar(32)           DEFAULT NULL COMMENT 'md5',
     `gmt_create`   datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `gmt_modified` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-    `src_user`     text COMMENT 'source user',
+    `src_user`     text COMMENT 'source userBO',
     `src_ip`       varchar(50)           DEFAULT NULL COMMENT 'source ip',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_configinfotag_datagrouptenanttag` (`data_id`, `group_id`, `tenant_id`, `tag_id`)
@@ -240,25 +240,25 @@ CREATE TABLE `users`
     `enabled`  boolean      NOT NULL
 );
 
-CREATE TABLE `roles`
+CREATE TABLE `roleBOS`
 (
     `username` varchar(50) NOT NULL,
-    `role`     varchar(50) NOT NULL,
-    UNIQUE INDEX `idx_user_role` (`username` ASC, `role` ASC) USING BTREE
+    `roleBO`     varchar(50) NOT NULL,
+    UNIQUE INDEX `idx_user_role` (`username` ASC, `roleBO` ASC) USING BTREE
 );
 
 CREATE TABLE `permissions`
 (
-    `role`     varchar(50)  NOT NULL,
+    `roleBO`     varchar(50)  NOT NULL,
     `resource` varchar(255) NOT NULL,
     `action`   varchar(8)   NOT NULL,
-    UNIQUE INDEX `uk_role_permission` (`role`, `resource`, `action`) USING BTREE
+    UNIQUE INDEX `uk_role_permission` (`roleBO`, `resource`, `action`) USING BTREE
 );
 
 INSERT INTO users (username, password, enabled)
 VALUES ('dc3', '$2a$10$wM3B4eTqtsbD0GQzPcSdnOVFCTY/eB1VTJqnLbQWq/Xk/PVyCz13i', TRUE);
 
-INSERT INTO roles (username, role)
+INSERT INTO roleBOS (username, roleBO)
 VALUES ('dc3', 'ROLE_ADMIN');
 
 INSERT INTO tenant_info (`id`, `kp`, `tenant_id`, `tenant_name`, `tenant_desc`, `create_source`, `gmt_create`,

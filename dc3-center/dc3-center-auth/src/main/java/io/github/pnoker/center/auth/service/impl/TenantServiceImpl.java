@@ -21,13 +21,13 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.TenantPageQuery;
+import io.github.pnoker.center.auth.entity.bo.TenantBO;
+import io.github.pnoker.center.auth.entity.query.TenantBOPageQuery;
 import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.Tenant;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,8 +48,8 @@ public class TenantServiceImpl implements TenantService {
     private TenantMapper tenantMapper;
 
     @Override
-    public void save(Tenant entityBO) {
-        Tenant select = selectByCode(entityBO.getTenantName());
+    public void save(TenantBO entityBO) {
+        TenantBO select = selectByCode(entityBO.getTenantName());
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The tenant already exists");
         }
@@ -61,8 +61,8 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public void remove(Long id) {
-        Tenant tenant = selectById(id);
-        if (ObjectUtil.isNull(tenant)) {
+        TenantBO tenantBO = selectById(id);
+        if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("The tenant does not exist");
         }
 
@@ -72,7 +72,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public void update(Tenant entityBO) {
+    public void update(TenantBO entityBO) {
         entityBO.setTenantName(null);
         entityBO.setOperateTime(null);
         if (tenantMapper.updateById(entityBO) < 1) {
@@ -81,31 +81,31 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Tenant selectById(Long id) {
+    public TenantBO selectById(Long id) {
         return null;
     }
 
     @Override
-    public Tenant selectByCode(String code) {
-        LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
-        queryWrapper.eq(Tenant::getTenantCode, code);
-        queryWrapper.eq(Tenant::getEnableFlag, EnableFlagEnum.ENABLE);
+    public TenantBO selectByCode(String code) {
+        LambdaQueryWrapper<TenantBO> queryWrapper = Wrappers.<TenantBO>query().lambda();
+        queryWrapper.eq(TenantBO::getTenantCode, code);
+        queryWrapper.eq(TenantBO::getEnableFlag, EnableFlagEnum.ENABLE);
         queryWrapper.last("limit 1");
         return tenantMapper.selectOne(queryWrapper);
     }
 
     @Override
-    public Page<Tenant> selectByPage(TenantPageQuery entityQuery) {
+    public Page<TenantBO> selectByPage(TenantBOPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         return tenantMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
-    private LambdaQueryWrapper<Tenant> fuzzyQuery(TenantPageQuery query) {
-        LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
+    private LambdaQueryWrapper<TenantBO> fuzzyQuery(TenantBOPageQuery query) {
+        LambdaQueryWrapper<TenantBO> queryWrapper = Wrappers.<TenantBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getTenantName()), Tenant::getTenantName, query.getTenantName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getTenantName()), TenantBO::getTenantName, query.getTenantName());
         }
         return queryWrapper;
     }

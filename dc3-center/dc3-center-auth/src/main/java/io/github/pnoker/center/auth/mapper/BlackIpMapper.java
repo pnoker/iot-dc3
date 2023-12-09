@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.model.BlackIp;
+import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -27,5 +27,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2022.1.0
  */
 @Mapper
-public interface BlackIpMapper extends BaseMapper<BlackIp> {
+public interface BlackIpMapper extends BaseMapper<BlackIpBO> {
 }

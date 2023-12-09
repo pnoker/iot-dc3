@@ -772,7 +772,7 @@ VALUES (1, 'pnoker', 1, 1, 1, '用户', 0, 'dc3', '2016-10-01 00:00:00', 0, 'dc3
 
 -- ----------------------------
 -- Records of dc3_user
--- user: dc3
+-- userBO: dc3
 -- password: dc3
 -- ----------------------------
 INSERT INTO dc3_user_password

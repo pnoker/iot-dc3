@@ -25,9 +25,9 @@ import io.github.pnoker.api.center.auth.TenantDTO;
 import io.github.pnoker.api.common.BaseDTO;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.RDTO;
+import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.Tenant;
 import io.github.pnoker.common.utils.BuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
     public void selectByCode(CodeQuery request, StreamObserver<RTenantDTO> responseObserver) {
         RTenantDTO.Builder builder = RTenantDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
-        Tenant select = tenantService.selectByCode(request.getCode());
+        TenantBO select = tenantService.selectByCode(request.getCode());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -77,7 +77,7 @@ public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
      * @param entityDO Tenant
      * @return TenantDTO
      */
-    private TenantDTO buildDTOByDO(Tenant entityDO) {
+    private TenantDTO buildDTOByDO(TenantBO entityDO) {
         TenantDTO.Builder builder = TenantDTO.newBuilder();
         BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);

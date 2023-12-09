@@ -19,6 +19,7 @@ package io.github.pnoker.center.auth.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
+import io.github.pnoker.center.auth.entity.bo.*;
 import io.github.pnoker.center.auth.service.*;
 import io.github.pnoker.common.entity.auth.Login;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -65,8 +66,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserLogin authenticateUser(Login login) {
-        Tenant tenant = tenantService.selectByCode(login.getTenant());
-        if (ObjectUtil.isNull(tenant)) {
+        TenantBO tenantBO = tenantService.selectByCode(login.getTenant());
+        if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("租户{}不存在", login.getTenant());
         }
 
@@ -77,25 +78,25 @@ public class AuthServiceImpl implements AuthService {
             throw new NotFoundException("用户{}不存在", login.getName());
         }
 
-        TenantBind tenantBind = tenantBindService.selectByTenantIdAndUserId(tenant.getId(), userLogin.getUserId());
-        if (ObjectUtil.isNull(tenantBind)) {
+        TenantBindBO tenantBindBO = tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
+        if (ObjectUtil.isNull(tenantBindBO)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
 
-        UserPassword userPassword = userPasswordService.selectById(userLogin.getUserPasswordId());
-        if (ObjectUtil.isNull(userPassword)) {
+        UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
+        if (ObjectUtil.isNull(userPasswordBO)) {
             throw new NotFoundException("密码不存在，请先设置密码");
         }
 
-        String saltValue = AuthUtil.getPasswordSalt(tenant.getId(), login.getName());
+        String saltValue = AuthUtil.getPasswordSalt(tenantBO.getId(), login.getName());
         if (CharSequenceUtil.isEmpty(saltValue)) {
             throw new NotFoundException("密码盐不存在，请重新登录");
         }
 
-        String decodedPassword = DecodeUtil.md5(userPassword.getLoginPassword() + saltValue);
+        String decodedPassword = DecodeUtil.md5(userPasswordBO.getLoginPassword() + saltValue);
         if (saltValue.equals(login.getSalt()) && decodedPassword.equals(login.getPassword())) {
             //create and save token
-            String token = AuthUtil.createToken(tenant.getId(), login.getName(), saltValue);
+            String token = AuthUtil.createToken(tenantBO.getId(), login.getName(), saltValue);
             login.setToken(token);
             return userLogin;
         }
@@ -116,27 +117,27 @@ public class AuthServiceImpl implements AuthService {
         AuthUser authUser = new AuthUser();
         authUser.setUserId(userLogin.getUserId());
         authUser.setUserName(userLogin.getLoginName());
-        Tenant tenant = tenantService.selectByCode(login.getTenant());
-        authUser.setTenantId(tenant.getId());
+        TenantBO tenantBO = tenantService.selectByCode(login.getTenant());
+        authUser.setTenantId(tenantBO.getId());
 
         //2.1 roles
-        List<Role> roles = roleUserBindService.listRoleByTenantIdAndUserId(tenant.getId(), userLogin.getUserId());
-        if (CollUtil.isEmpty(roles)) {
+        List<RoleBO> roleBOS = roleUserBindService.listRoleByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
+        if (CollUtil.isEmpty(roleBOS)) {
             throw new ServiceException("请先为用户{}分配角色", login.getName());
         }
-        Set<String> roleCodeSet = roles.stream().map(Role::getRoleCode).collect(Collectors.toSet());
+        Set<String> roleCodeSet = roleBOS.stream().map(RoleBO::getRoleCode).collect(Collectors.toSet());
         authUser.setRoleCodeSet(roleCodeSet);
 
         //2.2 resources
-        Set<io.github.pnoker.common.model.Resource> resourceSet = new HashSet<>();
-        for (Role role : roles) {
-            List<io.github.pnoker.common.model.Resource> resources = roleResourceBindService.listResourceByRoleId(role.getId());
-            resourceSet.addAll(resources);
+        Set<ResourceBO> resourceBOSet = new HashSet<>();
+        for (RoleBO roleBO : roleBOS) {
+            List<ResourceBO> resourceBOS = roleResourceBindService.listResourceByRoleId(roleBO.getId());
+            resourceBOSet.addAll(resourceBOS);
         }
-        if (CollUtil.isEmpty(resourceSet)) {
+        if (CollUtil.isEmpty(resourceBOSet)) {
             throw new ServiceException("请先为用户{}分配权限", login.getName());
         }
-        Set<String> resourceCodeSet = resourceSet.stream().map(io.github.pnoker.common.model.Resource::getResourceCode).collect(Collectors.toSet());
+        Set<String> resourceCodeSet = resourceBOSet.stream().map(ResourceBO::getResourceCode).collect(Collectors.toSet());
         authUser.setResourceCodeSet(resourceCodeSet);
 
         AuthUtil.saveTokenToAuthUserMap(login.getToken(), authUser);

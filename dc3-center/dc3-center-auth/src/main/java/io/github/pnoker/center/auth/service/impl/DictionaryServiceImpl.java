@@ -23,9 +23,9 @@ import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.mapper.UserLoginMapper;
 import io.github.pnoker.center.auth.service.DictionaryService;
 import io.github.pnoker.common.entity.common.Dictionary;
-import io.github.pnoker.common.model.BlackIp;
-import io.github.pnoker.common.model.Tenant;
-import io.github.pnoker.common.model.UserLogin;
+import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
+import io.github.pnoker.center.auth.entity.bo.TenantBO;
+import io.github.pnoker.center.auth.entity.bo.UserLogin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -51,12 +51,12 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public List<Dictionary> tenantDictionary() {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<Tenant> queryWrapper = Wrappers.<Tenant>query().lambda();
-        List<Tenant> tenantList = tenantMapper.selectList(queryWrapper);
-        for (Tenant tenant : tenantList) {
+        LambdaQueryWrapper<TenantBO> queryWrapper = Wrappers.<TenantBO>query().lambda();
+        List<TenantBO> tenantBOList = tenantMapper.selectList(queryWrapper);
+        for (TenantBO tenantBO : tenantBOList) {
             Dictionary driverDictionary = new Dictionary();
-            driverDictionary.setLabel(tenant.getTenantName());
-            driverDictionary.setValue(tenant.getId().toString());
+            driverDictionary.setLabel(tenantBO.getTenantName());
+            driverDictionary.setValue(tenantBO.getId().toString());
             dictionaryList.add(driverDictionary);
         }
         return dictionaryList;
@@ -79,12 +79,12 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public List<Dictionary> blackIpDictionary(Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
-        List<BlackIp> blackIpList = blackIpMapper.selectList(queryWrapper);
-        for (BlackIp blackIp : blackIpList) {
+        LambdaQueryWrapper<BlackIpBO> queryWrapper = Wrappers.<BlackIpBO>query().lambda();
+        List<BlackIpBO> blackIpBOList = blackIpMapper.selectList(queryWrapper);
+        for (BlackIpBO blackIpBO : blackIpBOList) {
             Dictionary driverDictionary = new Dictionary();
-            driverDictionary.setLabel(blackIp.getIp());
-            driverDictionary.setValue(blackIp.getId().toString());
+            driverDictionary.setLabel(blackIpBO.getIp());
+            driverDictionary.setValue(blackIpBO.getId().toString());
             dictionaryList.add(driverDictionary);
         }
         return dictionaryList;

@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.model.TenantBind;
+import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -27,5 +27,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2022.1.0
  */
 @Mapper
-public interface TenantBindMapper extends BaseMapper<TenantBind> {
+public interface TenantBindMapper extends BaseMapper<TenantBindBO> {
 }

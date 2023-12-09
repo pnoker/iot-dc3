@@ -16,13 +16,12 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.TenantBind;
+import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
 import lombok.*;
 
 /**
- * TenantBind DTO
+ * UserPassword DTO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -32,8 +31,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class TenantBindPageQuery extends TenantBind {
+public class UserPasswordBOPageQuery extends UserPasswordBO {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 }

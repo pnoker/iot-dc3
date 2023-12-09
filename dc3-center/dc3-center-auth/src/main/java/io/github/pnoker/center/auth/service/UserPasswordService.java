@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.query.UserPasswordPageQuery;
+import io.github.pnoker.center.auth.entity.query.UserPasswordBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.UserPassword;
+import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
 
 /**
  * UserPassword Interface
@@ -26,7 +26,7 @@ import io.github.pnoker.common.model.UserPassword;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface UserPasswordService extends Service<UserPassword, UserPasswordPageQuery> {
+public interface UserPasswordService extends Service<UserPasswordBO, UserPasswordBOPageQuery> {
 
     /**
      * 重置密码

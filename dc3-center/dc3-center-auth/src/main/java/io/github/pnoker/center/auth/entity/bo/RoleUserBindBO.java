@@ -14,24 +14,40 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.query;
+package io.github.pnoker.center.auth.entity.bo;
 
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.UserPassword;
+import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Update;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+
+import javax.validation.constraints.NotBlank;
 
 /**
- * UserPassword DTO
+ * RoleUserBind BO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
+@RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class UserPasswordPageQuery extends UserPassword {
+public class RoleUserBindBO extends BaseBO {
 
-    private Pages page;
+    /**
+     * 角色ID
+     */
+    @NotBlank(message = "Role id can't be empty",
+            groups = {Insert.class, Update.class})
+    private String roleId;
+
+    /**
+     * 用户ID
+     */
+    @NotBlank(message = "User id can't be empty",
+            groups = {Insert.class, Update.class})
+    private Long userId;
 }

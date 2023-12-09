@@ -22,7 +22,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.RoleUserBindPageQuery;
+import io.github.pnoker.center.auth.entity.query.RoleUserBindBOPageQuery;
 import io.github.pnoker.center.auth.mapper.RoleMapper;
 import io.github.pnoker.center.auth.mapper.RoleUserBindMapper;
 import io.github.pnoker.center.auth.service.RoleUserBindService;
@@ -31,8 +31,8 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.UpdateException;
-import io.github.pnoker.common.model.Role;
-import io.github.pnoker.common.model.RoleUserBind;
+import io.github.pnoker.center.auth.entity.bo.RoleBO;
+import io.github.pnoker.center.auth.entity.bo.RoleUserBindBO;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -57,12 +57,12 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
 
     @Override
-    public RoleUserBind selectById(Long id) {
+    public RoleUserBindBO selectById(Long id) {
         return null;
     }
 
     @Override
-    public Page<RoleUserBind> selectByPage(RoleUserBindPageQuery entityQuery) {
+    public Page<RoleUserBindBO> selectByPage(RoleUserBindBOPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
@@ -70,7 +70,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     }
 
     @Override
-    public void save(RoleUserBind entityBO) {
+    public void save(RoleUserBindBO entityBO) {
         //todo check if exists
         if (roleUserBindMapper.insert(entityBO) < 1) {
             throw new AddException("The role user bind add failed");
@@ -78,7 +78,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     }
 
     @Override
-    public void update(RoleUserBind entityBO) {
+    public void update(RoleUserBindBO entityBO) {
         selectById(entityBO.getId());
         if (roleUserBindMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The role user bind update failed");
@@ -94,25 +94,25 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     }
 
     @Override
-    public List<Role> listRoleByTenantIdAndUserId(Long tenantId, Long userId) {
-        LambdaQueryWrapper<RoleUserBind> queryWrapper = Wrappers.<RoleUserBind>query().lambda();
-        queryWrapper.eq(RoleUserBind::getUserId, userId);
-        List<RoleUserBind> roleUserBinds = roleUserBindMapper.selectList(queryWrapper);
-        if (CollUtil.isNotEmpty(roleUserBinds)) {
-            List<Role> roles = roleMapper.selectBatchIds(roleUserBinds.stream().map(RoleUserBind::getRoleId)
+    public List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId) {
+        LambdaQueryWrapper<RoleUserBindBO> queryWrapper = Wrappers.<RoleUserBindBO>query().lambda();
+        queryWrapper.eq(RoleUserBindBO::getUserId, userId);
+        List<RoleUserBindBO> roleUserBindBOS = roleUserBindMapper.selectList(queryWrapper);
+        if (CollUtil.isNotEmpty(roleUserBindBOS)) {
+            List<RoleBO> roleBOS = roleMapper.selectBatchIds(roleUserBindBOS.stream().map(RoleUserBindBO::getRoleId)
                     .collect(Collectors.toList()));
-            return roles.stream().filter(e -> EnableFlagEnum.ENABLE.equals(e.getEnableFlag()) && tenantId.equals(e.getTenantId()))
+            return roleBOS.stream().filter(e -> EnableFlagEnum.ENABLE.equals(e.getEnableFlag()) && tenantId.equals(e.getTenantId()))
                     .collect(Collectors.toList());
         }
 
         return null;
     }
 
-    public LambdaQueryWrapper<RoleUserBind> buildQueryWrapper(RoleUserBindPageQuery pageQuery) {
-        LambdaQueryWrapper<RoleUserBind> queryWrapper = Wrappers.<RoleUserBind>query().lambda();
+    public LambdaQueryWrapper<RoleUserBindBO> buildQueryWrapper(RoleUserBindBOPageQuery pageQuery) {
+        LambdaQueryWrapper<RoleUserBindBO> queryWrapper = Wrappers.<RoleUserBindBO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getUserId()), RoleUserBind::getUserId, pageQuery.getUserId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleUserBind::getRoleId, pageQuery.getRoleId());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getUserId()), RoleUserBindBO::getUserId, pageQuery.getUserId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleUserBindBO::getRoleId, pageQuery.getRoleId());
         }
         return queryWrapper;
     }
