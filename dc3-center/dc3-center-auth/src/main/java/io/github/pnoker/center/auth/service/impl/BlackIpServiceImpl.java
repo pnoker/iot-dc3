@@ -21,13 +21,13 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.BlackIpPageQuery;
+import io.github.pnoker.center.auth.entity.query.BlackIpBOPageQuery;
 import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.BlackIp;
+import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,8 +48,8 @@ public class BlackIpServiceImpl implements BlackIpService {
     private BlackIpMapper blackIpMapper;
 
     @Override
-    public void save(BlackIp entityBO) {
-        BlackIp select = selectByIp(entityBO.getIp());
+    public void save(BlackIpBO entityBO) {
+        BlackIpBO select = selectByIp(entityBO.getIp());
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The ip already exists in the blacklist");
         }
@@ -61,8 +61,8 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public void remove(Long id) {
-        BlackIp blackIp = selectById(id);
-        if (ObjectUtil.isNull(blackIp)) {
+        BlackIpBO blackIpBO = selectById(id);
+        if (ObjectUtil.isNull(blackIpBO)) {
             throw new NotFoundException("The ip does not exist in the blacklist");
         }
 
@@ -72,7 +72,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public void update(BlackIp entityBO) {
+    public void update(BlackIpBO entityBO) {
         entityBO.setIp(null);
         entityBO.setOperateTime(null);
         if (blackIpMapper.updateById(entityBO) < 1) {
@@ -81,21 +81,21 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public BlackIp selectById(Long id) {
+    public BlackIpBO selectById(Long id) {
         return null;
     }
 
     @Override
-    public BlackIp selectByIp(String ip) {
-        LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
-        queryWrapper.eq(BlackIp::getIp, ip);
-        queryWrapper.eq(BlackIp::getEnableFlag, EnableFlagEnum.ENABLE);
+    public BlackIpBO selectByIp(String ip) {
+        LambdaQueryWrapper<BlackIpBO> queryWrapper = Wrappers.<BlackIpBO>query().lambda();
+        queryWrapper.eq(BlackIpBO::getIp, ip);
+        queryWrapper.eq(BlackIpBO::getEnableFlag, EnableFlagEnum.ENABLE);
         queryWrapper.last("limit 1");
         return blackIpMapper.selectOne(queryWrapper);
     }
 
     @Override
-    public Page<BlackIp> selectByPage(BlackIpPageQuery entityQuery) {
+    public Page<BlackIpBO> selectByPage(BlackIpBOPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
@@ -104,14 +104,14 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public Boolean checkBlackIpValid(String ip) {
-        BlackIp blackIp = selectByIp(ip);
-        return ObjectUtil.isNotNull(blackIp);
+        BlackIpBO blackIpBO = selectByIp(ip);
+        return ObjectUtil.isNotNull(blackIpBO);
     }
 
-    private LambdaQueryWrapper<BlackIp> fuzzyQuery(BlackIpPageQuery query) {
-        LambdaQueryWrapper<BlackIp> queryWrapper = Wrappers.<BlackIp>query().lambda();
+    private LambdaQueryWrapper<BlackIpBO> fuzzyQuery(BlackIpBOPageQuery query) {
+        LambdaQueryWrapper<BlackIpBO> queryWrapper = Wrappers.<BlackIpBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getIp()), BlackIp::getIp, query.getIp());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getIp()), BlackIpBO::getIp, query.getIp());
         }
         return queryWrapper;
     }

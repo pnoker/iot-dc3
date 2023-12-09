@@ -48,38 +48,38 @@ public class PointAttributeConfigVO extends BaseVO {
 
     /**
      * 位号属性ID
-     */
+     */@Schema(description = "位号属性ID")
     @NotBlank(message = "位号属性ID不能为空",
             groups = {Insert.class, Update.class})
     private Long pointAttributeId;
 
     /**
      * 位号属性配置值
-     */
+     */@Schema(description = "位号属性配置值")
     @NotNull(message = "位号属性配置值不能为空")
     private String configValue;
 
     /**
      * 设备ID
-     */
+     */@Schema(description = "设备ID")
     @NotBlank(message = "设备ID不能为空",
             groups = {Insert.class, Update.class})
     private Long deviceId;
 
     /**
      * 位号ID
-     */
+     */@Schema(description = "位号ID")
     @NotBlank(message = "位号ID不能为空",
             groups = {Insert.class, Update.class})
     private Long pointId;
 
     /**
      * 使能标识
-     */
+     */@Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
      * 租户ID
-     */
+     */@Schema(description = "租户ID")
     private Long tenantId;
 }

@@ -19,6 +19,7 @@ package io.github.pnoker.center.auth.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * User
+ * UserLogin VO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -37,25 +38,30 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(title = "UserLogin", description = "登录")
 public class UserLoginVO extends BaseVO {
 
     /**
      * 登录名称
      */
+    @Schema(description = "登录名称")
     private String loginName;
 
     /**
      * 用户ID
      */
+    @Schema(description = "用户ID")
     private Long userId;
 
     /**
      * 用户密码ID
      */
+    @Schema(description = "用户密码ID")
     private String userPasswordId;
 
     /**
      * 使能标识
      */
+    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

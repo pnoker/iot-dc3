@@ -50,7 +50,7 @@ public class PointAttributeVO extends BaseVO {
 
     /**
      * 显示名称
-     */
+     */@Schema(description = "显示名称")
     @NotBlank(message = "显示名称不能为空",
             groups = {Insert.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
@@ -60,7 +60,7 @@ public class PointAttributeVO extends BaseVO {
 
     /**
      * 属性名称
-     */
+     */@Schema(description = "属性名称")
     @NotBlank(message = "属性名称不能为空",
             groups = {Insert.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
@@ -70,28 +70,28 @@ public class PointAttributeVO extends BaseVO {
 
     /**
      * 属性类型标识
-     */
+     */@Schema(description = "属性类型标识")
     private AttributeTypeFlagEnum attributeTypeFlag;
 
     /**
      * 默认值
-     */
+     */@Schema(description = "默认值")
     private String defaultValue;
 
     /**
      * 驱动ID
-     */
+     */@Schema(description = "驱动ID")
     @NotNull(message = "驱动ID不能为空"
             , groups = {Insert.class, Update.class})
     private Long driverId;
 
     /**
      * 使能标识
-     */
+     */@Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
      * 租户ID
-     */
+     */@Schema(description = "租户ID")
     private Long tenantId;
 }

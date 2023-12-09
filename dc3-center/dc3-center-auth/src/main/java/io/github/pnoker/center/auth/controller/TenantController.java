@@ -18,13 +18,13 @@ package io.github.pnoker.center.auth.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.TenantPageQuery;
+import io.github.pnoker.center.auth.entity.bo.TenantBO;
+import io.github.pnoker.center.auth.entity.query.TenantBOPageQuery;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.Tenant;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -51,13 +51,13 @@ public class TenantController implements Controller {
     /**
      * 新增租户
      *
-     * @param tenant 租户
-     * @return {@link Tenant}
+     * @param tenantBO 租户
+     * @return {@link TenantBO}
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Tenant tenant) {
+    public R<String> add(@Validated(Insert.class) @RequestBody TenantBO tenantBO) {
         try {
-            tenantService.save(tenant);
+            tenantService.save(tenantBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -87,14 +87,14 @@ public class TenantController implements Controller {
      * <li>不支持更新: Name</li>
      * </ol>
      *
-     * @param tenant Tenant
-     * @return {@link Tenant}
+     * @param tenantBO Tenant
+     * @return {@link TenantBO}
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Tenant tenant) {
+    public R<String> update(@Validated(Update.class) @RequestBody TenantBO tenantBO) {
         try {
-            tenant.setTenantName(null);
-            tenantService.update(tenant);
+            tenantBO.setTenantName(null);
+            tenantService.update(tenantBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -105,12 +105,12 @@ public class TenantController implements Controller {
      * 根据 ID 查询租户
      *
      * @param id 租户ID
-     * @return {@link Tenant}
+     * @return {@link TenantBO}
      */
     @GetMapping("/id/{id}")
-    public R<Tenant> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<TenantBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Tenant select = tenantService.selectById(Long.parseLong(id));
+            TenantBO select = tenantService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -124,12 +124,12 @@ public class TenantController implements Controller {
      * 根据 Code 查询租户
      *
      * @param code 租户Code
-     * @return {@link Tenant}
+     * @return {@link TenantBO}
      */
     @GetMapping("/code/{code}")
-    public R<Tenant> selectByCode(@NotNull @PathVariable(value = "code") String code) {
+    public R<TenantBO> selectByCode(@NotNull @PathVariable(value = "code") String code) {
         try {
-            Tenant select = tenantService.selectByCode(code);
+            TenantBO select = tenantService.selectByCode(code);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -143,15 +143,15 @@ public class TenantController implements Controller {
      * 分页查询租户
      *
      * @param tenantPageQuery 租户和分页参数
-     * @return 带分页的 {@link Tenant}
+     * @return 带分页的 {@link TenantBO}
      */
     @PostMapping("/list")
-    public R<Page<Tenant>> list(@RequestBody(required = false) TenantPageQuery tenantPageQuery) {
+    public R<Page<TenantBO>> list(@RequestBody(required = false) TenantBOPageQuery tenantPageQuery) {
         try {
             if (ObjectUtil.isEmpty(tenantPageQuery)) {
-                tenantPageQuery = new TenantPageQuery();
+                tenantPageQuery = new TenantBOPageQuery();
             }
-            Page<Tenant> page = tenantService.selectByPage(tenantPageQuery);
+            Page<TenantBO> page = tenantService.selectByPage(tenantPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

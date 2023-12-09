@@ -18,11 +18,13 @@ package io.github.pnoker.center.auth.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.RoleUserBind;
+import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
 import lombok.*;
 
 /**
- * @author linys
+ * BlackIp DTO
+ *
+ * @author pnoker
  * @since 2022.1.0
  */
 @Data
@@ -30,7 +32,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class RoleUserBindPageQuery extends RoleUserBind {
+public class BlackIpBOPageQuery extends BlackIpBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

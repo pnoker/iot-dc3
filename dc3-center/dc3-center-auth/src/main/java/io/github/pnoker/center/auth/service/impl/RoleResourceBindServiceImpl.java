@@ -22,7 +22,8 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.RoleResourceBindPageQuery;
+import io.github.pnoker.center.auth.entity.bo.ResourceBO;
+import io.github.pnoker.center.auth.entity.query.RoleResourceBindBOPageQuery;
 import io.github.pnoker.center.auth.mapper.ResourceMapper;
 import io.github.pnoker.center.auth.mapper.RoleResourceBindMapper;
 import io.github.pnoker.center.auth.service.RoleResourceBindService;
@@ -31,7 +32,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.UpdateException;
-import io.github.pnoker.common.model.RoleResourceBind;
+import io.github.pnoker.center.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     private ResourceMapper resourceMapper;
 
     @Override
-    public void save(RoleResourceBind entityBO) {
+    public void save(RoleResourceBindBO entityBO) {
         //todo check if exists
         if (bindMapper.insert(entityBO) < 1) {
             throw new AddException("The tenant bind add failed");
@@ -71,7 +72,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public void update(RoleResourceBind entityBO) {
+    public void update(RoleResourceBindBO entityBO) {
         selectById(entityBO.getId());
         if (bindMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The role resource bind update failed");
@@ -79,12 +80,12 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public RoleResourceBind selectById(Long id) {
+    public RoleResourceBindBO selectById(Long id) {
         return null;
     }
 
     @Override
-    public Page<RoleResourceBind> selectByPage(RoleResourceBindPageQuery entityQuery) {
+    public Page<RoleResourceBindBO> selectByPage(RoleResourceBindBOPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
@@ -92,25 +93,25 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public List<io.github.pnoker.common.model.Resource> listResourceByRoleId(Long RoleId) {
-        LambdaQueryWrapper<RoleResourceBind> queryWrapper = Wrappers.<RoleResourceBind>query().lambda();
-        queryWrapper.eq(RoleResourceBind::getRoleId, RoleId);
-        List<RoleResourceBind> roleResourceBinds = bindMapper.selectList(queryWrapper);
-        if (CollUtil.isNotEmpty(roleResourceBinds)) {
-            List<io.github.pnoker.common.model.Resource> resources = resourceMapper.selectBatchIds(roleResourceBinds.stream()
-                    .map(RoleResourceBind::getResourceId).collect(Collectors.toList()));
-            return resources.stream().filter(e -> EnableFlagEnum.ENABLE.equals(e.getEnableFlag()))
+    public List<ResourceBO> listResourceByRoleId(Long RoleId) {
+        LambdaQueryWrapper<RoleResourceBindBO> queryWrapper = Wrappers.<RoleResourceBindBO>query().lambda();
+        queryWrapper.eq(RoleResourceBindBO::getRoleId, RoleId);
+        List<RoleResourceBindBO> roleResourceBindBOS = bindMapper.selectList(queryWrapper);
+        if (CollUtil.isNotEmpty(roleResourceBindBOS)) {
+            List<ResourceBO> resourceBOS = resourceMapper.selectBatchIds(roleResourceBindBOS.stream()
+                    .map(RoleResourceBindBO::getResourceId).collect(Collectors.toList()));
+            return resourceBOS.stream().filter(e -> EnableFlagEnum.ENABLE.equals(e.getEnableFlag()))
                     .collect(Collectors.toList());
         }
 
         return null;
     }
 
-    private LambdaQueryWrapper<RoleResourceBind> buildQueryWrapper(RoleResourceBindPageQuery pageQuery) {
-        LambdaQueryWrapper<RoleResourceBind> queryWrapper = Wrappers.<RoleResourceBind>query().lambda();
+    private LambdaQueryWrapper<RoleResourceBindBO> buildQueryWrapper(RoleResourceBindBOPageQuery pageQuery) {
+        LambdaQueryWrapper<RoleResourceBindBO> queryWrapper = Wrappers.<RoleResourceBindBO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleResourceBind::getResourceId, pageQuery.getRoleId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceId()), RoleResourceBind::getResourceId, pageQuery.getResourceId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleResourceBindBO::getResourceId, pageQuery.getRoleId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceId()), RoleResourceBindBO::getResourceId, pageQuery.getResourceId());
         }
         return queryWrapper;
     }

@@ -17,8 +17,8 @@
 package io.github.pnoker.center.auth.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.Resource;
 import lombok.*;
 
 /**
@@ -30,7 +30,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ResourcePageQuery extends Resource {
+public class ResourceBOPageQuery extends ResourceBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

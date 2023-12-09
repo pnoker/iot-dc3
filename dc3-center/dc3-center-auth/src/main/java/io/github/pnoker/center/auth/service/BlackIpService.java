@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.query.BlackIpPageQuery;
+import io.github.pnoker.center.auth.entity.query.BlackIpBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.BlackIp;
+import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
 
 /**
  * User Interface
@@ -26,14 +26,14 @@ import io.github.pnoker.common.model.BlackIp;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface BlackIpService extends Service<BlackIp, BlackIpPageQuery> {
+public interface BlackIpService extends Service<BlackIpBO, BlackIpBOPageQuery> {
     /**
      * 根据 Ip 查询 BlackIp
      *
      * @param ip IP
      * @return BlackIp
      */
-    BlackIp selectByIp(String ip);
+    BlackIpBO selectByIp(String ip);
 
     /**
      * 根据 Ip 是否在Ip黑名单列表

@@ -20,7 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.UserPasswordPageQuery;
+import io.github.pnoker.center.auth.entity.query.UserPasswordBOPageQuery;
 import io.github.pnoker.center.auth.mapper.UserPasswordMapper;
 import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
@@ -29,7 +29,7 @@ import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
-import io.github.pnoker.common.model.UserPassword;
+import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +53,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     @Transactional
-    public void save(UserPassword entityBO) {
+    public void save(UserPasswordBO entityBO) {
         entityBO.setLoginPassword(DecodeUtil.md5(entityBO.getLoginPassword()));
         // 插入 userPassword 数据，并返回插入后的 userPassword
         if (userPasswordMapper.insert(entityBO) < 1) {
@@ -64,8 +64,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     @Override
     @Transactional
     public void remove(Long id) {
-        UserPassword userPassword = selectById(id);
-        if (ObjectUtil.isNull(userPassword)) {
+        UserPasswordBO userPasswordBO = selectById(id);
+        if (ObjectUtil.isNull(userPasswordBO)) {
             throw new NotFoundException("The user password does not exist");
         }
 
@@ -75,8 +75,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public void update(UserPassword entityBO) {
-        UserPassword selectById = selectById(entityBO.getId());
+    public void update(UserPasswordBO entityBO) {
+        UserPasswordBO selectById = selectById(entityBO.getId());
         if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException();
         }
@@ -88,12 +88,12 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public UserPassword selectById(Long id) {
+    public UserPasswordBO selectById(Long id) {
         return null;
     }
 
     @Override
-    public Page<UserPassword> selectByPage(UserPasswordPageQuery entityQuery) {
+    public Page<UserPasswordBO> selectByPage(UserPasswordBOPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
@@ -102,15 +102,15 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     public void restPassword(Long id) {
-        UserPassword userPassword = selectById(id);
-        if (ObjectUtil.isNotNull(userPassword)) {
-            userPassword.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
-            update(userPassword);
+        UserPasswordBO userPasswordBO = selectById(id);
+        if (ObjectUtil.isNotNull(userPasswordBO)) {
+            userPasswordBO.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
+            update(userPasswordBO);
         }
     }
 
-    private LambdaQueryWrapper<UserPassword> fuzzyQuery(UserPasswordPageQuery query) {
-        return Wrappers.<UserPassword>query().lambda();
+    private LambdaQueryWrapper<UserPasswordBO> fuzzyQuery(UserPasswordBOPageQuery query) {
+        return Wrappers.<UserPasswordBO>query().lambda();
     }
 
 }

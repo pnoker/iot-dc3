@@ -14,26 +14,35 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.query;
+package io.github.pnoker.center.auth.entity.bo.ext;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.BlackIp;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+import java.io.Serializable;
 
 /**
- * BlackIp DTO
+ * Api BO
+ * ApiExt BO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class BlackIpPageQuery extends BlackIp {
+@Builder
+@RequiredArgsConstructor
+public class ApiExtBO implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
+    /**
+     * Api接口编号，一般为URL的MD5编码
+     */
+    private String title;
+
+    /**
+     * Api接口拓展信息
+     */
+    private String url;
+
 }

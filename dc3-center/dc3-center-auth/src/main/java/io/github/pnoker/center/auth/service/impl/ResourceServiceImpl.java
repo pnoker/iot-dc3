@@ -21,14 +21,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.ResourcePageQuery;
+import io.github.pnoker.center.auth.entity.bo.ResourceBO;
+import io.github.pnoker.center.auth.entity.query.ResourceBOPageQuery;
 import io.github.pnoker.center.auth.mapper.ResourceMapper;
 import io.github.pnoker.center.auth.service.ResourceService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.UpdateException;
-import io.github.pnoker.common.model.Resource;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 
     @Override
-    public void save(Resource entityBO) {
+    public void save(ResourceBO entityBO) {
         //todo check if exists
         if (resourceMapper.insert(entityBO) < 1) {
             throw new AddException("The resource add failed");
@@ -62,7 +62,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public void update(Resource entityBO) {
+    public void update(ResourceBO entityBO) {
         selectById(entityBO.getId());
         if (resourceMapper.updateById(entityBO) < 1) {
             throw new UpdateException("The resource update failed");
@@ -70,27 +70,27 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public Resource selectById(Long id) {
+    public ResourceBO selectById(Long id) {
         return null;
     }
 
     @Override
-    public Page<Resource> selectByPage(ResourcePageQuery entityQuery) {
+    public Page<ResourceBO> selectByPage(ResourceBOPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         return resourceMapper.selectPage(PageUtil.page(entityQuery.getPage()), buildQueryWrapper(entityQuery));
     }
 
-    private LambdaQueryWrapper<Resource> buildQueryWrapper(ResourcePageQuery pageQuery) {
-        LambdaQueryWrapper<Resource> queryWrapper = Wrappers.<Resource>query().lambda();
+    private LambdaQueryWrapper<ResourceBO> buildQueryWrapper(ResourceBOPageQuery pageQuery) {
+        LambdaQueryWrapper<ResourceBO> queryWrapper = Wrappers.<ResourceBO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getTenantId()), Resource::getTenantId, pageQuery.getTenantId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getParentResourceId()), Resource::getParentResourceId, pageQuery.getParentResourceId());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(pageQuery.getResourceName()), Resource::getResourceName, pageQuery.getResourceName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceCode()), Resource::getResourceCode, pageQuery.getResourceCode());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getResourceTypeFlag()), Resource::getResourceTypeFlag, pageQuery.getResourceTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getEnableFlag()), Resource::getEnableFlag, pageQuery.getEnableFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getTenantId()), ResourceBO::getTenantId, pageQuery.getTenantId());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getParentResourceId()), ResourceBO::getParentResourceId, pageQuery.getParentResourceId());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(pageQuery.getResourceName()), ResourceBO::getResourceName, pageQuery.getResourceName());
+            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceCode()), ResourceBO::getResourceCode, pageQuery.getResourceCode());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getResourceTypeFlag()), ResourceBO::getResourceTypeFlag, pageQuery.getResourceTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getEnableFlag()), ResourceBO::getEnableFlag, pageQuery.getEnableFlag());
 
         }
         return queryWrapper;

@@ -25,7 +25,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * User
+ * UserLogin BO
  *
  * @author pnoker
  * @since 2022.1.0

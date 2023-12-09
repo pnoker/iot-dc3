@@ -16,16 +16,17 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
-import io.github.pnoker.center.auth.entity.vo.UserLoginVO;
-import io.github.pnoker.common.model.UserLogin;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.bo.UserLoginBO;
+import io.github.pnoker.center.manager.entity.model.UserLoginDO;
+import io.github.pnoker.center.manager.entity.vo.UserLoginVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
 /**
- * User Builder
+ * UserLogin Builder
  *
  * @author pnoker
  * @since 2022.1.0
@@ -56,7 +57,7 @@ public interface UserLoginBuilder {
      * @return EntityDO
      */
     @Mapping(target = "deleted", ignore = true)
-    UserLogin buildDOByBO(UserLoginBO entityBO);
+    UserLoginDO buildDOByBO(UserLoginBO entityBO);
 
     /**
      * BOList to DOList
@@ -64,7 +65,7 @@ public interface UserLoginBuilder {
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
      */
-    List<UserLogin> buildDOListByBOList(List<UserLoginBO> entityBOList);
+    List<UserLoginDO> buildDOListByBOList(List<UserLoginBO> entityBOList);
 
     /**
      * DO to BO
@@ -72,7 +73,7 @@ public interface UserLoginBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
-    UserLoginBO buildBOByDO(UserLogin entityDO);
+    UserLoginBO buildBOByDO(UserLoginDO entityDO);
 
     /**
      * DOList to BOList
@@ -80,7 +81,7 @@ public interface UserLoginBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<UserLoginBO> buildBOByDO(List<UserLogin> entityDOList);
+    List<UserLoginBO> buildBOByDO(List<UserLoginDO> entityDOList);
 
     /**
      * BO to VO
@@ -97,4 +98,22 @@ public interface UserLoginBuilder {
      * @return EntityVO Array
      */
     List<UserLoginVO> buildVOListByBOList(List<UserLoginBO> entityBOList);
+
+    /**
+     * DOPage to BOPage
+     *
+     * @param entityPageDO EntityDO Page
+     * @return EntityBO Page
+     */
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<UserLoginBO> buildBOPageByDOPage(Page<UserLoginDO> entityPageDO);
+
+    /**
+     * BOPage to VOPage
+     *
+     * @param entityPageBO EntityBO Page
+     * @return EntityVO Page
+     */
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<UserLoginVO> buildVOPageByBOPage(Page<UserLoginBO> entityPageBO);
 }

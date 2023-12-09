@@ -14,24 +14,39 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.query;
+package io.github.pnoker.center.auth.entity.vo.ext;
 
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.Tenant;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+import java.io.Serializable;
 
 /**
- * User DTO
+ * Menu VO
+ * MenuExt VO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class TenantPageQuery extends Tenant {
+@Builder
+@RequiredArgsConstructor
+public class MenuExtVO implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private Pages page;
+    /**
+     * 菜单
+     */
+    private String icon;
+
+    /**
+     * Api接口编号，一般为URL的MD5编码
+     */
+    private String title;
+
+    /**
+     * Api接口拓展信息
+     */
+    private String url;
 }

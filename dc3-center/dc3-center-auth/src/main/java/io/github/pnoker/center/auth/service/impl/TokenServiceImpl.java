@@ -21,6 +21,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
 import io.github.pnoker.center.auth.entity.bean.UserLimit;
+import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.service.*;
 import io.github.pnoker.common.constant.cache.TimeoutConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
@@ -28,10 +29,9 @@ import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Tenant;
-import io.github.pnoker.common.model.TenantBind;
-import io.github.pnoker.common.model.UserLogin;
-import io.github.pnoker.common.model.UserPassword;
+import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
+import io.github.pnoker.center.auth.entity.bo.UserLogin;
+import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
 import io.github.pnoker.common.utils.RedisUtil;
@@ -70,11 +70,11 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateSalt(String userName, String tenantName) {
-        Tenant tenant = tenantService.selectByCode(tenantName);
-        if (ObjectUtil.isNull(tenant)) {
+        TenantBO tenantBO = tenantService.selectByCode(tenantName);
+        if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
+        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantBO.getId();
         String salt = redisUtil.getKey(redisSaltKey);
         if (CharSequenceUtil.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
@@ -85,46 +85,46 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateToken(String userName, String salt, String password, String tenantName) {
-        Tenant tenant = tenantService.selectByCode(tenantName);
-        if (ObjectUtil.isNull(tenant)) {
+        TenantBO tenantBO = tenantService.selectByCode(tenantName);
+        if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        checkUserLimit(userName, tenant.getId());
+        checkUserLimit(userName, tenantBO.getId());
         UserLogin userLogin = userLoginService.selectByLoginName(userName, false);
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        TenantBind tenantBind = tenantBindService.selectByTenantIdAndUserId(tenant.getId(), userLogin.getUserId());
-        if (ObjectUtil.isNull(tenantBind)) {
+        TenantBindBO tenantBindBO = tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
+        if (ObjectUtil.isNull(tenantBindBO)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        UserPassword userPassword = userPasswordService.selectById(userLogin.getUserPasswordId());
-        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
+        UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
+        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantBO.getId();
         String redisSaltValue = redisUtil.getKey(redisSaltKey);
-        String md5Password = DecodeUtil.md5(userPassword.getLoginPassword() + redisSaltValue);
+        String md5Password = DecodeUtil.md5(userPasswordBO.getLoginPassword() + redisSaltValue);
         if (CharSequenceUtil.isNotEmpty(redisSaltValue) && redisSaltValue.equals(salt) && md5Password.equals(password)) {
-            String redisTokenKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
-            String token = KeyUtil.generateToken(userName, redisSaltValue, tenant.getId());
+            String redisTokenKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantBO.getId();
+            String token = KeyUtil.generateToken(userName, redisSaltValue, tenantBO.getId());
             redisUtil.setKey(redisTokenKey, token, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
             return token;
         }
-        updateUserLimit(userName, tenant.getId(), true);
+        updateUserLimit(userName, tenantBO.getId(), true);
         throw new ServiceException("租户、用户信息不匹配");
     }
 
     @Override
     public TokenValid checkTokenValid(String userName, String salt, String token, String tenantName) {
-        Tenant tenant = tenantService.selectByCode(tenantName);
-        if (ObjectUtil.isNull(tenant)) {
+        TenantBO tenantBO = tenantService.selectByCode(tenantName);
+        if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
+        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantBO.getId();
         String redisToken = redisUtil.getKey(redisKey);
         if (CharSequenceUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
         try {
-            Claims claims = KeyUtil.parserToken(userName, salt, token, tenant.getId());
+            Claims claims = KeyUtil.parserToken(userName, salt, token, tenantBO.getId());
             return new TokenValid(true, claims.getExpiration());
         } catch (Exception e) {
             return new TokenValid(false, null);
@@ -133,11 +133,11 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Boolean cancelToken(String userName, String tenantName) {
-        Tenant tenant = tenantService.selectByCode(tenantName);
-        if (ObjectUtil.isNull(tenant)) {
+        TenantBO tenantBO = tenantService.selectByCode(tenantName);
+        if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenant.getId();
+        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantBO.getId();
         redisUtil.deleteKey(redisKey);
         return true;
     }
