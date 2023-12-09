@@ -26,7 +26,7 @@ import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.center.auth.entity.bo.UserLogin;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -58,7 +58,7 @@ public class UserLoginController implements Controller {
      * @return {@link UserLogin}
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody UserLogin userLogin) {
+    public R<String> add(@Validated(Add.class) @RequestBody UserLogin userLogin) {
         try {
             userLoginService.save(userLogin);
             return R.ok();

@@ -19,7 +19,7 @@ package io.github.pnoker.center.manager.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -51,7 +51,7 @@ public class DriverAttributeConfigVO extends BaseVO {
      */
     @Schema(description = "驱动属性ID")
     @NotBlank(message = "驱动属性ID不能为空",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private Long driverAttributeId;
 
     /**
@@ -66,7 +66,7 @@ public class DriverAttributeConfigVO extends BaseVO {
      */
     @Schema(description = "设备ID")
     @NotBlank(message = "设备ID不能为空",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private Long deviceId;
 
     /**

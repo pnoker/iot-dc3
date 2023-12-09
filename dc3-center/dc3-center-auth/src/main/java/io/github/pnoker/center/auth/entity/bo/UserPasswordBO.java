@@ -18,7 +18,7 @@ package io.github.pnoker.center.auth.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.valid.Auth;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -43,9 +43,9 @@ public class UserPasswordBO extends BaseBO {
      * 登录密码
      */
     @NotBlank(message = "Login password can't be empty",
-            groups = {Insert.class, Auth.class})
+            groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$",
             message = "Invalid login password",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String loginPassword;
 }

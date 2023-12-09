@@ -19,7 +19,7 @@ package io.github.pnoker.center.auth.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Auth;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -41,17 +41,17 @@ import javax.validation.constraints.Pattern;
 public class TenantBO extends BaseBO {
 
     @NotBlank(message = "Tenant name can't be empty",
-            groups = {Insert.class, Auth.class})
+            groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "Invalid tenant name",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String tenantName;
 
     @NotBlank(message = "Tenant code can't be empty",
-            groups = {Insert.class})
+            groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
             message = "Invalid tenant code",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String tenantCode;
 
     /**

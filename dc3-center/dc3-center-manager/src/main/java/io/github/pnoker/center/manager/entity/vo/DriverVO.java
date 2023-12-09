@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -52,10 +52,10 @@ public class DriverVO extends BaseVO {
      */
     @Schema(description = "驱动名称")
     @NotBlank(message = "驱动名称不能为空",
-            groups = {Insert.class})
+            groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "驱动名称格式无效",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String driverName;
 
     /**
@@ -69,10 +69,10 @@ public class DriverVO extends BaseVO {
      */
     @Schema(description = "驱动服务名称")
     @NotBlank(message = "服务名称不能为空",
-            groups = {Insert.class})
+            groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9\\-_#@/.|]{1,31}$",
             message = "服务名称格式无效",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String serviceName;
 
     /**
@@ -86,10 +86,10 @@ public class DriverVO extends BaseVO {
      */
     @Schema(description = "服务主机")
     @NotBlank(message = "服务主机不能为空",
-            groups = {Insert.class})
+            groups = {Add.class})
     @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$",
             message = "服务主机格式无效",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String serviceHost;
 
     /**

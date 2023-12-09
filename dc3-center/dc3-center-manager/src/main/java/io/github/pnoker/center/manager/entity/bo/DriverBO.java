@@ -16,20 +16,14 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.valid.Insert;
-import io.github.pnoker.common.valid.Update;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * Driver BO

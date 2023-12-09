@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -53,10 +53,10 @@ public class DriverAttributeVO extends BaseVO {
      */
     @Schema(description = "显示名称")
     @NotBlank(message = "显示名称不能为空",
-            groups = {Insert.class})
+            groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "显示名称格式无效",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String displayName;
 
     /**
@@ -64,10 +64,10 @@ public class DriverAttributeVO extends BaseVO {
      */
     @Schema(description = "属性名称")
     @NotBlank(message = "属性名称不能为空",
-            groups = {Insert.class})
+            groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
             message = "属性名称格式无效",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String attributeName;
 
     /**
@@ -87,7 +87,7 @@ public class DriverAttributeVO extends BaseVO {
      */
     @Schema(description = "驱动ID")
     @NotNull(message = "驱动ID不能为空"
-            , groups = {Insert.class, Update.class})
+            , groups = {Add.class, Update.class})
     private Long driverId;
 
     /**

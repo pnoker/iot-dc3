@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -41,13 +41,13 @@ public class RoleResourceBindBO extends BaseBO {
      * 角色ID
      */
     @NotBlank(message = "Role id can't be empty",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String roleId;
 
     /**
      * 权限资源ID
      */
     @NotBlank(message = "Resource id can't be empty",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String resourceId;
 }

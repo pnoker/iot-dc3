@@ -18,7 +18,7 @@ package io.github.pnoker.center.auth.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.valid.Auth;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -43,20 +43,20 @@ public class UserBO extends BaseBO {
      * 用户昵称
      */
     @NotBlank(message = "Nick name can't be empty",
-            groups = {Insert.class, Auth.class})
+            groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "Invalid nick name",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String nickName;
 
     /**
      * 用户名称
      */
     @NotBlank(message = "User name can't be empty",
-            groups = {Insert.class, Auth.class})
+            groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
             message = "Invalid user name",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String userName;
 
     /**
@@ -64,7 +64,7 @@ public class UserBO extends BaseBO {
      */
     @Pattern(regexp = "^1([3-9])\\d{9}$",
             message = "Invalid phone",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String phone;
 
     /**
@@ -72,7 +72,7 @@ public class UserBO extends BaseBO {
      */
     @Pattern(regexp = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$",
             message = "Invalid email",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String email;
 
     /**

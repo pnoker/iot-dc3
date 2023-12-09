@@ -20,13 +20,8 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ProfileShareFlagEnum;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
-import io.github.pnoker.common.valid.Insert;
-import io.github.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * Profile BO

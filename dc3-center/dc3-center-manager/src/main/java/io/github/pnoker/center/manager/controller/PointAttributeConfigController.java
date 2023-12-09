@@ -24,7 +24,7 @@ import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -55,7 +55,7 @@ public class PointAttributeConfigController implements Controller {
      * @return PointInfo
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody PointAttributeConfigBO pointAttributeConfigBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody PointAttributeConfigBO pointAttributeConfigBO) {
         try {
             pointAttributeConfigService.save(pointAttributeConfigBO);
             return R.ok();
