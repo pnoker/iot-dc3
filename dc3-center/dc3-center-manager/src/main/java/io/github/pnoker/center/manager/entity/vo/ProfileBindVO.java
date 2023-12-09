@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -48,13 +48,13 @@ public class ProfileBindVO extends BaseVO {
      * 模版ID
      */@Schema(description = "模版ID")
     @NotBlank(message = "模版ID不能为空",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private Long profileId;
 
     /**
      * 设备ID
      */@Schema(description = "设备ID")
     @NotBlank(message = "设备ID不能为空",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private Long deviceId;
 }

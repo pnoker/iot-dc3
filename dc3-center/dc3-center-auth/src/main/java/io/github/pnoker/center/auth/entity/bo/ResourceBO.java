@@ -20,7 +20,7 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
 import io.github.pnoker.common.valid.Auth;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -45,17 +45,17 @@ public class ResourceBO extends BaseBO {
      * 权限资源父级ID
      */
     @NotBlank(message = "Resource parent id can't be empty",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String parentResourceId;
 
     /**
      * 权限资源名称
      */
     @NotBlank(message = "Role name can't be empty",
-            groups = {Insert.class, Auth.class})
+            groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
             message = "Invalid role name",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String resourceName;
 
     /**
@@ -84,7 +84,7 @@ public class ResourceBO extends BaseBO {
      * 权限资源实体ID
      */
     @NotBlank(message = "实体ID不能为空",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String entityId;
 
     /**

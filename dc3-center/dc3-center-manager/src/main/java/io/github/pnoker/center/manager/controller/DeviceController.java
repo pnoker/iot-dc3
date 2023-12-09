@@ -25,7 +25,7 @@ import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.RequestUtil;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +63,7 @@ public class DeviceController implements Controller {
      * @return Device
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody DeviceBO deviceBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody DeviceBO deviceBO) {
         try {
             deviceBO.setTenantId(getTenantId());
             deviceService.save(deviceBO);

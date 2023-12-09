@@ -25,7 +25,7 @@ import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -55,7 +55,7 @@ public class TenantController implements Controller {
      * @return {@link TenantBO}
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody TenantBO tenantBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody TenantBO tenantBO) {
         try {
             tenantService.save(tenantBO);
             return R.ok();

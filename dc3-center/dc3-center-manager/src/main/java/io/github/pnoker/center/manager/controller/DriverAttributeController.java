@@ -26,7 +26,7 @@ import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -58,7 +58,7 @@ public class DriverAttributeController implements Controller {
      * @return DriverAttribute
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody DriverAttributeBO driverAttributeBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody DriverAttributeBO driverAttributeBO) {
         try {
             driverAttributeService.save(driverAttributeBO);
             return R.ok();

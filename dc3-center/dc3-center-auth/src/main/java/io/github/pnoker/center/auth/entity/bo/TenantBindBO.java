@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -41,13 +41,13 @@ public class TenantBindBO extends BaseBO {
      * 租户ID
      */
     @NotBlank(message = "Tenant id can't be empty",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private Long tenantId;
 
     /**
      * 用户ID
      */
     @NotBlank(message = "User id can't be empty",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private Long userId;
 }

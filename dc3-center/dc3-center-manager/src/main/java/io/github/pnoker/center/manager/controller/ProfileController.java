@@ -24,7 +24,7 @@ import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -59,7 +59,7 @@ public class ProfileController implements Controller {
      * @return Profile
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody ProfileBO profileBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody ProfileBO profileBO) {
         try {
             profileBO.setTenantId(getTenantId());
             profileService.save(profileBO);

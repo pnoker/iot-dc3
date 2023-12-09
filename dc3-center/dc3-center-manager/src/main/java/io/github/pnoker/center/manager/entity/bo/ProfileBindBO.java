@@ -17,12 +17,8 @@
 package io.github.pnoker.center.manager.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
-import io.github.pnoker.common.valid.Insert;
-import io.github.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.NotBlank;
 
 /**
  * ProfileBind BO

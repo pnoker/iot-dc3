@@ -23,7 +23,7 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.valid.Auth;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -48,7 +48,7 @@ public class MenuBO extends BaseBO {
      * 菜单父级ID
      */
     @NotBlank(message = "Menu parent id can't be empty",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String parentMenuId;
 
     /**
@@ -60,10 +60,10 @@ public class MenuBO extends BaseBO {
      * 菜单名称
      */
     @NotBlank(message = "Menu name can't be empty",
-            groups = {Insert.class, Auth.class})
+            groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
             message = "Invalid menu name",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String menuName;
 
     /**

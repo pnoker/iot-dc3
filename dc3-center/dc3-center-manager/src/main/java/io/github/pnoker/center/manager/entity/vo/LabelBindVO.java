@@ -2,7 +2,7 @@ package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -33,7 +33,7 @@ public class LabelBindVO extends BaseVO {
      */
     @Schema(description = "标签ID")
     @NotBlank(message = "标签ID不能为空",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String labelId;
 
     /**
@@ -41,6 +41,6 @@ public class LabelBindVO extends BaseVO {
      */
     @Schema(description = "实体ID")
     @NotBlank(message = "实体ID不能为空",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String entityId;
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -36,10 +36,10 @@ public class LabelVO extends BaseVO {
      */
     @Schema(description = "标签名称")
     @NotBlank(message = "标签名称不能为空",
-            groups = {Insert.class})
+            groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "标签名称格式无效",
-            groups = {Insert.class, Update.class})
+            groups = {Add.class, Update.class})
     private String labelName;
 
     /**

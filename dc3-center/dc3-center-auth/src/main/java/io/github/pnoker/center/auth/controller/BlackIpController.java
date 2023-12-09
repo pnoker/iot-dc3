@@ -25,7 +25,7 @@ import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -55,7 +55,7 @@ public class BlackIpController implements Controller {
      * @return {@link BlackIpBO}
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody BlackIpBO blackIpBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody BlackIpBO blackIpBO) {
         try {
             blackIpService.save(blackIpBO);
             return R.ok();

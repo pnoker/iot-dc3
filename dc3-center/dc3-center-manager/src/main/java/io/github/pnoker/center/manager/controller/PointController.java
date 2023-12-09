@@ -25,7 +25,7 @@ import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -60,7 +60,7 @@ public class PointController implements Controller {
      * @return Point
      */
     @PostMapping("/add")
-    public R<PointBO> add(@Validated(Insert.class) @RequestBody PointBO pointBO) {
+    public R<PointBO> add(@Validated(Add.class) @RequestBody PointBO pointBO) {
         try {
             pointBO.setTenantId(getTenantId());
             pointService.save(pointBO);

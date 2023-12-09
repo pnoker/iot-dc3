@@ -24,7 +24,7 @@ import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -55,7 +55,7 @@ public class DriverAttributeConfigController implements Controller {
      * @return DriverInfo
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody DriverAttributeConfigBO driverAttributeConfigBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody DriverAttributeConfigBO driverAttributeConfigBO) {
         try {
             driverAttributeConfigService.save(driverAttributeConfigBO);
             return R.ok();
