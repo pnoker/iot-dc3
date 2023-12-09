@@ -21,12 +21,12 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DriverAttributePageQuery;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeBOPageQuery;
 import io.github.pnoker.center.manager.mapper.DriverAttributeMapper;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,7 +51,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public void save(DriverAttribute entityBO) {
+    public void save(DriverAttributeBO entityBO) {
         try {
             selectByNameAndDriverId(entityBO.getAttributeName(), entityBO.getDriverId());
             throw new DuplicateException("The driver attribute already exists");
@@ -67,8 +67,8 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      */
     @Override
     public void remove(Long id) {
-        DriverAttribute driverAttribute = selectById(id);
-        if (ObjectUtil.isNull(driverAttribute)) {
+        DriverAttributeBO driverAttributeBO = selectById(id);
+        if (ObjectUtil.isNull(driverAttributeBO)) {
             throw new NotFoundException("The driver attribute does not exist");
         }
 
@@ -81,7 +81,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public void update(DriverAttribute entityBO) {
+    public void update(DriverAttributeBO entityBO) {
         selectById(entityBO.getId());
         entityBO.setOperateTime(null);
         if (driverAttributeMapper.updateById(entityBO) < 1) {
@@ -90,7 +90,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     }
 
     @Override
-    public DriverAttribute selectById(Long id) {
+    public DriverAttributeBO selectById(Long id) {
         return null;
     }
 
@@ -98,52 +98,52 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      * {@inheritDoc}
      */
     @Override
-    public DriverAttribute selectByNameAndDriverId(String name, Long driverId) {
-        LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
-        queryWrapper.eq(DriverAttribute::getAttributeName, name);
-        queryWrapper.eq(DriverAttribute::getDriverId, driverId);
+    public DriverAttributeBO selectByNameAndDriverId(String name, Long driverId) {
+        LambdaQueryWrapper<DriverAttributeBO> queryWrapper = Wrappers.<DriverAttributeBO>query().lambda();
+        queryWrapper.eq(DriverAttributeBO::getAttributeName, name);
+        queryWrapper.eq(DriverAttributeBO::getDriverId, driverId);
         queryWrapper.last("limit 1");
-        DriverAttribute driverAttribute = driverAttributeMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(driverAttribute)) {
+        DriverAttributeBO driverAttributeBO = driverAttributeMapper.selectOne(queryWrapper);
+        if (ObjectUtil.isNull(driverAttributeBO)) {
             throw new NotFoundException();
         }
-        return driverAttribute;
+        return driverAttributeBO;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<DriverAttribute> selectByDriverId(Long driverId, boolean throwException) {
-        DriverAttributePageQuery driverAttributePageQuery = new DriverAttributePageQuery();
+    public List<DriverAttributeBO> selectByDriverId(Long driverId, boolean throwException) {
+        DriverAttributeBOPageQuery driverAttributePageQuery = new DriverAttributeBOPageQuery();
         driverAttributePageQuery.setDriverId(driverId);
-        List<DriverAttribute> driverAttributes = driverAttributeMapper.selectList(fuzzyQuery(driverAttributePageQuery));
+        List<DriverAttributeBO> driverAttributeBOS = driverAttributeMapper.selectList(fuzzyQuery(driverAttributePageQuery));
         if (throwException) {
-            if (ObjectUtil.isNull(driverAttributes) || driverAttributes.isEmpty()) {
+            if (ObjectUtil.isNull(driverAttributeBOS) || driverAttributeBOS.isEmpty()) {
                 throw new NotFoundException();
             }
         }
-        return driverAttributes;
+        return driverAttributeBOS;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverAttribute> selectByPage(DriverAttributePageQuery entityQuery) {
+    public Page<DriverAttributeBO> selectByPage(DriverAttributeBOPageQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         return driverAttributeMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
-    private LambdaQueryWrapper<DriverAttribute> fuzzyQuery(DriverAttributePageQuery query) {
-        LambdaQueryWrapper<DriverAttribute> queryWrapper = Wrappers.<DriverAttribute>query().lambda();
+    private LambdaQueryWrapper<DriverAttributeBO> fuzzyQuery(DriverAttributeBOPageQuery query) {
+        LambdaQueryWrapper<DriverAttributeBO> queryWrapper = Wrappers.<DriverAttributeBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getAttributeName()), DriverAttribute::getAttributeName, query.getAttributeName());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getDisplayName()), DriverAttribute::getDisplayName, query.getDisplayName());
-            queryWrapper.eq(ObjectUtil.isNotNull(query.getAttributeTypeFlag()), DriverAttribute::getAttributeTypeFlag, query.getAttributeTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDriverId()), DriverAttribute::getDriverId, query.getDriverId());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getAttributeName()), DriverAttributeBO::getAttributeName, query.getAttributeName());
+            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getDisplayName()), DriverAttributeBO::getDisplayName, query.getDisplayName());
+            queryWrapper.eq(ObjectUtil.isNotNull(query.getAttributeTypeFlag()), DriverAttributeBO::getAttributeTypeFlag, query.getAttributeTypeFlag());
+            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDriverId()), DriverAttributeBO::getDriverId, query.getDriverId());
         }
         return queryWrapper;
     }

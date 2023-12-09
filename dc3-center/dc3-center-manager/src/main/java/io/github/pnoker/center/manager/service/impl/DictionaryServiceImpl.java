@@ -21,6 +21,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
@@ -33,8 +34,6 @@ import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Dictionary;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.DriverDO;
 import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -70,10 +69,10 @@ public class DictionaryServiceImpl implements DictionaryService {
         if (ObjectUtil.isNull(dictionaryQuery.getPages())) {
             dictionaryQuery.setPages(new Pages());
         }
-        LambdaQueryWrapper<DriverDO> queryWrapper = Wrappers.<DriverDO>query().lambda();
-        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryQuery.getLabel()), DriverDO::getDriverName, dictionaryQuery.getLabel());
-        queryWrapper.eq(ObjectUtil.isNotEmpty(dictionaryQuery.getTenantId()), DriverDO::getTenantId, dictionaryQuery.getTenantId());
-        Page<DriverDO> driverPage = driverManager.page(PageUtil.page(dictionaryQuery.getPages()), queryWrapper);
+        LambdaQueryWrapper<DriverBO> queryWrapper = Wrappers.<DriverBO>query().lambda();
+        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryQuery.getLabel()), DriverBO::getDriverName, dictionaryQuery.getLabel());
+        queryWrapper.eq(ObjectUtil.isNotEmpty(dictionaryQuery.getTenantId()), DriverBO::getTenantId, dictionaryQuery.getTenantId());
+        Page<DriverBO> driverPage = driverManager.page(PageUtil.page(dictionaryQuery.getPages()), queryWrapper);
         List<Dictionary> dictionaryList = driverPage.getRecords().parallelStream().map(driver -> {
             Dictionary dictionary = new Dictionary();
             dictionary.setLabel(driver.getDriverName());

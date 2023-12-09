@@ -19,13 +19,13 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DriverAttributePageQuery;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeBOPageQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.model.DriverAttribute;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -54,13 +54,13 @@ public class DriverAttributeController implements Controller {
     /**
      * 新增 DriverAttribute
      *
-     * @param driverAttribute DriverAttribute
+     * @param driverAttributeBO DriverAttribute
      * @return DriverAttribute
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody DriverAttribute driverAttribute) {
+    public R<String> add(@Validated(Insert.class) @RequestBody DriverAttributeBO driverAttributeBO) {
         try {
-            driverAttributeService.save(driverAttribute);
+            driverAttributeService.save(driverAttributeBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -86,13 +86,13 @@ public class DriverAttributeController implements Controller {
     /**
      * 更新 DriverAttribute
      *
-     * @param driverAttribute DriverAttribute
+     * @param driverAttributeBO DriverAttribute
      * @return DriverAttribute
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody DriverAttribute driverAttribute) {
+    public R<String> update(@Validated(Update.class) @RequestBody DriverAttributeBO driverAttributeBO) {
         try {
-            driverAttributeService.update(driverAttribute);
+            driverAttributeService.update(driverAttributeBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -106,9 +106,9 @@ public class DriverAttributeController implements Controller {
      * @return DriverAttribute
      */
     @GetMapping("/id/{id}")
-    public R<DriverAttribute> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<DriverAttributeBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverAttribute select = driverAttributeService.selectById(Long.parseLong(id));
+            DriverAttributeBO select = driverAttributeService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -125,9 +125,9 @@ public class DriverAttributeController implements Controller {
      * @return DriverAttribute
      */
     @GetMapping("/driver_id/{id}")
-    public R<List<DriverAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
+    public R<List<DriverAttributeBO>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
         try {
-            List<DriverAttribute> select = driverAttributeService.selectByDriverId(Long.parseLong(id), true);
+            List<DriverAttributeBO> select = driverAttributeService.selectByDriverId(Long.parseLong(id), true);
             if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
@@ -146,12 +146,12 @@ public class DriverAttributeController implements Controller {
      * @return Page Of DriverAttribute
      */
     @PostMapping("/list")
-    public R<Page<DriverAttribute>> list(@RequestBody(required = false) DriverAttributePageQuery driverAttributePageQuery) {
+    public R<Page<DriverAttributeBO>> list(@RequestBody(required = false) DriverAttributeBOPageQuery driverAttributePageQuery) {
         try {
             if (ObjectUtil.isEmpty(driverAttributePageQuery)) {
-                driverAttributePageQuery = new DriverAttributePageQuery();
+                driverAttributePageQuery = new DriverAttributeBOPageQuery();
             }
-            Page<DriverAttribute> page = driverAttributeService.selectByPage(driverAttributePageQuery);
+            Page<DriverAttributeBO> page = driverAttributeService.selectByPage(driverAttributePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

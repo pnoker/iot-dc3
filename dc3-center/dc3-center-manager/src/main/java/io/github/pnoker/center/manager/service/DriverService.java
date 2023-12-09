@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.DriverDO;
 
 import java.util.List;
 import java.util.Set;
@@ -29,7 +29,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverService extends Service<DriverDO, DriverPageQuery> {
+public interface DriverService extends Service<DriverBO, DriverPageQuery> {
 
     /**
      * 根据 驱动Id集 查询 驱动集
@@ -37,7 +37,7 @@ public interface DriverService extends Service<DriverDO, DriverPageQuery> {
      * @param ids Driver ID Array
      * @return Driver Array
      */
-    List<DriverDO> selectByIds(Set<Long> ids);
+    List<DriverBO> selectByIds(Set<Long> ids);
 
     /**
      * 根据 驱动ServiceName 查询 驱动
@@ -47,7 +47,7 @@ public interface DriverService extends Service<DriverDO, DriverPageQuery> {
      * @param throwException Throw Exception
      * @return Driver
      */
-    DriverDO selectByServiceName(String serviceName, Long tenantId, boolean throwException);
+    DriverBO selectByServiceName(String serviceName, Long tenantId, boolean throwException);
 
     /**
      * 根据 模版Id 查询 驱动集
@@ -55,7 +55,7 @@ public interface DriverService extends Service<DriverDO, DriverPageQuery> {
      * @param profileId Profile ID
      * @return Driver Array
      */
-    List<DriverDO> selectByProfileId(Long profileId);
+    List<DriverBO> selectByProfileId(Long profileId);
 
     /**
      * 根据 驱动Id 查询 驱动
@@ -63,7 +63,7 @@ public interface DriverService extends Service<DriverDO, DriverPageQuery> {
      * @param deviceId 设备ID
      * @return Driver
      */
-    DriverDO selectByDeviceId(Long deviceId);
+    DriverBO selectByDeviceId(Long deviceId);
 
     Long count();
 }

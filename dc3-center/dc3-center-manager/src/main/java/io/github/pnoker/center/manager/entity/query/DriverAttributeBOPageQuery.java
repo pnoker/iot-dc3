@@ -17,12 +17,12 @@
 package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.Device;
 import lombok.*;
 
 /**
- * Device DTO
+ * ConnectInfo DTO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -32,10 +32,8 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class DevicePageQuery extends Device {
+public class DriverAttributeBOPageQuery extends DriverAttributeBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
-
-    private Long profileId;
 }

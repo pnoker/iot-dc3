@@ -20,13 +20,13 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.api.center.data.PointValueQuery;
 import io.github.pnoker.api.center.data.RPointValueDTO;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.dto.DataStatisticsDTO;
 import io.github.pnoker.common.dto.WeatherDeviceStatisticsDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
-import io.github.pnoker.common.model.DriverDO;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -79,8 +79,8 @@ public class IndexServiceImpl implements IndexService {
 
     @Override
     public List<WeatherDeviceStatisticsDTO> weatherDeviceList() {
-        DriverDO driverDO = driverService.selectByServiceName("default/dc3-driver-weather-amap", 1L, false);
-        return deviceService.selectAllByDriverId(driverDO.getId(), 1L).stream().map(device -> {
+        DriverBO driverBO = driverService.selectByServiceName("default/dc3-driver-weather-amap", 1L, false);
+        return deviceService.selectAllByDriverId(driverBO.getId(), 1L).stream().map(device -> {
             WeatherDeviceStatisticsDTO weatherDeviceStatisticsDTO = new WeatherDeviceStatisticsDTO();
             weatherDeviceStatisticsDTO.setDevice(device);
             weatherDeviceStatisticsDTO.setLocation(attributeConfigService.selectByDeviceId(device.getId()).get(0).getConfigValue());

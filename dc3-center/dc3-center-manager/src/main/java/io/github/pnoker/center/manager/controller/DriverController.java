@@ -18,12 +18,12 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.DriverDO;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +59,7 @@ public class DriverController implements Controller {
      * @return Driver
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody DriverDO entityDO) {
+    public R<String> add(@Validated(Insert.class) @RequestBody DriverBO entityDO) {
         try {
             entityDO.setTenantId(getTenantId());
             driverService.save(entityDO);
@@ -92,7 +92,7 @@ public class DriverController implements Controller {
      * @return Driver
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody DriverDO entityDO) {
+    public R<String> update(@Validated(Update.class) @RequestBody DriverBO entityDO) {
         try {
             entityDO.setTenantId(getTenantId());
             driverService.update(entityDO);
@@ -109,9 +109,9 @@ public class DriverController implements Controller {
      * @return Driver
      */
     @GetMapping("/id/{id}")
-    public R<DriverDO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<DriverBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverDO select = driverService.selectById(Long.parseLong(id));
+            DriverBO select = driverService.selectById(Long.parseLong(id));
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -125,11 +125,11 @@ public class DriverController implements Controller {
      * @return Map String:Driver
      */
     @PostMapping("/ids")
-    public R<Map<Long, DriverDO>> selectByIds(@RequestBody Set<String> driverIds) {
+    public R<Map<Long, DriverBO>> selectByIds(@RequestBody Set<String> driverIds) {
         try {
             Set<Long> collect = driverIds.stream().map(Long::parseLong).collect(Collectors.toSet());
-            List<DriverDO> entityDOS = driverService.selectByIds(collect);
-            Map<Long, DriverDO> driverMap = entityDOS.stream().collect(Collectors.toMap(DriverDO::getId, Function.identity()));
+            List<DriverBO> entityDOS = driverService.selectByIds(collect);
+            Map<Long, DriverBO> driverMap = entityDOS.stream().collect(Collectors.toMap(DriverBO::getId, Function.identity()));
             return R.ok(driverMap);
             // todo 返回 long id 前端无法解析
         } catch (Exception e) {
@@ -144,9 +144,9 @@ public class DriverController implements Controller {
      * @return Driver
      */
     @GetMapping("/service/{serviceName}")
-    public R<DriverDO> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
+    public R<DriverBO> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
         try {
-            DriverDO select = driverService.selectByServiceName(serviceName, getTenantId(), true);
+            DriverBO select = driverService.selectByServiceName(serviceName, getTenantId(), true);
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -160,13 +160,13 @@ public class DriverController implements Controller {
      * @return Page Of Driver
      */
     @PostMapping("/list")
-    public R<Page<DriverDO>> list(@RequestBody(required = false) DriverPageQuery driverPageQuery) {
+    public R<Page<DriverBO>> list(@RequestBody(required = false) DriverPageQuery driverPageQuery) {
         try {
             if (ObjectUtil.isEmpty(driverPageQuery)) {
                 driverPageQuery = new DriverPageQuery();
             }
             driverPageQuery.setTenantId(getTenantId());
-            Page<DriverDO> page = driverService.selectByPage(driverPageQuery);
+            Page<DriverBO> page = driverService.selectByPage(driverPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

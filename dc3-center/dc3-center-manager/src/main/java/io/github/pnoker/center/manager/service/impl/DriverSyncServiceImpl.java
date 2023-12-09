@@ -20,6 +20,8 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.CodeQuery;
 import io.github.pnoker.api.center.auth.RTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
@@ -28,8 +30,6 @@ import io.github.pnoker.common.dto.DriverSyncUpDTO;
 import io.github.pnoker.common.entity.driver.DriverMetadata;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.DriverAttribute;
-import io.github.pnoker.common.model.DriverDO;
 import io.github.pnoker.common.model.PointAttribute;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +79,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
         }
 
         try {
-            DriverDO entityDO = registerDriver(entityDTO);
+            DriverBO entityDO = registerDriver(entityDTO);
             registerDriverAttribute(entityDTO, entityDO);
             registerPointAttribute(entityDTO, entityDO);
             DriverMetadata driverMetadata = batchService.batchDriverMetadata(entityDO.getServiceName(), entityDO.getTenantId());
@@ -101,7 +101,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
      *
      * @param entityDTO DriverSyncUpDTO
      */
-    private DriverDO registerDriver(DriverSyncUpDTO entityDTO) {
+    private DriverBO registerDriver(DriverSyncUpDTO entityDTO) {
         // check tenant
         RTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(entityDTO.getTenant()).build());
         if (!rTenantDTO.getResult().getOk()) {
@@ -109,11 +109,11 @@ public class DriverSyncServiceImpl implements DriverSyncService {
         }
 
         // register driver
-        DriverDO entityDO = entityDTO.getDriver();
+        DriverBO entityDO = entityDTO.getDriver();
         entityDO.setTenantId(rTenantDTO.getData().getBase().getId());
         log.info("Register driver {}", entityDO);
         try {
-            DriverDO byServiceName = driverService.selectByServiceName(entityDO.getServiceName(), entityDO.getTenantId(), true);
+            DriverBO byServiceName = driverService.selectByServiceName(entityDO.getServiceName(), entityDO.getTenantId(), true);
             log.debug("Driver already registered, updating {} ", entityDO);
             entityDO.setId(byServiceName.getId());
             driverService.update(entityDO);
@@ -130,23 +130,23 @@ public class DriverSyncServiceImpl implements DriverSyncService {
      * @param driverSyncUpDTO DriverSyncUpDTO
      * @param entityDO        Driver
      */
-    private void registerDriverAttribute(DriverSyncUpDTO driverSyncUpDTO, DriverDO entityDO) {
-        Map<String, DriverAttribute> newDriverAttributeMap = new HashMap<>(8);
+    private void registerDriverAttribute(DriverSyncUpDTO driverSyncUpDTO, DriverBO entityDO) {
+        Map<String, DriverAttributeBO> newDriverAttributeMap = new HashMap<>(8);
         if (ObjectUtil.isNotNull(driverSyncUpDTO.getDriverAttributes()) && !driverSyncUpDTO.getDriverAttributes().isEmpty()) {
             driverSyncUpDTO.getDriverAttributes().forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
         }
 
-        Map<String, DriverAttribute> oldDriverAttributeMap = new HashMap<>(8);
+        Map<String, DriverAttributeBO> oldDriverAttributeMap = new HashMap<>(8);
         try {
-            List<DriverAttribute> byDriverId = driverAttributeService.selectByDriverId(entityDO.getId(), true);
+            List<DriverAttributeBO> byDriverId = driverAttributeService.selectByDriverId(entityDO.getId(), true);
             byDriverId.forEach(driverAttribute -> oldDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do
         }
 
-        for (Map.Entry<String, DriverAttribute> entry : newDriverAttributeMap.entrySet()) {
+        for (Map.Entry<String, DriverAttributeBO> entry : newDriverAttributeMap.entrySet()) {
             String name = entry.getKey();
-            DriverAttribute info = newDriverAttributeMap.get(name);
+            DriverAttributeBO info = newDriverAttributeMap.get(name);
             info.setDriverId(entityDO.getId());
             if (oldDriverAttributeMap.containsKey(name)) {
                 info.setId(oldDriverAttributeMap.get(name).getId());
@@ -158,7 +158,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
             }
         }
 
-        for (Map.Entry<String, DriverAttribute> entry : oldDriverAttributeMap.entrySet()) {
+        for (Map.Entry<String, DriverAttributeBO> entry : oldDriverAttributeMap.entrySet()) {
             String name = entry.getKey();
             if (!newDriverAttributeMap.containsKey(name)) {
                 try {
@@ -178,7 +178,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
      * @param driverSyncUpDTO DriverSyncUpDTO
      * @param entityDO        Driver
      */
-    private void registerPointAttribute(DriverSyncUpDTO driverSyncUpDTO, DriverDO entityDO) {
+    private void registerPointAttribute(DriverSyncUpDTO driverSyncUpDTO, DriverBO entityDO) {
         Map<String, PointAttribute> newPointAttributeMap = new HashMap<>(8);
         if (ObjectUtil.isNotNull(driverSyncUpDTO.getPointAttributes()) && !driverSyncUpDTO.getPointAttributes().isEmpty()) {
             driverSyncUpDTO.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));

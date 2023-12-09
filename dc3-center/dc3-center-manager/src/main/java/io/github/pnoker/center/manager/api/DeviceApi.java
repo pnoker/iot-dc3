@@ -25,12 +25,12 @@ import io.github.pnoker.api.common.BaseDTO;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.PageDTO;
 import io.github.pnoker.api.common.RDTO;
-import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.query.DeviceBOPageQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.utils.BuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -58,9 +58,9 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         RPageDeviceDTO.Builder builder = RPageDeviceDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
-        DevicePageQuery pageQuery = buildPageQuery(request);
+        DeviceBOPageQuery pageQuery = buildPageQuery(request);
 
-        Page<Device> devicePage = deviceService.selectByPage(pageQuery);
+        Page<DeviceBO> devicePage = deviceService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(devicePage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -93,8 +93,8 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         RDeviceListDTO.Builder builder = RDeviceListDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
-        List<Device> devices = deviceService.selectByProfileId(request.getProfileId());
-        if (CollUtil.isEmpty(devices)) {
+        List<DeviceBO> deviceBOS = deviceService.selectByProfileId(request.getProfileId());
+        if (CollUtil.isEmpty(deviceBOS)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getMessage());
@@ -103,7 +103,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
 
-            List<DeviceDTO> deviceDTOS = devices.stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<DeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).collect(Collectors.toList());
 
             builder.addAllData(deviceDTOS);
         }
@@ -119,8 +119,8 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
      * @param request PageDeviceQueryDTO
      * @return DevicePageQuery
      */
-    private DevicePageQuery buildPageQuery(PageDeviceQueryDTO request) {
-        DevicePageQuery pageQuery = new DevicePageQuery();
+    private DeviceBOPageQuery buildPageQuery(PageDeviceQueryDTO request) {
+        DeviceBOPageQuery pageQuery = new DeviceBOPageQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());
@@ -142,7 +142,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
      * @param entityDO Device
      * @return DeviceDTO
      */
-    private DeviceDTO buildDTOByDO(Device entityDO) {
+    private DeviceDTO buildDTOByDO(DeviceBO entityDO) {
         DeviceDTO.Builder builder = DeviceDTO.newBuilder();
         BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
