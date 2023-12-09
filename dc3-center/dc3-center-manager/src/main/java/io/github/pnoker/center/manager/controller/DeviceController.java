@@ -18,12 +18,12 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.query.DeviceBOPageQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.utils.RequestUtil;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
@@ -59,14 +59,14 @@ public class DeviceController implements Controller {
     /**
      * 新增 Device
      *
-     * @param device Device
+     * @param deviceBO Device
      * @return Device
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Device device) {
+    public R<String> add(@Validated(Insert.class) @RequestBody DeviceBO deviceBO) {
         try {
-            device.setTenantId(getTenantId());
-            deviceService.save(device);
+            deviceBO.setTenantId(getTenantId());
+            deviceService.save(deviceBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -92,14 +92,14 @@ public class DeviceController implements Controller {
     /**
      * 更新 Device
      *
-     * @param device Device
+     * @param deviceBO Device
      * @return Device
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Device device) {
+    public R<String> update(@Validated(Update.class) @RequestBody DeviceBO deviceBO) {
         try {
-            device.setTenantId(getTenantId());
-            deviceService.update(device);
+            deviceBO.setTenantId(getTenantId());
+            deviceService.update(deviceBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -113,9 +113,9 @@ public class DeviceController implements Controller {
      * @return Device
      */
     @GetMapping("/id/{id}")
-    public R<Device> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<DeviceBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            Device select = deviceService.selectById(Long.parseLong(id));
+            DeviceBO select = deviceService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -132,11 +132,11 @@ public class DeviceController implements Controller {
      * @return Map String:Device
      */
     @PostMapping("/ids")
-    public R<Map<Long, Device>> selectByIds(@RequestBody Set<String> deviceIds) {
+    public R<Map<Long, DeviceBO>> selectByIds(@RequestBody Set<String> deviceIds) {
         try {
             Set<Long> collect = deviceIds.stream().map(Long::parseLong).collect(Collectors.toSet());
-            List<Device> devices = deviceService.selectByIds(collect);
-            Map<Long, Device> deviceMap = devices.stream().collect(Collectors.toMap(Device::getId, Function.identity()));
+            List<DeviceBO> deviceBOS = deviceService.selectByIds(collect);
+            Map<Long, DeviceBO> deviceMap = deviceBOS.stream().collect(Collectors.toMap(DeviceBO::getId, Function.identity()));
             return R.ok(deviceMap);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -150,13 +150,13 @@ public class DeviceController implements Controller {
      * @return Page Of Device
      */
     @PostMapping("/list")
-    public R<Page<Device>> list(@RequestBody(required = false) DevicePageQuery devicePageQuery) {
+    public R<Page<DeviceBO>> list(@RequestBody(required = false) DeviceBOPageQuery devicePageQuery) {
         try {
             if (ObjectUtil.isEmpty(devicePageQuery)) {
-                devicePageQuery = new DevicePageQuery();
+                devicePageQuery = new DeviceBOPageQuery();
             }
             devicePageQuery.setTenantId(getTenantId());
-            Page<Device> page = deviceService.selectByPage(devicePageQuery);
+            Page<DeviceBO> page = deviceService.selectByPage(devicePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
@@ -169,14 +169,14 @@ public class DeviceController implements Controller {
     /**
      * 导入 Device
      *
-     * @param device Device
+     * @param deviceBO Device
      * @return Device
      */
     @PostMapping("/import")
-    public R<String> importDevice(@Validated(Update.class) Device device, @RequestParam("file") MultipartFile multipartFile) {
+    public R<String> importDevice(@Validated(Update.class) DeviceBO deviceBO, @RequestParam("file") MultipartFile multipartFile) {
         try {
-            device.setTenantId(getTenantId());
-            deviceService.importDevice(device, multipartFile);
+            deviceBO.setTenantId(getTenantId());
+            deviceService.importDevice(deviceBO, multipartFile);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -186,14 +186,14 @@ public class DeviceController implements Controller {
     /**
      * 导入 Device 模板
      *
-     * @param device Device
+     * @param deviceBO Device
      * @return Device
      */
     @PostMapping("/import/template")
-    public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody Device device) {
+    public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody DeviceBO deviceBO) {
         try {
-            device.setTenantId(getTenantId());
-            Path filePath = deviceService.generateImportTemplate(device);
+            deviceBO.setTenantId(getTenantId());
+            Path filePath = deviceService.generateImportTemplate(deviceBO);
             return RequestUtil.responseFile(filePath);
         } catch (Exception e) {
             return null;

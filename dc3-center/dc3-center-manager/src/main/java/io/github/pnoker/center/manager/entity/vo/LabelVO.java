@@ -35,10 +35,10 @@ public class LabelVO extends BaseVO {
      * 标签名称
      */
     @Schema(description = "标签名称")
-    @NotBlank(message = "Label name can't be empty",
+    @NotBlank(message = "标签名称不能为空",
             groups = {Insert.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
-            message = "Invalid label name",
+            message = "标签名称格式无效",
             groups = {Insert.class, Update.class})
     private String labelName;
 

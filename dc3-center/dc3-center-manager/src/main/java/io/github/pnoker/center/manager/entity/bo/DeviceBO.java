@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.bo;
+package io.github.pnoker.center.manager.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -24,8 +24,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * User
+ * Device BO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -35,25 +38,38 @@ import lombok.experimental.SuperBuilder;
 @RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class UserLoginBO extends BaseBO {
+public class DeviceBO extends BaseBO {
 
     /**
-     * 登录名称
+     * 设备名称
      */
-    private String loginName;
+    private String deviceName;
 
     /**
-     * 用户ID
+     * 设备编号
      */
-    private Long userId;
+    private String deviceCode;
 
     /**
-     * 用户密码ID
+     * 驱动ID
      */
-    private String userPasswordId;
+    private Long driverId;
+
+    /**
+     * 分组ID
+     */
+    private Long groupId;
 
     /**
      * 使能标识
      */
     private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    private Long tenantId;
+
+    // 附加
+    private Set<Long> profileIds = new HashSet<>(8);
 }

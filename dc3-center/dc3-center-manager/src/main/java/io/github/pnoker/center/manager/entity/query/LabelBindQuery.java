@@ -17,8 +17,8 @@
 package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.center.manager.entity.bo.LabelBindBO;
+import io.github.pnoker.common.entity.common.Pages;
 import lombok.*;
 
 /**

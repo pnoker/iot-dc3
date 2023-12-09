@@ -21,13 +21,13 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.*;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.model.DriverDO;
 import io.github.pnoker.common.utils.BuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
 
         DriverPageQuery pageQuery = buildPageQuery(request);
 
-        Page<DriverDO> driverPage = driverService.selectByPage(pageQuery);
+        Page<DriverBO> driverPage = driverService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(driverPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -90,7 +90,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
         RDriverDTO.Builder builder = RDriverDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
-        DriverDO entityDO = driverService.selectByDeviceId(request.getDeviceId());
+        DriverBO entityDO = driverService.selectByDeviceId(request.getDeviceId());
         if (ObjectUtil.isNull(entityDO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -139,7 +139,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
      * @param entityDO Driver
      * @return DriverDTO
      */
-    private DriverDTO buildDTOByDO(DriverDO entityDO) {
+    private DriverDTO buildDTOByDO(DriverBO entityDO) {
         DriverDTO.Builder builder = DriverDTO.newBuilder();
         BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);

@@ -18,12 +18,12 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigPageQuery;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigBOPageQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.DriverAttributeConfig;
 import io.github.pnoker.common.valid.Insert;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -51,13 +51,13 @@ public class DriverAttributeConfigController implements Controller {
     /**
      * 新增 DriverInfo
      *
-     * @param driverAttributeConfig DriverInfo
+     * @param driverAttributeConfigBO DriverInfo
      * @return DriverInfo
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody DriverAttributeConfig driverAttributeConfig) {
+    public R<String> add(@Validated(Insert.class) @RequestBody DriverAttributeConfigBO driverAttributeConfigBO) {
         try {
-            driverAttributeConfigService.save(driverAttributeConfig);
+            driverAttributeConfigService.save(driverAttributeConfigBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -83,13 +83,13 @@ public class DriverAttributeConfigController implements Controller {
     /**
      * 更新 DriverInfo
      *
-     * @param driverAttributeConfig DriverInfo
+     * @param driverAttributeConfigBO DriverInfo
      * @return DriverInfo
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody DriverAttributeConfig driverAttributeConfig) {
+    public R<String> update(@Validated(Update.class) @RequestBody DriverAttributeConfigBO driverAttributeConfigBO) {
         try {
-            driverAttributeConfigService.update(driverAttributeConfig);
+            driverAttributeConfigService.update(driverAttributeConfigBO);
             return R.ok();
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -103,9 +103,9 @@ public class DriverAttributeConfigController implements Controller {
      * @return DriverInfo
      */
     @GetMapping("/id/{id}")
-    public R<DriverAttributeConfig> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<DriverAttributeConfigBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverAttributeConfig select = driverAttributeConfigService.selectById(Long.parseLong(id));
+            DriverAttributeConfigBO select = driverAttributeConfigService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -123,10 +123,10 @@ public class DriverAttributeConfigController implements Controller {
      * @return DriverInfo
      */
     @GetMapping("/device_id/{deviceId}/attribute_id/{attributeId}")
-    public R<DriverAttributeConfig> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") String deviceId,
-                                                                   @NotNull @PathVariable(value = "attributeId") String attributeId) {
+    public R<DriverAttributeConfigBO> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") String deviceId,
+                                                                     @NotNull @PathVariable(value = "attributeId") String attributeId) {
         try {
-            DriverAttributeConfig select = driverAttributeConfigService.selectByDeviceIdAndAttributeId(Long.parseLong(deviceId), Long.parseLong(attributeId));
+            DriverAttributeConfigBO select = driverAttributeConfigService.selectByDeviceIdAndAttributeId(Long.parseLong(deviceId), Long.parseLong(attributeId));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -143,9 +143,9 @@ public class DriverAttributeConfigController implements Controller {
      * @return DriverInfo Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<DriverAttributeConfig>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public R<List<DriverAttributeConfigBO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<DriverAttributeConfig> select = driverAttributeConfigService.selectByDeviceId(deviceId);
+            List<DriverAttributeConfigBO> select = driverAttributeConfigService.selectByDeviceId(deviceId);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -162,12 +162,12 @@ public class DriverAttributeConfigController implements Controller {
      * @return Page Of DriverInfo
      */
     @PostMapping("/list")
-    public R<Page<DriverAttributeConfig>> list(@RequestBody(required = false) DriverAttributeConfigPageQuery driverInfoPageQuery) {
+    public R<Page<DriverAttributeConfigBO>> list(@RequestBody(required = false) DriverAttributeConfigBOPageQuery driverInfoPageQuery) {
         try {
             if (ObjectUtil.isEmpty(driverInfoPageQuery)) {
-                driverInfoPageQuery = new DriverAttributeConfigPageQuery();
+                driverInfoPageQuery = new DriverAttributeConfigBOPageQuery();
             }
-            Page<DriverAttributeConfig> page = driverAttributeConfigService.selectByPage(driverInfoPageQuery);
+            Page<DriverAttributeConfigBO> page = driverAttributeConfigService.selectByPage(driverInfoPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

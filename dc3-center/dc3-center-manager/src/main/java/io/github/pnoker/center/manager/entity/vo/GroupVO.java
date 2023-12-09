@@ -28,17 +28,17 @@ import javax.validation.constraints.Pattern;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "Group",description = "分组")
+@Schema(title = "Group", description = "分组")
 public class GroupVO extends BaseVO {
 
     /**
      * 分组名称
      */
     @Schema(description = "分组名称")
-    @NotBlank(message = "Group name can't be empty",
+    @NotBlank(message = "分组名称不能为空",
             groups = {Insert.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
-            message = "Invalid group name",
+            message = "分组名称格式无效",
             groups = {Insert.class, Update.class})
     private String groupName;
 

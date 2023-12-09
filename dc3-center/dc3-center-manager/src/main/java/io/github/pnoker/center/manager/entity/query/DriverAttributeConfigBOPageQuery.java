@@ -17,12 +17,12 @@
 package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.DriverAttribute;
 import lombok.*;
 
 /**
- * ConnectInfo DTO
+ * DriverInfo DTO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -32,7 +32,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class DriverAttributePageQuery extends DriverAttribute {
+public class DriverAttributeConfigBOPageQuery extends DriverAttributeConfigBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

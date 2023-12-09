@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.bo;
+package io.github.pnoker.center.manager.entity.bo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Update;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
 /**
- * User
+ * Driver BO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -35,25 +42,40 @@ import lombok.experimental.SuperBuilder;
 @RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class UserLoginBO extends BaseBO {
+public class DriverBO extends BaseBO {
 
     /**
-     * 登录名称
+     * 驱动名称
      */
-    private String loginName;
+    private String driverName;
 
     /**
-     * 用户ID
+     * 驱动编号
      */
-    private Long userId;
+    private String driverCode;
 
     /**
-     * 用户密码ID
+     * 驱动服务名称
      */
-    private String userPasswordId;
+    private String serviceName;
+
+    /**
+     * 驱动类型标识
+     */
+    private DriverTypeFlagEnum driverTypeFlag;
+
+    /**
+     * 服务主机
+     */
+    private String serviceHost;
 
     /**
      * 使能标识
      */
     private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    private Long tenantId;
 }

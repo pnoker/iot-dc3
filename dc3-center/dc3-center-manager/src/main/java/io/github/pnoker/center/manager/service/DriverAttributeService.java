@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.DriverAttributePageQuery;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.DriverAttribute;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverAttributeService extends Service<DriverAttribute, DriverAttributePageQuery> {
+public interface DriverAttributeService extends Service<DriverAttributeBO, DriverAttributeBOPageQuery> {
 
     /**
      * 根据驱动配置属性 NAME 和 驱动 ID 查询
@@ -37,7 +37,7 @@ public interface DriverAttributeService extends Service<DriverAttribute, DriverA
      * @param driverId 驱动ID
      * @return DriverAttribute
      */
-    DriverAttribute selectByNameAndDriverId(String name, Long driverId);
+    DriverAttributeBO selectByNameAndDriverId(String name, Long driverId);
 
     /**
      * 根据驱动 ID 查询
@@ -46,5 +46,5 @@ public interface DriverAttributeService extends Service<DriverAttribute, DriverA
      * @param throwException Throw Exception
      * @return DriverAttribute Array
      */
-    List<DriverAttribute> selectByDriverId(Long driverId, boolean throwException);
+    List<DriverAttributeBO> selectByDriverId(Long driverId, boolean throwException);
 }

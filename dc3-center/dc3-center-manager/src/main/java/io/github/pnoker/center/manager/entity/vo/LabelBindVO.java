@@ -32,13 +32,15 @@ public class LabelBindVO extends BaseVO {
      * 标签ID
      */
     @Schema(description = "标签ID")
-    @NotBlank(message = "Label id can't be empty", groups = {Insert.class, Update.class})
+    @NotBlank(message = "标签ID不能为空",
+            groups = {Insert.class, Update.class})
     private String labelId;
 
     /**
      * 实体ID
      */
     @Schema(description = "实体ID")
-    @NotBlank(message = "Entity id can't be empty", groups = {Insert.class, Update.class})
+    @NotBlank(message = "实体ID不能为空",
+            groups = {Insert.class, Update.class})
     private String entityId;
 }
