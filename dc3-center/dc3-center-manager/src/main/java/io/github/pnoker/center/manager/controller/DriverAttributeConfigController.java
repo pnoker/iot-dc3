@@ -19,7 +19,7 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
-import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
@@ -126,7 +126,7 @@ public class DriverAttributeConfigController implements Controller {
     public R<DriverAttributeConfigBO> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") String deviceId,
                                                                      @NotNull @PathVariable(value = "attributeId") String attributeId) {
         try {
-            DriverAttributeConfigBO select = driverAttributeConfigService.selectByDeviceIdAndAttributeId(Long.parseLong(deviceId), Long.parseLong(attributeId));
+            DriverAttributeConfigBO select = driverAttributeConfigService.selectByAttributeIdAndDeviceId(Long.parseLong(deviceId), Long.parseLong(attributeId));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -162,10 +162,10 @@ public class DriverAttributeConfigController implements Controller {
      * @return Page Of DriverInfo
      */
     @PostMapping("/list")
-    public R<Page<DriverAttributeConfigBO>> list(@RequestBody(required = false) DriverAttributeConfigBOPageQuery driverInfoPageQuery) {
+    public R<Page<DriverAttributeConfigBO>> list(@RequestBody(required = false) DriverAttributeConfigQuery driverInfoPageQuery) {
         try {
             if (ObjectUtil.isEmpty(driverInfoPageQuery)) {
-                driverInfoPageQuery = new DriverAttributeConfigBOPageQuery();
+                driverInfoPageQuery = new DriverAttributeConfigQuery();
             }
             Page<DriverAttributeConfigBO> page = driverAttributeConfigService.selectByPage(driverInfoPageQuery);
             if (ObjectUtil.isNotNull(page)) {

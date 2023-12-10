@@ -19,7 +19,7 @@ package io.github.pnoker.center.manager.service.rabbit;
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.manager.service.DriverSyncService;
-import io.github.pnoker.common.dto.DriverSyncUpDTO;
+import io.github.pnoker.common.entity.dto.DriverSyncUpDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;

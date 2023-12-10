@@ -81,7 +81,7 @@ public interface DriverAttributeConfigBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<DriverAttributeConfigBO> buildBOByDO(List<DriverAttributeConfigDO> entityDOList);
+    List<DriverAttributeConfigBO> buildBOListByDOList(List<DriverAttributeConfigDO> entityDOList);
 
     /**
      * BO to VO

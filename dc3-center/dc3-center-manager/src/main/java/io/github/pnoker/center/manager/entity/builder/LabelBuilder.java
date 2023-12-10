@@ -81,7 +81,7 @@ public interface LabelBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<LabelBO> buildBOByDO(List<LabelDO> entityDOList);
+    List<LabelBO> buildBOListByDOList(List<LabelDO> entityDOList);
 
     /**
      * BO to VO

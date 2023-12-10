@@ -23,7 +23,7 @@ import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.point.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,7 +50,7 @@ public class PointValueController implements Controller {
      * 查询最新 PointValue 集合
      *
      * @param pointValuePageQuery 位号值和分页参数
-     * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}
+     * @return 带分页的 {@link PointValue}
      */
     @PostMapping("/latest")
     public R<Page<PointValue>> latest(@RequestBody PointValuePageQuery pointValuePageQuery) {
@@ -72,7 +72,7 @@ public class PointValueController implements Controller {
      * 分页查询 PointValue
      *
      * @param pointValuePageQuery 位号值和分页参数
-     * @return 带分页的 {@link io.github.pnoker.common.entity.point.PointValue}
+     * @return 带分页的 {@link PointValue}
      */
     @PostMapping("/list")
     public R<Page<PointValue>> list(@RequestBody(required = false) PointValuePageQuery pointValuePageQuery) {

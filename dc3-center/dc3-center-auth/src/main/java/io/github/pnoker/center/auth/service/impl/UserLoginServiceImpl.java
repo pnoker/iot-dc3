@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.query.UserLoginPageQuery;
 import io.github.pnoker.center.auth.mapper.UserLoginMapper;
 import io.github.pnoker.center.auth.service.UserLoginService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
@@ -111,11 +112,11 @@ public class UserLoginServiceImpl implements UserLoginService {
             return null;
         }
 
-        LambdaQueryWrapper<UserLogin> queryWrapper = Wrappers.<UserLogin>query().lambda();
-        queryWrapper.eq(UserLogin::getLoginName, loginName);
-        queryWrapper.eq(UserLogin::getEnableFlag, EnableFlagEnum.ENABLE);
-        queryWrapper.last("limit 1");
-        UserLogin userLogin = userLoginMapper.selectOne(queryWrapper);
+        LambdaQueryWrapper<UserLogin> wrapper = Wrappers.<UserLogin>query().lambda();
+        wrapper.eq(UserLogin::getLoginName, loginName);
+        wrapper.eq(UserLogin::getEnableFlag, EnableFlagEnum.ENABLE);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        UserLogin userLogin = userLoginMapper.selectOne(wrapper);
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException();
         }
@@ -133,11 +134,11 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     private LambdaQueryWrapper<UserLogin> fuzzyQuery(UserLoginPageQuery query) {
-        LambdaQueryWrapper<UserLogin> queryWrapper = Wrappers.<UserLogin>query().lambda();
+        LambdaQueryWrapper<UserLogin> wrapper = Wrappers.<UserLogin>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getLoginName()), UserLogin::getLoginName, query.getLoginName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getLoginName()), UserLogin::getLoginName, query.getLoginName());
         }
-        return queryWrapper;
+        return wrapper;
     }
 
 }

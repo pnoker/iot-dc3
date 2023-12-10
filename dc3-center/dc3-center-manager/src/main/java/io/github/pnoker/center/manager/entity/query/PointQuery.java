@@ -17,23 +17,31 @@
 package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.manager.entity.bo.DriverBO;
+import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.vo.PointVO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
- * Driver DTO
+ * Point DTO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
+@RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class DriverPageQuery extends DriverBO {
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(title = "PointQuery", description = "位号-查询")
+public class PointQuery extends PointVO {
 
+    @Schema(description = "分页")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    private Long deviceId;
 }

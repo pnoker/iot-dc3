@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.service.impl;
 
 import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.entity.base.Base;
+import io.github.pnoker.common.base.Base;
 import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.entity.driver.DriverMetadata;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -109,7 +109,7 @@ public class BatchServiceImpl implements BatchService {
     public Map<Long, DriverAttributeBO> getDriverAttributeMap(Long driverId) {
         Map<Long, DriverAttributeBO> driverAttributeMap = new ConcurrentHashMap<>(16);
         try {
-            List<DriverAttributeBO> driverAttributeBOS = driverAttributeService.selectByDriverId(driverId, true);
+            List<DriverAttributeBO> driverAttributeBOS = driverAttributeService.selectByDriverId(driverId);
             driverAttributeBOS.forEach(driverAttribute -> driverAttributeMap.put(driverAttribute.getId(), driverAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do
@@ -237,7 +237,7 @@ public class BatchServiceImpl implements BatchService {
     /**
      * Get profile  map
      *
-     * @param deviceIds 设备ID Set
+     * @param deviceIds 设备ID集
      * @return map(profileId ( pointId, point))
      */
     public Map<Long, Map<Long, PointBO>> getProfilePointMap(Set<Long> deviceIds) {

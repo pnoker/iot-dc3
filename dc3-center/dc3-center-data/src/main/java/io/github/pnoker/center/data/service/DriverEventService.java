@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.service;
 
-import io.github.pnoker.common.dto.DriverEventDTO;
+import io.github.pnoker.common.entity.dto.DriverEventDTO;
 
 /**
  * 驱动事件相关接口

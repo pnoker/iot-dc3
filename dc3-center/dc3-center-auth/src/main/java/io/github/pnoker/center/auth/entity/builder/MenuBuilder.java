@@ -81,7 +81,7 @@ public interface MenuBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<MenuBO> buildBOByDO(List<MenuDO> entityDOList);
+    List<MenuBO> buildBOListByDOList(List<MenuDO> entityDOList);
 
     /**
      * BO to VO

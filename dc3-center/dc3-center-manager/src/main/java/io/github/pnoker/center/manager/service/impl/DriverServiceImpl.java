@@ -20,20 +20,24 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
-import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
-import io.github.pnoker.center.manager.mapper.DriverMapper;
-import io.github.pnoker.center.manager.service.DeviceService;
+import io.github.pnoker.center.manager.entity.builder.DriverBuilder;
+import io.github.pnoker.center.manager.entity.model.DeviceDO;
+import io.github.pnoker.center.manager.entity.model.DriverDO;
+import io.github.pnoker.center.manager.entity.query.DriverQuery;
+import io.github.pnoker.center.manager.manager.DeviceManager;
+import io.github.pnoker.center.manager.manager.DriverManager;
 import io.github.pnoker.center.manager.service.DriverService;
+import io.github.pnoker.center.manager.service.ProfileBindService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -53,24 +57,26 @@ import java.util.stream.Collectors;
 public class DriverServiceImpl implements DriverService {
 
     @Resource
-    private DriverMapper driverMapper;
+    private DriverBuilder driverBuilder;
 
-    @Lazy
     @Resource
-    private DeviceService deviceService;
+    private DriverManager driverManager;
+    @Resource
+    private DeviceManager deviceManager;
+
+    @Resource
+    private ProfileBindService profileBindService;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void save(DriverBO entityBO) {
-        boolean duplicate = checkDuplicate(entityBO);
-        if (duplicate) {
-            throw new DuplicateException("The driver already exists");
-        }
+        checkDuplicate(entityBO, false, true);
 
-        if (driverMapper.insert(entityBO) < 1) {
-            throw new AddException("The driver {} add failed", entityBO.getDriverName());
+        DriverDO entityDO = driverBuilder.buildDOByBO(entityBO);
+        if (!driverManager.save(entityDO)) {
+            throw new AddException("驱动创建失败");
         }
     }
 
@@ -79,13 +85,10 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public void remove(Long id) {
-        DriverBO entityDO = selectById(id);
-        if (ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The driver does not exist");
-        }
+        getDOById(id, true);
 
-        if (driverMapper.deleteById(id) < 1) {
-            throw new DeleteException("The driver delete failed");
+        if (!driverManager.removeById(id)) {
+            throw new DeleteException("驱动删除失败");
         }
     }
 
@@ -94,27 +97,33 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public void update(DriverBO entityBO) {
-        selectById(entityBO.getId());
-        entityBO.setOperateTime(null);
-        if (driverMapper.updateById(entityBO) < 1) {
-            throw new UpdateException("The driver update failed");
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
+        DriverDO entityDO = driverBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!driverManager.updateById(entityDO)) {
+            throw new UpdateException("驱动更新失败");
         }
     }
 
     @Override
     public DriverBO selectById(Long id) {
-        return null;
+        DriverDO entityDO = getDOById(id, true);
+        return driverBuilder.buildBOByDO(entityDO);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<DriverBO> selectByPage(DriverPageQuery entityQuery) {
+    public Page<DriverBO> selectByPage(DriverQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return driverMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<DriverDO> entityPageDO = driverManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return driverBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**
@@ -122,10 +131,8 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public List<DriverBO> selectByIds(Set<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        return driverMapper.selectBatchIds(ids);
+        List<DriverDO> entityDOS = driverManager.listByIds(ids);
+        return driverBuilder.buildBOListByDOList(entityDOS);
     }
 
     /**
@@ -133,15 +140,9 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public DriverBO selectByServiceName(String serviceName, Long tenantId, boolean throwException) {
-        LambdaQueryWrapper<DriverBO> queryWrapper = Wrappers.<DriverBO>query().lambda();
-        queryWrapper.eq(DriverBO::getServiceName, serviceName);
-        queryWrapper.eq(DriverBO::getTenantId, tenantId);
-        queryWrapper.last("limit 1");
-        DriverBO entityDO = driverMapper.selectOne(queryWrapper);
-        if (throwException && (ObjectUtil.isNull(entityDO))) {
-            throw new NotFoundException("The driver does not exist of service name: {} for tenant: {}", serviceName, tenantId);
-        }
-        return entityDO;
+        LambdaQueryChainWrapper<DriverDO> wrapper = driverManager.lambdaQuery().eq(DriverDO::getServiceName, serviceName).eq(DriverDO::getTenantId, tenantId).last(QueryWrapperConstant.LIMIT_ONE);
+        DriverDO entityDO = driverManager.getOne(wrapper);
+        return driverBuilder.buildBOByDO(entityDO);
     }
 
     /**
@@ -149,8 +150,9 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public List<DriverBO> selectByProfileId(Long profileId) {
-        List<DeviceBO> deviceBOS = deviceService.selectByProfileId(profileId);
-        Set<Long> driverIds = deviceBOS.stream().map(DeviceBO::getDriverId).collect(Collectors.toSet());
+        Set<Long> deviceIds = profileBindService.selectDeviceIdsByProfileId(profileId);
+        List<DeviceDO> deviceDOS = deviceManager.listByIds(deviceIds);
+        Set<Long> driverIds = deviceDOS.stream().map(DeviceDO::getDriverId).collect(Collectors.toSet());
         List<DriverBO> entityDOList = selectByIds(driverIds);
         if (CollUtil.isEmpty(entityDOList)) {
             return Collections.emptyList();
@@ -163,37 +165,59 @@ public class DriverServiceImpl implements DriverService {
      */
     @Override
     public DriverBO selectByDeviceId(Long deviceId) {
-        DeviceBO deviceBO = deviceService.selectById(deviceId);
-        return selectById(deviceBO.getDriverId());
+        DeviceDO entityDO = deviceManager.getById(deviceId);
+        return selectById(entityDO.getDriverId());
     }
 
-    @Override
-    public Long count() {
-        return driverMapper.selectCount(new QueryWrapper<>());
+    private LambdaQueryWrapper<DriverDO> fuzzyQuery(DriverQuery query) {
+        LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
+        if (ObjectUtil.isNotNull(query)) {
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getDriverName()), DriverDO::getDriverName, query.getDriverName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getServiceName()), DriverDO::getServiceName, query.getServiceName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getServiceHost()), DriverDO::getServiceHost, query.getServiceHost());
+            wrapper.eq(ObjectUtil.isNotNull(query.getDriverTypeFlag()), DriverDO::getDriverTypeFlag, query.getDriverTypeFlag());
+            wrapper.eq(ObjectUtil.isNotNull(query.getEnableFlag()), DriverDO::getEnableFlag, query.getEnableFlag());
+            wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), DriverDO::getTenantId, query.getTenantId());
+        }
+        return wrapper;
     }
 
     /**
-     * 按服务名称，判断是否重复
+     * 重复性校验
      *
-     * @param entityDO DriverDO
+     * @param entityBO       {@link DriverBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
      * @return 是否重复
      */
-    private boolean checkDuplicate(DriverBO entityDO) {
-        DriverBO driverBO = selectByServiceName(entityDO.getServiceName(), entityDO.getTenantId(), false);
-        return ObjectUtil.isNotNull(driverBO);
-    }
-
-    private LambdaQueryWrapper<DriverBO> fuzzyQuery(DriverPageQuery query) {
-        LambdaQueryWrapper<DriverBO> queryWrapper = Wrappers.<DriverBO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getDriverName()), DriverBO::getDriverName, query.getDriverName());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getServiceName()), DriverBO::getServiceName, query.getServiceName());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getServiceHost()), DriverBO::getServiceHost, query.getServiceHost());
-            queryWrapper.eq(ObjectUtil.isNotNull(query.getDriverTypeFlag()), DriverBO::getDriverTypeFlag, query.getDriverTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(query.getEnableFlag()), DriverBO::getEnableFlag, query.getEnableFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), DriverBO::getTenantId, query.getTenantId());
+    private boolean checkDuplicate(DriverBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
+        wrapper.eq(DriverDO::getDriverName, entityBO.getDriverName());
+        wrapper.eq(DriverDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        DriverDO one = driverManager.getOne(wrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
         }
-        return queryWrapper;
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("The driver is duplicates");
+        }
+        return duplicate;
     }
 
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link DriverDO}
+     */
+    private DriverDO getDOById(Long id, boolean throwException) {
+        DriverDO entityDO = driverManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("The driver not exist");
+        }
+        return entityDO;
+    }
 }

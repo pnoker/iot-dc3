@@ -94,9 +94,9 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
     @Override
     public List<ResourceBO> listResourceByRoleId(Long RoleId) {
-        LambdaQueryWrapper<RoleResourceBindBO> queryWrapper = Wrappers.<RoleResourceBindBO>query().lambda();
-        queryWrapper.eq(RoleResourceBindBO::getRoleId, RoleId);
-        List<RoleResourceBindBO> roleResourceBindBOS = bindMapper.selectList(queryWrapper);
+        LambdaQueryWrapper<RoleResourceBindBO> wrapper = Wrappers.<RoleResourceBindBO>query().lambda();
+        wrapper.eq(RoleResourceBindBO::getRoleId, RoleId);
+        List<RoleResourceBindBO> roleResourceBindBOS = bindMapper.selectList(wrapper);
         if (CollUtil.isNotEmpty(roleResourceBindBOS)) {
             List<ResourceBO> resourceBOS = resourceMapper.selectBatchIds(roleResourceBindBOS.stream()
                     .map(RoleResourceBindBO::getResourceId).collect(Collectors.toList()));
@@ -108,11 +108,11 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     private LambdaQueryWrapper<RoleResourceBindBO> buildQueryWrapper(RoleResourceBindBOPageQuery pageQuery) {
-        LambdaQueryWrapper<RoleResourceBindBO> queryWrapper = Wrappers.<RoleResourceBindBO>query().lambda();
+        LambdaQueryWrapper<RoleResourceBindBO> wrapper = Wrappers.<RoleResourceBindBO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleResourceBindBO::getResourceId, pageQuery.getRoleId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceId()), RoleResourceBindBO::getResourceId, pageQuery.getResourceId());
+            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleResourceBindBO::getResourceId, pageQuery.getRoleId());
+            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceId()), RoleResourceBindBO::getResourceId, pageQuery.getResourceId());
         }
-        return queryWrapper;
+        return wrapper;
     }
 }

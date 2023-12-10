@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.*;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
-import io.github.pnoker.center.manager.entity.query.PointBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -56,7 +56,7 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         RPagePointDTO.Builder builder = RPagePointDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
-        PointBOPageQuery pageQuery = buildPageQuery(request);
+        PointQuery pageQuery = buildPageQuery(request);
 
         Page<PointBO> pointPage = pointService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(pointPage)) {
@@ -92,8 +92,8 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
      * @param request PagePointQueryDTO
      * @return PointPageQuery
      */
-    private PointBOPageQuery buildPageQuery(PagePointQueryDTO request) {
-        PointBOPageQuery pageQuery = new PointBOPageQuery();
+    private PointQuery buildPageQuery(PagePointQueryDTO request) {
+        PointQuery pageQuery = new PointQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());

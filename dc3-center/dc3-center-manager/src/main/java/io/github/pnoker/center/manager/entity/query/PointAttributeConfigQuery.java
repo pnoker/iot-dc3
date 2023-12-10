@@ -17,16 +17,29 @@
 package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.vo.PointAttributeConfigVO;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.NodeRedFlows;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+/**
+ * PointInfo DTO
+ *
+ * @author pnoker
+ * @since 2022.1.0
+ */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
+@RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class NodeRedFlowsPageQuery extends NodeRedFlows {
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(title = "PointAttributeConfigQuery", description = "位号属性配置-查询")
+public class PointAttributeConfigQuery extends PointAttributeConfigVO {
+
+    @Schema(description = "分页")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 }

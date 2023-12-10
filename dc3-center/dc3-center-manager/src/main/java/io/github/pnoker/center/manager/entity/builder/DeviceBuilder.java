@@ -81,7 +81,7 @@ public interface DeviceBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<DeviceBO> buildBOByDO(List<DeviceDO> entityDOList);
+    List<DeviceBO> buildBOListByDOList(List<DeviceDO> entityDOList);
 
     /**
      * BO to VO

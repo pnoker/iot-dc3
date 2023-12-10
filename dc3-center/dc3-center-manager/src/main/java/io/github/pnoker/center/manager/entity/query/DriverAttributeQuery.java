@@ -17,25 +17,29 @@
 package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
+import io.github.pnoker.center.manager.entity.vo.DriverAttributeVO;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.center.manager.entity.bo.ProfileBO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
- * Profile DTO
+ * ConnectInfo DTO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
+@RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ProfileBOPageQuery extends ProfileBO {
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(title = "DriverAttributeQuery", description = "驱动属性-查询")
+public class DriverAttributeQuery extends DriverAttributeVO {
 
+    @Schema(description = "分页")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
-
-    private Long deviceId;
 }

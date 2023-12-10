@@ -26,7 +26,7 @@ import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.PageDTO;
 import io.github.pnoker.api.common.RDTO;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
-import io.github.pnoker.center.manager.entity.query.DeviceBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -58,7 +58,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         RPageDeviceDTO.Builder builder = RPageDeviceDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
-        DeviceBOPageQuery pageQuery = buildPageQuery(request);
+        DeviceQuery pageQuery = buildPageQuery(request);
 
         Page<DeviceBO> devicePage = deviceService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(devicePage)) {
@@ -119,8 +119,8 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
      * @param request PageDeviceQueryDTO
      * @return DevicePageQuery
      */
-    private DeviceBOPageQuery buildPageQuery(PageDeviceQueryDTO request) {
-        DeviceBOPageQuery pageQuery = new DeviceBOPageQuery();
+    private DeviceQuery buildPageQuery(PageDeviceQueryDTO request) {
+        DeviceQuery pageQuery = new DeviceQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());

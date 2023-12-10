@@ -17,8 +17,8 @@
 package io.github.pnoker.center.manager.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.bo.DictionaryBO;
 import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
-import io.github.pnoker.common.entity.common.Dictionary;
 
 /**
  * Dictionary Interface
@@ -31,34 +31,49 @@ public interface DictionaryService {
     /**
      * 获取驱动字典带分页的列表
      *
-     * @param dictionaryQuery 字典和分页参数
-     * @return 带分页的 {@link DictionaryQuery}
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
      */
-    Page<Dictionary> driverDictionary(DictionaryQuery dictionaryQuery);
-
-    /**
-     * 获取设备字典带分页的列表
-     *
-     * @param dictionaryQuery 字典和分页参数
-     * @return 带分页的 {@link DictionaryQuery}
-     */
-    Page<Dictionary> deviceDictionary(DictionaryQuery dictionaryQuery);
+    Page<DictionaryBO> driverDictionary(DictionaryQuery entityQuery);
 
     /**
      * 获取模板字典带分页的列表
      *
-     * @param dictionaryQuery 字典和分页参数
-     * @return 带分页的 {@link DictionaryQuery}
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
      */
-    Page<Dictionary> profileDictionary(DictionaryQuery dictionaryQuery);
+    Page<DictionaryBO> profileDictionary(DictionaryQuery entityQuery);
 
     /**
-     * 带分页的列表
-     * profile/device
+     * 获取模板下位号字典带分页的列表
      *
-     * @param dictionaryQuery 字典和分页参数
-     * @return 带分页的 {@link DictionaryQuery}
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
      */
-    Page<Dictionary> pointDictionary(DictionaryQuery dictionaryQuery);
+    Page<DictionaryBO> pointDictionaryForProfile(DictionaryQuery entityQuery);
+
+    /**
+     * 获取设备下位号字典带分页的列表
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
+     */
+    Page<DictionaryBO> pointDictionaryForDevice(DictionaryQuery entityQuery);
+
+    /**
+     * 获取设备字典带分页的列表
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
+     */
+    Page<DictionaryBO> deviceDictionary(DictionaryQuery entityQuery);
+
+    /**
+     * 获取驱动下设备字典带分页的列表
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
+     */
+    Page<DictionaryBO> deviceDictionaryForDriver(DictionaryQuery entityQuery);
 
 }

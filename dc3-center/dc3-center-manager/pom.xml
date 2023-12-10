@@ -31,28 +31,22 @@
 
     <dependencies>
 
-        <!-- DC3 Api Manager -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-manager</artifactId>
-        </dependency>
-
         <!-- DC3 Api Auth -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
+        <!-- DC3 Api Manager -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-manager</artifactId>
+        </dependency>
+
         <!-- DC3 Api Data -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-data</artifactId>
-        </dependency>
-
-        <!-- DC3 Common RabbitMQ -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-rabbitmq</artifactId>
         </dependency>
 
         <!-- DC3 Common MySQL -->
@@ -73,12 +67,12 @@
             <artifactId>dc3-common-mongo</artifactId>
         </dependency>
 
-        <!--待移除-->
+        <!-- DC3 Common RabbitMQ -->
         <dependency>
-            <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
-            <version>2.0.25</version>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-rabbitmq</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

@@ -20,7 +20,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
-import io.github.pnoker.center.manager.entity.query.PointBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
@@ -125,7 +125,7 @@ public class PointController implements Controller {
     /**
      * 根据 ID 集合查询 Point
      *
-     * @param pointIds Point ID Set
+     * @param pointIds 位号ID集
      * @return Map String:Point
      */
     @PostMapping("/ids")
@@ -160,7 +160,7 @@ public class PointController implements Controller {
     }
 
     /**
-     * 根据 设备 ID 查询 Point
+     * 根据 设备ID 查询 Point
      *
      * @param deviceId 设备ID
      * @return Point Array
@@ -185,10 +185,10 @@ public class PointController implements Controller {
      * @return Page Of Point
      */
     @PostMapping("/list")
-    public R<Page<PointBO>> list(@RequestBody(required = false) PointBOPageQuery pointPageQuery) {
+    public R<Page<PointBO>> list(@RequestBody(required = false) PointQuery pointPageQuery) {
         try {
             if (ObjectUtil.isEmpty(pointPageQuery)) {
-                pointPageQuery = new PointBOPageQuery();
+                pointPageQuery = new PointQuery();
             }
             pointPageQuery.setTenantId(getTenantId());
             Page<PointBO> page = pointService.selectByPage(pointPageQuery);
@@ -204,7 +204,7 @@ public class PointController implements Controller {
     /**
      * 查询 位号单位
      *
-     * @param pointIds Point ID Set
+     * @param pointIds 位号ID集
      * @return Map String:String
      */
     @PostMapping("/unit")

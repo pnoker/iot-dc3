@@ -81,7 +81,7 @@ public interface RoleBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<RoleBO> buildBOByDO(List<RoleDO> entityDOList);
+    List<RoleBO> buildBOListByDOList(List<RoleDO> entityDOList);
 
     /**
      * BO to VO

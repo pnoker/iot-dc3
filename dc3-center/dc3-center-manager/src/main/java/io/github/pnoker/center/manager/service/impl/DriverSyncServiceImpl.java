@@ -26,8 +26,8 @@ import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
-import io.github.pnoker.common.dto.DriverSyncDownDTO;
-import io.github.pnoker.common.dto.DriverSyncUpDTO;
+import io.github.pnoker.common.entity.dto.DriverSyncDownDTO;
+import io.github.pnoker.common.entity.dto.DriverSyncUpDTO;
 import io.github.pnoker.common.entity.driver.DriverMetadata;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -138,7 +138,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
 
         Map<String, DriverAttributeBO> oldDriverAttributeMap = new HashMap<>(8);
         try {
-            List<DriverAttributeBO> byDriverId = driverAttributeService.selectByDriverId(entityDO.getId(), true);
+            List<DriverAttributeBO> byDriverId = driverAttributeService.selectByDriverId(entityDO.getId());
             byDriverId.forEach(driverAttribute -> oldDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do

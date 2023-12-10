@@ -22,7 +22,7 @@ import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
-import io.github.pnoker.common.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;

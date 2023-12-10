@@ -81,7 +81,7 @@ public interface BlackIpBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<BlackIpBO> buildBOByDO(List<BlackIpDO> entityDOList);
+    List<BlackIpBO> buildBOListByDOList(List<BlackIpDO> entityDOList);
 
     /**
      * BO to VO

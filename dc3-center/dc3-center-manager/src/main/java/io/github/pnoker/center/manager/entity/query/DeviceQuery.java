@@ -17,23 +17,31 @@
 package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.vo.DeviceVO;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.center.manager.entity.bo.ProfileBindBO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
- * ProfileBind DTO
+ * Device DTO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
+@RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ProfileBindBOPageQuery extends ProfileBindBO {
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(title = "DeviceQuery", description = "设备-查询")
+public class DeviceQuery extends DeviceVO {
 
+    @Schema(description = "分页")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    private Long profileId;
 }

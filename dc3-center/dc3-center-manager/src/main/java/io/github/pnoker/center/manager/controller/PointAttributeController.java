@@ -20,7 +20,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
-import io.github.pnoker.center.manager.entity.query.PointAttributeBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointAttributeQuery;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
@@ -146,10 +146,10 @@ public class PointAttributeController implements Controller {
      * @return Page Of PointAttribute
      */
     @PostMapping("/list")
-    public R<Page<PointAttributeBO>> list(@RequestBody(required = false) PointAttributeBOPageQuery pointAttributePageQuery) {
+    public R<Page<PointAttributeBO>> list(@RequestBody(required = false) PointAttributeQuery pointAttributePageQuery) {
         try {
             if (ObjectUtil.isEmpty(pointAttributePageQuery)) {
-                pointAttributePageQuery = new PointAttributeBOPageQuery();
+                pointAttributePageQuery = new PointAttributeQuery();
             }
             Page<PointAttributeBO> page = pointAttributeService.selectByPage(pointAttributePageQuery);
             if (ObjectUtil.isNotNull(page)) {

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.query;
+package io.github.pnoker.center.data.entity.point;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import lombok.*;
+import org.springframework.data.annotation.Id;
 
 /**
- * PointInfo DTO
+ * MongoDB 位号数据
  *
  * @author pnoker
  * @since 2022.1.0
@@ -32,8 +32,13 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class PointAttributeConfigBOPageQuery extends PointAttributeConfigBO {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class EsPointValue extends PointValue {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
+    @Id
+    private String id;
+
+    public EsPointValue(PointValue pointValue) {
+        BeanUtil.copyProperties(pointValue, this);
+    }
 }

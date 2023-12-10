@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.query;
+package io.github.pnoker.center.manager.entity.vo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.center.manager.entity.bo.PointBO;
-import lombok.*;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 /**
- * Point DTO
+ * Dictionary BO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class PointBOPageQuery extends PointBO {
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
-
-    private Long deviceId;
+@SuperBuilder
+@RequiredArgsConstructor
+public class DictionaryVO {
+    private String type;
+    private String label;
+    private String value;
+    private boolean disabled;
+    private boolean expand = true;
+    private List<DictionaryVO> children;
 }

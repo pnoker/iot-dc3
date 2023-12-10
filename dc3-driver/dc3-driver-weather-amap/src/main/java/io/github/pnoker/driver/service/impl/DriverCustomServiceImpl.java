@@ -19,7 +19,7 @@ package io.github.pnoker.driver.service.impl;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.constant.driver.EventConstant;
-import io.github.pnoker.common.entity.DeviceEvent;
+import io.github.pnoker.common.event.DeviceEvent;
 import io.github.pnoker.common.entity.driver.AttributeInfo;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.exception.ServiceException;

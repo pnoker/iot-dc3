@@ -37,7 +37,7 @@ Accept: */*
 Cache-Control: no-cache
 
 
-### 根据 Device ID 和 Point ID 查询 最新值
+### 根据 Device ID 和 位号ID 查询 最新值
 #/latest/device_id/:deviceId/point_id/:pointId
 GET http://{{dc3-data}}/data/point_value/latest/device_id/1/point_id/1
 Accept: */*
@@ -51,7 +51,7 @@ Accept: */*
 Cache-Control: no-cache
 
 
-### 根据 Device ID 和 Point ID 查询 实时值
+### 根据 Device ID 和 位号ID 查询 实时值
 #/realtime/device_id/:deviceId/point_id/:pointId
 GET http://{{dc3-data}}/data/point_value/realtime/device_id/1/point_id/1
 Accept: */*

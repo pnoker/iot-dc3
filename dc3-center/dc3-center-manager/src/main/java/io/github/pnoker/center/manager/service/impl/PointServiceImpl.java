@@ -16,19 +16,24 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
-import io.github.pnoker.center.manager.entity.query.PointBOPageQuery;
+import io.github.pnoker.center.manager.entity.builder.PointBuilder;
+import io.github.pnoker.center.manager.entity.model.PointDO;
+import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
+import io.github.pnoker.center.manager.entity.query.PointQuery;
+import io.github.pnoker.center.manager.manager.PointManager;
+import io.github.pnoker.center.manager.manager.ProfileBindManager;
 import io.github.pnoker.center.manager.mapper.PointMapper;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointService;
-import io.github.pnoker.center.manager.service.ProfileBindService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.*;
@@ -37,7 +42,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,10 +58,16 @@ import java.util.stream.Collectors;
 public class PointServiceImpl implements PointService {
 
     @Resource
-    private PointMapper pointMapper;
+    private PointBuilder pointBuilder;
 
     @Resource
-    private ProfileBindService profileBindService;
+    private PointManager pointManager;
+    @Resource
+    private ProfileBindManager profileBindManager;
+
+    @Resource
+    private PointMapper pointMapper;
+
     @Resource
     private NotifyService notifyService;
 
@@ -66,18 +76,17 @@ public class PointServiceImpl implements PointService {
      */
     @Override
     public void save(PointBO entityBO) {
-        try {
-            selectByNameAndProfileId(entityBO.getPointName(), entityBO.getProfileId());
-            throw new DuplicateException("The point already exists in the profile");
-        } catch (NotFoundException notFoundException) {
-            if (pointMapper.insert(entityBO) < 1) {
-                throw new AddException("The point {} add failed", entityBO.getPointName());
-            }
+        checkDuplicate(entityBO, false, true);
 
-            // 通知驱动新增
-            PointBO pointBO = pointMapper.selectById(entityBO.getId());
-            notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, pointBO);
+        PointDO entityDO = pointBuilder.buildDOByBO(entityBO);
+        if (!pointManager.save(entityDO)) {
+            throw new AddException("位号创建失败");
         }
+
+        // 通知驱动新增
+        entityDO = pointManager.getById(entityDO.getId());
+        entityBO = pointBuilder.buildBOByDO(entityDO);
+        notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, entityBO);
     }
 
     /**
@@ -85,16 +94,14 @@ public class PointServiceImpl implements PointService {
      */
     @Override
     public void remove(Long id) {
-        PointBO pointBO = selectById(id);
-        if (ObjectUtil.isNull(pointBO)) {
-            throw new NotFoundException("The point does not exist");
+        PointDO entityDO = getDOById(id, true);
+
+        if (!pointManager.removeById(id)) {
+            throw new DeleteException("位号删除失败");
         }
 
-        if (pointMapper.deleteById(id) < 1) {
-            throw new DeleteException("The point delete failed");
-        }
-
-        notifyService.notifyDriverPoint(MetadataCommandTypeEnum.DELETE, pointBO);
+        PointBO entityBO = pointBuilder.buildBOByDO(entityDO);
+        notifyService.notifyDriverPoint(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     /**
@@ -102,30 +109,25 @@ public class PointServiceImpl implements PointService {
      */
     @Override
     public void update(PointBO entityBO) {
-        PointBO old = selectById(entityBO.getId());
-        entityBO.setOperateTime(null);
-        if (!old.getProfileId().equals(entityBO.getProfileId()) || !old.getPointName().equals(entityBO.getPointName())) {
-            try {
-                selectByNameAndProfileId(entityBO.getPointName(), entityBO.getProfileId());
-                throw new DuplicateException("The point already exists");
-            } catch (NotFoundException ignored) {
-                // nothing to do
-            }
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
+        PointDO entityDO = pointBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!pointManager.updateById(entityDO)) {
+            throw new UpdateException("位号更新失败");
         }
 
-        if (pointMapper.updateById(entityBO) < 1) {
-            throw new UpdateException("The point update failed");
-        }
-
-        PointBO select = pointMapper.selectById(entityBO.getId());
-        entityBO.setPointName(select.getPointName());
-        entityBO.setProfileId(select.getProfileId());
-        notifyService.notifyDriverPoint(MetadataCommandTypeEnum.UPDATE, select);
+        entityDO = pointManager.getById(entityDO.getId());
+        entityBO = pointBuilder.buildBOByDO(entityDO);
+        notifyService.notifyDriverPoint(MetadataCommandTypeEnum.UPDATE, entityBO);
     }
 
     @Override
     public PointBO selectById(Long id) {
-        return null;
+        PointDO entityDO = getDOById(id, true);
+        return pointBuilder.buildBOByDO(entityDO);
     }
 
     /**
@@ -133,27 +135,8 @@ public class PointServiceImpl implements PointService {
      */
     @Override
     public List<PointBO> selectByIds(Set<Long> ids) {
-        List<PointBO> devices = pointMapper.selectBatchIds(ids);
-        if (CollUtil.isEmpty(devices)) {
-            throw new NotFoundException();
-        }
-        return devices;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PointBO selectByNameAndProfileId(String name, Long profileId) {
-        LambdaQueryWrapper<PointBO> queryWrapper = Wrappers.<PointBO>query().lambda();
-        queryWrapper.eq(PointBO::getPointName, name);
-        queryWrapper.eq(PointBO::getProfileId, profileId);
-        queryWrapper.last("limit 1");
-        PointBO pointBO = pointMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(pointBO)) {
-            throw new NotFoundException();
-        }
-        return pointBO;
+        List<PointDO> entityDOS = pointManager.listByIds(ids);
+        return pointBuilder.buildBOListByDOList(entityDOS);
     }
 
     /**
@@ -161,8 +144,10 @@ public class PointServiceImpl implements PointService {
      */
     @Override
     public List<PointBO> selectByDeviceId(Long deviceId) {
-        Set<Long> profileIds = profileBindService.selectProfileIdsByDeviceId(deviceId);
-        return selectByProfileIds(profileIds, true);
+        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId);
+        List<ProfileBindDO> entityDOS = wrapper.list();
+        Set<Long> profileIds = entityDOS.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
+        return selectByProfileIds(profileIds);
     }
 
     /**
@@ -170,46 +155,31 @@ public class PointServiceImpl implements PointService {
      */
     @Override
     public List<PointBO> selectByProfileId(Long profileId) {
-        PointBOPageQuery pointPageQuery = new PointBOPageQuery();
-        pointPageQuery.setProfileId(profileId);
-        List<PointBO> pointBOS = pointMapper.selectList(fuzzyQuery(pointPageQuery));
-        if (ObjectUtil.isNull(pointBOS) || pointBOS.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return pointBOS;
+        LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, profileId);
+        List<PointDO> entityDOS = wrapper.list();
+        return pointBuilder.buildBOListByDOList(entityDOS);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<PointBO> selectByProfileIds(Set<Long> profileIds, boolean throwException) {
-        List<PointBO> pointBOS = new ArrayList<>(16);
-        profileIds.forEach(profileId -> {
-            PointBOPageQuery pointPageQuery = new PointBOPageQuery();
-            pointPageQuery.setProfileId(profileId);
-            List<PointBO> pointBOList = pointMapper.selectList(fuzzyQuery(pointPageQuery));
-            if (ObjectUtil.isNotNull(pointBOList)) {
-                pointBOS.addAll(pointBOList);
-            }
-        });
-        if (throwException) {
-            if (pointBOS.isEmpty()) {
-                throw new NotFoundException();
-            }
-        }
-        return pointBOS;
+    public List<PointBO> selectByProfileIds(Set<Long> profileIds) {
+        LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().in(PointDO::getProfileId, profileIds);
+        List<PointDO> entityDOS = wrapper.list();
+        return pointBuilder.buildBOListByDOList(entityDOS);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<PointBO> selectByPage(PointBOPageQuery entityQuery) {
+    public Page<PointBO> selectByPage(PointQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return pointMapper.selectPageWithDevice(PageUtil.page(entityQuery.getPage()), customFuzzyQuery(entityQuery), entityQuery.getDeviceId());
+        Page<PointDO> entityPageDO = pointMapper.selectPageWithDevice(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery), entityQuery.getDeviceId());
+        return pointBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**
@@ -217,42 +187,63 @@ public class PointServiceImpl implements PointService {
      */
     @Override
     public Map<Long, String> unit(Set<Long> pointIds) {
-        List<PointBO> pointBOS = pointMapper.selectBatchIds(pointIds);
-        return pointBOS.stream().collect(Collectors.toMap(PointBO::getId, PointBO::getUnit));
+        List<PointDO> pointDOS = pointManager.listByIds(pointIds);
+        return pointDOS.stream().collect(Collectors.toMap(PointDO::getId, PointDO::getUnit));
     }
 
-    @Override
-    public Long count() {
-        return pointMapper.selectCount(new QueryWrapper<>());
-    }
-
-    private LambdaQueryWrapper<PointBO> fuzzyQuery(PointBOPageQuery query) {
-        LambdaQueryWrapper<PointBO> queryWrapper = Wrappers.<PointBO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getPointName()), PointBO::getPointName, query.getPointName());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getPointCode()), PointBO::getPointCode, query.getPointCode());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getPointTypeFlag()), PointBO::getPointTypeFlag, query.getPointTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getRwFlag()), PointBO::getRwFlag, query.getRwFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getProfileId()), PointBO::getProfileId, query.getProfileId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getEnableFlag()), PointBO::getEnableFlag, query.getEnableFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), PointBO::getTenantId, query.getTenantId());
-        }
-        return queryWrapper;
-    }
-
-    private LambdaQueryWrapper<PointBO> customFuzzyQuery(PointBOPageQuery pointPageQuery) {
-        QueryWrapper<PointBO> queryWrapper = Wrappers.query();
-        queryWrapper.eq("dp.deleted", 0);
+    private LambdaQueryWrapper<PointDO> fuzzyQuery(PointQuery pointPageQuery) {
+        QueryWrapper<PointDO> wrapper = Wrappers.query();
+        wrapper.eq("dp.deleted", 0);
         if (ObjectUtil.isNotNull(pointPageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(pointPageQuery.getPointName()), "dp.point_name", pointPageQuery.getPointName());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointCode()), "dp.point_code", pointPageQuery.getPointTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), "dp.point_type_flag", pointPageQuery.getPointTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getRwFlag()), "dp.rw_flag", pointPageQuery.getRwFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getProfileId()), "dp.profile_id", pointPageQuery.getProfileId());
-            queryWrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getEnableFlag()), "dp.enable_flag", pointPageQuery.getEnableFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getTenantId()), "dp.tenant_id", pointPageQuery.getTenantId());
+            wrapper.like(CharSequenceUtil.isNotEmpty(pointPageQuery.getPointName()), "dp.point_name", pointPageQuery.getPointName());
+            wrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointCode()), "dp.point_code", pointPageQuery.getPointTypeFlag());
+            wrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), "dp.point_type_flag", pointPageQuery.getPointTypeFlag());
+            wrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getRwFlag()), "dp.rw_flag", pointPageQuery.getRwFlag());
+            wrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getProfileId()), "dp.profile_id", pointPageQuery.getProfileId());
+            wrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getEnableFlag()), "dp.enable_flag", pointPageQuery.getEnableFlag());
+            wrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getTenantId()), "dp.tenant_id", pointPageQuery.getTenantId());
         }
-        return queryWrapper.lambda();
+        return wrapper.lambda();
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link PointBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(PointBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<PointDO> wrapper = Wrappers.<PointDO>query().lambda();
+        wrapper.eq(PointDO::getPointName, entityBO.getPointName());
+        wrapper.eq(PointDO::getProfileId, entityBO.getProfileId());
+        wrapper.eq(PointDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        PointDO one = pointManager.getOne(wrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("The point is duplicates");
+        }
+        return duplicate;
+    }
+
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link PointDO}
+     */
+    private PointDO getDOById(Long id, boolean throwException) {
+        PointDO entityDO = pointManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("The point not exist");
+        }
+        return entityDO;
     }
 
 }

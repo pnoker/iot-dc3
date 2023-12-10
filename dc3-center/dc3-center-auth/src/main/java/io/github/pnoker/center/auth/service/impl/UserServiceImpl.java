@@ -26,6 +26,7 @@ import io.github.pnoker.center.auth.entity.bo.UserBO;
 import io.github.pnoker.center.auth.entity.query.UserBODto;
 import io.github.pnoker.center.auth.mapper.UserMapper;
 import io.github.pnoker.center.auth.service.UserService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
@@ -175,21 +176,21 @@ public class UserServiceImpl implements UserService {
     }
 
     private LambdaQueryWrapper<UserBO> fuzzyQuery(UserBODto query) {
-        LambdaQueryWrapper<UserBO> queryWrapper = Wrappers.<UserBO>query().lambda();
+        LambdaQueryWrapper<UserBO> wrapper = Wrappers.<UserBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getNickName()), UserBO::getNickName, query.getNickName());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getUserName()), UserBO::getUserName, query.getUserName());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getPhone()), UserBO::getPhone, query.getPhone());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getEmail()), UserBO::getEmail, query.getEmail());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getNickName()), UserBO::getNickName, query.getNickName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getUserName()), UserBO::getUserName, query.getUserName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getPhone()), UserBO::getPhone, query.getPhone());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getEmail()), UserBO::getEmail, query.getEmail());
         }
-        return queryWrapper;
+        return wrapper;
     }
 
     private UserBO selectByKey(SFunction<UserBO, ?> key, String value, boolean throwException) {
-        LambdaQueryWrapper<UserBO> queryWrapper = Wrappers.<UserBO>query().lambda();
-        queryWrapper.eq(key, value);
-        queryWrapper.last("limit 1");
-        UserBO userBO = userMapper.selectOne(queryWrapper);
+        LambdaQueryWrapper<UserBO> wrapper = Wrappers.<UserBO>query().lambda();
+        wrapper.eq(key, value);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        UserBO userBO = userMapper.selectOne(wrapper);
         if (ObjectUtil.isNull(userBO)) {
             if (throwException) {
                 throw new NotFoundException();

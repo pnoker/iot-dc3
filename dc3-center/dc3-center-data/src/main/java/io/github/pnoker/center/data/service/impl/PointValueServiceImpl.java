@@ -37,7 +37,7 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.StorageConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.SneakyThrows;

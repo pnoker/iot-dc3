@@ -20,8 +20,8 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
+import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -34,5 +34,5 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface ProfileMapper extends BaseMapper<ProfileDO> {
 
-    Page<ProfileBO> selectPageWithDevice(Page<ProfileBO> page, @Param(Constants.WRAPPER) Wrapper<ProfileBO> queryWrapper, @Param("deviceId") Long deviceId);
+    Page<ProfileDO> selectPageWithDevice(Page<ProfileDO> page, @Param(Constants.WRAPPER) Wrapper<ProfileDO> wrapper, @Param("deviceId") Long deviceId);
 }

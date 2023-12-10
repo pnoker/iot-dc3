@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -54,7 +54,7 @@ public class DeviceVO extends BaseVO {
      * 设备名称
      */
     @Schema(description = "设备名称")
-    @NotBlank(message = "设备名称不能为空", 
+    @NotBlank(message = "设备名称不能为空",
             groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "设备名称格式无效",
@@ -71,7 +71,7 @@ public class DeviceVO extends BaseVO {
      * 驱动ID
      */
     @Schema(description = "驱动ID")
-    @NotBlank(message = "驱动ID不能为空",
+    @NotNull(message = "驱动ID不能为空",
             groups = {Add.class, Update.class, Upload.class})
     private Long driverId;
 

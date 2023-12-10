@@ -14,26 +14,33 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.query;
+package io.github.pnoker.center.data.entity.point;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
-import io.github.pnoker.common.entity.common.Pages;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 /**
- * ConnectInfo DTO
+ * MongoDB 位号数据
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
+@Document
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class DriverAttributeBOPageQuery extends DriverAttributeBO {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class MgPointValue extends PointValue {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
+    @MongoId
+    private String id;
+
+    public MgPointValue(PointValue pointValue) {
+        BeanUtil.copyProperties(pointValue, this);
+    }
 }

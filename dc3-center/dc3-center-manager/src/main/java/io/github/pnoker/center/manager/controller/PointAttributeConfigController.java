@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.PointAttributeConfigBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
@@ -120,7 +120,7 @@ public class PointAttributeConfigController implements Controller {
      *
      * @param attributeId Attribute ID
      * @param deviceId    设备ID
-     * @param pointId     Point ID
+     * @param pointId     位号ID
      * @return PointInfo
      */
     @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}/point_id/{pointId}")
@@ -185,10 +185,10 @@ public class PointAttributeConfigController implements Controller {
      * @return Page Of PointInfo
      */
     @PostMapping("/list")
-    public R<Page<PointAttributeConfigBO>> list(@RequestBody(required = false) PointAttributeConfigBOPageQuery pointInfoPageQuery) {
+    public R<Page<PointAttributeConfigBO>> list(@RequestBody(required = false) PointAttributeConfigQuery pointInfoPageQuery) {
         try {
             if (ObjectUtil.isEmpty(pointInfoPageQuery)) {
-                pointInfoPageQuery = new PointAttributeConfigBOPageQuery();
+                pointInfoPageQuery = new PointAttributeConfigQuery();
             }
             Page<PointAttributeConfigBO> page = pointAttributeConfigService.selectByPage(pointInfoPageQuery);
             if (ObjectUtil.isNotNull(page)) {

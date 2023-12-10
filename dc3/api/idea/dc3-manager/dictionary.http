@@ -15,8 +15,8 @@
 #
 
 ### 查询 Driver Dictionary
-#/manager/dictionary/driver
-POST http://{{dc3-manager}}/manager/dictionary/driver
+#/manager/dictionaryBO/driver
+POST http://{{dc3-manager}}/manager/dictionaryBO/driver
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -24,8 +24,8 @@ Cache-Control: no-cache
 {}
 
 ### 查询 Profile Dictionary
-#/manager/dictionary/profileBO
-POST http://{{dc3-manager}}/manager/dictionary/profileBO
+#/manager/dictionaryBO/profileBO
+POST http://{{dc3-manager}}/manager/dictionaryBO/profileBO
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -33,8 +33,8 @@ Cache-Control: no-cache
 {}
 
 ### 查询 Device/driver Dictionary
-#/manager/dictionary/deviceBO
-POST http://{{dc3-manager}}/manager/dictionary/deviceBO
+#/manager/dictionaryBO/deviceBO
+POST http://{{dc3-manager}}/manager/dictionaryBO/deviceBO
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -42,8 +42,8 @@ Cache-Control: no-cache
 {}
 
 ### 查询 Point/profileBO Dictionary
-#/manager/dictionary/pointBO
-POST http://{{dc3-manager}}/manager/dictionary/pointBO
+#/manager/dictionaryBO/pointBO
+POST http://{{dc3-manager}}/manager/dictionaryBO/pointBO
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -35,9 +36,9 @@ import java.io.Serializable;
 public class PointValueReadVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "驱动ID不能为空")
+    @NotNull(message = "驱动ID不能为空")
     private Long deviceId;
 
-    @NotBlank(message = "位号ID不能为空")
+    @NotNull(message = "位号ID不能为空")
     private Long pointId;
 }

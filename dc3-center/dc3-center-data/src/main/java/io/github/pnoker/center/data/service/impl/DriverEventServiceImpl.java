@@ -19,7 +19,7 @@ package io.github.pnoker.center.data.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.data.service.DriverEventService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.dto.DriverEventDTO;
+import io.github.pnoker.common.entity.dto.DriverEventDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;

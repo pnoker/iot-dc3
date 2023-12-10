@@ -81,7 +81,7 @@ public interface UserPasswordBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<UserPasswordBO> buildBOByDO(List<UserPasswordDO> entityDOList);
+    List<UserPasswordBO> buildBOListByDOList(List<UserPasswordDO> entityDOList);
 
     /**
      * BO to VO

@@ -29,6 +29,7 @@ import io.github.pnoker.center.manager.entity.query.LabelQuery;
 import io.github.pnoker.center.manager.manager.LabelBindManager;
 import io.github.pnoker.center.manager.manager.LabelManager;
 import io.github.pnoker.center.manager.service.LabelService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
@@ -76,9 +77,9 @@ public class LabelServiceImpl implements LabelService {
         getDOById(id, true);
 
         // 删除标签之前需要检查该标签是否存在关联
-        LambdaQueryWrapper<LabelBindDO> queryWrapper = Wrappers.<LabelBindDO>query().lambda();
-        queryWrapper.eq(LabelBindDO::getLabelId, id);
-        long count = labelBindManager.count(queryWrapper);
+        LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
+        wrapper.eq(LabelBindDO::getLabelId, id);
+        long count = labelBindManager.count(wrapper);
         if (count > 0) {
             throw new AssociatedException("The label has been bound by another entity");
         }
@@ -132,12 +133,12 @@ public class LabelServiceImpl implements LabelService {
      * @return {@link LambdaQueryWrapper}
      */
     private LambdaQueryWrapper<LabelDO> fuzzyQuery(LabelQuery query) {
-        LambdaQueryWrapper<LabelDO> queryWrapper = Wrappers.<LabelDO>query().lambda();
-        queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getLabelName()), LabelDO::getLabelName, query.getLabelName());
-        queryWrapper.eq(ObjectUtil.isNotNull(query.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, query.getEntityTypeFlag());
-        queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getColor()), LabelDO::getColor, query.getColor());
-        queryWrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), LabelDO::getTenantId, query.getTenantId());
-        return queryWrapper;
+        LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
+        wrapper.like(CharSequenceUtil.isNotEmpty(query.getLabelName()), LabelDO::getLabelName, query.getLabelName());
+        wrapper.eq(ObjectUtil.isNotNull(query.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, query.getEntityTypeFlag());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(query.getColor()), LabelDO::getColor, query.getColor());
+        wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), LabelDO::getTenantId, query.getTenantId());
+        return wrapper;
     }
 
     /**
@@ -149,11 +150,11 @@ public class LabelServiceImpl implements LabelService {
      * @return 是否重复
      */
     private boolean checkDuplicate(LabelBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<LabelDO> queryWrapper = Wrappers.<LabelDO>query().lambda();
-        queryWrapper.eq(LabelDO::getLabelName, entityBO.getLabelName());
-        queryWrapper.eq(LabelDO::getTenantId, entityBO.getTenantId());
-        queryWrapper.last("limit 1");
-        LabelDO one = labelManager.getOne(queryWrapper);
+        LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
+        wrapper.eq(LabelDO::getLabelName, entityBO.getLabelName());
+        wrapper.eq(LabelDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        LabelDO one = labelManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
             return false;
         }
@@ -165,7 +166,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     /**
-     * 根据 ID 获取
+     * 根据 主键ID 获取
      *
      * @param id             ID
      * @param throwException 是否抛异常
