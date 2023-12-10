@@ -81,7 +81,7 @@ public interface RoleResourceBindBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<RoleResourceBindBO> buildBOByDO(List<RoleResourceBindDO> entityDOList);
+    List<RoleResourceBindBO> buildBOListByDOList(List<RoleResourceBindDO> entityDOList);
 
     /**
      * BO to VO

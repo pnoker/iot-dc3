@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.*;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
-import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
+import io.github.pnoker.center.manager.entity.query.DriverQuery;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
@@ -55,7 +55,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
         RPageDriverDTO.Builder builder = RPageDriverDTO.newBuilder();
         RDTO.Builder rBuilder = RDTO.newBuilder();
 
-        DriverPageQuery pageQuery = buildPageQuery(request);
+        DriverQuery pageQuery = buildPageQuery(request);
 
         Page<DriverBO> driverPage = driverService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(driverPage)) {
@@ -116,8 +116,8 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
      * @param request PageDriverQueryDTO
      * @return DriverPageQuery
      */
-    private DriverPageQuery buildPageQuery(PageDriverQueryDTO request) {
-        DriverPageQuery pageQuery = new DriverPageQuery();
+    private DriverQuery buildPageQuery(PageDriverQueryDTO request) {
+        DriverQuery pageQuery = new DriverQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());

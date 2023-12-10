@@ -14,26 +14,48 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.query;
+package io.github.pnoker.center.manager.entity.bo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
-import io.github.pnoker.common.entity.common.Pages;
-import lombok.*;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 /**
- * DriverInfo DTO
+ * Dictionary BO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class DriverAttributeConfigBOPageQuery extends DriverAttributeConfigBO {
+@SuperBuilder
+@RequiredArgsConstructor
+public class DictionaryBO {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages page;
+    /**
+     * 字典类型
+     */
+    private String type;
+
+    /**
+     * 字典标签名称
+     */
+    private String label;
+
+    /**
+     * 字典标签值
+     */
+    private Long value;
+
+    /**
+     * 是否禁用
+     */
+    private boolean disabled = false;
+
+    /**
+     * 是否展开
+     */
+    private boolean expand = true;
+    private List<DictionaryBO> children;
 }

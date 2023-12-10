@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.ProfileBindBOPageQuery;
-import io.github.pnoker.common.base.Service;
 import io.github.pnoker.center.manager.entity.bo.ProfileBindBO;
+import io.github.pnoker.center.manager.entity.query.ProfileBindQuery;
+import io.github.pnoker.common.base.Service;
 
 import java.util.Set;
 
@@ -28,7 +28,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindBOPageQuery> {
+public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindQuery> {
 
     /**
      * 根据 设备ID 删除关联的模版映射
@@ -36,7 +36,7 @@ public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindBO
      * @param deviceId 设备ID
      * @return 是否删除
      */
-    Boolean deleteByDeviceId(Long deviceId);
+    Boolean removeByDeviceId(Long deviceId);
 
     /**
      * 根据 设备ID 和 模版ID 删除关联的模版映射
@@ -45,7 +45,7 @@ public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindBO
      * @param profileId Profile ID
      * @return 是否删除
      */
-    Boolean deleteByDeviceIdAndProfileId(Long deviceId, Long profileId);
+    Boolean removeByDeviceIdAndProfileId(Long deviceId, Long profileId);
 
     /**
      * 根据 设备ID 和 模版ID 查询关联的模版映射
@@ -60,7 +60,7 @@ public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindBO
      * 根据 模版ID 查询关联的 设备ID 集合
      *
      * @param profileId Profile ID
-     * @return 设备ID Set
+     * @return 设备ID集
      */
     Set<Long> selectDeviceIdsByProfileId(Long profileId);
 
@@ -68,7 +68,7 @@ public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindBO
      * 根据 设备ID 查询关联的 模版ID 集合
      *
      * @param deviceId 设备ID
-     * @return Profile ID Set
+     * @return Profile ID集
      */
     Set<Long> selectProfileIdsByDeviceId(Long deviceId);
 

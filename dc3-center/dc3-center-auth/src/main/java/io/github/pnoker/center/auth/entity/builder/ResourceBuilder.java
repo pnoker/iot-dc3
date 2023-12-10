@@ -81,7 +81,7 @@ public interface ResourceBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<ResourceBO> buildBOByDO(List<ResourceDO> entityDOList);
+    List<ResourceBO> buildBOListByDOList(List<ResourceDO> entityDOList);
 
     /**
      * BO to VO

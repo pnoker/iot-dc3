@@ -20,7 +20,7 @@ import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
-import io.github.pnoker.common.dto.DriverMetadataDTO;
+import io.github.pnoker.common.entity.dto.DriverMetadataDTO;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;

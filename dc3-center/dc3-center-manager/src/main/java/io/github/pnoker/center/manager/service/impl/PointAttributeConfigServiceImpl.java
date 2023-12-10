@@ -19,19 +19,22 @@ package io.github.pnoker.center.manager.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
-import io.github.pnoker.center.manager.entity.query.PointAttributeConfigBOPageQuery;
-import io.github.pnoker.center.manager.mapper.PointAttributeConfigMapper;
-import io.github.pnoker.center.manager.mapper.PointAttributeMapper;
+import io.github.pnoker.center.manager.entity.builder.PointAttributeConfigBuilder;
+import io.github.pnoker.center.manager.entity.model.PointAttributeConfigDO;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
+import io.github.pnoker.center.manager.manager.PointAttributeConfigManager;
+import io.github.pnoker.center.manager.manager.PointAttributeManager;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,9 +55,12 @@ import java.util.stream.Collectors;
 public class PointAttributeConfigServiceImpl implements PointAttributeConfigService {
 
     @Resource
-    private PointAttributeMapper pointAttributeMapper;
+    private PointAttributeConfigBuilder pointAttributeConfigBuilder;
+
     @Resource
-    private PointAttributeConfigMapper pointAttributeConfigMapper;
+    private PointAttributeManager pointAttributeManager;
+    @Resource
+    private PointAttributeConfigManager pointAttributeConfigManager;
 
     @Resource
     private PointService pointService;
@@ -66,19 +72,17 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     @Override
     public void save(PointAttributeConfigBO entityBO) {
-        try {
-            selectByAttributeIdAndDeviceIdAndPointId(entityBO.getPointAttributeId(), entityBO.getDeviceId(), entityBO.getPointId());
-            throw new DuplicateException("The point attribute config already exists");
-        } catch (NotFoundException notFoundException) {
-            if (pointAttributeConfigMapper.insert(entityBO) < 1) {
-                PointAttributeBO pointAttributeBO = pointAttributeMapper.selectById(entityBO.getPointAttributeId());
-                throw new AddException("The point attribute config {} add failed", pointAttributeBO.getAttributeName());
-            }
+        checkDuplicate(entityBO, false, true);
 
-            // 通知驱动新增
-            PointAttributeConfigBO pointAttributeConfigBO = pointAttributeConfigMapper.selectById(entityBO.getId());
-            notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.ADD, pointAttributeConfigBO);
+        PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
+        if (!pointAttributeConfigManager.save(entityDO)) {
+            throw new AddException("位号属性配置创建失败");
         }
+
+        // 通知驱动新增
+        entityDO = pointAttributeConfigManager.getById(entityDO.getId());
+        entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
+        notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.ADD, entityBO);
     }
 
     /**
@@ -86,16 +90,14 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     @Override
     public void remove(Long id) {
-        PointAttributeConfigBO pointAttributeConfigBO = selectById(id);
-        if (ObjectUtil.isNull(pointAttributeConfigBO)) {
-            throw new NotFoundException("The point attribute config does not exist");
+        PointAttributeConfigDO entityDO = getDOById(id, true);
+
+        if (!pointAttributeConfigManager.removeById(id)) {
+            throw new DeleteException("位号属性配置删除失败");
         }
 
-        if (pointAttributeConfigMapper.deleteById(id) < 1) {
-            throw new DeleteException("The point attribute delete failed");
-        }
-
-        notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, pointAttributeConfigBO);
+        PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
+        notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     /**
@@ -103,62 +105,45 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     @Override
     public void update(PointAttributeConfigBO entityBO) {
-        PointAttributeConfigBO old = selectById(entityBO.getId());
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
+        PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
-        if (!old.getPointAttributeId().equals(entityBO.getPointAttributeId()) || !old.getDeviceId().equals(entityBO.getDeviceId()) || !old.getPointId().equals(entityBO.getPointId())) {
-            try {
-                selectByAttributeIdAndDeviceIdAndPointId(entityBO.getPointAttributeId(), entityBO.getDeviceId(), entityBO.getPointId());
-                throw new DuplicateException("The point attribute config already exists");
-            } catch (NotFoundException ignored) {
-                // nothing to do
-            }
+        if (!pointAttributeConfigManager.updateById(entityDO)) {
+            throw new UpdateException("位号属性配置更新失败");
         }
 
-        if (pointAttributeConfigMapper.updateById(entityBO) < 1) {
-            throw new UpdateException("The point attribute config update failed");
-        }
-
-        PointAttributeConfigBO select = pointAttributeConfigMapper.selectById(entityBO.getId());
-        entityBO.setPointAttributeId(select.getPointAttributeId());
-        entityBO.setDeviceId(select.getDeviceId());
-        entityBO.setPointId(select.getPointId());
-        notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, select);
+        entityDO = pointAttributeConfigManager.getById(entityDO.getId());
+        entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
+        notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, entityBO);
     }
 
     @Override
     public PointAttributeConfigBO selectById(Long id) {
-        return null;
+        PointAttributeConfigDO entityDO = getDOById(id, true);
+        return pointAttributeConfigBuilder.buildBOByDO(entityDO);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long pointAttributeId, Long deviceId, Long pointId) {
-        LambdaQueryWrapper<PointAttributeConfigBO> queryWrapper = Wrappers.<PointAttributeConfigBO>query().lambda();
-        queryWrapper.eq(PointAttributeConfigBO::getPointAttributeId, pointAttributeId);
-        queryWrapper.eq(PointAttributeConfigBO::getDeviceId, deviceId);
-        queryWrapper.eq(PointAttributeConfigBO::getPointId, pointId);
-        queryWrapper.last("limit 1");
-        PointAttributeConfigBO pointAttributeConfigBO = pointAttributeConfigMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(pointAttributeConfigBO)) {
-            throw new NotFoundException();
-        }
-        return pointAttributeConfigBO;
+    public PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId) {
+        LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery().eq(PointAttributeConfigDO::getDeviceId, deviceId).eq(PointAttributeConfigDO::getPointId, pointId).last(QueryWrapperConstant.LIMIT_ONE);
+        PointAttributeConfigDO entityDO = wrapper.one();
+        return pointAttributeConfigBuilder.buildBOByDO(entityDO);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<PointAttributeConfigBO> selectByAttributeId(Long pointAttributeId) {
-        LambdaQueryWrapper<PointAttributeConfigBO> queryWrapper = Wrappers.<PointAttributeConfigBO>query().lambda();
-        queryWrapper.eq(PointAttributeConfigBO::getPointAttributeId, pointAttributeId);
-        List<PointAttributeConfigBO> pointAttributeConfigBOS = pointAttributeConfigMapper.selectList(queryWrapper);
-        if (ObjectUtil.isNull(pointAttributeConfigBOS) || pointAttributeConfigBOS.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return pointAttributeConfigBOS;
+    public List<PointAttributeConfigBO> selectByAttributeId(Long attributeId) {
+        LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery().eq(PointAttributeConfigDO::getPointAttributeId, attributeId);
+        List<PointAttributeConfigDO> entityDO = wrapper.list();
+        return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
 
     /**
@@ -166,16 +151,11 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     @Override
     public List<PointAttributeConfigBO> selectByDeviceId(Long deviceId) {
-        LambdaQueryWrapper<PointAttributeConfigBO> queryWrapper = Wrappers.<PointAttributeConfigBO>query().lambda();
         List<PointBO> pointBOS = pointService.selectByDeviceId(deviceId);
         Set<Long> pointIds = pointBOS.stream().map(PointBO::getId).collect(Collectors.toSet());
-        queryWrapper.eq(PointAttributeConfigBO::getDeviceId, deviceId);
-        queryWrapper.in(PointAttributeConfigBO::getPointId, pointIds);
-        List<PointAttributeConfigBO> pointAttributeConfigBOS = pointAttributeConfigMapper.selectList(queryWrapper);
-        if (ObjectUtil.isNull(pointAttributeConfigBOS)) {
-            throw new NotFoundException();
-        }
-        return pointAttributeConfigBOS;
+        LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery().eq(PointAttributeConfigDO::getDeviceId, deviceId).in(PointAttributeConfigDO::getPointId, pointIds);
+        List<PointAttributeConfigDO> entityDO = wrapper.list();
+        return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
 
     /**
@@ -183,35 +163,72 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     @Override
     public List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
-        LambdaQueryWrapper<PointAttributeConfigBO> queryWrapper = Wrappers.<PointAttributeConfigBO>query().lambda();
-        queryWrapper.eq(PointAttributeConfigBO::getDeviceId, deviceId);
-        queryWrapper.eq(PointAttributeConfigBO::getPointId, pointId);
-        List<PointAttributeConfigBO> pointAttributeConfigBOS = pointAttributeConfigMapper.selectList(queryWrapper);
-        if (ObjectUtil.isNull(pointAttributeConfigBOS)) {
-            throw new NotFoundException();
-        }
-        return pointAttributeConfigBOS;
+        LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery().eq(PointAttributeConfigDO::getDeviceId, deviceId).eq(PointAttributeConfigDO::getPointId, pointId);
+        List<PointAttributeConfigDO> entityDO = wrapper.list();
+        return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Page<PointAttributeConfigBO> selectByPage(PointAttributeConfigBOPageQuery entityQuery) {
+    public Page<PointAttributeConfigBO> selectByPage(PointAttributeConfigQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return pointAttributeConfigMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<PointAttributeConfigDO> entityPageDO = pointAttributeConfigManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return pointAttributeConfigBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<PointAttributeConfigBO> fuzzyQuery(PointAttributeConfigBOPageQuery query) {
-        LambdaQueryWrapper<PointAttributeConfigBO> queryWrapper = Wrappers.<PointAttributeConfigBO>query().lambda();
+    private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery query) {
+        LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getPointAttributeId()), PointAttributeConfigBO::getPointAttributeId, query.getPointAttributeId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDeviceId()), PointAttributeConfigBO::getDeviceId, query.getDeviceId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getPointId()), PointAttributeConfigBO::getPointId, query.getPointId());
+            wrapper.eq(ObjectUtil.isNotEmpty(query.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, query.getPointAttributeId());
+            wrapper.eq(ObjectUtil.isNotEmpty(query.getDeviceId()), PointAttributeConfigDO::getDeviceId, query.getDeviceId());
+            wrapper.eq(ObjectUtil.isNotEmpty(query.getPointId()), PointAttributeConfigDO::getPointId, query.getPointId());
         }
-        return queryWrapper;
+        return wrapper;
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link PointAttributeConfigBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(PointAttributeConfigBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
+        wrapper.eq(PointAttributeConfigDO::getPointAttributeId, entityBO.getPointAttributeId());
+        wrapper.eq(PointAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
+        wrapper.eq(PointAttributeConfigDO::getPointId, entityBO.getPointId());
+        wrapper.eq(PointAttributeConfigDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        PointAttributeConfigDO one = pointAttributeConfigManager.getOne(wrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("位号属性配置重复");
+        }
+        return duplicate;
+    }
+
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link PointAttributeConfigDO}
+     */
+    private PointAttributeConfigDO getDOById(Long id, boolean throwException) {
+        PointAttributeConfigDO entityDO = pointAttributeConfigManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("位号属性配置不存在");
+        }
+        return entityDO;
     }
 
 }

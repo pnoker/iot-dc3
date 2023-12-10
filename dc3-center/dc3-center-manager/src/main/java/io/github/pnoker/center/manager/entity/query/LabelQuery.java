@@ -18,8 +18,11 @@ package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.center.manager.entity.bo.LabelBO;
+import io.github.pnoker.center.manager.entity.vo.LabelVO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Label DTO
@@ -28,12 +31,15 @@ import lombok.*;
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
+@RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class LabelQuery extends LabelBO {
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(title = "LabelQuery", description = "标签-查询")
+public class LabelQuery extends LabelVO {
 
+    @Schema(description = "分页")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 }

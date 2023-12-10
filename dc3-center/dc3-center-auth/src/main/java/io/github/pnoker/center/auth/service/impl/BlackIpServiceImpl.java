@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.query.BlackIpBOPageQuery;
 import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.service.BlackIpService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
@@ -87,11 +88,11 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public BlackIpBO selectByIp(String ip) {
-        LambdaQueryWrapper<BlackIpBO> queryWrapper = Wrappers.<BlackIpBO>query().lambda();
-        queryWrapper.eq(BlackIpBO::getIp, ip);
-        queryWrapper.eq(BlackIpBO::getEnableFlag, EnableFlagEnum.ENABLE);
-        queryWrapper.last("limit 1");
-        return blackIpMapper.selectOne(queryWrapper);
+        LambdaQueryWrapper<BlackIpBO> wrapper = Wrappers.<BlackIpBO>query().lambda();
+        wrapper.eq(BlackIpBO::getIp, ip);
+        wrapper.eq(BlackIpBO::getEnableFlag, EnableFlagEnum.ENABLE);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        return blackIpMapper.selectOne(wrapper);
     }
 
     @Override
@@ -109,11 +110,11 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     private LambdaQueryWrapper<BlackIpBO> fuzzyQuery(BlackIpBOPageQuery query) {
-        LambdaQueryWrapper<BlackIpBO> queryWrapper = Wrappers.<BlackIpBO>query().lambda();
+        LambdaQueryWrapper<BlackIpBO> wrapper = Wrappers.<BlackIpBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getIp()), BlackIpBO::getIp, query.getIp());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getIp()), BlackIpBO::getIp, query.getIp());
         }
-        return queryWrapper;
+        return wrapper;
     }
 
 }

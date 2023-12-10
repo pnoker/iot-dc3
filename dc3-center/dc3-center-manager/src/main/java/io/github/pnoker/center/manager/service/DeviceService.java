@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
-import io.github.pnoker.center.manager.entity.query.DeviceBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.base.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,60 +31,63 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DeviceService extends Service<DeviceBO, DeviceBOPageQuery> {
+public interface DeviceService extends Service<DeviceBO, DeviceQuery> {
 
     /**
      * 根据 设备Name 和 租户Id 查询设备
      *
-     * @param name     Device Name
+     * @param name     设备名称
      * @param tenantId 租户ID
-     * @return Device
+     * @return {@link DeviceBO}
      */
     DeviceBO selectByName(String name, Long tenantId);
 
     /**
-     * 根据 驱动Id 查询该驱动下的全部设备
+     * 根据 设备Name 和 租户Id 查询设备
      *
-     * @param driverId Driver ID
-     * @return Device Array
+     * @param code     设备编号
+     * @param tenantId 租户ID
+     * @return {@link DeviceBO}
      */
-    List<DeviceBO> selectByDriverId(Long driverId);
+    DeviceBO selectByCode(String code, Long tenantId);
 
     /**
-     * 根据 模板Id 查询该驱动下的全部设备
+     * 根据 驱动ID 查询该驱动下的全部设备
      *
-     * @param profileId Profile ID
-     * @return Device Array
+     * @param id Driver ID
+     * @return {@link DeviceBO} Array
      */
-    List<DeviceBO> selectByProfileId(Long profileId);
+    List<DeviceBO> selectByDriverId(Long id);
 
     /**
-     * 根据 设备Id集 查询设备
+     * 根据 模板ID 查询该驱动下的全部设备
      *
-     * @param ids 设备ID Set
-     * @return Device Array
+     * @param id Profile ID
+     * @return {@link DeviceBO} Array
+     */
+    List<DeviceBO> selectByProfileId(Long id);
+
+    /**
+     * 根据 设备ID集 查询设备
+     *
+     * @param ids 设备ID集
+     * @return {@link DeviceBO} Array
      */
     List<DeviceBO> selectByIds(Set<Long> ids);
 
     /**
      * 导入设备
      *
-     * @param deviceBO      Device
-     * @param multipartFile MultipartFile
+     * @param entityBO      {@link DeviceBO}
+     * @param multipartFile {@link MultipartFile}
      */
-    void importDevice(DeviceBO deviceBO, MultipartFile multipartFile);
+    void importDevice(DeviceBO entityBO, MultipartFile multipartFile);
 
     /**
-     * 生成导入设备模板
+     * 生成导入模板
      *
-     * @param deviceBO Device
+     * @param entityBO {@link DeviceBO}
      * @return File Path
      */
-    Path generateImportTemplate(DeviceBO deviceBO);
-
-    Long count();
-
-    Long dataCount();
-
-    List<DeviceBO> selectAllByDriverId(Long id, Long tenantId);
+    Path generateImportTemplate(DeviceBO entityBO);
 }

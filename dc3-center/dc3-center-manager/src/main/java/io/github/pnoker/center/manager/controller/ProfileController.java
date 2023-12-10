@@ -19,7 +19,7 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
-import io.github.pnoker.center.manager.entity.query.ProfileBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.ProfileQuery;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
@@ -141,7 +141,7 @@ public class ProfileController implements Controller {
     }
 
     /**
-     * 根据 设备 ID 查询 Profile 集合
+     * 根据 设备ID 查询 Profile 集合
      *
      * @param deviceId 设备ID
      * @return Profile Array
@@ -166,10 +166,10 @@ public class ProfileController implements Controller {
      * @return Page Of Profile
      */
     @PostMapping("/list")
-    public R<Page<ProfileBO>> list(@RequestBody(required = false) ProfileBOPageQuery profilePageQuery) {
+    public R<Page<ProfileBO>> list(@RequestBody(required = false) ProfileQuery profilePageQuery) {
         try {
             if (ObjectUtil.isEmpty(profilePageQuery)) {
-                profilePageQuery = new ProfileBOPageQuery();
+                profilePageQuery = new ProfileQuery();
             }
             profilePageQuery.setTenantId(getTenantId());
             Page<ProfileBO> page = profileService.selectByPage(profilePageQuery);

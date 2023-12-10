@@ -81,7 +81,7 @@ public interface TenantBindBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<TenantBindBO> buildBOByDO(List<TenantBindDO> entityDOList);
+    List<TenantBindBO> buildBOListByDOList(List<TenantBindDO> entityDOList);
 
     /**
      * BO to VO

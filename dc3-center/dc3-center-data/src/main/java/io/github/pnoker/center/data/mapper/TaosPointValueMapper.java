@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.mapper;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.entity.point.TaosPointValue;
+import io.github.pnoker.center.data.entity.point.TaosPointValue;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

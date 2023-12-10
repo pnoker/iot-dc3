@@ -81,7 +81,7 @@ public interface ProfileBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<ProfileBO> buildBOByDO(List<ProfileDO> entityDOList);
+    List<ProfileBO> buildBOListByDOList(List<ProfileDO> entityDOList);
 
     /**
      * BO to VO

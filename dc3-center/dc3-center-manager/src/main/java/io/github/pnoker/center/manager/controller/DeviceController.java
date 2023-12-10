@@ -19,11 +19,14 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
-import io.github.pnoker.center.manager.entity.query.DeviceBOPageQuery;
+import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
+import io.github.pnoker.center.manager.entity.query.DeviceQuery;
+import io.github.pnoker.center.manager.entity.vo.DeviceVO;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.utils.RequestUtil;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -39,7 +42,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -54,20 +56,24 @@ import java.util.stream.Collectors;
 public class DeviceController implements Controller {
 
     @Resource
+    private DeviceBuilder deviceBuilder;
+
+    @Resource
     private DeviceService deviceService;
 
     /**
      * 新增 Device
      *
-     * @param deviceBO Device
-     * @return Device
+     * @param entityVO {@link  DeviceVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody DeviceBO deviceBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
         try {
-            deviceBO.setTenantId(getTenantId());
-            deviceService.save(deviceBO);
-            return R.ok();
+            entityVO.setTenantId(getTenantId());
+            DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+            deviceService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -77,13 +83,13 @@ public class DeviceController implements Controller {
      * 根据 ID 删除 Device
      *
      * @param id 设备ID
-     * @return 是否删除
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
             deviceService.remove(Long.parseLong(id));
-            return R.ok();
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -92,15 +98,16 @@ public class DeviceController implements Controller {
     /**
      * 更新 Device
      *
-     * @param deviceBO Device
-     * @return Device
+     * @param entityVO {@link  DeviceVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody DeviceBO deviceBO) {
+    public R<String> update(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
         try {
-            deviceBO.setTenantId(getTenantId());
-            deviceService.update(deviceBO);
-            return R.ok();
+            entityVO.setTenantId(getTenantId());
+            DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+            deviceService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -110,33 +117,30 @@ public class DeviceController implements Controller {
      * 根据 ID 查询 Device
      *
      * @param id 设备ID
-     * @return Device
+     * @return R of DeviceVO
      */
     @GetMapping("/id/{id}")
-    public R<DeviceBO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<DeviceVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            DeviceBO select = deviceService.selectById(Long.parseLong(id));
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            DeviceBO entityBO = deviceService.selectById(id);
+            DeviceVO entityVO = deviceBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
      * 根据 ID 集合查询 Device
      *
-     * @param deviceIds 设备ID Set
+     * @param deviceIds 设备ID集
      * @return Map String:Device
      */
     @PostMapping("/ids")
-    public R<Map<Long, DeviceBO>> selectByIds(@RequestBody Set<String> deviceIds) {
+    public R<Map<Long, DeviceVO>> selectByIds(@RequestBody Set<Long> deviceIds) {
         try {
-            Set<Long> collect = deviceIds.stream().map(Long::parseLong).collect(Collectors.toSet());
-            List<DeviceBO> deviceBOS = deviceService.selectByIds(collect);
-            Map<Long, DeviceBO> deviceMap = deviceBOS.stream().collect(Collectors.toMap(DeviceBO::getId, Function.identity()));
+            List<DeviceBO> entityBOS = deviceService.selectByIds(deviceIds);
+            Map<Long, DeviceVO> deviceMap = entityBOS.stream().collect(Collectors.toMap(DeviceBO::getId, entityBO -> deviceBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -147,36 +151,35 @@ public class DeviceController implements Controller {
      * 分页查询 Device
      *
      * @param devicePageQuery 设备和分页参数
-     * @return Page Of Device
+     * @return R Of DeviceVO Page
      */
     @PostMapping("/list")
-    public R<Page<DeviceBO>> list(@RequestBody(required = false) DeviceBOPageQuery devicePageQuery) {
+    public R<Page<DeviceVO>> list(@RequestBody(required = false) DeviceQuery devicePageQuery) {
         try {
             if (ObjectUtil.isEmpty(devicePageQuery)) {
-                devicePageQuery = new DeviceBOPageQuery();
+                devicePageQuery = new DeviceQuery();
             }
             devicePageQuery.setTenantId(getTenantId());
-            Page<DeviceBO> page = deviceService.selectByPage(devicePageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            Page<DeviceBO> entityPageBO = deviceService.selectByPage(devicePageQuery);
+            Page<DeviceVO> entityPageVO = deviceBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
      * 导入 Device
      *
-     * @param deviceBO Device
-     * @return Device
+     * @param entityVO {@link  DeviceVO}
+     * @return R of String
      */
     @PostMapping("/import")
-    public R<String> importDevice(@Validated(Update.class) DeviceBO deviceBO, @RequestParam("file") MultipartFile multipartFile) {
+    public R<String> importDevice(@Validated(Update.class) DeviceVO entityVO, @RequestParam("file") MultipartFile multipartFile) {
         try {
-            deviceBO.setTenantId(getTenantId());
-            deviceService.importDevice(deviceBO, multipartFile);
+            entityVO.setTenantId(getTenantId());
+            DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+            deviceService.importDevice(entityBO, multipartFile);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -184,16 +187,17 @@ public class DeviceController implements Controller {
     }
 
     /**
-     * 导入 Device 模板
+     * 下载导入模板
      *
-     * @param deviceBO Device
-     * @return Device
+     * @param entityVO {@link  DeviceVO}
+     * @return 模板文件流
      */
-    @PostMapping("/import/template")
-    public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody DeviceBO deviceBO) {
+    @PostMapping("/export/import_template")
+    public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
         try {
-            deviceBO.setTenantId(getTenantId());
-            Path filePath = deviceService.generateImportTemplate(deviceBO);
+            entityVO.setTenantId(getTenantId());
+            DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+            Path filePath = deviceService.generateImportTemplate(entityBO);
             return RequestUtil.responseFile(filePath);
         } catch (Exception e) {
             return null;

@@ -27,6 +27,7 @@ import io.github.pnoker.center.manager.entity.model.LabelBindDO;
 import io.github.pnoker.center.manager.entity.query.LabelBindQuery;
 import io.github.pnoker.center.manager.manager.LabelBindManager;
 import io.github.pnoker.center.manager.service.LabelBindService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
@@ -120,10 +121,10 @@ public class LabelBindServiceImpl implements LabelBindService {
      * @return {@link LambdaQueryWrapper}
      */
     private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery query) {
-        LambdaQueryWrapper<LabelBindDO> queryWrapper = Wrappers.<LabelBindDO>query().lambda();
-        queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getLabelId()), LabelBindDO::getLabelId, query.getLabelId());
-        queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getEntityId()), LabelBindDO::getEntityId, query.getEntityId());
-        return queryWrapper;
+        LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
+        wrapper.eq(CharSequenceUtil.isNotEmpty(query.getLabelId()), LabelBindDO::getLabelId, query.getLabelId());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(query.getEntityId()), LabelBindDO::getEntityId, query.getEntityId());
+        return wrapper;
     }
 
     /**
@@ -135,11 +136,11 @@ public class LabelBindServiceImpl implements LabelBindService {
      * @return 是否重复
      */
     private boolean checkDuplicate(LabelBindBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<LabelBindDO> queryWrapper = Wrappers.<LabelBindDO>query().lambda();
-        queryWrapper.eq(LabelBindDO::getLabelId, entityBO.getLabelId());
-        queryWrapper.eq(LabelBindDO::getEntityId, entityBO.getEntityId());
-        queryWrapper.last("limit 1");
-        LabelBindDO one = labelBindManager.getOne(queryWrapper);
+        LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
+        wrapper.eq(LabelBindDO::getLabelId, entityBO.getLabelId());
+        wrapper.eq(LabelBindDO::getEntityId, entityBO.getEntityId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        LabelBindDO one = labelBindManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
             return false;
         }
@@ -151,7 +152,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     /**
-     * 根据 ID 获取
+     * 根据 主键ID 获取
      *
      * @param id             ID
      * @param throwException 是否抛异常

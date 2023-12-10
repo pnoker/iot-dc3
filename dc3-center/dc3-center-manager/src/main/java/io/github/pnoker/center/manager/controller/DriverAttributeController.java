@@ -20,7 +20,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
-import io.github.pnoker.center.manager.entity.query.DriverAttributeBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
@@ -127,7 +127,7 @@ public class DriverAttributeController implements Controller {
     @GetMapping("/driver_id/{id}")
     public R<List<DriverAttributeBO>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
         try {
-            List<DriverAttributeBO> select = driverAttributeService.selectByDriverId(Long.parseLong(id), true);
+            List<DriverAttributeBO> select = driverAttributeService.selectByDriverId(Long.parseLong(id));
             if (CollUtil.isNotEmpty(select)) {
                 return R.ok(select);
             }
@@ -146,10 +146,10 @@ public class DriverAttributeController implements Controller {
      * @return Page Of DriverAttribute
      */
     @PostMapping("/list")
-    public R<Page<DriverAttributeBO>> list(@RequestBody(required = false) DriverAttributeBOPageQuery driverAttributePageQuery) {
+    public R<Page<DriverAttributeBO>> list(@RequestBody(required = false) DriverAttributeQuery driverAttributePageQuery) {
         try {
             if (ObjectUtil.isEmpty(driverAttributePageQuery)) {
-                driverAttributePageQuery = new DriverAttributeBOPageQuery();
+                driverAttributePageQuery = new DriverAttributeQuery();
             }
             Page<DriverAttributeBO> page = driverAttributeService.selectByPage(driverAttributePageQuery);
             if (ObjectUtil.isNotNull(page)) {

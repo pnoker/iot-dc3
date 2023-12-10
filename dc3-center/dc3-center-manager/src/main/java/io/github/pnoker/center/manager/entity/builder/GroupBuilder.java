@@ -81,7 +81,7 @@ public interface GroupBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<GroupBO> buildBOByDO(List<GroupDO> entityDOList);
+    List<GroupBO> buildBOListByDOList(List<GroupDO> entityDOList);
 
     /**
      * BO to VO

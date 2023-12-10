@@ -20,7 +20,7 @@ import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.center.data.service.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
-import io.github.pnoker.common.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.point.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

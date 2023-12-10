@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.dto.DriverSyncUpDTO;
+import io.github.pnoker.common.entity.dto.DriverSyncUpDTO;
 
 /**
  * 驱动同步相关接口

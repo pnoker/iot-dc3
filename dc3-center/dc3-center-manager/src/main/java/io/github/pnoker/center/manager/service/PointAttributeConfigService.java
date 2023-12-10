@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.PointAttributeConfigBOPageQuery;
-import io.github.pnoker.common.base.Service;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
+import io.github.pnoker.common.base.Service;
 
 import java.util.List;
 
@@ -28,28 +28,10 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointAttributeConfigService extends Service<PointAttributeConfigBO, PointAttributeConfigBOPageQuery> {
+public interface PointAttributeConfigService extends Service<PointAttributeConfigBO, PointAttributeConfigQuery> {
 
     /**
-     * 根据位号配置信息 ID 、 设备 ID 、 位号 ID 查询
-     *
-     * @param pointAttributeId Point Attribute ID
-     * @param deviceId         设备ID
-     * @param pointId          Point ID
-     * @return PointInfo
-     */
-    PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long pointAttributeId, Long deviceId, Long pointId);
-
-    /**
-     * 根据位号配置信息 ID 查询
-     *
-     * @param pointAttributeId Point Attribute ID
-     * @return PointInfo Array
-     */
-    List<PointAttributeConfigBO> selectByAttributeId(Long pointAttributeId);
-
-    /**
-     * 根据 设备 ID 查询
+     * 根据 设备ID 查询
      *
      * @param deviceId 设备ID
      * @return PointInfo Array
@@ -57,11 +39,29 @@ public interface PointAttributeConfigService extends Service<PointAttributeConfi
     List<PointAttributeConfigBO> selectByDeviceId(Long deviceId);
 
     /**
-     * 根据 设备 ID 、 位号 ID 查询
+     * 根据 属性ID 查询
+     *
+     * @param attributeId 属性ID
+     * @return PointInfo Array
+     */
+    List<PointAttributeConfigBO> selectByAttributeId(Long attributeId);
+
+    /**
+     * 根据 设备ID 、 位号ID 查询
      *
      * @param deviceId 设备ID
      * @param pointId  位号ID
      * @return PointInfo Array
      */
     List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
+
+    /**
+     * 根据 属性ID 、 设备ID 、 位号ID 查询
+     *
+     * @param attributeId 属性ID
+     * @param deviceId    设备ID
+     * @param pointId     位号ID
+     * @return PointInfo
+     */
+    PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId);
 }

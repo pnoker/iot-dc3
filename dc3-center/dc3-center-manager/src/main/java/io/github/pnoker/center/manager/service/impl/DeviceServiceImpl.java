@@ -22,14 +22,16 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.*;
+import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
-import io.github.pnoker.center.manager.entity.query.DeviceBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.center.manager.manager.DeviceManager;
+import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.constant.driver.StorageConstant;
-import io.github.pnoker.common.entity.base.Base;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.*;
@@ -44,7 +46,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,7 +71,12 @@ import java.util.stream.Collectors;
 public class DeviceServiceImpl implements DeviceService {
 
     @Resource
+    private DeviceBuilder deviceBuilder;
+
+    @Resource
     private DeviceManager deviceManager;
+    @Resource
+    private DeviceMapper deviceMapper;
 
     @Resource
     private DriverAttributeService driverAttributeService;
@@ -88,22 +94,23 @@ public class DeviceServiceImpl implements DeviceService {
     private ProfileBindService profileBindService;
     @Resource
     private NotifyService notifyService;
-    @Resource
-    private MongoTemplate mongoTemplate;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void save(DeviceBO entityBO) {
-        if (deviceManager.save(entityBO) < 1) {
-            throw new AddException("The device {} add failed", entityBO.getDeviceName());
+        checkDuplicate(entityBO, false, true);
+
+        DeviceDO entityDO = deviceBuilder.buildDOByBO(entityBO);
+        if (!deviceManager.save(entityDO)) {
+            throw new AddException("设备创建失败");
         }
 
         addProfileBind(entityBO.getId(), entityBO.getProfileIds());
 
         // 通知驱动新增
-        DeviceBO deviceBO = deviceManager.getById(entityBO.getId());
+        DeviceBO deviceBO = selectById(entityBO.getId());
         List<ProfileBO> profileBOS = profileService.selectByDeviceId(entityBO.getId());
         // ?/pnoker 同步给驱动的设备需要profile id set吗
         deviceBO.setProfileIds(profileBOS.stream().map(ProfileBO::getId).collect(Collectors.toSet()));
@@ -116,21 +123,20 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     @Transactional
     public void remove(Long id) {
-        DeviceBO deviceBO = selectById(id);
-        if (ObjectUtil.isNull(deviceBO)) {
-            throw new NotFoundException("The device does not exist");
-        }
+        DeviceDO entityDO = getDOById(id, true);
 
-        if (!profileBindService.deleteByDeviceId(id)) {
+        // 删除设备之前需要检查该设备是否存在关联
+        if (!profileBindService.removeByDeviceId(id)) {
             throw new DeleteException("The profile bind delete failed");
         }
 
-        if (deviceManager.removeById(id) < 1) {
+        if (!deviceManager.removeById(id)) {
             throw new DeleteException("The device delete failed");
         }
 
         // 通知驱动删除设备
-        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.DELETE, deviceBO);
+        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
+        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     /**
@@ -138,7 +144,9 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     public void update(DeviceBO entityBO) {
-        selectById(entityBO.getId());
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
 
         Set<Long> newProfileIds = ObjectUtil.isNotNull(entityBO.getProfileIds()) ? entityBO.getProfileIds() : new HashSet<>();
         Set<Long> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityBO.getId());
@@ -146,21 +154,20 @@ public class DeviceServiceImpl implements DeviceService {
         // 新增的模板
         Set<Long> add = new HashSet<>(newProfileIds);
         add.removeAll(oldProfileIds);
+        addProfileBind(entityBO.getId(), add);
 
         // 删除的模板
         Set<Long> delete = new HashSet<>(oldProfileIds);
         delete.removeAll(newProfileIds);
+        delete.forEach(profileId -> profileBindService.removeByDeviceIdAndProfileId(entityBO.getId(), profileId));
 
-        addProfileBind(entityBO.getId(), add);
-        delete.forEach(profileId -> profileBindService.deleteByDeviceIdAndProfileId(entityBO.getId(), profileId));
-
+        DeviceDO entityDO = deviceBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
-
-        if (deviceManager.updateById(entityBO) < 1) {
+        if (!deviceManager.updateById(entityDO)) {
             throw new UpdateException("The device update failed");
         }
 
-        DeviceBO select = deviceManager.selectById(entityBO.getId());
+        DeviceBO select = selectById(entityBO.getId());
         select.setProfileIds(newProfileIds);
         entityBO.setDeviceName(select.getDeviceName());
         // 通知驱动更新设备
@@ -172,12 +179,10 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     public DeviceBO selectById(Long id) {
-        DeviceBO deviceBO = deviceManager.selectById(id);
-        if (ObjectUtil.isNull(deviceBO)) {
-            throw new NotFoundException();
-        }
-        deviceBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
-        return deviceBO;
+        DeviceDO entityDO = getDOById(id, true);
+        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
+        entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
+        return entityBO;
     }
 
     /**
@@ -185,29 +190,37 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     public DeviceBO selectByName(String name, Long tenantId) {
-        LambdaQueryWrapper<DeviceBO> queryWrapper = Wrappers.<DeviceBO>query().lambda();
-        queryWrapper.eq(DeviceBO::getDeviceName, name);
-        queryWrapper.eq(DeviceBO::getTenantId, tenantId);
-        queryWrapper.last("limit 1");
-        DeviceBO deviceBO = deviceManager.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(deviceBO)) {
-            throw new NotFoundException();
-        }
-        deviceBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(deviceBO.getId()));
-        return deviceBO;
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+        wrapper.eq(DeviceDO::getDeviceName, name);
+        wrapper.eq(DeviceDO::getTenantId, tenantId);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        DeviceDO entityDO = deviceManager.getOne(wrapper);
+        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
+        entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(entityDO.getId()));
+        return entityBO;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceBO> selectByDriverId(Long driverId) {
-        DeviceBOPageQuery devicePageQuery = new DeviceBOPageQuery();
-        devicePageQuery.setDriverId(driverId);
-        List<DeviceBO> deviceBOS = deviceManager.selectList(fuzzyQuery(devicePageQuery));
-        if (ObjectUtil.isNull(deviceBOS) || deviceBOS.isEmpty()) {
-            throw new NotFoundException();
-        }
+    public DeviceBO selectByCode(String code, Long tenantId) {
+        LambdaQueryChainWrapper<DeviceDO> wrapper = deviceManager.lambdaQuery().eq(DeviceDO::getDeviceCode, code).eq(DeviceDO::getTenantId, tenantId).last(QueryWrapperConstant.LIMIT_ONE);
+        DeviceDO entityDO = deviceManager.getOne(wrapper);
+        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
+        entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(entityDO.getId()));
+        return entityBO;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DeviceBO> selectByDriverId(Long id) {
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+        wrapper.eq(DeviceDO::getDriverId, id);
+        List<DeviceDO> entityDOS = deviceManager.list(wrapper);
+        List<DeviceBO> deviceBOS = deviceBuilder.buildBOListByDOList(entityDOS);
         deviceBOS.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
         return deviceBOS;
     }
@@ -216,8 +229,8 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceBO> selectByProfileId(Long profileId) {
-        return selectByIds(profileBindService.selectDeviceIdsByProfileId(profileId));
+    public List<DeviceBO> selectByProfileId(Long id) {
+        return selectByIds(profileBindService.selectDeviceIdsByProfileId(id));
     }
 
     /**
@@ -225,10 +238,8 @@ public class DeviceServiceImpl implements DeviceService {
      */
     @Override
     public List<DeviceBO> selectByIds(Set<Long> ids) {
-        List<DeviceBO> deviceBOS = deviceManager.selectBatchIds(ids);
-        if (CollUtil.isEmpty(deviceBOS)) {
-            throw new NotFoundException();
-        }
+        List<DeviceDO> entityDOS = deviceManager.listByIds(ids);
+        List<DeviceBO> deviceBOS = deviceBuilder.buildBOListByDOList(entityDOS);
         deviceBOS.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
         return deviceBOS;
     }
@@ -237,32 +248,34 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
-    public Page<DeviceBO> selectByPage(DeviceBOPageQuery entityQuery) {
+    public Page<DeviceBO> selectByPage(DeviceQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return deviceManager.selectPageWithProfile(PageUtil.page(entityQuery.getPage()), customFuzzyQuery(entityQuery), entityQuery.getProfileId());
+        Page<DeviceDO> entityPageDO = deviceMapper.selectPageWithProfile(PageUtil.page(entityQuery.getPage()), customFuzzyQuery(entityQuery), entityQuery.getProfileId());
+        return deviceBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<DeviceBO> fuzzyQuery(DeviceBOPageQuery query) {
-        LambdaQueryWrapper<DeviceBO> queryWrapper = Wrappers.<DeviceBO>query().lambda();
-        if (ObjectUtil.isNotEmpty(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getDeviceName()), DeviceBO::getDeviceName, query.getDeviceName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDeviceCode()), DeviceBO::getDeviceCode, query.getDeviceCode());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getDriverId()), DeviceBO::getDriverId, query.getDriverId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getEnableFlag()), DeviceBO::getEnableFlag, query.getEnableFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), DeviceBO::getTenantId, query.getTenantId());
+    public LambdaQueryWrapper<DeviceDO> customFuzzyQuery(DeviceQuery entityQuery) {
+        QueryWrapper<DeviceDO> wrapper = Wrappers.query();
+        wrapper.eq("dd.deleted", 0);
+        if (ObjectUtil.isNotNull(entityQuery)) {
+            wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceName()), "dd.device_name", entityQuery.getDeviceName());
+            wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code", entityQuery.getDeviceCode());
+            wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
+            wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
+            wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getTenantId()), "dd.tenant_id", entityQuery.getTenantId());
         }
-        return queryWrapper;
+        return wrapper.lambda();
     }
 
     @Override
     @SneakyThrows
     @Transactional
-    public void importDevice(DeviceBO deviceBO, MultipartFile multipartFile) {
-        List<DriverAttributeBO> driverAttributeBOS = driverAttributeService.selectByDriverId(deviceBO.getDriverId(), false);
-        List<PointAttributeBO> pointAttributeBOS = pointAttributeService.selectByDriverId(deviceBO.getDriverId(), false);
-        List<PointBO> pointBOS = pointService.selectByProfileIds(deviceBO.getProfileIds(), false);
+    public void importDevice(DeviceBO entityBO, MultipartFile multipartFile) {
+        List<DriverAttributeBO> driverAttributeBOS = driverAttributeService.selectByDriverId(entityBO.getDriverId());
+        List<PointAttributeBO> pointAttributeBOS = pointAttributeService.selectByDriverId(entityBO.getDriverId(), false);
+        List<PointBO> pointBOS = pointService.selectByProfileIds(entityBO.getProfileIds());
 
         Workbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
         Sheet mainSheet = workbook.getSheet("设备导入");
@@ -273,7 +286,7 @@ public class DeviceServiceImpl implements DeviceService {
 
         for (int i = 4; i <= mainSheet.getLastRowNum(); i++) {
             // 导入设备
-            DeviceBO importDeviceBO = importDevice(deviceBO, mainSheet, i);
+            DeviceBO importDeviceBO = importDevice(entityBO, mainSheet, i);
             log.info("正在导入设备：{}, index: {}", importDeviceBO.getDeviceName(), 1);
 
             // 导入驱动属性配置
@@ -286,10 +299,10 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     @SneakyThrows
-    public Path generateImportTemplate(DeviceBO deviceBO) {
-        List<DriverAttributeBO> driverAttributeBOS = driverAttributeService.selectByDriverId(deviceBO.getDriverId(), false);
-        List<PointAttributeBO> pointAttributeBOS = pointAttributeService.selectByDriverId(deviceBO.getDriverId(), false);
-        List<PointBO> pointBOS = pointService.selectByProfileIds(deviceBO.getProfileIds(), false);
+    public Path generateImportTemplate(DeviceBO entityBO) {
+        List<DriverAttributeBO> driverAttributeBOS = driverAttributeService.selectByDriverId(entityBO.getDriverId());
+        List<PointAttributeBO> pointAttributeBOS = pointAttributeService.selectByDriverId(entityBO.getDriverId(), false);
+        List<PointBO> pointBOS = pointService.selectByProfileIds(entityBO.getProfileIds());
 
         Workbook workbook = new XSSFWorkbook();
         CellStyle cellStyle = PoiUtil.getCenterCellStyle(workbook);
@@ -321,24 +334,6 @@ public class DeviceServiceImpl implements DeviceService {
 
         // 生成设备导入模板
         return generateTemplate(workbook);
-    }
-
-    @Override
-    public Long count() {
-        return deviceManager.selectCount(new QueryWrapper<>());
-    }
-
-    @Override
-    public Long dataCount() {
-        return deviceManager.selectList(new LambdaQueryWrapper<>()).stream()
-                .map(Base::getId)
-                .mapToLong(deviceId -> mongoTemplate.getCollection(StorageConstant.POINT_VALUE_PREFIX + deviceId).countDocuments())
-                .sum();
-    }
-
-    @Override
-    public List<DeviceBO> selectAllByDriverId(Long driverId, Long tenantId) {
-        return deviceManager.selectList(new LambdaQueryWrapper<DeviceBO>().eq(DeviceBO::getDriverId, driverId).eq(DeviceBO::getTenantId, tenantId));
     }
 
     /**
@@ -373,7 +368,7 @@ public class DeviceServiceImpl implements DeviceService {
         }
     }
 
-    private static DeviceBO getDevice(DeviceBO deviceBO, Sheet mainSheet, int rowIndex) {
+    private DeviceBO getDevice(DeviceBO deviceBO, Sheet mainSheet, int rowIndex) {
         String deviceName = PoiUtil.getCellStringValue(mainSheet, rowIndex, 0);
         if (CharSequenceUtil.isEmpty(deviceName)) {
             throw new ImportException("The device name in line {} of the import file is empty", rowIndex + 1);
@@ -390,7 +385,7 @@ public class DeviceServiceImpl implements DeviceService {
         return importDeviceBO;
     }
 
-    private static DriverAttributeConfigBO getDriverAttributeConfig(DeviceBO deviceBO, DriverAttributeBO driverAttributeBO, Sheet mainSheet, int rowIndex, int cellIndex) {
+    private DriverAttributeConfigBO getDriverAttributeConfig(DeviceBO deviceBO, DriverAttributeBO driverAttributeBO, Sheet mainSheet, int rowIndex, int cellIndex) {
         DriverAttributeConfigBO importAttributeConfig = new DriverAttributeConfigBO();
         importAttributeConfig.setDriverAttributeId(driverAttributeBO.getId());
         importAttributeConfig.setDeviceId(deviceBO.getId());
@@ -410,7 +405,7 @@ public class DeviceServiceImpl implements DeviceService {
         }
     }
 
-    private static PointAttributeConfigBO getPointAttributeConfig(DeviceBO deviceBO, PointBO pointBO, PointAttributeBO pointAttributeBO, Sheet mainSheet, int rowIndex, int cellIndex) {
+    private PointAttributeConfigBO getPointAttributeConfig(DeviceBO deviceBO, PointBO pointBO, PointAttributeBO pointAttributeBO, Sheet mainSheet, int rowIndex, int cellIndex) {
         PointAttributeConfigBO importAttributeConfig = new PointAttributeConfigBO();
         importAttributeConfig.setPointAttributeId(pointAttributeBO.getId());
         importAttributeConfig.setDeviceId(deviceBO.getId());
@@ -426,8 +421,8 @@ public class DeviceServiceImpl implements DeviceService {
      * 判断配置数据是否一致
      *
      * @param driverAttributeBOS DriverAttribute Array
-     * @param pointAttributeBOS    PointAttribute Array
-     * @param pointBOS             Point Array
+     * @param pointAttributeBOS  PointAttribute Array
+     * @param pointBOS           Point Array
      * @param workbook           Workbook
      */
     private boolean configIsEqual(List<DriverAttributeBO> driverAttributeBOS, List<PointAttributeBO> pointAttributeBOS, List<PointBO> pointBOS, Workbook workbook) {
@@ -475,8 +470,8 @@ public class DeviceServiceImpl implements DeviceService {
      * 设置配置工作表
      *
      * @param driverAttributeBOS DriverAttribute Array
-     * @param pointAttributeBOS    PointAttribute Array
-     * @param pointBOS             Point Array
+     * @param pointAttributeBOS  PointAttribute Array
+     * @param pointBOS           Point Array
      * @param workbook           Workbook
      */
     private void configConfigSheet(List<DriverAttributeBO> driverAttributeBOS, List<PointAttributeBO> pointAttributeBOS, List<PointBO> pointBOS, Workbook workbook) {
@@ -493,8 +488,8 @@ public class DeviceServiceImpl implements DeviceService {
      * 设置位号属性配置列
      *
      * @param driverAttributeBOS DriverAttribute Array
-     * @param pointAttributeBOS    PointAttribute Array
-     * @param pointBOS             Point  Array
+     * @param pointAttributeBOS  PointAttribute Array
+     * @param pointBOS           Point  Array
      * @param mainSheet          Main Sheet
      * @param titleRow           Title Row
      * @param attributeRow       Attribute Row
@@ -537,19 +532,6 @@ public class DeviceServiceImpl implements DeviceService {
         return path;
     }
 
-    public LambdaQueryWrapper<DeviceBO> customFuzzyQuery(DeviceBOPageQuery devicePageQuery) {
-        QueryWrapper<DeviceBO> queryWrapper = Wrappers.query();
-        queryWrapper.eq("dd.deleted", 0);
-        if (ObjectUtil.isNotNull(devicePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceName()), "dd.device_name", devicePageQuery.getDeviceName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceCode()), "dd.device_code", devicePageQuery.getDeviceCode());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(devicePageQuery.getDriverId()), "dd.driver_id", devicePageQuery.getDriverId());
-            queryWrapper.eq(ObjectUtil.isNotNull(devicePageQuery.getEnableFlag()), "dd.enable_flag", devicePageQuery.getEnableFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(devicePageQuery.getTenantId()), "dd.tenant_id", devicePageQuery.getTenantId());
-        }
-        return queryWrapper.lambda();
-    }
-
     private void addProfileBind(Long deviceId, Set<Long> profileIds) {
         if (CollUtil.isEmpty(profileIds)) {
             return;
@@ -557,8 +539,8 @@ public class DeviceServiceImpl implements DeviceService {
 
         profileIds.forEach(profileId -> {
             try {
-                profileService.selectById(profileId);
-                profileBindService.save(new ProfileBindBO(profileId, deviceId));
+                ProfileBindBO entityBO = ProfileBindBO.builder().profileId(profileId).deviceId(deviceId).build();
+                profileBindService.save(entityBO);
 
                 List<PointBO> pointBOS = pointService.selectByProfileId(profileId);
                 // 通知驱动新增位号
@@ -573,24 +555,30 @@ public class DeviceServiceImpl implements DeviceService {
     /**
      * 重复性校验
      *
-     * @param entityDO {@link DeviceDO}
-     * @param isUpdate 是否为更新操作
+     * @param entityBO       {@link DeviceBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
      * @return 是否重复
      */
-    private boolean checkDuplicate(DeviceDO entityDO, boolean isUpdate) {
-        LambdaQueryWrapper<DeviceDO> queryWrapper = Wrappers.<DeviceDO>query().lambda();
-        queryWrapper.eq(DeviceDO::getDeviceName, entityDO.getDeviceName());
-        queryWrapper.eq(DeviceDO::getTenantId, entityDO.getTenantId());
-        queryWrapper.last("limit 1");
-        DeviceDO one = deviceManager.getOne(queryWrapper);
+    private boolean checkDuplicate(DeviceBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+        wrapper.eq(DeviceDO::getDeviceName, entityBO.getDeviceName());
+        wrapper.eq(DeviceDO::getDeviceCode, entityBO.getDeviceCode());
+        wrapper.eq(DeviceDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        DeviceDO one = deviceManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
             return false;
         }
-        return !isUpdate || !one.getId().equals(entityDO.getId());
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("The device is duplicates");
+        }
+        return duplicate;
     }
 
     /**
-     * 根据 ID 获取
+     * 根据 主键ID 获取
      *
      * @param id             ID
      * @param throwException 是否抛异常
@@ -599,7 +587,7 @@ public class DeviceServiceImpl implements DeviceService {
     private DeviceDO getDOById(Long id, boolean throwException) {
         DeviceDO entityDO = deviceManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The label does not exist");
+            throw new NotFoundException("The device not exist");
         }
         return entityDO;
     }

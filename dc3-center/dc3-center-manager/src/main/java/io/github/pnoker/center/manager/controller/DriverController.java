@@ -19,7 +19,7 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
-import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
+import io.github.pnoker.center.manager.entity.query.DriverQuery;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
@@ -121,7 +121,7 @@ public class DriverController implements Controller {
     /**
      * 根据 ID 集合查询 Driver
      *
-     * @param driverIds Driver ID Set
+     * @param driverIds Driver ID集
      * @return Map String:Driver
      */
     @PostMapping("/ids")
@@ -156,17 +156,17 @@ public class DriverController implements Controller {
     /**
      * 分页查询 Driver
      *
-     * @param driverPageQuery Driver Dto
+     * @param driverQuery Driver Dto
      * @return Page Of Driver
      */
     @PostMapping("/list")
-    public R<Page<DriverBO>> list(@RequestBody(required = false) DriverPageQuery driverPageQuery) {
+    public R<Page<DriverBO>> list(@RequestBody(required = false) DriverQuery driverQuery) {
         try {
-            if (ObjectUtil.isEmpty(driverPageQuery)) {
-                driverPageQuery = new DriverPageQuery();
+            if (ObjectUtil.isEmpty(driverQuery)) {
+                driverQuery = new DriverQuery();
             }
-            driverPageQuery.setTenantId(getTenantId());
-            Page<DriverBO> page = driverService.selectByPage(driverPageQuery);
+            driverQuery.setTenantId(getTenantId());
+            Page<DriverBO> page = driverService.selectByPage(driverQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

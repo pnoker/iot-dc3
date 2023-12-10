@@ -81,7 +81,7 @@ public interface PointBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<PointBO> buildBOByDO(List<PointDO> entityDOList);
+    List<PointBO> buildBOListByDOList(List<PointDO> entityDOList);
 
     /**
      * BO to VO

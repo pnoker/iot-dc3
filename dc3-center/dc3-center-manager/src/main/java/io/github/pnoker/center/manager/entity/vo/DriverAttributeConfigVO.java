@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -50,7 +49,7 @@ public class DriverAttributeConfigVO extends BaseVO {
      * 驱动属性ID
      */
     @Schema(description = "驱动属性ID")
-    @NotBlank(message = "驱动属性ID不能为空",
+    @NotNull(message = "驱动属性ID不能为空",
             groups = {Add.class, Update.class})
     private Long driverAttributeId;
 
@@ -65,7 +64,7 @@ public class DriverAttributeConfigVO extends BaseVO {
      * 设备ID
      */
     @Schema(description = "设备ID")
-    @NotBlank(message = "设备ID不能为空",
+    @NotNull(message = "设备ID不能为空",
             groups = {Add.class, Update.class})
     private Long deviceId;
 

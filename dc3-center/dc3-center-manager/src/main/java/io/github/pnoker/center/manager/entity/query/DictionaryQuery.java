@@ -18,11 +18,13 @@ package io.github.pnoker.center.manager.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.valid.Parent;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -32,33 +34,24 @@ import java.io.Serializable;
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Schema(description = "字典查询")
+@SuperBuilder
+@RequiredArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(title = "GroupQuery", description = "字典-查询")
 public class DictionaryQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Pages pages;
+    private Pages page;
 
     @Schema(description = "名称")
     private String label;
 
-    @Schema(description = "值")
-    private String value;
-
-    /**
-     * 父级 Value 值1
-     */
-    @Schema(description = "值1，可用于区分不同的父级")
-    private String value1;
-
-    /**
-     * 父级 Value 值2
-     */
-    @Schema(description = "值2，可用于区分不同的父级")
-    private String value2;
+    @NotNull(message = "父级ID不能为空",
+            groups = {Parent.class})
+    @Schema(description = "父级ID")
+    private Long parentId;
 
     @Schema(description = "租户ID")
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)

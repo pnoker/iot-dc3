@@ -81,7 +81,7 @@ public interface ApiBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<ApiBO> buildBOByDO(List<ApiDO> entityDOList);
+    List<ApiBO> buildBOListByDOList(List<ApiDO> entityDOList);
 
     /**
      * BO to VO

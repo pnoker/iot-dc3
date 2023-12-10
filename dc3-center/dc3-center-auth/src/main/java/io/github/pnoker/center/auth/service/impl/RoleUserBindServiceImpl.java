@@ -95,9 +95,9 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
     @Override
     public List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId) {
-        LambdaQueryWrapper<RoleUserBindBO> queryWrapper = Wrappers.<RoleUserBindBO>query().lambda();
-        queryWrapper.eq(RoleUserBindBO::getUserId, userId);
-        List<RoleUserBindBO> roleUserBindBOS = roleUserBindMapper.selectList(queryWrapper);
+        LambdaQueryWrapper<RoleUserBindBO> wrapper = Wrappers.<RoleUserBindBO>query().lambda();
+        wrapper.eq(RoleUserBindBO::getUserId, userId);
+        List<RoleUserBindBO> roleUserBindBOS = roleUserBindMapper.selectList(wrapper);
         if (CollUtil.isNotEmpty(roleUserBindBOS)) {
             List<RoleBO> roleBOS = roleMapper.selectBatchIds(roleUserBindBOS.stream().map(RoleUserBindBO::getRoleId)
                     .collect(Collectors.toList()));
@@ -109,11 +109,11 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     }
 
     public LambdaQueryWrapper<RoleUserBindBO> buildQueryWrapper(RoleUserBindBOPageQuery pageQuery) {
-        LambdaQueryWrapper<RoleUserBindBO> queryWrapper = Wrappers.<RoleUserBindBO>query().lambda();
+        LambdaQueryWrapper<RoleUserBindBO> wrapper = Wrappers.<RoleUserBindBO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getUserId()), RoleUserBindBO::getUserId, pageQuery.getUserId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleUserBindBO::getRoleId, pageQuery.getRoleId());
+            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getUserId()), RoleUserBindBO::getUserId, pageQuery.getUserId());
+            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleUserBindBO::getRoleId, pageQuery.getRoleId());
         }
-        return queryWrapper;
+        return wrapper;
     }
 }

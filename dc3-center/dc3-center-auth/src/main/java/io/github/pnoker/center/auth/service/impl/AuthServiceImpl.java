@@ -21,7 +21,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.entity.bo.*;
 import io.github.pnoker.center.auth.service.*;
-import io.github.pnoker.common.entity.auth.Login;
+import io.github.pnoker.center.auth.entity.auth.Login;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.*;

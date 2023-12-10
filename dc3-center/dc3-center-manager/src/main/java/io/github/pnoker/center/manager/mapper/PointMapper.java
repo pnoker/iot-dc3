@@ -16,6 +16,6 @@ import org.apache.ibatis.annotations.Param;
  * @since 2022.1.0
  */
 public interface PointMapper extends BaseMapper<PointDO> {
-    Page<PointDO> selectPageWithDevice(Page<PointDO> page, @Param(Constants.WRAPPER) Wrapper<PointDO> queryWrapper, @Param("deviceId") Long deviceId);
+    Page<PointDO> selectPageWithDevice(Page<PointDO> page, @Param(Constants.WRAPPER) Wrapper<PointDO> wrapper, @Param("deviceId") Long deviceId);
 
 }

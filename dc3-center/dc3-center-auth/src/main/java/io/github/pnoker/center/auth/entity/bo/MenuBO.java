@@ -19,7 +19,7 @@ package io.github.pnoker.center.auth.entity.bo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.center.auth.entity.bo.ext.MenuExtBO;
-import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.valid.Auth;

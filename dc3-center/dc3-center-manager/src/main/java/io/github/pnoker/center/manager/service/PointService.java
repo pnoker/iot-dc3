@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.bo.PointBO;
-import io.github.pnoker.center.manager.entity.query.PointBOPageQuery;
+import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.common.base.Service;
 
 import java.util.List;
@@ -30,19 +30,10 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointService extends Service<PointBO, PointBOPageQuery> {
+public interface PointService extends Service<PointBO, PointQuery> {
 
     /**
-     * 根据 位号Name 、 模板Id 查询位号
-     *
-     * @param name      Point Name
-     * @param profileId Profile ID
-     * @return Point
-     */
-    PointBO selectByNameAndProfileId(String name, Long profileId);
-
-    /**
-     * 根据 设备Id 查询位号
+     * 根据 设备ID 查询位号
      *
      * @param deviceId 设备ID
      * @return Point Array
@@ -50,7 +41,7 @@ public interface PointService extends Service<PointBO, PointBOPageQuery> {
     List<PointBO> selectByDeviceId(Long deviceId);
 
     /**
-     * 根据 模板Id 查询位号
+     * 根据 模板ID 查询位号
      *
      * @param profileId Profile ID
      * @return Point Array
@@ -58,18 +49,18 @@ public interface PointService extends Service<PointBO, PointBOPageQuery> {
     List<PointBO> selectByProfileId(Long profileId);
 
     /**
-     * 根据 模板Id 集查询位号
+     * 根据 模板ID 集查询位号
      *
-     * @param profileIds     Profile ID Set
+     * @param profileIds     Profile ID集
      * @param throwException Throw Exception
      * @return Point Array
      */
-    List<PointBO> selectByProfileIds(Set<Long> profileIds, boolean throwException);
+    List<PointBO> selectByProfileIds(Set<Long> profileIds);
 
     /**
-     * 根据 设备Id集 查询设备
+     * 根据 设备ID集 查询设备
      *
-     * @param ids Point ID Set
+     * @param ids 位号ID集
      * @return Point Array
      */
     List<PointBO> selectByIds(Set<Long> ids);
@@ -77,10 +68,9 @@ public interface PointService extends Service<PointBO, PointBOPageQuery> {
     /**
      * 查询 位号单位
      *
-     * @param pointIds Point ID Set
+     * @param pointIds 位号ID集
      * @return Map Long:Unit String
      */
     Map<Long, String> unit(Set<Long> pointIds);
 
-    Long count();
 }

@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.query.TenantBindBOPageQuery;
 import io.github.pnoker.center.auth.mapper.TenantBindMapper;
 import io.github.pnoker.center.auth.service.TenantBindService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
@@ -83,11 +84,11 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     @Override
     public TenantBindBO selectByTenantIdAndUserId(Long tenantId, Long userId) {
-        LambdaQueryWrapper<TenantBindBO> queryWrapper = Wrappers.<TenantBindBO>query().lambda();
-        queryWrapper.eq(TenantBindBO::getTenantId, tenantId);
-        queryWrapper.eq(TenantBindBO::getUserId, userId);
-        queryWrapper.last("limit 1");
-        return tenantBindMapper.selectOne(queryWrapper);
+        LambdaQueryWrapper<TenantBindBO> wrapper = Wrappers.<TenantBindBO>query().lambda();
+        wrapper.eq(TenantBindBO::getTenantId, tenantId);
+        wrapper.eq(TenantBindBO::getUserId, userId);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        return tenantBindMapper.selectOne(wrapper);
     }
 
     @Override
@@ -99,12 +100,12 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     private LambdaQueryWrapper<TenantBindBO> fuzzyQuery(TenantBindBOPageQuery query) {
-        LambdaQueryWrapper<TenantBindBO> queryWrapper = Wrappers.<TenantBindBO>query().lambda();
+        LambdaQueryWrapper<TenantBindBO> wrapper = Wrappers.<TenantBindBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), TenantBindBO::getTenantId, query.getTenantId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getUserId()), TenantBindBO::getUserId, query.getUserId());
+            wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), TenantBindBO::getTenantId, query.getTenantId());
+            wrapper.eq(ObjectUtil.isNotEmpty(query.getUserId()), TenantBindBO::getUserId, query.getUserId());
         }
-        return queryWrapper;
+        return wrapper;
     }
 
 }

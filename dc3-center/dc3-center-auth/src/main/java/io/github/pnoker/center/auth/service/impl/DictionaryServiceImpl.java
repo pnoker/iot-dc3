@@ -51,8 +51,8 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public List<Dictionary> tenantDictionary() {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<TenantBO> queryWrapper = Wrappers.<TenantBO>query().lambda();
-        List<TenantBO> tenantBOList = tenantMapper.selectList(queryWrapper);
+        LambdaQueryWrapper<TenantBO> wrapper = Wrappers.<TenantBO>query().lambda();
+        List<TenantBO> tenantBOList = tenantMapper.selectList(wrapper);
         for (TenantBO tenantBO : tenantBOList) {
             Dictionary driverDictionary = new Dictionary();
             driverDictionary.setLabel(tenantBO.getTenantName());
@@ -65,8 +65,8 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public List<Dictionary> userDictionary(Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<UserLogin> queryWrapper = Wrappers.<UserLogin>query().lambda();
-        List<UserLogin> userLoginList = userLoginMapper.selectList(queryWrapper);
+        LambdaQueryWrapper<UserLogin> wrapper = Wrappers.<UserLogin>query().lambda();
+        List<UserLogin> userLoginList = userLoginMapper.selectList(wrapper);
         for (UserLogin userLogin : userLoginList) {
             Dictionary driverDictionary = new Dictionary();
             driverDictionary.setLabel(userLogin.getLoginName());
@@ -79,8 +79,8 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public List<Dictionary> blackIpDictionary(Long tenantId) {
         List<Dictionary> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<BlackIpBO> queryWrapper = Wrappers.<BlackIpBO>query().lambda();
-        List<BlackIpBO> blackIpBOList = blackIpMapper.selectList(queryWrapper);
+        LambdaQueryWrapper<BlackIpBO> wrapper = Wrappers.<BlackIpBO>query().lambda();
+        List<BlackIpBO> blackIpBOList = blackIpMapper.selectList(wrapper);
         for (BlackIpBO blackIpBO : blackIpBOList) {
             Dictionary driverDictionary = new Dictionary();
             driverDictionary.setLabel(blackIpBO.getIp());

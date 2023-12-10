@@ -37,6 +37,7 @@ import lombok.experimental.SuperBuilder;
 @RequiredArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "GroupQuery", description = "分组-查询")
 public class GroupQuery extends GroupVO {
 

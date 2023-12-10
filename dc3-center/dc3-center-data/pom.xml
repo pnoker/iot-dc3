@@ -32,24 +32,6 @@
 
     <dependencies>
 
-        <!-- DC3 Api Manager -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-manager</artifactId>
-        </dependency>
-
-        <!-- DC3 Api Auth -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-auth</artifactId>
-        </dependency>
-
-        <!-- DC3 Api Data -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-data</artifactId>
-        </dependency>
-
         <!-- Elasticsearch -->
         <dependency>
             <groupId>co.elastic.clients</groupId>
@@ -62,10 +44,10 @@
             <artifactId>okhttp</artifactId>
         </dependency>
 
-        <!-- Jakarta JSON 相关 -->
+        <!-- DC3 Api Auth -->
         <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
         <!-- DC3 Api Manager -->
@@ -78,12 +60,6 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-data</artifactId>
-        </dependency>
-
-        <!-- DC3 Common RabbitMQ -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-rabbitmq</artifactId>
         </dependency>
 
         <!-- DC3 Common MySQL -->
@@ -116,6 +92,12 @@
             <artifactId>dc3-common-tdengine</artifactId>
         </dependency>-->
 
+        <!-- DC3 Common RabbitMQ -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-rabbitmq</artifactId>
+        </dependency>
+
         <!-- DC3 Common Quartz -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -123,14 +105,5 @@
         </dependency>
 
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

@@ -81,7 +81,7 @@ public interface UserLoginBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<UserLoginBO> buildBOByDO(List<UserLoginDO> entityDOList);
+    List<UserLoginBO> buildBOListByDOList(List<UserLoginDO> entityDOList);
 
     /**
      * BO to VO

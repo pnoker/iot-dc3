@@ -25,6 +25,7 @@ import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.query.TenantBOPageQuery;
 import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.service.TenantService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
@@ -87,11 +88,11 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public TenantBO selectByCode(String code) {
-        LambdaQueryWrapper<TenantBO> queryWrapper = Wrappers.<TenantBO>query().lambda();
-        queryWrapper.eq(TenantBO::getTenantCode, code);
-        queryWrapper.eq(TenantBO::getEnableFlag, EnableFlagEnum.ENABLE);
-        queryWrapper.last("limit 1");
-        return tenantMapper.selectOne(queryWrapper);
+        LambdaQueryWrapper<TenantBO> wrapper = Wrappers.<TenantBO>query().lambda();
+        wrapper.eq(TenantBO::getTenantCode, code);
+        wrapper.eq(TenantBO::getEnableFlag, EnableFlagEnum.ENABLE);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        return tenantMapper.selectOne(wrapper);
     }
 
     @Override
@@ -103,11 +104,11 @@ public class TenantServiceImpl implements TenantService {
     }
 
     private LambdaQueryWrapper<TenantBO> fuzzyQuery(TenantBOPageQuery query) {
-        LambdaQueryWrapper<TenantBO> queryWrapper = Wrappers.<TenantBO>query().lambda();
+        LambdaQueryWrapper<TenantBO> wrapper = Wrappers.<TenantBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getTenantName()), TenantBO::getTenantName, query.getTenantName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getTenantName()), TenantBO::getTenantName, query.getTenantName());
         }
-        return queryWrapper;
+        return wrapper;
     }
 
 }

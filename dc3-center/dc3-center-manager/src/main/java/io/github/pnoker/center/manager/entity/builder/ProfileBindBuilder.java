@@ -81,7 +81,7 @@ public interface ProfileBindBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<ProfileBindBO> buildBOByDO(List<ProfileBindDO> entityDOList);
+    List<ProfileBindBO> buildBOListByDOList(List<ProfileBindDO> entityDOList);
 
     /**
      * BO to VO

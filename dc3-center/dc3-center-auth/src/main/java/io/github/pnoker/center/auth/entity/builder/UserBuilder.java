@@ -81,7 +81,7 @@ public interface UserBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<UserBO> buildBOByDO(List<UserDO> entityDOList);
+    List<UserBO> buildBOListByDOList(List<UserDO> entityDOList);
 
     /**
      * BO to VO

@@ -83,16 +83,16 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private LambdaQueryWrapper<ResourceBO> buildQueryWrapper(ResourceBOPageQuery pageQuery) {
-        LambdaQueryWrapper<ResourceBO> queryWrapper = Wrappers.<ResourceBO>query().lambda();
+        LambdaQueryWrapper<ResourceBO> wrapper = Wrappers.<ResourceBO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getTenantId()), ResourceBO::getTenantId, pageQuery.getTenantId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getParentResourceId()), ResourceBO::getParentResourceId, pageQuery.getParentResourceId());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(pageQuery.getResourceName()), ResourceBO::getResourceName, pageQuery.getResourceName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceCode()), ResourceBO::getResourceCode, pageQuery.getResourceCode());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getResourceTypeFlag()), ResourceBO::getResourceTypeFlag, pageQuery.getResourceTypeFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getEnableFlag()), ResourceBO::getEnableFlag, pageQuery.getEnableFlag());
+            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getTenantId()), ResourceBO::getTenantId, pageQuery.getTenantId());
+            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getParentResourceId()), ResourceBO::getParentResourceId, pageQuery.getParentResourceId());
+            wrapper.like(CharSequenceUtil.isNotEmpty(pageQuery.getResourceName()), ResourceBO::getResourceName, pageQuery.getResourceName());
+            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceCode()), ResourceBO::getResourceCode, pageQuery.getResourceCode());
+            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getResourceTypeFlag()), ResourceBO::getResourceTypeFlag, pageQuery.getResourceTypeFlag());
+            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getEnableFlag()), ResourceBO::getEnableFlag, pageQuery.getEnableFlag());
 
         }
-        return queryWrapper;
+        return wrapper;
     }
 }

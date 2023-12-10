@@ -20,6 +20,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.GroupBO;
 import io.github.pnoker.center.manager.entity.builder.GroupBuilder;
@@ -27,6 +28,7 @@ import io.github.pnoker.center.manager.entity.model.GroupDO;
 import io.github.pnoker.center.manager.entity.query.GroupQuery;
 import io.github.pnoker.center.manager.manager.GroupManager;
 import io.github.pnoker.center.manager.service.GroupService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
@@ -62,7 +64,7 @@ public class GroupServiceImpl implements GroupService {
 
         GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
         if (!groupManager.save(entityDO)) {
-            throw new AddException("The group add failed");
+            throw new AddException("分组创建失败");
         }
     }
 
@@ -74,15 +76,14 @@ public class GroupServiceImpl implements GroupService {
         getDOById(id, true);
 
         // 删除分组之前需要检查该分组是否存在关联
-        LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.<GroupDO>query().lambda();
-        queryWrapper.eq(GroupDO::getParentGroupId, id);
-        long count = groupManager.count(queryWrapper);
+        LambdaQueryChainWrapper<GroupDO> wrapper = groupManager.lambdaQuery().eq(GroupDO::getParentGroupId, id);
+        long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("The group has been bound by another group");
+            throw new AssociatedException("分组删除失败，该分组下存在子分组");
         }
 
         if (!groupManager.removeById(id)) {
-            throw new DeleteException("The group delete failed");
+            throw new DeleteException("分组删除失败");
         }
     }
 
@@ -98,7 +99,7 @@ public class GroupServiceImpl implements GroupService {
         GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!groupManager.updateById(entityDO)) {
-            throw new UpdateException("The group update failed");
+            throw new UpdateException("分组更新失败");
         }
     }
 
@@ -130,10 +131,10 @@ public class GroupServiceImpl implements GroupService {
      * @return {@link LambdaQueryWrapper}
      */
     private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupQuery query) {
-        LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.<GroupDO>query().lambda();
-        queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getGroupName()), GroupDO::getGroupName, query.getGroupName());
-        queryWrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), GroupDO::getTenantId, query.getTenantId());
-        return queryWrapper;
+        LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
+        wrapper.like(CharSequenceUtil.isNotEmpty(query.getGroupName()), GroupDO::getGroupName, query.getGroupName());
+        wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), GroupDO::getTenantId, query.getTenantId());
+        return wrapper;
     }
 
     /**
@@ -145,11 +146,11 @@ public class GroupServiceImpl implements GroupService {
      * @return 是否重复
      */
     private boolean checkDuplicate(GroupBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.<GroupDO>query().lambda();
-        queryWrapper.eq(GroupDO::getGroupName, entityBO.getGroupName());
-        queryWrapper.eq(GroupDO::getTenantId, entityBO.getTenantId());
-        queryWrapper.last("limit 1");
-        GroupDO one = groupManager.getOne(queryWrapper);
+        LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
+        wrapper.eq(GroupDO::getGroupName, entityBO.getGroupName());
+        wrapper.eq(GroupDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        GroupDO one = groupManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
             return false;
         }
@@ -161,7 +162,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
-     * 根据 ID 获取
+     * 根据 主键ID 获取
      *
      * @param id             ID
      * @param throwException 是否抛异常

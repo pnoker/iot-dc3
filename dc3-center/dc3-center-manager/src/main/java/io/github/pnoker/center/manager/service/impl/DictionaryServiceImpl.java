@@ -16,33 +16,17 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.DriverBO;
-import io.github.pnoker.center.manager.entity.bo.PointBO;
-import io.github.pnoker.center.manager.entity.model.DeviceDO;
-import io.github.pnoker.center.manager.entity.model.ProfileDO;
-import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
-import io.github.pnoker.center.manager.entity.query.PointBOPageQuery;
-import io.github.pnoker.center.manager.manager.DriverManager;
-import io.github.pnoker.center.manager.mapper.DeviceMapper;
-import io.github.pnoker.center.manager.mapper.DriverMapper;
-import io.github.pnoker.center.manager.mapper.ProfileMapper;
-import io.github.pnoker.center.manager.service.DictionaryService;
-import io.github.pnoker.center.manager.service.PointService;
-import io.github.pnoker.common.entity.common.Dictionary;
+import io.github.pnoker.center.manager.entity.bo.*;
+import io.github.pnoker.center.manager.entity.builder.DictionaryBuilder;
+import io.github.pnoker.center.manager.entity.query.*;
+import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author pnoker
@@ -53,103 +37,105 @@ import java.util.stream.Collectors;
 public class DictionaryServiceImpl implements DictionaryService {
 
     @Resource
-    private DriverMapper driverMapper;
-    @Resource
-    private DriverManager driverManager;
-    @Resource
-    private ProfileMapper profileMapper;
-    @Resource
-    private DeviceMapper deviceMapper;
+    private DictionaryBuilder dictionaryBuilder;
 
+    @Resource
+    private DriverService driverService;
+    @Resource
+    private ProfileService profileService;
+    @Resource
+    private DeviceService deviceService;
     @Resource
     private PointService pointService;
 
     @Override
-    public Page<Dictionary> driverDictionary(DictionaryQuery dictionaryQuery) {
-        if (ObjectUtil.isNull(dictionaryQuery.getPages())) {
-            dictionaryQuery.setPages(new Pages());
+    public Page<DictionaryBO> driverDictionary(DictionaryQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery)) {
+            entityQuery = new DictionaryQuery();
         }
-        LambdaQueryWrapper<DriverBO> queryWrapper = Wrappers.<DriverBO>query().lambda();
-        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryQuery.getLabel()), DriverBO::getDriverName, dictionaryQuery.getLabel());
-        queryWrapper.eq(ObjectUtil.isNotEmpty(dictionaryQuery.getTenantId()), DriverBO::getTenantId, dictionaryQuery.getTenantId());
-        Page<DriverBO> driverPage = driverManager.page(PageUtil.page(dictionaryQuery.getPages()), queryWrapper);
-        List<Dictionary> dictionaryList = driverPage.getRecords().parallelStream().map(driver -> {
-            Dictionary dictionary = new Dictionary();
-            dictionary.setLabel(driver.getDriverName());
-            dictionary.setValue(driver.getId().toString());
-            return dictionary;
-        }).collect(Collectors.toList());
-        Page<Dictionary> page = new Page<>();
-        BeanUtils.copyProperties(driverPage, page);
-        page.setRecords(dictionaryList);
-        return page;
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+
+        DriverQuery driverQuery = DriverQuery.builder().page(entityQuery.getPage()).driverName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        Page<DriverBO> driverPageBO = driverService.selectByPage(driverQuery);
+
+        return dictionaryBuilder.buildVOPageByDriverBOPage(driverPageBO);
     }
 
     @Override
-    public Page<Dictionary> deviceDictionary(DictionaryQuery dictionaryQuery) {
-        if (ObjectUtil.isNull(dictionaryQuery.getPages())) {
-            dictionaryQuery.setPages(new Pages());
+    public Page<DictionaryBO> profileDictionary(DictionaryQuery entityQuery) {
+        if (ObjectUtil.isEmpty(entityQuery)) {
+            entityQuery = new DictionaryQuery();
         }
-        LambdaQueryWrapper<DeviceDO> queryWrapper = Wrappers.<DeviceDO>query().lambda();
-        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryQuery.getLabel()), DeviceDO::getDeviceName, dictionaryQuery.getLabel());
-        queryWrapper.eq(CharSequenceUtil.isNotEmpty(dictionaryQuery.getValue1()), DeviceDO::getDriverId, dictionaryQuery.getValue1());
-        queryWrapper.eq(ObjectUtil.isNotEmpty(dictionaryQuery.getTenantId()), DeviceDO::getTenantId, dictionaryQuery.getTenantId());
-        Page<DeviceDO> devicePage = driverManager.page(PageUtil.page(dictionaryQuery.getPages()), queryWrapper);
-        List<Dictionary> dictionaryList = devicePage.getRecords().parallelStream().map(profile -> {
-            Dictionary dictionary = new Dictionary();
-            dictionary.setLabel(profile.getDeviceName());
-            dictionary.setValue(profile.getId().toString());
-            return dictionary;
-        }).collect(Collectors.toList());
-        Page<Dictionary> page = new Page<>();
-        BeanUtils.copyProperties(devicePage, page);
-        page.setRecords(dictionaryList);
-        return page;
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+
+        ProfileQuery profileQuery = ProfileQuery.builder().page(entityQuery.getPage()).profileName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        Page<ProfileBO> profilePageBO = profileService.selectByPage(profileQuery);
+
+        return dictionaryBuilder.buildVOPageByProfileBOPage(profilePageBO);
     }
 
     @Override
-    public Page<Dictionary> profileDictionary(DictionaryQuery dictionaryQuery) {
-        if (ObjectUtil.isNull(dictionaryQuery.getPages())) {
-            dictionaryQuery.setPages(new Pages());
+    public Page<DictionaryBO> pointDictionaryForProfile(DictionaryQuery entityQuery) {
+        if (ObjectUtil.isEmpty(entityQuery)) {
+            entityQuery = new DictionaryQuery();
         }
-        LambdaQueryWrapper<ProfileDO> queryWrapper = Wrappers.<ProfileDO>query().lambda();
-        queryWrapper.like(CharSequenceUtil.isNotEmpty(dictionaryQuery.getLabel()), ProfileDO::getProfileName, dictionaryQuery.getLabel());
-        queryWrapper.eq(ObjectUtil.isNotEmpty(dictionaryQuery.getTenantId()), ProfileDO::getTenantId, dictionaryQuery.getTenantId());
-        Page<ProfileDO> profilePage = profileMapper.selectPage(PageUtil.page(dictionaryQuery.getPages()), queryWrapper);
-        List<Dictionary> dictionaryList = profilePage.getRecords().parallelStream().map(profile -> {
-            Dictionary dictionary = new Dictionary();
-            dictionary.setLabel(profile.getProfileName());
-            dictionary.setValue(profile.getId().toString());
-            return dictionary;
-        }).collect(Collectors.toList());
-        Page<Dictionary> page = new Page<>();
-        BeanUtils.copyProperties(profilePage, page);
-        page.setRecords(dictionaryList);
-        return page;
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+
+        PointQuery pointQuery = PointQuery.builder().page(entityQuery.getPage()).profileId(entityQuery.getParentId()).pointName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        Page<PointBO> pointPageBO = pointService.selectByPage(pointQuery);
+
+        return dictionaryBuilder.buildVOPageByPointBOPage(pointPageBO);
     }
 
     @Override
-    public Page<Dictionary> pointDictionary(DictionaryQuery dictionaryQuery) {
-        if (ObjectUtil.isNull(dictionaryQuery.getPages())) {
-            dictionaryQuery.setPages(new Pages());
+    public Page<DictionaryBO> pointDictionaryForDevice(DictionaryQuery entityQuery) {
+        if (ObjectUtil.isEmpty(entityQuery)) {
+            entityQuery = new DictionaryQuery();
         }
-        PointBOPageQuery pointPageQuery = new PointBOPageQuery();
-        pointPageQuery.setPage(dictionaryQuery.getPages());
-        pointPageQuery.setDeviceId(Long.parseLong(dictionaryQuery.getValue2()));
-        pointPageQuery.setPointName(dictionaryQuery.getLabel());
-        pointPageQuery.setProfileId(Long.parseLong(dictionaryQuery.getValue1()));
-        pointPageQuery.setTenantId(dictionaryQuery.getTenantId());
-        Page<PointBO> pointPage = pointService.selectByPage(pointPageQuery);
-        List<Dictionary> dictionaryList = pointPage.getRecords().parallelStream().map(profile -> {
-            Dictionary dictionary = new Dictionary();
-            dictionary.setLabel(profile.getPointName());
-            dictionary.setValue(profile.getId().toString());
-            return dictionary;
-        }).collect(Collectors.toList());
-        Page<Dictionary> page = new Page<>();
-        BeanUtils.copyProperties(pointPage, page);
-        page.setRecords(dictionaryList);
-        return page;
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+
+        PointQuery pointQuery = PointQuery.builder().page(entityQuery.getPage()).deviceId(entityQuery.getParentId()).pointName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        Page<PointBO> pointPageBO = pointService.selectByPage(pointQuery);
+
+        return dictionaryBuilder.buildVOPageByPointBOPage(pointPageBO);
+    }
+
+    @Override
+    public Page<DictionaryBO> deviceDictionary(DictionaryQuery entityQuery) {
+        if (ObjectUtil.isEmpty(entityQuery)) {
+            entityQuery = new DictionaryQuery();
+        }
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+
+        DeviceQuery deviceQuery = DeviceQuery.builder().page(entityQuery.getPage()).deviceName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        Page<DeviceBO> devicePageBO = deviceService.selectByPage(deviceQuery);
+
+        return dictionaryBuilder.buildVOPageByDeviceBOPage(devicePageBO);
+    }
+
+    @Override
+    public Page<DictionaryBO> deviceDictionaryForDriver(DictionaryQuery entityQuery) {
+        if (ObjectUtil.isEmpty(entityQuery)) {
+            entityQuery = new DictionaryQuery();
+        }
+        if (ObjectUtil.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+
+        DeviceQuery deviceQuery = DeviceQuery.builder().page(entityQuery.getPage()).driverId(entityQuery.getParentId()).deviceName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        Page<DeviceBO> devicePageBO = deviceService.selectByPage(deviceQuery);
+
+        return dictionaryBuilder.buildVOPageByDeviceBOPage(devicePageBO);
     }
 
 }

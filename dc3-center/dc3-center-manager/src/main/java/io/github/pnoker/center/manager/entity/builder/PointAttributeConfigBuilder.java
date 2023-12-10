@@ -81,7 +81,7 @@ public interface PointAttributeConfigBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<PointAttributeConfigBO> buildBOByDO(List<PointAttributeConfigDO> entityDOList);
+    List<PointAttributeConfigBO> buildBOListByDOList(List<PointAttributeConfigDO> entityDOList);
 
     /**
      * BO to VO

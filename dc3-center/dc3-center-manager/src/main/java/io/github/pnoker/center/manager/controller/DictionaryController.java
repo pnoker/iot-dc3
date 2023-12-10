@@ -16,15 +16,18 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.bo.DictionaryBO;
+import io.github.pnoker.center.manager.entity.builder.DictionaryBuilder;
 import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
+import io.github.pnoker.center.manager.entity.vo.DictionaryVO;
 import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.common.Dictionary;
+import io.github.pnoker.common.valid.Parent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,97 +47,116 @@ import javax.annotation.Resource;
 public class DictionaryController implements Controller {
 
     @Resource
+    private DictionaryBuilder dictionaryBuilder;
+
+    @Resource
     private DictionaryService dictionaryService;
 
     /**
      * 查询驱动 Dictionary
      *
-     * @param dictionaryQuery DictionaryDto
-     * @return Page Of Dictionary
+     * @param entityQuery {@link DictionaryQuery}
+     * @return R Of DictionaryVO Page
      */
     @PostMapping("/driver")
-    public R<Page<Dictionary>> driverDictionary(@RequestBody(required = false) DictionaryQuery dictionaryQuery) {
+    public R<Page<DictionaryVO>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(dictionaryQuery)) {
-                dictionaryQuery = new DictionaryQuery();
-            }
-            dictionaryQuery.setTenantId(getTenantId());
-            Page<Dictionary> page = dictionaryService.driverDictionary(dictionaryQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<DictionaryBO> entityPageBO = dictionaryService.driverDictionary(entityQuery);
+            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
      * 查询模板 Dictionary
      *
-     * @param dictionaryQuery DictionaryDto
-     * @return Page Of Dictionary
+     * @param entityQuery {@link DictionaryQuery}
+     * @return R Of DictionaryVO Page
      */
     @PostMapping("/profile")
-    public R<Page<Dictionary>> profileDictionary(@RequestBody(required = false) DictionaryQuery dictionaryQuery) {
+    public R<Page<DictionaryVO>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(dictionaryQuery)) {
-                dictionaryQuery = new DictionaryQuery();
-            }
-            dictionaryQuery.setTenantId(getTenantId());
-            Page<Dictionary> page = dictionaryService.profileDictionary(dictionaryQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<DictionaryBO> entityPageBO = dictionaryService.profileDictionary(entityQuery);
+            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
-    }
-
-    /**
-     * 查询设备 Dictionary
-     *
-     * @param dictionaryQuery DictionaryDto
-     * @return Page Of Dictionary
-     */
-    @PostMapping("/device")
-    public R<Page<Dictionary>> deviceDictionary(@RequestBody(required = false) DictionaryQuery dictionaryQuery) {
-        try {
-            if (ObjectUtil.isEmpty(dictionaryQuery)) {
-                dictionaryQuery = new DictionaryQuery();
-            }
-            dictionaryQuery.setTenantId(getTenantId());
-            Page<Dictionary> page = dictionaryService.deviceDictionary(dictionaryQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
     }
 
     /**
      * 查询位号 Dictionary
      *
-     * @param dictionaryQuery DictionaryDto
-     * @return Page Of Dictionary
+     * @param entityQuery {@link DictionaryQuery}
+     * @return R Of DictionaryVO Page
      */
-    @PostMapping("/point")
-    public R<Page<Dictionary>> pointDictionary(@RequestBody(required = false) DictionaryQuery dictionaryQuery) {
+    @PostMapping("/profile_point")
+    public R<Page<DictionaryVO>> pointDictionaryForProfile(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(dictionaryQuery)) {
-                dictionaryQuery = new DictionaryQuery();
-            }
-            dictionaryQuery.setTenantId(getTenantId());
-            Page<Dictionary> page = dictionaryService.pointDictionary(dictionaryQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<DictionaryBO> entityPageBO = dictionaryService.pointDictionaryForProfile(entityQuery);
+            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
+    }
+
+    /**
+     * 查询位号 Dictionary
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return R Of DictionaryVO Page
+     */
+    @PostMapping("/device_point")
+    public R<Page<DictionaryVO>> pointDictionaryForDevice(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
+        try {
+            entityQuery.setTenantId(getTenantId());
+            Page<DictionaryBO> entityPageBO = dictionaryService.pointDictionaryForDevice(entityQuery);
+            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 查询设备 Dictionary
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return R Of DictionaryVO Page
+     */
+    @PostMapping("/device")
+    public R<Page<DictionaryVO>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
+        try {
+            entityQuery.setTenantId(getTenantId());
+            Page<DictionaryBO> entityPageBO = dictionaryService.deviceDictionary(entityQuery);
+            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 查询设备 Dictionary
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return R Of DictionaryVO Page
+     */
+    @PostMapping("/driver_device")
+    public R<Page<DictionaryVO>> deviceDictionaryForDriver(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
+        try {
+            entityQuery.setTenantId(getTenantId());
+            Page<DictionaryBO> entityPageBO = dictionaryService.deviceDictionaryForDriver(entityQuery);
+            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
+        } catch (Exception e) {
+            return R.fail(e.getMessage());
+        }
     }
 }

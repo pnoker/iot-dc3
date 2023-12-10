@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import lombok.Data;

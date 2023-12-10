@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.service;
 
-import io.github.pnoker.common.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.point.PointValue;
 
 import java.io.IOException;
 import java.util.List;
