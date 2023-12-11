@@ -30,8 +30,6 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
  */
 @Data
 @Document
-@NoArgsConstructor
-@AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)

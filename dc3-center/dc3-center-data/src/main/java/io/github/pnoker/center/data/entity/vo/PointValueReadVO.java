@@ -31,8 +31,6 @@ import java.io.Serializable;
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PointValueReadVO implements Serializable {
     private static final long serialVersionUID = 1L;
 

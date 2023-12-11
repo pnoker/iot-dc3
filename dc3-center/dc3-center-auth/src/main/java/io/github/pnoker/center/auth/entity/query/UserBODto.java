@@ -27,8 +27,6 @@ import lombok.*;
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class UserBODto extends UserBO {

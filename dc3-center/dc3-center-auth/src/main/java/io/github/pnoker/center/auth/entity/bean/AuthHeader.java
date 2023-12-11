@@ -25,8 +25,6 @@ import lombok.NoArgsConstructor;
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class AuthHeader {
     private String user;
     private String salt;

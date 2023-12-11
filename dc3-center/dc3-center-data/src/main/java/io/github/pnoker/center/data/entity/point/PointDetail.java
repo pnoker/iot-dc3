@@ -33,8 +33,6 @@ import javax.validation.constraints.Pattern;
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PointDetail {
 
     @NotBlank(message = "device name can't be empty", groups = {Add.class})

@@ -28,7 +28,7 @@ import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.dto.DriverSyncDownDTO;
 import io.github.pnoker.common.entity.dto.DriverSyncUpDTO;
-import io.github.pnoker.common.entity.driver.DriverMetadata;
+import io.github.pnoker.common.entity.dto.DriverMetadataDTO;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -82,9 +82,9 @@ public class DriverSyncServiceImpl implements DriverSyncService {
             DriverBO entityDO = registerDriver(entityDTO);
             registerDriverAttribute(entityDTO, entityDO);
             registerPointAttribute(entityDTO, entityDO);
-            DriverMetadata driverMetadata = batchService.batchDriverMetadata(entityDO.getServiceName(), entityDO.getTenantId());
+            DriverMetadataDTO driverMetadataDTO = batchService.batchDriverMetadata(entityDO.getServiceName(), entityDO.getTenantId());
 
-            DriverSyncDownDTO driverSyncDownDTO = new DriverSyncDownDTO(JsonUtil.toJsonString(driverMetadata));
+            DriverSyncDownDTO driverSyncDownDTO = new DriverSyncDownDTO(JsonUtil.toJsonString(driverMetadataDTO));
 
             rabbitTemplate.convertAndSend(
                     RabbitConstant.TOPIC_EXCHANGE_SYNC,

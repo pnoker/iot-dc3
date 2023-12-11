@@ -17,7 +17,7 @@
 package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.common.entity.driver.AttributeInfo;
+import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.exception.ConnectorException;
@@ -89,11 +89,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         - MAINTAIN:维护
         - FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE));
+        driverContext.getDriverMetadataDTO().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE));
     }
 
     @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, Point point) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
@@ -103,7 +103,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, AttributeInfoDTO value) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
@@ -118,7 +118,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverInfo 驱动信息
      * @return OpcUaClient
      */
-    private OpcUaClient getConnector(Long deviceId, Map<String, AttributeInfo> driverInfo) {
+    private OpcUaClient getConnector(Long deviceId, Map<String, AttributeInfoDTO> driverInfo) {
         log.debug("Opc Ua Server Connection Info {}", JsonUtil.toJsonString(driverInfo));
         OpcUaClient opcUaClient = connectMap.get(deviceId);
         if (ObjectUtil.isNull(opcUaClient)) {
@@ -144,7 +144,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointInfo 位号信息
      * @return OpcUa Node
      */
-    private NodeId getNode(Map<String, AttributeInfo> pointInfo) {
+    private NodeId getNode(Map<String, AttributeInfoDTO> pointInfo) {
         int namespace = attribute(pointInfo, "namespace");
         String tag = attribute(pointInfo, "tag");
         return new NodeId(namespace, tag);
@@ -157,7 +157,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointInfo 位号信息
      * @return Node Value
      */
-    private String readValue(OpcUaClient client, Map<String, AttributeInfo> pointInfo) {
+    private String readValue(OpcUaClient client, Map<String, AttributeInfoDTO> pointInfo) {
         try {
             NodeId nodeId = getNode(pointInfo);
             client.connect().get();
@@ -180,7 +180,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointInfo 位号信息
      * @param value     写入值
      */
-    private boolean writeValue(OpcUaClient client, Map<String, AttributeInfo> pointInfo, AttributeInfo value) {
+    private boolean writeValue(OpcUaClient client, Map<String, AttributeInfoDTO> pointInfo, AttributeInfoDTO value) {
         try {
             NodeId nodeId = getNode(pointInfo);
 
@@ -206,7 +206,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws ExecutionException   ExecutionException
      * @throws InterruptedException InterruptedException
      */
-    private boolean writeNode(OpcUaClient client, NodeId nodeId, AttributeInfo value) throws ExecutionException, InterruptedException {
+    private boolean writeNode(OpcUaClient client, NodeId nodeId, AttributeInfoDTO value) throws ExecutionException, InterruptedException {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(value.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + value.getType());
