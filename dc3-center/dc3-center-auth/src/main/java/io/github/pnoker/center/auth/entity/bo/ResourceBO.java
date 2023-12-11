@@ -17,8 +17,8 @@
 package io.github.pnoker.center.auth.entity.bo;
 
 import io.github.pnoker.common.base.BaseBO;
-import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.ResourceTypeFlagEnum;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;

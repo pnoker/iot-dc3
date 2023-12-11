@@ -24,7 +24,7 @@ import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.center.auth.entity.bo.UserLogin;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;

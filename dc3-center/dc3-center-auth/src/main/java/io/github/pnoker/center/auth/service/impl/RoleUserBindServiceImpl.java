@@ -27,7 +27,7 @@ import io.github.pnoker.center.auth.mapper.RoleMapper;
 import io.github.pnoker.center.auth.mapper.RoleUserBindMapper;
 import io.github.pnoker.center.auth.service.RoleUserBindService;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.UpdateException;

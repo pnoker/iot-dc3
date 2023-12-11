@@ -63,8 +63,8 @@
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
-    <profileBOS>
-        <profileBO>
+    <profiles>
+        <profile>
             <id>dev</id>
             <properties>
                 <!-- You can configure environment variables commonly used in development -->
@@ -73,26 +73,26 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-        </profileBO>
-        <profileBO>
+        </profile>
+        <profile>
             <id>test</id>
             <properties>
                 <NODE_ENV>test</NODE_ENV>
             </properties>
-        </profileBO>
-        <profileBO>
+        </profile>
+        <profile>
             <id>pre</id>
             <properties>
                 <NODE_ENV>pre</NODE_ENV>
             </properties>
-        </profileBO>
-        <profileBO>
+        </profile>
+        <profile>
             <id>pro</id>
             <properties>
                 <NODE_ENV>pro</NODE_ENV>
             </properties>
-        </profileBO>
-    </profileBOS>
+        </profile>
+    </profiles>
 
     <modules>
         <module>dc3-gateway</module>

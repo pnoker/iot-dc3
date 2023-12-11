@@ -23,12 +23,14 @@ import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
+import io.github.pnoker.center.manager.entity.builder.DriverBuilder;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.entity.dto.DriverDTO;
+import io.github.pnoker.common.entity.dto.DriverMetadataDTO;
 import io.github.pnoker.common.entity.dto.DriverSyncDownDTO;
 import io.github.pnoker.common.entity.dto.DriverSyncUpDTO;
-import io.github.pnoker.common.entity.dto.DriverMetadataDTO;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -51,6 +53,9 @@ import java.util.Map;
 @Slf4j
 @Service
 public class DriverSyncServiceImpl implements DriverSyncService {
+
+    @Resource
+    private DriverBuilder driverBuilder;
 
     @GrpcClient(AuthServiceConstant.SERVICE_NAME)
     private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
@@ -84,7 +89,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
             registerPointAttribute(entityDTO, entityDO);
             DriverMetadataDTO driverMetadataDTO = batchService.batchDriverMetadata(entityDO.getServiceName(), entityDO.getTenantId());
 
-            DriverSyncDownDTO driverSyncDownDTO = new DriverSyncDownDTO(JsonUtil.toJsonString(driverMetadataDTO));
+            DriverSyncDownDTO driverSyncDownDTO = DriverSyncDownDTO.builder().content(JsonUtil.toJsonString(driverMetadataDTO)).build();
 
             rabbitTemplate.convertAndSend(
                     RabbitConstant.TOPIC_EXCHANGE_SYNC,
@@ -109,17 +114,18 @@ public class DriverSyncServiceImpl implements DriverSyncService {
         }
 
         // register driver
-        DriverBO entityDO = entityDTO.getDriver();
+        DriverDTO entityDO = entityDTO.getDriver();
         entityDO.setTenantId(rTenantDTO.getData().getBase().getId());
+        DriverBO entityBO = driverBuilder.buildBOByDTO(entityDO);
         log.info("Register driver {}", entityDO);
         try {
             DriverBO byServiceName = driverService.selectByServiceName(entityDO.getServiceName(), entityDO.getTenantId(), true);
             log.debug("Driver already registered, updating {} ", entityDO);
             entityDO.setId(byServiceName.getId());
-            driverService.update(entityDO);
+            driverService.update(entityBO);
         } catch (NotFoundException notFoundException1) {
             log.debug("Driver does not registered, adding {} ", entityDO);
-            driverService.save(entityDO);
+            driverService.save(entityBO);
         }
         return driverService.selectById(entityDO.getId());
     }
