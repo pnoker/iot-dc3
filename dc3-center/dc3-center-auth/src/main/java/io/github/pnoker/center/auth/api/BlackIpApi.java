@@ -20,7 +20,7 @@ package io.github.pnoker.center.auth.api;
 import io.github.pnoker.api.center.auth.BlackIpApiGrpc;
 import io.github.pnoker.api.center.auth.IpQuery;
 import io.github.pnoker.api.center.auth.RBlackIpDTO;
-import io.github.pnoker.api.common.RDTO;
+import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;

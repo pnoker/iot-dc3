@@ -21,7 +21,7 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.LoginQuery;
 import io.github.pnoker.api.center.auth.RTokenDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
-import io.github.pnoker.api.common.RDTO;
+import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
 import io.github.pnoker.center.auth.service.TokenService;
 import io.github.pnoker.common.constant.enums.ResponseEnum;

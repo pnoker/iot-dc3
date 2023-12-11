@@ -20,7 +20,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
-import io.github.pnoker.api.common.PageDTO;
+import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.entity.vo.query.DevicePageQuery;
 import io.github.pnoker.center.data.service.DeviceStatusService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
