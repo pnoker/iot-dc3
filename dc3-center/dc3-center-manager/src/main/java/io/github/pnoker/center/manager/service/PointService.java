@@ -43,7 +43,7 @@ public interface PointService extends Service<PointBO, PointQuery> {
     /**
      * 根据 模板ID 查询位号
      *
-     * @param profileId Profile ID
+     * @param profileId 位号ID
      * @return Point Array
      */
     List<PointBO> selectByProfileId(Long profileId);

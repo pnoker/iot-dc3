@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.entity.model.PointAttributeDO;
 import io.github.pnoker.center.manager.entity.vo.PointAttributeVO;
+import io.github.pnoker.common.entity.dto.PointAttributeDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -98,6 +99,22 @@ public interface PointAttributeBuilder {
      * @return EntityVO Array
      */
     List<PointAttributeVO> buildVOListByBOList(List<PointAttributeBO> entityBOList);
+
+    /**
+     * BO to DTO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDTO
+     */
+    PointAttributeDTO buildDTOByBO(PointAttributeBO entityBO);
+
+    /**
+     * BOList to DTOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDTO Array
+     */
+    List<PointAttributeDTO> buildDTOListByBOList(List<PointAttributeBO> entityBOList);
 
     /**
      * DOPage to BOPage

@@ -64,7 +64,7 @@ public class DeviceStatusController implements Controller {
      * 根据 驱动ID 查询 Device 服务状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
-     * @param driverId Driver ID
+     * @param driverId 驱动ID
      * @return Map String:String
      */
     @GetMapping("/device/driver_id/{driverId}")
@@ -83,7 +83,7 @@ public class DeviceStatusController implements Controller {
      * 根据 模板ID 查询 Device 服务状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
-     * @param profileId Profile ID
+     * @param profileId 位号ID
      * @return Map String:String
      */
     @GetMapping("/device/profile_id/{profileId}")

@@ -52,7 +52,7 @@ public interface DriverService extends Service<DriverBO, DriverQuery> {
     /**
      * 根据 模版ID 查询 驱动集
      *
-     * @param profileId Profile ID
+     * @param profileId 位号ID
      * @return Driver Array
      */
     List<DriverBO> selectByProfileId(Long profileId);

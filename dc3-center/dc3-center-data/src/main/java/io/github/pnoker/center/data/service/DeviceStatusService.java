@@ -39,7 +39,7 @@ public interface DeviceStatusService {
     /**
      * 根据 模板ID 查询 Device 服务状态
      *
-     * @param profileId Profile ID
+     * @param profileId 位号ID
      * @return Map String:String
      */
     Map<Long, String> deviceByProfileId(Long profileId);
