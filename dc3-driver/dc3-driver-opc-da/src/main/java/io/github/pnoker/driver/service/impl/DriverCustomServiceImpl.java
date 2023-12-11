@@ -18,8 +18,8 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
-import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
+import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;

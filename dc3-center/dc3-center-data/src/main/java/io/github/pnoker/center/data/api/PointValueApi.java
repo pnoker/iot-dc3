@@ -24,7 +24,7 @@ import io.github.pnoker.api.center.data.RPointValueDTO;
 import io.github.pnoker.api.common.RDTO;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.entity.point.PointValue;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;

@@ -25,7 +25,7 @@ import io.github.pnoker.api.center.auth.UserDTO;
 import io.github.pnoker.api.common.BaseDTO;
 import io.github.pnoker.api.common.RDTO;
 import io.github.pnoker.center.auth.service.UserService;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.center.auth.entity.bo.UserBO;
 import io.github.pnoker.common.utils.BuilderUtil;
 import io.grpc.stub.StreamObserver;

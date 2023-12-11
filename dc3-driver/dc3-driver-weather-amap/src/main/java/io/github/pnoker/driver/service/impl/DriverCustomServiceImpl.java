@@ -21,7 +21,7 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.constant.driver.EventConstant;
 import io.github.pnoker.common.event.DeviceEvent;
 import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
-import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.Device;
 import io.github.pnoker.common.model.Point;

@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.model.DriverDO;
 import io.github.pnoker.center.manager.entity.vo.DriverVO;
+import io.github.pnoker.common.entity.dto.DriverDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -98,6 +99,30 @@ public interface DriverBuilder {
      * @return EntityVO Array
      */
     List<DriverVO> buildVOListByBOList(List<DriverBO> entityBOList);
+
+    /**
+     * BO to DTO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDTO
+     */
+    DriverDTO buildDTOByBO(DriverBO entityBO);
+
+    /**
+     * BOList to DTOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDTO Array
+     */
+    List<DriverDTO> buildDTOListByBOList(List<DriverBO> entityBOList);
+
+    /**
+     * DTO to BO
+     *
+     * @param entityDTO EntityDTO
+     * @return EntityBO
+     */
+    DriverBO buildBOByDTO(DriverDTO entityDTO);
 
     /**
      * DOPage to BOPage

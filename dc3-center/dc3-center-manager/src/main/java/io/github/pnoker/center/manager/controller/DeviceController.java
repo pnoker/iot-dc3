@@ -26,7 +26,7 @@ import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.utils.RequestUtil;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
