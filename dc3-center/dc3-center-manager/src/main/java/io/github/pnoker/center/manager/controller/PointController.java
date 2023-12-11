@@ -143,7 +143,7 @@ public class PointController implements Controller {
     /**
      * 根据 模板 ID 查询 Point
      *
-     * @param profileId Profile ID
+     * @param profileId 位号ID
      * @return Point Array
      */
     @GetMapping("/profile_id/{profileId}")

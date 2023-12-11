@@ -18,8 +18,10 @@ package io.github.pnoker.center.manager.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.vo.DeviceVO;
+import io.github.pnoker.common.entity.dto.DeviceDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -99,6 +101,22 @@ public interface DeviceBuilder {
      */
     List<DeviceVO> buildVOListByBOList(List<DeviceBO> entityBOList);
 
+    /**
+     * BO to DTO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDTO
+     */
+    DeviceDTO buildDTOByBO(DeviceBO entityBO);
+
+    /**
+     * BOList to DTOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDTO Array
+     */
+    List<DeviceDTO> buildDTOListByBOList(List<DeviceBO> entityBOList);
+    
     /**
      * DOPage to BOPage
      *

@@ -43,7 +43,7 @@ public interface ProfileService extends Service<ProfileBO, ProfileQuery> {
     ProfileBO selectByNameAndType(String name, ProfileTypeFlagEnum type, Long tenantId);
 
     /**
-     * 根据 模版Id集 查询模版
+     * 根据 模版ID集 查询模版
      *
      * @param ids Profile ID集
      * @return ProfileBO Array

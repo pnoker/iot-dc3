@@ -42,7 +42,7 @@ public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindQu
      * 根据 设备ID 和 模版ID 删除关联的模版映射
      *
      * @param deviceId  设备ID
-     * @param profileId Profile ID
+     * @param profileId 位号ID
      * @return 是否删除
      */
     Boolean removeByDeviceIdAndProfileId(Long deviceId, Long profileId);
@@ -51,7 +51,7 @@ public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindQu
      * 根据 设备ID 和 模版ID 查询关联的模版映射
      *
      * @param deviceId  设备ID
-     * @param profileId Profile ID
+     * @param profileId 位号ID
      * @return ProfileBind
      */
     ProfileBindBO selectByDeviceIdAndProfileId(Long deviceId, Long profileId);
@@ -59,7 +59,7 @@ public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindQu
     /**
      * 根据 模版ID 查询关联的 设备ID 集合
      *
-     * @param profileId Profile ID
+     * @param profileId 位号ID
      * @return 设备ID集
      */
     Set<Long> selectDeviceIdsByProfileId(Long profileId);
