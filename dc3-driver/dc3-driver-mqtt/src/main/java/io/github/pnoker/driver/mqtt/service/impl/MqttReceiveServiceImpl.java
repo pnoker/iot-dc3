@@ -16,6 +16,7 @@
 
 package io.github.pnoker.driver.mqtt.service.impl;
 
+import io.github.pnoker.common.entity.dto.PointValueDTO;
 import io.github.pnoker.common.entity.point.PointValue;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
@@ -44,7 +45,7 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     public void receiveValue(MqttMessage mqttMessage) {
         // do something to process your mqtt messages
         log.info(JsonUtil.toPrettyJsonString(mqttMessage));
-        PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
+        PointValueDTO pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValueDTO.class);
         pointValue.setOriginTime(new Date());
         driverSenderService.pointValueSender(pointValue);
     }
@@ -53,9 +54,9 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     public void receiveValues(List<MqttMessage> mqttMessageList) {
         // do something to process your mqtt messages
         log.info(JsonUtil.toPrettyJsonString(mqttMessageList));
-        List<PointValue> pointValues = mqttMessageList.stream()
+        List<PointValueDTO> pointValues = mqttMessageList.stream()
                 .map(mqttMessage -> {
-                    PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
+                    PointValueDTO pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValueDTO.class);
                     pointValue.setOriginTime(new Date());
                     return pointValue;
                 }).collect(Collectors.toList());
