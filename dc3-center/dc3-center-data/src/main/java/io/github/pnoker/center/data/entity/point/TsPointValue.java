@@ -31,8 +31,6 @@ import java.util.Map;
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class TsPointValue implements Serializable {
     private String metric;
     private Long timestamp;

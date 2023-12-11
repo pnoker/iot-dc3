@@ -32,8 +32,6 @@ import javax.validation.constraints.NotBlank;
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Login {
 
     @NotBlank(message = "Tenant can't be empty",

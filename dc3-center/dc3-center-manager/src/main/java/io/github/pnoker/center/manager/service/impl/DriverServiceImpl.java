@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.builder.DriverBuilder;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;

@@ -36,8 +36,6 @@ import java.util.List;
  */
 @Data
 @Document
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PointValue implements Serializable {
     private static final long serialVersionUID = 1L;

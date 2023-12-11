@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.common.entity.driver.DriverMetadata;
+import io.github.pnoker.common.entity.dto.DriverMetadataDTO;
 
 /**
  * BatchService Interface
@@ -33,6 +33,6 @@ public interface BatchService {
      * @param tenantId    租户ID
      * @return DriverMetadata
      */
-    DriverMetadata batchDriverMetadata(String serviceName, Long tenantId);
+    DriverMetadataDTO batchDriverMetadata(String serviceName, Long tenantId);
 
 }

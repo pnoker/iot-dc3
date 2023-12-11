@@ -19,7 +19,7 @@ package io.github.pnoker.driver.service.impl;
 import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.constant.driver.EventConstant;
 import io.github.pnoker.common.event.DeviceEvent;
-import io.github.pnoker.common.entity.driver.AttributeInfo;
+import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.model.Device;
@@ -72,11 +72,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         - MAINTAIN:维护
         - FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceEventSender(new DeviceEvent(id, EventConstant.Device.STATUS, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS)));
+        driverContext.getDriverMetadataDTO().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceEventSender(new DeviceEvent(id, EventConstant.Device.STATUS, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS)));
     }
 
     @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, Point point) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
@@ -90,7 +90,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, AttributeInfoDTO value) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */

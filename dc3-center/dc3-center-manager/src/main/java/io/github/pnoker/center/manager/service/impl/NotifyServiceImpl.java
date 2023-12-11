@@ -20,7 +20,7 @@ import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
-import io.github.pnoker.common.entity.dto.DriverMetadataDTO;
+import io.github.pnoker.common.entity.dto.DriverTransferMetadataDTO;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
@@ -56,7 +56,7 @@ public class NotifyServiceImpl implements NotifyService {
         try {
             List<DriverBO> entityDOS = driverService.selectByProfileId(profileBO.getId());
             entityDOS.forEach(driver -> {
-                DriverMetadataDTO entityDTO = new DriverMetadataDTO(
+                DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
                         MetadataTypeEnum.PROFILE,
                         command,
                         JsonUtil.toJsonString(profileBO)
@@ -76,7 +76,7 @@ public class NotifyServiceImpl implements NotifyService {
         try {
             List<DriverBO> entityDOS = driverService.selectByProfileId(pointBO.getProfileId());
             entityDOS.forEach(driver -> {
-                DriverMetadataDTO entityDTO = new DriverMetadataDTO(
+                DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
                         MetadataTypeEnum.POINT,
                         command,
                         JsonUtil.toJsonString(pointBO)
@@ -95,7 +95,7 @@ public class NotifyServiceImpl implements NotifyService {
     public void notifyDriverDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO) {
         try {
             DriverBO entityDO = driverService.selectById(deviceBO.getDriverId());
-            DriverMetadataDTO entityDTO = new DriverMetadataDTO(
+            DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
                     MetadataTypeEnum.DEVICE,
                     command,
                     JsonUtil.toJsonString(deviceBO)
@@ -113,7 +113,7 @@ public class NotifyServiceImpl implements NotifyService {
     public void notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfigBO driverAttributeConfigBO) {
         try {
             DriverBO entityDO = driverService.selectByDeviceId(driverAttributeConfigBO.getDeviceId());
-            DriverMetadataDTO entityDTO = new DriverMetadataDTO(
+            DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
                     MetadataTypeEnum.DRIVER_ATTRIBUTE_CONFIG,
                     command,
                     JsonUtil.toJsonString(driverAttributeConfigBO)
@@ -131,7 +131,7 @@ public class NotifyServiceImpl implements NotifyService {
     public void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointAttributeConfigBO pointAttributeConfigBO) {
         try {
             DriverBO entityDO = driverService.selectByDeviceId(pointAttributeConfigBO.getDeviceId());
-            DriverMetadataDTO entityDTO = new DriverMetadataDTO(
+            DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
                     MetadataTypeEnum.POINT_ATTRIBUTE_CONFIG,
                     command,
                     JsonUtil.toJsonString(pointAttributeConfigBO)
@@ -148,7 +148,7 @@ public class NotifyServiceImpl implements NotifyService {
      * @param entityDO  Driver
      * @param entityDTO DriverMetadataDTO
      */
-    private void notifyDriver(DriverBO entityDO, DriverMetadataDTO entityDTO) {
+    private void notifyDriver(DriverBO entityDO, DriverTransferMetadataDTO entityDTO) {
         log.info("Notify driver[{}]: {}", entityDO.getServiceName(), entityDTO);
         rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA, RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + entityDO.getServiceName(), entityDTO);
     }

@@ -28,8 +28,6 @@ import java.util.Date;
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PlcS7PointVariable {
     private int dbNum;
     private int byteOffset;

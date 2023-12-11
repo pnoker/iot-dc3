@@ -18,7 +18,7 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.driver.AttributeInfo;
+import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.exception.ServiceException;
@@ -100,11 +100,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         - MAINTAIN:维护
         - FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE));
+        driverContext.getDriverMetadataDTO().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE));
     }
 
     @Override
-    public String read(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, Point point) {
+    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, Point point) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
@@ -125,7 +125,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfo> driverInfo, Map<String, AttributeInfo> pointInfo, Device device, AttributeInfo value) {
+    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, AttributeInfoDTO value) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
@@ -154,7 +154,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverInfo DeviceInfo Map
      * @return S7Serializer
      */
-    private MyS7Connector getS7Connector(Long deviceId, Map<String, AttributeInfo> driverInfo) {
+    private MyS7Connector getS7Connector(Long deviceId, Map<String, AttributeInfoDTO> driverInfo) {
         MyS7Connector myS7Connector = s7ConnectorMap.get(deviceId);
         if (ObjectUtil.isNull(myS7Connector)) {
             myS7Connector = new MyS7Connector();
@@ -181,7 +181,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointInfo PointInfo Map
      * @return Plcs7PointVariable
      */
-    private PlcS7PointVariable getPointVariable(Map<String, AttributeInfo> pointInfo, String type) {
+    private PlcS7PointVariable getPointVariable(Map<String, AttributeInfoDTO> pointInfo, String type) {
         log.debug("Plc S7 Point Attribute Config {}", JsonUtil.toJsonString(pointInfo));
         return new PlcS7PointVariable(attribute(pointInfo, "dbNum"), attribute(pointInfo, "byteOffset"), attribute(pointInfo, "bitOffset"), attribute(pointInfo, "blockSize"), type);
     }

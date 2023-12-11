@@ -28,8 +28,6 @@ import org.springframework.data.annotation.Id;
  * @since 2022.1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
