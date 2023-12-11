@@ -24,7 +24,7 @@ import io.github.pnoker.api.center.manager.PageDriverQueryDTO;
 import io.github.pnoker.api.center.manager.RPageDriverDTO;
 import io.github.pnoker.api.common.DriverTypeFlagDTOEnum;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
-import io.github.pnoker.api.common.PageDTO;
+import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.entity.vo.query.DriverPageQuery;
 import io.github.pnoker.center.data.service.DriverStatusService;
 import io.github.pnoker.common.constant.common.DefaultConstant;

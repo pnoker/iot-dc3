@@ -21,7 +21,7 @@ import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.api.center.data.PointValueDTO;
 import io.github.pnoker.api.center.data.PointValueQuery;
 import io.github.pnoker.api.center.data.RPointValueDTO;
-import io.github.pnoker.api.common.RDTO;
+import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.common.constant.enums.ResponseEnum;

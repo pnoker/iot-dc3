@@ -26,7 +26,7 @@ import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.center.manager.PointDTO;
 import io.github.pnoker.api.center.manager.RPagePointDTO;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
-import io.github.pnoker.api.common.PageDTO;
+import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.entity.vo.query.PointValuePageQuery;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;

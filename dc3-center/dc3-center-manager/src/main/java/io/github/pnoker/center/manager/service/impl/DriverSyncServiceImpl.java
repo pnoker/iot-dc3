@@ -17,8 +17,6 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.auth.CodeQuery;
-import io.github.pnoker.api.center.auth.RTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
@@ -108,7 +106,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
      */
     private DriverBO registerDriver(DriverSyncUpDTO entityDTO) {
         // check tenant
-        RTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(entityDTO.getTenant()).build());
+        GrpcRTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(entityDTO.getTenant()).build());
         if (!rTenantDTO.getResult().getOk()) {
             throw new ServiceException("Invalid {}, {}", entityDTO.getTenant(), rTenantDTO.getResult().getMessage());
         }
