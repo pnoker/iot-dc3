@@ -17,7 +17,6 @@
 package io.github.pnoker.driver.mqtt.service.impl;
 
 import io.github.pnoker.common.entity.dto.PointValueDTO;
-import io.github.pnoker.common.entity.point.PointValue;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.utils.JsonUtil;

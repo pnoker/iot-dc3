@@ -19,7 +19,7 @@ package io.github.pnoker.center.auth.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.NameQuery;
-import io.github.pnoker.api.center.auth.RUserLoginDTO;
+import io.github.pnoker.api.center.auth.GrpcRUserLoginDTO;
 import io.github.pnoker.api.center.auth.UserLoginApiGrpc;
 import io.github.pnoker.api.center.auth.UserLoginDTO;
 import io.github.pnoker.api.common.GrpcBaseDTO;
@@ -49,9 +49,9 @@ public class UserLoginApi extends UserLoginApiGrpc.UserLoginApiImplBase {
     private UserLoginService userLoginService;
 
     @Override
-    public void selectByName(NameQuery request, StreamObserver<RUserLoginDTO> responseObserver) {
-        RUserLoginDTO.Builder builder = RUserLoginDTO.newBuilder();
-        RDTO.Builder rBuilder = RDTO.newBuilder();
+    public void selectByName(NameQuery request, StreamObserver<GrpcRUserLoginDTO> responseObserver) {
+        GrpcRUserLoginDTO.Builder builder = GrpcRUserLoginDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
         UserLogin select = userLoginService.selectByLoginName(request.getName(), false);
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);

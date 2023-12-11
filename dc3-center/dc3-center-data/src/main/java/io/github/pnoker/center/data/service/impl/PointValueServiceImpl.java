@@ -104,7 +104,7 @@ public class PointValueServiceImpl implements PointValueService {
         if (ObjectUtil.isEmpty(pageQuery.getPage())) pageQuery.setPage(new Pages());
         pointValuePage.setCurrent(pageQuery.getPage().getCurrent()).setSize(pageQuery.getPage().getSize());
 
-        PageDTO.Builder page = PageDTO.newBuilder()
+        GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
                 .setSize(pageQuery.getPage().getSize())
                 .setCurrent(pageQuery.getPage().getCurrent());
         PointDTO.Builder builder = buildDTOByQuery(pageQuery);

@@ -17,8 +17,8 @@
 package io.github.pnoker.gateway.filter;
 
 import io.github.pnoker.api.center.auth.BlackIpApiGrpc;
-import io.github.pnoker.api.center.auth.IpQuery;
-import io.github.pnoker.api.center.auth.RBlackIpDTO;
+import io.github.pnoker.api.center.auth.GrpcIpQuery;
+import io.github.pnoker.api.center.auth.GrpcRBlackIpDTO;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +53,7 @@ public class BlackIpGlobalFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         String remoteIp = GatewayUtil.getRemoteIp(request);
 
-        RBlackIpDTO rBlackIpDTO = blackIpApiBlockingStub.checkBlackIpValid(IpQuery.newBuilder().setIp(remoteIp).build());
+        GrpcRBlackIpDTO rBlackIpDTO = blackIpApiBlockingStub.checkBlackIpValid(GrpcIpQuery.newBuilder().setIp(remoteIp).build());
         if (rBlackIpDTO.getResult().getOk()) {
             log.error("Forbidden Ip: {}", remoteIp);
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);

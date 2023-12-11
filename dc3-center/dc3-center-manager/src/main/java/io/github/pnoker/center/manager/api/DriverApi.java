@@ -20,14 +20,16 @@ package io.github.pnoker.center.manager.api;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.*;
+import io.github.pnoker.api.common.GrpcBaseDTO;
+import io.github.pnoker.api.common.GrpcPageDTO;
+import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.query.DriverQuery;
 import io.github.pnoker.center.manager.service.DriverService;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.constant.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.utils.BuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -51,9 +53,9 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
     private DriverService driverService;
 
     @Override
-    public void list(PageDriverQueryDTO request, StreamObserver<RPageDriverDTO> responseObserver) {
-        RPageDriverDTO.Builder builder = RPageDriverDTO.newBuilder();
-        RDTO.Builder rBuilder = RDTO.newBuilder();
+    public void list(GrpcPageDriverQueryDTO request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
+        GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
 
         DriverQuery pageQuery = buildPageQuery(request);
 
@@ -67,14 +69,14 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
 
-            PageDriverDTO.Builder pageDriverBuilder = PageDriverDTO.newBuilder();
-            PageDTO.Builder pageBuilder = PageDTO.newBuilder();
+            GrpcPageDriverDTO.Builder pageDriverBuilder = GrpcPageDriverDTO.newBuilder();
+            GrpcPageDTO.Builder pageBuilder = GrpcPageDTO.newBuilder();
             pageBuilder.setCurrent(driverPage.getCurrent());
             pageBuilder.setSize(driverPage.getSize());
             pageBuilder.setPages(driverPage.getPages());
             pageBuilder.setTotal(driverPage.getTotal());
             pageDriverBuilder.setPage(pageBuilder);
-            List<DriverDTO> collect = driverPage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<GrpcDriverDTO> collect = driverPage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
             pageDriverBuilder.addAllData(collect);
 
             builder.setData(pageDriverBuilder);
@@ -86,9 +88,9 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
     }
 
     @Override
-    public void selectByDeviceId(ByDeviceQueryDTO request, StreamObserver<RDriverDTO> responseObserver) {
-        RDriverDTO.Builder builder = RDriverDTO.newBuilder();
-        RDTO.Builder rBuilder = RDTO.newBuilder();
+    public void selectByDeviceId(GrpcByDeviceQueryDTO request, StreamObserver<GrpcRDriverDTO> responseObserver) {
+        GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
 
         DriverBO entityDO = driverService.selectByDeviceId(request.getDeviceId());
         if (ObjectUtil.isNull(entityDO)) {
@@ -100,7 +102,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
 
-            DriverDTO driverDTO = buildDTOByDO(entityDO);
+            GrpcDriverDTO driverDTO = buildDTOByDO(entityDO);
 
             builder.setData(driverDTO);
         }
@@ -116,20 +118,20 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
      * @param request PageDriverQueryDTO
      * @return DriverPageQuery
      */
-    private DriverQuery buildPageQuery(PageDriverQueryDTO request) {
+    private DriverQuery buildPageQuery(GrpcPageDriverQueryDTO request) {
         DriverQuery pageQuery = new DriverQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());
         pageQuery.setPage(pages);
 
-        DriverDTO driver = request.getDriver();
+        GrpcDriverDTO driver = request.getDriver();
         pageQuery.setDriverName(driver.getDriverName());
         pageQuery.setServiceName(driver.getServiceName());
         pageQuery.setServiceHost(driver.getServiceHost());
         pageQuery.setTenantId(driver.getTenantId());
-        pageQuery.setDriverTypeFlag(DriverTypeFlagEnum.ofName(driver.getDriverTypeFlag().name()));
-        pageQuery.setEnableFlag(EnableFlagEnum.ofName(driver.getEnableFlag().name()));
+        pageQuery.setDriverTypeFlag(DriverTypeFlagEnum.values()[driver.getDriverTypeFlag()]);
+        pageQuery.setEnableFlag(EnableFlagEnum.values()[driver.getEnableFlag()]);
         return pageQuery;
     }
 
@@ -139,16 +141,16 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
      * @param entityDO Driver
      * @return DriverDTO
      */
-    private DriverDTO buildDTOByDO(DriverBO entityDO) {
-        DriverDTO.Builder builder = DriverDTO.newBuilder();
-        BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+    private GrpcDriverDTO buildDTOByDO(DriverBO entityDO) {
+        GrpcDriverDTO.Builder builder = GrpcDriverDTO.newBuilder();
+        GrpcBaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
         builder.setDriverName(entityDO.getDriverName());
         builder.setDriverCode(entityDO.getDriverCode());
         builder.setServiceName(entityDO.getServiceName());
-        builder.setDriverTypeFlag(DriverTypeFlagDTOEnum.valueOf(entityDO.getDriverTypeFlag().name()));
+        builder.setDriverTypeFlag(entityDO.getDriverTypeFlag().getIndex());
         builder.setServiceHost(entityDO.getServiceHost());
-        builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
+        builder.setEnableFlag(entityDO.getEnableFlag().getIndex());
         builder.setTenantId(entityDO.getTenantId());
         return builder.build();
     }

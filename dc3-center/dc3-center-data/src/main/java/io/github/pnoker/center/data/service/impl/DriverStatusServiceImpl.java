@@ -61,7 +61,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
     @Override
     public Map<Long, String> driver(DriverPageQuery pageQuery) {
-        PageDTO.Builder page = PageDTO.newBuilder()
+        GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
                 .setSize(pageQuery.getPage().getSize())
                 .setCurrent(pageQuery.getPage().getCurrent());
         DriverDTO.Builder builder = buildDTOByQuery(pageQuery);

@@ -20,15 +20,17 @@ package io.github.pnoker.center.manager.api;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.*;
+import io.github.pnoker.api.common.GrpcBaseDTO;
+import io.github.pnoker.api.common.GrpcPageDTO;
+import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.service.PointService;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.enums.RwFlagEnum;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.utils.BuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -52,9 +54,9 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
     private PointService pointService;
 
     @Override
-    public void list(PagePointQueryDTO request, StreamObserver<RPagePointDTO> responseObserver) {
-        RPagePointDTO.Builder builder = RPagePointDTO.newBuilder();
-        RDTO.Builder rBuilder = RDTO.newBuilder();
+    public void list(GrpcPagePointQueryDTO request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
+        GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
 
         PointQuery pageQuery = buildPageQuery(request);
 
@@ -68,14 +70,14 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
 
-            PagePointDTO.Builder pagePointBuilder = PagePointDTO.newBuilder();
-            PageDTO.Builder pageBuilder = PageDTO.newBuilder();
+            GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
+            GrpcPageDTO.Builder pageBuilder = GrpcPageDTO.newBuilder();
             pageBuilder.setCurrent(pointPage.getCurrent());
             pageBuilder.setSize(pointPage.getSize());
             pageBuilder.setPages(pointPage.getPages());
             pageBuilder.setTotal(pointPage.getTotal());
             pagePointBuilder.setPage(pageBuilder);
-            List<PointDTO> collect = pointPage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<GrpcPointDTO> collect = pointPage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
             pagePointBuilder.addAllData(collect);
 
             builder.setData(pagePointBuilder);
@@ -92,21 +94,21 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
      * @param request PagePointQueryDTO
      * @return PointPageQuery
      */
-    private PointQuery buildPageQuery(PagePointQueryDTO request) {
+    private PointQuery buildPageQuery(GrpcPagePointQueryDTO request) {
         PointQuery pageQuery = new PointQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());
         pageQuery.setPage(pages);
 
-        PointDTO point = request.getPoint();
+        GrpcPointDTO point = request.getPoint();
         pageQuery.setDeviceId(request.getDeviceId());
         pageQuery.setPointName(point.getPointName());
         pageQuery.setProfileId(point.getProfileId());
         pageQuery.setTenantId(point.getTenantId());
-        pageQuery.setPointTypeFlag(PointTypeFlagEnum.ofName(point.getPointTypeFlag().name()));
-        pageQuery.setRwFlag(RwFlagEnum.ofName(point.getRwFlag().name()));
-        pageQuery.setEnableFlag(EnableFlagEnum.ofName(point.getEnableFlag().name()));
+        pageQuery.setPointTypeFlag(PointTypeFlagEnum.values()[point.getPointTypeFlag()]);
+        pageQuery.setRwFlag(RwFlagEnum.values()[point.getRwFlag()]);
+        pageQuery.setEnableFlag(EnableFlagEnum.values()[point.getEnableFlag()]);
 
         return pageQuery;
     }
@@ -117,21 +119,21 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
      * @param entityDO Point
      * @return PointDTO
      */
-    private PointDTO buildDTOByDO(PointBO entityDO) {
-        PointDTO.Builder builder = PointDTO.newBuilder();
-        BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+    private GrpcPointDTO buildDTOByDO(PointBO entityDO) {
+        GrpcPointDTO.Builder builder = GrpcPointDTO.newBuilder();
+        GrpcBaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
         builder.setPointName(entityDO.getPointName());
         builder.setPointCode(entityDO.getPointCode());
-        builder.setPointTypeFlag(PointTypeFlagDTOEnum.valueOf(entityDO.getPointTypeFlag().name()));
-        builder.setRwFlag(RwFlagDTOEnum.valueOf(entityDO.getRwFlag().name()));
+        builder.setPointTypeFlag(entityDO.getPointTypeFlag().getIndex());
+        builder.setRwFlag(entityDO.getRwFlag().getIndex());
         builder.setBaseValue(entityDO.getBaseValue().doubleValue());
         builder.setMultiple(entityDO.getMultiple().doubleValue());
         builder.setValueDecimal(entityDO.getValueDecimal());
         builder.setUnit(entityDO.getUnit());
         builder.setProfileId(entityDO.getProfileId());
         builder.setGroupId(entityDO.getGroupId());
-        builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
+        builder.setEnableFlag(entityDO.getEnableFlag().getIndex());
         builder.setTenantId(entityDO.getTenantId());
         return builder.build();
     }
