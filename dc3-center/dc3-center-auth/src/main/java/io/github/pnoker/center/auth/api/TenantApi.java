@@ -19,12 +19,10 @@ package io.github.pnoker.center.auth.api;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.CodeQuery;
-import io.github.pnoker.api.center.auth.RTenantDTO;
+import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.api.center.auth.TenantDTO;
-import io.github.pnoker.api.common.GrpcBaseDTO;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
-import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
@@ -49,9 +47,9 @@ public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
     private TenantService tenantService;
 
     @Override
-    public void selectByCode(CodeQuery request, StreamObserver<RTenantDTO> responseObserver) {
-        RTenantDTO.Builder builder = RTenantDTO.newBuilder();
-        RDTO.Builder rBuilder = RDTO.newBuilder();
+    public void selectByCode(CodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {
+        GrpcRTenantDTO.Builder builder = GrpcRTenantDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
         TenantBO select = tenantService.selectByCode(request.getCode());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);

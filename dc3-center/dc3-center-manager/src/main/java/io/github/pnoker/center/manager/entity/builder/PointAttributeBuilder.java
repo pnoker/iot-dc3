@@ -117,6 +117,14 @@ public interface PointAttributeBuilder {
     List<PointAttributeDTO> buildDTOListByBOList(List<PointAttributeBO> entityBOList);
 
     /**
+     * DTO to BO
+     *
+     * @param entityDTO EntityDTO
+     * @return EntityBO
+     */
+    PointAttributeBO buildBOByDTO(PointAttributeDTO entityDTO);
+
+    /**
      * DOPage to BOPage
      *
      * @param entityPageDO EntityDO Page

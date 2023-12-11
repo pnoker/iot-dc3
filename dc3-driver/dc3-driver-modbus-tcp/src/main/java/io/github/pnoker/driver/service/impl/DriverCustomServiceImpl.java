@@ -27,14 +27,14 @@ import com.serotonin.modbus4j.ip.IpParameters;
 import com.serotonin.modbus4j.locator.BaseLocator;
 import com.serotonin.modbus4j.msg.WriteCoilRequest;
 import com.serotonin.modbus4j.msg.WriteCoilResponse;
-import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
+import io.github.pnoker.common.entity.dto.DeviceDTO;
+import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.driver.sdk.DriverContext;
 import io.github.pnoker.driver.sdk.service.DriverCustomService;
@@ -100,7 +100,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, Point point) {
+    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, DeviceDTO device, PointDTO point) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
         */
@@ -109,7 +109,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, AttributeInfoDTO value) {
+    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, DeviceDTO device, AttributeInfoDTO value) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
         */

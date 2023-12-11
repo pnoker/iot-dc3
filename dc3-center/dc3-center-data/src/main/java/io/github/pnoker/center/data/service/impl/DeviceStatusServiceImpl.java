@@ -57,7 +57,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Override
     public Map<Long, String> device(DevicePageQuery pageQuery) {
-        PageDTO.Builder page = PageDTO.newBuilder()
+        GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
                 .setSize(pageQuery.getPage().getSize())
                 .setCurrent(pageQuery.getPage().getCurrent());
         DeviceDTO.Builder builder = buildDTOByQuery(pageQuery);

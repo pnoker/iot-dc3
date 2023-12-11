@@ -48,7 +48,7 @@ public class TokenApi extends TokenApiGrpc.TokenApiImplBase {
     @Override
     public void checkTokenValid(LoginQuery request, StreamObserver<RTokenDTO> responseObserver) {
         RTokenDTO.Builder builder = RTokenDTO.newBuilder();
-        RDTO.Builder rBuilder = RDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
         TokenValid select = tokenService.checkTokenValid(request.getName(), request.getSalt(), request.getToken(), request.getTenant());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);

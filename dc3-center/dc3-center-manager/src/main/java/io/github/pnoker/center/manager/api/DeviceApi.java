@@ -22,15 +22,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcBaseDTO;
-import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.utils.BuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -54,9 +53,9 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
     private DeviceService deviceService;
 
     @Override
-    public void list(PageDeviceQueryDTO request, StreamObserver<RPageDeviceDTO> responseObserver) {
-        RPageDeviceDTO.Builder builder = RPageDeviceDTO.newBuilder();
-        RDTO.Builder rBuilder = RDTO.newBuilder();
+    public void list(GrpcPageDeviceQueryDTO request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
+        GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
 
         DeviceQuery pageQuery = buildPageQuery(request);
 
@@ -70,8 +69,8 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
 
-            PageDeviceDTO.Builder pageDeviceBuilder = PageDeviceDTO.newBuilder();
-            PageDTO.Builder pageBuilder = PageDTO.newBuilder();
+            GrpcPageDeviceDTO.Builder pageDeviceBuilder = GrpcPageDeviceDTO.newBuilder();
+            GrpcPageDTO.Builder pageBuilder = GrpcPageDTO.newBuilder();
             pageBuilder.setCurrent(devicePage.getCurrent());
             pageBuilder.setSize(devicePage.getSize());
             pageBuilder.setPages(devicePage.getPages());
@@ -89,9 +88,9 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void selectByProfileId(ByProfileQueryDTO request, StreamObserver<RDeviceListDTO> responseObserver) {
-        RDeviceListDTO.Builder builder = RDeviceListDTO.newBuilder();
-        RDTO.Builder rBuilder = RDTO.newBuilder();
+    public void selectByProfileId(GrpcByProfileQueryDTO request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
+        GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
 
         List<DeviceBO> deviceBOS = deviceService.selectByProfileId(request.getProfileId());
         if (CollUtil.isEmpty(deviceBOS)) {
@@ -119,7 +118,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
      * @param request PageDeviceQueryDTO
      * @return DevicePageQuery
      */
-    private DeviceQuery buildPageQuery(PageDeviceQueryDTO request) {
+    private DeviceQuery buildPageQuery(GrpcPageDeviceQueryDTO request) {
         DeviceQuery pageQuery = new DeviceQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
@@ -131,7 +130,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         pageQuery.setDeviceName(device.getDeviceName());
         pageQuery.setDriverId(device.getDriverId());
         pageQuery.setTenantId(device.getTenantId());
-        pageQuery.setEnableFlag(EnableFlagEnum.ofName(device.getEnableFlag().name()));
+        pageQuery.setEnableFlag(EnableFlagEnum.values()[device.getEnableFlag()]);
 
         return pageQuery;
     }
@@ -144,13 +143,13 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
      */
     private DeviceDTO buildDTOByDO(DeviceBO entityDO) {
         DeviceDTO.Builder builder = DeviceDTO.newBuilder();
-        BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+        GrpcBaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
         builder.setDeviceName(entityDO.getDeviceName());
         builder.setDeviceCode(entityDO.getDeviceCode());
         builder.setDriverId(entityDO.getDriverId());
         builder.setGroupId(entityDO.getGroupId());
-        builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
+        builder.setEnableFlag(entityDO.getEnableFlag().getIndex());
         builder.setTenantId(entityDO.getTenantId());
         return builder.build();
     }

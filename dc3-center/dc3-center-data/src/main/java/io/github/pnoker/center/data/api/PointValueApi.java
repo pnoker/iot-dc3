@@ -41,7 +41,7 @@ public class PointValueApi extends PointValueApiGrpc.PointValueApiImplBase {
     @Override
     public void lastValue(PointValueQuery request, StreamObserver<RPointValueDTO> responseObserver) {
         RPointValueDTO.Builder builder = RPointValueDTO.newBuilder();
-        RDTO.Builder rBuilder = RDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
         PointValue pointValue = pointValueService.latest(request);
         if (ObjectUtil.isNull(pointValue)) {
             rBuilder.setOk(false);

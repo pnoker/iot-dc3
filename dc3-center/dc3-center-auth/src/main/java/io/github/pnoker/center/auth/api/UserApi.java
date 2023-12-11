@@ -50,7 +50,7 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
     @Override
     public void selectById(IdQuery request, StreamObserver<RUserDTO> responseObserver) {
         RUserDTO.Builder builder = RUserDTO.newBuilder();
-        RDTO.Builder rBuilder = RDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
         UserBO select = userService.selectById(request.getId());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);

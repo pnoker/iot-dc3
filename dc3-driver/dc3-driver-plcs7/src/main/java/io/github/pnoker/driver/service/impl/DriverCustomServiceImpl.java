@@ -18,12 +18,12 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
+import io.github.pnoker.common.entity.dto.DeviceDTO;
+import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Point;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.driver.api.S7Connector;
 import io.github.pnoker.driver.api.S7Serializer;
@@ -104,7 +104,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, Point point) {
+    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, DeviceDTO device, PointDTO point) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
@@ -125,7 +125,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, AttributeInfoDTO value) {
+    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, DeviceDTO device, AttributeInfoDTO value) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */

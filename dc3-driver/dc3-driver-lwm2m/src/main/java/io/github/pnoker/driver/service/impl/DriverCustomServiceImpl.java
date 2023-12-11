@@ -18,8 +18,8 @@ package io.github.pnoker.driver.service.impl;
 
 import com.mchange.v2.lang.StringUtils;
 import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
-import io.github.pnoker.common.model.Device;
-import io.github.pnoker.common.model.Point;
+import io.github.pnoker.common.entity.dto.DeviceDTO;
+import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.driver.sdk.service.DriverCustomService;
 import io.github.pnoker.driver.server.Lwm2mServer;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +80,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return
      */
     @Override
-    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, Point point) {
+    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, DeviceDTO device, PointDTO point) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
 
@@ -101,7 +101,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return
      */
     @Override
-    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, Device device, AttributeInfoDTO value) {
+    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, DeviceDTO device, AttributeInfoDTO value) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */

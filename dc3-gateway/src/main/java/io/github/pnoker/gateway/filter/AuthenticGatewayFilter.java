@@ -19,8 +19,8 @@ package io.github.pnoker.gateway.filter;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.*;
-import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -68,8 +68,8 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
 
         try {
             // Tenant, Login
-            RTenantDTO rTenantDTO = getTenantDTO(request);
-            RUserLoginDTO rUserLoginDTO = getLoginDTO(request);
+            GrpcRTenantDTO rTenantDTO = getTenantDTO(request);
+            GrpcRUserLoginDTO rUserLoginDTO = getLoginDTO(request);
 
             // Check Token Valid
             checkTokenValid(request, rTenantDTO, rUserLoginDTO);
@@ -94,36 +94,36 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
     }
 
     @NotNull
-    private RTenantDTO getTenantDTO(ServerHttpRequest request) {
+    private GrpcRTenantDTO getTenantDTO(ServerHttpRequest request) {
         String tenant = DecodeUtil.byteToString(DecodeUtil.decode(GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT)));
         if (ObjectUtil.isEmpty(tenant)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        RTenantDTO entityDTO = tenantApiBlockingStub.selectByCode(CodeQuery.newBuilder().setCode(tenant).build());
-        if (!entityDTO.getResult().getOk() || !EnableFlagDTOEnum.ENABLE.equals(entityDTO.getData().getEnableFlag())) {
+        GrpcRTenantDTO entityDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(tenant).build());
+        if (!entityDTO.getResult().getOk() || EnableFlagEnum.ENABLE.getIndex() != entityDTO.getData().getEnableFlag()) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
         return entityDTO;
     }
 
     @NotNull
-    private RUserLoginDTO getLoginDTO(ServerHttpRequest request) {
+    private GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request) {
         String user = DecodeUtil.byteToString(DecodeUtil.decode(GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN)));
         if (ObjectUtil.isEmpty(user)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        RUserLoginDTO entityDTO = userLoginApiBlockingStub.selectByName(NameQuery.newBuilder().setName(user).build());
-        if (!entityDTO.getResult().getOk() || !EnableFlagDTOEnum.ENABLE.equals(entityDTO.getData().getEnableFlag())) {
+        GrpcRUserLoginDTO entityDTO = userLoginApiBlockingStub.selectByName(GrpcNameQuery.newBuilder().setName(user).build());
+        if (!entityDTO.getResult().getOk() || EnableFlagEnum.ENABLE.getIndex() != entityDTO.getData().getEnableFlag()) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
         return entityDTO;
     }
 
     @NotNull
-    private RequestHeader.UserHeader getUserDTO(RUserLoginDTO rUserLoginDTO, RTenantDTO rTenantDTO) {
-        RUserDTO entityDTO = userApiBlockingStub.selectById(IdQuery.newBuilder().setId(rUserLoginDTO.getData().getBase().getId()).build());
+    private RequestHeader.UserHeader getUserDTO(GrpcRUserLoginDTO rUserLoginDTO, GrpcRTenantDTO rTenantDTO) {
+        GrpcRUserDTO entityDTO = userApiBlockingStub.selectById(GrpcIdQuery.newBuilder().setId(rUserLoginDTO.getData().getBase().getId()).build());
         if (!entityDTO.getResult().getOk()) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
@@ -136,15 +136,15 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
         return entityBO;
     }
 
-    private void checkTokenValid(ServerHttpRequest request, RTenantDTO rTenantDTO, RUserLoginDTO rUserLoginDTO) {
+    private void checkTokenValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO) {
         String token = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
         RequestHeader.TokenHeader entityBO = JsonUtil.parseObject(DecodeUtil.decode(token), RequestHeader.TokenHeader.class);
         if (ObjectUtil.isEmpty(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        LoginQuery login = LoginQuery.newBuilder().setTenant(rTenantDTO.getData().getTenantCode()).setName(rUserLoginDTO.getData().getLoginName()).setSalt(entityBO.getSalt()).setToken(entityBO.getToken()).build();
-        RTokenDTO entityDTO = tokenApiBlockingStub.checkTokenValid(login);
+        GrpcLoginQuery login = GrpcLoginQuery.newBuilder().setTenant(rTenantDTO.getData().getTenantCode()).setName(rUserLoginDTO.getData().getLoginName()).setSalt(entityBO.getSalt()).setToken(entityBO.getToken()).build();
+        GrpcRTokenDTO entityDTO = tokenApiBlockingStub.checkTokenValid(login);
         if (!entityDTO.getResult().getOk()) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }

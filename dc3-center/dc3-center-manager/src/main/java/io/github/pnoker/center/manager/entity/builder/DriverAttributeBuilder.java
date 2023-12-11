@@ -117,6 +117,14 @@ public interface DriverAttributeBuilder {
     List<DriverAttributeDTO> buildDTOListByBOList(List<DriverAttributeBO> entityBOList);
 
     /**
+     * DTO to BO
+     *
+     * @param entityDTO EntityDTO
+     * @return EntityBO
+     */
+    DriverAttributeBO buildBOByDTO(DriverAttributeDTO entityDTO);
+
+    /**
      * DOPage to BOPage
      *
      * @param entityPageDO EntityDO Page
