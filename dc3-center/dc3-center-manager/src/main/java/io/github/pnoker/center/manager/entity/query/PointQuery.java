@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.center.manager.entity.vo.PointVO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -31,15 +33,11 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "PointQuery", description = "位号-查询")
 public class PointQuery extends PointVO {
 
     @Schema(description = "分页")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
     private Long deviceId;

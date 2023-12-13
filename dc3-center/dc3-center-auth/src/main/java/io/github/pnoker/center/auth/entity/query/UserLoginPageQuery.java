@@ -16,9 +16,11 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.center.auth.entity.bo.UserLogin;
-import lombok.*;
+import io.github.pnoker.common.entity.common.Pages;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * User DTO
@@ -27,8 +29,6 @@ import lombok.*;
  * @since 2022.1.0
  */
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 public class UserLoginPageQuery extends UserLogin {
 
     private Pages page;

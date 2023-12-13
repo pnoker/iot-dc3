@@ -243,13 +243,13 @@ CREATE TABLE `users`
 CREATE TABLE `roleBOS`
 (
     `username` varchar(50) NOT NULL,
-    `roleBO`     varchar(50) NOT NULL,
+    `roleBO`   varchar(50) NOT NULL,
     UNIQUE INDEX `idx_user_role` (`username` ASC, `roleBO` ASC) USING BTREE
 );
 
 CREATE TABLE `permissions`
 (
-    `roleBO`     varchar(50)  NOT NULL,
+    `roleBO`   varchar(50)  NOT NULL,
     `resource` varchar(255) NOT NULL,
     `action`   varchar(8)   NOT NULL,
     UNIQUE INDEX `uk_role_permission` (`roleBO`, `resource`, `action`) USING BTREE

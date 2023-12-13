@@ -18,7 +18,9 @@ package io.github.pnoker.center.data.entity.point;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 
 /**
@@ -28,8 +30,6 @@ import org.springframework.data.annotation.Id;
  * @since 2022.1.0
  */
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EsPointValue extends PointValue {
 

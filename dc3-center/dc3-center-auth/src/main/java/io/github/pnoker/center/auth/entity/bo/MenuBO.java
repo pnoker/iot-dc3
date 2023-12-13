@@ -22,10 +22,12 @@ import io.github.pnoker.center.auth.entity.bo.ext.MenuExtBO;
 import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuTypeFlagEnum;
-import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Add;
+import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
@@ -39,8 +41,6 @@ import javax.validation.constraints.Pattern;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class MenuBO extends BaseBO {
 

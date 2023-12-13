@@ -18,7 +18,6 @@ package io.github.pnoker.center.auth.entity.bo.ext;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 
@@ -30,8 +29,7 @@ import java.io.Serializable;
  * @since 2022.1.0
  */
 @Data
-@Builder
-@RequiredArgsConstructor
+@SuperBuilder
 public class ApiExtBO implements Serializable {
     private static final long serialVersionUID = 1L;
 

@@ -21,8 +21,6 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.valid.Parent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -34,15 +32,11 @@ import java.io.Serializable;
  * @since 2022.1.0
  */
 @Data
-@SuperBuilder
-@RequiredArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "GroupQuery", description = "字典-查询")
 public class DictionaryQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
     @Schema(description = "名称")
@@ -54,6 +48,5 @@ public class DictionaryQuery implements Serializable {
     private Long parentId;
 
     @Schema(description = "租户ID")
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private Long tenantId;
 }

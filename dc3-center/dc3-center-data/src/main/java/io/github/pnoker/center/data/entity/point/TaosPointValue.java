@@ -19,9 +19,7 @@ package io.github.pnoker.center.data.entity.point;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.sql.Timestamp;
@@ -33,7 +31,6 @@ import java.sql.Timestamp;
  * @since 2022.1.0
  */
 @Data
-@ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaosPointValue {
 

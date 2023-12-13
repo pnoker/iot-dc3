@@ -32,8 +32,8 @@ import io.github.pnoker.center.manager.manager.DeviceManager;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -148,7 +148,7 @@ public class DeviceServiceImpl implements DeviceService {
 
         checkDuplicate(entityBO, true, true);
 
-        Set<Long> newProfileIds = ObjectUtil.isNotNull(entityBO.getProfileIds()) ? entityBO.getProfileIds() : new HashSet<>();
+        Set<Long> newProfileIds = ObjectUtil.isNotNull(entityBO.getProfileIds()) ? entityBO.getProfileIds() : new HashSet<>(4);
         Set<Long> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityBO.getId());
 
         // 新增的模板
