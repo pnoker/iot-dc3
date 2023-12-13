@@ -17,8 +17,8 @@
 package io.github.pnoker.center.data.entity.vo.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.common.Pages;
 import lombok.Data;
 
 import java.io.Serializable;

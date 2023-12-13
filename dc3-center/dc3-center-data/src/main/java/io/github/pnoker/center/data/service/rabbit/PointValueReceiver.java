@@ -18,10 +18,10 @@ package io.github.pnoker.center.data.service.rabbit;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
+import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.center.data.service.job.PointValueScheduleJob;
-import io.github.pnoker.center.data.entity.point.PointValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -55,7 +55,7 @@ public class PointValueReceiver {
     private ThreadPoolExecutor threadPoolExecutor;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{pointValueQueue.name}")
+    @RabbitListener(queues = "#{pointValueQueue.name}",containerFactory = "")
     public void pointValueReceive(Channel channel, Message message, PointValue pointValue) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);

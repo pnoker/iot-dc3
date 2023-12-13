@@ -17,9 +17,11 @@
 package io.github.pnoker.center.auth.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
-import lombok.*;
+import io.github.pnoker.common.entity.common.Pages;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * BlackIp DTO
@@ -28,8 +30,6 @@ import lombok.*;
  * @since 2022.1.0
  */
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 public class BlackIpBOPageQuery extends BlackIpBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

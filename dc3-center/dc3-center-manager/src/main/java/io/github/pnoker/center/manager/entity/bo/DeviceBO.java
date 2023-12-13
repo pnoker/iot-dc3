@@ -18,10 +18,10 @@ package io.github.pnoker.center.manager.entity.bo;
 
 import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
@@ -35,8 +35,7 @@ import java.util.Set;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DeviceBO extends BaseBO {
 
@@ -71,5 +70,6 @@ public class DeviceBO extends BaseBO {
     private Long tenantId;
 
     // 附加
-    private Set<Long> profileIds = new HashSet<>(8);
+    @Builder.Default
+    private Set<Long> profileIds = new HashSet<>(4);
 }

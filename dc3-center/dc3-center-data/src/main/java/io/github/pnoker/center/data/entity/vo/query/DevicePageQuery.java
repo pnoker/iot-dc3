@@ -19,7 +19,9 @@ package io.github.pnoker.center.data.entity.vo.query;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.model.Device;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * Device DTO
@@ -28,8 +30,6 @@ import lombok.*;
  * @since 2022.1.0
  */
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 public class DevicePageQuery extends Device {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

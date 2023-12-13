@@ -26,7 +26,7 @@ import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -43,8 +43,7 @@ import java.math.BigDecimal;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "Point", description = "位号")

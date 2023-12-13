@@ -20,13 +20,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.data.PointValueQuery;
 import io.github.pnoker.api.center.manager.PagePointQueryDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.center.manager.PointDTO;
 import io.github.pnoker.api.center.manager.RPagePointDTO;
 import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.GrpcPageDTO;
+import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.center.data.entity.vo.query.PointValuePageQuery;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
@@ -37,7 +37,6 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.StorageConstant;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.SneakyThrows;
@@ -161,12 +160,6 @@ public class PointValueServiceImpl implements PointValueService {
         List<PointValue> pointValues = mongoTemplate.find(query, PointValue.class, collection);
         pointValuePage.setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(pointValues);
         return pointValuePage;
-    }
-
-    @Override
-    public PointValue latest(PointValueQuery request) {
-        final String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + request.getDeviceId() + SymbolConstant.DOT;
-        return redisUtil.getKey(prefix + request.getPointId());
     }
 
     /**

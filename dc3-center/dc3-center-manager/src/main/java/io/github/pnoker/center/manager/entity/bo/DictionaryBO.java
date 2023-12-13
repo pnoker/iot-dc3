@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.entity.bo;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.List;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class DictionaryBO {
 
     /**
@@ -51,11 +51,15 @@ public class DictionaryBO {
     /**
      * 是否禁用
      */
-    private boolean disabled = false;
+    private boolean disabled;
 
     /**
      * 是否展开
      */
-    private boolean expand = true;
+    private boolean expand;
+
+    /**
+     * 子节点
+     */
     private List<DictionaryBO> children;
 }

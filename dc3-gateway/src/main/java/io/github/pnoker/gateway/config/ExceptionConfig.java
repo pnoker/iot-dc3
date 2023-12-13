@@ -18,7 +18,6 @@ package io.github.pnoker.gateway.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.common.entity.R;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.annotation.Order;
@@ -41,7 +40,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Order(-1)
 @Component
-@RequiredArgsConstructor
 public class ExceptionConfig implements ErrorWebExceptionHandler {
 
     private final ObjectMapper objectMapper;

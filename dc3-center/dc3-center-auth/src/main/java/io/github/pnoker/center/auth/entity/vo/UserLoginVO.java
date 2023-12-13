@@ -22,7 +22,6 @@ import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -34,8 +33,6 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "UserLogin", description = "登录")

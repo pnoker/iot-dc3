@@ -1,9 +1,7 @@
 package io.github.pnoker.center.manager.entity.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -59,7 +57,7 @@ public class PointAttributeConfigDO implements Serializable {
      * 使能标识
      */
     @TableField("enable_flag")
-    private Byte enableFlag;
+    private EnableFlagEnum enableFlag;
 
     /**
      * 租户ID
@@ -112,6 +110,7 @@ public class PointAttributeConfigDO implements Serializable {
     /**
      * 逻辑删除标识,0:未删除,1:已删除
      */
-    @TableField("deleted")
+    @TableLogic
+    @TableField(value = "deleted", select = false)
     private Byte deleted;
 }

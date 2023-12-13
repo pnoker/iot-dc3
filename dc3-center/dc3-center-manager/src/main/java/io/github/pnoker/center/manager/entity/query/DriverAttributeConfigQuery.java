@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.center.manager.entity.vo.DriverAttributeConfigVO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -31,10 +33,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "DriverAttributeConfigQuery", description = "驱动属性配置-查询")
 public class DriverAttributeConfigQuery extends DriverAttributeConfigVO {
 

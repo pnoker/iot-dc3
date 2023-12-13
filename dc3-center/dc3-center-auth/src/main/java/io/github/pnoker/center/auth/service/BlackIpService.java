@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.service;
 
+import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
 import io.github.pnoker.center.auth.entity.query.BlackIpBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
 
 /**
  * User Interface

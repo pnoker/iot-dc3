@@ -19,7 +19,10 @@ package io.github.pnoker.center.manager.entity.bo;
 import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.constant.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -30,8 +33,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class PointAttributeBO extends BaseBO {
 

@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.service;
 
+import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
 import io.github.pnoker.center.auth.entity.query.UserPasswordBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
 
 /**
  * UserPassword Interface

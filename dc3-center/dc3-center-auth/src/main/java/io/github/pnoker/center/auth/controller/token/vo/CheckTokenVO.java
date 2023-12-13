@@ -19,7 +19,6 @@ package io.github.pnoker.center.auth.controller.token.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -33,8 +32,6 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
 @Schema(title = "校验令牌请求体")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class CheckTokenVO {

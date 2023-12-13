@@ -18,9 +18,7 @@ package io.github.pnoker.center.data.entity.point;
 
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

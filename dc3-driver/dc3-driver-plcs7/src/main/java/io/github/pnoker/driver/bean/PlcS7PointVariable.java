@@ -17,9 +17,7 @@
 package io.github.pnoker.driver.bean;
 
 import io.github.pnoker.driver.api.S7Type;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 

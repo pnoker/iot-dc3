@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.GroupTypeFlagEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -33,8 +33,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class GroupBO extends BaseBO {
 

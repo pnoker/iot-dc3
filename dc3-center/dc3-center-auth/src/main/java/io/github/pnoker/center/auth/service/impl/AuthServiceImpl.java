@@ -19,12 +19,12 @@ package io.github.pnoker.center.auth.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
+import io.github.pnoker.center.auth.entity.auth.Login;
 import io.github.pnoker.center.auth.entity.bo.*;
 import io.github.pnoker.center.auth.service.*;
-import io.github.pnoker.center.auth.entity.auth.Login;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.model.*;
+import io.github.pnoker.common.model.AuthUser;
 import io.github.pnoker.common.utils.AuthUtil;
 import io.github.pnoker.common.utils.DecodeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -129,7 +129,7 @@ public class AuthServiceImpl implements AuthService {
         authUser.setRoleCodeSet(roleCodeSet);
 
         //2.2 resources
-        Set<ResourceBO> resourceBOSet = new HashSet<>();
+        Set<ResourceBO> resourceBOSet = new HashSet<>(4);
         for (RoleBO roleBO : roleBOS) {
             List<ResourceBO> resourceBOS = roleResourceBindService.listResourceByRoleId(roleBO.getId());
             resourceBOSet.addAll(resourceBOS);

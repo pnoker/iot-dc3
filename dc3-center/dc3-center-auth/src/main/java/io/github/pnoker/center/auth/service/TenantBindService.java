@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.service;
 
+import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.center.auth.entity.query.TenantBindBOPageQuery;
 import io.github.pnoker.common.base.Service;
-import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
 
 /**
  * TenantBind Interface

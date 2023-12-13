@@ -16,10 +16,10 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.query.RoleUserBindBOPageQuery;
-import io.github.pnoker.common.base.Service;
 import io.github.pnoker.center.auth.entity.bo.RoleBO;
 import io.github.pnoker.center.auth.entity.bo.RoleUserBindBO;
+import io.github.pnoker.center.auth.entity.query.RoleUserBindBOPageQuery;
+import io.github.pnoker.common.base.Service;
 
 import java.util.List;
 

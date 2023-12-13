@@ -20,7 +20,7 @@ import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -32,8 +32,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DriverAttributeConfigBO extends BaseBO {
 

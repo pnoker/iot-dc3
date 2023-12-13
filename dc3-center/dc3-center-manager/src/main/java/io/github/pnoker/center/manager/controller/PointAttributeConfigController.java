@@ -18,12 +18,12 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;

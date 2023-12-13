@@ -16,8 +16,10 @@
 
 package io.github.pnoker.center.manager.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -30,12 +32,44 @@ import java.util.List;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Schema(title = "Dictionary", description = "字典")
 public class DictionaryVO {
+
+    /**
+     * 字典类型
+     */
+    @Schema(description = "字典类型")
     private String type;
+
+    /**
+     * 字典标签名称
+     */
+    @Schema(description = "字典标签名称")
     private String label;
+
+    /**
+     * 字典标签值
+     */
+    @Schema(description = "字典标签值")
     private String value;
+
+    /**
+     * 是否禁用
+     */
+    @Schema(description = "是否禁用")
     private boolean disabled;
-    private boolean expand = true;
+
+    /**
+     * 是否展开
+     */
+    @Schema(description = "是否展开")
+    private boolean expand;
+
+    /**
+     * 子节点
+     */
+    @Schema(description = "子节点")
     private List<DictionaryVO> children;
 }

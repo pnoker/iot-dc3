@@ -19,9 +19,7 @@ package io.github.pnoker.center.data.entity.point;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.constant.common.TimeConstant;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;

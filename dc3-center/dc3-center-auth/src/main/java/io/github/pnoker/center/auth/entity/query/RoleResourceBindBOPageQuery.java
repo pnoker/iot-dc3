@@ -17,17 +17,17 @@
 package io.github.pnoker.center.auth.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.center.auth.entity.bo.RoleResourceBindBO;
-import lombok.*;
+import io.github.pnoker.common.entity.common.Pages;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * @author linys
  * @since 2022.1.0
  */
 @Data
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 public class RoleResourceBindBOPageQuery extends RoleResourceBindBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

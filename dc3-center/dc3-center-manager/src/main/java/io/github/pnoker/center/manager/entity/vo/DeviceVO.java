@@ -25,7 +25,7 @@ import io.github.pnoker.common.valid.Upload;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -43,8 +43,7 @@ import java.util.Set;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "Device", description = "设备")
@@ -96,5 +95,5 @@ public class DeviceVO extends BaseVO {
     @Schema(description = "模版ID集")
     @NotNull(message = "模版ID集不能为空",
             groups = {Upload.class})
-    private Set<Long> profileIds = new HashSet<>(8);
+    private Set<Long> profileIds = new HashSet<>(4);
 }

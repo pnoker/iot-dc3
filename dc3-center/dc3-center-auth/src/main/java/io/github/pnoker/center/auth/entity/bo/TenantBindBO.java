@@ -19,7 +19,9 @@ package io.github.pnoker.center.auth.entity.bo;
 import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
@@ -32,8 +34,6 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 @SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class TenantBindBO extends BaseBO {
 
