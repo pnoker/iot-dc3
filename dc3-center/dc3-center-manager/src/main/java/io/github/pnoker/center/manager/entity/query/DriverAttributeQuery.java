@@ -16,13 +16,11 @@
 
 package io.github.pnoker.center.manager.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.center.manager.entity.vo.DriverAttributeVO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
