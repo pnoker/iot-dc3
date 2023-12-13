@@ -19,8 +19,6 @@ package io.github.pnoker.center.data.entity.point;
 import cn.hutool.core.bean.BeanUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.springframework.data.annotation.Id;
 
 /**

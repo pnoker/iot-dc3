@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.vo.ext;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 

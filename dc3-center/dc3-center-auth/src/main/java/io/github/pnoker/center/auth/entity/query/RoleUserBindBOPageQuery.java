@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.center.auth.entity.bo.RoleUserBindBO;
 import io.github.pnoker.common.entity.common.Pages;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 /**
  * @author linys
