@@ -53,8 +53,8 @@ Cache-Control: no-cache
 
 
 ### 分页查询 DriverInfo
-#/manager/driver_attribute_config/list，支持driverAttributeId\profileId精准查询
-POST http://{{dc3-manager}}/manager/driver_attribute_config/list
+#/manager/driver_attribute_config/List，支持driverAttributeId\profileId精准查询
+POST http://{{dc3-manager}}/manager/driver_attribute_config/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

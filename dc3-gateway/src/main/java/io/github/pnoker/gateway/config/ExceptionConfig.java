@@ -31,6 +31,8 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.handler.ResponseStatusExceptionHandler;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.Resource;
+
 /**
  * 网关异常通用处理器，只作用在webflux 环境下 , 优先级低于 {@link ResponseStatusExceptionHandler} 执行
  *
@@ -42,7 +44,8 @@ import reactor.core.publisher.Mono;
 @Component
 public class ExceptionConfig implements ErrorWebExceptionHandler {
 
-    private final ObjectMapper objectMapper;
+    @Resource
+    private ObjectMapper objectMapper;
 
     @NonNull
     @Override

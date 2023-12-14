@@ -20,7 +20,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.constant.common.TimeConstant;
 import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -33,8 +34,9 @@ import java.util.List;
  * @since 2022.1.0
  */
 @Data
-@Document
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@SuperBuilder
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class PointValue implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -62,11 +64,9 @@ public class PointValue implements Serializable {
 
     private List<String> children;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.TIMEZONE)
     private Date originTime;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.TIMEZONE)
     private Date createTime;
 

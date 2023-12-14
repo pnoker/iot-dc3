@@ -76,8 +76,8 @@ Cache-Control: no-cache
 
 
 ### 分页查询 Device
-#/manager/deviceBO/list，支持name模糊查询，code\driverStatus\profileId\groupId精准查询
-POST http://{{dc3-manager}}/manager/deviceBO/list
+#/manager/deviceBO/List，支持name模糊查询，code\driverStatus\profileId\groupId精准查询
+POST http://{{dc3-manager}}/manager/deviceBO/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

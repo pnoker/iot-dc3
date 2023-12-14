@@ -20,14 +20,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.PagePointQueryDTO;
+import io.github.pnoker.api.center.manager.GrpcPagePointQueryDTO;
+import io.github.pnoker.api.center.manager.GrpcPointDTO;
+import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
-import io.github.pnoker.api.center.manager.PointDTO;
-import io.github.pnoker.api.center.manager.RPagePointDTO;
-import io.github.pnoker.api.common.EnableFlagDTOEnum;
 import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.entity.point.PointValue;
-import io.github.pnoker.center.data.entity.vo.query.PointValuePageQuery;
+import io.github.pnoker.center.data.entity.query.PointValueQuery;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.center.data.service.RepositoryHandleService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
@@ -98,7 +97,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public Page<PointValue> latest(PointValuePageQuery pageQuery) {
+    public Page<PointValue> latest(PointValueQuery pageQuery) {
         Page<PointValue> pointValuePage = new Page<>();
         if (ObjectUtil.isEmpty(pageQuery.getPage())) pageQuery.setPage(new Pages());
         pointValuePage.setCurrent(pageQuery.getPage().getCurrent()).setSize(pageQuery.getPage().getSize());
@@ -106,20 +105,20 @@ public class PointValueServiceImpl implements PointValueService {
         GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
                 .setSize(pageQuery.getPage().getSize())
                 .setCurrent(pageQuery.getPage().getCurrent());
-        PointDTO.Builder builder = buildDTOByQuery(pageQuery);
-        PagePointQueryDTO.Builder query = PagePointQueryDTO.newBuilder()
+        GrpcPointDTO.Builder builder = buildDTOByQuery(pageQuery);
+        GrpcPagePointQueryDTO.Builder query = GrpcPagePointQueryDTO.newBuilder()
                 .setPage(page)
                 .setPoint(builder);
         if (ObjectUtil.isNotEmpty(pageQuery.getDeviceId())) {
             query.setDeviceId(pageQuery.getDeviceId());
         }
-        RPagePointDTO rPagePointDTO = pointApiBlockingStub.list(query.build());
+        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.list(query.build());
 
         if (!rPagePointDTO.getResult().getOk()) {
             return pointValuePage;
         }
 
-        List<PointDTO> points = rPagePointDTO.getData().getDataList();
+        List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
         List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).collect(Collectors.toList());
         List<PointValue> pointValues = realtime(pageQuery.getDeviceId(), pointIds);
         if (CollUtil.isEmpty(pointValues)) {
@@ -137,7 +136,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     @SneakyThrows
-    public Page<PointValue> list(PointValuePageQuery pageQuery) {
+    public Page<PointValue> list(PointValueQuery pageQuery) {
         Page<PointValue> pointValuePage = new Page<>();
         if (ObjectUtil.isEmpty(pageQuery.getPage())) pageQuery.setPage(new Pages());
 
@@ -168,18 +167,18 @@ public class PointValueServiceImpl implements PointValueService {
      * @param pageQuery PointValuePageQuery
      * @return PointDTO Builder
      */
-    private static PointDTO.Builder buildDTOByQuery(PointValuePageQuery pageQuery) {
-        PointDTO.Builder builder = PointDTO.newBuilder();
+    private static GrpcPointDTO.Builder buildDTOByQuery(PointValueQuery pageQuery) {
+        GrpcPointDTO.Builder builder = GrpcPointDTO.newBuilder();
 
         if (CharSequenceUtil.isNotEmpty(pageQuery.getPointName())) {
             builder.setPointName(pageQuery.getPointName());
         }
-        builder.setPointTypeFlagValue(DefaultConstant.DEFAULT_INT);
-        builder.setRwFlagValue(DefaultConstant.DEFAULT_INT);
+        builder.setPointTypeFlag(DefaultConstant.DEFAULT_INT);
+        builder.setRwFlag(DefaultConstant.DEFAULT_INT);
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            builder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));
+            builder.setEnableFlag(pageQuery.getEnableFlag().getIndex());
         } else {
-            builder.setEnableFlagValue(DefaultConstant.DEFAULT_INT);
+            builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
         }
         return builder;
     }

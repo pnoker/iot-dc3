@@ -59,8 +59,8 @@ Cache-Control: no-cache
 
 
 ### 分页查询 DriverAttribute
-#/manager/driver_attribute/list，支持displayName模糊查询，name\type\driverId精准查询
-POST http://{{dc3-manager}}/manager/driver_attribute/list
+#/manager/driver_attribute/List，支持displayName模糊查询，name\type\driverId精准查询
+POST http://{{dc3-manager}}/manager/driver_attribute/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

@@ -18,11 +18,9 @@ package io.github.pnoker.center.data.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.manager.DeviceApiGrpc;
-import io.github.pnoker.api.center.manager.DeviceDTO;
-import io.github.pnoker.api.common.EnableFlagDTOEnum;
+import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcPageDTO;
-import io.github.pnoker.center.data.entity.vo.query.DevicePageQuery;
+import io.github.pnoker.center.data.entity.query.DeviceQuery;
 import io.github.pnoker.center.data.service.DeviceStatusService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
@@ -57,18 +55,18 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     private RedisUtil redisUtil;
 
     @Override
-    public Map<Long, String> device(DevicePageQuery pageQuery) {
+    public Map<Long, String> device(DeviceQuery pageQuery) {
         GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
                 .setSize(pageQuery.getPage().getSize())
                 .setCurrent(pageQuery.getPage().getCurrent());
         DeviceDTO.Builder builder = buildDTOByQuery(pageQuery);
-        PageDeviceQueryDTO.Builder query = PageDeviceQueryDTO.newBuilder()
+        GrpcPageDeviceQueryDTO.Builder query = GrpcPageDeviceQueryDTO.newBuilder()
                 .setPage(page)
                 .setDevice(builder);
         if (ObjectUtil.isNotEmpty(pageQuery.getProfileId())) {
             query.setProfileId(pageQuery.getProfileId());
         }
-        RPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.list(query.build());
+        GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.list(query.build());
 
         if (!rPageDeviceDTO.getResult().getOk()) {
             return new HashMap<>();
@@ -80,10 +78,10 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Override
     public Map<Long, String> deviceByProfileId(Long profileId) {
-        ByProfileQueryDTO query = ByProfileQueryDTO.newBuilder()
+        GrpcByProfileQueryDTO query = GrpcByProfileQueryDTO.newBuilder()
                 .setProfileId(profileId)
                 .build();
-        RDeviceListDTO rDeviceListDTO = deviceApiBlockingStub.selectByProfileId(query);
+        GrpcRDeviceListDTO rDeviceListDTO = deviceApiBlockingStub.selectByProfileId(query);
         if (!rDeviceListDTO.getResult().getOk()) {
             return new HashMap<>();
         }
@@ -98,7 +96,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
      * @param pageQuery DevicePageQuery
      * @return DeviceDTO Builder
      */
-    private static DeviceDTO.Builder buildDTOByQuery(DevicePageQuery pageQuery) {
+    private static DeviceDTO.Builder buildDTOByQuery(DeviceQuery pageQuery) {
         DeviceDTO.Builder builder = DeviceDTO.newBuilder();
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {
             builder.setDeviceName(pageQuery.getDeviceName());
@@ -107,9 +105,9 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
             builder.setDriverId(pageQuery.getDriverId());
         }
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            builder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));
+            builder.setEnableFlag(pageQuery.getEnableFlag().getIndex());
         } else {
-            builder.setEnableFlagValue(DefaultConstant.DEFAULT_INT);
+            builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
         }
         if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
             builder.setTenantId(pageQuery.getTenantId());

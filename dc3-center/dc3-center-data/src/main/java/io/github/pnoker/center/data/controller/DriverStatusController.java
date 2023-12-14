@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.controller;
 
-import io.github.pnoker.center.data.entity.vo.query.DriverPageQuery;
+import io.github.pnoker.center.data.entity.query.DriverQuery;
 import io.github.pnoker.center.data.service.DriverStatusService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
@@ -48,14 +48,14 @@ public class DriverStatusController implements Controller {
      * 查询 Driver 服务状态
      * ONLINE, OFFLINE
      *
-     * @param driverPageQuery 驱动和分页参数
+     * @param driverQuery 驱动和分页参数
      * @return Map String:String
      */
     @PostMapping("/driver")
-    public R<Map<Long, String>> driverStatus(@RequestBody(required = false) DriverPageQuery driverPageQuery) {
+    public R<Map<Long, String>> driverStatus(@RequestBody(required = false) DriverQuery driverQuery) {
         try {
-            driverPageQuery.setTenantId(getTenantId());
-            Map<Long, String> statuses = driverStatusService.driver(driverPageQuery);
+            driverQuery.setTenantId(getTenantId());
+            Map<Long, String> statuses = driverStatusService.driver(driverQuery);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());

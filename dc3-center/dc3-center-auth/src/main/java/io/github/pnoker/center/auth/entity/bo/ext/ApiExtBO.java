@@ -17,6 +17,7 @@
 package io.github.pnoker.center.auth.entity.bo.ext;
 
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 

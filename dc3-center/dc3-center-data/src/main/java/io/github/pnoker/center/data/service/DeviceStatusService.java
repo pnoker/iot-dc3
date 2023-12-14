@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.service;
 
-import io.github.pnoker.center.data.entity.vo.query.DevicePageQuery;
+import io.github.pnoker.center.data.entity.query.DeviceQuery;
 
 import java.util.Map;
 
@@ -31,10 +31,10 @@ public interface DeviceStatusService {
     /**
      * 分页查询 Device 服务状态，同设备分页查询配套使用
      *
-     * @param devicePageQuery 设备和分页参数
+     * @param deviceQuery 设备和分页参数
      * @return Map String:String
      */
-    Map<Long, String> device(DevicePageQuery devicePageQuery);
+    Map<Long, String> device(DeviceQuery deviceQuery);
 
     /**
      * 根据 模板ID 查询 Device 服务状态

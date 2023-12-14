@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.query;
+package io.github.pnoker.center.data.entity.query;
 
+import io.github.pnoker.common.constant.enums.DriverTypeFlagEnum;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.valid.Parent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * 字典查询实体类
+ * Driver Query
  *
  * @author pnoker
  * @since 2022.1.0
@@ -35,21 +35,52 @@ import java.io.Serializable;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@Schema(title = "GroupQuery", description = "字典-查询")
-public class DictionaryQuery implements Serializable {
+@Schema(title = "Driver", description = "驱动-查询")
+public class DriverQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")
     private Pages page;
 
-    @Schema(description = "名称")
-    private String label;
+    /**
+     * 驱动名称
+     */
+    @Schema(description = "驱动名称")
+    private String driverName;
 
-    @NotNull(message = "父级ID不能为空",
-            groups = {Parent.class})
-    @Schema(description = "父级ID")
-    private Long parentId;
+    /**
+     * 驱动编号
+     */
+    @Schema(description = "驱动编号")
+    private String driverCode;
 
+    /**
+     * 驱动服务名称
+     */
+    @Schema(description = "驱动服务名称")
+    private String serviceName;
+
+    /**
+     * 驱动类型标识
+     */
+    @Schema(description = "驱动类型标识")
+    private DriverTypeFlagEnum driverTypeFlag;
+
+    /**
+     * 服务主机
+     */
+    @Schema(description = "服务主机")
+    private String serviceHost;
+
+    /**
+     * 使能标识
+     */
+    @Schema(description = "使能标识")
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
     @Schema(description = "租户ID")
     private Long tenantId;
 }

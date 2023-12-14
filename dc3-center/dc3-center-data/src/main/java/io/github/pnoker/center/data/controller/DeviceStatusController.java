@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.controller;
 
-import io.github.pnoker.center.data.entity.vo.query.DevicePageQuery;
+import io.github.pnoker.center.data.entity.query.DeviceQuery;
 import io.github.pnoker.center.data.service.DeviceStatusService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
@@ -46,14 +46,14 @@ public class DeviceStatusController implements Controller {
      * 查询 Device 服务状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
-     * @param devicePageQuery Device Dto
+     * @param deviceQuery Device Dto
      * @return Map String:String
      */
     @PostMapping("/device")
-    public R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DevicePageQuery devicePageQuery) {
+    public R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         try {
-            devicePageQuery.setTenantId(getTenantId());
-            Map<Long, String> statuses = deviceStatusService.device(devicePageQuery);
+            deviceQuery.setTenantId(getTenantId());
+            Map<Long, String> statuses = deviceStatusService.device(deviceQuery);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -70,9 +70,9 @@ public class DeviceStatusController implements Controller {
     @GetMapping("/device/driver_id/{driverId}")
     public R<Map<Long, String>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
-            DevicePageQuery devicePageQuery = new DevicePageQuery();
-            devicePageQuery.setDriverId(driverId);
-            Map<Long, String> statuses = deviceStatusService.device(devicePageQuery);
+            DeviceQuery deviceQuery = new DeviceQuery();
+            deviceQuery.setDriverId(driverId);
+            Map<Long, String> statuses = deviceStatusService.device(deviceQuery);
             return R.ok(statuses);
         } catch (Exception e) {
             return R.fail(e.getMessage());
