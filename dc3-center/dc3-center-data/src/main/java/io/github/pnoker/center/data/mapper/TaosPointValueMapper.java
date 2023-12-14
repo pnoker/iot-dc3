@@ -39,6 +39,6 @@ public interface TaosPointValueMapper extends BaseMapper<TaosPointValue> {
     @Insert("INSERT INTO point_value_${deviceId} (create_time,point_value,raw_value,origin_time) VALUES (#{createTime},#{pointValue},#{rawValue},#{originTime})")
     int insertOne(TaosPointValue taosPointValue);
 
-    @Insert("<script>INSERT INTO point_value_${deviceId} (create_time,point_value,raw_value,origin_time) VALUES <foreach collection='list' item='item' index='index' separator=','>(#{item.createTime},#{item.pointValue},#{item.rawValue},#{item.originTime})</foreach></script>")
+    @Insert("<script>INSERT INTO point_value_${deviceId} (create_time,point_value,raw_value,origin_time) VALUES <foreach collection='List' item='item' index='index' separator=','>(#{item.createTime},#{item.pointValue},#{item.rawValue},#{item.originTime})</foreach></script>")
     int batchInsert(List<TaosPointValue> collect);
 }

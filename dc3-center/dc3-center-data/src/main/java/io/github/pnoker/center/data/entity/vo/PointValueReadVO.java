@@ -16,24 +16,32 @@
 
 package io.github.pnoker.center.data.entity.vo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * Point Value Read VO
+ * PointValueRead VO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
+@SuperBuilder
+@NoArgsConstructor
+@Schema(title = "PointValueRead", description = "位号读")
 public class PointValueReadVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "驱动ID不能为空")
+    @Schema(description = "设备ID")
+    @NotNull(message = "设备ID不能为空")
     private Long deviceId;
 
+    @Schema(description = "位号ID")
     @NotNull(message = "位号ID不能为空")
     private Long pointId;
 }

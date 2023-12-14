@@ -56,7 +56,7 @@ X-Auth-Tenant-Id:-1
 
 
 ### 分页查询 BlackIp
-POST http://{{dc3-auth}}/auth/black_ip/list
+POST http://{{dc3-auth}}/auth/black_ip/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

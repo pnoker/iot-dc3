@@ -66,7 +66,7 @@ Cache-Control: no-cache
 
 
 ### 分页查询 Point
-POST http://{{dc3-manager}}/manager/pointBO/list
+POST http://{{dc3-manager}}/manager/pointBO/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -134,7 +134,7 @@ Cache-Control: no-cache
 
 
 ### 分页查询 PointAttribute
-POST http://{{dc3-manager}}/manager/point_attribute/list
+POST http://{{dc3-manager}}/manager/point_attribute/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -200,7 +200,7 @@ Cache-Control: no-cache
 
 
 ### 分页查询 PointInfo
-POST http://{{dc3-manager}}/manager/point_attribute_config/list
+POST http://{{dc3-manager}}/manager/point_attribute_config/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

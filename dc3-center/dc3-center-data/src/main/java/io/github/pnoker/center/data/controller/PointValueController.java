@@ -19,7 +19,7 @@ package io.github.pnoker.center.data.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.point.PointValue;
-import io.github.pnoker.center.data.entity.vo.query.PointValuePageQuery;
+import io.github.pnoker.center.data.entity.query.PointValueQuery;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
@@ -49,16 +49,16 @@ public class PointValueController implements Controller {
     /**
      * 查询最新 PointValue 集合
      *
-     * @param pointValuePageQuery 位号值和分页参数
+     * @param pointValueQuery 位号值和分页参数
      * @return 带分页的 {@link PointValue}
      */
     @PostMapping("/latest")
-    public R<Page<PointValue>> latest(@RequestBody PointValuePageQuery pointValuePageQuery) {
+    public R<Page<PointValue>> latest(@RequestBody PointValueQuery pointValueQuery) {
         try {
-            if (ObjectUtil.isEmpty(pointValuePageQuery)) {
-                pointValuePageQuery = new PointValuePageQuery();
+            if (ObjectUtil.isEmpty(pointValueQuery)) {
+                pointValueQuery = new PointValueQuery();
             }
-            Page<PointValue> page = pointValueService.latest(pointValuePageQuery);
+            Page<PointValue> page = pointValueService.latest(pointValueQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
@@ -71,16 +71,16 @@ public class PointValueController implements Controller {
     /**
      * 分页查询 PointValue
      *
-     * @param pointValuePageQuery 位号值和分页参数
+     * @param pointValueQuery 位号值和分页参数
      * @return 带分页的 {@link PointValue}
      */
     @PostMapping("/list")
-    public R<Page<PointValue>> list(@RequestBody(required = false) PointValuePageQuery pointValuePageQuery) {
+    public R<Page<PointValue>> list(@RequestBody(required = false) PointValueQuery pointValueQuery) {
         try {
-            if (ObjectUtil.isEmpty(pointValuePageQuery)) {
-                pointValuePageQuery = new PointValuePageQuery();
+            if (ObjectUtil.isEmpty(pointValueQuery)) {
+                pointValueQuery = new PointValueQuery();
             }
-            Page<PointValue> page = pointValueService.list(pointValuePageQuery);
+            Page<PointValue> page = pointValueService.list(pointValueQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

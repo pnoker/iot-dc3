@@ -19,13 +19,11 @@ package io.github.pnoker.center.data.service.impl;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.DriverApiGrpc;
-import io.github.pnoker.api.center.manager.DriverDTO;
-import io.github.pnoker.api.center.manager.PageDriverQueryDTO;
-import io.github.pnoker.api.center.manager.RPageDriverDTO;
-import io.github.pnoker.api.common.DriverTypeFlagDTOEnum;
-import io.github.pnoker.api.common.EnableFlagDTOEnum;
+import io.github.pnoker.api.center.manager.GrpcDriverDTO;
+import io.github.pnoker.api.center.manager.GrpcPageDriverQueryDTO;
+import io.github.pnoker.api.center.manager.GrpcRPageDriverDTO;
 import io.github.pnoker.api.common.GrpcPageDTO;
-import io.github.pnoker.center.data.entity.vo.query.DriverPageQuery;
+import io.github.pnoker.center.data.entity.query.DriverQuery;
 import io.github.pnoker.center.data.service.DriverStatusService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
@@ -60,21 +58,21 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     private RedisUtil redisUtil;
 
     @Override
-    public Map<Long, String> driver(DriverPageQuery pageQuery) {
+    public Map<Long, String> driver(DriverQuery pageQuery) {
         GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
                 .setSize(pageQuery.getPage().getSize())
                 .setCurrent(pageQuery.getPage().getCurrent());
-        DriverDTO.Builder builder = buildDTOByQuery(pageQuery);
-        PageDriverQueryDTO.Builder query = PageDriverQueryDTO.newBuilder()
+        GrpcDriverDTO.Builder builder = buildDTOByQuery(pageQuery);
+        GrpcPageDriverQueryDTO.Builder query = GrpcPageDriverQueryDTO.newBuilder()
                 .setPage(page)
                 .setDriver(builder);
-        RPageDriverDTO rPageDriverDTO = driverApiBlockingStub.list(query.build());
+        GrpcRPageDriverDTO rPageDriverDTO = driverApiBlockingStub.list(query.build());
 
         if (!rPageDriverDTO.getResult().getOk()) {
             return new HashMap<>();
         }
 
-        List<DriverDTO> drivers = rPageDriverDTO.getData().getDataList();
+        List<GrpcDriverDTO> drivers = rPageDriverDTO.getData().getDataList();
         return getStatusMap(drivers);
     }
 
@@ -84,8 +82,8 @@ public class DriverStatusServiceImpl implements DriverStatusService {
      * @param pageQuery DriverPageQuery
      * @return DriverDTO Builder
      */
-    private static DriverDTO.Builder buildDTOByQuery(DriverPageQuery pageQuery) {
-        DriverDTO.Builder builder = DriverDTO.newBuilder();
+    private static GrpcDriverDTO.Builder buildDTOByQuery(DriverQuery pageQuery) {
+        GrpcDriverDTO.Builder builder = GrpcDriverDTO.newBuilder();
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverName())) {
             builder.setDriverName(pageQuery.getDriverName());
         }
@@ -96,14 +94,14 @@ public class DriverStatusServiceImpl implements DriverStatusService {
             builder.setServiceHost(pageQuery.getServiceHost());
         }
         if (ObjectUtil.isNotNull(pageQuery.getDriverTypeFlag())) {
-            builder.setDriverTypeFlag(DriverTypeFlagDTOEnum.valueOf(pageQuery.getDriverTypeFlag().name()));
+            builder.setDriverTypeFlag(pageQuery.getDriverTypeFlag().getIndex());
         } else {
-            builder.setDriverTypeFlagValue(DefaultConstant.DEFAULT_INT);
+            builder.setDriverTypeFlag(DefaultConstant.DEFAULT_INT);
         }
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            builder.setEnableFlag(EnableFlagDTOEnum.valueOf(pageQuery.getEnableFlag().name()));
+            builder.setEnableFlag(pageQuery.getEnableFlag().getIndex());
         } else {
-            builder.setEnableFlagValue(DefaultConstant.DEFAULT_INT);
+            builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
         }
         if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
             builder.setTenantId(pageQuery.getTenantId());
@@ -118,7 +116,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
      * @param drivers DriverDTO Array
      * @return Status Map
      */
-    private Map<Long, String> getStatusMap(List<DriverDTO> drivers) {
+    private Map<Long, String> getStatusMap(List<GrpcDriverDTO> drivers) {
         Map<Long, String> statusMap = new HashMap<>(16);
         Set<Long> driverIds = drivers.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
         driverIds.forEach(id -> {

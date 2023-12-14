@@ -17,8 +17,8 @@
 package io.github.pnoker.center.data.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.data.entity.vo.query.DeviceEventPageQuery;
-import io.github.pnoker.center.data.entity.vo.query.DriverEventPageQuery;
+import io.github.pnoker.center.data.entity.query.DeviceEventQuery;
+import io.github.pnoker.center.data.entity.query.DriverEventQuery;
 import io.github.pnoker.common.event.DeviceEvent;
 import io.github.pnoker.common.event.DriverEvent;
 
@@ -61,17 +61,17 @@ public interface EventService {
     /**
      * 获取 DriverEvent 带分页、排序
      *
-     * @param driverEventPageQuery 驱动事件和分页参数
+     * @param driverEventQuery 驱动事件和分页参数
      * @return Page Of DriverEvent
      */
-    Page<DriverEvent> driverEvent(DriverEventPageQuery driverEventPageQuery);
+    Page<DriverEvent> driverEvent(DriverEventQuery driverEventQuery);
 
     /**
      * 获取 DeviceEvent 带分页、排序
      *
-     * @param deviceEventPageQuery 设备事件和分页参数
+     * @param deviceEventQuery 设备事件和分页参数
      * @return Page Of DeviceEvent
      */
-    Page<DeviceEvent> deviceEvent(DeviceEventPageQuery deviceEventPageQuery);
+    Page<DeviceEvent> deviceEvent(DeviceEventQuery deviceEventQuery);
 
 }

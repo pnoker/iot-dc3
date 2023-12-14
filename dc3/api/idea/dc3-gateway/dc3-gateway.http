@@ -148,8 +148,8 @@ Cache-Control: no-cache
 
 
 ### 分页查询 Driver
-#/api/v3/manager/driver/list，支持name\serverName\host模糊查询，port精准查询
-POST http://{{dc3-gateway}}/api/v3/manager/driver/list
+#/api/v3/manager/driver/List，支持name\serverName\host模糊查询，port精准查询
+POST http://{{dc3-gateway}}/api/v3/manager/driver/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -221,8 +221,8 @@ Cache-Control: no-cache
 
 
 ### 分页查询 DriverAttribute
-#/api/v3/manager/driver_attribute/list，支持displayName模糊查询，name\type\driverId精准查询
-POST http://{{dc3-gateway}}/api/v3/manager/driver_attribute/list
+#/api/v3/manager/driver_attribute/List，支持displayName模糊查询，name\type\driverId精准查询
+POST http://{{dc3-gateway}}/api/v3/manager/driver_attribute/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
@@ -287,7 +287,7 @@ Cache-Control: no-cache
 
 
 ### 分页查询 DriverInfo
-POST http://{{dc3-gateway}}/api/v3/manager/driver_attribute_config/list
+POST http://{{dc3-gateway}}/api/v3/manager/driver_attribute_config/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

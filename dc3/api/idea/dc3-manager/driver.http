@@ -99,8 +99,8 @@ X-Auth-Tenant-Id: -1
 
 
 ### 分页查询 Driver
-#/manager/driver/list，支持name\serverName\host模糊查询，port精准查询
-POST http://{{dc3-manager}}/manager/driver/list
+#/manager/driver/List，支持name\serverName\host模糊查询，port精准查询
+POST http://{{dc3-manager}}/manager/driver/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

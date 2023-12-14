@@ -61,7 +61,7 @@ Cache-Control: no-cache
 
 
 ### 分页查询 User
-POST http://{{host}}/auth/userLogin/list
+POST http://{{host}}/auth/userLogin/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

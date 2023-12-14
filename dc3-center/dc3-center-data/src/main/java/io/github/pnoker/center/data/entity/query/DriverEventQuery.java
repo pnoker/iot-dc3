@@ -14,22 +14,34 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.entity.vo.query;
+package io.github.pnoker.center.data.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.model.DriverDO;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+import java.io.Serializable;
 
 /**
- * Driver DTO
+ * DriverEvent Query
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-public class DriverPageQuery extends DriverDO {
+@SuperBuilder
+@NoArgsConstructor
+@Schema(title = "DriverEvent", description = "驱动事件-查询")
+public class DriverEventQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    /**
+     * 驱动ID
+     */
+    private Long driverId;
+
+    @Schema(description = "分页")
     private Pages page;
 }

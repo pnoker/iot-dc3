@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.data.entity.vo.query.DeviceEventPageQuery;
+import io.github.pnoker.center.data.entity.query.DeviceEventQuery;
 import io.github.pnoker.center.data.service.EventService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
@@ -49,16 +49,16 @@ public class DeviceEventController implements Controller {
     /**
      * 分页查询 DeviceEvent
      *
-     * @param deviceEventPageQuery DeviceEventDto
+     * @param deviceEventQuery DeviceEventDto
      * @return Page Of DeviceEvent
      */
     @PostMapping("/device")
-    public R<Page<DeviceEvent>> deviceEvent(@RequestBody(required = false) DeviceEventPageQuery deviceEventPageQuery) {
+    public R<Page<DeviceEvent>> deviceEvent(@RequestBody(required = false) DeviceEventQuery deviceEventQuery) {
         try {
-            if (ObjectUtil.isEmpty(deviceEventPageQuery)) {
-                deviceEventPageQuery = new DeviceEventPageQuery();
+            if (ObjectUtil.isEmpty(deviceEventQuery)) {
+                deviceEventQuery = new DeviceEventQuery();
             }
-            Page<DeviceEvent> page = eventService.deviceEvent(deviceEventPageQuery);
+            Page<DeviceEvent> page = eventService.deviceEvent(deviceEventQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

@@ -50,8 +50,8 @@ Cache-Control: no-cache
 
 
 ### 分页查询 Group
-#/manager/groupBO/list，支持name模糊查询
-POST http://{{dc3-manager}}/manager/groupBO/list
+#/manager/groupBO/List，支持name模糊查询
+POST http://{{dc3-manager}}/manager/groupBO/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache

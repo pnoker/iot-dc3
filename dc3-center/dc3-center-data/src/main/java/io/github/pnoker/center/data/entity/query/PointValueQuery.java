@@ -14,27 +14,48 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.entity.vo.query;
+package io.github.pnoker.center.data.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
 /**
+ * PointValue Query
+ *
  * @author pnoker
  * @since 2022.1.0
  */
 @Data
-public class DriverEventPageQuery implements Serializable {
+@SuperBuilder
+@NoArgsConstructor
+@Schema(title = "PointValue", description = "位号值-查询")
+public class PointValueQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 驱动ID
-     */
-    private Long driverId;
+    private Long deviceId;
+    private Long pointId;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    /**
+     * 位号名称
+     */
+    private String pointName;
+
+    /**
+     * 使能标识
+     */
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 是否返回最近历史数据
+     */
+    private Boolean history = false;
+
+    @Schema(description = "分页")
     private Pages page;
 }

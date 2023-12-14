@@ -15,8 +15,8 @@
 #
 
 ### 分页查询 Point Value
-#/data/list
-POST http://{{dc3-data}}/data/point_value/list
+#/data/List
+POST http://{{dc3-data}}/data/point_value/List
 Accept: */*
 Content-Type: application/json
 Cache-Control: no-cache
