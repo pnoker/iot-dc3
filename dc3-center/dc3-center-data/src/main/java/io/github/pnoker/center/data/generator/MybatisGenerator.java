@@ -62,7 +62,12 @@ public class MybatisGenerator {
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder
                         .addInclude(
-                                "dc3_user"
+                                "dc3_alarm_message_profile",
+                                "dc3_alarm_notify_profile",
+                                "dc3_alarm_rule",
+                                "dc3_group",
+                                "dc3_label",
+                                "dc3_label_bind"
                         )
                 ).execute();
     }
