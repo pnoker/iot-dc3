@@ -16,12 +16,7 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
-import java.util.List;
 
 /**
  * Tenant Builder
@@ -32,7 +27,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface TenantBuilder {
 
-   /* *//**
+    /* *//**
      * VO to BO
      *
      * @param entityVO EntityVO

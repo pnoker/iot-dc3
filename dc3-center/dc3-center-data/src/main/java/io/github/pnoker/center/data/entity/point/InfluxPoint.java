@@ -18,9 +18,7 @@ package io.github.pnoker.center.data.entity.point;
 
 import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;
-import io.github.pnoker.common.constant.common.TimeConstant;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
-import io.github.pnoker.common.utils.TimeUtil;
 import lombok.Data;
 
 @Data

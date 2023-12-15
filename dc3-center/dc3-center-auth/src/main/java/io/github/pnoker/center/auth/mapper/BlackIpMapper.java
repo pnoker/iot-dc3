@@ -17,15 +17,16 @@
 package io.github.pnoker.center.auth.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
-import org.apache.ibatis.annotations.Mapper;
+import io.github.pnoker.center.auth.entity.model.BlackIpDO;
 
 /**
- * Mapper
+ * <p>
+ * Ip黑名单表 Mapper 接口
+ * </p>
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper
-public interface BlackIpMapper extends BaseMapper<BlackIpBO> {
+public interface BlackIpMapper extends BaseMapper<BlackIpDO> {
+
 }
