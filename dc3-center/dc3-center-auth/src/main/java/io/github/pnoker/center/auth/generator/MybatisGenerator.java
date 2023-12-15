@@ -74,7 +74,7 @@ public class MybatisGenerator {
                                 "dc3_role_user_bind",
                                 "dc3_tenant",
                                 "dc3_tenant_bind",
-                                /*"dc3_user",*/
+                                "dc3_user",
                                 "dc3_user_login",
                                 "dc3_user_password"
                         )
