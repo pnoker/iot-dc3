@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.entity.bo.ext;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 

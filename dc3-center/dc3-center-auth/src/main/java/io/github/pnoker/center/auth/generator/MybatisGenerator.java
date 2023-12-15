@@ -62,7 +62,21 @@ public class MybatisGenerator {
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder
                         .addInclude(
-                                "dc3_user"
+                                "dc3_api",
+                                "dc3_black_ip",
+                                "dc3_group",
+                                "dc3_label",
+                                "dc3_label_bind",
+                                "dc3_menu",
+                                "dc3_resource",
+                                "dc3_role",
+                                "dc3_role_resource_bind",
+                                "dc3_role_user_bind",
+                                "dc3_tenant",
+                                "dc3_tenant_bind",
+                                /*"dc3_user",*/
+                                "dc3_user_login",
+                                "dc3_user_password"
                         )
                 ).execute();
     }

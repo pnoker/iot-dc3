@@ -22,7 +22,6 @@ import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
-import io.github.pnoker.common.entity.vo.DictionaryVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

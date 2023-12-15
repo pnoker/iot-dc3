@@ -17,15 +17,16 @@
 package io.github.pnoker.center.auth.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.center.auth.entity.bo.RoleResourceBindBO;
-import org.apache.ibatis.annotations.Mapper;
+import io.github.pnoker.center.auth.entity.model.RoleResourceBindDO;
 
 /**
- * role resource mapper
+ * <p>
+ * 角色-权限资源关联表 Mapper 接口
+ * </p>
  *
- * @author linys
+ * @author pnoker
  * @since 2022.1.0
  */
-@Mapper
-public interface RoleResourceBindMapper extends BaseMapper<RoleResourceBindBO> {
+public interface RoleResourceBindMapper extends BaseMapper<RoleResourceBindDO> {
+
 }

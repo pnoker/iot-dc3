@@ -16,12 +16,7 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
-import java.util.List;
 
 /**
  * Resource Builder
