@@ -23,7 +23,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserBO;
-import io.github.pnoker.center.auth.entity.query.UserBODto;
+import io.github.pnoker.center.auth.entity.query.UserQuery;
 import io.github.pnoker.center.auth.mapper.UserMapper;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -168,14 +168,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserBO> selectByPage(UserBODto entityQuery) {
+    public Page<UserBO> selectByPage(UserQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         return userMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
-    private LambdaQueryWrapper<UserBO> fuzzyQuery(UserBODto query) {
+    private LambdaQueryWrapper<UserBO> fuzzyQuery(UserQuery query) {
         LambdaQueryWrapper<UserBO> wrapper = Wrappers.<UserBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             wrapper.like(CharSequenceUtil.isNotEmpty(query.getNickName()), UserBO::getNickName, query.getNickName());

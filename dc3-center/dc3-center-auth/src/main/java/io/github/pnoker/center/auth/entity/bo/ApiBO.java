@@ -27,6 +27,7 @@ import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
@@ -40,6 +41,7 @@ import javax.validation.constraints.Pattern;
  */
 @Data
 @SuperBuilder
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ApiBO extends BaseBO {
 

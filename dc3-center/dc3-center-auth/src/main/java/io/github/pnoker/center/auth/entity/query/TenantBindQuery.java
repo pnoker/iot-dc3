@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.bo;
+package io.github.pnoker.center.auth.entity.query;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
+import io.github.pnoker.common.entity.common.Pages;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
-
 /**
- * Dictionary BO
+ * TenantBind DTO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -31,35 +33,9 @@ import java.util.List;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-public class DictionaryBO {
+@Schema(title = "DeviceQuery", description = "租户绑定-查询")
+public class TenantBindQuery extends TenantBindBO {
 
-    /**
-     * 字典类型
-     */
-    private String type;
-
-    /**
-     * 字典标签名称
-     */
-    private String label;
-
-    /**
-     * 字典标签值
-     */
-    private Long value;
-
-    /**
-     * 是否禁用
-     */
-    private boolean disabled;
-
-    /**
-     * 是否展开
-     */
-    private boolean expand;
-
-    /**
-     * 子节点
-     */
-    private List<DictionaryBO> children;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Pages page;
 }

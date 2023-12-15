@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
-import io.github.pnoker.center.auth.entity.query.UserPasswordBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.UserPasswordQuery;
 import io.github.pnoker.center.auth.mapper.UserPasswordMapper;
 import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
@@ -93,7 +93,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     @Override
-    public Page<UserPasswordBO> selectByPage(UserPasswordBOPageQuery entityQuery) {
+    public Page<UserPasswordBO> selectByPage(UserPasswordQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
@@ -109,7 +109,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         }
     }
 
-    private LambdaQueryWrapper<UserPasswordBO> fuzzyQuery(UserPasswordBOPageQuery query) {
+    private LambdaQueryWrapper<UserPasswordBO> fuzzyQuery(UserPasswordQuery query) {
         return Wrappers.<UserPasswordBO>query().lambda();
     }
 

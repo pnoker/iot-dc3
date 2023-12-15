@@ -19,7 +19,7 @@ package io.github.pnoker.center.auth.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
-import io.github.pnoker.center.auth.entity.query.TenantBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.TenantQuery;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
@@ -146,10 +146,10 @@ public class TenantController implements Controller {
      * @return 带分页的 {@link TenantBO}
      */
     @PostMapping("/list")
-    public R<Page<TenantBO>> list(@RequestBody(required = false) TenantBOPageQuery tenantPageQuery) {
+    public R<Page<TenantBO>> list(@RequestBody(required = false) TenantQuery tenantPageQuery) {
         try {
             if (ObjectUtil.isEmpty(tenantPageQuery)) {
-                tenantPageQuery = new TenantBOPageQuery();
+                tenantPageQuery = new TenantQuery();
             }
             Page<TenantBO> page = tenantService.selectByPage(tenantPageQuery);
             if (ObjectUtil.isNotNull(page)) {

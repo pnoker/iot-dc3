@@ -16,12 +16,10 @@
 
 package io.github.pnoker.center.manager.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.manager.entity.vo.DeviceVO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -34,13 +32,47 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Schema(title = "DeviceQuery", description = "设备-查询")
-public class DeviceQuery extends DeviceVO {
+public class DeviceQuery {
 
     @Schema(description = "分页")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
     private Long profileId;
+
+    /**
+     * 设备名称
+     */
+    @Schema(description = "设备名称")
+    private String deviceName;
+
+    /**
+     * 设备编号
+     */
+    @Schema(description = "设备编号")
+    private String deviceCode;
+
+    /**
+     * 驱动ID
+     */
+    @Schema(description = "驱动ID")
+    private Long driverId;
+
+    /**
+     * 分组ID
+     */
+    @Schema(description = "分组ID")
+    private Long groupId;
+
+    /**
+     * 使能标识
+     */
+    @Schema(description = "使能标识")
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    @Schema(description = "租户ID")
+    private Long tenantId;
 }

@@ -17,9 +17,7 @@
 package io.github.pnoker.center.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.RoleBO;
-import io.github.pnoker.center.manager.entity.model.RoleDO;
-import io.github.pnoker.center.manager.entity.vo.RoleVO;
+import io.github.pnoker.center.auth.entity.bo.RoleBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -39,81 +37,81 @@ public interface RoleBuilder {
      *
      * @param entityVO EntityVO
      * @return EntityBO
-     */
+     *//*
     RoleBO buildBOByVO(RoleVO entityVO);
 
-    /**
+    *//**
      * VOList to BOList
      *
      * @param entityVOList EntityVO Array
      * @return EntityBO Array
-     */
+     *//*
     List<RoleBO> buildBOListByVOList(List<RoleVO> entityVOList);
 
-    /**
+    *//**
      * BO to DO
      *
      * @param entityBO EntityBO
      * @return EntityDO
-     */
+     *//*
     @Mapping(target = "deleted", ignore = true)
     RoleDO buildDOByBO(RoleBO entityBO);
 
-    /**
+    *//**
      * BOList to DOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
-     */
+     *//*
     List<RoleDO> buildDOListByBOList(List<RoleBO> entityBOList);
 
-    /**
+    *//**
      * DO to BO
      *
      * @param entityDO EntityDO
      * @return EntityBO
-     */
+     *//*
     RoleBO buildBOByDO(RoleDO entityDO);
 
-    /**
+    *//**
      * DOList to BOList
      *
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
-     */
+     *//*
     List<RoleBO> buildBOListByDOList(List<RoleDO> entityDOList);
 
-    /**
+    *//**
      * BO to VO
      *
      * @param entityBO EntityBO
      * @return EntityVO
-     */
+     *//*
     RoleVO buildVOByBO(RoleBO entityBO);
 
-    /**
+    *//**
      * BOList to VOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityVO Array
-     */
+     *//*
     List<RoleVO> buildVOListByBOList(List<RoleBO> entityBOList);
 
-    /**
+    *//**
      * DOPage to BOPage
      *
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
-     */
+     *//*
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<RoleBO> buildBOPageByDOPage(Page<RoleDO> entityPageDO);
 
-    /**
+    *//**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
-     */
+     *//*
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<RoleVO> buildVOPageByBOPage(Page<RoleBO> entityPageBO);
+    Page<RoleVO> buildVOPageByBOPage(Page<RoleBO> entityPageBO);*/
 }

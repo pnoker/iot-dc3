@@ -17,101 +17,60 @@
 package io.github.pnoker.center.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.bo.ApiBO;
+import io.github.pnoker.common.entity.bo.DictionaryBO;
+import io.github.pnoker.common.entity.vo.DictionaryVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
 /**
- * Api Builder
+ * Dictionary Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring")
-public interface ApiBuilder {
+public interface DictionaryBuilder {
 
     /**
      * VO to BO
      *
      * @param entityVO EntityVO
      * @return EntityBO
-     *//*
-    ApiBO buildBOByVO(ApiVO entityVO);
+     */
+    DictionaryBO buildBOByVO(DictionaryVO entityVO);
 
-    *//**
+    /**
      * VOList to BOList
      *
      * @param entityVOList EntityVO Array
      * @return EntityBO Array
-     *//*
-    List<ApiBO> buildBOListByVOList(List<ApiVO> entityVOList);
+     */
+    List<DictionaryBO> buildBOListByVOList(List<DictionaryVO> entityVOList);
 
-    *//**
-     * BO to DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     *//*
-    @Mapping(target = "deleted", ignore = true)
-    ApiDO buildDOByBO(ApiBO entityBO);
-
-    *//**
-     * BOList to DOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
-     *//*
-    List<ApiDO> buildDOListByBOList(List<ApiBO> entityBOList);
-
-    *//**
-     * DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     *//*
-    ApiBO buildBOByDO(ApiDO entityDO);
-
-    *//**
-     * DOList to BOList
-     *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
-     *//*
-    List<ApiBO> buildBOListByDOList(List<ApiDO> entityDOList);
-
-    *//**
+    /**
      * BO to VO
      *
      * @param entityBO EntityBO
      * @return EntityVO
-     *//*
-    ApiVO buildVOByBO(ApiBO entityBO);
+     */
+    DictionaryVO buildVOByBO(DictionaryBO entityBO);
 
-    *//**
+    /**
      * BOList to VOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityVO Array
-     *//*
-    List<ApiVO> buildVOListByBOList(List<ApiBO> entityBOList);
+     */
+    List<DictionaryVO> buildVOListByBOList(List<DictionaryBO> entityBOList);
 
-    *//**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     *//*
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<ApiBO> buildBOPageByDOPage(Page<ApiDO> entityPageDO);
-
-    *//**
+    /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
-     *//*
+     */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<ApiVO> buildVOPageByBOPage(Page<ApiBO> entityPageBO);*/
+    Page<DictionaryVO> buildVOPageByBOPage(Page<DictionaryBO> entityPageBO);
 }

@@ -16,11 +16,11 @@
 
 package io.github.pnoker.center.manager.entity.query;
 
-import io.github.pnoker.center.manager.entity.vo.DriverAttributeVO;
+import io.github.pnoker.common.constant.enums.AttributeTypeFlagEnum;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -33,10 +33,51 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Schema(title = "DriverAttributeQuery", description = "驱动属性-查询")
-public class DriverAttributeQuery extends DriverAttributeVO {
+public class DriverAttributeQuery {
 
     @Schema(description = "分页")
     private Pages page;
+
+    /**
+     * 显示名称
+     */
+    @Schema(description = "显示名称")
+    private String displayName;
+
+    /**
+     * 属性名称
+     */
+    @Schema(description = "属性名称")
+    private String attributeName;
+
+    /**
+     * 属性类型标识
+     */
+    @Schema(description = "属性类型标识")
+    private AttributeTypeFlagEnum attributeTypeFlag;
+
+    /**
+     * 默认值
+     */
+    @Schema(description = "默认值")
+    private String defaultValue;
+
+    /**
+     * 驱动ID
+     */
+    @Schema(description = "驱动ID")
+    private Long driverId;
+
+    /**
+     * 使能标识
+     */
+    @Schema(description = "使能标识")
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    @Schema(description = "租户ID")
+    private Long tenantId;
 }

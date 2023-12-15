@@ -17,16 +17,24 @@
 package io.github.pnoker.center.auth.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.auth.entity.bo.ResourceBO;
+import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
- * @author linys
+ * BlackIp DTO
+ *
+ * @author pnoker
  * @since 2022.1.0
  */
 @Data
-public class ResourceBOPageQuery extends ResourceBO {
+@SuperBuilder
+@NoArgsConstructor
+@Schema(title = "BlackIpQuery", description = "禁止IP-查询")
+public class BlackIpQuery extends BlackIpBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

@@ -18,11 +18,12 @@ package io.github.pnoker.center.auth.api;
 
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.auth.CodeQuery;
+import io.github.pnoker.api.center.auth.GrpcCodeQuery;
 import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
+import io.github.pnoker.api.center.auth.GrpcTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
-import io.github.pnoker.api.center.auth.TenantDTO;
-import io.github.pnoker.api.common.EnableFlagDTOEnum;
+import io.github.pnoker.api.common.GrpcBaseDTO;
+import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
@@ -47,7 +48,7 @@ public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
     private TenantService tenantService;
 
     @Override
-    public void selectByCode(CodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {
+    public void selectByCode(GrpcCodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {
         GrpcRTenantDTO.Builder builder = GrpcRTenantDTO.newBuilder();
         GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
         TenantBO select = tenantService.selectByCode(request.getCode());
@@ -59,7 +60,7 @@ public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
-            TenantDTO tenant = buildDTOByDO(select);
+            GrpcTenantDTO tenant = buildGrpcDTOByBO(select);
             builder.setData(tenant);
         }
 
@@ -72,16 +73,16 @@ public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
     /**
      * DO to DTO
      *
-     * @param entityDO Tenant
+     * @param entityBO Tenant
      * @return TenantDTO
      */
-    private TenantDTO buildDTOByDO(TenantBO entityDO) {
-        TenantDTO.Builder builder = TenantDTO.newBuilder();
-        BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+    private GrpcTenantDTO buildGrpcDTOByBO(TenantBO entityBO) {
+        GrpcTenantDTO.Builder builder = GrpcTenantDTO.newBuilder();
+        GrpcBaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityBO);
         builder.setBase(baseDTO);
-        builder.setTenantName(entityDO.getTenantName());
-        builder.setTenantCode(entityDO.getTenantCode());
-        builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
+        builder.setTenantName(entityBO.getTenantName());
+        builder.setTenantCode(entityBO.getTenantCode());
+        builder.setEnableFlag(entityBO.getEnableFlag().getIndex());
         return builder.build();
     }
 }

@@ -25,6 +25,7 @@ import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.driver.StorageConstant;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.http.entity.ContentType;
@@ -97,7 +98,7 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
     private List<TsPointValue> convertPointValues(String metric, PointValue pointValue) {
         Long point = pointValue.getPointId();
         String value = pointValue.getValue();
-        long timestamp = pointValue.getOriginTime().getTime();
+        long timestamp = LocalDateTimeUtil.milliSeconds(pointValue.getOriginTime());
 
         List<TsPointValue> tsPointValues = new ArrayList<>(2);
 

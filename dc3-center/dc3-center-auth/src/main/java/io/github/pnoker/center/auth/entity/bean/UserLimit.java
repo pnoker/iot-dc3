@@ -16,9 +16,11 @@
 
 package io.github.pnoker.center.auth.entity.bean;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 用户登录限制
@@ -27,6 +29,8 @@ import java.util.Date;
  * @since 2022.1.0
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserLimit {
     /**
      * 登录验证错误次数
@@ -36,5 +40,5 @@ public class UserLimit {
     /**
      * 限制失效时间
      */
-    private Date expireTime;
+    private LocalDateTime expireTime;
 }

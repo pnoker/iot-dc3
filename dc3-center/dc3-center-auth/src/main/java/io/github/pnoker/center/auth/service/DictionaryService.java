@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.common.entity.common.Dictionary;
+import io.github.pnoker.common.entity.bo.DictionaryBO;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public interface DictionaryService {
      *
      * @return Dictionary Array
      */
-    List<Dictionary> tenantDictionary();
+    List<DictionaryBO> tenantDictionary();
 
     /**
      * 获取用户字典
@@ -41,7 +41,7 @@ public interface DictionaryService {
      * @param tenantId 租户ID
      * @return Dictionary Array
      */
-    List<Dictionary> userDictionary(Long tenantId);
+    List<DictionaryBO> userDictionary(Long tenantId);
 
     /**
      * 获取 Ip 黑名单字典
@@ -49,6 +49,6 @@ public interface DictionaryService {
      * @param tenantId 租户ID
      * @return Dictionary Array
      */
-    List<Dictionary> blackIpDictionary(Long tenantId);
+    List<DictionaryBO> blackIpDictionary(Long tenantId);
 
 }

@@ -19,7 +19,7 @@ package io.github.pnoker.center.auth.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
-import io.github.pnoker.center.auth.entity.query.BlackIpBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.BlackIpQuery;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
@@ -145,10 +145,10 @@ public class BlackIpController implements Controller {
      * @return 带分页的 {@link BlackIpBO}
      */
     @PostMapping("/list")
-    public R<Page<BlackIpBO>> list(@RequestBody(required = false) BlackIpBOPageQuery blackIpPageQuery) {
+    public R<Page<BlackIpBO>> list(@RequestBody(required = false) BlackIpQuery blackIpPageQuery) {
         try {
             if (ObjectUtil.isEmpty(blackIpPageQuery)) {
-                blackIpPageQuery = new BlackIpBOPageQuery();
+                blackIpPageQuery = new BlackIpQuery();
             }
             Page<BlackIpBO> page = blackIpService.selectByPage(blackIpPageQuery);
             if (ObjectUtil.isNotNull(page)) {

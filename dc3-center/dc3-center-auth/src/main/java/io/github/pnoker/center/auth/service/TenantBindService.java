@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
-import io.github.pnoker.center.auth.entity.query.TenantBindBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.TenantBindQuery;
 import io.github.pnoker.common.base.Service;
 
 /**
@@ -26,7 +26,7 @@ import io.github.pnoker.common.base.Service;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface TenantBindService extends Service<TenantBindBO, TenantBindBOPageQuery> {
+public interface TenantBindService extends Service<TenantBindBO, TenantBindQuery> {
 
     /**
      * 根据 租户ID 和 关联的用户ID 查询

@@ -21,7 +21,8 @@ import io.github.pnoker.center.auth.service.DictionaryService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.common.Dictionary;
+import io.github.pnoker.common.entity.bo.DictionaryBO;
+import io.github.pnoker.common.entity.vo.DictionaryVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,9 +51,9 @@ public class DictionaryController implements Controller {
      * @return 字典列表
      */
     @GetMapping("/tenant")
-    public R<List<Dictionary>> tenantDictionary() {
+    public R<List<DictionaryBO>> tenantDictionary() {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.tenantDictionary();
+            List<DictionaryBO> dictionaryList = dictionaryService.tenantDictionary();
             if (ObjectUtil.isNotNull(dictionaryList)) {
                 return R.ok(dictionaryList);
             }
@@ -68,9 +69,9 @@ public class DictionaryController implements Controller {
      * @return 字典列表
      */
     @GetMapping("/user")
-    public R<List<Dictionary>> userDictionary() {
+    public R<List<DictionaryBO>> userDictionary() {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.userDictionary(getTenantId());
+            List<DictionaryBO> dictionaryList = dictionaryService.userDictionary(getTenantId());
             if (ObjectUtil.isNotNull(dictionaryList)) {
                 return R.ok(dictionaryList);
             }
@@ -86,9 +87,9 @@ public class DictionaryController implements Controller {
      * @return 字典列表
      */
     @GetMapping("/black_ip")
-    public R<List<Dictionary>> blackIpDictionary() {
+    public R<List<DictionaryBO>> blackIpDictionary() {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.blackIpDictionary(getTenantId());
+            List<DictionaryBO> dictionaryList = dictionaryService.blackIpDictionary(getTenantId());
             if (ObjectUtil.isNotNull(dictionaryList)) {
                 return R.ok(dictionaryList);
             }

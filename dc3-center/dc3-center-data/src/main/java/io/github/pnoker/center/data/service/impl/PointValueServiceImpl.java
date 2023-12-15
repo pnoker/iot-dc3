@@ -48,6 +48,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -82,7 +83,7 @@ public class PointValueServiceImpl implements PointValueService {
             return;
         }
 
-        pointValue.setCreateTime(new Date());
+        pointValue.setCreateTime(LocalDateTime.now());
         repositoryHandleService.save(pointValue);
     }
 
@@ -92,7 +93,7 @@ public class PointValueServiceImpl implements PointValueService {
             return;
         }
 
-        pointValues.forEach(pointValue -> pointValue.setCreateTime(new Date()));
+        pointValues.forEach(pointValue -> pointValue.setCreateTime(LocalDateTime.now()));
         repositoryHandleService.save(pointValues);
     }
 

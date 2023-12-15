@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
     private RoleResourceBindService roleResourceBindService;
 
     @Override
-    public UserLogin authenticateUser(Login login) {
+    public UserLoginBO authenticateUser(Login login) {
         TenantBO tenantBO = tenantService.selectByCode(login.getTenant());
         if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("租户{}不存在", login.getTenant());
@@ -73,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
 
         //todo checkUserLimit
 
-        UserLogin userLogin = userLoginService.selectByLoginName(login.getName(), false);
+        UserLoginBO userLogin = userLoginService.selectByLoginName(login.getName(), false);
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException("用户{}不存在", login.getName());
         }
@@ -108,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthUser login(Login login) {
         //1. authenticate user
-        UserLogin userLogin = authenticateUser(login);
+        UserLoginBO userLogin = authenticateUser(login);
         if (ObjectUtil.isNull(userLogin)) {
             throw new ServiceException("认证失败！请重试");
         }

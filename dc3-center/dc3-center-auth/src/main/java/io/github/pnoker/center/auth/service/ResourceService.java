@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.center.auth.entity.bo.ResourceBO;
-import io.github.pnoker.center.auth.entity.query.ResourceBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.ResourceQuery;
 import io.github.pnoker.common.base.Service;
 
 /**
@@ -26,5 +26,5 @@ import io.github.pnoker.common.base.Service;
  * @author linys
  * @since 2022.1.0
  */
-public interface ResourceService extends Service<ResourceBO, ResourceBOPageQuery> {
+public interface ResourceService extends Service<ResourceBO, ResourceQuery> {
 }

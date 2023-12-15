@@ -21,8 +21,8 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.bo.UserLogin;
-import io.github.pnoker.center.auth.entity.query.UserLoginPageQuery;
+import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
+import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
 import io.github.pnoker.center.auth.mapper.UserLoginMapper;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -51,9 +51,9 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     @Transactional
-    public void save(UserLogin entityBO) {
+    public void save(UserLoginBO entityBO) {
         // 判断登录名称是否存在
-        UserLogin selectByLoginName = selectByLoginName(entityBO.getLoginName(), false);
+        UserLoginBO selectByLoginName = selectByLoginName(entityBO.getLoginName(), false);
         if (ObjectUtil.isNotNull(selectByLoginName)) {
             throw new DuplicateException("The user already exists with login name: {}", entityBO.getLoginName());
         }
@@ -67,7 +67,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     @Override
     @Transactional
     public void remove(Long id) {
-        UserLogin userLogin = selectById(id);
+        UserLoginBO userLogin = selectById(id);
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException("The user login does not exist");
         }
@@ -78,8 +78,8 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public void update(UserLogin entityBO) {
-        UserLogin selectById = selectById(entityBO.getId());
+    public void update(UserLoginBO entityBO) {
+        UserLoginBO selectById = selectById(entityBO.getId());
         if (ObjectUtil.isNull(selectById)) {
             throw new NotFoundException("The user login does not exist");
         }
@@ -91,12 +91,12 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public UserLogin selectById(Long id) {
+    public UserLoginBO selectById(Long id) {
         return null;
     }
 
     @Override
-    public Page<UserLogin> selectByPage(UserLoginPageQuery entityQuery) {
+    public Page<UserLoginBO> selectByPage(UserLoginQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
@@ -104,7 +104,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     @Override
-    public UserLogin selectByLoginName(String loginName, boolean throwException) {
+    public UserLoginBO selectByLoginName(String loginName, boolean throwException) {
         if (CharSequenceUtil.isEmpty(loginName)) {
             if (throwException) {
                 throw new EmptyException("The login name is empty");
@@ -112,11 +112,11 @@ public class UserLoginServiceImpl implements UserLoginService {
             return null;
         }
 
-        LambdaQueryWrapper<UserLogin> wrapper = Wrappers.<UserLogin>query().lambda();
-        wrapper.eq(UserLogin::getLoginName, loginName);
-        wrapper.eq(UserLogin::getEnableFlag, EnableFlagEnum.ENABLE);
+        LambdaQueryWrapper<UserLoginBO> wrapper = Wrappers.<UserLoginBO>query().lambda();
+        wrapper.eq(UserLoginBO::getLoginName, loginName);
+        wrapper.eq(UserLoginBO::getEnableFlag, EnableFlagEnum.ENABLE);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        UserLogin userLogin = userLoginMapper.selectOne(wrapper);
+        UserLoginBO userLogin = userLoginMapper.selectOne(wrapper);
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException();
         }
@@ -125,7 +125,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     public boolean checkLoginNameValid(String loginName) {
-        UserLogin userLogin = selectByLoginName(loginName, false);
+        UserLoginBO userLogin = selectByLoginName(loginName, false);
         if (ObjectUtil.isNotNull(userLogin)) {
             return EnableFlagEnum.ENABLE.equals(userLogin.getEnableFlag());
         }
@@ -133,10 +133,10 @@ public class UserLoginServiceImpl implements UserLoginService {
         return false;
     }
 
-    private LambdaQueryWrapper<UserLogin> fuzzyQuery(UserLoginPageQuery query) {
-        LambdaQueryWrapper<UserLogin> wrapper = Wrappers.<UserLogin>query().lambda();
+    private LambdaQueryWrapper<UserLoginBO> fuzzyQuery(UserLoginQuery query) {
+        LambdaQueryWrapper<UserLoginBO> wrapper = Wrappers.<UserLoginBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getLoginName()), UserLogin::getLoginName, query.getLoginName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getLoginName()), UserLoginBO::getLoginName, query.getLoginName());
         }
         return wrapper;
     }

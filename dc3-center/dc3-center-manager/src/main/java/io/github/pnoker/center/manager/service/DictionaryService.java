@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.DictionaryBO;
+import io.github.pnoker.common.entity.bo.DictionaryBO;
 import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
 
 /**

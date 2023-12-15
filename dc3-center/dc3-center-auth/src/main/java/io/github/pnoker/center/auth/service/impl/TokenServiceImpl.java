@@ -23,7 +23,7 @@ import io.github.pnoker.center.auth.entity.bean.TokenValid;
 import io.github.pnoker.center.auth.entity.bean.UserLimit;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
-import io.github.pnoker.center.auth.entity.bo.UserLogin;
+import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
 import io.github.pnoker.center.auth.service.*;
 import io.github.pnoker.common.constant.cache.TimeoutConstant;
@@ -34,15 +34,15 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.common.utils.RedisUtil;
-import io.github.pnoker.common.utils.TimeUtil;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -90,7 +90,7 @@ public class TokenServiceImpl implements TokenService {
             throw new NotFoundException("租户、用户信息不匹配");
         }
         checkUserLimit(userName, tenantBO.getId());
-        UserLogin userLogin = userLoginService.selectByLoginName(userName, false);
+        UserLoginBO userLogin = userLoginService.selectByLoginName(userName, false);
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
@@ -152,11 +152,10 @@ public class TokenServiceImpl implements TokenService {
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantId;
         UserLimit limit = redisUtil.getKey(redisKey);
         if (ObjectUtil.isNotNull(limit) && limit.getTimes() >= 5) {
-            Date now = new Date();
-            long interval = limit.getExpireTime().getTime() - now.getTime();
-            if (interval > 0) {
+            boolean interval = limit.getExpireTime().isAfter(LocalDateTime.now());
+            if (interval) {
                 limit = updateUserLimit(userName, tenantId, false);
-                throw new ServiceException("Access restricted，Please try again after {}", TimeUtil.completeFormat(limit.getExpireTime()));
+                throw new ServiceException("Access restricted，Please try again after {}", LocalDateTimeUtil.completeFormat(limit.getExpireTime()));
             }
         }
     }
@@ -173,7 +172,7 @@ public class TokenServiceImpl implements TokenService {
         int amount = TimeoutConstant.USER_LIMIT_TIMEOUT;
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantId;
         UserLimit userLimit = redisUtil.getKey(redisKey);
-        UserLimit limit = Optional.ofNullable(userLimit).orElse(new UserLimit(0, new Date()));
+        UserLimit limit = Optional.ofNullable(userLimit).orElse(new UserLimit(0, LocalDateTime.now()));
         limit.setTimes(limit.getTimes() + 1);
         if (limit.getTimes() > 20) {
             //TODO 拉黑IP和锁定用户操作，然后通过Gateway进行拦截
@@ -182,7 +181,7 @@ public class TokenServiceImpl implements TokenService {
             amount = limit.getTimes() * TimeoutConstant.USER_LIMIT_TIMEOUT;
         }
         if (expireTime) {
-            limit.setExpireTime(TimeUtil.expireTime(amount, Calendar.MINUTE));
+            limit.setExpireTime(LocalDateTimeUtil.expireTime(amount, ChronoUnit.MINUTES));
         }
         redisUtil.setKey(redisKey, limit, 1, TimeUnit.DAYS);
         return limit;

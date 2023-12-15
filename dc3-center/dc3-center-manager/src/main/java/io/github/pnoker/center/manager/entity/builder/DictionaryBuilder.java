@@ -18,7 +18,8 @@ package io.github.pnoker.center.manager.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.*;
-import io.github.pnoker.center.manager.entity.vo.DictionaryVO;
+import io.github.pnoker.common.entity.bo.DictionaryBO;
+import io.github.pnoker.common.entity.vo.DictionaryVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

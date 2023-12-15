@@ -16,9 +16,12 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.bo.TenantBO;
+import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * User DTO
@@ -27,7 +30,10 @@ import lombok.Data;
  * @since 2022.1.0
  */
 @Data
-public class TenantBOPageQuery extends TenantBO {
+@SuperBuilder
+@NoArgsConstructor
+@Schema(title = "DeviceQuery", description = "用户登录-查询")
+public class UserLoginQuery extends UserLoginBO {
 
     private Pages page;
 }

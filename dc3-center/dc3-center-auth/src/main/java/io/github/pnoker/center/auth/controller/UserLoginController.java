@@ -18,8 +18,8 @@ package io.github.pnoker.center.auth.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.bo.UserLogin;
-import io.github.pnoker.center.auth.entity.query.UserLoginPageQuery;
+import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
+import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.base.Controller;
@@ -55,10 +55,10 @@ public class UserLoginController implements Controller {
      * 新增用户
      *
      * @param userLogin 用户
-     * @return {@link UserLogin}
+     * @return {@link UserLoginBO}
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody UserLogin userLogin) {
+    public R<String> add(@Validated(Add.class) @RequestBody UserLoginBO userLogin) {
         try {
             userLoginService.save(userLogin);
             return R.ok();
@@ -91,10 +91,10 @@ public class UserLoginController implements Controller {
      * </ol>
      *
      * @param userLogin 用户
-     * @return {@link UserLogin}
+     * @return {@link UserLoginBO}
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody UserLogin userLogin) {
+    public R<String> update(@Validated(Update.class) @RequestBody UserLoginBO userLogin) {
         try {
             userLogin.setLoginName(null);
             userLoginService.update(userLogin);
@@ -124,12 +124,12 @@ public class UserLoginController implements Controller {
      * 根据 ID 查询用户
      *
      * @param id 用户ID
-     * @return {@link UserLogin}
+     * @return {@link UserLoginBO}
      */
     @GetMapping("/id/{id}")
-    public R<UserLogin> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<UserLoginBO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            UserLogin select = userLoginService.selectById(Long.parseLong(id));
+            UserLoginBO select = userLoginService.selectById(Long.parseLong(id));
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -143,12 +143,12 @@ public class UserLoginController implements Controller {
      * 根据 Name 查询 User
      *
      * @param name 用户名称
-     * @return {@link UserLogin}
+     * @return {@link UserLoginBO}
      */
     @GetMapping("/name/{name}")
-    public R<UserLogin> selectByName(@NotNull @PathVariable(value = "name") String name) {
+    public R<UserLoginBO> selectByName(@NotNull @PathVariable(value = "name") String name) {
         try {
-            UserLogin select = userLoginService.selectByLoginName(name, false);
+            UserLoginBO select = userLoginService.selectByLoginName(name, false);
             if (ObjectUtil.isNotNull(select)) {
                 return R.ok(select);
             }
@@ -162,15 +162,15 @@ public class UserLoginController implements Controller {
      * 分页查询 User
      *
      * @param userPageQuery 用户和分页参数
-     * @return 带分页的 {@link UserLogin}
+     * @return 带分页的 {@link UserLoginBO}
      */
     @PostMapping("/list")
-    public R<Page<UserLogin>> list(@RequestBody(required = false) UserLoginPageQuery userPageQuery) {
+    public R<Page<UserLoginBO>> list(@RequestBody(required = false) UserLoginQuery userPageQuery) {
         try {
             if (ObjectUtil.isEmpty(userPageQuery)) {
-                userPageQuery = new UserLoginPageQuery();
+                userPageQuery = new UserLoginQuery();
             }
-            Page<UserLogin> page = userLoginService.selectByPage(userPageQuery);
+            Page<UserLoginBO> page = userLoginService.selectByPage(userPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }

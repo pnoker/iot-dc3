@@ -16,12 +16,9 @@
 
 package io.github.pnoker.center.manager.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.manager.entity.vo.LabelBindVO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -34,11 +31,21 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Schema(title = "LabelBindQuery", description = "标签绑定-查询")
-public class LabelBindQuery extends LabelBindVO {
+public class LabelBindQuery {
 
     @Schema(description = "分页")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    /**
+     * 标签ID
+     */
+    @Schema(description = "标签ID")
+    private String labelId;
+
+    /**
+     * 实体ID
+     */
+    @Schema(description = "实体ID")
+    private String entityId;
 }
