@@ -16,12 +16,12 @@
 
 package io.github.pnoker.center.manager.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.manager.entity.vo.ProfileVO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.ProfileShareFlagEnum;
+import io.github.pnoker.common.constant.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -34,13 +34,53 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Schema(title = "ProfileQuery", description = "模板-查询")
-public class ProfileQuery extends ProfileVO {
+public class ProfileQuery {
 
     @Schema(description = "分页")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 
     private Long deviceId;
+
+    /**
+     * 模板名称
+     */
+    @Schema(description = "模板名称")
+    private String profileName;
+
+    /**
+     * 模板编号
+     */
+    @Schema(description = "模板编号")
+    private String profileCode;
+
+    /**
+     * 模板共享类型标识
+     */
+    @Schema(description = "模板共享类型标识")
+    private ProfileShareFlagEnum profileShareFlag;
+
+    /**
+     * 模板类型标识
+     */
+    @Schema(description = "模板类型标识")
+    private ProfileTypeFlagEnum profileTypeFlag;
+
+    /**
+     * 分组ID
+     */
+    @Schema(description = "分组ID")
+    private Long groupId;
+
+    /**
+     * 使能标识
+     */
+    @Schema(description = "使能标识")
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    @Schema(description = "租户ID")
+    private Long tenantId;
 }

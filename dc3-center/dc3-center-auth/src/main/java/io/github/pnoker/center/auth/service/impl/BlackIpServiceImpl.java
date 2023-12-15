@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
-import io.github.pnoker.center.auth.entity.query.BlackIpBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.BlackIpQuery;
 import io.github.pnoker.center.auth.mapper.BlackIpMapper;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -96,7 +96,7 @@ public class BlackIpServiceImpl implements BlackIpService {
     }
 
     @Override
-    public Page<BlackIpBO> selectByPage(BlackIpBOPageQuery entityQuery) {
+    public Page<BlackIpBO> selectByPage(BlackIpQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
@@ -109,7 +109,7 @@ public class BlackIpServiceImpl implements BlackIpService {
         return ObjectUtil.isNotNull(blackIpBO);
     }
 
-    private LambdaQueryWrapper<BlackIpBO> fuzzyQuery(BlackIpBOPageQuery query) {
+    private LambdaQueryWrapper<BlackIpBO> fuzzyQuery(BlackIpQuery query) {
         LambdaQueryWrapper<BlackIpBO> wrapper = Wrappers.<BlackIpBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             wrapper.like(CharSequenceUtil.isNotEmpty(query.getIp()), BlackIpBO::getIp, query.getIp());

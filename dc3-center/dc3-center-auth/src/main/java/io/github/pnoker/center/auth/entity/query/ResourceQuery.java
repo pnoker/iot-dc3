@@ -17,18 +17,22 @@
 package io.github.pnoker.center.auth.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
+import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
- * BlackIp DTO
- *
- * @author pnoker
+ * @author linys
  * @since 2022.1.0
  */
 @Data
-public class BlackIpBOPageQuery extends BlackIpBO {
+@SuperBuilder
+@NoArgsConstructor
+@Schema(title = "DeviceQuery", description = "资源-查询")
+public class ResourceQuery extends ResourceBO {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;

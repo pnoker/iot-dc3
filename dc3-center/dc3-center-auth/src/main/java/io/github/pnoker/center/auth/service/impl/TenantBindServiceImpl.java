@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
-import io.github.pnoker.center.auth.entity.query.TenantBindBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.TenantBindQuery;
 import io.github.pnoker.center.auth.mapper.TenantBindMapper;
 import io.github.pnoker.center.auth.service.TenantBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -92,14 +92,14 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     @Override
-    public Page<TenantBindBO> selectByPage(TenantBindBOPageQuery entityQuery) {
+    public Page<TenantBindBO> selectByPage(TenantBindQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         return tenantBindMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
-    private LambdaQueryWrapper<TenantBindBO> fuzzyQuery(TenantBindBOPageQuery query) {
+    private LambdaQueryWrapper<TenantBindBO> fuzzyQuery(TenantBindQuery query) {
         LambdaQueryWrapper<TenantBindBO> wrapper = Wrappers.<TenantBindBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), TenantBindBO::getTenantId, query.getTenantId());

@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.ResourceBO;
-import io.github.pnoker.center.auth.entity.query.ResourceBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.ResourceQuery;
 import io.github.pnoker.center.auth.mapper.ResourceMapper;
 import io.github.pnoker.center.auth.service.ResourceService;
 import io.github.pnoker.common.entity.common.Pages;
@@ -75,14 +75,14 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
-    public Page<ResourceBO> selectByPage(ResourceBOPageQuery entityQuery) {
+    public Page<ResourceBO> selectByPage(ResourceQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         return resourceMapper.selectPage(PageUtil.page(entityQuery.getPage()), buildQueryWrapper(entityQuery));
     }
 
-    private LambdaQueryWrapper<ResourceBO> buildQueryWrapper(ResourceBOPageQuery pageQuery) {
+    private LambdaQueryWrapper<ResourceBO> buildQueryWrapper(ResourceQuery pageQuery) {
         LambdaQueryWrapper<ResourceBO> wrapper = Wrappers.<ResourceBO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
             wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getTenantId()), ResourceBO::getTenantId, pageQuery.getTenantId());

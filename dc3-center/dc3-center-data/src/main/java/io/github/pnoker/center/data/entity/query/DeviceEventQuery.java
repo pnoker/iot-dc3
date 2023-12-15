@@ -37,6 +37,9 @@ import java.io.Serializable;
 public class DeviceEventQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
+    private Pages page;
+
     /**
      * 设备ID
      */
@@ -48,7 +51,4 @@ public class DeviceEventQuery implements Serializable {
      */
     @Schema(description = "位号ID")
     private Long pointId;
-
-    @Schema(description = "分页")
-    private Pages page;
 }

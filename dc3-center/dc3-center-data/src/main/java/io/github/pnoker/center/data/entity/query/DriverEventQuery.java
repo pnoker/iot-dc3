@@ -37,11 +37,11 @@ import java.io.Serializable;
 public class DriverEventQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
+    private Pages page;
+
     /**
      * 驱动ID
      */
     private Long driverId;
-
-    @Schema(description = "分页")
-    private Pages page;
 }

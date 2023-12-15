@@ -16,11 +16,11 @@
 
 package io.github.pnoker.center.manager.entity.query;
 
-import io.github.pnoker.center.manager.entity.vo.LabelVO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -33,10 +33,39 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Schema(title = "LabelQuery", description = "标签-查询")
-public class LabelQuery extends LabelVO {
+public class LabelQuery {
 
     @Schema(description = "分页")
     private Pages page;
+
+    /**
+     * 标签名称
+     */
+    @Schema(description = "标签名称")
+    private String labelName;
+
+    /**
+     * 标签颜色
+     */
+    @Schema(description = "标签颜色")
+    private String color;
+
+    /**
+     * 实体标识
+     */
+    @Schema(description = "实体标识")
+    private EntityTypeFlagEnum entityTypeFlag;
+
+    /**
+     * 使能标识
+     */
+    @Schema(description = "使能标识")
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    @Schema(description = "租户ID")
+    private Long tenantId;
 }

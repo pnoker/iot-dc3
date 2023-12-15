@@ -18,8 +18,8 @@ package io.github.pnoker.center.auth.api;
 
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.auth.LoginQuery;
-import io.github.pnoker.api.center.auth.RTokenDTO;
+import io.github.pnoker.api.center.auth.GrpcLoginQuery;
+import io.github.pnoker.api.center.auth.GrpcRTokenDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
@@ -46,8 +46,8 @@ public class TokenApi extends TokenApiGrpc.TokenApiImplBase {
     private TokenService tokenService;
 
     @Override
-    public void checkTokenValid(LoginQuery request, StreamObserver<RTokenDTO> responseObserver) {
-        RTokenDTO.Builder builder = RTokenDTO.newBuilder();
+    public void checkTokenValid(GrpcLoginQuery request, StreamObserver<GrpcRTokenDTO> responseObserver) {
+        GrpcRTokenDTO.Builder builder = GrpcRTokenDTO.newBuilder();
         GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
         TokenValid select = tokenService.checkTokenValid(request.getName(), request.getSalt(), request.getToken(), request.getTenant());
         if (ObjectUtil.isNull(select)) {

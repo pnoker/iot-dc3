@@ -38,6 +38,9 @@ import java.io.Serializable;
 public class PointValueQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
+    private Pages page;
+
     private Long deviceId;
     private Long pointId;
 
@@ -55,7 +58,4 @@ public class PointValueQuery implements Serializable {
      * 是否返回最近历史数据
      */
     private Boolean history = false;
-
-    @Schema(description = "分页")
-    private Pages page;
 }

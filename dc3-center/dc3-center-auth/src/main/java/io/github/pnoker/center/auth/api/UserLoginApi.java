@@ -18,13 +18,13 @@ package io.github.pnoker.center.auth.api;
 
 
 import cn.hutool.core.util.ObjectUtil;
+import io.github.pnoker.api.center.auth.GrpcNameQuery;
 import io.github.pnoker.api.center.auth.GrpcRUserLoginDTO;
-import io.github.pnoker.api.center.auth.NameQuery;
+import io.github.pnoker.api.center.auth.GrpcUserLoginDTO;
 import io.github.pnoker.api.center.auth.UserLoginApiGrpc;
-import io.github.pnoker.api.center.auth.UserLoginDTO;
-import io.github.pnoker.api.common.EnableFlagDTOEnum;
+import io.github.pnoker.api.common.GrpcBaseDTO;
 import io.github.pnoker.api.common.GrpcRDTO;
-import io.github.pnoker.center.auth.entity.bo.UserLogin;
+import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.utils.BuilderUtil;
@@ -48,10 +48,10 @@ public class UserLoginApi extends UserLoginApiGrpc.UserLoginApiImplBase {
     private UserLoginService userLoginService;
 
     @Override
-    public void selectByName(NameQuery request, StreamObserver<GrpcRUserLoginDTO> responseObserver) {
+    public void selectByName(GrpcNameQuery request, StreamObserver<GrpcRUserLoginDTO> responseObserver) {
         GrpcRUserLoginDTO.Builder builder = GrpcRUserLoginDTO.newBuilder();
         GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
-        UserLogin select = userLoginService.selectByLoginName(request.getName(), false);
+        UserLoginBO select = userLoginService.selectByLoginName(request.getName(), false);
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -60,7 +60,7 @@ public class UserLoginApi extends UserLoginApiGrpc.UserLoginApiImplBase {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
-            UserLoginDTO user = buildDTOByDO(select);
+            GrpcUserLoginDTO user = buildGrpcDTOByBO(select);
             builder.setData(user);
         }
 
@@ -73,17 +73,17 @@ public class UserLoginApi extends UserLoginApiGrpc.UserLoginApiImplBase {
     /**
      * DO to DTO
      *
-     * @param entityDO UserLogin
+     * @param entityBO UserLogin
      * @return UserLoginDTO
      */
-    private UserLoginDTO buildDTOByDO(UserLogin entityDO) {
-        UserLoginDTO.Builder builder = UserLoginDTO.newBuilder();
-        BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+    private GrpcUserLoginDTO buildGrpcDTOByBO(UserLoginBO entityBO) {
+        GrpcUserLoginDTO.Builder builder = GrpcUserLoginDTO.newBuilder();
+        GrpcBaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityBO);
         builder.setBase(baseDTO);
-        builder.setLoginName(entityDO.getLoginName());
-        builder.setUserId(entityDO.getUserId());
-        builder.setUserPasswordId(entityDO.getUserPasswordId());
-        builder.setEnableFlag(EnableFlagDTOEnum.valueOf(entityDO.getEnableFlag().name()));
+        builder.setLoginName(entityBO.getLoginName());
+        builder.setUserId(entityBO.getUserId());
+        builder.setUserPasswordId(entityBO.getUserPasswordId());
+        builder.setEnableFlag(entityBO.getEnableFlag().getIndex());
         return builder.build();
     }
 }

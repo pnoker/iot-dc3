@@ -16,11 +16,10 @@
 
 package io.github.pnoker.center.manager.entity.query;
 
-import io.github.pnoker.center.manager.entity.vo.PointAttributeConfigVO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -33,10 +32,45 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Schema(title = "PointAttributeConfigQuery", description = "位号属性配置-查询")
-public class PointAttributeConfigQuery extends PointAttributeConfigVO {
+public class PointAttributeConfigQuery {
 
     @Schema(description = "分页")
     private Pages page;
+
+    /**
+     * 位号属性ID
+     */
+    @Schema(description = "位号属性ID")
+    private Long pointAttributeId;
+
+    /**
+     * 位号属性配置值
+     */
+    @Schema(description = "位号属性配置值")
+    private String configValue;
+
+    /**
+     * 设备ID
+     */
+    @Schema(description = "设备ID")
+    private Long deviceId;
+
+    /**
+     * 位号ID
+     */
+    @Schema(description = "位号ID")
+    private Long pointId;
+
+    /**
+     * 使能标识
+     */
+    @Schema(description = "使能标识")
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    @Schema(description = "租户ID")
+    private Long tenantId;
 }

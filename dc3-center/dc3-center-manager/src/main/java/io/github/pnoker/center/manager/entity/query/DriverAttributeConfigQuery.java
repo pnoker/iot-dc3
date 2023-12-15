@@ -16,12 +16,10 @@
 
 package io.github.pnoker.center.manager.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.manager.entity.vo.DriverAttributeConfigVO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -34,11 +32,39 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Schema(title = "DriverAttributeConfigQuery", description = "驱动属性配置-查询")
-public class DriverAttributeConfigQuery extends DriverAttributeConfigVO {
+public class DriverAttributeConfigQuery {
 
     @Schema(description = "分页")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    /**
+     * 驱动属性ID
+     */
+    @Schema(description = "驱动属性ID")
+    private Long driverAttributeId;
+
+    /**
+     * 驱动属性配置值
+     */
+    @Schema(description = "驱动属性配置值")
+    private String configValue;
+
+    /**
+     * 设备ID
+     */
+    @Schema(description = "设备ID")
+    private Long deviceId;
+
+    /**
+     * 使能标识
+     */
+    @Schema(description = "使能标识")
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    @Schema(description = "租户ID")
+    private Long tenantId;
 }

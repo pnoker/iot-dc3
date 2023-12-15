@@ -16,11 +16,9 @@
 
 package io.github.pnoker.center.manager.entity.query;
 
-import io.github.pnoker.center.manager.entity.vo.ProfileBindVO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -33,10 +31,21 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Schema(title = "ProfileBindQuery", description = "位号绑定-查询")
-public class ProfileBindQuery extends ProfileBindVO {
+public class ProfileBindQuery {
 
     @Schema(description = "分页")
     private Pages page;
+
+    /**
+     * 模版ID
+     */
+    @Schema(description = "模版ID")
+    private Long profileId;
+
+    /**
+     * 设备ID
+     */
+    @Schema(description = "设备ID")
+    private Long deviceId;
 }

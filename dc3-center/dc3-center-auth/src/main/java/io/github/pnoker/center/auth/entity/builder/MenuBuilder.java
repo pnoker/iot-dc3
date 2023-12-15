@@ -17,9 +17,7 @@
 package io.github.pnoker.center.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.MenuBO;
-import io.github.pnoker.center.manager.entity.model.MenuDO;
-import io.github.pnoker.center.manager.entity.vo.MenuVO;
+import io.github.pnoker.center.auth.entity.bo.MenuBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -39,81 +37,81 @@ public interface MenuBuilder {
      *
      * @param entityVO EntityVO
      * @return EntityBO
-     */
+     *//*
     MenuBO buildBOByVO(MenuVO entityVO);
 
-    /**
+    *//**
      * VOList to BOList
      *
      * @param entityVOList EntityVO Array
      * @return EntityBO Array
-     */
+     *//*
     List<MenuBO> buildBOListByVOList(List<MenuVO> entityVOList);
 
-    /**
+    *//**
      * BO to DO
      *
      * @param entityBO EntityBO
      * @return EntityDO
-     */
+     *//*
     @Mapping(target = "deleted", ignore = true)
     MenuDO buildDOByBO(MenuBO entityBO);
 
-    /**
+    *//**
      * BOList to DOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
-     */
+     *//*
     List<MenuDO> buildDOListByBOList(List<MenuBO> entityBOList);
 
-    /**
+    *//**
      * DO to BO
      *
      * @param entityDO EntityDO
      * @return EntityBO
-     */
+     *//*
     MenuBO buildBOByDO(MenuDO entityDO);
 
-    /**
+    *//**
      * DOList to BOList
      *
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
-     */
+     *//*
     List<MenuBO> buildBOListByDOList(List<MenuDO> entityDOList);
 
-    /**
+    *//**
      * BO to VO
      *
      * @param entityBO EntityBO
      * @return EntityVO
-     */
+     *//*
     MenuVO buildVOByBO(MenuBO entityBO);
 
-    /**
+    *//**
      * BOList to VOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityVO Array
-     */
+     *//*
     List<MenuVO> buildVOListByBOList(List<MenuBO> entityBOList);
 
-    /**
+    *//**
      * DOPage to BOPage
      *
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
-     */
+     *//*
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<MenuBO> buildBOPageByDOPage(Page<MenuDO> entityPageDO);
 
-    /**
+    *//**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
-     */
+     *//*
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<MenuVO> buildVOPageByBOPage(Page<MenuBO> entityPageBO);
+    Page<MenuVO> buildVOPageByBOPage(Page<MenuBO> entityPageBO);*/
 }

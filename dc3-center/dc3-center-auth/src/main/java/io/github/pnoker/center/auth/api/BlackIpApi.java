@@ -18,8 +18,8 @@ package io.github.pnoker.center.auth.api;
 
 
 import io.github.pnoker.api.center.auth.BlackIpApiGrpc;
-import io.github.pnoker.api.center.auth.IpQuery;
-import io.github.pnoker.api.center.auth.RBlackIpDTO;
+import io.github.pnoker.api.center.auth.GrpcIpQuery;
+import io.github.pnoker.api.center.auth.GrpcRBlackIpDTO;
 import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
@@ -43,8 +43,8 @@ public class BlackIpApi extends BlackIpApiGrpc.BlackIpApiImplBase {
     private BlackIpService blackIpService;
 
     @Override
-    public void checkBlackIpValid(IpQuery request, StreamObserver<RBlackIpDTO> responseObserver) {
-        RBlackIpDTO.Builder builder = RBlackIpDTO.newBuilder();
+    public void checkBlackIpValid(GrpcIpQuery request, StreamObserver<GrpcRBlackIpDTO> responseObserver) {
+        GrpcRBlackIpDTO.Builder builder = GrpcRBlackIpDTO.newBuilder();
         GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
         Boolean ipValid = blackIpService.checkBlackIpValid(request.getIp());
         if (!Boolean.TRUE.equals(ipValid)) {

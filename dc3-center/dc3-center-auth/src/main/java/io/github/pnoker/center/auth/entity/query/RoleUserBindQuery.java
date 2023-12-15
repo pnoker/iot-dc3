@@ -16,18 +16,24 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.auth.entity.bo.RoleUserBindBO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
- * UserPassword DTO
- *
- * @author pnoker
+ * @author linys
  * @since 2022.1.0
  */
 @Data
-public class UserPasswordBOPageQuery extends UserPasswordBO {
+@SuperBuilder
+@NoArgsConstructor
+@Schema(title = "DeviceQuery", description = "角色用户绑定-查询")
+public class RoleUserBindQuery extends RoleUserBindBO {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
 }

@@ -18,7 +18,7 @@ package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.center.auth.entity.bo.RoleBO;
 import io.github.pnoker.center.auth.entity.bo.RoleUserBindBO;
-import io.github.pnoker.center.auth.entity.query.RoleUserBindBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.RoleUserBindQuery;
 import io.github.pnoker.common.base.Service;
 
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.List;
  * @author linys
  * @since 2022.1.0
  */
-public interface RoleUserBindService extends Service<RoleUserBindBO, RoleUserBindBOPageQuery> {
+public interface RoleUserBindService extends Service<RoleUserBindBO, RoleUserBindQuery> {
 
     /**
      * 根据 租户id 和 用户id 查询

@@ -17,6 +17,7 @@
 package io.github.pnoker.center.auth.entity.bo.ext;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
@@ -30,6 +31,7 @@ import java.io.Serializable;
  */
 @Data
 @SuperBuilder
+@NoArgsConstructor
 public class MenuExtBO implements Serializable {
     private static final long serialVersionUID = 1L;
 

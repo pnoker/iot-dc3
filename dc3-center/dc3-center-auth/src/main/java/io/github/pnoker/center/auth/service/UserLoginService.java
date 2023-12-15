@@ -16,8 +16,8 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.bo.UserLogin;
-import io.github.pnoker.center.auth.entity.query.UserLoginPageQuery;
+import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
+import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
 import io.github.pnoker.common.base.Service;
 
 /**
@@ -26,7 +26,7 @@ import io.github.pnoker.common.base.Service;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface UserLoginService extends Service<UserLogin, UserLoginPageQuery> {
+public interface UserLoginService extends Service<UserLoginBO, UserLoginQuery> {
 
     /**
      * 根据登录名称查询用户
@@ -35,7 +35,7 @@ public interface UserLoginService extends Service<UserLogin, UserLoginPageQuery>
      * @param throwException Throw Exception
      * @return User
      */
-    UserLogin selectByLoginName(String loginName, boolean throwException);
+    UserLoginBO selectByLoginName(String loginName, boolean throwException);
 
     /**
      * 判断登录名称是否有效

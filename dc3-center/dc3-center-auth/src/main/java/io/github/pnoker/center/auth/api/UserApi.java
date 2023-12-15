@@ -18,10 +18,11 @@ package io.github.pnoker.center.auth.api;
 
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.auth.IdQuery;
-import io.github.pnoker.api.center.auth.RUserDTO;
+import io.github.pnoker.api.center.auth.GrpcIdQuery;
+import io.github.pnoker.api.center.auth.GrpcRUserDTO;
+import io.github.pnoker.api.center.auth.GrpcUserDTO;
 import io.github.pnoker.api.center.auth.UserApiGrpc;
-import io.github.pnoker.api.center.auth.UserDTO;
+import io.github.pnoker.api.common.GrpcBaseDTO;
 import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.auth.entity.bo.UserBO;
 import io.github.pnoker.center.auth.service.UserService;
@@ -47,8 +48,8 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
     private UserService userService;
 
     @Override
-    public void selectById(IdQuery request, StreamObserver<RUserDTO> responseObserver) {
-        RUserDTO.Builder builder = RUserDTO.newBuilder();
+    public void selectById(GrpcIdQuery request, StreamObserver<GrpcRUserDTO> responseObserver) {
+        GrpcRUserDTO.Builder builder = GrpcRUserDTO.newBuilder();
         GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
         UserBO select = userService.selectById(request.getId());
         if (ObjectUtil.isNull(select)) {
@@ -59,7 +60,7 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getMessage());
-            UserDTO user = buildDTOByDO(select);
+            GrpcUserDTO user = buildGrpcDTOByBO(select);
             builder.setData(user);
         }
 
@@ -72,19 +73,19 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
     /**
      * DO to DTO
      *
-     * @param entityDO User
+     * @param entityBO User
      * @return UserDTO
      */
-    private UserDTO buildDTOByDO(UserBO entityDO) {
-        UserDTO.Builder builder = UserDTO.newBuilder();
-        BaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+    private GrpcUserDTO buildGrpcDTOByBO(UserBO entityBO) {
+        GrpcUserDTO.Builder builder = GrpcUserDTO.newBuilder();
+        GrpcBaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityBO);
         builder.setBase(baseDTO);
-        builder.setNickName(entityDO.getNickName());
-        builder.setUserName(entityDO.getUserName());
-        builder.setPhone(entityDO.getPhone());
-        builder.setEmail(entityDO.getEmail());
-        builder.setSocialExt(entityDO.getSocialExt());
-        builder.setIdentityExt(entityDO.getIdentityExt());
+        builder.setNickName(entityBO.getNickName());
+        builder.setUserName(entityBO.getUserName());
+        builder.setPhone(entityBO.getPhone());
+        builder.setEmail(entityBO.getEmail());
+        builder.setSocialExt(entityBO.getSocialExt());
+        builder.setIdentityExt(entityBO.getIdentityExt());
         return builder.build();
     }
 }

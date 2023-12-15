@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
-import io.github.pnoker.center.auth.entity.query.TenantBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.TenantQuery;
 import io.github.pnoker.center.auth.mapper.TenantMapper;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -96,14 +96,14 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
-    public Page<TenantBO> selectByPage(TenantBOPageQuery entityQuery) {
+    public Page<TenantBO> selectByPage(TenantQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         return tenantMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
     }
 
-    private LambdaQueryWrapper<TenantBO> fuzzyQuery(TenantBOPageQuery query) {
+    private LambdaQueryWrapper<TenantBO> fuzzyQuery(TenantQuery query) {
         LambdaQueryWrapper<TenantBO> wrapper = Wrappers.<TenantBO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
             wrapper.like(CharSequenceUtil.isNotEmpty(query.getTenantName()), TenantBO::getTenantName, query.getTenantName());

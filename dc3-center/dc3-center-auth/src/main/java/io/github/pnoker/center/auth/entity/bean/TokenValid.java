@@ -16,7 +16,9 @@
 
 package io.github.pnoker.center.auth.entity.bean;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -25,6 +27,8 @@ import java.util.Date;
  * @since 2022.1.0
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenValid {
     private boolean valid;
     private Date expireTime;

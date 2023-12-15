@@ -20,6 +20,7 @@ import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -30,6 +31,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Data
 @SuperBuilder
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class UserLoginBO extends BaseBO {
 
@@ -46,7 +48,7 @@ public class UserLoginBO extends BaseBO {
     /**
      * 用户密码ID
      */
-    private String userPasswordId;
+    private Long userPasswordId;
 
     /**
      * 使能标识

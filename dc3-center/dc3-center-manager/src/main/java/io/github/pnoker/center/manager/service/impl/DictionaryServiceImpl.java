@@ -22,6 +22,7 @@ import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.builder.DictionaryBuilder;
 import io.github.pnoker.center.manager.entity.query.*;
 import io.github.pnoker.center.manager.service.*;
+import io.github.pnoker.common.entity.bo.DictionaryBO;
 import io.github.pnoker.common.entity.common.Pages;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

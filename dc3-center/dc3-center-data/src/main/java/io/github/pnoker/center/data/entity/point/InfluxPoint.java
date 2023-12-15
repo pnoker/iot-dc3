@@ -18,12 +18,13 @@ package io.github.pnoker.center.data.entity.point;
 
 import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;
+import io.github.pnoker.common.constant.common.TimeConstant;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
+import io.github.pnoker.common.utils.TimeUtil;
 import lombok.Data;
 
-import java.time.Instant;
-
-@Measurement(name = "point_value")
 @Data
+@Measurement(name = "point_value")
 public class InfluxPoint {
 
     @Column(tag = true)
@@ -36,12 +37,12 @@ public class InfluxPoint {
     private String pointValue;
 
     @Column(timestamp = true)
-    private Instant time;
+    private Long time;
 
     public InfluxPoint(PointValue pointValue) {
         this.deviceId = pointValue.getDeviceId();
         this.pointId = pointValue.getPointId();
         this.pointValue = pointValue.getValue();
-        this.time = pointValue.getCreateTime().toInstant();
+        this.time = LocalDateTimeUtil.milliSeconds(pointValue.getCreateTime());
     }
 }

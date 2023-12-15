@@ -19,6 +19,7 @@ package io.github.pnoker.center.data.entity.point;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -63,7 +64,7 @@ public class TaosPointValue {
     public TaosPointValue(PointValue pointValue) {
         BeanUtil.copyProperties(pointValue, this);
         this.setPointValue(pointValue.getValue());
-        this.setCreateTime(new Timestamp(pointValue.getCreateTime().getTime()));
-        this.setOriginTime(new Timestamp(pointValue.getOriginTime().getTime()));
+        this.setCreateTime(new Timestamp(LocalDateTimeUtil.milliSeconds(pointValue.getCreateTime())));
+        this.setOriginTime(new Timestamp(LocalDateTimeUtil.milliSeconds(pointValue.getOriginTime())));
     }
 }

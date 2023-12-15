@@ -24,7 +24,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import io.github.pnoker.center.auth.entity.bo.RoleResourceBindBO;
-import io.github.pnoker.center.auth.entity.query.RoleResourceBindBOPageQuery;
+import io.github.pnoker.center.auth.entity.query.RoleResourceBindQuery;
 import io.github.pnoker.center.auth.mapper.ResourceMapper;
 import io.github.pnoker.center.auth.mapper.RoleResourceBindMapper;
 import io.github.pnoker.center.auth.service.RoleResourceBindService;
@@ -85,7 +85,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     @Override
-    public Page<RoleResourceBindBO> selectByPage(RoleResourceBindBOPageQuery entityQuery) {
+    public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
@@ -107,7 +107,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         return null;
     }
 
-    private LambdaQueryWrapper<RoleResourceBindBO> buildQueryWrapper(RoleResourceBindBOPageQuery pageQuery) {
+    private LambdaQueryWrapper<RoleResourceBindBO> buildQueryWrapper(RoleResourceBindQuery pageQuery) {
         LambdaQueryWrapper<RoleResourceBindBO> wrapper = Wrappers.<RoleResourceBindBO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
             wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleResourceBindBO::getResourceId, pageQuery.getRoleId());

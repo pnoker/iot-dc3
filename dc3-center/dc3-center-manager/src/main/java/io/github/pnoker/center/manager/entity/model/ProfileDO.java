@@ -3,6 +3,7 @@ package io.github.pnoker.center.manager.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileShareFlagEnum;
+import io.github.pnoker.common.constant.enums.ProfileTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -52,7 +53,7 @@ public class ProfileDO implements Serializable {
      * 模板类型标识
      */
     @TableField("profile_type_flag")
-    private ProfileShareFlagEnum profileTypeFlag;
+    private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
      * 分组ID

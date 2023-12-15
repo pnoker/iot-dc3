@@ -16,11 +16,11 @@
 
 package io.github.pnoker.center.manager.entity.query;
 
-import io.github.pnoker.center.manager.entity.vo.GroupVO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.GroupTypeFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -33,10 +33,45 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Schema(title = "GroupQuery", description = "分组-查询")
-public class GroupQuery extends GroupVO {
+public class GroupQuery {
 
     @Schema(description = "分页")
     private Pages page;
+
+    /**
+     * 分组名称
+     */
+    @Schema(description = "分组名称")
+    private String groupName;
+
+    /**
+     * 父分组ID
+     */
+    @Schema(description = "分组父级ID")
+    private String parentGroupId;
+
+    /**
+     * 分组排序位置
+     */
+    @Schema(description = "分组排序")
+    private Integer position;
+
+    /**
+     * 分组标识
+     */
+    @Schema(description = "分组标识")
+    private GroupTypeFlagEnum groupTypeFlag;
+
+    /**
+     * 使能标识
+     */
+    @Schema(description = "使能标识")
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    @Schema(description = "租户ID")
+    private Long tenantId;
 }

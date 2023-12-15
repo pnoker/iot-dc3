@@ -17,9 +17,7 @@
 package io.github.pnoker.center.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.ResourceBO;
-import io.github.pnoker.center.manager.entity.model.ResourceDO;
-import io.github.pnoker.center.manager.entity.vo.ResourceVO;
+import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -39,81 +37,81 @@ public interface ResourceBuilder {
      *
      * @param entityVO EntityVO
      * @return EntityBO
-     */
+     *//*
     ResourceBO buildBOByVO(ResourceVO entityVO);
 
-    /**
+    *//**
      * VOList to BOList
      *
      * @param entityVOList EntityVO Array
      * @return EntityBO Array
-     */
+     *//*
     List<ResourceBO> buildBOListByVOList(List<ResourceVO> entityVOList);
 
-    /**
+    *//**
      * BO to DO
      *
      * @param entityBO EntityBO
      * @return EntityDO
-     */
+     *//*
     @Mapping(target = "deleted", ignore = true)
     ResourceDO buildDOByBO(ResourceBO entityBO);
 
-    /**
+    *//**
      * BOList to DOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
-     */
+     *//*
     List<ResourceDO> buildDOListByBOList(List<ResourceBO> entityBOList);
 
-    /**
+    *//**
      * DO to BO
      *
      * @param entityDO EntityDO
      * @return EntityBO
-     */
+     *//*
     ResourceBO buildBOByDO(ResourceDO entityDO);
 
-    /**
+    *//**
      * DOList to BOList
      *
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
-     */
+     *//*
     List<ResourceBO> buildBOListByDOList(List<ResourceDO> entityDOList);
 
-    /**
+    *//**
      * BO to VO
      *
      * @param entityBO EntityBO
      * @return EntityVO
-     */
+     *//*
     ResourceVO buildVOByBO(ResourceBO entityBO);
 
-    /**
+    *//**
      * BOList to VOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityVO Array
-     */
+     *//*
     List<ResourceVO> buildVOListByBOList(List<ResourceBO> entityBOList);
 
-    /**
+    *//**
      * DOPage to BOPage
      *
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
-     */
+     *//*
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<ResourceBO> buildBOPageByDOPage(Page<ResourceDO> entityPageDO);
 
-    /**
+    *//**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
-     */
+     *//*
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<ResourceVO> buildVOPageByBOPage(Page<ResourceBO> entityPageBO);
+    Page<ResourceVO> buildVOPageByBOPage(Page<ResourceBO> entityPageBO);*/
 }

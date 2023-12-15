@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.center.auth.entity.auth.Login;
-import io.github.pnoker.center.auth.entity.bo.UserLogin;
+import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.common.model.AuthUser;
 
 /**
@@ -34,7 +34,7 @@ public interface AuthService {
      * @param login login info
      * @return UserLogin userLogin
      */
-    UserLogin authenticateUser(Login login);
+    UserLoginBO authenticateUser(Login login);
 
     /**
      * 用户登录
