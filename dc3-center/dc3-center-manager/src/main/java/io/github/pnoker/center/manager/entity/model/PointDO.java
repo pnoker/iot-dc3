@@ -162,6 +162,6 @@ public class PointDO implements Serializable {
      * 逻辑删除标识,0:未删除,1:已删除
      */
     @TableLogic
-    @TableField(value = "deleted", select = false)
+    @TableField(value = "deleted")
     private Byte deleted;
 }
