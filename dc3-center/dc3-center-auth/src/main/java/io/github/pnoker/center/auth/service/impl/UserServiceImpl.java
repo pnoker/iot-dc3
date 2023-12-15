@@ -23,8 +23,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserBO;
+import io.github.pnoker.center.auth.entity.builder.UserBuilder;
+import io.github.pnoker.center.auth.entity.model.UserDO;
 import io.github.pnoker.center.auth.entity.query.UserQuery;
-import io.github.pnoker.center.auth.mapper.UserMapper;
+import io.github.pnoker.center.auth.manager.UserManager;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -47,7 +49,10 @@ import javax.annotation.Resource;
 public class UserServiceImpl implements UserService {
 
     @Resource
-    private UserMapper userMapper;
+    private UserBuilder userBuilder;
+
+    @Resource
+    private UserManager userManager;
 
     @Override
     @Transactional
@@ -75,7 +80,8 @@ public class UserServiceImpl implements UserService {
         }
 
         // 插入 user 数据，并返回插入后的 user
-        if (userMapper.insert(entityBO) < 1) {
+        UserDO entityDO = userBuilder.buildDOByBO(entityBO);
+        if (!userManager.save(entityDO)) {
             throw new AddException("The user add failed: {}", entityBO.toString());
         }
     }
@@ -88,7 +94,7 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("The user does not exist");
         }
 
-        if (userMapper.deleteById(id) < 1) {
+        if (!userManager.removeById(id)) {
             throw new DeleteException("The user delete failed");
         }
     }
@@ -122,7 +128,8 @@ public class UserServiceImpl implements UserService {
 
         entityBO.setUserName(null);
         entityBO.setOperateTime(null);
-        if (userMapper.updateById(entityBO) < 1) {
+        UserDO entityDO = userBuilder.buildDOByBO(entityBO);
+        if (!userManager.updateById(entityDO)) {
             throw new UpdateException("The user update failed");
         }
     }
@@ -140,7 +147,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        return selectByKey(UserBO::getUserName, userName, throwException);
+        return selectByKey(UserDO::getUserName, userName, throwException);
     }
 
     @Override
@@ -152,7 +159,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        return selectByKey(UserBO::getPhone, phone, throwException);
+        return selectByKey(UserDO::getPhone, phone, throwException);
     }
 
     @Override
@@ -164,7 +171,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        return selectByKey(UserBO::getEmail, email, throwException);
+        return selectByKey(UserDO::getEmail, email, throwException);
     }
 
     @Override
@@ -172,32 +179,33 @@ public class UserServiceImpl implements UserService {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return userMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<UserDO> page = userManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return userBuilder.buildBOPageByDOPage(page);
     }
 
-    private LambdaQueryWrapper<UserBO> fuzzyQuery(UserQuery query) {
-        LambdaQueryWrapper<UserBO> wrapper = Wrappers.<UserBO>query().lambda();
+    private LambdaQueryWrapper<UserDO> fuzzyQuery(UserQuery query) {
+        LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getNickName()), UserBO::getNickName, query.getNickName());
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getUserName()), UserBO::getUserName, query.getUserName());
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getPhone()), UserBO::getPhone, query.getPhone());
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getEmail()), UserBO::getEmail, query.getEmail());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getNickName()), UserDO::getNickName, query.getNickName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getUserName()), UserDO::getUserName, query.getUserName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getPhone()), UserDO::getPhone, query.getPhone());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getEmail()), UserDO::getEmail, query.getEmail());
         }
         return wrapper;
     }
 
-    private UserBO selectByKey(SFunction<UserBO, ?> key, String value, boolean throwException) {
-        LambdaQueryWrapper<UserBO> wrapper = Wrappers.<UserBO>query().lambda();
+    private UserBO selectByKey(SFunction<UserDO, ?> key, String value, boolean throwException) {
+        LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
         wrapper.eq(key, value);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        UserBO userBO = userMapper.selectOne(wrapper);
-        if (ObjectUtil.isNull(userBO)) {
+        UserDO userDO = userManager.getOne(wrapper);
+        if (ObjectUtil.isNull(userDO)) {
             if (throwException) {
                 throw new NotFoundException();
             }
             return null;
         }
-        return userBO;
+        return userBuilder.buildBOByDO(userDO);
     }
 
 }

@@ -17,15 +17,16 @@
 package io.github.pnoker.center.auth.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.center.auth.entity.bo.UserBO;
-import org.apache.ibatis.annotations.Mapper;
+import io.github.pnoker.center.auth.entity.model.UserDO;
 
 /**
- * Mapper
+ * <p>
+ * 用户表 Mapper 接口
+ * </p>
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper
-public interface UserMapper extends BaseMapper<UserBO> {
+public interface UserMapper extends BaseMapper<UserDO> {
+
 }
