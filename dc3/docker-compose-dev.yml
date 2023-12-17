@@ -18,7 +18,7 @@ version: '3'
 
 services:
   register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-register:2023.11.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-register:2024.1.1.dev
     restart: always
     ports:
       - "8848:8848"
@@ -50,7 +50,7 @@ services:
         aliases:
           - dc3-register
   mysql:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.11.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2024.1.1.dev
     restart: always
     ports:
       - '33306:3306'
@@ -72,7 +72,7 @@ services:
           - dc3-mysql
 
   mongo:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.11.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2024.1.1.dev
     restart: always
     ports:
       - '37017:27017'
@@ -92,7 +92,7 @@ services:
           - dc3-mongo
 
   redis:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.11.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2024.1.1.dev
     restart: always
     ports:
       - '36379:6379'
@@ -111,7 +111,7 @@ services:
           - dc3-redis
 
   rabbitmq:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.11.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2024.1.1.dev
     restart: always
     ports:
       - '5672:5672'
@@ -134,7 +134,7 @@ services:
           - dc3-rabbitmq
 
   emqx:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-emqx:2023.11.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-emqx:2024.1.1.dev
     restart: always
     ports:
       - '1883:1883'
