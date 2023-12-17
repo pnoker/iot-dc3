@@ -21,8 +21,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
+import io.github.pnoker.center.auth.entity.builder.TenantBindBuilder;
+import io.github.pnoker.center.auth.entity.model.TenantBindDO;
 import io.github.pnoker.center.auth.entity.query.TenantBindQuery;
-import io.github.pnoker.center.auth.mapper.TenantBindMapper;
+import io.github.pnoker.center.auth.manager.TenantBindManager;
 import io.github.pnoker.center.auth.service.TenantBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -47,11 +49,15 @@ import javax.annotation.Resource;
 public class TenantBindServiceImpl implements TenantBindService {
 
     @Resource
-    private TenantBindMapper tenantBindMapper;
+    private TenantBindBuilder tenantBindBuilder;
+
+    @Resource
+    private TenantBindManager tenantBindManager;
 
     @Override
     public void save(TenantBindBO entityBO) {
-        if (tenantBindMapper.insert(entityBO) < 1) {
+        TenantBindDO entityDO = tenantBindBuilder.buildDOByBO(entityBO);
+        if (!tenantBindManager.save(entityDO)) {
             throw new AddException("The tenant bind add failed");
         }
     }
@@ -63,7 +69,7 @@ public class TenantBindServiceImpl implements TenantBindService {
             throw new NotFoundException("The tenant bind does not exist");
         }
 
-        if (tenantBindMapper.deleteById(id) < 1) {
+        if (!tenantBindManager.removeById(id)) {
             throw new DeleteException("The tenant bind delete failed");
         }
     }
@@ -72,7 +78,8 @@ public class TenantBindServiceImpl implements TenantBindService {
     public void update(TenantBindBO entityBO) {
         selectById(entityBO.getId());
         entityBO.setOperateTime(null);
-        if (tenantBindMapper.updateById(entityBO) < 1) {
+        TenantBindDO entityDO = tenantBindBuilder.buildDOByBO(entityBO);
+        if (!tenantBindManager.updateById(entityDO)) {
             throw new UpdateException("The tenant bind update failed");
         }
     }
@@ -84,11 +91,12 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     @Override
     public TenantBindBO selectByTenantIdAndUserId(Long tenantId, Long userId) {
-        LambdaQueryWrapper<TenantBindBO> wrapper = Wrappers.<TenantBindBO>query().lambda();
-        wrapper.eq(TenantBindBO::getTenantId, tenantId);
-        wrapper.eq(TenantBindBO::getUserId, userId);
+        LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
+        wrapper.eq(TenantBindDO::getTenantId, tenantId);
+        wrapper.eq(TenantBindDO::getUserId, userId);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        return tenantBindMapper.selectOne(wrapper);
+        TenantBindDO entityDO = tenantBindManager.getOne(wrapper);
+        return tenantBindBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -96,14 +104,15 @@ public class TenantBindServiceImpl implements TenantBindService {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return tenantBindMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<TenantBindDO> entityPageDO = tenantBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return tenantBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<TenantBindBO> fuzzyQuery(TenantBindQuery query) {
-        LambdaQueryWrapper<TenantBindBO> wrapper = Wrappers.<TenantBindBO>query().lambda();
+    private LambdaQueryWrapper<TenantBindDO> fuzzyQuery(TenantBindQuery query) {
+        LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), TenantBindBO::getTenantId, query.getTenantId());
-            wrapper.eq(ObjectUtil.isNotEmpty(query.getUserId()), TenantBindBO::getUserId, query.getUserId());
+            wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), TenantBindDO::getTenantId, query.getTenantId());
+            wrapper.eq(ObjectUtil.isNotEmpty(query.getUserId()), TenantBindDO::getUserId, query.getUserId());
         }
         return wrapper;
     }

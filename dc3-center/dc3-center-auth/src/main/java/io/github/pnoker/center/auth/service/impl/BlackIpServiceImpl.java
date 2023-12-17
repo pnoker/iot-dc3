@@ -22,8 +22,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
+import io.github.pnoker.center.auth.entity.builder.BlackIpBuilder;
+import io.github.pnoker.center.auth.entity.model.BlackIpDO;
 import io.github.pnoker.center.auth.entity.query.BlackIpQuery;
-import io.github.pnoker.center.auth.mapper.BlackIpMapper;
+import io.github.pnoker.center.auth.manager.BlackIpManager;
 import io.github.pnoker.center.auth.service.BlackIpService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
@@ -46,7 +48,11 @@ import javax.annotation.Resource;
 public class BlackIpServiceImpl implements BlackIpService {
 
     @Resource
-    private BlackIpMapper blackIpMapper;
+    private BlackIpBuilder blackIpBuilder;
+
+    @Resource
+    private BlackIpManager blackIpManager;
+
 
     @Override
     public void save(BlackIpBO entityBO) {
@@ -54,8 +60,8 @@ public class BlackIpServiceImpl implements BlackIpService {
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The ip already exists in the blacklist");
         }
-
-        if (blackIpMapper.insert(entityBO) < 1) {
+        BlackIpDO entityDO = blackIpBuilder.buildDOByBO(entityBO);
+        if (!blackIpManager.save(entityDO)) {
             throw new AddException("The ip {} add to the blacklist failed", entityBO.getIp());
         }
     }
@@ -67,7 +73,7 @@ public class BlackIpServiceImpl implements BlackIpService {
             throw new NotFoundException("The ip does not exist in the blacklist");
         }
 
-        if (blackIpMapper.deleteById(id) < 1) {
+        if (!blackIpManager.removeById(id)) {
             throw new DeleteException("The ip delete failed");
         }
     }
@@ -76,7 +82,8 @@ public class BlackIpServiceImpl implements BlackIpService {
     public void update(BlackIpBO entityBO) {
         entityBO.setIp(null);
         entityBO.setOperateTime(null);
-        if (blackIpMapper.updateById(entityBO) < 1) {
+        BlackIpDO entityDO = blackIpBuilder.buildDOByBO(entityBO);
+        if (blackIpManager.updateById(entityDO)) {
             throw new UpdateException("The ip update failed in the blacklist");
         }
     }
@@ -88,11 +95,12 @@ public class BlackIpServiceImpl implements BlackIpService {
 
     @Override
     public BlackIpBO selectByIp(String ip) {
-        LambdaQueryWrapper<BlackIpBO> wrapper = Wrappers.<BlackIpBO>query().lambda();
-        wrapper.eq(BlackIpBO::getIp, ip);
-        wrapper.eq(BlackIpBO::getEnableFlag, EnableFlagEnum.ENABLE);
+        LambdaQueryWrapper<BlackIpDO> wrapper = Wrappers.<BlackIpDO>query().lambda();
+        wrapper.eq(BlackIpDO::getIp, ip);
+        wrapper.eq(BlackIpDO::getEnableFlag, EnableFlagEnum.ENABLE);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        return blackIpMapper.selectOne(wrapper);
+        BlackIpDO entityDO = blackIpManager.getOne(wrapper);
+        return blackIpBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -100,7 +108,8 @@ public class BlackIpServiceImpl implements BlackIpService {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return blackIpMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<BlackIpDO> entityPageDO = blackIpManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return blackIpBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     @Override
@@ -109,10 +118,10 @@ public class BlackIpServiceImpl implements BlackIpService {
         return ObjectUtil.isNotNull(blackIpBO);
     }
 
-    private LambdaQueryWrapper<BlackIpBO> fuzzyQuery(BlackIpQuery query) {
-        LambdaQueryWrapper<BlackIpBO> wrapper = Wrappers.<BlackIpBO>query().lambda();
+    private LambdaQueryWrapper<BlackIpDO> fuzzyQuery(BlackIpQuery query) {
+        LambdaQueryWrapper<BlackIpDO> wrapper = Wrappers.<BlackIpDO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getIp()), BlackIpBO::getIp, query.getIp());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getIp()), BlackIpDO::getIp, query.getIp());
         }
         return wrapper;
     }

@@ -21,7 +21,7 @@ import io.github.pnoker.center.auth.entity.query.BlackIpQuery;
 import io.github.pnoker.common.base.Service;
 
 /**
- * User Interface
+ * BlackIp Interface
  *
  * @author pnoker
  * @since 2022.1.0

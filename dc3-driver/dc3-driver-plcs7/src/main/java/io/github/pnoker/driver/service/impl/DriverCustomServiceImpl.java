@@ -34,8 +34,9 @@ import io.github.pnoker.driver.sdk.DriverContext;
 import io.github.pnoker.driver.sdk.service.DriverCustomService;
 import io.github.pnoker.driver.sdk.service.DriverSenderService;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +67,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      */
     private Map<Long, MyS7Connector> s7ConnectorMap;
 
-    @Data
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     private static class MyS7Connector {

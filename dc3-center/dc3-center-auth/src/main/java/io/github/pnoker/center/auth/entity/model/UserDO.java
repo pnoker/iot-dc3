@@ -1,6 +1,9 @@
 package io.github.pnoker.center.auth.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import io.github.pnoker.center.auth.entity.bo.ext.UserIdentityExtBO;
+import io.github.pnoker.center.auth.entity.bo.ext.UserSocialExtBO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,14 +58,14 @@ public class UserDO implements Serializable {
     /**
      * 社交相关拓展信息，加密存储
      */
-    @TableField("social_ext")
-    private String socialExt;
+    @TableField(value = "social_ext", typeHandler = JacksonTypeHandler.class)
+    private UserSocialExtBO socialExt;
 
     /**
      * 身份相关拓展信息，加密存储
      */
-    @TableField("identity_ext")
-    private String identityExt;
+    @TableField(value = "identity_ext", typeHandler = JacksonTypeHandler.class)
+    private UserIdentityExtBO identityExt;
 
     /**
      * 描述

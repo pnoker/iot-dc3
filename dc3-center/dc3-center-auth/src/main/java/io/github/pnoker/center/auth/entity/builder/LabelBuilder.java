@@ -17,21 +17,22 @@
 package io.github.pnoker.center.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.entity.bo.DictionaryBO;
-import io.github.pnoker.common.entity.vo.DictionaryVO;
+import io.github.pnoker.center.auth.entity.bo.LabelBO;
+import io.github.pnoker.center.auth.entity.model.LabelDO;
+import io.github.pnoker.center.auth.entity.vo.LabelVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
 /**
- * Dictionary Builder
+ * Label Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring")
-public interface DictionaryBuilder {
+public interface LabelBuilder {
 
     /**
      * VO to BO
@@ -39,7 +40,7 @@ public interface DictionaryBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
-    DictionaryBO buildBOByVO(DictionaryVO entityVO);
+    LabelBO buildBOByVO(LabelVO entityVO);
 
     /**
      * VOList to BOList
@@ -47,7 +48,40 @@ public interface DictionaryBuilder {
      * @param entityVOList EntityVO Array
      * @return EntityBO Array
      */
-    List<DictionaryBO> buildBOListByVOList(List<DictionaryVO> entityVOList);
+    List<LabelBO> buildBOListByVOList(List<LabelVO> entityVOList);
+
+    /**
+     * BO to DO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDO
+     */
+    @Mapping(target = "deleted", ignore = true)
+    LabelDO buildDOByBO(LabelBO entityBO);
+
+    /**
+     * BOList to DOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDO Array
+     */
+    List<LabelDO> buildDOListByBOList(List<LabelBO> entityBOList);
+
+    /**
+     * DO to BO
+     *
+     * @param entityDO EntityDO
+     * @return EntityBO
+     */
+    LabelBO buildBOByDO(LabelDO entityDO);
+
+    /**
+     * DOList to BOList
+     *
+     * @param entityDOList EntityDO Array
+     * @return EntityBO Array
+     */
+    List<LabelBO> buildBOListByDOList(List<LabelDO> entityDOList);
 
     /**
      * BO to VO
@@ -55,7 +89,7 @@ public interface DictionaryBuilder {
      * @param entityBO EntityBO
      * @return EntityVO
      */
-    DictionaryVO buildVOByBO(DictionaryBO entityBO);
+    LabelVO buildVOByBO(LabelBO entityBO);
 
     /**
      * BOList to VOList
@@ -63,7 +97,16 @@ public interface DictionaryBuilder {
      * @param entityBOList EntityBO Array
      * @return EntityVO Array
      */
-    List<DictionaryVO> buildVOListByBOList(List<DictionaryBO> entityBOList);
+    List<LabelVO> buildVOListByBOList(List<LabelBO> entityBOList);
+
+    /**
+     * DOPage to BOPage
+     *
+     * @param entityPageDO EntityDO Page
+     * @return EntityBO Page
+     */
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<LabelBO> buildBOPageByDOPage(Page<LabelDO> entityPageDO);
 
     /**
      * BOPage to VOPage
@@ -72,5 +115,5 @@ public interface DictionaryBuilder {
      * @return EntityVO Page
      */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<DictionaryVO> buildVOPageByBOPage(Page<DictionaryBO> entityPageBO);
+    Page<LabelVO> buildVOPageByBOPage(Page<LabelBO> entityPageBO);
 }

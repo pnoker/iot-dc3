@@ -21,8 +21,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
+import io.github.pnoker.center.auth.entity.builder.UserPasswordBuilder;
+import io.github.pnoker.center.auth.entity.model.UserPasswordDO;
 import io.github.pnoker.center.auth.entity.query.UserPasswordQuery;
-import io.github.pnoker.center.auth.mapper.UserPasswordMapper;
+import io.github.pnoker.center.auth.manager.UserPasswordManager;
 import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -49,14 +51,18 @@ import javax.annotation.Resource;
 public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Resource
-    private UserPasswordMapper userPasswordMapper;
+    private UserPasswordBuilder userPasswordBuilder;
+
+    @Resource
+    private UserPasswordManager userPasswordManager;
 
     @Override
     @Transactional
     public void save(UserPasswordBO entityBO) {
         entityBO.setLoginPassword(DecodeUtil.md5(entityBO.getLoginPassword()));
+        UserPasswordDO entityDO = userPasswordBuilder.buildDOByBO(entityBO);
         // 插入 userPassword 数据，并返回插入后的 userPassword
-        if (userPasswordMapper.insert(entityBO) < 1) {
+        if (!userPasswordManager.save(entityDO)) {
             throw new AddException("The user password add failed: {}", entityBO.toString());
         }
     }
@@ -69,7 +75,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
             throw new NotFoundException("The user password does not exist");
         }
 
-        if (userPasswordMapper.deleteById(id) < 1) {
+        if (!userPasswordManager.removeById(id)) {
             throw new DeleteException("The user password delete failed");
         }
     }
@@ -82,7 +88,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         }
         entityBO.setLoginPassword(DecodeUtil.md5(entityBO.getLoginPassword()));
         entityBO.setOperateTime(null);
-        if (userPasswordMapper.updateById(entityBO) < 1) {
+        UserPasswordDO entityDO = userPasswordBuilder.buildDOByBO(entityBO);
+        if (!userPasswordManager.updateById(entityDO)) {
             throw new UpdateException("The user password update failed");
         }
     }
@@ -97,7 +104,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return userPasswordMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<UserPasswordDO> entityPageDO = userPasswordManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return userPasswordBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     @Override
@@ -109,8 +117,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         }
     }
 
-    private LambdaQueryWrapper<UserPasswordBO> fuzzyQuery(UserPasswordQuery query) {
-        return Wrappers.<UserPasswordBO>query().lambda();
+    private LambdaQueryWrapper<UserPasswordDO> fuzzyQuery(UserPasswordQuery query) {
+        return Wrappers.<UserPasswordDO>query().lambda();
     }
 
 }

@@ -16,24 +16,57 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.bo.UserBO;
+import io.github.pnoker.center.auth.entity.bo.ext.UserIdentityExtBO;
+import io.github.pnoker.center.auth.entity.bo.ext.UserSocialExtBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
- * User DTO
+ * User Query
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@Schema(title = "DeviceQuery", description = "用户-查询")
-public class UserQuery extends UserBO {
+@Schema(title = "UserQuery", description = "用户-查询")
+public class UserQuery {
 
     private Pages page;
+
+    /**
+     * 用户昵称
+     */
+    private String nickName;
+
+    /**
+     * 用户名称
+     */
+    private String userName;
+
+    /**
+     * 手机号
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 社交相关拓展信息
+     */
+    private UserSocialExtBO socialExt;
+
+    /**
+     * 身份相关拓展信息
+     */
+    private UserIdentityExtBO identityExt;
 }

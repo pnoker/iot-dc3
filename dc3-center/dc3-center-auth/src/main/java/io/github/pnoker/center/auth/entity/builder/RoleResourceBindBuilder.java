@@ -16,7 +16,14 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.auth.entity.bo.RoleResourceBindBO;
+import io.github.pnoker.center.auth.entity.model.RoleResourceBindDO;
+import io.github.pnoker.center.auth.entity.vo.RoleResourceBindVO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.util.List;
 
 /**
  * RoleResourceBind Builder
@@ -32,81 +39,81 @@ public interface RoleResourceBindBuilder {
      *
      * @param entityVO EntityVO
      * @return EntityBO
-     *//*
+     */
     RoleResourceBindBO buildBOByVO(RoleResourceBindVO entityVO);
 
-    *//**
+    /**
      * VOList to BOList
      *
      * @param entityVOList EntityVO Array
      * @return EntityBO Array
-     *//*
+     */
     List<RoleResourceBindBO> buildBOListByVOList(List<RoleResourceBindVO> entityVOList);
 
-    *//**
+    /**
      * BO to DO
      *
      * @param entityBO EntityBO
      * @return EntityDO
-     *//*
+     */
     @Mapping(target = "deleted", ignore = true)
     RoleResourceBindDO buildDOByBO(RoleResourceBindBO entityBO);
 
-    *//**
+    /**
      * BOList to DOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
-     *//*
+     */
     List<RoleResourceBindDO> buildDOListByBOList(List<RoleResourceBindBO> entityBOList);
 
-    *//**
+    /**
      * DO to BO
      *
      * @param entityDO EntityDO
      * @return EntityBO
-     *//*
+     */
     RoleResourceBindBO buildBOByDO(RoleResourceBindDO entityDO);
 
-    *//**
+    /**
      * DOList to BOList
      *
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
-     *//*
+     */
     List<RoleResourceBindBO> buildBOListByDOList(List<RoleResourceBindDO> entityDOList);
 
-    *//**
+    /**
      * BO to VO
      *
      * @param entityBO EntityBO
      * @return EntityVO
-     *//*
+     */
     RoleResourceBindVO buildVOByBO(RoleResourceBindBO entityBO);
 
-    *//**
+    /**
      * BOList to VOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityVO Array
-     *//*
+     */
     List<RoleResourceBindVO> buildVOListByBOList(List<RoleResourceBindBO> entityBOList);
 
-    *//**
+    /**
      * DOPage to BOPage
      *
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
-     *//*
+     */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<RoleResourceBindBO> buildBOPageByDOPage(Page<RoleResourceBindDO> entityPageDO);
 
-    *//**
+    /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
-     *//*
+     */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<RoleResourceBindVO> buildVOPageByBOPage(Page<RoleResourceBindBO> entityPageBO);*/
+    Page<RoleResourceBindVO> buildVOPageByBOPage(Page<RoleResourceBindBO> entityPageBO);
 }

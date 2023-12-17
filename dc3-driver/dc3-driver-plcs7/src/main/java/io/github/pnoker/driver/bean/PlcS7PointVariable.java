@@ -17,7 +17,8 @@
 package io.github.pnoker.driver.bean;
 
 import io.github.pnoker.driver.api.S7Type;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
@@ -25,7 +26,8 @@ import java.util.Date;
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 public class PlcS7PointVariable {
     private int dbNum;
     private int byteOffset;

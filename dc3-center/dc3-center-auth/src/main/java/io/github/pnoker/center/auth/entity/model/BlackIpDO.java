@@ -1,6 +1,7 @@
 package io.github.pnoker.center.auth.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,7 +30,7 @@ public class BlackIpDO implements Serializable {
     private Long id;
 
     /**
-     * 黑IP
+     * 禁止IP
      */
     @TableField("ip")
     private String ip;
@@ -38,7 +39,7 @@ public class BlackIpDO implements Serializable {
      * 使能标识
      */
     @TableField("enable_flag")
-    private Byte enableFlag;
+    private EnableFlagEnum enableFlag;
 
     /**
      * 租户ID

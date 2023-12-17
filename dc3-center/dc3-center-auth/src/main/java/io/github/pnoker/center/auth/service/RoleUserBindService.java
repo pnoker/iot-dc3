@@ -24,7 +24,7 @@ import io.github.pnoker.common.base.Service;
 import java.util.List;
 
 /**
- * role user mapper service
+ * RoleUserBind Interface
  *
  * @author linys
  * @since 2022.1.0

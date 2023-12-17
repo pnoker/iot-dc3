@@ -19,8 +19,9 @@ package io.github.pnoker.center.manager.entity.query;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.valid.Parent;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotNull;
@@ -32,7 +33,8 @@ import java.io.Serializable;
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "GroupQuery", description = "字典-查询")

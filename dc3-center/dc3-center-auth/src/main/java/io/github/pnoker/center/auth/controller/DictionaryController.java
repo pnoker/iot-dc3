@@ -70,7 +70,7 @@ public class DictionaryController implements Controller {
     @GetMapping("/user")
     public R<List<DictionaryBO>> userDictionary() {
         try {
-            List<DictionaryBO> dictionaryList = dictionaryService.userDictionary(getTenantId());
+            List<DictionaryBO> dictionaryList = dictionaryService.userLoginDictionary(getTenantId());
             if (ObjectUtil.isNotNull(dictionaryList)) {
                 return R.ok(dictionaryList);
             }

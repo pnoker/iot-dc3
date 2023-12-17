@@ -16,24 +16,46 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
- * User DTO
+ * User Query
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@Schema(title = "DeviceQuery", description = "用户登录-查询")
-public class UserLoginQuery extends UserLoginBO {
+@Schema(title = "UserLoginQuery", description = "用户登录-查询")
+public class UserLoginQuery {
 
     private Pages page;
+
+    /**
+     * 登录名称
+     */
+    private String loginName;
+
+    /**
+     * 用户ID
+     */
+    private Long userId;
+
+    /**
+     * 用户密码ID
+     */
+    private Long userPasswordId;
+
+    /**
+     * 使能标识
+     */
+    private EnableFlagEnum enableFlag;
 }

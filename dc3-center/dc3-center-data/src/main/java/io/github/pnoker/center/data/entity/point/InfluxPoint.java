@@ -19,9 +19,11 @@ package io.github.pnoker.center.data.entity.point;
 import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Measurement(name = "point_value")
 public class InfluxPoint {
 

@@ -16,7 +16,14 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
+import io.github.pnoker.center.auth.entity.model.BlackIpDO;
+import io.github.pnoker.center.auth.entity.vo.BlackIpVO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.util.List;
 
 /**
  * BlackIp Builder
@@ -32,81 +39,81 @@ public interface BlackIpBuilder {
      *
      * @param entityVO EntityVO
      * @return EntityBO
-     *//*
+     */
     BlackIpBO buildBOByVO(BlackIpVO entityVO);
 
-    *//**
+    /**
      * VOList to BOList
      *
      * @param entityVOList EntityVO Array
      * @return EntityBO Array
-     *//*
+     */
     List<BlackIpBO> buildBOListByVOList(List<BlackIpVO> entityVOList);
 
-    *//**
+    /**
      * BO to DO
      *
      * @param entityBO EntityBO
      * @return EntityDO
-     *//*
+     */
     @Mapping(target = "deleted", ignore = true)
     BlackIpDO buildDOByBO(BlackIpBO entityBO);
 
-    *//**
+    /**
      * BOList to DOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
-     *//*
+     */
     List<BlackIpDO> buildDOListByBOList(List<BlackIpBO> entityBOList);
 
-    *//**
+    /**
      * DO to BO
      *
      * @param entityDO EntityDO
      * @return EntityBO
-     *//*
+     */
     BlackIpBO buildBOByDO(BlackIpDO entityDO);
 
-    *//**
+    /**
      * DOList to BOList
      *
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
-     *//*
+     */
     List<BlackIpBO> buildBOListByDOList(List<BlackIpDO> entityDOList);
 
-    *//**
+    /**
      * BO to VO
      *
      * @param entityBO EntityBO
      * @return EntityVO
-     *//*
+     */
     BlackIpVO buildVOByBO(BlackIpBO entityBO);
 
-    *//**
+    /**
      * BOList to VOList
      *
      * @param entityBOList EntityBO Array
      * @return EntityVO Array
-     *//*
+     */
     List<BlackIpVO> buildVOListByBOList(List<BlackIpBO> entityBOList);
 
-    *//**
+    /**
      * DOPage to BOPage
      *
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
-     *//*
+     */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<BlackIpBO> buildBOPageByDOPage(Page<BlackIpDO> entityPageDO);
 
-    *//**
+    /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
-     *//*
+     */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<BlackIpVO> buildVOPageByBOPage(Page<BlackIpBO> entityPageBO);*/
+    Page<BlackIpVO> buildVOPageByBOPage(Page<BlackIpBO> entityPageBO);
 }

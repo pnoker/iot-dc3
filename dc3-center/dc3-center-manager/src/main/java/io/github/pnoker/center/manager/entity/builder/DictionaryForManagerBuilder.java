@@ -22,62 +22,18 @@ import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
-import io.github.pnoker.common.entity.vo.DictionaryVO;
+import io.github.pnoker.common.entity.builder.DictionaryBuilder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
-
 /**
- * Dictionary Builder
+ * Dictionary For Manager Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring")
-public interface DictionaryBuilder {
-
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    DictionaryBO buildBOByVO(DictionaryVO entityVO);
-
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<DictionaryBO> buildBOListByVOList(List<DictionaryVO> entityVOList);
-
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    DictionaryVO buildVOByBO(DictionaryBO entityBO);
-
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<DictionaryVO> buildVOListByBOList(List<DictionaryBO> entityBOList);
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<DictionaryVO> buildVOPageByBOPage(Page<DictionaryBO> entityPageBO);
-
+public interface DictionaryForManagerBuilder extends DictionaryBuilder {
 
     // 驱动相关
 

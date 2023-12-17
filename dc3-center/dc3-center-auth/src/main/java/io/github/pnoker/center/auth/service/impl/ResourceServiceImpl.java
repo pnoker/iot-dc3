@@ -22,8 +22,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.ResourceBO;
+import io.github.pnoker.center.auth.entity.builder.ResourceBuilder;
+import io.github.pnoker.center.auth.entity.model.ResourceDO;
 import io.github.pnoker.center.auth.entity.query.ResourceQuery;
-import io.github.pnoker.center.auth.mapper.ResourceMapper;
+import io.github.pnoker.center.auth.manager.ResourceManager;
 import io.github.pnoker.center.auth.service.ResourceService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
@@ -33,6 +35,8 @@ import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 /**
  * @author linys
  * @since 2022.1.0
@@ -41,14 +45,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class ResourceServiceImpl implements ResourceService {
 
-    @javax.annotation.Resource
-    private ResourceMapper resourceMapper;
+    @Resource
+    private ResourceBuilder resourceBuilder;
+
+    @Resource
+    private ResourceManager resourceManager;
 
 
     @Override
     public void save(ResourceBO entityBO) {
-        //todo check if exists
-        if (resourceMapper.insert(entityBO) < 1) {
+        ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
+
+        if (!resourceManager.save(entityDO)) {
             throw new AddException("The resource add failed");
         }
     }
@@ -56,7 +64,7 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public void remove(Long id) {
         selectById(id);
-        if (resourceMapper.deleteById(id) < 1) {
+        if (!resourceManager.removeById(id)) {
             throw new DeleteException("The resource delete failed");
         }
     }
@@ -64,7 +72,8 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public void update(ResourceBO entityBO) {
         selectById(entityBO.getId());
-        if (resourceMapper.updateById(entityBO) < 1) {
+        ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
+        if (!resourceManager.updateById(entityDO)) {
             throw new UpdateException("The resource update failed");
         }
     }
@@ -79,18 +88,19 @@ public class ResourceServiceImpl implements ResourceService {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return resourceMapper.selectPage(PageUtil.page(entityQuery.getPage()), buildQueryWrapper(entityQuery));
+        Page<ResourceDO> entityPageDO = resourceManager.page(PageUtil.page(entityQuery.getPage()), buildQueryWrapper(entityQuery));
+        return resourceBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<ResourceBO> buildQueryWrapper(ResourceQuery pageQuery) {
-        LambdaQueryWrapper<ResourceBO> wrapper = Wrappers.<ResourceBO>query().lambda();
+    private LambdaQueryWrapper<ResourceDO> buildQueryWrapper(ResourceQuery pageQuery) {
+        LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
-            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getTenantId()), ResourceBO::getTenantId, pageQuery.getTenantId());
-            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getParentResourceId()), ResourceBO::getParentResourceId, pageQuery.getParentResourceId());
-            wrapper.like(CharSequenceUtil.isNotEmpty(pageQuery.getResourceName()), ResourceBO::getResourceName, pageQuery.getResourceName());
-            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceCode()), ResourceBO::getResourceCode, pageQuery.getResourceCode());
-            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getResourceTypeFlag()), ResourceBO::getResourceTypeFlag, pageQuery.getResourceTypeFlag());
-            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getEnableFlag()), ResourceBO::getEnableFlag, pageQuery.getEnableFlag());
+            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getTenantId()), ResourceDO::getTenantId, pageQuery.getTenantId());
+            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getParentResourceId()), ResourceDO::getParentResourceId, pageQuery.getParentResourceId());
+            wrapper.like(CharSequenceUtil.isNotEmpty(pageQuery.getResourceName()), ResourceDO::getResourceName, pageQuery.getResourceName());
+            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceCode()), ResourceDO::getResourceCode, pageQuery.getResourceCode());
+            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, pageQuery.getResourceTypeFlag());
+            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getEnableFlag()), ResourceDO::getEnableFlag, pageQuery.getEnableFlag());
 
         }
         return wrapper;

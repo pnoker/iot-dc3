@@ -22,7 +22,7 @@ import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
-import io.github.pnoker.center.manager.entity.builder.DictionaryBuilder;
+import io.github.pnoker.center.manager.entity.builder.DictionaryForManagerBuilder;
 import io.github.pnoker.center.manager.entity.query.*;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
@@ -41,7 +41,7 @@ import javax.annotation.Resource;
 public class DictionaryServiceImpl implements DictionaryService {
 
     @Resource
-    private DictionaryBuilder dictionaryBuilder;
+    private DictionaryForManagerBuilder dictionaryBuilder;
 
     @Resource
     private DriverService driverService;

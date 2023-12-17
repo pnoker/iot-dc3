@@ -16,13 +16,15 @@
 
 package io.github.pnoker.center.auth.entity.bean;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 public class AuthHeader {
     private String user;
     private String salt;

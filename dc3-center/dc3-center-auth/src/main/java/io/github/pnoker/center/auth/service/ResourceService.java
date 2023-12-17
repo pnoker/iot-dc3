@@ -21,7 +21,7 @@ import io.github.pnoker.center.auth.entity.query.ResourceQuery;
 import io.github.pnoker.common.base.Service;
 
 /**
- * resource service
+ * Resource Interface
  *
  * @author linys
  * @since 2022.1.0

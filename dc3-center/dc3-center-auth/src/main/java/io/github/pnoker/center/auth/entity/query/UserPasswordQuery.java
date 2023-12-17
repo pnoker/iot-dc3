@@ -16,24 +16,30 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
- * UserPassword DTO
+ * UserPassword Query
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@Schema(title = "DeviceQuery", description = "用户密码-查询")
-public class UserPasswordQuery extends UserPasswordBO {
+@Schema(title = "UserPasswordQuery", description = "用户密码-查询")
+public class UserPasswordQuery {
 
     private Pages page;
+
+    /**
+     * 登录密码
+     */
+    private String loginPassword;
 }

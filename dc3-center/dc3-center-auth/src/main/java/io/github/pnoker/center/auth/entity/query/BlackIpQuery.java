@@ -16,26 +16,41 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
- * BlackIp DTO
+ * BlackIp Query
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "BlackIpQuery", description = "禁止IP-查询")
-public class BlackIpQuery extends BlackIpBO {
+public class BlackIpQuery {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    /**
+     * 禁止IP
+     */
+    private String ip;
+
+    /**
+     * 使能标识
+     */
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    private Long tenantId;
 }
