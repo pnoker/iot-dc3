@@ -16,24 +16,35 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.bo.TenantBO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
- * User DTO
+ * User Query
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@Schema(title = "DeviceQuery", description = "租户-查询")
-public class TenantQuery extends TenantBO {
+@Schema(title = "TenantQuery", description = "租户-查询")
+public class TenantQuery {
 
     private Pages page;
+
+    private String tenantName;
+
+    private String tenantCode;
+
+    /**
+     * 使能标识
+     */
+    private EnableFlagEnum enableFlag;
 }

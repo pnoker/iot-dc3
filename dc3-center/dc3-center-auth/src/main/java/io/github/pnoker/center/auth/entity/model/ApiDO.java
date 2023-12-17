@@ -1,6 +1,10 @@
 package io.github.pnoker.center.auth.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import io.github.pnoker.center.auth.entity.bo.ext.ApiExtBO;
+import io.github.pnoker.common.constant.enums.ApiTypeFlagEnum;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,7 +36,7 @@ public class ApiDO implements Serializable {
      * Api接口类型标识
      */
     @TableField("api_type_flag")
-    private Byte apiTypeFlag;
+    private ApiTypeFlagEnum apiTypeFlag;
 
     /**
      * Api接口名称
@@ -49,14 +53,14 @@ public class ApiDO implements Serializable {
     /**
      * Api接口拓展信息
      */
-    @TableField("api_ext")
-    private String apiExt;
+    @TableField(value = "api_ext", typeHandler = JacksonTypeHandler.class)
+    private ApiExtBO apiExt;
 
     /**
      * 使能标识
      */
     @TableField("enable_flag")
-    private Byte enableFlag;
+    private EnableFlagEnum enableFlag;
 
     /**
      * 租户ID

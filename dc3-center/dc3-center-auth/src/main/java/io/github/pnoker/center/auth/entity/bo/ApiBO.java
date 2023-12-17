@@ -16,22 +16,14 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.center.auth.entity.bo.ext.ApiExtBO;
 import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.constant.enums.ApiTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
-import io.github.pnoker.common.valid.Add;
-import io.github.pnoker.common.valid.Auth;
-import io.github.pnoker.common.valid.Update;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * Api BO
@@ -39,10 +31,10 @@ import javax.validation.constraints.Pattern;
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class ApiBO extends BaseBO {
 
     /**
@@ -53,11 +45,6 @@ public class ApiBO extends BaseBO {
     /**
      * Api接口名称
      */
-    @NotBlank(message = "Api name can't be empty",
-            groups = {Add.class, Auth.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "Invalid api name",
-            groups = {Add.class, Update.class})
     private String apiName;
 
     /**
@@ -68,7 +55,6 @@ public class ApiBO extends BaseBO {
     /**
      * Api接口拓展信息
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
     private ApiExtBO apiExtBO;
 
     /**

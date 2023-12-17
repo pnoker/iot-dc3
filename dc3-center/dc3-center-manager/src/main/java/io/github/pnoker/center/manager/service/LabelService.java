@@ -21,7 +21,7 @@ import io.github.pnoker.center.manager.entity.query.LabelQuery;
 import io.github.pnoker.common.base.Service;
 
 /**
- * Label Service Interface
+ * Label Interface
  *
  * @author pnoker
  * @since 2022.1.0

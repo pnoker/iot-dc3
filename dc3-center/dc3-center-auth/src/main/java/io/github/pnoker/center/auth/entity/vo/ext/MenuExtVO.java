@@ -16,7 +16,9 @@
 
 package io.github.pnoker.center.auth.entity.vo.ext;
 
-import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
@@ -28,23 +30,33 @@ import java.io.Serializable;
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 public class MenuExtVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 菜单
+     * 标题
      */
-    private String icon;
-
-    /**
-     * Api接口编号，一般为URL的MD5编码
-     */
+    @Schema(description = "标题")
     private String title;
 
     /**
-     * Api接口拓展信息
+     * 图标
      */
+    @Schema(description = "图标")
+    private String icon;
+
+    /**
+     * 链接
+     */
+    @Schema(description = "链接")
     private String url;
+
+    /**
+     * 描述
+     */
+    @Schema(description = "描述")
+    private String remark;
 }

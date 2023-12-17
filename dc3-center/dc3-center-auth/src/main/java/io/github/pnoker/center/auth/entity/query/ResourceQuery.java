@@ -16,24 +16,72 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.auth.entity.bo.ResourceBO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.ResourceTypeFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
  * @author linys
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@Schema(title = "DeviceQuery", description = "资源-查询")
-public class ResourceQuery extends ResourceBO {
+@Schema(title = "ResourceQuery", description = "资源-查询")
+public class ResourceQuery {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    /**
+     * 权限资源父级ID
+     */
+    private String parentResourceId;
+
+    /**
+     * 权限资源名称
+     */
+    private String resourceName;
+
+    /**
+     * 权限资源编号
+     */
+    private String resourceCode;
+
+    /**
+     * 权限资源类型标识
+     */
+    private ResourceTypeFlagEnum resourceTypeFlag;
+
+    /**
+     * 权限资源范围标识，参考：ResourceScopeFlagEnum
+     * <ul>
+     *     <li>0x01：新增</li>
+     *     <li>0x02：删除</li>
+     *     <li>0x04：更新</li>
+     *     <li>0x08：查询</li>
+     * </ul>
+     * 具有多个权限范围可以累加
+     */
+    private Byte resourceScopeFlag;
+
+    /**
+     * 权限资源实体ID
+     */
+    private String entityId;
+
+    /**
+     * 使能标识
+     */
+    private EnableFlagEnum enableFlag;
+
+    /**
+     * 租户ID
+     */
+    private Long tenantId;
 }

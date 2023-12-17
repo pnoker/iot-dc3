@@ -21,9 +21,13 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
-import io.github.pnoker.center.auth.mapper.BlackIpMapper;
-import io.github.pnoker.center.auth.mapper.TenantMapper;
-import io.github.pnoker.center.auth.mapper.UserLoginMapper;
+import io.github.pnoker.center.auth.entity.builder.DictionaryForAuthBuilder;
+import io.github.pnoker.center.auth.entity.model.BlackIpDO;
+import io.github.pnoker.center.auth.entity.model.TenantDO;
+import io.github.pnoker.center.auth.entity.model.UserLoginDO;
+import io.github.pnoker.center.auth.manager.BlackIpManager;
+import io.github.pnoker.center.auth.manager.TenantManager;
+import io.github.pnoker.center.auth.manager.UserLoginManager;
 import io.github.pnoker.center.auth.service.DictionaryService;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import lombok.extern.slf4j.Slf4j;
@@ -42,18 +46,21 @@ import java.util.List;
 public class DictionaryServiceImpl implements DictionaryService {
 
     @Resource
-    private TenantMapper tenantMapper;
+    private DictionaryForAuthBuilder dictionaryBuilder;
+
     @Resource
-    private UserLoginMapper userLoginMapper;
+    private TenantManager tenantManager;
     @Resource
-    private BlackIpMapper blackIpMapper;
+    private UserLoginManager userLoginManager;
+    @Resource
+    private BlackIpManager blackIpManager;
 
     @Override
     public List<DictionaryBO> tenantDictionary() {
         List<DictionaryBO> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<TenantBO> wrapper = Wrappers.<TenantBO>query().lambda();
-        List<TenantBO> tenantBOList = tenantMapper.selectList(wrapper);
-        for (TenantBO tenantBO : tenantBOList) {
+        LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
+        List<TenantDO> tenantBOList = tenantManager.list(wrapper);
+        for (TenantDO tenantBO : tenantBOList) {
             DictionaryBO driverDictionary = new DictionaryBO();
             driverDictionary.setLabel(tenantBO.getTenantName());
             driverDictionary.setValue(tenantBO.getId());
@@ -63,11 +70,11 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    public List<DictionaryBO> userDictionary(Long tenantId) {
+    public List<DictionaryBO> userLoginDictionary(Long tenantId) {
         List<DictionaryBO> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<UserLoginBO> wrapper = Wrappers.<UserLoginBO>query().lambda();
-        List<UserLoginBO> userLoginList = userLoginMapper.selectList(wrapper);
-        for (UserLoginBO userLogin : userLoginList) {
+        LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
+        List<UserLoginDO> userLoginList = userLoginManager.list(wrapper);
+        for (UserLoginDO userLogin : userLoginList) {
             DictionaryBO driverDictionary = new DictionaryBO();
             driverDictionary.setLabel(userLogin.getLoginName());
             driverDictionary.setValue(userLogin.getId());
@@ -79,9 +86,9 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Override
     public List<DictionaryBO> blackIpDictionary(Long tenantId) {
         List<DictionaryBO> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<BlackIpBO> wrapper = Wrappers.<BlackIpBO>query().lambda();
-        List<BlackIpBO> blackIpBOList = blackIpMapper.selectList(wrapper);
-        for (BlackIpBO blackIpBO : blackIpBOList) {
+        LambdaQueryWrapper<BlackIpDO> wrapper = Wrappers.<BlackIpDO>query().lambda();
+        List<BlackIpDO> blackIpBOList = blackIpManager.list(wrapper);
+        for (BlackIpDO blackIpBO : blackIpBOList) {
             DictionaryBO driverDictionary = new DictionaryBO();
             driverDictionary.setLabel(blackIpBO.getIp());
             driverDictionary.setValue(blackIpBO.getId());

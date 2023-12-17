@@ -17,13 +17,13 @@
 package io.github.pnoker.center.manager.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.builder.DictionaryBuilder;
 import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
 import io.github.pnoker.center.manager.service.DictionaryService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
+import io.github.pnoker.common.entity.builder.DictionaryBuilder;
 import io.github.pnoker.common.entity.vo.DictionaryVO;
 import io.github.pnoker.common.valid.Parent;
 import lombok.extern.slf4j.Slf4j;

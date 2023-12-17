@@ -21,7 +21,7 @@ import io.github.pnoker.center.manager.entity.query.LabelBindQuery;
 import io.github.pnoker.common.base.Service;
 
 /**
- * LabelBind Service Interface
+ * LabelBind Interface
  *
  * @author pnoker
  * @since 2022.1.0

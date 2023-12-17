@@ -19,7 +19,7 @@ package io.github.pnoker.center.manager.service;
 import io.github.pnoker.common.entity.dto.DriverMetadataDTO;
 
 /**
- * BatchService Interface
+ * BatchInterface
  *
  * @author pnoker
  * @since 2022.1.0

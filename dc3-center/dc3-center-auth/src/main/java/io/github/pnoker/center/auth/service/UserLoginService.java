@@ -21,7 +21,7 @@ import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
 import io.github.pnoker.common.base.Service;
 
 /**
- * User Interface
+ * UserLogin Interface
  *
  * @author pnoker
  * @since 2022.1.0

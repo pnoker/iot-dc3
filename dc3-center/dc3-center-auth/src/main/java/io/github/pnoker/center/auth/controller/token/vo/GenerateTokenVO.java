@@ -18,7 +18,8 @@ package io.github.pnoker.center.auth.controller.token.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
@@ -29,7 +30,8 @@ import javax.validation.constraints.NotBlank;
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @Schema(title = "生成令牌请求体")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)

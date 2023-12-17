@@ -22,8 +22,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
+import io.github.pnoker.center.auth.entity.builder.UserLoginBuilder;
+import io.github.pnoker.center.auth.entity.model.UserLoginDO;
 import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
-import io.github.pnoker.center.auth.mapper.UserLoginMapper;
+import io.github.pnoker.center.auth.manager.UserLoginManager;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
@@ -47,7 +49,10 @@ import javax.annotation.Resource;
 public class UserLoginServiceImpl implements UserLoginService {
 
     @Resource
-    private UserLoginMapper userLoginMapper;
+    private UserLoginBuilder userLoginBuilder;
+
+    @Resource
+    private UserLoginManager userLoginManager;
 
     @Override
     @Transactional
@@ -58,8 +63,9 @@ public class UserLoginServiceImpl implements UserLoginService {
             throw new DuplicateException("The user already exists with login name: {}", entityBO.getLoginName());
         }
 
+        UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
         // 插入 user 数据，并返回插入后的 user
-        if (userLoginMapper.insert(entityBO) < 1) {
+        if (!userLoginManager.save(entityDO)) {
             throw new AddException("The user add failed: {}", entityBO.toString());
         }
     }
@@ -72,7 +78,7 @@ public class UserLoginServiceImpl implements UserLoginService {
             throw new NotFoundException("The user login does not exist");
         }
 
-        if (userLoginMapper.deleteById(id) < 1) {
+        if (!userLoginManager.removeById(id)) {
             throw new DeleteException("The user login delete failed");
         }
     }
@@ -85,7 +91,8 @@ public class UserLoginServiceImpl implements UserLoginService {
         }
         entityBO.setLoginName(null);
         entityBO.setOperateTime(null);
-        if (userLoginMapper.updateById(entityBO) < 1) {
+        UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
+        if (!userLoginManager.updateById(entityDO)) {
             throw new UpdateException("The user login update failed");
         }
     }
@@ -100,7 +107,8 @@ public class UserLoginServiceImpl implements UserLoginService {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return userLoginMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<UserLoginDO> entityPageBO = userLoginManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return userLoginBuilder.buildBOPageByDOPage(entityPageBO);
     }
 
     @Override
@@ -112,15 +120,15 @@ public class UserLoginServiceImpl implements UserLoginService {
             return null;
         }
 
-        LambdaQueryWrapper<UserLoginBO> wrapper = Wrappers.<UserLoginBO>query().lambda();
-        wrapper.eq(UserLoginBO::getLoginName, loginName);
-        wrapper.eq(UserLoginBO::getEnableFlag, EnableFlagEnum.ENABLE);
+        LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
+        wrapper.eq(UserLoginDO::getLoginName, loginName);
+        wrapper.eq(UserLoginDO::getEnableFlag, EnableFlagEnum.ENABLE);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        UserLoginBO userLogin = userLoginMapper.selectOne(wrapper);
+        UserLoginDO userLogin = userLoginManager.getOne(wrapper);
         if (ObjectUtil.isNull(userLogin)) {
             throw new NotFoundException();
         }
-        return userLogin;
+        return userLoginBuilder.buildBOByDO(userLogin);
     }
 
     @Override
@@ -133,10 +141,10 @@ public class UserLoginServiceImpl implements UserLoginService {
         return false;
     }
 
-    private LambdaQueryWrapper<UserLoginBO> fuzzyQuery(UserLoginQuery query) {
-        LambdaQueryWrapper<UserLoginBO> wrapper = Wrappers.<UserLoginBO>query().lambda();
+    private LambdaQueryWrapper<UserLoginDO> fuzzyQuery(UserLoginQuery query) {
+        LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getLoginName()), UserLoginBO::getLoginName, query.getLoginName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getLoginName()), UserLoginDO::getLoginName, query.getLoginName());
         }
         return wrapper;
     }

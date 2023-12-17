@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,7 +46,7 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         // do something to process your mqtt messages
         log.info(JsonUtil.toPrettyJsonString(mqttMessage));
         PointValueDTO pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValueDTO.class);
-        pointValue.setOriginTime(new Date());
+        pointValue.setOriginTime(LocalDateTime.now());
         driverSenderService.pointValueSender(pointValue);
     }
 
@@ -56,7 +57,7 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         List<PointValueDTO> pointValues = mqttMessageList.stream()
                 .map(mqttMessage -> {
                     PointValueDTO pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValueDTO.class);
-                    pointValue.setOriginTime(new Date());
+                    pointValue.setOriginTime(LocalDateTime.now());
                     return pointValue;
                 }).collect(Collectors.toList());
         driverSenderService.pointValueSender(pointValues);

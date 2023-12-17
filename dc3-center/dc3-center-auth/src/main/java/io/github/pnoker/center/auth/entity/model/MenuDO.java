@@ -1,6 +1,10 @@
 package io.github.pnoker.center.auth.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import io.github.pnoker.center.auth.entity.bo.ext.MenuExtBO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.MenuTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,7 +42,7 @@ public class MenuDO implements Serializable {
      * 菜单类型标识
      */
     @TableField("menu_type_flag")
-    private Byte menuTypeFlag;
+    private MenuTypeFlagEnum menuTypeFlag;
 
     /**
      * 菜单名称
@@ -67,14 +71,14 @@ public class MenuDO implements Serializable {
     /**
      * 菜单拓展信息
      */
-    @TableField("menu_ext")
-    private String menuExt;
+    @TableField(value = "menu_ext", typeHandler = JacksonTypeHandler.class)
+    private MenuExtBO menuExt;
 
     /**
      * 使能标识
      */
     @TableField("enable_flag")
-    private Byte enableFlag;
+    private EnableFlagEnum enableFlag;
 
     /**
      * 租户ID

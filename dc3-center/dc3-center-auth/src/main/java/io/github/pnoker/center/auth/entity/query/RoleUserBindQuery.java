@@ -16,24 +16,33 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.auth.entity.bo.RoleUserBindBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
  * @author linys
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@Schema(title = "DeviceQuery", description = "角色用户绑定-查询")
-public class RoleUserBindQuery extends RoleUserBindBO {
+@Schema(title = "RoleUserBindQuery", description = "角色用户绑定-查询")
+public class RoleUserBindQuery {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    /**
+     * 角色ID
+     */
+    private String roleId;
+
+    /**
+     * 用户ID
+     */
+    private Long userId;
 }

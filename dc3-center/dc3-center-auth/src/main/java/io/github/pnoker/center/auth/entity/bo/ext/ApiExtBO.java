@@ -16,8 +16,9 @@
 
 package io.github.pnoker.center.auth.entity.bo.ext;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
@@ -25,24 +26,32 @@ import java.io.Serializable;
 /**
  * Api BO
  * ApiExt BO
+ * <p>
+ * 接口拓展信息
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
 public class ApiExtBO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Api接口编号，一般为URL的MD5编码
+     * 标题
      */
     private String title;
 
     /**
-     * Api接口拓展信息
+     * 链接
      */
     private String url;
+
+    /**
+     * 描述
+     */
+    private String remark;
 
 }

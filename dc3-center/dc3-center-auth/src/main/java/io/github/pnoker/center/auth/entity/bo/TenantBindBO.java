@@ -17,14 +17,10 @@
 package io.github.pnoker.center.auth.entity.bo;
 
 import io.github.pnoker.common.base.BaseBO;
-import io.github.pnoker.common.valid.Add;
-import io.github.pnoker.common.valid.Update;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.NotBlank;
 
 /**
  * TenantBind BO
@@ -32,23 +28,19 @@ import javax.validation.constraints.NotBlank;
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class TenantBindBO extends BaseBO {
 
     /**
      * 租户ID
      */
-    @NotBlank(message = "Tenant id can't be empty",
-            groups = {Add.class, Update.class})
     private Long tenantId;
 
     /**
      * 用户ID
      */
-    @NotBlank(message = "User id can't be empty",
-            groups = {Add.class, Update.class})
     private Long userId;
 }

@@ -21,7 +21,7 @@ import io.github.pnoker.center.manager.entity.query.GroupQuery;
 import io.github.pnoker.common.base.Service;
 
 /**
- * Group Service Interface
+ * Group Interface
  *
  * @author pnoker
  * @since 2022.1.0

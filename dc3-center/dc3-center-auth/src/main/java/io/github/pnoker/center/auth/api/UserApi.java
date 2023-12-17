@@ -28,6 +28,7 @@ import io.github.pnoker.center.auth.entity.bo.UserBO;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.utils.BuilderUtil;
+import io.github.pnoker.common.utils.JsonUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -84,8 +85,8 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
         builder.setUserName(entityBO.getUserName());
         builder.setPhone(entityBO.getPhone());
         builder.setEmail(entityBO.getEmail());
-        builder.setSocialExt(entityBO.getSocialExt());
-        builder.setIdentityExt(entityBO.getIdentityExt());
+        builder.setSocialExt(JsonUtil.toJsonString(entityBO.getSocialExt()));
+        builder.setIdentityExt(JsonUtil.toJsonString(entityBO.getIdentityExt()));
         return builder.build();
     }
 }

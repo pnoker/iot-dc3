@@ -741,7 +741,7 @@ drop table if exists dc3_black_ip;
 create table dc3_black_ip
 (
     id            bigint unsigned auto_increment primary key not null comment '主键ID',
-    ip            varchar(128) default ''                   not null comment '黑IP',
+    ip            varchar(128) default ''                   not null comment '禁止IP',
     enable_flag   tinyint(4) default 1 not null comment '使能标识',
     tenant_id     bigint       default 0                    not null comment '租户ID',
     remark        varchar(512) default ''                   not null comment '描述',

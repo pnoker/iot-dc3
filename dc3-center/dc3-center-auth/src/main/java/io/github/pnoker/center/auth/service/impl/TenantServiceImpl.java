@@ -22,8 +22,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
+import io.github.pnoker.center.auth.entity.builder.TenantBuilder;
+import io.github.pnoker.center.auth.entity.model.TenantDO;
 import io.github.pnoker.center.auth.entity.query.TenantQuery;
-import io.github.pnoker.center.auth.mapper.TenantMapper;
+import io.github.pnoker.center.auth.manager.TenantManager;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
@@ -46,7 +48,10 @@ import javax.annotation.Resource;
 public class TenantServiceImpl implements TenantService {
 
     @Resource
-    private TenantMapper tenantMapper;
+    private TenantBuilder tenantBuilder;
+
+    @Resource
+    private TenantManager tenantManager;
 
     @Override
     public void save(TenantBO entityBO) {
@@ -54,8 +59,9 @@ public class TenantServiceImpl implements TenantService {
         if (ObjectUtil.isNotNull(select)) {
             throw new DuplicateException("The tenant already exists");
         }
+        TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
 
-        if (tenantMapper.insert(entityBO) < 1) {
+        if (!tenantManager.save(entityDO)) {
             throw new AddException("The tenant {} add failed", entityBO.getTenantName());
         }
     }
@@ -67,7 +73,7 @@ public class TenantServiceImpl implements TenantService {
             throw new NotFoundException("The tenant does not exist");
         }
 
-        if (tenantMapper.deleteById(id) < 1) {
+        if (!tenantManager.removeById(id)) {
             throw new DeleteException("The tenant delete failed");
         }
     }
@@ -76,7 +82,8 @@ public class TenantServiceImpl implements TenantService {
     public void update(TenantBO entityBO) {
         entityBO.setTenantName(null);
         entityBO.setOperateTime(null);
-        if (tenantMapper.updateById(entityBO) < 1) {
+        TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
+        if (!tenantManager.updateById(entityDO)) {
             throw new UpdateException("The tenant update failed");
         }
     }
@@ -88,11 +95,12 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public TenantBO selectByCode(String code) {
-        LambdaQueryWrapper<TenantBO> wrapper = Wrappers.<TenantBO>query().lambda();
-        wrapper.eq(TenantBO::getTenantCode, code);
-        wrapper.eq(TenantBO::getEnableFlag, EnableFlagEnum.ENABLE);
+        LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
+        wrapper.eq(TenantDO::getTenantCode, code);
+        wrapper.eq(TenantDO::getEnableFlag, EnableFlagEnum.ENABLE);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        return tenantMapper.selectOne(wrapper);
+        TenantDO entityDO = tenantManager.getOne(wrapper);
+        return tenantBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -100,13 +108,14 @@ public class TenantServiceImpl implements TenantService {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        return tenantMapper.selectPage(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<TenantDO> entityPageDO = tenantManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return tenantBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<TenantBO> fuzzyQuery(TenantQuery query) {
-        LambdaQueryWrapper<TenantBO> wrapper = Wrappers.<TenantBO>query().lambda();
+    private LambdaQueryWrapper<TenantDO> fuzzyQuery(TenantQuery query) {
+        LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
         if (ObjectUtil.isNotNull(query)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getTenantName()), TenantBO::getTenantName, query.getTenantName());
+            wrapper.like(CharSequenceUtil.isNotEmpty(query.getTenantName()), TenantDO::getTenantName, query.getTenantName());
         }
         return wrapper;
     }

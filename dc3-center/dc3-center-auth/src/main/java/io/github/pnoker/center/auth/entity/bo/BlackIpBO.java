@@ -18,15 +18,10 @@ package io.github.pnoker.center.auth.entity.bo;
 
 import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
-import io.github.pnoker.common.valid.Add;
-import io.github.pnoker.common.valid.Update;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * BlackIp BO
@@ -34,17 +29,15 @@ import javax.validation.constraints.Pattern;
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class BlackIpBO extends BaseBO {
 
     /**
-     * 黑IP
+     * 禁止IP
      */
-    @NotBlank(message = "Ip can't be empty", groups = {Add.class})
-    @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$", message = "Invalid ip", groups = {Add.class, Update.class})
     private String ip;
 
     /**

@@ -17,16 +17,10 @@
 package io.github.pnoker.center.auth.entity.bo;
 
 import io.github.pnoker.common.base.BaseBO;
-import io.github.pnoker.common.valid.Add;
-import io.github.pnoker.common.valid.Auth;
-import io.github.pnoker.common.valid.Update;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * UserPassword BO
@@ -34,19 +28,14 @@ import javax.validation.constraints.Pattern;
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 public class UserPasswordBO extends BaseBO {
 
     /**
      * 登录密码
      */
-    @NotBlank(message = "Login password can't be empty",
-            groups = {Add.class, Auth.class})
-    @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$",
-            message = "Invalid login password",
-            groups = {Add.class, Update.class})
     private String loginPassword;
 }

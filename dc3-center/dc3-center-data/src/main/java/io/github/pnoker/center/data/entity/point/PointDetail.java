@@ -18,7 +18,8 @@ package io.github.pnoker.center.data.entity.point;
 
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -30,7 +31,8 @@ import javax.validation.constraints.Pattern;
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 public class PointDetail {
 
     @NotBlank(message = "device name can't be empty", groups = {Add.class})

@@ -16,26 +16,36 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**
- * TenantBind DTO
+ * TenantBind Query
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor
-@Schema(title = "DeviceQuery", description = "租户绑定-查询")
-public class TenantBindQuery extends TenantBindBO {
+@Schema(title = "TenantBindQuery", description = "租户绑定-查询")
+public class TenantBindQuery {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Pages page;
+
+    /**
+     * 租户ID
+     */
+    private Long tenantId;
+
+    /**
+     * 用户ID
+     */
+    private Long userId;
+
 }

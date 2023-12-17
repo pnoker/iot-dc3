@@ -17,12 +17,14 @@
 package io.github.pnoker.driver.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class WeatherInfo {
     /**
@@ -51,7 +53,8 @@ public class WeatherInfo {
      */
     private List<Live> lives;
 
-    @Data
+    @Getter
+    @Setter
     @NoArgsConstructor
     public static class Live {
         /**
