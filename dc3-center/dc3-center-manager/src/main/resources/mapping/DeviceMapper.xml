@@ -25,9 +25,12 @@
         <result column="device_code" property="deviceCode"/>
         <result column="driver_id" property="driverId"/>
         <result column="group_id" property="groupId"/>
+        <result column="device_ext" property="deviceExt"/>
         <result column="enable_flag" property="enableFlag"/>
         <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
+        <result column="signature" property="signature"/>
+        <result column="version" property="version"/>
         <result column="creator_id" property="creatorId"/>
         <result column="creator_name" property="creatorName"/>
         <result column="create_time" property="createTime"/>
@@ -40,7 +43,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , device_name, device_code, driver_id, group_id, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , device_name, device_code, driver_id, group_id, device_ext, enable_flag, tenant_id, remark, signature, version, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
     <select id="selectPageWithProfile" resultType="io.github.pnoker.center.manager.entity.model.DeviceDO">
@@ -50,9 +53,12 @@
         dd.device_code,
         dd.driver_id,
         dd.group_id,
+        dd.device_ext,
         dd.enable_flag,
         dd.tenant_id,
         dd.remark,
+        dd.signature,
+        dd.version,
         dd.creator_id,
         dd.creator_name,
         dd.create_time,

@@ -18,14 +18,11 @@ package io.github.pnoker.center.auth.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
-import io.github.pnoker.center.auth.entity.bo.TenantBO;
-import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.entity.builder.DictionaryForAuthBuilder;
-import io.github.pnoker.center.auth.entity.model.BlackIpDO;
+import io.github.pnoker.center.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.center.auth.entity.model.TenantDO;
 import io.github.pnoker.center.auth.entity.model.UserLoginDO;
-import io.github.pnoker.center.auth.manager.BlackIpManager;
+import io.github.pnoker.center.auth.manager.LimitedIpManager;
 import io.github.pnoker.center.auth.manager.TenantManager;
 import io.github.pnoker.center.auth.manager.UserLoginManager;
 import io.github.pnoker.center.auth.service.DictionaryService;
@@ -53,7 +50,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Resource
     private UserLoginManager userLoginManager;
     @Resource
-    private BlackIpManager blackIpManager;
+    private LimitedIpManager limitedIpManager;
 
     @Override
     public List<DictionaryBO> tenantDictionary() {
@@ -84,14 +81,14 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    public List<DictionaryBO> blackIpDictionary(Long tenantId) {
+    public List<DictionaryBO> limitedIpDictionary(Long tenantId) {
         List<DictionaryBO> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<BlackIpDO> wrapper = Wrappers.<BlackIpDO>query().lambda();
-        List<BlackIpDO> blackIpBOList = blackIpManager.list(wrapper);
-        for (BlackIpDO blackIpBO : blackIpBOList) {
+        LambdaQueryWrapper<LimitedIpDO> wrapper = Wrappers.<LimitedIpDO>query().lambda();
+        List<LimitedIpDO> limitedIpBOList = limitedIpManager.list(wrapper);
+        for (LimitedIpDO limitedIpBO : limitedIpBOList) {
             DictionaryBO driverDictionary = new DictionaryBO();
-            driverDictionary.setLabel(blackIpBO.getIp());
-            driverDictionary.setValue(blackIpBO.getId());
+            driverDictionary.setLabel(limitedIpBO.getIp());
+            driverDictionary.setValue(limitedIpBO.getId());
             dictionaryList.add(driverDictionary);
         }
         return dictionaryList;

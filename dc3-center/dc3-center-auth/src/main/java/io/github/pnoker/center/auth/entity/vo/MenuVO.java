@@ -94,7 +94,7 @@ public class MenuVO extends BaseVO {
      * 菜单拓展信息
      */
     @Schema(description = "菜单拓展信息")
-    private MenuExtVO menuExtVO;
+    private MenuExtVO menuExt;
 
     /**
      * 使能标识

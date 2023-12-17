@@ -1,0 +1,44 @@
+[
+  {
+    "serviceName": "dc3-driver-virtual",
+    "profiles": [
+      {
+        "name": "Virtual-Profile",
+        "share": true,
+        "driverConfig": {
+          "host": "localhost",
+          "port": "9000"
+        },
+        "points": [
+          {
+            "name": "Virtual-Point-String",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "format": "%.3f",
+            "unit": "-"
+          }
+        ],
+        "pointConfig": {
+          "Virtual-Point-String": {
+            "tag": "tag-string"
+          }
+        },
+        "groups": [
+          {
+            "name": "Virtual-Group",
+            "devices": [
+              {
+                "name": "Virtual-Device1",
+                "multi": false
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

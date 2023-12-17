@@ -54,6 +54,12 @@ public class DeviceDO implements Serializable {
     private Long groupId;
 
     /**
+     * 设备拓展信息
+     */
+    @TableField("device_ext")
+    private String deviceExt;
+
+    /**
      * 使能标识
      */
     @TableField("enable_flag")
@@ -70,6 +76,18 @@ public class DeviceDO implements Serializable {
      */
     @TableField("remark")
     private String remark;
+
+    /**
+     * 签名
+     */
+    @TableField("signature")
+    private String signature;
+
+    /**
+     * 版本
+     */
+    @TableField("version")
+    private Integer version;
 
     /**
      * 创建者ID

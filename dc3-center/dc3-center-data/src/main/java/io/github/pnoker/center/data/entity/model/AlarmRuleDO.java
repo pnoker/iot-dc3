@@ -42,10 +42,10 @@ public class AlarmRuleDO implements Serializable {
     private Byte alarmTypeFlag;
 
     /**
-     * 报警规则拓展信息
+     * 报警规则
      */
-    @TableField("alarm_rule_ext")
-    private String alarmRuleExt;
+    @TableField("alarm_rule")
+    private String alarmRule;
 
     /**
      * 使能标识

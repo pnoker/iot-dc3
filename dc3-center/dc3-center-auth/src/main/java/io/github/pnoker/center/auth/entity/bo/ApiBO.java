@@ -55,7 +55,7 @@ public class ApiBO extends BaseBO {
     /**
      * Api接口拓展信息
      */
-    private ApiExtBO apiExtBO;
+    private ApiExtBO apiExt;
 
     /**
      * 使能标识

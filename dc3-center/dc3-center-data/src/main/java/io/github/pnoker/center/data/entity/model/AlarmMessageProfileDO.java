@@ -42,16 +42,10 @@ public class AlarmMessageProfileDO implements Serializable {
     private Byte alarmLevel;
 
     /**
-     * 报警内容
+     * 报警信息
      */
     @TableField("alarm_content")
     private String alarmContent;
-
-    /**
-     * 报警内容拓展信息
-     */
-    @TableField("alarm_content_ext")
-    private String alarmContentExt;
 
     /**
      * 使能标识

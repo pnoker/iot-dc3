@@ -1,0 +1,121 @@
+[
+  {
+    "serviceName": "dc3-driver-opc-ua",
+    "profiles": [
+      {
+        "name": "OpcUa-Profile",
+        "share": false,
+        "driverConfig": {
+          "host": "localhost",
+          "port": "53530",
+          "path": "/OPCUA/SimulationServer"
+        },
+        "points": [
+          {
+            "name": "OpcUa-Point-String",
+            "type": "string",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "OpcUa-Point-Boolean",
+            "type": "boolean",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "OpcUa-Point-Int",
+            "type": "int",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "OpcUa-Point-Long",
+            "type": "long",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "OpcUa-Point-Float",
+            "type": "float",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "format": "%.3f",
+            "unit": "-"
+          },
+          {
+            "name": "OpcUa-Point-Double",
+            "type": "double",
+            "rw": 0,
+            "base": 0,
+            "minimum": -999999,
+            "maximum": 999999,
+            "multiple": 1,
+            "format": "%.3f",
+            "unit": "-"
+          }
+        ],
+        "groups": [
+          {
+            "name": "OpcUa-Group",
+            "devices": [
+              {
+                "name": "OpcUa-Device",
+                "multi": false,
+                "pointConfig": {
+                  "OpcUa-Point-String": {
+                    "namespace": "5",
+                    "tag": "tag-string"
+                  },
+                  "OpcUa-Point-Boolean": {
+                    "namespace": "5",
+                    "tag": "tag-boolean"
+                  },
+                  "OpcUa-Point-Int": {
+                    "namespace": "5",
+                    "tag": "tag-int"
+                  },
+                  "OpcUa-Point-Long": {
+                    "namespace": "5",
+                    "tag": "tag-long"
+                  },
+                  "OpcUa-Point-Float": {
+                    "namespace": "5",
+                    "tag": "tag-float"
+                  },
+                  "OpcUa-Point-Double": {
+                    "namespace": "5",
+                    "tag": "tag-double"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

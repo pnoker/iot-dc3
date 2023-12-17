@@ -30,13 +30,13 @@ public class PointAttributeConfigDO implements Serializable {
     private Long id;
 
     /**
-     * 位号属性ID
+     * 位号配置ID
      */
     @TableField("point_attribute_id")
     private Long pointAttributeId;
 
     /**
-     * 位号属性配置值
+     * 位号配置值
      */
     @TableField("config_value")
     private String configValue;
@@ -70,6 +70,18 @@ public class PointAttributeConfigDO implements Serializable {
      */
     @TableField("remark")
     private String remark;
+
+    /**
+     * 签名
+     */
+    @TableField("signature")
+    private String signature;
+
+    /**
+     * 版本
+     */
+    @TableField("version")
+    private Integer version;
 
     /**
      * 创建者ID

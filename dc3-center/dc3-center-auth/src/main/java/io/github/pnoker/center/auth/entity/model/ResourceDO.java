@@ -67,6 +67,12 @@ public class ResourceDO implements Serializable {
     private Long entityId;
 
     /**
+     * 资源拓展信息
+     */
+    @TableField("resource_ext")
+    private String resourceExt;
+
+    /**
      * 使能标识
      */
     @TableField("enable_flag")

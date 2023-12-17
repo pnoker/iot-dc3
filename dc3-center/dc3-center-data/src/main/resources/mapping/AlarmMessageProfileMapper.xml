@@ -8,7 +8,6 @@
         <result column="alarm_title" property="alarmTitle"/>
         <result column="alarm_level" property="alarmLevel"/>
         <result column="alarm_content" property="alarmContent"/>
-        <result column="alarm_content_ext" property="alarmContentExt"/>
         <result column="enable_flag" property="enableFlag"/>
         <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
@@ -24,7 +23,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , alarm_title, alarm_level, alarm_content, alarm_content_ext, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , alarm_title, alarm_level, alarm_content, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
 </mapper>

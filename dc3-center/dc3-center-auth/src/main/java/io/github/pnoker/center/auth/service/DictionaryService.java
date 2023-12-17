@@ -49,6 +49,6 @@ public interface DictionaryService {
      * @param tenantId 租户ID
      * @return Dictionary Array
      */
-    List<DictionaryBO> blackIpDictionary(Long tenantId);
+    List<DictionaryBO> limitedIpDictionary(Long tenantId);
 
 }

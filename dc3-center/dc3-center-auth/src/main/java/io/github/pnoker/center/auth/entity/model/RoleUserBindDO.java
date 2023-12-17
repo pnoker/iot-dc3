@@ -41,6 +41,12 @@ public class RoleUserBindDO implements Serializable {
     private Long userId;
 
     /**
+     * 租户ID
+     */
+    @TableField("tenant_id")
+    private Long tenantId;
+
+    /**
      * 描述
      */
     @TableField("remark")

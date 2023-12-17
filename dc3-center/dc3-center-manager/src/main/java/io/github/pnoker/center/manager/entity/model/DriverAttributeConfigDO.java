@@ -66,6 +66,18 @@ public class DriverAttributeConfigDO implements Serializable {
     private String remark;
 
     /**
+     * 签名
+     */
+    @TableField("signature")
+    private String signature;
+
+    /**
+     * 版本
+     */
+    @TableField("version")
+    private Integer version;
+
+    /**
      * 创建者ID
      */
     @TableField("creator_id")

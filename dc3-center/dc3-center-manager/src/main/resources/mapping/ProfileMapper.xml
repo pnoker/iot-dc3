@@ -26,9 +26,12 @@
         <result column="profile_share_flag" property="profileShareFlag"/>
         <result column="profile_type_flag" property="profileTypeFlag"/>
         <result column="group_id" property="groupId"/>
+        <result column="profile_ext" property="profileExt"/>
         <result column="enable_flag" property="enableFlag"/>
         <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
+        <result column="signature" property="signature"/>
+        <result column="version" property="version"/>
         <result column="creator_id" property="creatorId"/>
         <result column="creator_name" property="creatorName"/>
         <result column="create_time" property="createTime"/>
@@ -41,7 +44,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , profile_name, profile_code, profile_share_flag, profile_type_flag, group_id, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , profile_name, profile_code, profile_share_flag, profile_type_flag, group_id, profile_ext, enable_flag, tenant_id, remark, signature, version, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
     <select id="selectPageWithDevice" resultType="io.github.pnoker.center.manager.entity.model.ProfileDO">
@@ -51,9 +54,12 @@
         dp.profile_share_flag,
         dp.profile_type_flag,
         dp.group_id,
+        dp.profile_ext,
         dp.enable_flag,
         dp.tenant_id,
         dp.remark,
+        dp.signature,
+        dp.version,
         dp.creator_id,
         dp.creator_name,
         dp.create_time,

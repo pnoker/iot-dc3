@@ -48,6 +48,12 @@ public class RoleDO implements Serializable {
     private String roleCode;
 
     /**
+     * 角色拓展信息
+     */
+    @TableField("role_ext")
+    private String roleExt;
+
+    /**
      * 使能标识
      */
     @TableField("enable_flag")

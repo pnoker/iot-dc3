@@ -61,6 +61,12 @@ public class DriverDO implements Serializable {
     private DriverTypeFlagEnum driverTypeFlag;
 
     /**
+     * 驱动拓展信息
+     */
+    @TableField("driver_ext")
+    private String driverExt;
+
+    /**
      * 使能标识
      */
     @TableField("enable_flag")
@@ -77,6 +83,18 @@ public class DriverDO implements Serializable {
      */
     @TableField("remark")
     private String remark;
+
+    /**
+     * 签名
+     */
+    @TableField("signature")
+    private String signature;
+
+    /**
+     * 版本
+     */
+    @TableField("version")
+    private Integer version;
 
     /**
      * 创建者ID

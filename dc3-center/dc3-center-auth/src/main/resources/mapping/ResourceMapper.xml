@@ -11,6 +11,7 @@
         <result column="resource_type_flag" property="resourceTypeFlag"/>
         <result column="resource_scope_flag" property="resourceScopeFlag"/>
         <result column="entity_id" property="entityId"/>
+        <result column="resource_ext" property="resourceExt"/>
         <result column="enable_flag" property="enableFlag"/>
         <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
@@ -26,7 +27,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , parent_resource_id, resource_name, resource_code, resource_type_flag, resource_scope_flag, entity_id, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , parent_resource_id, resource_name, resource_code, resource_type_flag, resource_scope_flag, entity_id, resource_ext, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
 </mapper>

@@ -7,7 +7,7 @@
         <id column="id" property="id"/>
         <result column="point_id" property="pointId"/>
         <result column="alarm_type_flag" property="alarmTypeFlag"/>
-        <result column="alarm_rule_ext" property="alarmRuleExt"/>
+        <result column="alarm_rule" property="alarmRule"/>
         <result column="enable_flag" property="enableFlag"/>
         <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
@@ -23,7 +23,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , point_id, alarm_type_flag, alarm_rule_ext, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , point_id, alarm_type_flag, alarm_rule, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
 </mapper>
