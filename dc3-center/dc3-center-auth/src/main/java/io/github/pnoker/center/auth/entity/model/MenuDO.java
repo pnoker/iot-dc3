@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.center.auth.entity.bo.ext.MenuExtBO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.MenuLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,7 +61,7 @@ public class MenuDO implements Serializable {
      * 菜单层级
      */
     @TableField("menu_level")
-    private Byte menuLevel;
+    private MenuLevelFlagEnum menuLevel;
 
     /**
      * 菜单顺序

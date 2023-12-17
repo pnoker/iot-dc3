@@ -1,6 +1,7 @@
 package io.github.pnoker.center.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.github.pnoker.common.constant.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +34,7 @@ public class AlarmNotifyProfileDO implements Serializable {
      * 自动确认标识
      */
     @TableField("auto_confirm_flag")
-    private Byte autoConfirmFlag;
+    private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
      * 通知间隔，毫秒

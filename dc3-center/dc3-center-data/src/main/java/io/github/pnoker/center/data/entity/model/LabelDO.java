@@ -2,6 +2,7 @@ package io.github.pnoker.center.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.EntityTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,7 +46,7 @@ public class LabelDO implements Serializable {
      * 实体类型标识
      */
     @TableField("entity_type_flag")
-    private Byte entityTypeFlag;
+    private EntityTypeFlagEnum entityTypeFlag;
 
     /**
      * 使能标识

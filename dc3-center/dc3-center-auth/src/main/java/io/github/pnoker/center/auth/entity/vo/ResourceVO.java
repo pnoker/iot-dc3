@@ -19,6 +19,7 @@ package io.github.pnoker.center.auth.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.base.BaseVO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.ResourceScopeFlagEnum;
 import io.github.pnoker.common.constant.enums.ResourceTypeFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
@@ -88,7 +89,7 @@ public class ResourceVO extends BaseVO {
      * 具有多个权限范围可以累加
      */
     @Schema(description = "权限资源范围标识")
-    private Byte resourceScopeFlag;
+    private ResourceScopeFlagEnum resourceScopeFlag;
 
     /**
      * 权限资源实体ID

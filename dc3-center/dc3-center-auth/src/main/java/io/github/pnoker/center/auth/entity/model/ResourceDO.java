@@ -2,6 +2,7 @@ package io.github.pnoker.center.auth.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.ResourceScopeFlagEnum;
 import io.github.pnoker.common.constant.enums.ResourceTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,7 +59,7 @@ public class ResourceDO implements Serializable {
      * 权限资源范围标识
      */
     @TableField("resource_scope_flag")
-    private Byte resourceScopeFlag;
+    private ResourceScopeFlagEnum resourceScopeFlag;
 
     /**
      * 权限资源实体ID
