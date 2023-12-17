@@ -1,34 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.center.manager.mapper.PointAttributeMapper">
-
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="io.github.pnoker.center.manager.entity.model.PointAttributeDO">
-        <id column="id" property="id"/>
-        <result column="display_name" property="displayName"/>
-        <result column="attribute_name" property="attributeName"/>
-        <result column="attribute_type_flag" property="attributeTypeFlag"/>
-        <result column="default_value" property="defaultValue"/>
-        <result column="driver_id" property="driverId"/>
-        <result column="attribute_ext" property="attributeExt"/>
-        <result column="enable_flag" property="enableFlag"/>
-        <result column="tenant_id" property="tenantId"/>
-        <result column="remark" property="remark"/>
-        <result column="signature" property="signature"/>
-        <result column="version" property="version"/>
-        <result column="creator_id" property="creatorId"/>
-        <result column="creator_name" property="creatorName"/>
-        <result column="create_time" property="createTime"/>
-        <result column="operator_id" property="operatorId"/>
-        <result column="operator_name" property="operatorName"/>
-        <result column="operate_time" property="operateTime"/>
-        <result column="deleted" property="deleted"/>
-    </resultMap>
-
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        id
-        , display_name, attribute_name, attribute_type_flag, default_value, driver_id, attribute_ext, enable_flag, tenant_id, remark, signature, version, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
-    </sql>
 
 </mapper>
