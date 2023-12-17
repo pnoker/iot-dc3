@@ -75,7 +75,7 @@ spring:
         - id: auth_route_other
           uri: lb://dc3-center-auth
           predicates:
-            - Path=/api/v3/auth/user/**,/api/v3/auth/black_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
+            - Path=/api/v3/auth/user/**,/api/v3/auth/limited_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
           filters:
             - StripPrefix=2
             - Authentic

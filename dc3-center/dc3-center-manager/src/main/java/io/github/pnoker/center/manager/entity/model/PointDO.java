@@ -105,6 +105,12 @@ public class PointDO implements Serializable {
     private Long groupId;
 
     /**
+     * 位号拓展信息
+     */
+    @TableField("point_ext")
+    private String pointExt;
+
+    /**
      * 使能标识
      */
     @TableField("enable_flag")
@@ -121,6 +127,18 @@ public class PointDO implements Serializable {
      */
     @TableField("remark")
     private String remark;
+
+    /**
+     * 签名
+     */
+    @TableField("signature")
+    private String signature;
+
+    /**
+     * 版本
+     */
+    @TableField("version")
+    private Integer version;
 
     /**
      * 创建者ID

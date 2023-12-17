@@ -8,6 +8,7 @@
         <result column="parent_role_id" property="parentRoleId"/>
         <result column="role_name" property="roleName"/>
         <result column="role_code" property="roleCode"/>
+        <result column="role_ext" property="roleExt"/>
         <result column="enable_flag" property="enableFlag"/>
         <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
@@ -23,7 +24,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , parent_role_id, role_name, role_code, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , parent_role_id, role_name, role_code, role_ext, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
 </mapper>

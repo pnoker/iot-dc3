@@ -7,7 +7,7 @@
         <id column="id" property="id"/>
         <result column="auto_confirm_flag" property="autoConfirmFlag"/>
         <result column="notify_interval" property="notifyInterval"/>
-        <result column="alarm_notify_ext" property="alarmNotifyExt"/>
+        <result column="alarm_config" property="alarmConfig"/>
         <result column="enable_flag" property="enableFlag"/>
         <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
@@ -23,7 +23,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , auto_confirm_flag, notify_interval, alarm_notify_ext, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , auto_confirm_flag, notify_interval, alarm_config, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
 </mapper>

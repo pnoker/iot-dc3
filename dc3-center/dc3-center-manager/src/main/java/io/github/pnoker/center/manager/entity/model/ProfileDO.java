@@ -28,7 +28,7 @@ public class ProfileDO implements Serializable {
     /**
      * 主键ID
      */
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
@@ -62,6 +62,12 @@ public class ProfileDO implements Serializable {
     private Long groupId;
 
     /**
+     * 模板拓展信息
+     */
+    @TableField("profile_ext")
+    private String profileExt;
+
+    /**
      * 使能标识
      */
     @TableField("enable_flag")
@@ -78,6 +84,18 @@ public class ProfileDO implements Serializable {
      */
     @TableField("remark")
     private String remark;
+
+    /**
+     * 签名
+     */
+    @TableField("signature")
+    private String signature;
+
+    /**
+     * 版本
+     */
+    @TableField("version")
+    private Integer version;
 
     /**
      * 创建者ID

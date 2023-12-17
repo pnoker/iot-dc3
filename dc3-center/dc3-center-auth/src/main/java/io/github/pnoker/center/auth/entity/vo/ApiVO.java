@@ -74,7 +74,7 @@ public class ApiVO extends BaseVO {
      * Api接口拓展信息
      */
     @Schema(description = "Api接口拓展信息")
-    private ApiExtVO apiExtVO;
+    private ApiExtVO apiExt;
 
     /**
      * 使能标识

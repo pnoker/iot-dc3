@@ -61,6 +61,12 @@ public class DriverAttributeDO implements Serializable {
     private Long driverId;
 
     /**
+     * 驱动属性拓展信息
+     */
+    @TableField("attribute_ext")
+    private String attributeExt;
+
+    /**
      * 使能标识
      */
     @TableField("enable_flag")
@@ -77,6 +83,18 @@ public class DriverAttributeDO implements Serializable {
      */
     @TableField("remark")
     private String remark;
+
+    /**
+     * 签名
+     */
+    @TableField("signature")
+    private String signature;
+
+    /**
+     * 版本
+     */
+    @TableField("version")
+    private Integer version;
 
     /**
      * 创建者ID

@@ -7,6 +7,7 @@
         <id column="id" property="id"/>
         <result column="role_id" property="roleId"/>
         <result column="user_id" property="userId"/>
+        <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
         <result column="creator_id" property="creatorId"/>
         <result column="creator_name" property="creatorName"/>
@@ -20,7 +21,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , role_id, user_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , role_id, user_id, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
 </mapper>

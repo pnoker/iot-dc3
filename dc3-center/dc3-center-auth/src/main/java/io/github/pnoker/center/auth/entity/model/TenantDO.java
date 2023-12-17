@@ -42,6 +42,12 @@ public class TenantDO implements Serializable {
     private String tenantCode;
 
     /**
+     * 租户拓展信息
+     */
+    @TableField("tenant_ext")
+    private String tenantExt;
+
+    /**
      * 使能标识
      */
     @TableField("enable_flag")

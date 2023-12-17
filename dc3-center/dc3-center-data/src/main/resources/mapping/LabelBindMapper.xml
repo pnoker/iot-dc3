@@ -5,8 +5,10 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="io.github.pnoker.center.data.entity.model.LabelBindDO">
         <id column="id" property="id"/>
+        <result column="entity_type_flag" property="entityTypeFlag"/>
         <result column="label_id" property="labelId"/>
         <result column="entity_id" property="entityId"/>
+        <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
         <result column="creator_id" property="creatorId"/>
         <result column="creator_name" property="creatorName"/>
@@ -20,7 +22,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , label_id, entity_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , entity_type_flag, label_id, entity_id, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
 </mapper>

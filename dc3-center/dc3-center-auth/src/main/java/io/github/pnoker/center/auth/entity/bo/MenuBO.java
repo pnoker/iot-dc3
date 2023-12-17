@@ -70,7 +70,7 @@ public class MenuBO extends BaseBO {
     /**
      * 菜单拓展信息
      */
-    private MenuExtBO menuExtBO;
+    private MenuExtBO menuExt;
 
     /**
      * 使能标识

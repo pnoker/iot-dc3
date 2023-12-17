@@ -7,6 +7,7 @@
         <id column="id" property="id"/>
         <result column="tenant_name" property="tenantName"/>
         <result column="tenant_code" property="tenantCode"/>
+        <result column="tenant_ext" property="tenantExt"/>
         <result column="enable_flag" property="enableFlag"/>
         <result column="remark" property="remark"/>
         <result column="creator_id" property="creatorId"/>
@@ -21,7 +22,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , tenant_name, tenant_code, enable_flag, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , tenant_name, tenant_code, tenant_ext, enable_flag, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
 </mapper>

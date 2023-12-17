@@ -1,0 +1,106 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+### 新增 Device
+#/manager/deviceBO/add
+POST http://{{dc3-manager}}/manager/deviceBO/add
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "multi": false,
+  "profileIds": [
+    "1538467573683765249"
+  ],
+  "driverId": "1519329568578621442",
+  "name": "虚拟设备"
+}
+
+
+### 更新 Device
+#/manager/deviceBO/update
+POST http://{{dc3-manager}}/manager/deviceBO/update
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "id": 1,
+  "name": "测试设备",
+  "profileId": -1,
+  "groupId": -1,
+  "description": "测试设备"
+}
+
+
+### 根据 ID 查询 Device
+#/manager/deviceBO/id/:id
+GET http://{{dc3-manager}}/manager/deviceBO/id/1
+Accept: */*
+Cache-Control: no-cache
+
+
+### 查询 Device 状态
+#/manager/deviceBO/driverStatus，支持name模糊查询，code\driverStatus\profileId\groupId精准查询
+POST http://{{dc3-manager}}/manager/deviceBO/driverStatus
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "",
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 分页查询 Device
+#/manager/deviceBO/List，支持name模糊查询，code\driverStatus\profileId\groupId精准查询
+POST http://{{dc3-manager}}/manager/deviceBO/List
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "name": "",
+  "page": {
+    "current": 1,
+    "orders": [
+      {
+        "column": "id",
+        "asc": false
+      }
+    ]
+  }
+}
+
+
+### 根据 ID 删除 Device
+#/manager/deviceBO/delete/:id
+POST http://{{dc3-manager}}/manager/deviceBO/delete/1
+Accept: */*
+Content-Type: application/json
+Cache-Control: no-cache
+
+###

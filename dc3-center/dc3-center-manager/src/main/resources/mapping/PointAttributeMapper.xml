@@ -10,9 +10,12 @@
         <result column="attribute_type_flag" property="attributeTypeFlag"/>
         <result column="default_value" property="defaultValue"/>
         <result column="driver_id" property="driverId"/>
+        <result column="attribute_ext" property="attributeExt"/>
         <result column="enable_flag" property="enableFlag"/>
         <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
+        <result column="signature" property="signature"/>
+        <result column="version" property="version"/>
         <result column="creator_id" property="creatorId"/>
         <result column="creator_name" property="creatorName"/>
         <result column="create_time" property="createTime"/>
@@ -25,7 +28,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , display_name, attribute_name, attribute_type_flag, default_value, driver_id, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , display_name, attribute_name, attribute_type_flag, default_value, driver_id, attribute_ext, enable_flag, tenant_id, remark, signature, version, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
 </mapper>

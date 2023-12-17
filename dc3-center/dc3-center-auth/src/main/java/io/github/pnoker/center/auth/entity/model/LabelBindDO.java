@@ -29,6 +29,12 @@ public class LabelBindDO implements Serializable {
     private Long id;
 
     /**
+     * 实体类型标识
+     */
+    @TableField("entity_type_flag")
+    private Byte entityTypeFlag;
+
+    /**
      * 标签ID
      */
     @TableField("label_id")
@@ -39,6 +45,12 @@ public class LabelBindDO implements Serializable {
      */
     @TableField("entity_id")
     private Long entityId;
+
+    /**
+     * 租户ID
+     */
+    @TableField("tenant_id")
+    private Long tenantId;
 
     /**
      * 描述

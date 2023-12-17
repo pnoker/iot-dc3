@@ -42,10 +42,10 @@ public class AlarmNotifyProfileDO implements Serializable {
     private Long notifyInterval;
 
     /**
-     * 报警通知拓展信息
+     * 报警通知配置
      */
-    @TableField("alarm_notify_ext")
-    private String alarmNotifyExt;
+    @TableField("alarm_config")
+    private String alarmConfig;
 
     /**
      * 使能标识

@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.bo.BlackIpBO;
+import io.github.pnoker.center.auth.entity.bo.LimitedIpBO;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
@@ -84,7 +84,7 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @param entityBO EntityBO
      * @return EntityVO
      */
-    default DictionaryBO buildVOByBlackIpBO(BlackIpBO entityBO) {
+    default DictionaryBO buildVOByLimitedIpBO(LimitedIpBO entityBO) {
         return DictionaryBO.builder().label(entityBO.getIp()).value(entityBO.getId()).build();
     }
 
@@ -95,6 +95,6 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @return EntityVO Page
      */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<DictionaryBO> buildVOPageByBlackIpBOPage(Page<BlackIpBO> entityPageBO);
+    Page<DictionaryBO> buildVOPageByLimitedIpBOPage(Page<LimitedIpBO> entityPageBO);
 
 }

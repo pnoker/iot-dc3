@@ -63,7 +63,7 @@ public class MybatisGenerator {
                 .strategyConfig(builder -> builder
                         .addInclude(
                                 "dc3_api",
-                                "dc3_black_ip",
+                                "dc3_limited_ip",
                                 "dc3_group",
                                 "dc3_label",
                                 "dc3_label_bind",

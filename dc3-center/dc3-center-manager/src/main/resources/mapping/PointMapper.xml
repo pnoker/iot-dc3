@@ -33,9 +33,12 @@
         <result column="alarm_notify_profile_id" property="alarmNotifyProfileId"/>
         <result column="alarm_message_profile_id" property="alarmMessageProfileId"/>
         <result column="group_id" property="groupId"/>
+        <result column="point_ext" property="pointExt"/>
         <result column="enable_flag" property="enableFlag"/>
         <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
+        <result column="signature" property="signature"/>
+        <result column="version" property="version"/>
         <result column="creator_id" property="creatorId"/>
         <result column="creator_name" property="creatorName"/>
         <result column="create_time" property="createTime"/>
@@ -48,7 +51,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , point_name, point_code, point_type_flag, rw_flag, base_value, multiple, value_decimal, unit, profile_id, alarm_notify_profile_id, alarm_message_profile_id, group_id, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , point_name, point_code, point_type_flag, rw_flag, base_value, multiple, value_decimal, unit, profile_id, alarm_notify_profile_id, alarm_message_profile_id, group_id, point_ext, enable_flag, tenant_id, remark, signature, version, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
     <select id="selectPageWithDevice" resultType="io.github.pnoker.center.manager.entity.model.PointDO">
@@ -64,9 +67,12 @@
         dp.unit,
         dp.profile_id,
         dp.group_id,
+        dp.point_ext,
         dp.enable_flag,
         dp.tenant_id,
         dp.remark,
+        dp.signature,
+        dp.version,
         dp.creator_id,
         dp.creator_name,
         dp.create_time,

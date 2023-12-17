@@ -12,6 +12,8 @@
         <result column="enable_flag" property="enableFlag"/>
         <result column="tenant_id" property="tenantId"/>
         <result column="remark" property="remark"/>
+        <result column="signature" property="signature"/>
+        <result column="version" property="version"/>
         <result column="creator_id" property="creatorId"/>
         <result column="creator_name" property="creatorName"/>
         <result column="create_time" property="createTime"/>
@@ -24,7 +26,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , point_attribute_id, config_value, device_id, point_id, enable_flag, tenant_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
+        , point_attribute_id, config_value, device_id, point_id, enable_flag, tenant_id, remark, signature, version, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted
     </sql>
 
 </mapper>

@@ -17,7 +17,7 @@
 package io.github.pnoker.gateway.config;
 
 import io.github.pnoker.gateway.fallback.GatewayFallback;
-import io.github.pnoker.gateway.filter.BlackIpGlobalFilter;
+import io.github.pnoker.gateway.filter.LimitedIpGlobalFilter;
 import io.github.pnoker.gateway.filter.factory.AuthenticGatewayFilterFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -58,8 +58,8 @@ public class GatewayConfig {
     }
 
     @Bean
-    public BlackIpGlobalFilter blackIpGlobalFilter() {
-        return new BlackIpGlobalFilter();
+    public LimitedIpGlobalFilter limitedIpGlobalFilter() {
+        return new LimitedIpGlobalFilter();
     }
 
     @Bean

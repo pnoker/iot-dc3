@@ -85,10 +85,10 @@ public class DictionaryController implements Controller {
      *
      * @return 字典列表
      */
-    @GetMapping("/black_ip")
-    public R<List<DictionaryBO>> blackIpDictionary() {
+    @GetMapping("/limited_ip")
+    public R<List<DictionaryBO>> limitedIpDictionary() {
         try {
-            List<DictionaryBO> dictionaryList = dictionaryService.blackIpDictionary(getTenantId());
+            List<DictionaryBO> dictionaryList = dictionaryService.limitedIpDictionary(getTenantId());
             if (ObjectUtil.isNotNull(dictionaryList)) {
                 return R.ok(dictionaryList);
             }
