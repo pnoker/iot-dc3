@@ -2,6 +2,7 @@ package io.github.pnoker.center.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.GroupTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -51,7 +52,7 @@ public class GroupDO implements Serializable {
      * 分组类型标识
      */
     @TableField("group_type_flag")
-    private Byte groupTypeFlag;
+    private GroupTypeFlagEnum groupTypeFlag;
 
     /**
      * 使能标识

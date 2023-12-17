@@ -18,6 +18,7 @@ package io.github.pnoker.center.auth.entity.bo;
 
 import io.github.pnoker.common.base.BaseBO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.ResourceScopeFlagEnum;
 import io.github.pnoker.common.constant.enums.ResourceTypeFlagEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -66,7 +67,7 @@ public class ResourceBO extends BaseBO {
      * </ul>
      * 具有多个权限范围可以累加
      */
-    private Byte resourceScopeFlag;
+    private ResourceScopeFlagEnum resourceScopeFlag;
 
     /**
      * 权限资源实体ID

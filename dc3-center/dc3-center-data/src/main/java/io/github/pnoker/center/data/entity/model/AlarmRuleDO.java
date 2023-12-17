@@ -1,6 +1,7 @@
 package io.github.pnoker.center.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.github.pnoker.common.constant.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +40,7 @@ public class AlarmRuleDO implements Serializable {
      * 报警类型标识
      */
     @TableField("alarm_type_flag")
-    private Byte alarmTypeFlag;
+    private AlarmTypeFlagEnum alarmTypeFlag;
 
     /**
      * 报警规则
