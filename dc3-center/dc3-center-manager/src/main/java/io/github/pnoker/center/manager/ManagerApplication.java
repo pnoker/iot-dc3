@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableTransactionManagement
+@MapperScan("io.github.pnoker.center.manager.mapper")
 public class ManagerApplication {
 
     public static void main(String[] args) {
