@@ -24,6 +24,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 /**
  * LimitedIp Query
  *
@@ -35,7 +37,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "LimitedIpQuery", description = "禁止IP-查询")
-public class LimitedIpQuery {
+public class LimitedIpQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Pages page;
 

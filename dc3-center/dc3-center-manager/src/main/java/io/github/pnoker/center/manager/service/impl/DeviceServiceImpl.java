@@ -587,7 +587,7 @@ public class DeviceServiceImpl implements DeviceService {
     private DeviceDO getDOById(Long id, boolean throwException) {
         DeviceDO entityDO = deviceManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The device not exist");
+            throw new NotFoundException("设备不存在");
         }
         return entityDO;
     }

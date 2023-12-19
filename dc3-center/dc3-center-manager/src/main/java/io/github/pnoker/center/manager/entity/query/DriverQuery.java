@@ -25,6 +25,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 /**
  * Driver Query
  *
@@ -36,7 +38,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "DriverQuery", description = "驱动-查询")
-public class DriverQuery {
+public class DriverQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")
     private Pages page;

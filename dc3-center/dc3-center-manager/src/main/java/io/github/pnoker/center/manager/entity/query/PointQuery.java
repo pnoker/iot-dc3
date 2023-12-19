@@ -26,6 +26,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 /**
  * Point Query
  *
@@ -37,7 +39,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "PointQuery", description = "位号-查询")
-public class PointQuery {
+public class PointQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")
     private Pages page;

@@ -208,4 +208,19 @@ public class UserServiceImpl implements UserService {
         return userBuilder.buildBOByDO(userDO);
     }
 
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link UserDO}
+     */
+    private UserDO getDOById(Long id, boolean throwException) {
+        UserDO entityDO = userManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("用户不存在");
+        }
+        return entityDO;
+    }
+
 }

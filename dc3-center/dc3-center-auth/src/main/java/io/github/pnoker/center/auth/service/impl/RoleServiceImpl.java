@@ -171,7 +171,7 @@ public class RoleServiceImpl implements RoleService {
     private RoleDO getDOById(Long id, boolean throwException) {
         RoleDO entityDO = roleManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The role not exist");
+            throw new NotFoundException("角色不存在");
         }
         return entityDO;
     }

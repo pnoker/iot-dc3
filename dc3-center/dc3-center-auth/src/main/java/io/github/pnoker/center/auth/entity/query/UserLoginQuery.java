@@ -24,6 +24,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 /**
  * User Query
  *
@@ -35,7 +37,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "UserLoginQuery", description = "用户登录-查询")
-public class UserLoginQuery {
+public class UserLoginQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Pages page;
 

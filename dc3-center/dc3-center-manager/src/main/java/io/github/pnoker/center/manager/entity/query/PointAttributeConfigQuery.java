@@ -24,6 +24,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 /**
  * PointInfo Query
  *
@@ -35,7 +37,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "PointAttributeConfigQuery", description = "位号属性配置-查询")
-public class PointAttributeConfigQuery {
+public class PointAttributeConfigQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")
     private Pages page;

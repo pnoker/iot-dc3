@@ -23,6 +23,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 /**
  * ProfileBind Query
  *
@@ -34,7 +36,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "ProfileBindQuery", description = "位号绑定-查询")
-public class ProfileBindQuery {
+public class ProfileBindQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")
     private Pages page;

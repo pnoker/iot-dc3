@@ -171,7 +171,7 @@ public class MenuServiceImpl implements MenuService {
     private MenuDO getDOById(Long id, boolean throwException) {
         MenuDO entityDO = menuManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The menu not exist");
+            throw new NotFoundException("菜单不存在");
         }
         return entityDO;
     }

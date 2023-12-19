@@ -215,7 +215,7 @@ public class DriverServiceImpl implements DriverService {
     private DriverDO getDOById(Long id, boolean throwException) {
         DriverDO entityDO = driverManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The driver not exist");
+            throw new NotFoundException("驱动不存在");
         }
         return entityDO;
     }

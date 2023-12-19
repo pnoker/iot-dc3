@@ -241,7 +241,7 @@ public class PointServiceImpl implements PointService {
     private PointDO getDOById(Long id, boolean throwException) {
         PointDO entityDO = pointManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The point not exist");
+            throw new NotFoundException("位号不存在");
         }
         return entityDO;
     }

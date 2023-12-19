@@ -205,7 +205,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     private ProfileBindDO getDOById(Long id, boolean throwException) {
         ProfileBindDO entityDO = profileBindManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The profile bind not exist");
+            throw new NotFoundException("模板绑定不存在");
         }
         return entityDO;
     }
