@@ -161,7 +161,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     private LabelBindDO getDOById(Long id, boolean throwException) {
         LabelBindDO entityDO = labelBindManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The label bind does not exist");
+            throw new NotFoundException("标签绑定不存在");
         }
         return entityDO;
     }

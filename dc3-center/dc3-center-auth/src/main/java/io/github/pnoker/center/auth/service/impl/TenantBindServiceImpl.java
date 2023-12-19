@@ -117,4 +117,18 @@ public class TenantBindServiceImpl implements TenantBindService {
         return wrapper;
     }
 
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link TenantBindDO}
+     */
+    private TenantBindDO getDOById(Long id, boolean throwException) {
+        TenantBindDO entityDO = tenantBindManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("租户绑定不存在");
+        }
+        return entityDO;
+    }
 }

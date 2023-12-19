@@ -163,7 +163,7 @@ public class ApiServiceImpl implements ApiService {
     private ApiDO getDOById(Long id, boolean throwException) {
         ApiDO entityDO = apiManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The api not exist");
+            throw new NotFoundException("接口不存在");
         }
         return entityDO;
     }

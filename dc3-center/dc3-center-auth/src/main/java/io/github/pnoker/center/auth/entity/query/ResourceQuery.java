@@ -25,6 +25,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 /**
  * @author linys
  * @since 2022.1.0
@@ -34,7 +36,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "ResourceQuery", description = "资源-查询")
-public class ResourceQuery {
+public class ResourceQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Pages page;
 

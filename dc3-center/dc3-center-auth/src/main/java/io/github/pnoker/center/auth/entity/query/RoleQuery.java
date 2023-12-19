@@ -24,6 +24,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 /**
  * @author linys
  * @since 2022.1.0
@@ -33,7 +35,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "RoleQuery", description = "角色-查询")
-public class RoleQuery {
+public class RoleQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Pages page;
 

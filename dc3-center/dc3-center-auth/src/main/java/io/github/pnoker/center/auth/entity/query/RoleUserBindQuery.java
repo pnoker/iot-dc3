@@ -23,6 +23,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 /**
  * @author linys
  * @since 2022.1.0
@@ -32,7 +34,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Schema(title = "RoleUserBindQuery", description = "角色用户绑定-查询")
-public class RoleUserBindQuery {
+public class RoleUserBindQuery implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Pages page;
 

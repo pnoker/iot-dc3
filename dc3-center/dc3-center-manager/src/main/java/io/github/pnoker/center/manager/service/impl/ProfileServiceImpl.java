@@ -208,7 +208,7 @@ public class ProfileServiceImpl implements ProfileService {
     private ProfileDO getDOById(Long id, boolean throwException) {
         ProfileDO entityDO = profileManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The profile not exist");
+            throw new NotFoundException("模板不存在");
         }
         return entityDO;
     }

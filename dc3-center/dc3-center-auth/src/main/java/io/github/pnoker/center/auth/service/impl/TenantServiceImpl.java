@@ -120,4 +120,18 @@ public class TenantServiceImpl implements TenantService {
         return wrapper;
     }
 
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link TenantDO}
+     */
+    private TenantDO getDOById(Long id, boolean throwException) {
+        TenantDO entityDO = tenantManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("租户");
+        }
+        return entityDO;
+    }
 }

@@ -175,7 +175,7 @@ public class LabelServiceImpl implements LabelService {
     private LabelDO getDOById(Long id, boolean throwException) {
         LabelDO entityDO = labelManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The label does not exist");
+            throw new NotFoundException("标签不存在");
         }
         return entityDO;
     }

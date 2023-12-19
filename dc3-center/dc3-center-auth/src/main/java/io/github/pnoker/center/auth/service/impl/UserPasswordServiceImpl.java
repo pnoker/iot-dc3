@@ -121,4 +121,18 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         return Wrappers.<UserPasswordDO>query().lambda();
     }
 
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link UserPasswordDO}
+     */
+    private UserPasswordDO getDOById(Long id, boolean throwException) {
+        UserPasswordDO entityDO = userPasswordManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("用户密码不存在");
+        }
+        return entityDO;
+    }
 }

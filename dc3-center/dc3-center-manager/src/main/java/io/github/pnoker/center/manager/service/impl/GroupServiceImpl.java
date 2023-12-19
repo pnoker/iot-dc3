@@ -171,7 +171,7 @@ public class GroupServiceImpl implements GroupService {
     private GroupDO getDOById(Long id, boolean throwException) {
         GroupDO entityDO = groupManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("The group not exist");
+            throw new NotFoundException("分组不存在");
         }
         return entityDO;
     }

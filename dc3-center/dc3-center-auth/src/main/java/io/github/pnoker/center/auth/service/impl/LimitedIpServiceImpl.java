@@ -126,4 +126,19 @@ public class LimitedIpServiceImpl implements LimitedIpService {
         return wrapper;
     }
 
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link LimitedIpDO}
+     */
+    private LimitedIpDO getDOById(Long id, boolean throwException) {
+        LimitedIpDO entityDO = limitedIpManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("受限IP不存在");
+        }
+        return entityDO;
+    }
+
 }

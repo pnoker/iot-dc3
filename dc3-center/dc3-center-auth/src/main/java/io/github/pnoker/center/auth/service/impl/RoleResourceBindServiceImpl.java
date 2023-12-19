@@ -36,6 +36,7 @@ import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -125,5 +126,20 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
             wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceId()), RoleResourceBindDO::getResourceId, pageQuery.getResourceId());
         }
         return wrapper;
+    }
+
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link RoleResourceBindDO}
+     */
+    private RoleResourceBindDO getDOById(Long id, boolean throwException) {
+        RoleResourceBindDO entityDO = roleResourceBindManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("角色资源绑定不存在");
+        }
+        return entityDO;
     }
 }

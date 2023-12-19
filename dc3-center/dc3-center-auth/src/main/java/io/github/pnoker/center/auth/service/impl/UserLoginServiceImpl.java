@@ -149,4 +149,18 @@ public class UserLoginServiceImpl implements UserLoginService {
         return wrapper;
     }
 
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link UserLoginDO}
+     */
+    private UserLoginDO getDOById(Long id, boolean throwException) {
+        UserLoginDO entityDO = userLoginManager.getById(id);
+        if (throwException && ObjectUtil.isNull(entityDO)) {
+            throw new NotFoundException("用户登录不存在");
+        }
+        return entityDO;
+    }
 }
