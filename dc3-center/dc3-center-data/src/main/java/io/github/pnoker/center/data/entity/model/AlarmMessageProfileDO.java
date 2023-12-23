@@ -1,7 +1,7 @@
 package io.github.pnoker.center.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
-import io.github.pnoker.common.constant.enums.AlarmLevelFlagEnum;
+import io.github.pnoker.common.constant.enums.AlarmMessageProfileLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,22 +31,28 @@ public class AlarmMessageProfileDO implements Serializable {
     private Long id;
 
     /**
-     * 报警标题
+     * 报警信息模板标题
      */
-    @TableField("alarm_title")
-    private String alarmTitle;
+    @TableField("message_profile_title")
+    private String messageProfileTitle;
 
     /**
-     * 报警等级
+     * 报警信息模板编号
      */
-    @TableField("alarm_level")
-    private AlarmLevelFlagEnum alarmLevel;
+    @TableField("message_profile_code")
+    private String messageProfileCode;
 
     /**
-     * 报警信息
+     * 报警信息模板等级
      */
-    @TableField("alarm_content")
-    private String alarmContent;
+    @TableField("message_profile_level")
+    private AlarmMessageProfileLevelFlagEnum messageProfileLevel;
+
+    /**
+     * 报警信息模板内容
+     */
+    @TableField("message_profile_content")
+    private String messageProfileContent;
 
     /**
      * 使能标识

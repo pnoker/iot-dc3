@@ -64,7 +64,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
 
         AlarmNotifyProfileDO entityDO = alarmNotifyProfileBuilder.buildDOByBO(entityBO);
         if (!alarmNotifyProfileManager.save(entityDO)) {
-            throw new AddException("分组创建失败");
+            throw new AddException("报警通知模板创建失败");
         }
     }
 
@@ -75,15 +75,15 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 删除分组之前需要检查该分组是否存在关联
-        LambdaQueryChainWrapper<AlarmNotifyProfileDO> wrapper = alarmNotifyProfileManager.lambdaQuery().eq(AlarmNotifyProfileDO::getParentAlarmNotifyProfileId, id);
+        // 删除报警通知模板之前需要检查该报警通知模板是否存在关联
+        LambdaQueryChainWrapper<AlarmNotifyProfileDO> wrapper = alarmNotifyProfileManager.lambdaQuery().eq(AlarmNotifyProfileDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("分组删除失败，该分组下存在子分组");
+            throw new AssociatedException("报警通知模板删除失败，该报警通知模板下存在子报警通知模板");
         }
 
         if (!alarmNotifyProfileManager.removeById(id)) {
-            throw new DeleteException("分组删除失败");
+            throw new DeleteException("报警通知模板删除失败");
         }
     }
 
@@ -99,7 +99,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         AlarmNotifyProfileDO entityDO = alarmNotifyProfileBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!alarmNotifyProfileManager.updateById(entityDO)) {
-            throw new UpdateException("分组更新失败");
+            throw new UpdateException("报警通知模板更新失败");
         }
     }
 
@@ -132,7 +132,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
      */
     private LambdaQueryWrapper<AlarmNotifyProfileDO> fuzzyQuery(AlarmNotifyProfileQuery query) {
         LambdaQueryWrapper<AlarmNotifyProfileDO> wrapper = Wrappers.<AlarmNotifyProfileDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmNotifyProfileName()), AlarmNotifyProfileDO::getAlarmNotifyProfileName, query.getAlarmNotifyProfileName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(query.getNotifyProfileName()), AlarmNotifyProfileDO::getNotifyProfileName, query.getNotifyProfileName());
         wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), AlarmNotifyProfileDO::getTenantId, query.getTenantId());
         return wrapper;
     }
@@ -147,7 +147,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
      */
     private boolean checkDuplicate(AlarmNotifyProfileBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmNotifyProfileDO> wrapper = Wrappers.<AlarmNotifyProfileDO>query().lambda();
-        wrapper.eq(AlarmNotifyProfileDO::getAlarmNotifyProfileName, entityBO.getAlarmNotifyProfileName());
+        wrapper.eq(AlarmNotifyProfileDO::getNotifyProfileName, entityBO.getNotifyProfileName());
         wrapper.eq(AlarmNotifyProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmNotifyProfileDO one = alarmNotifyProfileManager.getOne(wrapper);
@@ -171,7 +171,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
     private AlarmNotifyProfileDO getDOById(Long id, boolean throwException) {
         AlarmNotifyProfileDO entityDO = alarmNotifyProfileManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("分组不存在");
+            throw new NotFoundException("报警通知模板不存在");
         }
         return entityDO;
     }

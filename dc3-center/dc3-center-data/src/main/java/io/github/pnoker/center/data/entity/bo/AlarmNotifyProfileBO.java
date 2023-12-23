@@ -22,6 +22,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class AlarmNotifyProfileBO extends BaseBO {
 
+    private String notifyProfileName;
     /**
      * 自动确认标识
      */

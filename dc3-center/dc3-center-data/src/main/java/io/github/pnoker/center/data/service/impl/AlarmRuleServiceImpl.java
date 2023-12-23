@@ -64,7 +64,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
 
         AlarmRuleDO entityDO = alarmRuleBuilder.buildDOByBO(entityBO);
         if (!alarmRuleManager.save(entityDO)) {
-            throw new AddException("分组创建失败");
+            throw new AddException("报警规则创建失败");
         }
     }
 
@@ -75,15 +75,15 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 删除分组之前需要检查该分组是否存在关联
-        LambdaQueryChainWrapper<AlarmRuleDO> wrapper = alarmRuleManager.lambdaQuery().eq(AlarmRuleDO::getParentAlarmRuleId, id);
+        // 删除报警规则之前需要检查该报警规则是否存在关联
+        LambdaQueryChainWrapper<AlarmRuleDO> wrapper = alarmRuleManager.lambdaQuery().eq(AlarmRuleDO::getPointId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("分组删除失败，该分组下存在子分组");
+            throw new AssociatedException("报警规则删除失败，该报警规则下存在子报警规则");
         }
 
         if (!alarmRuleManager.removeById(id)) {
-            throw new DeleteException("分组删除失败");
+            throw new DeleteException("报警规则删除失败");
         }
     }
 
@@ -99,7 +99,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
         AlarmRuleDO entityDO = alarmRuleBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!alarmRuleManager.updateById(entityDO)) {
-            throw new UpdateException("分组更新失败");
+            throw new UpdateException("报警规则更新失败");
         }
     }
 
@@ -132,7 +132,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
      */
     private LambdaQueryWrapper<AlarmRuleDO> fuzzyQuery(AlarmRuleQuery query) {
         LambdaQueryWrapper<AlarmRuleDO> wrapper = Wrappers.<AlarmRuleDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmRuleName()), AlarmRuleDO::getAlarmRuleName, query.getAlarmRuleName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(query.getRuleName()), AlarmRuleDO::getAlarmRuleName, query.getRuleName());
         wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), AlarmRuleDO::getTenantId, query.getTenantId());
         return wrapper;
     }
@@ -147,7 +147,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
      */
     private boolean checkDuplicate(AlarmRuleBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmRuleDO> wrapper = Wrappers.<AlarmRuleDO>query().lambda();
-        wrapper.eq(AlarmRuleDO::getAlarmRuleName, entityBO.getAlarmRuleName());
+        wrapper.eq(AlarmRuleDO::getAlarmRuleName, entityBO.getRuleName());
         wrapper.eq(AlarmRuleDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmRuleDO one = alarmRuleManager.getOne(wrapper);
@@ -171,7 +171,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
     private AlarmRuleDO getDOById(Long id, boolean throwException) {
         AlarmRuleDO entityDO = alarmRuleManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("分组不存在");
+            throw new NotFoundException("报警规则不存在");
         }
         return entityDO;
     }

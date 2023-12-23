@@ -22,6 +22,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class AlarmRuleBO extends BaseBO {
 
+    private String ruleName;
+
     /**
      * 位号ID
      */
