@@ -3,6 +3,7 @@ package io.github.pnoker.center.data.entity.query;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.constant.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,10 @@ import java.io.Serializable;
 @Schema(title = "AlarmNotifyProfile", description = "报警通知模板")
 public class AlarmNotifyProfileQuery implements Serializable {
     private static final long serialVersionUID = 1L;
+    @Schema(description = "分页")
+    private Pages page;
+
+    private String notifyProfileName;
 
     /**
      * 自动确认标识

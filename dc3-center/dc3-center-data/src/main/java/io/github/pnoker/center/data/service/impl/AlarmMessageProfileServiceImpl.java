@@ -76,7 +76,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         getDOById(id, true);
 
         // 删除分组之前需要检查该分组是否存在关联
-        LambdaQueryChainWrapper<AlarmMessageProfileDO> wrapper = alarmMessageProfileManager.lambdaQuery().eq(AlarmMessageProfileDO::getParentAlarmMessageProfileId, id);
+        LambdaQueryChainWrapper<AlarmMessageProfileDO> wrapper = alarmMessageProfileManager.lambdaQuery().eq(AlarmMessageProfileDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
             throw new AssociatedException("分组删除失败，该分组下存在子分组");
@@ -132,7 +132,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
      */
     private LambdaQueryWrapper<AlarmMessageProfileDO> fuzzyQuery(AlarmMessageProfileQuery query) {
         LambdaQueryWrapper<AlarmMessageProfileDO> wrapper = Wrappers.<AlarmMessageProfileDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmMessageProfileName()), AlarmMessageProfileDO::getAlarmMessageProfileName, query.getAlarmMessageProfileName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmTitle()), AlarmMessageProfileDO::getMessageProfileTitle, query.getAlarmTitle());
         wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), AlarmMessageProfileDO::getTenantId, query.getTenantId());
         return wrapper;
     }
@@ -147,8 +147,8 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
      */
     private boolean checkDuplicate(AlarmMessageProfileBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmMessageProfileDO> wrapper = Wrappers.<AlarmMessageProfileDO>query().lambda();
-        wrapper.eq(AlarmMessageProfileDO::getAlarmTitle, entityBO.getAlarmTitle());
-        wrapper.eq(AlarmMessageProfileDO::getAlarmLevel, entityBO.getAlarmLevel());
+        wrapper.eq(AlarmMessageProfileDO::getMessageProfileTitle, entityBO.getAlarmTitle());
+        wrapper.eq(AlarmMessageProfileDO::getMessageProfileLevel, entityBO.getAlarmLevel());
         wrapper.eq(AlarmMessageProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmMessageProfileDO one = alarmMessageProfileManager.getOne(wrapper);

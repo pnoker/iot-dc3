@@ -3,6 +3,7 @@ package io.github.pnoker.center.data.entity.query;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.constant.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +28,9 @@ import java.io.Serializable;
 @Schema(title = "AlarmRule", description = "报警规则")
 public class AlarmRuleQuery implements Serializable {
     private static final long serialVersionUID = 1L;
-
+    @Schema(description = "分页")
+    private Pages page;
+    private String ruleName;
     /**
      * 位号ID
      */

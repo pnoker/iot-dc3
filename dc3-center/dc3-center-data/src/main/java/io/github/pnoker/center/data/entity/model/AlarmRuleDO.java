@@ -31,10 +31,34 @@ public class AlarmRuleDO implements Serializable {
     private Long id;
 
     /**
+     * 报警规则名称
+     */
+    @TableField("alarm_rule_name")
+    private String alarmRuleName;
+
+    /**
+     * 报警规则编号
+     */
+    @TableField("alarm_rule_code")
+    private String alarmRuleCode;
+
+    /**
      * 位号ID
      */
     @TableField("point_id")
     private Long pointId;
+
+    /**
+     * 报警通知模板ID
+     */
+    @TableField("alarm_notify_profile_id")
+    private Long alarmNotifyProfileId;
+
+    /**
+     * 报警信息模板ID
+     */
+    @TableField("alarm_message_profile_id")
+    private Long alarmMessageProfileId;
 
     /**
      * 报警类型标识

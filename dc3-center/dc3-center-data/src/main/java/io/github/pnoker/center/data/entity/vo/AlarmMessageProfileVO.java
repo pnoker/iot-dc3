@@ -2,7 +2,7 @@ package io.github.pnoker.center.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.base.BaseVO;
-import io.github.pnoker.common.constant.enums.AlarmLevelFlagEnum;
+import io.github.pnoker.common.constant.enums.AlarmMessageProfileLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -36,7 +36,7 @@ public class AlarmMessageProfileVO extends BaseVO {
      * 报警等级
      */
     @Schema(description = "报警等级")
-    private AlarmLevelFlagEnum alarmLevel;
+    private AlarmMessageProfileLevelFlagEnum alarmLevel;
 
     /**
      * 报警信息

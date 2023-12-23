@@ -1,8 +1,8 @@
-package io.github.pnoker.center.data.entity.model;
+package io.github.pnoker.center.auth.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
-import io.github.pnoker.common.constant.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.constant.enums.ExpireFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 报警通知模板表
+ * 驱动令牌表
  * </p>
  *
  * @author pnoker
@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@TableName("dc3_alarm_notify_profile")
-public class AlarmNotifyProfileDO implements Serializable {
+@TableName("dc3_driver_token")
+public class DriverTokenDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,34 +31,34 @@ public class AlarmNotifyProfileDO implements Serializable {
     private Long id;
 
     /**
-     * 报警通知模板名称
+     * 驱动编号
      */
-    @TableField("notify_profile_name")
-    private String notifyProfileName;
+    @TableField("driver_code")
+    private String driverCode;
 
     /**
-     * 报警通知模板编号
+     * 驱动AppID
      */
-    @TableField("notify_profile_code")
-    private String notifyProfileCode;
+    @TableField("driver_app_id")
+    private String driverAppId;
 
     /**
-     * 自动确认标识
+     * 驱动AppKey
      */
-    @TableField("auto_confirm_flag")
-    private AutoConfirmFlagEnum autoConfirmFlag;
+    @TableField("driver_app_key")
+    private String driverAppKey;
 
     /**
-     * 通知间隔，毫秒
+     * 失效标识
      */
-    @TableField("notify_interval")
-    private Long notifyInterval;
+    @TableField("expire_flag")
+    private ExpireFlagEnum expireFlag;
 
     /**
-     * 报警通知配置
+     * 失效时间
      */
-    @TableField("alarm_config")
-    private String alarmConfig;
+    @TableField("expire_time")
+    private LocalDateTime expireTime;
 
     /**
      * 使能标识

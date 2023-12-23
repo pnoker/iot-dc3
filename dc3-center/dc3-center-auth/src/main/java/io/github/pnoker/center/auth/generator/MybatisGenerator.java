@@ -72,6 +72,7 @@ public class MybatisGenerator {
                                 "dc3_role",
                                 "dc3_role_resource_bind",
                                 "dc3_role_user_bind",
+                                "dc3_driver_token",
                                 "dc3_tenant",
                                 "dc3_tenant_bind",
                                 "dc3_user",
