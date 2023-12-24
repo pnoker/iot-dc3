@@ -18,7 +18,7 @@ package io.github.pnoker.center.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.center.auth.entity.vo.ext.MenuExtVO;
-import io.github.pnoker.common.base.BaseVO;
+import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuTypeFlagEnum;

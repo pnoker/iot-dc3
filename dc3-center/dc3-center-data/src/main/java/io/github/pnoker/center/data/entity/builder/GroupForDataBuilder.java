@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.builder;
+package io.github.pnoker.center.data.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.GroupBO;
-import io.github.pnoker.center.manager.entity.model.GroupDO;
-import io.github.pnoker.center.manager.entity.vo.GroupVO;
+import io.github.pnoker.center.data.entity.model.GroupDO;
+import io.github.pnoker.common.entity.bo.GroupBO;
+import io.github.pnoker.common.entity.builder.GroupBuilder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -32,23 +32,8 @@ import java.util.List;
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring")
-public interface GroupBuilder {
+public interface GroupForDataBuilder extends GroupBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    GroupBO buildBOByVO(GroupVO entityVO);
-
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<GroupBO> buildBOListByVOList(List<GroupVO> entityVOList);
 
     /**
      * BO to DO
@@ -83,21 +68,6 @@ public interface GroupBuilder {
      */
     List<GroupBO> buildBOListByDOList(List<GroupDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    GroupVO buildVOByBO(GroupBO entityBO);
-
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<GroupVO> buildVOListByBOList(List<GroupBO> entityBOList);
 
     /**
      * DOPage to BOPage
@@ -107,13 +77,4 @@ public interface GroupBuilder {
      */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<GroupBO> buildBOPageByDOPage(Page<GroupDO> entityPageDO);
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<GroupVO> buildVOPageByBOPage(Page<GroupBO> entityPageBO);
 }

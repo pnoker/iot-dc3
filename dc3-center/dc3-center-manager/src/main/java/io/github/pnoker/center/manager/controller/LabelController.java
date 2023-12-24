@@ -18,15 +18,15 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.LabelBO;
-import io.github.pnoker.center.manager.entity.builder.LabelBuilder;
+import io.github.pnoker.center.manager.entity.builder.LabelForManagerBuilder;
 import io.github.pnoker.center.manager.entity.query.LabelQuery;
-import io.github.pnoker.center.manager.entity.vo.LabelVO;
 import io.github.pnoker.center.manager.service.LabelService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.bo.LabelBO;
+import io.github.pnoker.common.entity.vo.LabelVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,7 @@ import javax.validation.constraints.NotNull;
 public class LabelController implements Controller {
 
     @Resource
-    private LabelBuilder labelBuilder;
+    private LabelForManagerBuilder labelForManagerBuilder;
 
     @Resource
     private LabelService labelService;
@@ -62,7 +62,7 @@ public class LabelController implements Controller {
     @PostMapping("/add")
     public R<String> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
         try {
-            LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
+            LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             labelService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
@@ -96,7 +96,7 @@ public class LabelController implements Controller {
     @PostMapping("/update")
     public R<String> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
         try {
-            LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
+            LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             labelService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
@@ -115,7 +115,7 @@ public class LabelController implements Controller {
     public R<LabelVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             LabelBO entityBO = labelService.selectById(id);
-            LabelVO entityVO = labelBuilder.buildVOByBO(entityBO);
+            LabelVO entityVO = labelForManagerBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -136,7 +136,7 @@ public class LabelController implements Controller {
             }
             entityQuery.setTenantId(getTenantId());
             Page<LabelBO> entityPageBO = labelService.selectByPage(entityQuery);
-            Page<LabelVO> entityPageVO = labelBuilder.buildVOPageByBOPage(entityPageBO);
+            Page<LabelVO> entityPageVO = labelForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());

@@ -19,6 +19,7 @@ package io.github.pnoker.center.data.entity.query;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -59,5 +60,6 @@ public class PointValueQuery implements Serializable {
     /**
      * 是否返回最近历史数据
      */
+    @Builder.Default
     private Boolean history = false;
 }

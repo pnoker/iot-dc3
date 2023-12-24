@@ -1,8 +1,10 @@
 package io.github.pnoker.center.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
-import io.github.pnoker.common.constant.enums.AlarmMessageProfileLevelFlagEnum;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import io.github.pnoker.common.constant.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,26 +35,26 @@ public class AlarmMessageProfileDO implements Serializable {
     /**
      * 报警信息模板标题
      */
-    @TableField("message_profile_title")
-    private String messageProfileTitle;
+    @TableField("alarm_message_title")
+    private String alarmMessageTitle;
 
     /**
      * 报警信息模板编号
      */
-    @TableField("message_profile_code")
-    private String messageProfileCode;
+    @TableField("alarm_message_code")
+    private String alarmMessageCode;
 
     /**
      * 报警信息模板等级
      */
-    @TableField("message_profile_level")
-    private AlarmMessageProfileLevelFlagEnum messageProfileLevel;
+    @TableField("alarm_message_level")
+    private AlarmMessageLevelFlagEnum alarmMessageLevel;
 
     /**
      * 报警信息模板内容
      */
-    @TableField("message_profile_content")
-    private String messageProfileContent;
+    @TableField(value = "alarm_message_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt alarmMessageExt;
 
     /**
      * 使能标识

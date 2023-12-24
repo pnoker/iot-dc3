@@ -1,9 +1,11 @@
 package io.github.pnoker.center.manager.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileShareFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -64,8 +66,8 @@ public class ProfileDO implements Serializable {
     /**
      * 模板拓展信息
      */
-    @TableField("profile_ext")
-    private String profileExt;
+    @TableField(value = "profile_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt profileExt;
 
     /**
      * 使能标识

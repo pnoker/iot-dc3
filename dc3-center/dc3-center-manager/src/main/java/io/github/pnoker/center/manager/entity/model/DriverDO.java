@@ -1,8 +1,10 @@
 package io.github.pnoker.center.manager.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.constant.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -63,8 +65,8 @@ public class DriverDO implements Serializable {
     /**
      * 驱动拓展信息
      */
-    @TableField("driver_ext")
-    private String driverExt;
+    @TableField(value = "driver_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt driverExt;
 
     /**
      * 使能标识

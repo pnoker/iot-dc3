@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.bo.LabelBindBO;
 import io.github.pnoker.center.manager.entity.query.LabelBindQuery;
 import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.entity.bo.LabelBindBO;
 
 /**
  * LabelBind Interface

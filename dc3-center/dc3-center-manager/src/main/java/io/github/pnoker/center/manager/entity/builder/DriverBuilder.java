@@ -57,6 +57,7 @@ public interface DriverBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "driverExt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     DriverDO buildDOByBO(DriverBO entityBO);
 

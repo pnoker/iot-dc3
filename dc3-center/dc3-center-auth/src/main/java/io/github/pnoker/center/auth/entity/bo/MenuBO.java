@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.entity.bo;
 
 import io.github.pnoker.center.auth.entity.bo.ext.MenuExtBO;
-import io.github.pnoker.common.base.BaseBO;
+import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuTypeFlagEnum;

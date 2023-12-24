@@ -56,6 +56,7 @@ public interface ProfileBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "profileExt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ProfileDO buildDOByBO(ProfileBO entityBO);
 

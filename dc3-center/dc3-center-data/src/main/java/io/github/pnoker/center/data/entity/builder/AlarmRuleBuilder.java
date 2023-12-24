@@ -56,6 +56,7 @@ public interface AlarmRuleBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "alarmRuleExt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     AlarmRuleDO buildDOByBO(AlarmRuleBO entityBO);
 

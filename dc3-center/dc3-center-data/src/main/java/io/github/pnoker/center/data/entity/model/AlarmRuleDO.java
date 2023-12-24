@@ -1,8 +1,10 @@
 package io.github.pnoker.center.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.constant.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -69,8 +71,8 @@ public class AlarmRuleDO implements Serializable {
     /**
      * 报警规则
      */
-    @TableField("alarm_rule")
-    private String alarmRule;
+    @TableField(value = "alarm_rule_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt alarmRuleExt;
 
     /**
      * 使能标识

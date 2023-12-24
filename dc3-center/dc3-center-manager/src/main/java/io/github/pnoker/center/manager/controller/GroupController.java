@@ -18,15 +18,15 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.GroupBO;
-import io.github.pnoker.center.manager.entity.builder.GroupBuilder;
+import io.github.pnoker.center.manager.entity.builder.GroupForManagerBuilder;
 import io.github.pnoker.center.manager.entity.query.GroupQuery;
-import io.github.pnoker.center.manager.entity.vo.GroupVO;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.bo.GroupBO;
+import io.github.pnoker.common.entity.vo.GroupVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,7 @@ import javax.validation.constraints.NotNull;
 public class GroupController implements Controller {
 
     @Resource
-    private GroupBuilder groupBuilder;
+    private GroupForManagerBuilder groupForManagerBuilder;
 
     @Resource
     private GroupService groupService;
@@ -63,7 +63,7 @@ public class GroupController implements Controller {
     public R<String> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
         try {
             entityVO.setTenantId(getTenantId());
-            GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
+            GroupBO entityBO = groupForManagerBuilder.buildBOByVO(entityVO);
             groupService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
@@ -96,7 +96,7 @@ public class GroupController implements Controller {
     @PostMapping("/update")
     public R<String> update(@Validated(Update.class) @RequestBody GroupVO entityVO) {
         try {
-            GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
+            GroupBO entityBO = groupForManagerBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             groupService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
@@ -115,7 +115,7 @@ public class GroupController implements Controller {
     public R<GroupVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             GroupBO entityBO = groupService.selectById(id);
-            GroupVO entityVO = groupBuilder.buildVOByBO(entityBO);
+            GroupVO entityVO = groupForManagerBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -136,7 +136,7 @@ public class GroupController implements Controller {
             }
             entityQuery.setTenantId(getTenantId());
             Page<GroupBO> entityPageBO = groupService.selectByPage(entityQuery);
-            Page<GroupVO> entityPageVO = groupBuilder.buildVOPageByBOPage(entityPageBO);
+            Page<GroupVO> entityPageVO = groupForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());

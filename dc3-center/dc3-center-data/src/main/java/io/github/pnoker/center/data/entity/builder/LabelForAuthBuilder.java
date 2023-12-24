@@ -17,38 +17,22 @@
 package io.github.pnoker.center.data.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.data.entity.bo.GroupBO;
-import io.github.pnoker.center.data.entity.model.GroupDO;
-import io.github.pnoker.center.data.entity.vo.GroupVO;
+import io.github.pnoker.center.data.entity.model.LabelDO;
+import io.github.pnoker.common.entity.bo.LabelBO;
+import io.github.pnoker.common.entity.builder.LabelBuilder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
 /**
- * Group Builder
+ * Label Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring")
-public interface GroupBuilder {
-
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    GroupBO buildBOByVO(GroupVO entityVO);
-
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<GroupBO> buildBOListByVOList(List<GroupVO> entityVOList);
+public interface LabelForAuthBuilder extends LabelBuilder {
 
     /**
      * BO to DO
@@ -57,7 +41,7 @@ public interface GroupBuilder {
      * @return EntityDO
      */
     @Mapping(target = "deleted", ignore = true)
-    GroupDO buildDOByBO(GroupBO entityBO);
+    LabelDO buildDOByBO(LabelBO entityBO);
 
     /**
      * BOList to DOList
@@ -65,7 +49,7 @@ public interface GroupBuilder {
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
      */
-    List<GroupDO> buildDOListByBOList(List<GroupBO> entityBOList);
+    List<LabelDO> buildDOListByBOList(List<LabelBO> entityBOList);
 
     /**
      * DO to BO
@@ -73,7 +57,7 @@ public interface GroupBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
-    GroupBO buildBOByDO(GroupDO entityDO);
+    LabelBO buildBOByDO(LabelDO entityDO);
 
     /**
      * DOList to BOList
@@ -81,23 +65,7 @@ public interface GroupBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<GroupBO> buildBOListByDOList(List<GroupDO> entityDOList);
-
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    GroupVO buildVOByBO(GroupBO entityBO);
-
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<GroupVO> buildVOListByBOList(List<GroupBO> entityBOList);
+    List<LabelBO> buildBOListByDOList(List<LabelDO> entityDOList);
 
     /**
      * DOPage to BOPage
@@ -106,14 +74,5 @@ public interface GroupBuilder {
      * @return EntityBO Page
      */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<GroupBO> buildBOPageByDOPage(Page<GroupDO> entityPageDO);
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<GroupVO> buildVOPageByBOPage(Page<GroupBO> entityPageBO);
+    Page<LabelBO> buildBOPageByDOPage(Page<LabelDO> entityPageDO);
 }

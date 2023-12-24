@@ -1,7 +1,7 @@
 package io.github.pnoker.center.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.constant.enums.AlarmMessageProfileLevelFlagEnum;
+import io.github.pnoker.common.constant.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,7 +40,7 @@ public class AlarmMessageProfileQuery implements Serializable {
      * 报警等级
      */
     @Schema(description = "报警等级")
-    private AlarmMessageProfileLevelFlagEnum alarmLevel;
+    private AlarmMessageLevelFlagEnum alarmLevel;
 
     /**
      * 报警信息

@@ -1,7 +1,7 @@
 package io.github.pnoker.center.data.entity.bo;
 
-import io.github.pnoker.common.base.BaseBO;
-import io.github.pnoker.common.constant.enums.AlarmMessageProfileLevelFlagEnum;
+import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.constant.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +30,7 @@ public class AlarmMessageProfileBO extends BaseBO {
     /**
      * 报警等级
      */
-    private AlarmMessageProfileLevelFlagEnum alarmLevel;
+    private AlarmMessageLevelFlagEnum alarmLevel;
 
     /**
      * 报警信息

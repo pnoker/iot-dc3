@@ -17,12 +17,13 @@
 package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.base.BaseVO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.github.pnoker.common.valid.Upload;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -94,5 +95,6 @@ public class DeviceVO extends BaseVO {
     @Schema(description = "模版ID集")
     @NotNull(message = "模版ID集不能为空",
             groups = {Upload.class})
+    @Builder.Default
     private Set<Long> profileIds = new HashSet<>(4);
 }

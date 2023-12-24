@@ -56,6 +56,7 @@ public interface AlarmMessageProfileBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "alarmMessageExt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     AlarmMessageProfileDO buildDOByBO(AlarmMessageProfileBO entityBO);
 

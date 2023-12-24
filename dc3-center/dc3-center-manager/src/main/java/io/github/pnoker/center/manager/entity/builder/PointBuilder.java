@@ -57,6 +57,7 @@ public interface PointBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "pointExt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     PointDO buildDOByBO(PointBO entityBO);
 

@@ -1,7 +1,9 @@
 package io.github.pnoker.center.auth.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -50,8 +52,8 @@ public class RoleDO implements Serializable {
     /**
      * 角色拓展信息
      */
-    @TableField("role_ext")
-    private String roleExt;
+    @TableField(value = "role_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt roleExt;
 
     /**
      * 使能标识

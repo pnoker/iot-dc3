@@ -56,6 +56,7 @@ public interface RoleBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "roleExt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     RoleDO buildDOByBO(RoleBO entityBO);
 

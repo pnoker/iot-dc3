@@ -17,38 +17,22 @@
 package io.github.pnoker.center.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.bo.LabelBindBO;
-import io.github.pnoker.center.auth.entity.model.LabelBindDO;
-import io.github.pnoker.center.auth.entity.vo.LabelBindVO;
+import io.github.pnoker.center.auth.entity.model.LabelDO;
+import io.github.pnoker.common.entity.bo.LabelBO;
+import io.github.pnoker.common.entity.builder.LabelBuilder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
 /**
- * LabelBind Builder
+ * Label Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring")
-public interface LabelBindBuilder {
-
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    LabelBindBO buildBOByVO(LabelBindVO entityVO);
-
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<LabelBindBO> buildBOListByVOList(List<LabelBindVO> entityVOList);
+public interface LabelForAuthBuilder extends LabelBuilder {
 
     /**
      * BO to DO
@@ -57,7 +41,7 @@ public interface LabelBindBuilder {
      * @return EntityDO
      */
     @Mapping(target = "deleted", ignore = true)
-    LabelBindDO buildDOByBO(LabelBindBO entityBO);
+    LabelDO buildDOByBO(LabelBO entityBO);
 
     /**
      * BOList to DOList
@@ -65,7 +49,7 @@ public interface LabelBindBuilder {
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
      */
-    List<LabelBindDO> buildDOListByBOList(List<LabelBindBO> entityBOList);
+    List<LabelDO> buildDOListByBOList(List<LabelBO> entityBOList);
 
     /**
      * DO to BO
@@ -73,7 +57,7 @@ public interface LabelBindBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
-    LabelBindBO buildBOByDO(LabelBindDO entityDO);
+    LabelBO buildBOByDO(LabelDO entityDO);
 
     /**
      * DOList to BOList
@@ -81,23 +65,7 @@ public interface LabelBindBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<LabelBindBO> buildBOListByDOList(List<LabelBindDO> entityDOList);
-
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    LabelBindVO buildVOByBO(LabelBindBO entityBO);
-
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<LabelBindVO> buildVOListByBOList(List<LabelBindBO> entityBOList);
+    List<LabelBO> buildBOListByDOList(List<LabelDO> entityDOList);
 
     /**
      * DOPage to BOPage
@@ -106,14 +74,5 @@ public interface LabelBindBuilder {
      * @return EntityBO Page
      */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<LabelBindBO> buildBOPageByDOPage(Page<LabelBindDO> entityPageDO);
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<LabelBindVO> buildVOPageByBOPage(Page<LabelBindBO> entityPageBO);
+    Page<LabelBO> buildBOPageByDOPage(Page<LabelDO> entityPageDO);
 }
