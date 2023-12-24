@@ -22,7 +22,7 @@ import io.github.pnoker.center.manager.entity.builder.DriverAttributeBuilder;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeBuilder;
 import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.base.BaseBO;
+import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -39,7 +39,7 @@ services:
     depends_on:
       - mysql
     volumes:
-      - register_log:/home/nacos/logs
+      - register:/home/nacos/logs
     logging:
       driver: json-file
       options:
@@ -223,7 +223,7 @@ services:
           - dc3-portainer
 
 volumes:
-  register_log:
+  register:
   mysql_lib:
   mysql_data:
   mongo_db:

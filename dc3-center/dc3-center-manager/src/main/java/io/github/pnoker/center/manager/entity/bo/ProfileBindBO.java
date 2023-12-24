@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
-import io.github.pnoker.common.base.BaseBO;
+import io.github.pnoker.common.entity.base.BaseBO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,4 +43,9 @@ public class ProfileBindBO extends BaseBO {
      * 设备ID
      */
     private Long deviceId;
+
+    /**
+     * 租户ID
+     */
+    private Long tenantId;
 }

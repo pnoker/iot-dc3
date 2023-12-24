@@ -14,41 +14,26 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.entity.builder;
+package io.github.pnoker.center.manager.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.data.entity.bo.LabelBO;
-import io.github.pnoker.center.data.entity.model.LabelDO;
-import io.github.pnoker.center.data.entity.vo.LabelVO;
+import io.github.pnoker.center.manager.entity.model.GroupDO;
+import io.github.pnoker.common.entity.bo.GroupBO;
+import io.github.pnoker.common.entity.builder.GroupBuilder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
 /**
- * Label Builder
+ * Group Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring")
-public interface LabelBuilder {
+public interface GroupForManagerBuilder extends GroupBuilder {
 
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    LabelBO buildBOByVO(LabelVO entityVO);
-
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<LabelBO> buildBOListByVOList(List<LabelVO> entityVOList);
 
     /**
      * BO to DO
@@ -57,7 +42,7 @@ public interface LabelBuilder {
      * @return EntityDO
      */
     @Mapping(target = "deleted", ignore = true)
-    LabelDO buildDOByBO(LabelBO entityBO);
+    GroupDO buildDOByBO(GroupBO entityBO);
 
     /**
      * BOList to DOList
@@ -65,7 +50,7 @@ public interface LabelBuilder {
      * @param entityBOList EntityBO Array
      * @return EntityDO Array
      */
-    List<LabelDO> buildDOListByBOList(List<LabelBO> entityBOList);
+    List<GroupDO> buildDOListByBOList(List<GroupBO> entityBOList);
 
     /**
      * DO to BO
@@ -73,7 +58,7 @@ public interface LabelBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
-    LabelBO buildBOByDO(LabelDO entityDO);
+    GroupBO buildBOByDO(GroupDO entityDO);
 
     /**
      * DOList to BOList
@@ -81,23 +66,8 @@ public interface LabelBuilder {
      * @param entityDOList EntityDO Array
      * @return EntityBO Array
      */
-    List<LabelBO> buildBOListByDOList(List<LabelDO> entityDOList);
+    List<GroupBO> buildBOListByDOList(List<GroupDO> entityDOList);
 
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    LabelVO buildVOByBO(LabelBO entityBO);
-
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<LabelVO> buildVOListByBOList(List<LabelBO> entityBOList);
 
     /**
      * DOPage to BOPage
@@ -106,14 +76,5 @@ public interface LabelBuilder {
      * @return EntityBO Page
      */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<LabelBO> buildBOPageByDOPage(Page<LabelDO> entityPageDO);
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<LabelVO> buildVOPageByBOPage(Page<LabelBO> entityPageBO);
+    Page<GroupBO> buildBOPageByDOPage(Page<GroupDO> entityPageDO);
 }

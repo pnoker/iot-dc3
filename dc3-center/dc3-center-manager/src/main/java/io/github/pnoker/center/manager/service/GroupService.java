@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.bo.GroupBO;
 import io.github.pnoker.center.manager.entity.query.GroupQuery;
 import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.entity.bo.GroupBO;
 
 /**
  * Group Interface

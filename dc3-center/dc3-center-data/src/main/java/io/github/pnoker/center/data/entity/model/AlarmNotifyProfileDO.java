@@ -1,8 +1,10 @@
 package io.github.pnoker.center.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.constant.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,14 +35,14 @@ public class AlarmNotifyProfileDO implements Serializable {
     /**
      * 报警通知模板名称
      */
-    @TableField("notify_profile_name")
-    private String notifyProfileName;
+    @TableField("alarm_notify_name")
+    private String alarmNotifyName;
 
     /**
      * 报警通知模板编号
      */
-    @TableField("notify_profile_code")
-    private String notifyProfileCode;
+    @TableField("alarm_notify_code")
+    private String alarmNotifyCode;
 
     /**
      * 自动确认标识
@@ -49,16 +51,16 @@ public class AlarmNotifyProfileDO implements Serializable {
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
-     * 通知间隔，毫秒
+     * 报警通知间隔，毫秒
      */
-    @TableField("notify_interval")
-    private Long notifyInterval;
+    @TableField("alarm_notify_interval")
+    private Long alarmNotifyInterval;
 
     /**
-     * 报警通知配置
+     * 报警通知模版配置
      */
-    @TableField("alarm_config")
-    private String alarmConfig;
+    @TableField(value = "alarm_notify_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt alarmNotifyExt;
 
     /**
      * 使能标识

@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
-import io.github.pnoker.common.base.BaseBO;
+import io.github.pnoker.common.entity.base.BaseBO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,10 +37,15 @@ public class RoleResourceBindBO extends BaseBO {
     /**
      * 角色ID
      */
-    private String roleId;
+    private Long roleId;
 
     /**
      * 权限资源ID
      */
-    private String resourceId;
+    private Long resourceId;
+
+    /**
+     * 租户ID
+     */
+    private Long tenantId;
 }

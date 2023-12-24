@@ -2,10 +2,10 @@ package io.github.pnoker.center.auth.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import io.github.pnoker.center.auth.entity.bo.ext.MenuExtBO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuTypeFlagEnum;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -73,7 +73,7 @@ public class MenuDO implements Serializable {
      * 菜单拓展信息
      */
     @TableField(value = "menu_ext", typeHandler = JacksonTypeHandler.class)
-    private MenuExtBO menuExt;
+    private JsonExt menuExt;
 
     /**
      * 使能标识

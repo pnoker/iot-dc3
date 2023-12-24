@@ -1,8 +1,10 @@
 package io.github.pnoker.center.manager.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.constant.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -63,8 +65,8 @@ public class PointAttributeDO implements Serializable {
     /**
      * 位号属性拓展信息
      */
-    @TableField("attribute_ext")
-    private String attributeExt;
+    @TableField(value = "attribute_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt attributeExt;
 
     /**
      * 使能标识

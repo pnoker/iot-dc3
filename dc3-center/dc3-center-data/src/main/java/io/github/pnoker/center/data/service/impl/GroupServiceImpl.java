@@ -22,13 +22,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.data.entity.bo.GroupBO;
-import io.github.pnoker.center.data.entity.builder.GroupBuilder;
+import io.github.pnoker.center.data.entity.builder.GroupForDataBuilder;
 import io.github.pnoker.center.data.entity.model.GroupDO;
 import io.github.pnoker.center.data.entity.query.GroupQuery;
 import io.github.pnoker.center.data.manager.GroupManager;
 import io.github.pnoker.center.data.service.GroupService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.entity.bo.GroupBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
@@ -50,7 +50,7 @@ import javax.annotation.Resource;
 public class GroupServiceImpl implements GroupService {
 
     @Resource
-    private GroupBuilder groupBuilder;
+    private GroupForDataBuilder groupForDataBuilder;
 
     @Resource
     private GroupManager groupManager;
@@ -62,7 +62,7 @@ public class GroupServiceImpl implements GroupService {
     public void save(GroupBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
-        GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
+        GroupDO entityDO = groupForDataBuilder.buildDOByBO(entityBO);
         if (!groupManager.save(entityDO)) {
             throw new AddException("分组创建失败");
         }
@@ -96,7 +96,7 @@ public class GroupServiceImpl implements GroupService {
 
         checkDuplicate(entityBO, true, true);
 
-        GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
+        GroupDO entityDO = groupForDataBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!groupManager.updateById(entityDO)) {
             throw new UpdateException("分组更新失败");
@@ -109,7 +109,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupBO selectById(Long id) {
         GroupDO entityDO = getDOById(id, true);
-        return groupBuilder.buildBOByDO(entityDO);
+        return groupForDataBuilder.buildBOByDO(entityDO);
     }
 
     /**
@@ -121,7 +121,7 @@ public class GroupServiceImpl implements GroupService {
             entityQuery.setPage(new Pages());
         }
         Page<GroupDO> entityPageDO = groupManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return groupBuilder.buildBOPageByDOPage(entityPageDO);
+        return groupForDataBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**

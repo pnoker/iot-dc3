@@ -132,7 +132,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
      */
     private LambdaQueryWrapper<AlarmMessageProfileDO> fuzzyQuery(AlarmMessageProfileQuery query) {
         LambdaQueryWrapper<AlarmMessageProfileDO> wrapper = Wrappers.<AlarmMessageProfileDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmTitle()), AlarmMessageProfileDO::getMessageProfileTitle, query.getAlarmTitle());
+        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmTitle()), AlarmMessageProfileDO::getAlarmMessageTitle, query.getAlarmTitle());
         wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), AlarmMessageProfileDO::getTenantId, query.getTenantId());
         return wrapper;
     }
@@ -147,8 +147,8 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
      */
     private boolean checkDuplicate(AlarmMessageProfileBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmMessageProfileDO> wrapper = Wrappers.<AlarmMessageProfileDO>query().lambda();
-        wrapper.eq(AlarmMessageProfileDO::getMessageProfileTitle, entityBO.getAlarmTitle());
-        wrapper.eq(AlarmMessageProfileDO::getMessageProfileLevel, entityBO.getAlarmLevel());
+        wrapper.eq(AlarmMessageProfileDO::getAlarmMessageTitle, entityBO.getAlarmTitle());
+        wrapper.eq(AlarmMessageProfileDO::getAlarmMessageTitle, entityBO.getAlarmLevel());
         wrapper.eq(AlarmMessageProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmMessageProfileDO one = alarmMessageProfileManager.getOne(wrapper);

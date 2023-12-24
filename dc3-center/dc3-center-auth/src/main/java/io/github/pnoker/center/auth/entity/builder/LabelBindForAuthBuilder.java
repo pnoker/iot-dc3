@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.entity.builder;
+package io.github.pnoker.center.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.LabelBindBO;
-import io.github.pnoker.center.manager.entity.model.LabelBindDO;
-import io.github.pnoker.center.manager.entity.vo.LabelBindVO;
+import io.github.pnoker.center.auth.entity.model.LabelBindDO;
+import io.github.pnoker.common.entity.bo.LabelBindBO;
+import io.github.pnoker.common.entity.builder.LabelBindBuilder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -32,23 +32,7 @@ import java.util.List;
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring")
-public interface LabelBindBuilder {
-
-    /**
-     * VO to BO
-     *
-     * @param entityVO EntityVO
-     * @return EntityBO
-     */
-    LabelBindBO buildBOByVO(LabelBindVO entityVO);
-
-    /**
-     * VOList to BOList
-     *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
-     */
-    List<LabelBindBO> buildBOListByVOList(List<LabelBindVO> entityVOList);
+public interface LabelBindForAuthBuilder extends LabelBindBuilder {
 
     /**
      * BO to DO
@@ -84,22 +68,6 @@ public interface LabelBindBuilder {
     List<LabelBindBO> buildBOListByDOList(List<LabelBindDO> entityDOList);
 
     /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    LabelBindVO buildVOByBO(LabelBindBO entityBO);
-
-    /**
-     * BOList to VOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityVO Array
-     */
-    List<LabelBindVO> buildVOListByBOList(List<LabelBindBO> entityBOList);
-
-    /**
      * DOPage to BOPage
      *
      * @param entityPageDO EntityDO Page
@@ -107,13 +75,4 @@ public interface LabelBindBuilder {
      */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<LabelBindBO> buildBOPageByDOPage(Page<LabelBindDO> entityPageDO);
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<LabelBindVO> buildVOPageByBOPage(Page<LabelBindBO> entityPageBO);
 }

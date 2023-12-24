@@ -132,7 +132,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
      */
     private LambdaQueryWrapper<AlarmNotifyProfileDO> fuzzyQuery(AlarmNotifyProfileQuery query) {
         LambdaQueryWrapper<AlarmNotifyProfileDO> wrapper = Wrappers.<AlarmNotifyProfileDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getNotifyProfileName()), AlarmNotifyProfileDO::getNotifyProfileName, query.getNotifyProfileName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(query.getNotifyProfileName()), AlarmNotifyProfileDO::getAlarmNotifyName, query.getNotifyProfileName());
         wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), AlarmNotifyProfileDO::getTenantId, query.getTenantId());
         return wrapper;
     }
@@ -147,7 +147,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
      */
     private boolean checkDuplicate(AlarmNotifyProfileBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmNotifyProfileDO> wrapper = Wrappers.<AlarmNotifyProfileDO>query().lambda();
-        wrapper.eq(AlarmNotifyProfileDO::getNotifyProfileName, entityBO.getNotifyProfileName());
+        wrapper.eq(AlarmNotifyProfileDO::getAlarmNotifyName, entityBO.getNotifyProfileName());
         wrapper.eq(AlarmNotifyProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmNotifyProfileDO one = alarmNotifyProfileManager.getOne(wrapper);

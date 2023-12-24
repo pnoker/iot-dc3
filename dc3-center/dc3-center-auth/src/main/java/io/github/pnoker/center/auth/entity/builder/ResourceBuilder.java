@@ -56,6 +56,7 @@ public interface ResourceBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "resourceExt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ResourceDO buildDOByBO(ResourceBO entityBO);
 

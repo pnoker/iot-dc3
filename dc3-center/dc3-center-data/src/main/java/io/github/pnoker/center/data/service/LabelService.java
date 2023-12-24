@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.data.service;
 
-import io.github.pnoker.center.data.entity.bo.LabelBO;
 import io.github.pnoker.center.data.entity.query.LabelQuery;
 import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.entity.bo.LabelBO;
 
 /**
  * Label Interface

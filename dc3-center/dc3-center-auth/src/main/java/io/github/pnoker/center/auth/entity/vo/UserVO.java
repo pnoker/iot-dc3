@@ -19,7 +19,7 @@ package io.github.pnoker.center.auth.entity.vo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.center.auth.entity.vo.ext.UserIdentityExtVO;
 import io.github.pnoker.center.auth.entity.vo.ext.UserSocialExtVO;
-import io.github.pnoker.common.base.BaseVO;
+import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
