@@ -16,11 +16,12 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.bo.ext.MenuExtBO;
+import io.github.pnoker.center.auth.entity.ext.MenuExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +37,7 @@ import java.io.Serializable;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(title = "MenuQuery", description = "菜单-查询")
 public class MenuQuery implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -74,7 +76,7 @@ public class MenuQuery implements Serializable {
     /**
      * 菜单拓展信息
      */
-    private MenuExtBO menuExt;
+    private MenuExt menuExt;
 
     /**
      * 使能标识

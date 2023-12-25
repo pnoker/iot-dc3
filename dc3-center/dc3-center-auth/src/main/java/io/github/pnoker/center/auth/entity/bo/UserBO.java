@@ -16,9 +16,10 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
-import io.github.pnoker.center.auth.entity.bo.ext.UserIdentityExtBO;
-import io.github.pnoker.center.auth.entity.bo.ext.UserSocialExtBO;
+import io.github.pnoker.center.auth.entity.ext.UserIdentityExt;
+import io.github.pnoker.center.auth.entity.ext.UserSocialExt;
 import io.github.pnoker.common.entity.base.BaseBO;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,6 +35,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserBO extends BaseBO {
 
     /**
@@ -59,10 +61,10 @@ public class UserBO extends BaseBO {
     /**
      * 社交相关拓展信息
      */
-    private UserSocialExtBO socialExt;
+    private UserSocialExt socialExt;
 
     /**
      * 身份相关拓展信息
      */
-    private UserIdentityExtBO identityExt;
+    private UserIdentityExt identityExt;
 }

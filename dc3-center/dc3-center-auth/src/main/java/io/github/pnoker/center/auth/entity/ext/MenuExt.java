@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.bo.ext;
+package io.github.pnoker.center.auth.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,10 +26,9 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 
 /**
- * Menu BO
- * MenuExt BO
+ * Menu Ext
  * <p>
- * 菜单拓展信息
+ * 菜单相关拓展信息
  *
  * @author pnoker
  * @since 2022.1.0
@@ -36,26 +37,32 @@ import java.io.Serializable;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class MenuExtBO implements Serializable {
+@AllArgsConstructor
+@Schema(description = "菜单相关拓展")
+public class MenuExt implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
      * 标题
      */
+    @Schema(description = "标题")
     private String title;
 
     /**
      * 图标
      */
+    @Schema(description = "图标")
     private String icon;
 
     /**
      * 链接
      */
+    @Schema(description = "链接")
     private String url;
 
     /**
      * 描述
      */
+    @Schema(description = "描述")
     private String remark;
 }

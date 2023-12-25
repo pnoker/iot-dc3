@@ -17,14 +17,15 @@
 package io.github.pnoker.center.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.auth.entity.vo.ext.ApiExtVO;
-import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.center.auth.entity.ext.ApiExt;
 import io.github.pnoker.common.constant.enums.ApiTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,6 +44,7 @@ import javax.validation.constraints.Pattern;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "Api", description = "接口")
 public class ApiVO extends BaseVO {
@@ -74,7 +76,7 @@ public class ApiVO extends BaseVO {
      * Api接口拓展信息
      */
     @Schema(description = "Api接口拓展信息")
-    private ApiExtVO apiExt;
+    private ApiExt apiExt;
 
     /**
      * 使能标识

@@ -16,10 +16,11 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.bo.ext.UserIdentityExtBO;
-import io.github.pnoker.center.auth.entity.bo.ext.UserSocialExtBO;
+import io.github.pnoker.center.auth.entity.ext.UserIdentityExt;
+import io.github.pnoker.center.auth.entity.ext.UserSocialExt;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,6 +38,7 @@ import java.io.Serializable;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(title = "UserQuery", description = "用户-查询")
 public class UserQuery implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -66,10 +68,10 @@ public class UserQuery implements Serializable {
     /**
      * 社交相关拓展信息
      */
-    private UserSocialExtBO socialExt;
+    private UserSocialExt socialExt;
 
     /**
      * 身份相关拓展信息
      */
-    private UserIdentityExtBO identityExt;
+    private UserIdentityExt identityExt;
 }

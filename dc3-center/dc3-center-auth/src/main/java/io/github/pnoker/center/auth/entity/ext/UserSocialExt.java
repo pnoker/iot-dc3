@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.vo.ext;
+package io.github.pnoker.center.auth.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
 /**
- * User VO
- * User Social Ext VO
+ * User Ext
  * <p>
  * 用户社交相关拓展信息
  *
@@ -35,7 +36,10 @@ import java.io.Serializable;
 @Getter
 @Setter
 @SuperBuilder
-public class UserSocialExtVO implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+@Schema(description = "用户社交相关拓展")
+public class UserSocialExt implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
