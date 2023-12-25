@@ -18,6 +18,7 @@ package io.github.pnoker.center.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +36,7 @@ import java.io.Serializable;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(title = "TenantBindQuery", description = "租户绑定-查询")
 public class TenantBindQuery implements Serializable {
     private static final long serialVersionUID = 1L;

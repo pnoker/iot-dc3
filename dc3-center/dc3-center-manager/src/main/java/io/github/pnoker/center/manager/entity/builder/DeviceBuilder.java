@@ -75,7 +75,6 @@ public interface DeviceBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
-    @Mapping(target = "enableFlag", ignore = true)
     DeviceBO buildBOByDO(DeviceDO entityDO);
 
     /**

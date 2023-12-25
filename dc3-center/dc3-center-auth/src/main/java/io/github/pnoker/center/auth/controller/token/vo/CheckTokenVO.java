@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
 
@@ -32,7 +31,6 @@ import javax.validation.constraints.NotBlank;
  */
 @Getter
 @Setter
-@SuperBuilder
 @Schema(title = "校验令牌请求体")
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class CheckTokenVO {

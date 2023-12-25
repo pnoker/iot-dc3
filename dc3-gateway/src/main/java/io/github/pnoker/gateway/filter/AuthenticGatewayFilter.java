@@ -30,7 +30,6 @@ import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.core.Ordered;
@@ -93,7 +92,6 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
         return chain.filter(exchange);
     }
 
-    @NotNull
     private GrpcRTenantDTO getTenantDTO(ServerHttpRequest request) {
         String tenant = DecodeUtil.byteToString(DecodeUtil.decode(GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT)));
         if (ObjectUtil.isEmpty(tenant)) {
@@ -107,7 +105,6 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
         return entityDTO;
     }
 
-    @NotNull
     private GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request) {
         String user = DecodeUtil.byteToString(DecodeUtil.decode(GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN)));
         if (ObjectUtil.isEmpty(user)) {
@@ -121,7 +118,6 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
         return entityDTO;
     }
 
-    @NotNull
     private RequestHeader.UserHeader getUserDTO(GrpcRUserLoginDTO rUserLoginDTO, GrpcRTenantDTO rTenantDTO) {
         GrpcRUserDTO entityDTO = userApiBlockingStub.selectById(GrpcIdQuery.newBuilder().setId(rUserLoginDTO.getData().getBase().getId()).build());
         if (!entityDTO.getResult().getOk()) {

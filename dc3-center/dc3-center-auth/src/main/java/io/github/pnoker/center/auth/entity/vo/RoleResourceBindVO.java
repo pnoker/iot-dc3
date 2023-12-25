@@ -21,6 +21,7 @@ import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,6 +39,7 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "RoleResourceBind", description = "角色资源绑定")
 public class RoleResourceBindVO extends BaseVO {

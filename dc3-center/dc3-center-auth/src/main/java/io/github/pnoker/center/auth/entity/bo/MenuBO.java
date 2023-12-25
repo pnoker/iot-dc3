@@ -16,11 +16,12 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
-import io.github.pnoker.center.auth.entity.bo.ext.MenuExtBO;
-import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.center.auth.entity.ext.MenuExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuTypeFlagEnum;
+import io.github.pnoker.common.entity.base.BaseBO;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +37,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public class MenuBO extends BaseBO {
 
     /**
@@ -71,7 +73,7 @@ public class MenuBO extends BaseBO {
     /**
      * 菜单拓展信息
      */
-    private MenuExtBO menuExt;
+    private MenuExt menuExt;
 
     /**
      * 使能标识

@@ -17,6 +17,7 @@
 package io.github.pnoker.center.data.entity.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +36,7 @@ import java.io.Serializable;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(title = "PointValueRead", description = "位号读")
 public class PointValueReadVO implements Serializable {
     private static final long serialVersionUID = 1L;

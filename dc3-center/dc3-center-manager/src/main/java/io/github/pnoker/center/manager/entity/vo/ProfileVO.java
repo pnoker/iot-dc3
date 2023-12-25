@@ -17,13 +17,14 @@
 package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileShareFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,6 +43,7 @@ import javax.validation.constraints.Pattern;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "Profile", description = "模版")
 public class ProfileVO extends BaseVO {

@@ -5,6 +5,7 @@ import io.github.pnoker.common.constant.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +25,7 @@ import java.io.Serializable;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "AlarmNotifyProfile", description = "报警通知模板")
 public class AlarmNotifyProfileQuery implements Serializable {

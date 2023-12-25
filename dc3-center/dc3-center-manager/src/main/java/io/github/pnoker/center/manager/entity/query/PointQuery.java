@@ -21,6 +21,7 @@ import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.RwFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,6 +39,7 @@ import java.io.Serializable;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(title = "PointQuery", description = "位号-查询")
 public class PointQuery implements Serializable {
     private static final long serialVersionUID = 1L;

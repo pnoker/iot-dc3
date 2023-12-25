@@ -17,14 +17,16 @@
 package io.github.pnoker.center.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.auth.entity.vo.ext.UserIdentityExtVO;
-import io.github.pnoker.center.auth.entity.vo.ext.UserSocialExtVO;
+import io.github.pnoker.center.auth.entity.ext.UserIdentityExt;
+import io.github.pnoker.center.auth.entity.ext.UserSocialExt;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -40,6 +42,8 @@ import javax.validation.constraints.Pattern;
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "User", description = "用户")
 public class UserVO extends BaseVO {
@@ -88,11 +92,11 @@ public class UserVO extends BaseVO {
      * 社交相关拓展信息
      */
     @Schema(description = "社交相关拓展信息")
-    private UserSocialExtVO socialExt;
+    private UserSocialExt socialExt;
 
     /**
      * 身份相关拓展信息
      */
     @Schema(description = "身份相关拓展信息")
-    private UserIdentityExtVO identityExt;
+    private UserIdentityExt identityExt;
 }

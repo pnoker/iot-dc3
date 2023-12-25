@@ -1,10 +1,11 @@
 package io.github.pnoker.center.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.constant.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.base.BaseVO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +23,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "AlarmMessageProfile", description = "报警信息模板")
 public class AlarmMessageProfileVO extends BaseVO {

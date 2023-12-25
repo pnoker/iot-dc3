@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.bo.ext;
+package io.github.pnoker.center.auth.entity.ext;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
 /**
- * User VO
- * User Identity Ext VO
+ * Api Ext
  * <p>
- * 用户身份相关拓展信息
+ * 接口相关拓展信息
  *
  * @author pnoker
  * @since 2022.1.0
@@ -34,27 +36,28 @@ import java.io.Serializable;
 @Getter
 @Setter
 @SuperBuilder
-public class UserIdentityExtBO implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+@Schema(description = "接口相关拓展")
+public class ApiExt implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 真实姓名
+     * 标题
      */
-    private String realName;
+    @Schema(description = "标题")
+    private String title;
 
     /**
-     * 性别
+     * 链接
      */
-    private String gender;
+    @Schema(description = "链接")
+    private String url;
 
     /**
-     * 国籍
+     * 描述
      */
-    private String nationality;
-
-    /**
-     * 身份证号码
-     */
-    private String idNumber;
+    @Schema(description = "描述")
+    private String remark;
 
 }

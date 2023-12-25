@@ -16,10 +16,11 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.RwFlagEnum;
+import io.github.pnoker.common.entity.base.BaseBO;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,6 +38,7 @@ import java.math.BigDecimal;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public class PointBO extends BaseBO {
 
     /**
@@ -98,6 +100,16 @@ public class PointBO extends BaseBO {
      * 租户ID
      */
     private Long tenantId;
+
+    /**
+     * 签名
+     */
+    private String signature;
+
+    /**
+     * 版本
+     */
+    private Integer version;
 
     /**
      * 设置默认值

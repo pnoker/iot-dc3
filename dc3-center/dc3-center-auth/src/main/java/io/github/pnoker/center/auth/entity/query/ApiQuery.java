@@ -16,11 +16,12 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.bo.ext.ApiExtBO;
+import io.github.pnoker.center.auth.entity.ext.ApiExt;
 import io.github.pnoker.common.constant.enums.ApiTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +37,7 @@ import java.io.Serializable;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(title = "ApiQuery", description = "接口-查询")
 public class ApiQuery implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -60,7 +62,7 @@ public class ApiQuery implements Serializable {
     /**
      * Api接口拓展信息
      */
-    private ApiExtBO apiExt;
+    private ApiExt apiExt;
 
     /**
      * 使能标识

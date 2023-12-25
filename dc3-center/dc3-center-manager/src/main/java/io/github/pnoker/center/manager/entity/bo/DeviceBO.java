@@ -16,12 +16,10 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseBO;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import io.github.pnoker.common.entity.base.BaseBO;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
@@ -37,6 +35,7 @@ import java.util.Set;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public class DeviceBO extends BaseBO {
 
     /**
@@ -68,6 +67,16 @@ public class DeviceBO extends BaseBO {
      * 租户ID
      */
     private Long tenantId;
+
+    /**
+     * 签名
+     */
+    private String signature;
+
+    /**
+     * 版本
+     */
+    private Integer version;
 
     // 附加
     @Builder.Default

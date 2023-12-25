@@ -16,10 +16,11 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
-import io.github.pnoker.center.auth.entity.bo.ext.ApiExtBO;
-import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.center.auth.entity.ext.ApiExt;
 import io.github.pnoker.common.constant.enums.ApiTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.base.BaseBO;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +36,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ApiBO extends BaseBO {
 
     /**
@@ -55,7 +57,7 @@ public class ApiBO extends BaseBO {
     /**
      * Api接口拓展信息
      */
-    private ApiExtBO apiExt;
+    private ApiExt apiExt;
 
     /**
      * 使能标识
