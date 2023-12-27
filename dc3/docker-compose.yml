@@ -27,7 +27,7 @@ services:
       - 8080:80
       - 443:443
     environment:
-      - APP_API_PATH=dc3-gateway
+      - APP_API_HOST=dc3-gateway
       - APP_API_PORT=8000
     container_name: iot-dc3-web
     hostname: iot-dc3-web
