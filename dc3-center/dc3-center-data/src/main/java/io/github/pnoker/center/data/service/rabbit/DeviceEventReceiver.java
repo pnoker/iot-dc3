@@ -21,7 +21,7 @@ import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.service.EventService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.driver.EventConstant;
-import io.github.pnoker.common.event.DeviceEvent;
+import io.github.pnoker.center.data.entity.DeviceEvent;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;

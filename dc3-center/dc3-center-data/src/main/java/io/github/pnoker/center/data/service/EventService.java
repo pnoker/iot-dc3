@@ -19,8 +19,8 @@ package io.github.pnoker.center.data.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.query.DeviceEventQuery;
 import io.github.pnoker.center.data.entity.query.DriverEventQuery;
-import io.github.pnoker.common.event.DeviceEvent;
-import io.github.pnoker.common.event.DriverEvent;
+import io.github.pnoker.center.data.entity.DeviceEvent;
+import io.github.pnoker.center.data.entity.DriverEvent;
 
 import java.util.List;
 

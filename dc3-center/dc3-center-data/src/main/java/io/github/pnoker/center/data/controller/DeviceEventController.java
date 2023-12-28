@@ -23,7 +23,7 @@ import io.github.pnoker.center.data.service.EventService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.event.DeviceEvent;
+import io.github.pnoker.center.data.entity.DeviceEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
