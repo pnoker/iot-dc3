@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Lwm2mServer 已经实现coap方式接入 待实现coaps方式
@@ -221,7 +222,7 @@ public class Lwm2mServer {
             @Override
             public void registered(Registration registration, Registration previousReg, Collection<Observation> previousObservations) {
                 log.debug("new device {} registered", registration.getEndpoint());
-                driverSenderService.deviceStatusSender(Long.valueOf(registration.getEndpoint()), DeviceStatusEnum.ONLINE);
+                driverSenderService.deviceStatusSender(Long.valueOf(registration.getEndpoint()), DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS);
             }
 
             /**
@@ -233,7 +234,7 @@ public class Lwm2mServer {
             @Override
             public void updated(RegistrationUpdate registrationUpdate, Registration updatedRegistration, Registration registration1) {
                 log.debug("device is still here:{}", updatedRegistration.getEndpoint());
-                driverSenderService.deviceStatusSender(Long.valueOf(updatedRegistration.getEndpoint()), DeviceStatusEnum.ONLINE);
+                driverSenderService.deviceStatusSender(Long.valueOf(updatedRegistration.getEndpoint()), DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS);
             }
 
             /**
