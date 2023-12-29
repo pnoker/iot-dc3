@@ -18,12 +18,10 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.common.constant.driver.EventConstant;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
-import io.github.pnoker.common.event.DeviceEvent;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.driver.entity.WeatherInfo;
@@ -85,7 +83,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         - MAINTAIN:维护
         - FAULT:故障
          */
-        driverContext.getDriverMetadataDTO().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceEventSender(new DeviceEvent(id, EventConstant.Device.STATUS, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS)));
+        driverContext.getDriverMetadataDTO().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
     @Override

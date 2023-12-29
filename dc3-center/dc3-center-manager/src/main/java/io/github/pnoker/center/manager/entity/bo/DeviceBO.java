@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
 import lombok.*;
