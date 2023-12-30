@@ -34,7 +34,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface TenantBuilder {
 
-    /* /**
+    /**
      * VO to BO
      *
      * @param entityVO EntityVO
@@ -56,6 +56,7 @@ public interface TenantBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "tenantExt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     TenantDO buildDOByBO(TenantBO entityBO);
 

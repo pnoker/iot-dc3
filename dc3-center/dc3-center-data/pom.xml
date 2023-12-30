@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>2023.4.5</version>
+        <version>2024.1.0</version>
     </parent>
 
     <artifactId>dc3-center-data</artifactId>

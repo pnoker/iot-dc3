@@ -41,6 +41,9 @@ public interface DriverBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "signature", ignore = true)
+    @Mapping(target = "version", ignore = true)
     DriverBO buildBOByVO(DriverVO entityVO);
 
     /**
@@ -123,6 +126,7 @@ public interface DriverBuilder {
      * @param entityDTO EntityDTO
      * @return EntityBO
      */
+    @Mapping(target = "driverExt", ignore = true)
     DriverBO buildBOByDTO(DriverDTO entityDTO);
 
     /**

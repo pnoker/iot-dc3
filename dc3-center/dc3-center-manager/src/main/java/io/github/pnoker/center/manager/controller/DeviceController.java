@@ -70,8 +70,8 @@ public class DeviceController implements Controller {
     @PostMapping("/add")
     public R<String> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
         try {
-            entityVO.setTenantId(getTenantId());
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
             deviceService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
@@ -104,8 +104,8 @@ public class DeviceController implements Controller {
     @PostMapping("/update")
     public R<String> update(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
         try {
-            entityVO.setTenantId(getTenantId());
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
             deviceService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
@@ -177,8 +177,8 @@ public class DeviceController implements Controller {
     @PostMapping("/import")
     public R<String> importDevice(@Validated(Update.class) DeviceVO entityVO, @RequestParam("file") MultipartFile multipartFile) {
         try {
-            entityVO.setTenantId(getTenantId());
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
             deviceService.importDevice(entityBO, multipartFile);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -195,8 +195,8 @@ public class DeviceController implements Controller {
     @PostMapping("/export/import_template")
     public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
         try {
-            entityVO.setTenantId(getTenantId());
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
             Path filePath = deviceService.generateImportTemplate(entityBO);
             return RequestUtil.responseFile(filePath);
         } catch (Exception e) {

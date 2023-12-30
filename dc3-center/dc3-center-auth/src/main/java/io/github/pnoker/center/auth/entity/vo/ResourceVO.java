@@ -106,10 +106,4 @@ public class ResourceVO extends BaseVO {
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    @Schema(description = "租户ID")
-    private Long tenantId;
 }

@@ -1,5 +1,6 @@
 package io.github.pnoker.center.data.entity.bo;
 
+import io.github.pnoker.center.data.entity.ext.AlarmRuleExt;
 import io.github.pnoker.common.constant.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -24,12 +25,30 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class AlarmRuleBO extends BaseBO {
 
-    private String ruleName;
+    /**
+     * 报警规则名称
+     */
+    private String alarmRuleName;
+
+    /**
+     * 报警规则编号
+     */
+    private String alarmRuleCode;
 
     /**
      * 位号ID
      */
     private Long pointId;
+
+    /**
+     * 报警通知模板ID
+     */
+    private Long alarmNotifyProfileId;
+
+    /**
+     * 报警信息模板ID
+     */
+    private Long alarmMessageProfileId;
 
     /**
      * 报警类型标识
@@ -39,7 +58,7 @@ public class AlarmRuleBO extends BaseBO {
     /**
      * 报警规则
      */
-    private String alarmRule;
+    private AlarmRuleExt alarmRuleExt;
 
     /**
      * 使能标识

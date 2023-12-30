@@ -40,6 +40,7 @@ public interface ApiBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "tenantId", ignore = true)
     ApiBO buildBOByVO(ApiVO entityVO);
 
     /**
@@ -56,6 +57,7 @@ public interface ApiBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "apiExt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ApiDO buildDOByBO(ApiBO entityBO);
 

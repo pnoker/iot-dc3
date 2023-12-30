@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
+import io.github.pnoker.center.auth.entity.ext.TenantExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
 import lombok.AllArgsConstructor;
@@ -37,9 +38,20 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class TenantBO extends BaseBO {
 
+    /**
+     * 租户名称
+     */
     private String tenantName;
 
+    /**
+     * 租户编号
+     */
     private String tenantCode;
+
+    /**
+     * 租户拓展信息
+     */
+    private TenantExt tenantExt;
 
     /**
      * 使能标识

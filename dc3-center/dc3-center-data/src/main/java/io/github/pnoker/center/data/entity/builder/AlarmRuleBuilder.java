@@ -40,6 +40,7 @@ public interface AlarmRuleBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "tenantId", ignore = true)
     AlarmRuleBO buildBOByVO(AlarmRuleVO entityVO);
 
     /**

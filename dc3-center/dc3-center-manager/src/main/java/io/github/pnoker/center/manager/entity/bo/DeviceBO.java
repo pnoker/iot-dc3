@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
+import io.github.pnoker.center.manager.entity.ext.DeviceExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
 import lombok.*;
@@ -56,6 +57,11 @@ public class DeviceBO extends BaseBO {
      * 分组ID
      */
     private Long groupId;
+
+    /**
+     * 设备拓展信息
+     */
+    private DeviceExt deviceExt;
 
     /**
      * 使能标识

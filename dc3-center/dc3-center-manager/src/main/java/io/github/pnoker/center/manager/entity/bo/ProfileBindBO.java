@@ -50,14 +50,4 @@ public class ProfileBindBO extends BaseBO {
      * 租户ID
      */
     private Long tenantId;
-
-    /**
-     * 签名
-     */
-    private String signature;
-
-    /**
-     * 版本
-     */
-    private Integer version;
 }

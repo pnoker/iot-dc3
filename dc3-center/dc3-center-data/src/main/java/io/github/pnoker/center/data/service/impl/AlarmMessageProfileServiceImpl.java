@@ -147,8 +147,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
      */
     private boolean checkDuplicate(AlarmMessageProfileBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmMessageProfileDO> wrapper = Wrappers.<AlarmMessageProfileDO>query().lambda();
-        wrapper.eq(AlarmMessageProfileDO::getAlarmMessageTitle, entityBO.getAlarmTitle());
-        wrapper.eq(AlarmMessageProfileDO::getAlarmMessageTitle, entityBO.getAlarmLevel());
+        wrapper.eq(AlarmMessageProfileDO::getAlarmMessageTitle, entityBO.getAlarmMessageTitle());
         wrapper.eq(AlarmMessageProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmMessageProfileDO one = alarmMessageProfileManager.getOne(wrapper);

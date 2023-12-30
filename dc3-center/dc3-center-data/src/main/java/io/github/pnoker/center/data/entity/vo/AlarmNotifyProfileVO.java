@@ -1,6 +1,7 @@
 package io.github.pnoker.center.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.data.entity.ext.AlarmNotifyExt;
 import io.github.pnoker.common.constant.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseVO;
@@ -29,32 +30,38 @@ import lombok.experimental.SuperBuilder;
 public class AlarmNotifyProfileVO extends BaseVO {
 
     /**
+     * 报警通知模板名称
+     */
+    @Schema(description = "报警通知模板名称")
+    private String alarmNotifyName;
+
+    /**
+     * 报警通知模板编号
+     */
+    @Schema(description = "报警通知模板编号")
+    private String alarmNotifyCode;
+
+    /**
      * 自动确认标识
      */
     @Schema(description = "自动确认标识")
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
-     * 通知间隔，毫秒
+     * 报警通知间隔，毫秒
      */
-    @Schema(description = "通知间隔，毫秒")
-    private Long notifyInterval;
+    @Schema(description = "报警通知间隔，毫秒")
+    private Long alarmNotifyInterval;
 
     /**
-     * 报警通知配置
+     * 报警通知模版配置
      */
-    @Schema(description = "报警通知配置")
-    private String alarmConfig;
+    @Schema(description = "报警通知模版配置")
+    private AlarmNotifyExt alarmNotifyExt;
 
     /**
      * 使能标识
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    @Schema(description = "租户ID")
-    private Long tenantId;
 }

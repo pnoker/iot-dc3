@@ -40,6 +40,7 @@ public interface AlarmMessageProfileBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "tenantId", ignore = true)
     AlarmMessageProfileBO buildBOByVO(AlarmMessageProfileVO entityVO);
 
     /**

@@ -41,29 +41,53 @@ import java.io.Serializable;
 @Schema(description = "用户身份相关拓展")
 public class UserIdentityExt implements Serializable {
     private static final long serialVersionUID = 1L;
+    /**
+     * 类型，用于解析Json字符串
+     */
+    @Schema(description = "类型")
+    private String type;
 
     /**
-     * 真实姓名
+     * 版本，用于乐观锁
      */
-    @Schema(description = "真实姓名")
-    private String realName;
+    @Schema(description = "版本")
+    private Long version;
 
     /**
-     * 性别
+     * 描述
      */
-    @Schema(description = "性别")
-    private String gender;
+    @Schema(description = "描述")
+    private String remark;
 
-    /**
-     * 国籍
-     */
-    @Schema(description = "国籍")
-    private String nationality;
+    @Getter
+    @Setter
+    @SuperBuilder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "内容")
+    public static class Content {
+        /**
+         * 真实姓名
+         */
+        @Schema(description = "真实姓名")
+        private String realName;
 
-    /**
-     * 身份证号码
-     */
-    @Schema(description = "身份证号码")
-    private String idNumber;
+        /**
+         * 性别
+         */
+        @Schema(description = "性别")
+        private String gender;
 
+        /**
+         * 国籍
+         */
+        @Schema(description = "国籍")
+        private String nationality;
+
+        /**
+         * 身份证号码
+         */
+        @Schema(description = "身份证号码")
+        private String idNumber;
+    }
 }

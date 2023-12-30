@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
+import io.github.pnoker.center.manager.entity.ext.ProfileExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileShareFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileTypeFlagEnum;
@@ -63,6 +64,11 @@ public class ProfileBO extends BaseBO {
      * 分组ID
      */
     private Long groupId;
+
+    /**
+     * 模板拓展信息
+     */
+    private ProfileExt profileExt;
 
     /**
      * 使能标识

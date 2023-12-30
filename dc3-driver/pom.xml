@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>2023.4.5</version>
+        <version>2024.1.0</version>
     </parent>
 
     <artifactId>dc3-driver</artifactId>
@@ -31,20 +31,20 @@
 
     <properties>
         <!-- DC3 Driver 相关 -->
-        <dc3.driver.sdk.version>2023.4.5</dc3.driver.sdk.version>
+        <dc3.driver.sdk.version>2024.1.0</dc3.driver.sdk.version>
     </properties>
 
     <modules>
-        <module>dc3-driver-virtual</module>
+        <module>dc3-driver-dtu-yeecom</module>
+        <module>dc3-driver-edge-gateway</module>
         <module>dc3-driver-listening-virtual</module>
-        <module>dc3-driver-plcs7</module>
+        <module>dc3-driver-lwm2m</module>
+        <module>dc3-driver-modbus-tcp</module>
+        <module>dc3-driver-mqtt</module>
         <module>dc3-driver-opc-da</module>
         <module>dc3-driver-opc-ua</module>
-        <module>dc3-driver-mqtt</module>
-        <module>dc3-driver-modbus-tcp</module>
-        <module>dc3-driver-edge-gateway</module>
-        <module>dc3-driver-lwm2m</module>
-        <module>dc3-driver-dtu-yeecom</module>
+        <module>dc3-driver-plcs7</module>
+        <module>dc3-driver-virtual</module>
         <module>dc3-driver-weather-amap</module>
     </modules>
 

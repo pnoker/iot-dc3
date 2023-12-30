@@ -17,6 +17,7 @@
 package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.manager.entity.ext.PointExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.RwFlagEnum;
@@ -118,16 +119,16 @@ public class PointVO extends BaseVO {
     private Long groupId;
 
     /**
+     * 位号拓展信息
+     */
+    @Schema(description = "位号拓展信息")
+    private PointExt pointExt;
+
+    /**
      * 使能标识
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    @Schema(description = "租户ID")
-    private Long tenantId;
 
     /**
      * 设置默认值

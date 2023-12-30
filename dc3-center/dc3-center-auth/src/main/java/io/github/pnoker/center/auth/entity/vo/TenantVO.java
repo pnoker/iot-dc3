@@ -17,6 +17,7 @@
 package io.github.pnoker.center.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.auth.entity.ext.TenantExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
@@ -47,6 +48,9 @@ import javax.validation.constraints.Pattern;
 @Schema(title = "Tenant", description = "租户")
 public class TenantVO extends BaseVO {
 
+    /**
+     * 租户名称
+     */
     @Schema(description = "租户名称")
     @NotBlank(message = "Tenant name can't be empty",
             groups = {Add.class, Auth.class})
@@ -55,6 +59,9 @@ public class TenantVO extends BaseVO {
             groups = {Add.class, Update.class})
     private String tenantName;
 
+    /**
+     * 租户编号
+     */
     @Schema(description = "租户编号")
     @NotBlank(message = "Tenant code can't be empty",
             groups = {Add.class})
@@ -62,6 +69,12 @@ public class TenantVO extends BaseVO {
             message = "Invalid tenant code",
             groups = {Add.class, Update.class})
     private String tenantCode;
+
+    /**
+     * 租户拓展信息
+     */
+    @Schema(description = "租户拓展信息")
+    private TenantExt tenantExt;
 
     /**
      * 使能标识

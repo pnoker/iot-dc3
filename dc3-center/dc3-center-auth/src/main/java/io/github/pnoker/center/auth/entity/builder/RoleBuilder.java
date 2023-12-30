@@ -40,6 +40,7 @@ public interface RoleBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "tenantId", ignore = true)
     RoleBO buildBOByVO(RoleVO entityVO);
 
     /**

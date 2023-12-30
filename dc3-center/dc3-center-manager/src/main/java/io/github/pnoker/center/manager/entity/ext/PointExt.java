@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.entity.ext;
+package io.github.pnoker.center.manager.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -26,9 +26,9 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 
 /**
- * User Ext
+ * Point Ext
  * <p>
- * 用户社交相关拓展信息
+ * 位号相关拓展信息
  *
  * @author pnoker
  * @since 2022.1.0
@@ -38,9 +38,10 @@ import java.io.Serializable;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "用户社交相关拓展")
-public class UserSocialExt implements Serializable {
+@Schema(description = "位号相关拓展")
+public class PointExt implements Serializable {
     private static final long serialVersionUID = 1L;
+
     /**
      * 类型，用于解析Json字符串
      */
@@ -66,34 +67,6 @@ public class UserSocialExt implements Serializable {
     @AllArgsConstructor
     @Schema(description = "内容")
     public static class Content {
-        /**
-         * 微信
-         */
-        @Schema(description = "微信")
-        private String wechat;
-
-        /**
-         * QQ
-         */
-        @Schema(description = "QQ")
-        private String qq;
-
-        /**
-         * 飞书
-         */
-        @Schema(description = "飞书")
-        private String lark;
-
-        /**
-         * 钉钉
-         */
-        @Schema(description = "钉钉")
-        private String dingTalk;
-
-        /**
-         * 社交主页
-         */
-        @Schema(description = "社交主页")
-        private String homeUrl;
+        private String keep;
     }
 }
