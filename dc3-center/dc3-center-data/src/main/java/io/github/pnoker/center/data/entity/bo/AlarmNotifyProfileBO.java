@@ -1,5 +1,6 @@
 package io.github.pnoker.center.data.entity.bo;
 
+import io.github.pnoker.center.data.entity.ext.AlarmNotifyExt;
 import io.github.pnoker.common.constant.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -24,21 +25,30 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class AlarmNotifyProfileBO extends BaseBO {
 
-    private String notifyProfileName;
+    /**
+     * 报警通知模板名称
+     */
+    private String alarmNotifyName;
+
+    /**
+     * 报警通知模板编号
+     */
+    private String alarmNotifyCode;
+
     /**
      * 自动确认标识
      */
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
-     * 通知间隔，毫秒
+     * 报警通知间隔，毫秒
      */
-    private Long notifyInterval;
+    private Long alarmNotifyInterval;
 
     /**
-     * 报警通知配置
+     * 报警通知模版配置
      */
-    private String alarmConfig;
+    private AlarmNotifyExt alarmNotifyExt;
 
     /**
      * 使能标识

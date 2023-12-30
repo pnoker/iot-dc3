@@ -17,6 +17,7 @@
 package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.manager.entity.ext.DriverExt;
 import io.github.pnoker.common.constant.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseVO;
@@ -93,14 +94,14 @@ public class DriverVO extends BaseVO {
     private String serviceHost;
 
     /**
+     * 驱动拓展信息
+     */
+    @Schema(description = "驱动拓展信息")
+    private DriverExt driverExt;
+
+    /**
      * 使能标识
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    @Schema(description = "租户ID")
-    private Long tenantId;
 }

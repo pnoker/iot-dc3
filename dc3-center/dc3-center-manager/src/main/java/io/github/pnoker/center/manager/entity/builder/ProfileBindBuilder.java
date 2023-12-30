@@ -40,6 +40,7 @@ public interface ProfileBindBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "tenantId", ignore = true)
     ProfileBindBO buildBOByVO(ProfileBindVO entityVO);
 
     /**

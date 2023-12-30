@@ -17,6 +17,7 @@
 package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.manager.entity.ext.ProfileExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileShareFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileTypeFlagEnum;
@@ -84,14 +85,14 @@ public class ProfileVO extends BaseVO {
     private Long groupId;
 
     /**
+     * 模板拓展信息
+     */
+    @Schema(description = "模板拓展信息")
+    private ProfileExt profileExt;
+
+    /**
      * 使能标识
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    @Schema(description = "租户ID")
-    private Long tenantId;
 }

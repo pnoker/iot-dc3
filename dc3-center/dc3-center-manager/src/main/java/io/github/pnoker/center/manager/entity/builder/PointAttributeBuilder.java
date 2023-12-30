@@ -41,6 +41,9 @@ public interface PointAttributeBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "signature", ignore = true)
+    @Mapping(target = "version", ignore = true)
     PointAttributeBO buildBOByVO(PointAttributeVO entityVO);
 
     /**
@@ -123,6 +126,7 @@ public interface PointAttributeBuilder {
      * @param entityDTO EntityDTO
      * @return EntityBO
      */
+    @Mapping(target = "attributeExt", ignore = true)
     PointAttributeBO buildBOByDTO(PointAttributeDTO entityDTO);
 
     /**

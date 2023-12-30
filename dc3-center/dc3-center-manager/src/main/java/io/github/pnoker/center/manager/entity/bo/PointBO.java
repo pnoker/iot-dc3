@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
+import io.github.pnoker.center.manager.entity.ext.PointExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.RwFlagEnum;
@@ -87,9 +88,24 @@ public class PointBO extends BaseBO {
     private Long profileId;
 
     /**
+     * 报警通知模板ID
+     */
+    private Long alarmNotifyProfileId;
+
+    /**
+     * 报警信息模板ID
+     */
+    private Long alarmMessageProfileId;
+
+    /**
      * 分组ID
      */
     private Long groupId;
+
+    /**
+     * 位号拓展信息
+     */
+    private PointExt pointExt;
 
     /**
      * 使能标识

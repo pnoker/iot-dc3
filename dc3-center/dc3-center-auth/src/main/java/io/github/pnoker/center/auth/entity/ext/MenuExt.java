@@ -41,28 +41,53 @@ import java.io.Serializable;
 @Schema(description = "菜单相关拓展")
 public class MenuExt implements Serializable {
     private static final long serialVersionUID = 1L;
+    /**
+     * 类型，用于解析Json字符串
+     */
+    @Schema(description = "类型")
+    private String type;
 
     /**
-     * 标题
+     * 版本，用于乐观锁
      */
-    @Schema(description = "标题")
-    private String title;
-
-    /**
-     * 图标
-     */
-    @Schema(description = "图标")
-    private String icon;
-
-    /**
-     * 链接
-     */
-    @Schema(description = "链接")
-    private String url;
+    @Schema(description = "版本")
+    private Long version;
 
     /**
      * 描述
      */
     @Schema(description = "描述")
     private String remark;
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "内容")
+    public static class Content {
+        /**
+         * 标题
+         */
+        @Schema(description = "标题")
+        private String title;
+
+        /**
+         * 图标
+         */
+        @Schema(description = "图标")
+        private String icon;
+
+        /**
+         * 链接
+         */
+        @Schema(description = "链接")
+        private String url;
+
+        /**
+         * 描述
+         */
+        @Schema(description = "描述")
+        private String remark;
+    }
 }

@@ -56,6 +56,8 @@ public interface UserBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "socialExt", ignore = true)
+    @Mapping(target = "identityExt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     UserDO buildDOByBO(UserBO entityBO);
 

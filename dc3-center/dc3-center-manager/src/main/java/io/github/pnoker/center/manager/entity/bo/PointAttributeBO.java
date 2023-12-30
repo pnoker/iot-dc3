@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
+import io.github.pnoker.center.manager.entity.ext.PointAttributeExt;
 import io.github.pnoker.common.constant.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -62,6 +63,11 @@ public class PointAttributeBO extends BaseBO {
      * 驱动ID
      */
     private Long driverId;
+
+    /**
+     * 位号属性拓展信息
+     */
+    private PointAttributeExt attributeExt;
 
     /**
      * 使能标识

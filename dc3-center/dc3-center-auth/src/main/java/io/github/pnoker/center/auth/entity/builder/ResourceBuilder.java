@@ -40,6 +40,7 @@ public interface ResourceBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "tenantId", ignore = true)
     ResourceBO buildBOByVO(ResourceVO entityVO);
 
     /**

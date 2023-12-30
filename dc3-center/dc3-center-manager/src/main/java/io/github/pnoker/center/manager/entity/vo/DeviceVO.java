@@ -17,6 +17,7 @@
 package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.manager.entity.ext.DeviceExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
@@ -79,16 +80,16 @@ public class DeviceVO extends BaseVO {
     private Long groupId;
 
     /**
+     * 设备拓展信息
+     */
+    @Schema(description = "设备拓展信息")
+    private DeviceExt deviceExt;
+
+    /**
      * 使能标识
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    @Schema(description = "租户ID")
-    private Long tenantId;
 
     @Schema(description = "模版ID集")
     @NotNull(message = "模版ID集不能为空",

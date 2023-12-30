@@ -147,7 +147,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
      */
     private boolean checkDuplicate(AlarmNotifyProfileBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmNotifyProfileDO> wrapper = Wrappers.<AlarmNotifyProfileDO>query().lambda();
-        wrapper.eq(AlarmNotifyProfileDO::getAlarmNotifyName, entityBO.getNotifyProfileName());
+        wrapper.eq(AlarmNotifyProfileDO::getAlarmNotifyName, entityBO.getAlarmNotifyName());
         wrapper.eq(AlarmNotifyProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmNotifyProfileDO one = alarmNotifyProfileManager.getOne(wrapper);

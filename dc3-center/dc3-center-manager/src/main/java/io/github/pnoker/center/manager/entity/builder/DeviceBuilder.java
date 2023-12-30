@@ -41,6 +41,9 @@ public interface DeviceBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "signature", ignore = true)
+    @Mapping(target = "version", ignore = true)
     DeviceBO buildBOByVO(DeviceVO entityVO);
 
     /**
@@ -75,6 +78,7 @@ public interface DeviceBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "profileIds", ignore = true)
     DeviceBO buildBOByDO(DeviceDO entityDO);
 
     /**

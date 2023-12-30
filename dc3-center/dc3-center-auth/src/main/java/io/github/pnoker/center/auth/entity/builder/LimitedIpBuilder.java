@@ -40,6 +40,7 @@ public interface LimitedIpBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "tenantId", ignore = true)
     LimitedIpBO buildBOByVO(LimitedIpVO entityVO);
 
     /**
