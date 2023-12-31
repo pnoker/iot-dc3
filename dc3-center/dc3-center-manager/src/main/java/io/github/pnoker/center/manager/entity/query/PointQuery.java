@@ -47,11 +47,7 @@ public class PointQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
-    /**
-     * 设备ID
-     */
-    @Schema(description = "设备ID")
-    private Long deviceId;
+    // 查询字段
 
     /**
      * 位号名称
@@ -96,9 +92,17 @@ public class PointQuery implements Serializable {
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * 版本
      */
-    @Schema(description = "租户ID")
-    private Long tenantId;
+    @Schema(description = "版本")
+    private Integer version;
+
+    // 附加字段
+
+    /**
+     * 设备ID
+     */
+    @Schema(description = "设备ID")
+    private Long deviceId;
 
 }

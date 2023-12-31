@@ -134,7 +134,6 @@ public class LabelController implements Controller {
             if (ObjectUtil.isEmpty(entityQuery)) {
                 entityQuery = new LabelQuery();
             }
-            entityQuery.setTenantId(getTenantId());
             Page<LabelBO> entityPageBO = labelService.selectByPage(entityQuery);
             Page<LabelVO> entityPageVO = labelForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);

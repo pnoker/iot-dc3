@@ -25,7 +25,7 @@ import io.github.pnoker.center.auth.entity.bo.LimitedIpBO;
 import io.github.pnoker.center.auth.entity.builder.LimitedIpBuilder;
 import io.github.pnoker.center.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.center.auth.entity.query.LimitedIpQuery;
-import io.github.pnoker.center.auth.manager.LimitedIpManager;
+import io.github.pnoker.center.auth.dal.LimitedIpManager;
 import io.github.pnoker.center.auth.service.LimitedIpService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;

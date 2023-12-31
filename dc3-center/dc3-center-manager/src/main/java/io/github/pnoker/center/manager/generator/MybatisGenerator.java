@@ -50,8 +50,8 @@ public class MybatisGenerator {
                 .packageConfig(builder -> builder
                         .parent("io.github.pnoker.center.manager")
                         .entity("entity.model")
-                        .service("manager")
-                        .serviceImpl("manager.impl")
+                        .service("dal")
+                        .serviceImpl("dal.impl")
                         .mapper("mapper")
                         .pathInfo(ImmutableMap.of(
                                 OutputFile.service, path + "/java/io/github/pnoker/center/manager/manager",

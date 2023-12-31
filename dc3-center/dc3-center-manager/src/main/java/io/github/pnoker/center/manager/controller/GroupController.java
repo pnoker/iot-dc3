@@ -134,7 +134,6 @@ public class GroupController implements Controller {
             if (ObjectUtil.isEmpty(entityQuery)) {
                 entityQuery = new GroupQuery();
             }
-            entityQuery.setTenantId(getTenantId());
             Page<GroupBO> entityPageBO = groupService.selectByPage(entityQuery);
             Page<GroupVO> entityPageVO = groupForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);

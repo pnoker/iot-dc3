@@ -46,6 +46,8 @@ public class PointAttributeQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
     /**
      * 显示名称
      */
@@ -65,12 +67,6 @@ public class PointAttributeQuery implements Serializable {
     private AttributeTypeFlagEnum attributeTypeFlag;
 
     /**
-     * 默认值
-     */
-    @Schema(description = "默认值")
-    private String defaultValue;
-
-    /**
      * 驱动ID
      */
     @Schema(description = "驱动ID")
@@ -83,8 +79,8 @@ public class PointAttributeQuery implements Serializable {
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * 版本
      */
-    @Schema(description = "租户ID")
-    private Long tenantId;
+    @Schema(description = "版本")
+    private Integer version;
 }

@@ -61,7 +61,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             entityQuery.setPage(new Pages());
         }
 
-        DriverQuery driverQuery = DriverQuery.builder().page(entityQuery.getPage()).driverName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        DriverQuery driverQuery = DriverQuery.builder().page(entityQuery.getPage()).driverName(entityQuery.getLabel()).build();
         Page<DriverBO> driverPageBO = driverService.selectByPage(driverQuery);
 
         return dictionaryBuilder.buildVOPageByDriverBOPage(driverPageBO);
@@ -76,7 +76,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             entityQuery.setPage(new Pages());
         }
 
-        ProfileQuery profileQuery = ProfileQuery.builder().page(entityQuery.getPage()).profileName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        ProfileQuery profileQuery = ProfileQuery.builder().page(entityQuery.getPage()).profileName(entityQuery.getLabel()).build();
         Page<ProfileBO> profilePageBO = profileService.selectByPage(profileQuery);
 
         return dictionaryBuilder.buildVOPageByProfileBOPage(profilePageBO);
@@ -91,7 +91,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             entityQuery.setPage(new Pages());
         }
 
-        PointQuery pointQuery = PointQuery.builder().page(entityQuery.getPage()).profileId(entityQuery.getParentId()).pointName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        PointQuery pointQuery = PointQuery.builder().page(entityQuery.getPage()).profileId(entityQuery.getParentId()).pointName(entityQuery.getLabel()).build();
         Page<PointBO> pointPageBO = pointService.selectByPage(pointQuery);
 
         return dictionaryBuilder.buildVOPageByPointBOPage(pointPageBO);
@@ -106,7 +106,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             entityQuery.setPage(new Pages());
         }
 
-        PointQuery pointQuery = PointQuery.builder().page(entityQuery.getPage()).deviceId(entityQuery.getParentId()).pointName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        PointQuery pointQuery = PointQuery.builder().page(entityQuery.getPage()).deviceId(entityQuery.getParentId()).pointName(entityQuery.getLabel()).build();
         Page<PointBO> pointPageBO = pointService.selectByPage(pointQuery);
 
         return dictionaryBuilder.buildVOPageByPointBOPage(pointPageBO);
@@ -121,7 +121,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             entityQuery.setPage(new Pages());
         }
 
-        DeviceQuery deviceQuery = DeviceQuery.builder().page(entityQuery.getPage()).deviceName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        DeviceQuery deviceQuery = DeviceQuery.builder().page(entityQuery.getPage()).deviceName(entityQuery.getLabel()).build();
         Page<DeviceBO> devicePageBO = deviceService.selectByPage(deviceQuery);
 
         return dictionaryBuilder.buildVOPageByDeviceBOPage(devicePageBO);
@@ -136,7 +136,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             entityQuery.setPage(new Pages());
         }
 
-        DeviceQuery deviceQuery = DeviceQuery.builder().page(entityQuery.getPage()).driverId(entityQuery.getParentId()).deviceName(entityQuery.getLabel()).tenantId(entityQuery.getTenantId()).build();
+        DeviceQuery deviceQuery = DeviceQuery.builder().page(entityQuery.getPage()).driverId(entityQuery.getParentId()).deviceName(entityQuery.getLabel()).build();
         Page<DeviceBO> devicePageBO = deviceService.selectByPage(deviceQuery);
 
         return dictionaryBuilder.buildVOPageByDeviceBOPage(devicePageBO);

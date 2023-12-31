@@ -24,7 +24,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.builder.LabelBindForDataBuilder;
 import io.github.pnoker.center.data.entity.model.LabelBindDO;
 import io.github.pnoker.center.data.entity.query.LabelBindQuery;
-import io.github.pnoker.center.data.manager.LabelBindManager;
+import io.github.pnoker.center.data.dal.LabelBindManager;
 import io.github.pnoker.center.data.service.LabelBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.bo.LabelBindBO;

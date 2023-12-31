@@ -26,7 +26,7 @@ import io.github.pnoker.center.auth.entity.bo.RoleBO;
 import io.github.pnoker.center.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.center.auth.entity.model.RoleDO;
 import io.github.pnoker.center.auth.entity.query.RoleQuery;
-import io.github.pnoker.center.auth.manager.RoleManager;
+import io.github.pnoker.center.auth.dal.RoleManager;
 import io.github.pnoker.center.auth.service.RoleService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -133,7 +133,7 @@ public class RoleServiceImpl implements RoleService {
     private LambdaQueryWrapper<RoleDO> fuzzyQuery(RoleQuery query) {
         LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(query.getRoleName()), RoleDO::getRoleName, query.getRoleName());
-        wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), RoleDO::getTenantId, query.getTenantId());
+        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), RoleDO::getTenantId, getTenantId());
         return wrapper;
     }
 

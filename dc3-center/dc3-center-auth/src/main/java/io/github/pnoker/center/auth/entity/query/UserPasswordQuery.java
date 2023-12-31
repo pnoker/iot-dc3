@@ -41,10 +41,14 @@ import java.io.Serializable;
 public class UserPasswordQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
     private Pages page;
+
+    // 查询字段
 
     /**
      * 登录密码
      */
+    @Schema(description = "登录密码")
     private String loginPassword;
 }

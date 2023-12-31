@@ -46,6 +46,8 @@ public class DriverQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
     /**
      * 驱动名称
      */
@@ -65,16 +67,16 @@ public class DriverQuery implements Serializable {
     private String serviceName;
 
     /**
-     * 驱动类型标识
-     */
-    @Schema(description = "驱动类型标识")
-    private DriverTypeFlagEnum driverTypeFlag;
-
-    /**
      * 服务主机
      */
     @Schema(description = "服务主机")
     private String serviceHost;
+
+    /**
+     * 驱动类型标识
+     */
+    @Schema(description = "驱动类型标识")
+    private DriverTypeFlagEnum driverTypeFlag;
 
     /**
      * 使能标识
@@ -83,8 +85,8 @@ public class DriverQuery implements Serializable {
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * 版本
      */
-    @Schema(description = "租户ID")
-    private Long tenantId;
+    @Schema(description = "版本")
+    private Integer version;
 }

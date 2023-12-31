@@ -28,8 +28,8 @@ import io.github.pnoker.center.manager.entity.builder.DriverBuilder;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.model.DriverDO;
 import io.github.pnoker.center.manager.entity.query.DriverQuery;
-import io.github.pnoker.center.manager.manager.DeviceManager;
-import io.github.pnoker.center.manager.manager.DriverManager;
+import io.github.pnoker.center.manager.dal.DeviceManager;
+import io.github.pnoker.center.manager.dal.DriverManager;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -176,7 +176,7 @@ public class DriverServiceImpl implements DriverService {
             wrapper.like(CharSequenceUtil.isNotEmpty(query.getServiceHost()), DriverDO::getServiceHost, query.getServiceHost());
             wrapper.eq(ObjectUtil.isNotNull(query.getDriverTypeFlag()), DriverDO::getDriverTypeFlag, query.getDriverTypeFlag());
             wrapper.eq(ObjectUtil.isNotNull(query.getEnableFlag()), DriverDO::getEnableFlag, query.getEnableFlag());
-            wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), DriverDO::getTenantId, query.getTenantId());
+            wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), DriverDO::getTenantId, getTenantId());
         }
         return wrapper;
     }

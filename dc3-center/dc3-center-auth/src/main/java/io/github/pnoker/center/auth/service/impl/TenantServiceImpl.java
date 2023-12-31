@@ -25,7 +25,7 @@ import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.builder.TenantBuilder;
 import io.github.pnoker.center.auth.entity.model.TenantDO;
 import io.github.pnoker.center.auth.entity.query.TenantQuery;
-import io.github.pnoker.center.auth.manager.TenantManager;
+import io.github.pnoker.center.auth.dal.TenantManager;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;

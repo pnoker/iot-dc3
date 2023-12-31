@@ -26,7 +26,7 @@ import io.github.pnoker.center.data.entity.bo.AlarmMessageProfileBO;
 import io.github.pnoker.center.data.entity.builder.AlarmMessageProfileBuilder;
 import io.github.pnoker.center.data.entity.model.AlarmMessageProfileDO;
 import io.github.pnoker.center.data.entity.query.AlarmMessageProfileQuery;
-import io.github.pnoker.center.data.manager.AlarmMessageProfileManager;
+import io.github.pnoker.center.data.dal.AlarmMessageProfileManager;
 import io.github.pnoker.center.data.service.AlarmMessageProfileService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -132,8 +132,8 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
      */
     private LambdaQueryWrapper<AlarmMessageProfileDO> fuzzyQuery(AlarmMessageProfileQuery query) {
         LambdaQueryWrapper<AlarmMessageProfileDO> wrapper = Wrappers.<AlarmMessageProfileDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmTitle()), AlarmMessageProfileDO::getAlarmMessageTitle, query.getAlarmTitle());
-        wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), AlarmMessageProfileDO::getTenantId, query.getTenantId());
+        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmMessageTitle()), AlarmMessageProfileDO::getAlarmMessageTitle, query.getAlarmMessageTitle());
+        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), AlarmMessageProfileDO::getTenantId, getTenantId());
         return wrapper;
     }
 

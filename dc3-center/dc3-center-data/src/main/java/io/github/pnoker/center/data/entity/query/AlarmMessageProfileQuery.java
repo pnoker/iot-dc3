@@ -30,35 +30,33 @@ import java.io.Serializable;
 @Schema(title = "AlarmMessageProfile", description = "报警信息模板")
 public class AlarmMessageProfileQuery implements Serializable {
     private static final long serialVersionUID = 1L;
+
     @Schema(description = "分页")
     private Pages page;
+
+    // 查询字段
+
     /**
-     * 报警标题
+     * 报警信息模板标题
      */
     @Schema(description = "报警标题")
-    private String alarmTitle;
+    private String alarmMessageTitle;
 
     /**
-     * 报警等级
+     * 报警信息模板编号
      */
-    @Schema(description = "报警等级")
-    private AlarmMessageLevelFlagEnum alarmLevel;
+    @Schema(description = "报警信息模板编号")
+    private String alarmMessageCode;
 
     /**
-     * 报警信息
+     * 报警信息模板等级
      */
-    @Schema(description = "报警信息")
-    private String alarmContent;
+    @Schema(description = "报警信息模板等级")
+    private AlarmMessageLevelFlagEnum alarmMessageLevel;
 
     /**
      * 使能标识
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    @Schema(description = "租户ID")
-    private Long tenantId;
 }

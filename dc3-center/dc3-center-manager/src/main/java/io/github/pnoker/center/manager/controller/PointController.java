@@ -190,7 +190,6 @@ public class PointController implements Controller {
             if (ObjectUtil.isEmpty(pointPageQuery)) {
                 pointPageQuery = new PointQuery();
             }
-            pointPageQuery.setTenantId(getTenantId());
             Page<PointBO> page = pointService.selectByPage(pointPageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);

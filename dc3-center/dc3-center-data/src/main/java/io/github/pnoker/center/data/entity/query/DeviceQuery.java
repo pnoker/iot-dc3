@@ -38,12 +38,14 @@ import java.io.Serializable;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "Device", description = "设备-查询")
+@Schema(title = "DeviceQuery", description = "设备-查询")
 public class DeviceQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")
     private Pages page;
+
+    // 查询字段
 
     /**
      * 设备名称
@@ -64,16 +66,28 @@ public class DeviceQuery implements Serializable {
     private Long driverId;
 
     /**
+     * 分组ID
+     */
+    @Schema(description = "分组ID")
+    private Long groupId;
+
+    /**
      * 使能标识
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * 版本
      */
-    @Schema(description = "租户ID")
-    private Long tenantId;
+    @Schema(description = "版本")
+    private Integer version;
 
+    // 附加字段
+
+    /**
+     * 模版ID
+     */
+    @Schema(description = "模版ID")
     private Long profileId;
 }

@@ -25,8 +25,8 @@ import io.github.pnoker.center.auth.entity.builder.LabelForAuthBuilder;
 import io.github.pnoker.center.auth.entity.model.LabelBindDO;
 import io.github.pnoker.center.auth.entity.model.LabelDO;
 import io.github.pnoker.center.auth.entity.query.LabelQuery;
-import io.github.pnoker.center.auth.manager.LabelBindManager;
-import io.github.pnoker.center.auth.manager.LabelManager;
+import io.github.pnoker.center.auth.dal.LabelBindManager;
+import io.github.pnoker.center.auth.dal.LabelManager;
 import io.github.pnoker.center.auth.service.LabelService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.bo.LabelBO;
@@ -137,7 +137,7 @@ public class LabelServiceImpl implements LabelService {
         wrapper.like(CharSequenceUtil.isNotEmpty(query.getLabelName()), LabelDO::getLabelName, query.getLabelName());
         wrapper.eq(ObjectUtil.isNotNull(query.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, query.getEntityTypeFlag());
         wrapper.eq(CharSequenceUtil.isNotEmpty(query.getColor()), LabelDO::getColor, query.getColor());
-        wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), LabelDO::getTenantId, query.getTenantId());
+        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), LabelDO::getTenantId, getTenantId());
         return wrapper;
     }
 

@@ -25,7 +25,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.builder.GroupForDataBuilder;
 import io.github.pnoker.center.data.entity.model.GroupDO;
 import io.github.pnoker.center.data.entity.query.GroupQuery;
-import io.github.pnoker.center.data.manager.GroupManager;
+import io.github.pnoker.center.data.dal.GroupManager;
 import io.github.pnoker.center.data.service.GroupService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.bo.GroupBO;

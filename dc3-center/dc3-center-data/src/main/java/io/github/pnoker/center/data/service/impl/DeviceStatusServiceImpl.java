@@ -27,6 +27,7 @@ import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.common.utils.UserHeaderUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
@@ -109,8 +110,8 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         } else {
             builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
         }
-        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
-            builder.setTenantId(pageQuery.getTenantId());
+        if (ObjectUtil.isNotEmpty(UserHeaderUtil.getUserHeader().getTenantId())) {
+            builder.setTenantId(UserHeaderUtil.getUserHeader().getTenantId());
         }
         return builder;
     }

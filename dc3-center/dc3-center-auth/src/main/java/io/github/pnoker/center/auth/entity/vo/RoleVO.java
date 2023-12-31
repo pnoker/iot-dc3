@@ -17,6 +17,7 @@
 package io.github.pnoker.center.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.auth.entity.ext.RoleExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
@@ -71,6 +72,12 @@ public class RoleVO extends BaseVO {
      */
     @Schema(description = "角色编号")
     private String roleCode;
+
+    /**
+     * 角色拓展信息
+     */
+    @Schema(description = "角色拓展信息")
+    private RoleExt roleExt;
 
     /**
      * 使能标识

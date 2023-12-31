@@ -77,12 +77,6 @@ public class DriverVO extends BaseVO {
     private String serviceName;
 
     /**
-     * 驱动类型标识
-     */
-    @Schema(description = "驱动类型标识")
-    private DriverTypeFlagEnum driverTypeFlag;
-
-    /**
      * 服务主机
      */
     @Schema(description = "服务主机")
@@ -92,6 +86,12 @@ public class DriverVO extends BaseVO {
             message = "服务主机格式无效",
             groups = {Add.class, Update.class})
     private String serviceHost;
+
+    /**
+     * 驱动类型标识
+     */
+    @Schema(description = "驱动类型标识")
+    private DriverTypeFlagEnum driverTypeFlag;
 
     /**
      * 驱动拓展信息
@@ -104,4 +104,16 @@ public class DriverVO extends BaseVO {
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
+
+    /**
+     * 签名
+     */
+    @Schema(description = "签名")
+    private String signature;
+
+    /**
+     * 版本
+     */
+    @Schema(description = "版本")
+    private Integer version;
 }

@@ -17,6 +17,7 @@
 package io.github.pnoker.center.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.auth.entity.ext.ResourceExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ResourceScopeFlagEnum;
 import io.github.pnoker.common.constant.enums.ResourceTypeFlagEnum;
@@ -100,6 +101,12 @@ public class ResourceVO extends BaseVO {
     @NotBlank(message = "实体ID不能为空",
             groups = {Add.class, Update.class})
     private String entityId;
+
+    /**
+     * 资源拓展信息
+     */
+    @Schema(description = "资源拓展信息")
+    private ResourceExt resourceExt;
 
     /**
      * 使能标识

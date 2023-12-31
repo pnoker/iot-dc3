@@ -45,7 +45,7 @@ public class DeviceQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
-    private Long profileId;
+    // 查询字段
 
     /**
      * 设备名称
@@ -78,8 +78,16 @@ public class DeviceQuery implements Serializable {
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * 版本
      */
-    @Schema(description = "租户ID")
-    private Long tenantId;
+    @Schema(description = "版本")
+    private Integer version;
+
+    // 附加字段
+
+    /**
+     * 模版ID
+     */
+    @Schema(description = "模版ID")
+    private Long profileId;
 }

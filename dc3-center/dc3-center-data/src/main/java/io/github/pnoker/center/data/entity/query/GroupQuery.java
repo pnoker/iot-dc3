@@ -46,6 +46,8 @@ public class GroupQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
     /**
      * 分组名称
      */

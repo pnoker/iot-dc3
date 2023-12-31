@@ -28,8 +28,8 @@ import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.entity.model.PointDO;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
-import io.github.pnoker.center.manager.manager.PointManager;
-import io.github.pnoker.center.manager.manager.ProfileBindManager;
+import io.github.pnoker.center.manager.dal.PointManager;
+import io.github.pnoker.center.manager.dal.ProfileBindManager;
 import io.github.pnoker.center.manager.mapper.PointMapper;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.PointService;
@@ -201,7 +201,7 @@ public class PointServiceImpl implements PointService {
             wrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getRwFlag()), "dp.rw_flag", pointPageQuery.getRwFlag());
             wrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getProfileId()), "dp.profile_id", pointPageQuery.getProfileId());
             wrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getEnableFlag()), "dp.enable_flag", pointPageQuery.getEnableFlag());
-            wrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getTenantId()), "dp.tenant_id", pointPageQuery.getTenantId());
+            wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), "dp.tenant_id", getTenantId());
         }
         return wrapper.lambda();
     }

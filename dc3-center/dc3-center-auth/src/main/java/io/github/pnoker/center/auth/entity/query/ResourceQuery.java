@@ -41,26 +41,24 @@ import java.io.Serializable;
 public class ResourceQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
     private Pages page;
 
-    /**
-     * 权限资源父级ID
-     */
-    private String parentResourceId;
+    // 查询字段
 
     /**
      * 权限资源名称
-     */
+     */@Schema(description = "权限资源名称")
     private String resourceName;
 
     /**
      * 权限资源编号
-     */
+     */@Schema(description = "权限资源编号")
     private String resourceCode;
 
     /**
      * 权限资源类型标识
-     */
+     */@Schema(description = "权限资源类型标识")
     private ResourceTypeFlagEnum resourceTypeFlag;
 
     /**
@@ -72,21 +70,11 @@ public class ResourceQuery implements Serializable {
      *     <li>0x08：查询</li>
      * </ul>
      * 具有多个权限范围可以累加
-     */
+     */@Schema(description = "权限资源范围标识")
     private Byte resourceScopeFlag;
 
     /**
-     * 权限资源实体ID
-     */
-    private String entityId;
-
-    /**
      * 使能标识
-     */
+     */@Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    private Long tenantId;
 }

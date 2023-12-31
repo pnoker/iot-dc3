@@ -165,7 +165,6 @@ public class DriverController implements Controller {
             if (ObjectUtil.isEmpty(driverQuery)) {
                 driverQuery = new DriverQuery();
             }
-            driverQuery.setTenantId(getTenantId());
             Page<DriverBO> page = driverService.selectByPage(driverQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);

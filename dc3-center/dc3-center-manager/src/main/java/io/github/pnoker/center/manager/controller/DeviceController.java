@@ -27,7 +27,7 @@ import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerServiceConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.utils.RequestUtil;
+import io.github.pnoker.common.utils.ResponseUtil;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import lombok.extern.slf4j.Slf4j;
@@ -159,7 +159,6 @@ public class DeviceController implements Controller {
             if (ObjectUtil.isEmpty(devicePageQuery)) {
                 devicePageQuery = new DeviceQuery();
             }
-            devicePageQuery.setTenantId(getTenantId());
             Page<DeviceBO> entityPageBO = deviceService.selectByPage(devicePageQuery);
             Page<DeviceVO> entityPageVO = deviceBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
@@ -198,7 +197,7 @@ public class DeviceController implements Controller {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             Path filePath = deviceService.generateImportTemplate(entityBO);
-            return RequestUtil.responseFile(filePath);
+            return ResponseUtil.responseFile(filePath);
         } catch (Exception e) {
             return null;
         }

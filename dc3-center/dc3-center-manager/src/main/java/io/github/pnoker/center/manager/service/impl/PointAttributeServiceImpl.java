@@ -26,7 +26,7 @@ import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeBuilder;
 import io.github.pnoker.center.manager.entity.model.PointAttributeDO;
 import io.github.pnoker.center.manager.entity.query.PointAttributeQuery;
-import io.github.pnoker.center.manager.manager.PointAttributeManager;
+import io.github.pnoker.center.manager.dal.PointAttributeManager;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;

@@ -25,7 +25,7 @@ import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import io.github.pnoker.center.auth.entity.builder.ResourceBuilder;
 import io.github.pnoker.center.auth.entity.model.ResourceDO;
 import io.github.pnoker.center.auth.entity.query.ResourceQuery;
-import io.github.pnoker.center.auth.manager.ResourceManager;
+import io.github.pnoker.center.auth.dal.ResourceManager;
 import io.github.pnoker.center.auth.service.ResourceService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
@@ -96,8 +96,7 @@ public class ResourceServiceImpl implements ResourceService {
     private LambdaQueryWrapper<ResourceDO> buildQueryWrapper(ResourceQuery pageQuery) {
         LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
-            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getTenantId()), ResourceDO::getTenantId, pageQuery.getTenantId());
-            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getParentResourceId()), ResourceDO::getParentResourceId, pageQuery.getParentResourceId());
+            wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), ResourceDO::getTenantId, getTenantId());
             wrapper.like(CharSequenceUtil.isNotEmpty(pageQuery.getResourceName()), ResourceDO::getResourceName, pageQuery.getResourceName());
             wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceCode()), ResourceDO::getResourceCode, pageQuery.getResourceCode());
             wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, pageQuery.getResourceTypeFlag());

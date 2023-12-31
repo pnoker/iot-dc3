@@ -25,7 +25,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.builder.GroupForManagerBuilder;
 import io.github.pnoker.center.manager.entity.model.GroupDO;
 import io.github.pnoker.center.manager.entity.query.GroupQuery;
-import io.github.pnoker.center.manager.manager.GroupManager;
+import io.github.pnoker.center.manager.dal.GroupManager;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.bo.GroupBO;
@@ -133,7 +133,7 @@ public class GroupServiceImpl implements GroupService {
     private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupQuery query) {
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(query.getGroupName()), GroupDO::getGroupName, query.getGroupName());
-        wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), GroupDO::getTenantId, query.getTenantId());
+        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), GroupDO::getTenantId, getTenantId());
         return wrapper;
     }
 

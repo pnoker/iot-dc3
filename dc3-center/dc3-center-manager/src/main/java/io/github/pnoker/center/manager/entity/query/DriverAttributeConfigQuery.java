@@ -45,17 +45,13 @@ public class DriverAttributeConfigQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
     /**
      * 驱动属性ID
      */
     @Schema(description = "驱动属性ID")
     private Long driverAttributeId;
-
-    /**
-     * 驱动属性配置值
-     */
-    @Schema(description = "驱动属性配置值")
-    private String configValue;
 
     /**
      * 设备ID
@@ -70,8 +66,8 @@ public class DriverAttributeConfigQuery implements Serializable {
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * 版本
      */
-    @Schema(description = "租户ID")
-    private Long tenantId;
+    @Schema(description = "版本")
+    private Integer version;
 }
