@@ -42,14 +42,26 @@ import java.io.Serializable;
 public class TenantQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
+    /**
+     * 租户名称
+     */
+    @Schema(description = "租户名称")
     private String tenantName;
 
+    /**
+     * 租户编号
+     */
+    @Schema(description = "租户编号")
     private String tenantCode;
 
     /**
      * 使能标识
      */
+    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

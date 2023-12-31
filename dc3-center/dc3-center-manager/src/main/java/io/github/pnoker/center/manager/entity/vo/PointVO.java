@@ -113,6 +113,18 @@ public class PointVO extends BaseVO {
     private Long profileId;
 
     /**
+     * 报警通知模板ID
+     */
+    @Schema(description = "报警通知模板ID")
+    private Long alarmNotifyProfileId;
+
+    /**
+     * 报警信息模板ID
+     */
+    @Schema(description = "报警信息模板ID")
+    private Long alarmMessageProfileId;
+
+    /**
      * 分组ID
      */
     @Schema(description = "分组ID")
@@ -131,15 +143,14 @@ public class PointVO extends BaseVO {
     private EnableFlagEnum enableFlag;
 
     /**
-     * 设置默认值
+     * 签名
      */
-    public void setDefault() {
-        this.pointTypeFlag = PointTypeFlagEnum.STRING;
-        this.rwFlag = RwFlagEnum.R;
-        this.baseValue = BigDecimal.valueOf(0);
-        this.multiple = BigDecimal.valueOf(1);
-        this.valueDecimal = 6;
-        this.unit = "";
-    }
+    @Schema(description = "签名")
+    private String signature;
 
+    /**
+     * 版本
+     */
+    @Schema(description = "版本")
+    private Integer version;
 }

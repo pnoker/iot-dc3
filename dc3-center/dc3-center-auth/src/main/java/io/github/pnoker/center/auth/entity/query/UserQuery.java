@@ -16,8 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.ext.UserIdentityExt;
-import io.github.pnoker.center.auth.entity.ext.UserSocialExt;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -43,35 +41,32 @@ import java.io.Serializable;
 public class UserQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
     private Pages page;
+
+    // 查询字段
 
     /**
      * 用户昵称
      */
+    @Schema(description = "用户昵称")
     private String nickName;
 
     /**
      * 用户名称
      */
+    @Schema(description = "用户名称")
     private String userName;
 
     /**
      * 手机号
      */
+    @Schema(description = "手机号")
     private String phone;
 
     /**
      * 邮箱
      */
+    @Schema(description = "邮箱")
     private String email;
-
-    /**
-     * 社交相关拓展信息
-     */
-    private UserSocialExt socialExt;
-
-    /**
-     * 身份相关拓展信息
-     */
-    private UserIdentityExt identityExt;
 }

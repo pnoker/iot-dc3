@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
+import io.github.pnoker.center.auth.entity.ext.RoleExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
 import lombok.AllArgsConstructor;
@@ -51,6 +52,11 @@ public class RoleBO extends BaseBO {
      * 角色编号
      */
     private String roleCode;
+
+    /**
+     * 角色拓展信息
+     */
+    private RoleExt roleExt;
 
     /**
      * 使能标识

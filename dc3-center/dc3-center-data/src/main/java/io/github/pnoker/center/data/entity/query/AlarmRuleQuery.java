@@ -30,9 +30,24 @@ import java.io.Serializable;
 @Schema(title = "AlarmRule", description = "报警规则")
 public class AlarmRuleQuery implements Serializable {
     private static final long serialVersionUID = 1L;
+
     @Schema(description = "分页")
     private Pages page;
-    private String ruleName;
+
+    // 查询字段
+
+    /**
+     * 报警规则名称
+     */
+    @Schema(description = "报警规则名称")
+    private String alarmRuleName;
+
+    /**
+     * 报警规则编号
+     */
+    @Schema(description = "报警规则编号")
+    private String alarmRuleCode;
+
     /**
      * 位号ID
      */
@@ -46,20 +61,8 @@ public class AlarmRuleQuery implements Serializable {
     private AlarmTypeFlagEnum alarmTypeFlag;
 
     /**
-     * 报警规则
-     */
-    @Schema(description = "报警规则")
-    private String alarmRule;
-
-    /**
      * 使能标识
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    @Schema(description = "租户ID")
-    private Long tenantId;
 }

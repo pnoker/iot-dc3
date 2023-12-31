@@ -40,30 +40,26 @@ import java.io.Serializable;
 public class RoleQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
     private Pages page;
 
-    /**
-     * 角色父级ID
-     */
-    private String parentRoleId;
+    // 查询字段
 
     /**
      * 角色名称
      */
+    @Schema(description = "角色名称")
     private String roleName;
 
     /**
      * 角色编号
      */
+    @Schema(description = "角色编号")
     private String roleCode;
 
     /**
      * 使能标识
      */
+    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    private Long tenantId;
 }

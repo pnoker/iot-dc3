@@ -83,7 +83,11 @@ public class DeviceBO extends BaseBO {
      */
     private Integer version;
 
-    // 附加
+    // 附加字段
+
+    /**
+     * 模版ID集
+     */
     @Builder.Default
     private Set<Long> profileIds = new HashSet<>(4);
 }

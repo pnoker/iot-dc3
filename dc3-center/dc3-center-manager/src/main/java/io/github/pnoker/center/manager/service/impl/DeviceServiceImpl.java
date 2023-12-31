@@ -28,7 +28,7 @@ import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.query.DeviceQuery;
-import io.github.pnoker.center.manager.manager.DeviceManager;
+import io.github.pnoker.center.manager.dal.DeviceManager;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -264,7 +264,7 @@ public class DeviceServiceImpl implements DeviceService {
             wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code", entityQuery.getDeviceCode());
             wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
             wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
-            wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getTenantId()), "dd.tenant_id", entityQuery.getTenantId());
+            wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), "dd.tenant_id", getTenantId());
         }
         return wrapper.lambda();
     }

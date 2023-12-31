@@ -44,6 +44,8 @@ public class DriverEventQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
     /**
      * 驱动ID
      */

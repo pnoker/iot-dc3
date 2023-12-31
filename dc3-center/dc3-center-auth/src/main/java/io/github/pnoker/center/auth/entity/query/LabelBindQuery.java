@@ -44,6 +44,8 @@ public class LabelBindQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
     /**
      * 标签ID
      */

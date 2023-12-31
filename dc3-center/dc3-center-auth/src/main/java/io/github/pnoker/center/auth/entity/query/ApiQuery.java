@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.ext.ApiExt;
 import io.github.pnoker.common.constant.enums.ApiTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
@@ -42,35 +41,32 @@ import java.io.Serializable;
 public class ApiQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
     private Pages page;
+
+    // 查询字段
 
     /**
      * Api接口类型标识
      */
+    @Schema(description = "Api接口类型标识")
     private ApiTypeFlagEnum apiTypeFlag;
 
     /**
      * Api接口名称
      */
+    @Schema(description = "Api接口名称")
     private String apiName;
 
     /**
      * Api接口编号，一般为URL的MD5编码
      */
+    @Schema(description = "Api接口编号")
     private String apiCode;
-
-    /**
-     * Api接口拓展信息
-     */
-    private ApiExt apiExt;
 
     /**
      * 使能标识
      */
+    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    private Long tenantId;
 }

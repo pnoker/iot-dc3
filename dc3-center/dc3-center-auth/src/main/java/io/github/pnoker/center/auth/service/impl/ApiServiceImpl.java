@@ -21,11 +21,11 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.auth.dal.ApiManager;
 import io.github.pnoker.center.auth.entity.bo.ApiBO;
 import io.github.pnoker.center.auth.entity.builder.ApiBuilder;
 import io.github.pnoker.center.auth.entity.model.ApiDO;
 import io.github.pnoker.center.auth.entity.query.ApiQuery;
-import io.github.pnoker.center.auth.manager.ApiManager;
 import io.github.pnoker.center.auth.service.ApiService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -125,7 +125,7 @@ public class ApiServiceImpl implements ApiService {
     private LambdaQueryWrapper<ApiDO> fuzzyQuery(ApiQuery query) {
         LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(query.getApiName()), ApiDO::getApiName, query.getApiName());
-        wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), ApiDO::getTenantId, query.getTenantId());
+        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), ApiDO::getTenantId, getTenantId());
         return wrapper;
     }
 

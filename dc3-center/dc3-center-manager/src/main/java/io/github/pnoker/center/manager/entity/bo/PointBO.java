@@ -130,7 +130,7 @@ public class PointBO extends BaseBO {
     /**
      * 设置默认值
      */
-    public void setDefault() {
+    public void setByDefault() {
         this.pointTypeFlag = PointTypeFlagEnum.STRING;
         this.rwFlag = RwFlagEnum.R;
         this.baseValue = BigDecimal.valueOf(0);

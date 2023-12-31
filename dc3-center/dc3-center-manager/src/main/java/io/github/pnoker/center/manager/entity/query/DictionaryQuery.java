@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.valid.Parent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +24,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -46,14 +44,11 @@ public class DictionaryQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
     @Schema(description = "名称")
     private String label;
 
-    @NotNull(message = "父级ID不能为空",
-            groups = {Parent.class})
     @Schema(description = "父级ID")
     private Long parentId;
-
-    @Schema(description = "租户ID")
-    private Long tenantId;
 }

@@ -95,4 +95,16 @@ public class ProfileVO extends BaseVO {
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
+
+    /**
+     * 签名
+     */
+    @Schema(description = "签名")
+    private String signature;
+
+    /**
+     * 版本
+     */
+    @Schema(description = "版本")
+    private Integer version;
 }

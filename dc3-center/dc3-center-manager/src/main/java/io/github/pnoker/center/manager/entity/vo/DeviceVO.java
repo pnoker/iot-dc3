@@ -91,6 +91,19 @@ public class DeviceVO extends BaseVO {
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
+    /**
+     * 签名
+     */
+    @Schema(description = "签名")
+    private String signature;
+
+    /**
+     * 版本
+     */
+    @Schema(description = "版本")
+    private Integer version;
+
+    // 附加字段
     @Schema(description = "模版ID集")
     @NotNull(message = "模版ID集不能为空",
             groups = {Upload.class})

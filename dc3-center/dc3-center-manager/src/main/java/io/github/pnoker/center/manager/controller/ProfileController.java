@@ -171,7 +171,6 @@ public class ProfileController implements Controller {
             if (ObjectUtil.isEmpty(profilePageQuery)) {
                 profilePageQuery = new ProfileQuery();
             }
-            profilePageQuery.setTenantId(getTenantId());
             Page<ProfileBO> page = profileService.selectByPage(profilePageQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);

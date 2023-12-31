@@ -26,7 +26,7 @@ import io.github.pnoker.center.data.entity.bo.AlarmRuleBO;
 import io.github.pnoker.center.data.entity.builder.AlarmRuleBuilder;
 import io.github.pnoker.center.data.entity.model.AlarmRuleDO;
 import io.github.pnoker.center.data.entity.query.AlarmRuleQuery;
-import io.github.pnoker.center.data.manager.AlarmRuleManager;
+import io.github.pnoker.center.data.dal.AlarmRuleManager;
 import io.github.pnoker.center.data.service.AlarmRuleService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -132,8 +132,8 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
      */
     private LambdaQueryWrapper<AlarmRuleDO> fuzzyQuery(AlarmRuleQuery query) {
         LambdaQueryWrapper<AlarmRuleDO> wrapper = Wrappers.<AlarmRuleDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getRuleName()), AlarmRuleDO::getAlarmRuleName, query.getRuleName());
-        wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), AlarmRuleDO::getTenantId, query.getTenantId());
+        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmRuleName()), AlarmRuleDO::getAlarmRuleName, query.getAlarmRuleName());
+        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), AlarmRuleDO::getTenantId, getTenantId());
         return wrapper;
     }
 

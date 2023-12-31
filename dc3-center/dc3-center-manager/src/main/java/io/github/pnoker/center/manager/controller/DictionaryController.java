@@ -61,7 +61,6 @@ public class DictionaryController implements Controller {
     @PostMapping("/driver")
     public R<Page<DictionaryVO>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.driverDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
@@ -79,7 +78,6 @@ public class DictionaryController implements Controller {
     @PostMapping("/profile")
     public R<Page<DictionaryVO>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.profileDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
@@ -97,7 +95,6 @@ public class DictionaryController implements Controller {
     @PostMapping("/profile_point")
     public R<Page<DictionaryVO>> pointDictionaryForProfile(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.pointDictionaryForProfile(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
@@ -115,7 +112,6 @@ public class DictionaryController implements Controller {
     @PostMapping("/device_point")
     public R<Page<DictionaryVO>> pointDictionaryForDevice(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.pointDictionaryForDevice(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
@@ -133,7 +129,6 @@ public class DictionaryController implements Controller {
     @PostMapping("/device")
     public R<Page<DictionaryVO>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.deviceDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
@@ -151,7 +146,6 @@ public class DictionaryController implements Controller {
     @PostMapping("/driver_device")
     public R<Page<DictionaryVO>> deviceDictionaryForDriver(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.deviceDictionaryForDriver(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);

@@ -42,25 +42,32 @@ import java.io.Serializable;
 public class UserLoginQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
     private Pages page;
+
+    // 查询字段
 
     /**
      * 登录名称
      */
+    @Schema(description = "登录名称")
     private String loginName;
 
     /**
      * 用户ID
      */
+    @Schema(description = "用户ID")
     private Long userId;
 
     /**
      * 用户密码ID
      */
+    @Schema(description = "用户密码ID")
     private Long userPasswordId;
 
     /**
      * 使能标识
      */
+    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

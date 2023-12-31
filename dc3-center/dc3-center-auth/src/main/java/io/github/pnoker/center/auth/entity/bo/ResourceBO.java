@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
+import io.github.pnoker.center.auth.entity.ext.ResourceExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ResourceScopeFlagEnum;
 import io.github.pnoker.common.constant.enums.ResourceTypeFlagEnum;
@@ -75,6 +76,11 @@ public class ResourceBO extends BaseBO {
      * 权限资源实体ID
      */
     private String entityId;
+
+    /**
+     * 资源拓展信息
+     */
+    private ResourceExt resourceExt;
 
     /**
      * 使能标识

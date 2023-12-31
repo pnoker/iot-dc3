@@ -55,14 +55,14 @@ public class DriverBO extends BaseBO {
     private String serviceName;
 
     /**
-     * 驱动类型标识
-     */
-    private DriverTypeFlagEnum driverTypeFlag;
-
-    /**
      * 服务主机
      */
     private String serviceHost;
+
+    /**
+     * 驱动类型标识
+     */
+    private DriverTypeFlagEnum driverTypeFlag;
 
     /**
      * 驱动拓展信息

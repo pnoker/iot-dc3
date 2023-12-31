@@ -26,7 +26,7 @@ import io.github.pnoker.center.auth.entity.bo.MenuBO;
 import io.github.pnoker.center.auth.entity.builder.MenuBuilder;
 import io.github.pnoker.center.auth.entity.model.MenuDO;
 import io.github.pnoker.center.auth.entity.query.MenuQuery;
-import io.github.pnoker.center.auth.manager.MenuManager;
+import io.github.pnoker.center.auth.dal.MenuManager;
 import io.github.pnoker.center.auth.service.MenuService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -133,7 +133,7 @@ public class MenuServiceImpl implements MenuService {
     private LambdaQueryWrapper<MenuDO> fuzzyQuery(MenuQuery query) {
         LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(query.getMenuName()), MenuDO::getMenuName, query.getMenuName());
-        wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), MenuDO::getTenantId, query.getTenantId());
+        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), MenuDO::getTenantId, getTenantId());
         return wrapper;
     }
 

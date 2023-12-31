@@ -30,10 +30,23 @@ import java.io.Serializable;
 @Schema(title = "AlarmNotifyProfile", description = "报警通知模板")
 public class AlarmNotifyProfileQuery implements Serializable {
     private static final long serialVersionUID = 1L;
+
     @Schema(description = "分页")
     private Pages page;
 
-    private String notifyProfileName;
+    // 查询字段
+
+    /**
+     * 报警通知模板名称
+     */
+    @Schema(description = "报警通知模板名称")
+    private String alarmNotifyName;
+
+    /**
+     * 报警通知模板编号
+     */
+    @Schema(description = "报警通知模板编号")
+    private String alarmNotifyCode;
 
     /**
      * 自动确认标识
@@ -42,26 +55,14 @@ public class AlarmNotifyProfileQuery implements Serializable {
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
-     * 通知间隔，毫秒
+     * 报警通知间隔，毫秒
      */
-    @Schema(description = "通知间隔，毫秒")
-    private Long notifyInterval;
-
-    /**
-     * 报警通知配置
-     */
-    @Schema(description = "报警通知配置")
-    private String alarmConfig;
+    @Schema(description = "报警通知间隔，毫秒")
+    private Long alarmNotifyInterval;
 
     /**
      * 使能标识
      */
     @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    @Schema(description = "租户ID")
-    private Long tenantId;
 }

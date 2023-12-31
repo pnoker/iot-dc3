@@ -29,9 +29,9 @@ import io.github.pnoker.center.manager.entity.model.PointDO;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import io.github.pnoker.center.manager.entity.query.ProfileQuery;
-import io.github.pnoker.center.manager.manager.PointManager;
-import io.github.pnoker.center.manager.manager.ProfileBindManager;
-import io.github.pnoker.center.manager.manager.ProfileManager;
+import io.github.pnoker.center.manager.dal.PointManager;
+import io.github.pnoker.center.manager.dal.ProfileBindManager;
+import io.github.pnoker.center.manager.dal.ProfileManager;
 import io.github.pnoker.center.manager.mapper.ProfileMapper;
 import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.center.manager.service.ProfileService;
@@ -169,7 +169,7 @@ public class ProfileServiceImpl implements ProfileService {
         wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getProfileCode()), "dp.profile_code", entityQuery.getProfileCode());
         wrapper.eq(ObjectUtil.isNotNull(entityQuery.getProfileShareFlag()), "dp.profile_share_flag", entityQuery.getProfileShareFlag());
         wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getTenantId()), "dp.tenant_id", entityQuery.getTenantId());
+        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), "dp.tenant_id", getTenantId());
         return wrapper.lambda();
     }
 

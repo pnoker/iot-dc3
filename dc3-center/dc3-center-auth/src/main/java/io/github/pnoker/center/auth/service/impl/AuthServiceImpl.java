@@ -19,7 +19,7 @@ package io.github.pnoker.center.auth.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.center.auth.entity.auth.Login;
+import io.github.pnoker.center.auth.entity.bean.Login;
 import io.github.pnoker.center.auth.entity.bo.*;
 import io.github.pnoker.center.auth.service.*;
 import io.github.pnoker.common.exception.NotFoundException;

@@ -39,7 +39,10 @@ import java.io.Serializable;
 public class RoleResourceBindQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
     private Pages page;
+
+    // 查询字段
 
     /**
      * 角色ID

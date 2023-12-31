@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.query;
 
-import io.github.pnoker.center.auth.entity.ext.MenuExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
@@ -42,50 +41,33 @@ import java.io.Serializable;
 public class MenuQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
     private Pages page;
-    /**
-     * 菜单父级ID
-     */
-    private String parentMenuId;
+
+    // 查询字段
 
     /**
      * 菜单类型标识
      */
+    @Schema(description = "菜单类型标识")
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
      * 菜单名称
      */
+    @Schema(description = "菜单名称")
     private String menuName;
 
     /**
      * 菜单编号，一般为URL的MD5编码
      */
+    @Schema(description = "菜单编号")
     private String menuCode;
-
-    /**
-     * 菜单层级
-     */
-    private Integer menuLevel;
-
-    /**
-     * 菜单顺序
-     */
-    private Integer menuIndex;
-
-    /**
-     * 菜单拓展信息
-     */
-    private MenuExt menuExt;
 
     /**
      * 使能标识
      */
+    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    private Long tenantId;
 
 }

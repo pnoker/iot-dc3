@@ -44,6 +44,8 @@ public class ProfileBindQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
     /**
      * 模版ID
      */

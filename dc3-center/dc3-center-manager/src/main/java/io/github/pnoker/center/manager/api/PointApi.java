@@ -105,7 +105,6 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         pageQuery.setDeviceId(request.getDeviceId());
         pageQuery.setPointName(point.getPointName());
         pageQuery.setProfileId(point.getProfileId());
-        pageQuery.setTenantId(point.getTenantId());
         pageQuery.setPointTypeFlag(PointTypeFlagEnum.values()[point.getPointTypeFlag()]);
         pageQuery.setRwFlag(RwFlagEnum.values()[point.getRwFlag()]);
         pageQuery.setEnableFlag(EnableFlagEnum.values()[point.getEnableFlag()]);

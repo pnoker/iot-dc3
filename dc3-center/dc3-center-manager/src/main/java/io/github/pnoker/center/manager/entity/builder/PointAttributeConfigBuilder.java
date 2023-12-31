@@ -41,8 +41,6 @@ public interface PointAttributeConfigBuilder {
      * @return EntityBO
      */
     @Mapping(target = "tenantId", ignore = true)
-    @Mapping(target = "signature", ignore = true)
-    @Mapping(target = "version", ignore = true)
     PointAttributeConfigBO buildBOByVO(PointAttributeConfigVO entityVO);
 
     /**

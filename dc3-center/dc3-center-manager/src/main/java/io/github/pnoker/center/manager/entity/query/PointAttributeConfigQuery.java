@@ -45,17 +45,13 @@ public class PointAttributeConfigQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
     /**
      * 位号属性ID
      */
     @Schema(description = "位号属性ID")
     private Long pointAttributeId;
-
-    /**
-     * 位号属性配置值
-     */
-    @Schema(description = "位号属性配置值")
-    private String configValue;
 
     /**
      * 设备ID
@@ -76,8 +72,8 @@ public class PointAttributeConfigQuery implements Serializable {
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * 版本
      */
-    @Schema(description = "租户ID")
-    private Long tenantId;
+    @Schema(description = "版本")
+    private Integer version;
 }

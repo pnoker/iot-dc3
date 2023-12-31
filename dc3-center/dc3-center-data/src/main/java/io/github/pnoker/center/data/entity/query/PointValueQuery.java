@@ -42,22 +42,36 @@ public class PointValueQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    // 查询字段
+
+    /**
+     * 设备ID
+     */
+    @Schema(description = "设备ID")
     private Long deviceId;
+
+    /**
+     * 位号ID
+     */
+    @Schema(description = "位号ID")
     private Long pointId;
 
     /**
      * 位号名称
      */
+    @Schema(description = "位号名称")
     private String pointName;
 
     /**
      * 使能标识
      */
+    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
      * 是否返回最近历史数据
      */
+    @Schema(description = "分是否返回最近历史数据页")
     @Builder.Default
     private Boolean history = false;
 }

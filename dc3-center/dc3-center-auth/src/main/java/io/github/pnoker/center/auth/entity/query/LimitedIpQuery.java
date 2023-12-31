@@ -42,20 +42,20 @@ import java.io.Serializable;
 public class LimitedIpQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "分页")
     private Pages page;
+
+    // 查询字段
 
     /**
      * 禁止IP
      */
+    @Schema(description = "禁止IP")
     private String ip;
 
     /**
      * 使能标识
      */
+    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
-
-    /**
-     * 租户ID
-     */
-    private Long tenantId;
 }

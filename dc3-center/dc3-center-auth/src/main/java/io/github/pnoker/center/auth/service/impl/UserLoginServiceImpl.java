@@ -25,7 +25,7 @@ import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.entity.builder.UserLoginBuilder;
 import io.github.pnoker.center.auth.entity.model.UserLoginDO;
 import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
-import io.github.pnoker.center.auth.manager.UserLoginManager;
+import io.github.pnoker.center.auth.dal.UserLoginManager;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
