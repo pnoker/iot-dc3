@@ -32,14 +32,6 @@ import java.util.Set;
 public interface DriverService extends Service<DriverBO, DriverQuery> {
 
     /**
-     * 根据 驱动ID 查询 驱动
-     *
-     * @param deviceId 设备ID
-     * @return Driver
-     */
-    DriverBO selectByDeviceId(Long deviceId);
-
-    /**
      * 根据 驱动ServiceName 查询 驱动
      *
      * @param serviceName    驱动服务名称
@@ -56,6 +48,14 @@ public interface DriverService extends Service<DriverBO, DriverQuery> {
      * @return Driver Array
      */
     List<DriverBO> selectByProfileId(Long profileId);
+
+    /**
+     * 根据 驱动ID 查询 驱动
+     *
+     * @param deviceId 设备ID
+     * @return Driver
+     */
+    DriverBO selectByDeviceId(Long deviceId);
 
     /**
      * 根据 驱动ID集 查询 驱动集

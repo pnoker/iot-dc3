@@ -71,10 +71,13 @@ public interface MenuBuilder {
     default void afterProcess(MenuBO entityBO, @MappingTarget MenuDO entityDO) {
         MenuExt entityExt = entityBO.getMenuExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setMenuExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setMenuExt(ext);
         }
     }
 
@@ -99,10 +102,13 @@ public interface MenuBuilder {
     default void afterProcess(MenuDO entityDO, @MappingTarget MenuBO entityBO) {
         JsonExt entityExt = entityDO.getMenuExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            MenuExt.MenuExtBuilder<?, ?> builder = MenuExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), MenuExt.Content.class));
-            entityBO.setMenuExt(builder.build());
+            MenuExt ext = new MenuExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), MenuExt.Content.class));
+            entityBO.setMenuExt(ext);
         }
     }
 

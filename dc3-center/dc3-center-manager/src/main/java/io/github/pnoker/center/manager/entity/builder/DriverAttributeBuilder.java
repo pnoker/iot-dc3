@@ -72,10 +72,13 @@ public interface DriverAttributeBuilder {
     default void afterProcess(DriverAttributeBO entityBO, @MappingTarget DriverAttributeDO entityDO) {
         DriverAttributeExt entityExt = entityBO.getAttributeExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setAttributeExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setAttributeExt(ext);
         }
     }
 
@@ -100,10 +103,13 @@ public interface DriverAttributeBuilder {
     default void afterProcess(DriverAttributeDO entityDO, @MappingTarget DriverAttributeBO entityBO) {
         JsonExt entityExt = entityDO.getAttributeExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            DriverAttributeExt.DriverAttributeExtBuilder<?, ?> builder = DriverAttributeExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), DriverAttributeExt.Content.class));
-            entityBO.setAttributeExt(builder.build());
+            DriverAttributeExt ext = new DriverAttributeExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DriverAttributeExt.Content.class));
+            entityBO.setAttributeExt(ext);
         }
     }
 

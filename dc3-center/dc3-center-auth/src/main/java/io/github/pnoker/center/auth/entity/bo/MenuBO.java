@@ -25,7 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 /**
  * Menu BO
@@ -35,7 +34,6 @@ import lombok.experimental.SuperBuilder;
  */
 @Getter
 @Setter
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuBO extends BaseBO {
@@ -43,7 +41,7 @@ public class MenuBO extends BaseBO {
     /**
      * 菜单父级ID
      */
-    private String parentMenuId;
+    private Long parentMenuId;
 
     /**
      * 菜单类型标识

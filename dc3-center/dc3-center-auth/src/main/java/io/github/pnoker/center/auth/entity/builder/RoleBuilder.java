@@ -71,10 +71,13 @@ public interface RoleBuilder {
     default void afterProcess(RoleBO entityBO, @MappingTarget RoleDO entityDO) {
         RoleExt entityExt = entityBO.getRoleExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setRoleExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setRoleExt(ext);
         }
     }
 
@@ -99,10 +102,13 @@ public interface RoleBuilder {
     default void afterProcess(RoleDO entityDO, @MappingTarget RoleBO entityBO) {
         JsonExt entityExt = entityDO.getRoleExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            RoleExt.RoleExtBuilder<?, ?> builder = RoleExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), RoleExt.Content.class));
-            entityBO.setRoleExt(builder.build());
+            RoleExt ext = new RoleExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), RoleExt.Content.class));
+            entityBO.setRoleExt(ext);
         }
     }
 

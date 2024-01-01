@@ -30,7 +30,7 @@ import java.util.List;
  */
 public interface PointAttributeService extends Service<PointAttributeBO, PointAttributeQuery> {
     /**
-     * 根据位号配置属性 NAME 和 驱动ID 查询
+     * 根据 位号配置属性名称 和 驱动ID 查询
      *
      * @param name     属性名称
      * @param driverId 驱动ID
@@ -39,7 +39,7 @@ public interface PointAttributeService extends Service<PointAttributeBO, PointAt
     PointAttributeBO selectByNameAndDriverId(String name, Long driverId);
 
     /**
-     * 根据驱动ID 查询
+     * 根据 驱动ID 查询
      *
      * @param driverId       驱动ID
      * @param throwException Throw Exception

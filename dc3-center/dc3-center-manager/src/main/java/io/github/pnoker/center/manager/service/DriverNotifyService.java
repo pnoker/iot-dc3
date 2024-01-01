@@ -20,12 +20,12 @@ import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
 
 /**
- * Notify Interface
+ * Driver Notify Interface
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface NotifyService {
+public interface DriverNotifyService {
 
     /**
      * 通知驱动 新增模板(ADD) / 删除模板(DELETE) / 更新模板(UPDATE)
@@ -33,7 +33,7 @@ public interface NotifyService {
      * @param command   Operation Type
      * @param profileBO Profile
      */
-    void notifyDriverProfile(MetadataCommandTypeEnum command, ProfileBO profileBO);
+    void notifyProfile(MetadataCommandTypeEnum command, ProfileBO profileBO);
 
     /**
      * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 更新位号(UPDATE)
@@ -41,7 +41,7 @@ public interface NotifyService {
      * @param command Operation Type
      * @param pointBO Point
      */
-    void notifyDriverPoint(MetadataCommandTypeEnum command, PointBO pointBO);
+    void notifyPoint(MetadataCommandTypeEnum command, PointBO pointBO);
 
     /**
      * 通知驱动 新增设备(ADD) / 删除设备(DELETE) / 更新设备(UPDATE)
@@ -49,7 +49,7 @@ public interface NotifyService {
      * @param command  Operation Type
      * @param deviceBO Device
      */
-    void notifyDriverDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO);
+    void notifyDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO);
 
     /**
      * 通知驱动 新增驱动配置(ADD) / 删除驱动配置(DELETE) / 更新驱动配置(UPDATE)
@@ -57,7 +57,7 @@ public interface NotifyService {
      * @param command                 Operation Type
      * @param driverAttributeConfigBO Driver Attribute Config
      */
-    void notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfigBO driverAttributeConfigBO);
+    void notifyDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfigBO driverAttributeConfigBO);
 
     /**
      * 通知驱动 新增位号配置(ADD) / 删除位号配置(DELETE) / 更新位号配置(UPDATE)
@@ -65,6 +65,6 @@ public interface NotifyService {
      * @param command                Operation Type
      * @param pointAttributeConfigBO PointInfo
      */
-    void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointAttributeConfigBO pointAttributeConfigBO);
+    void notifyPointAttributeConfig(MetadataCommandTypeEnum command, PointAttributeConfigBO pointAttributeConfigBO);
 
 }

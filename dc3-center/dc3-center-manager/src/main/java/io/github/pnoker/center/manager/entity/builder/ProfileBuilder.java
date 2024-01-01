@@ -71,10 +71,13 @@ public interface ProfileBuilder {
     default void afterProcess(ProfileBO entityBO, @MappingTarget ProfileDO entityDO) {
         ProfileExt entityExt = entityBO.getProfileExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setProfileExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setProfileExt(ext);
         }
     }
 
@@ -99,10 +102,13 @@ public interface ProfileBuilder {
     default void afterProcess(ProfileDO entityDO, @MappingTarget ProfileBO entityBO) {
         JsonExt entityExt = entityDO.getProfileExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            ProfileExt.ProfileExtBuilder<?, ?> builder = ProfileExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), ProfileExt.Content.class));
-            entityBO.setProfileExt(builder.build());
+            ProfileExt ext = new ProfileExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ProfileExt.Content.class));
+            entityBO.setProfileExt(ext);
         }
     }
 

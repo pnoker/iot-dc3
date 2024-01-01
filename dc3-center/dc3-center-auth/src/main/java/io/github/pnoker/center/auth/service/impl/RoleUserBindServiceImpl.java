@@ -121,7 +121,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         return null;
     }
 
-    public LambdaQueryWrapper<RoleUserBindDO> buildQueryWrapper(RoleUserBindQuery pageQuery) {
+    private LambdaQueryWrapper<RoleUserBindDO> buildQueryWrapper(RoleUserBindQuery pageQuery) {
         LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
         if (ObjectUtil.isNotNull(pageQuery)) {
             wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getUserId()), RoleUserBindDO::getUserId, pageQuery.getUserId());

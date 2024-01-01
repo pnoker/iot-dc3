@@ -72,10 +72,13 @@ public interface DeviceBuilder {
     default void afterProcess(DeviceBO entityBO, @MappingTarget DeviceDO entityDO) {
         DeviceExt entityExt = entityBO.getDeviceExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setDeviceExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setDeviceExt(ext);
         }
     }
 
@@ -101,10 +104,13 @@ public interface DeviceBuilder {
     default void afterProcess(DeviceDO entityDO, @MappingTarget DeviceBO entityBO) {
         JsonExt entityExt = entityDO.getDeviceExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            DeviceExt.DeviceExtBuilder<?, ?> builder = DeviceExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), DeviceExt.Content.class));
-            entityBO.setDeviceExt(builder.build());
+            DeviceExt ext = new DeviceExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DeviceExt.Content.class));
+            entityBO.setDeviceExt(ext);
         }
     }
 

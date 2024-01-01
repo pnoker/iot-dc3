@@ -93,7 +93,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Resource
     private ProfileBindService profileBindService;
     @Resource
-    private NotifyService notifyService;
+    private DriverNotifyService driverNotifyService;
 
     /**
      * {@inheritDoc}
@@ -114,7 +114,7 @@ public class DeviceServiceImpl implements DeviceService {
         List<ProfileBO> profileBOS = profileService.selectByDeviceId(entityBO.getId());
         // ?/pnoker 同步给驱动的设备需要profile id set吗
         deviceBO.setProfileIds(profileBOS.stream().map(ProfileBO::getId).collect(Collectors.toSet()));
-        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.ADD, deviceBO);
+        driverNotifyService.notifyDevice(MetadataCommandTypeEnum.ADD, deviceBO);
     }
 
     /**
@@ -136,7 +136,7 @@ public class DeviceServiceImpl implements DeviceService {
 
         // 通知驱动删除设备
         DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.DELETE, entityBO);
+        driverNotifyService.notifyDevice(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     /**
@@ -171,7 +171,7 @@ public class DeviceServiceImpl implements DeviceService {
         select.setProfileIds(newProfileIds);
         entityBO.setDeviceName(select.getDeviceName());
         // 通知驱动更新设备
-        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.UPDATE, select);
+        driverNotifyService.notifyDevice(MetadataCommandTypeEnum.UPDATE, select);
     }
 
     /**
@@ -216,9 +216,9 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceBO> selectByDriverId(Long id) {
+    public List<DeviceBO> selectByDriverId(Long driverId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
-        wrapper.eq(DeviceDO::getDriverId, id);
+        wrapper.eq(DeviceDO::getDriverId, driverId);
         List<DeviceDO> entityDOS = deviceManager.list(wrapper);
         List<DeviceBO> deviceBOS = deviceBuilder.buildBOListByDOList(entityDOS);
         deviceBOS.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
@@ -229,8 +229,8 @@ public class DeviceServiceImpl implements DeviceService {
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceBO> selectByProfileId(Long id) {
-        return selectByIds(profileBindService.selectDeviceIdsByProfileId(id));
+    public List<DeviceBO> selectByProfileId(Long profileId) {
+        return selectByIds(profileBindService.selectDeviceIdsByProfileId(profileId));
     }
 
     /**
@@ -254,19 +254,6 @@ public class DeviceServiceImpl implements DeviceService {
         }
         Page<DeviceDO> entityPageDO = deviceMapper.selectPageWithProfile(PageUtil.page(entityQuery.getPage()), customFuzzyQuery(entityQuery), entityQuery.getProfileId());
         return deviceBuilder.buildBOPageByDOPage(entityPageDO);
-    }
-
-    public LambdaQueryWrapper<DeviceDO> customFuzzyQuery(DeviceQuery entityQuery) {
-        QueryWrapper<DeviceDO> wrapper = Wrappers.query();
-        wrapper.eq("dd.deleted", 0);
-        if (ObjectUtil.isNotNull(entityQuery)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceName()), "dd.device_name", entityQuery.getDeviceName());
-            wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code", entityQuery.getDeviceCode());
-            wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
-            wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
-            wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), "dd.tenant_id", getTenantId());
-        }
-        return wrapper.lambda();
     }
 
     @Override
@@ -334,6 +321,19 @@ public class DeviceServiceImpl implements DeviceService {
 
         // 生成设备导入模板
         return generateTemplate(workbook);
+    }
+
+    private LambdaQueryWrapper<DeviceDO> customFuzzyQuery(DeviceQuery entityQuery) {
+        QueryWrapper<DeviceDO> wrapper = Wrappers.query();
+        wrapper.eq("dd.deleted", 0);
+        if (ObjectUtil.isNotNull(entityQuery)) {
+            wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceName()), "dd.device_name", entityQuery.getDeviceName());
+            wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code", entityQuery.getDeviceCode());
+            wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
+            wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
+            wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), "dd.tenant_id", getTenantId());
+        }
+        return wrapper.lambda();
     }
 
     /**
@@ -539,12 +539,14 @@ public class DeviceServiceImpl implements DeviceService {
 
         profileIds.forEach(profileId -> {
             try {
-                ProfileBindBO entityBO = ProfileBindBO.builder().profileId(profileId).deviceId(deviceId).build();
+                ProfileBindBO entityBO = new ProfileBindBO();
+                entityBO.setProfileId(profileId);
+                entityBO.setDeviceId(deviceId);
                 profileBindService.save(entityBO);
 
                 List<PointBO> pointBOS = pointService.selectByProfileId(profileId);
                 // 通知驱动新增位号
-                pointBOS.forEach(point -> notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, point));
+                pointBOS.forEach(point -> driverNotifyService.notifyPoint(MetadataCommandTypeEnum.ADD, point));
             } catch (Exception ignored) {
                 // nothing to do
             }

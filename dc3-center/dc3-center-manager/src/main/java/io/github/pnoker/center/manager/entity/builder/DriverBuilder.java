@@ -72,10 +72,13 @@ public interface DriverBuilder {
     default void afterProcess(DriverBO entityBO, @MappingTarget DriverDO entityDO) {
         DriverExt entityExt = entityBO.getDriverExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setDriverExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setDriverExt(ext);
         }
     }
 
@@ -100,10 +103,13 @@ public interface DriverBuilder {
     default void afterProcess(DriverDO entityDO, @MappingTarget DriverBO entityBO) {
         JsonExt entityExt = entityDO.getDriverExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            DriverExt.DriverExtBuilder<?, ?> builder = DriverExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), DriverExt.Content.class));
-            entityBO.setDriverExt(builder.build());
+            DriverExt ext = new DriverExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DriverExt.Content.class));
+            entityBO.setDriverExt(ext);
         }
     }
 

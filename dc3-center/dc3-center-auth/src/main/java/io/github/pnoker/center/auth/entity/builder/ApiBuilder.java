@@ -71,10 +71,13 @@ public interface ApiBuilder {
     default void afterProcess(ApiBO entityBO, @MappingTarget ApiDO entityDO) {
         ApiExt entityExt = entityBO.getApiExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setApiExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setApiExt(ext);
         }
     }
 
@@ -99,10 +102,13 @@ public interface ApiBuilder {
     default void afterProcess(ApiDO entityDO, @MappingTarget ApiBO entityBO) {
         JsonExt entityExt = entityDO.getApiExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            ApiExt.ApiExtBuilder<?, ?> builder = ApiExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), ApiExt.Content.class));
-            entityBO.setApiExt(builder.build());
+            ApiExt ext = new ApiExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ApiExt.Content.class));
+            entityBO.setApiExt(ext);
         }
     }
 

@@ -33,7 +33,7 @@ import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import io.github.pnoker.center.manager.entity.query.ProfileQuery;
 import io.github.pnoker.center.manager.mapper.ProfileMapper;
-import io.github.pnoker.center.manager.service.NotifyService;
+import io.github.pnoker.center.manager.service.DriverNotifyService;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
@@ -41,6 +41,7 @@ import io.github.pnoker.common.constant.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import io.github.pnoker.common.utils.UserHeaderUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -73,7 +74,7 @@ public class ProfileServiceImpl implements ProfileService {
     private ProfileMapper profileMapper;
 
     @Resource
-    private NotifyService notifyService;
+    private DriverNotifyService driverNotifyService;
 
     @Override
     public void save(ProfileBO entityBO) {
@@ -102,7 +103,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         ProfileBO entityBO = profileBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverProfile(MetadataCommandTypeEnum.DELETE, entityBO);
+        driverNotifyService.notifyProfile(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     @Override
@@ -119,7 +120,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         entityDO = profileManager.getById(entityDO.getId());
         entityBO = profileBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverProfile(MetadataCommandTypeEnum.UPDATE, entityBO);
+        driverNotifyService.notifyProfile(MetadataCommandTypeEnum.UPDATE, entityBO);
     }
 
     @Override
@@ -129,11 +130,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileBO selectByNameAndType(String name, ProfileTypeFlagEnum type, Long tenantId) {
+    public ProfileBO selectByNameAndType(String name, ProfileTypeFlagEnum type) {
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
         wrapper.eq(ProfileDO::getProfileName, name);
         wrapper.eq(ProfileDO::getProfileTypeFlag, type);
-        wrapper.eq(ProfileDO::getTenantId, tenantId);
+        wrapper.eq(ProfileDO::getTenantId, UserHeaderUtil.getUserHeader().getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileDO entityDO = profileManager.getOne(wrapper);
         return profileBuilder.buildBOByDO(entityDO);
@@ -146,8 +147,8 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public List<ProfileBO> selectByDeviceId(Long id) {
-        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, id);
+    public List<ProfileBO> selectByDeviceId(Long deviceId) {
+        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId);
         List<ProfileBindDO> entityDOS = wrapper.list();
         Set<Long> profileIds = entityDOS.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
         return selectByIds(profileIds);

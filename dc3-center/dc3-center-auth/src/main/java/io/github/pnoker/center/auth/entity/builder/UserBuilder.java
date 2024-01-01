@@ -72,17 +72,23 @@ public interface UserBuilder {
     default void afterProcess(UserBO entityBO, @MappingTarget UserDO entityDO) {
         UserSocialExt entitySocialExt = entityBO.getSocialExt();
         if (ObjectUtil.isNotNull(entitySocialExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entitySocialExt.getType()).version(entitySocialExt.getVersion()).remark(entitySocialExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entitySocialExt.getContent()));
-            entityDO.setSocialExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entitySocialExt.getType());
+            ext.setVersion(entitySocialExt.getVersion());
+            ext.setVersion(entitySocialExt.getVersion());
+            ext.setRemark(entitySocialExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entitySocialExt.getContent()));
+            entityDO.setSocialExt(ext);
         }
         UserIdentityExt entityIdentityExt = entityBO.getIdentityExt();
         if (ObjectUtil.isNotNull(entityIdentityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityIdentityExt.getType()).version(entityIdentityExt.getVersion()).remark(entityIdentityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityIdentityExt.getContent()));
-            entityDO.setIdentityExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityIdentityExt.getType());
+            ext.setVersion(entityIdentityExt.getVersion());
+            ext.setVersion(entityIdentityExt.getVersion());
+            ext.setRemark(entityIdentityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityIdentityExt.getContent()));
+            entityDO.setIdentityExt(ext);
         }
     }
 
@@ -108,17 +114,23 @@ public interface UserBuilder {
     default void afterProcess(UserDO entityDO, @MappingTarget UserBO entityBO) {
         JsonExt entitySocialExt = entityDO.getSocialExt();
         if (ObjectUtil.isNotNull(entitySocialExt)) {
-            UserSocialExt.UserSocialExtBuilder<?, ?> builder = UserSocialExt.builder();
-            builder.type(entitySocialExt.getType()).version(entitySocialExt.getVersion()).remark(entitySocialExt.getRemark());
-            builder.content(JsonUtil.parseObject(entitySocialExt.getContent(), UserSocialExt.Content.class));
-            entityBO.setSocialExt(builder.build());
+            UserSocialExt ext = new UserSocialExt();
+            ext.setType(entitySocialExt.getType());
+            ext.setVersion(entitySocialExt.getVersion());
+            ext.setVersion(entitySocialExt.getVersion());
+            ext.setRemark(entitySocialExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entitySocialExt.getContent(), UserSocialExt.Content.class));
+            entityBO.setSocialExt(ext);
         }
         JsonExt entityIdentityExt = entityDO.getIdentityExt();
         if (ObjectUtil.isNotNull(entityIdentityExt)) {
-            UserIdentityExt.UserIdentityExtBuilder<?, ?> builder = UserIdentityExt.builder();
-            builder.type(entityIdentityExt.getType()).version(entityIdentityExt.getVersion()).remark(entityIdentityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityIdentityExt.getContent(), UserIdentityExt.Content.class));
-            entityBO.setIdentityExt(builder.build());
+            UserIdentityExt ext = new UserIdentityExt();
+            ext.setType(entityIdentityExt.getType());
+            ext.setVersion(entityIdentityExt.getVersion());
+            ext.setVersion(entityIdentityExt.getVersion());
+            ext.setRemark(entityIdentityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityIdentityExt.getContent(), UserIdentityExt.Content.class));
+            entityBO.setIdentityExt(ext);
         }
     }
 

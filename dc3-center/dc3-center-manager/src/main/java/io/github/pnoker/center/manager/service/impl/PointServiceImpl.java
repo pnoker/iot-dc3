@@ -31,7 +31,7 @@ import io.github.pnoker.center.manager.entity.model.PointDO;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.mapper.PointMapper;
-import io.github.pnoker.center.manager.service.NotifyService;
+import io.github.pnoker.center.manager.service.DriverNotifyService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
@@ -69,7 +69,7 @@ public class PointServiceImpl implements PointService {
     private PointMapper pointMapper;
 
     @Resource
-    private NotifyService notifyService;
+    private DriverNotifyService driverNotifyService;
 
     /**
      * {@inheritDoc}
@@ -86,7 +86,7 @@ public class PointServiceImpl implements PointService {
         // 通知驱动新增
         entityDO = pointManager.getById(entityDO.getId());
         entityBO = pointBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, entityBO);
+        driverNotifyService.notifyPoint(MetadataCommandTypeEnum.ADD, entityBO);
     }
 
     /**
@@ -101,7 +101,7 @@ public class PointServiceImpl implements PointService {
         }
 
         PointBO entityBO = pointBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverPoint(MetadataCommandTypeEnum.DELETE, entityBO);
+        driverNotifyService.notifyPoint(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     /**
@@ -121,7 +121,7 @@ public class PointServiceImpl implements PointService {
 
         entityDO = pointManager.getById(entityDO.getId());
         entityBO = pointBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverPoint(MetadataCommandTypeEnum.UPDATE, entityBO);
+        driverNotifyService.notifyPoint(MetadataCommandTypeEnum.UPDATE, entityBO);
     }
 
     @Override

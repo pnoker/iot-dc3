@@ -19,8 +19,10 @@ package io.github.pnoker.center.manager.entity.bo;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.DeviceExt;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +35,6 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeviceBO extends BaseBO {
@@ -88,6 +89,5 @@ public class DeviceBO extends BaseBO {
     /**
      * 模版ID集
      */
-    @Builder.Default
     private Set<Long> profileIds = new HashSet<>(4);
 }

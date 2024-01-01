@@ -17,8 +17,8 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import io.github.pnoker.center.manager.entity.bo.*;
+import io.github.pnoker.center.manager.service.DriverNotifyService;
 import io.github.pnoker.center.manager.service.DriverService;
-import io.github.pnoker.center.manager.service.NotifyService;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.constant.enums.MetadataTypeEnum;
@@ -39,7 +39,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class NotifyServiceImpl implements NotifyService {
+public class DriverNotifyServiceImpl implements DriverNotifyService {
 
     @Resource
     private DriverService driverService;
@@ -51,7 +51,7 @@ public class NotifyServiceImpl implements NotifyService {
      * {@inheritDoc}
      */
     @Override
-    public void notifyDriverProfile(MetadataCommandTypeEnum command, ProfileBO profileBO) {
+    public void notifyProfile(MetadataCommandTypeEnum command, ProfileBO profileBO) {
         try {
             List<DriverBO> entityDOS = driverService.selectByProfileId(profileBO.getId());
             entityDOS.forEach(driver -> {
@@ -71,7 +71,7 @@ public class NotifyServiceImpl implements NotifyService {
      * {@inheritDoc}
      */
     @Override
-    public void notifyDriverPoint(MetadataCommandTypeEnum command, PointBO pointBO) {
+    public void notifyPoint(MetadataCommandTypeEnum command, PointBO pointBO) {
         try {
             List<DriverBO> entityDOS = driverService.selectByProfileId(pointBO.getProfileId());
             entityDOS.forEach(driver -> {
@@ -91,7 +91,7 @@ public class NotifyServiceImpl implements NotifyService {
      * {@inheritDoc}
      */
     @Override
-    public void notifyDriverDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO) {
+    public void notifyDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO) {
         try {
             DriverBO entityDO = driverService.selectById(deviceBO.getDriverId());
             DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
@@ -109,7 +109,7 @@ public class NotifyServiceImpl implements NotifyService {
      * {@inheritDoc}
      */
     @Override
-    public void notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfigBO driverAttributeConfigBO) {
+    public void notifyDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfigBO driverAttributeConfigBO) {
         try {
             DriverBO entityDO = driverService.selectByDeviceId(driverAttributeConfigBO.getDeviceId());
             DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
@@ -127,7 +127,7 @@ public class NotifyServiceImpl implements NotifyService {
      * {@inheritDoc}
      */
     @Override
-    public void notifyDriverPointInfo(MetadataCommandTypeEnum command, PointAttributeConfigBO pointAttributeConfigBO) {
+    public void notifyPointAttributeConfig(MetadataCommandTypeEnum command, PointAttributeConfigBO pointAttributeConfigBO) {
         try {
             DriverBO entityDO = driverService.selectByDeviceId(pointAttributeConfigBO.getDeviceId());
             DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(

@@ -32,7 +32,7 @@ public interface DriverAttributeService extends Service<DriverAttributeBO, Drive
 
 
     /**
-     * 根据驱动ID 查询
+     * 根据 驱动ID 查询
      *
      * @param driverId 驱动ID
      * @return DriverAttribute Array
@@ -40,7 +40,7 @@ public interface DriverAttributeService extends Service<DriverAttributeBO, Drive
     List<DriverAttributeBO> selectByDriverId(Long driverId);
 
     /**
-     * 根据驱动配置属性 NAME 和 驱动ID 查询
+     * 根据 驱动配置属性名称 和 驱动ID 查询
      *
      * @param name     属性名称
      * @param driverId 驱动ID
