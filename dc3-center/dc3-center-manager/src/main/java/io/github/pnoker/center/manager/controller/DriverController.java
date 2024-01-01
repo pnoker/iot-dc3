@@ -146,7 +146,7 @@ public class DriverController implements Controller {
     @GetMapping("/service/{serviceName}")
     public R<DriverBO> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
         try {
-            DriverBO select = driverService.selectByServiceName(serviceName, getTenantId(), true);
+            DriverBO select = driverService.selectByServiceName(serviceName, getTenantId());
             return R.ok(select);
         } catch (Exception e) {
             return R.fail(e.getMessage());

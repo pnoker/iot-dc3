@@ -70,15 +70,15 @@ public interface ResourceBuilder {
     @AfterMapping
     default void afterProcess(ResourceBO entityBO, @MappingTarget ResourceDO entityDO) {
         ResourceExt entityExt = entityBO.getResourceExt();
+        JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt ext = new JsonExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setResourceExt(ext);
         }
+        entityDO.setResourceExt(ext);
     }
 
     /**

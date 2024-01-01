@@ -34,12 +34,11 @@ public interface DriverService extends Service<DriverBO, DriverQuery> {
     /**
      * 根据 驱动ServiceName 查询 驱动
      *
-     * @param serviceName    驱动服务名称
-     * @param tenantId       租户ID
-     * @param throwException Throw Exception
+     * @param serviceName 驱动服务名称
+     * @param tenantId    租户ID
      * @return Driver
      */
-    DriverBO selectByServiceName(String serviceName, Long tenantId, boolean throwException);
+    DriverBO selectByServiceName(String serviceName, Long tenantId);
 
     /**
      * 根据 模版ID 查询 驱动集

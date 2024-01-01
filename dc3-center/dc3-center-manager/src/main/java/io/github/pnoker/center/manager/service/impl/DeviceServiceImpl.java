@@ -206,7 +206,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public DeviceBO selectByCode(String code, Long tenantId) {
         LambdaQueryChainWrapper<DeviceDO> wrapper = deviceManager.lambdaQuery().eq(DeviceDO::getDeviceCode, code).eq(DeviceDO::getTenantId, tenantId).last(QueryWrapperConstant.LIMIT_ONE);
-        DeviceDO entityDO = deviceManager.getOne(wrapper);
+        DeviceDO entityDO = wrapper.one();
         DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
         entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(entityDO.getId()));
         return entityBO;

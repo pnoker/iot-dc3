@@ -70,15 +70,15 @@ public interface AlarmRuleBuilder {
     @AfterMapping
     default void afterProcess(AlarmRuleBO entityBO, @MappingTarget AlarmRuleDO entityDO) {
         AlarmRuleExt entityExt = entityBO.getAlarmRuleExt();
+        JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt ext = new JsonExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setAlarmRuleExt(ext);
         }
+        entityDO.setAlarmRuleExt(ext);
     }
 
     /**

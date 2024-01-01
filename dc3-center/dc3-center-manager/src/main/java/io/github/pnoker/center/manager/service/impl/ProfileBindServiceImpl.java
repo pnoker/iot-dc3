@@ -85,7 +85,8 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public Boolean removeByDeviceId(Long deviceId) {
-        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId);
+        LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
+        wrapper.eq(ProfileBindDO::getDeviceId, deviceId);
         return profileBindManager.remove(wrapper);
     }
 
@@ -94,7 +95,9 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     @Override
     public Boolean removeByDeviceIdAndProfileId(Long deviceId, Long profileId) {
-        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId).eq(ProfileBindDO::getProfileId, profileId);
+        LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
+        wrapper.eq(ProfileBindDO::getDeviceId, deviceId)
+                .eq(ProfileBindDO::getProfileId, profileId);
         return profileBindManager.remove(wrapper);
     }
 
