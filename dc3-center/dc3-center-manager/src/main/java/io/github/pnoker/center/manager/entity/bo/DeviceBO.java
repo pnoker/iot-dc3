@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.entity.bo;
 
-import io.github.pnoker.center.manager.entity.ext.DeviceExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.ext.DeviceExt;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

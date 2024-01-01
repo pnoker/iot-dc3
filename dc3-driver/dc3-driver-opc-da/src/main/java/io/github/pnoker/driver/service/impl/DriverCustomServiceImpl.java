@@ -19,7 +19,7 @@ package io.github.pnoker.driver.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
+import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.exception.ConnectorException;
@@ -96,7 +96,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, DeviceDTO device, PointDTO point) {
+    public String read(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, PointDTO point) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
@@ -105,7 +105,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, DeviceDTO device, AttributeInfoDTO value) {
+    public Boolean write(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, AttributeConfigDTO value) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
@@ -120,7 +120,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverInfo 驱动信息
      * @return Server
      */
-    private Server getConnector(Long deviceId, Map<String, AttributeInfoDTO> driverInfo) {
+    private Server getConnector(Long deviceId, Map<String, AttributeConfigDTO> driverInfo) {
         log.debug("Opc Da Server Connection Info {}", JsonUtil.toJsonString(driverInfo));
         Server server = connectMap.get(deviceId);
         if (ObjectUtil.isNull(server)) {
@@ -154,7 +154,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws DuplicateGroupException DuplicateGroupException
      * @throws AddFailedException      AddFailedException
      */
-    public Item getItem(Server server, Map<String, AttributeInfoDTO> pointInfo) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException, AddFailedException {
+    public Item getItem(Server server, Map<String, AttributeConfigDTO> pointInfo) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException, AddFailedException {
         Group group;
         String groupName = attribute(pointInfo, "group");
         try {
@@ -172,7 +172,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointInfo 位号信息
      * @return Item Value
      */
-    private String readValue(Server server, Map<String, AttributeInfoDTO> pointInfo) {
+    private String readValue(Server server, Map<String, AttributeConfigDTO> pointInfo) {
         try {
             Item item = getItem(server, pointInfo);
             return readItem(item);
@@ -227,7 +227,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param value     写入值
      * @return 是否写入
      */
-    private boolean writeValue(Server server, Map<String, AttributeInfoDTO> pointInfo, AttributeInfoDTO value) {
+    private boolean writeValue(Server server, Map<String, AttributeConfigDTO> pointInfo, AttributeConfigDTO value) {
         try {
             Item item = getItem(server, pointInfo);
             return writeItem(item, value);
@@ -246,7 +246,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param value 写入值
      * @throws JIException OpcDa JIException
      */
-    private boolean writeItem(Item item, AttributeInfoDTO value) throws JIException {
+    private boolean writeItem(Item item, AttributeConfigDTO value) throws JIException {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(value.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + value.getType());

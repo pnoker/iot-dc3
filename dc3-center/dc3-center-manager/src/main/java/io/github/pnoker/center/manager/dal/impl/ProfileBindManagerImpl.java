@@ -1,8 +1,8 @@
 package io.github.pnoker.center.manager.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.dal.ProfileBindManager;
+import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.mapper.ProfileBindMapper;
 import org.springframework.stereotype.Service;
 

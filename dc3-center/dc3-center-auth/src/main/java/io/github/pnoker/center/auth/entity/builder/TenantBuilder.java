@@ -16,12 +16,18 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.model.TenantDO;
 import io.github.pnoker.center.auth.entity.vo.TenantVO;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.entity.ext.TenantExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -60,6 +66,17 @@ public interface TenantBuilder {
     @Mapping(target = "deleted", ignore = true)
     TenantDO buildDOByBO(TenantBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(TenantBO entityBO, @MappingTarget TenantDO entityDO) {
+        TenantExt entityExt = entityBO.getTenantExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setTenantExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -74,7 +91,19 @@ public interface TenantBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "tenantExt", ignore = true)
     TenantBO buildBOByDO(TenantDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(TenantDO entityDO, @MappingTarget TenantBO entityBO) {
+        JsonExt entityExt = entityDO.getTenantExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            TenantExt.TenantExtBuilder<?, ?> builder = TenantExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), TenantExt.Content.class));
+            entityBO.setTenantExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList

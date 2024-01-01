@@ -1,9 +1,9 @@
 package io.github.pnoker.center.data.entity.bo;
 
-import io.github.pnoker.center.data.entity.ext.AlarmNotifyExt;
 import io.github.pnoker.common.constant.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.ext.AlarmNotifyExt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -16,11 +16,11 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
-import io.github.pnoker.center.auth.entity.ext.ResourceExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ResourceScopeFlagEnum;
 import io.github.pnoker.common.constant.enums.ResourceTypeFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.ext.ResourceExt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -90,7 +90,7 @@ public class BatchServiceImpl implements BatchService {
         List<DeviceBO> deviceBOS = deviceService.selectByDriverId(entityDO.getId());
         Set<Long> deviceIds = deviceBOS.stream().map(BaseBO::getId).collect(Collectors.toSet());
 
-        Map<Long, Map<String, AttributeInfoDTO>> driverInfoMap = getDriverInfoMap(deviceIds, driverAttributeMap);
+        Map<Long, Map<String, AttributeConfigDTO>> driverInfoMap = getDriverInfoMap(deviceIds, driverAttributeMap);
         driverMetadataDTO.setDriverInfoMap(driverInfoMap);
 
         Map<Long, DeviceDTO> deviceMap = getDeviceMap(deviceBOS);
@@ -99,7 +99,7 @@ public class BatchServiceImpl implements BatchService {
         Map<Long, Map<Long, PointDTO>> profilePointMap = getProfilePointMap(deviceIds);
         driverMetadataDTO.setProfilePointMap(profilePointMap);
 
-        Map<Long, Map<Long, Map<String, AttributeInfoDTO>>> devicePointInfoMap = getPointInfoMap(deviceBOS, profilePointMap, pointAttributeMap);
+        Map<Long, Map<Long, Map<String, AttributeConfigDTO>>> devicePointInfoMap = getPointInfoMap(deviceBOS, profilePointMap, pointAttributeMap);
         driverMetadataDTO.setPointInfoMap(devicePointInfoMap);
 
         return driverMetadataDTO;
@@ -136,10 +136,10 @@ public class BatchServiceImpl implements BatchService {
      * @param driverAttributeMap 驱动属性Map
      * @return map(deviceId[driverAttribute.name[attributeInfo]]) 设备ID，属性名称，属性配置
      */
-    public Map<Long, Map<String, AttributeInfoDTO>> getDriverInfoMap(Set<Long> deviceIds, Map<Long, DriverAttributeDTO> driverAttributeMap) {
-        Map<Long, Map<String, AttributeInfoDTO>> driverInfoMap = new ConcurrentHashMap<>(16);
+    public Map<Long, Map<String, AttributeConfigDTO>> getDriverInfoMap(Set<Long> deviceIds, Map<Long, DriverAttributeDTO> driverAttributeMap) {
+        Map<Long, Map<String, AttributeConfigDTO>> driverInfoMap = new ConcurrentHashMap<>(16);
         deviceIds.forEach(deviceId -> {
-            Map<String, AttributeInfoDTO> infoMap = getDriverInfoMap(deviceId, driverAttributeMap);
+            Map<String, AttributeConfigDTO> infoMap = getDriverInfoMap(deviceId, driverAttributeMap);
             if (infoMap.size() > 0) {
                 driverInfoMap.put(deviceId, infoMap);
             }
@@ -154,12 +154,12 @@ public class BatchServiceImpl implements BatchService {
      * @param driverAttributeMap 驱动属性Map
      * @return map(attributeName, attributeInfo)
      */
-    public Map<String, AttributeInfoDTO> getDriverInfoMap(Long deviceId, Map<Long, DriverAttributeDTO> driverAttributeMap) {
-        Map<String, AttributeInfoDTO> attributeInfoMap = new ConcurrentHashMap<>(16);
+    public Map<String, AttributeConfigDTO> getDriverInfoMap(Long deviceId, Map<Long, DriverAttributeDTO> driverAttributeMap) {
+        Map<String, AttributeConfigDTO> attributeInfoMap = new ConcurrentHashMap<>(16);
         List<DriverAttributeConfigBO> driverAttributeConfigBOS = driverAttributeConfigService.selectByDeviceId(deviceId);
         driverAttributeConfigBOS.forEach(driverInfo -> {
             DriverAttributeDTO attribute = driverAttributeMap.get(driverInfo.getDriverAttributeId());
-            attributeInfoMap.put(attribute.getAttributeName(), AttributeInfoDTO.builder().type(attribute.getAttributeTypeFlag()).value(driverInfo.getConfigValue()).build());
+            attributeInfoMap.put(attribute.getAttributeName(), AttributeConfigDTO.builder().type(attribute.getAttributeTypeFlag()).value(driverInfo.getConfigValue()).build());
         });
         return attributeInfoMap;
     }
@@ -172,10 +172,10 @@ public class BatchServiceImpl implements BatchService {
      * @param pointAttributeMap Point Attribute Map
      * @return map(deviceId ( pointId, attribute ( attributeName, attributeInfo ( value, type))))
      */
-    public Map<Long, Map<Long, Map<String, AttributeInfoDTO>>> getPointInfoMap(List<DeviceBO> deviceBOS, Map<Long, Map<Long, PointDTO>> profilePointMap, Map<Long, PointAttributeDTO> pointAttributeMap) {
-        Map<Long, Map<Long, Map<String, AttributeInfoDTO>>> devicePointInfoMap = new ConcurrentHashMap<>(16);
+    public Map<Long, Map<Long, Map<String, AttributeConfigDTO>>> getPointInfoMap(List<DeviceBO> deviceBOS, Map<Long, Map<Long, PointDTO>> profilePointMap, Map<Long, PointAttributeDTO> pointAttributeMap) {
+        Map<Long, Map<Long, Map<String, AttributeConfigDTO>>> devicePointInfoMap = new ConcurrentHashMap<>(16);
         deviceBOS.forEach(device -> {
-            Map<Long, Map<String, AttributeInfoDTO>> infoMap = getPointInfoMap(device, profilePointMap, pointAttributeMap);
+            Map<Long, Map<String, AttributeConfigDTO>> infoMap = getPointInfoMap(device, profilePointMap, pointAttributeMap);
             if (infoMap.size() > 0) {
                 devicePointInfoMap.put(device.getId(), infoMap);
             }
@@ -191,15 +191,15 @@ public class BatchServiceImpl implements BatchService {
      * @param pointAttributeMap Point Attribute Map
      * @return map(pointId, attribute ( attributeName, attributeInfo ( value, type)))
      */
-    public Map<Long, Map<String, AttributeInfoDTO>> getPointInfoMap(DeviceBO deviceBO, Map<Long, Map<Long, PointDTO>> profilePointMap, Map<Long, PointAttributeDTO> pointAttributeMap) {
-        Map<Long, Map<String, AttributeInfoDTO>> attributeInfoMap = new ConcurrentHashMap<>(16);
+    public Map<Long, Map<String, AttributeConfigDTO>> getPointInfoMap(DeviceBO deviceBO, Map<Long, Map<Long, PointDTO>> profilePointMap, Map<Long, PointAttributeDTO> pointAttributeMap) {
+        Map<Long, Map<String, AttributeConfigDTO>> attributeInfoMap = new ConcurrentHashMap<>(16);
         deviceBO.getProfileIds().forEach(profileId -> profilePointMap.get(profileId).keySet()
                 .forEach(pointId -> {
                     List<PointAttributeConfigBO> pointAttributeConfigBOS = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceBO.getId(), pointId);
-                    Map<String, AttributeInfoDTO> infoMap = new ConcurrentHashMap<>(16);
+                    Map<String, AttributeConfigDTO> infoMap = new ConcurrentHashMap<>(16);
                     pointAttributeConfigBOS.forEach(pointInfo -> {
                         PointAttributeDTO attribute = pointAttributeMap.get(pointInfo.getPointAttributeId());
-                        infoMap.put(attribute.getAttributeName(), AttributeInfoDTO.builder().type(attribute.getAttributeTypeFlag()).value(pointInfo.getConfigValue()).build());
+                        infoMap.put(attribute.getAttributeName(), AttributeConfigDTO.builder().type(attribute.getAttributeTypeFlag()).value(pointInfo.getConfigValue()).build());
                     });
 
                     if (infoMap.size() > 0) {

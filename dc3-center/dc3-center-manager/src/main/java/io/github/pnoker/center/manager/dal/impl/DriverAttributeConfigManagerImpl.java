@@ -1,8 +1,8 @@
 package io.github.pnoker.center.manager.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.manager.entity.model.DriverAttributeConfigDO;
 import io.github.pnoker.center.manager.dal.DriverAttributeConfigManager;
+import io.github.pnoker.center.manager.entity.model.DriverAttributeConfigDO;
 import io.github.pnoker.center.manager.mapper.DriverAttributeConfigMapper;
 import org.springframework.stereotype.Service;
 

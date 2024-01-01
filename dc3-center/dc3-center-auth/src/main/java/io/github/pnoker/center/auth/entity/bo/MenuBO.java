@@ -16,11 +16,11 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
-import io.github.pnoker.center.auth.entity.ext.MenuExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuLevelFlagEnum;
 import io.github.pnoker.common.constant.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.ext.MenuExt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

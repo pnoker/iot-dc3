@@ -1,8 +1,8 @@
 package io.github.pnoker.center.data.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.data.entity.model.AlarmRuleDO;
 import io.github.pnoker.center.data.dal.AlarmRuleManager;
+import io.github.pnoker.center.data.entity.model.AlarmRuleDO;
 import io.github.pnoker.center.data.mapper.AlarmRuleMapper;
 import org.springframework.stereotype.Service;
 

@@ -17,11 +17,11 @@
 package io.github.pnoker.center.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.center.manager.entity.ext.ProfileExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileShareFlagEnum;
 import io.github.pnoker.common.constant.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.entity.ext.ProfileExt;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,8 +1,8 @@
 package io.github.pnoker.center.manager.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.manager.entity.model.PointAttributeDO;
 import io.github.pnoker.center.manager.dal.PointAttributeManager;
+import io.github.pnoker.center.manager.entity.model.PointAttributeDO;
 import io.github.pnoker.center.manager.mapper.PointAttributeMapper;
 import org.springframework.stereotype.Service;
 

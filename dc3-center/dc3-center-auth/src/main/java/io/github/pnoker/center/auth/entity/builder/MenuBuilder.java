@@ -16,12 +16,18 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.MenuBO;
 import io.github.pnoker.center.auth.entity.model.MenuDO;
 import io.github.pnoker.center.auth.entity.vo.MenuVO;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.entity.ext.MenuExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -61,6 +67,17 @@ public interface MenuBuilder {
     @Mapping(target = "deleted", ignore = true)
     MenuDO buildDOByBO(MenuBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(MenuBO entityBO, @MappingTarget MenuDO entityDO) {
+        MenuExt entityExt = entityBO.getMenuExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setMenuExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -75,7 +92,19 @@ public interface MenuBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "menuExt", ignore = true)
     MenuBO buildBOByDO(MenuDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(MenuDO entityDO, @MappingTarget MenuBO entityBO) {
+        JsonExt entityExt = entityDO.getMenuExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            MenuExt.MenuExtBuilder<?, ?> builder = MenuExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), MenuExt.Content.class));
+            entityBO.setMenuExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList

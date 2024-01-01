@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
-import io.github.pnoker.center.auth.entity.ext.TenantExt;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.ext.TenantExt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

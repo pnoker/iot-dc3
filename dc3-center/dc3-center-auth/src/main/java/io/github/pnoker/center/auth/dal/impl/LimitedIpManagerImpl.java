@@ -1,8 +1,8 @@
 package io.github.pnoker.center.auth.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.center.auth.dal.LimitedIpManager;
+import io.github.pnoker.center.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.center.auth.mapper.LimitedIpMapper;
 import org.springframework.stereotype.Service;
 

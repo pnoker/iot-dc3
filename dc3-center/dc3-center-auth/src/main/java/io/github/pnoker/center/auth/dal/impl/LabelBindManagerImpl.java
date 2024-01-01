@@ -1,8 +1,8 @@
 package io.github.pnoker.center.auth.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.auth.entity.model.LabelBindDO;
 import io.github.pnoker.center.auth.dal.LabelBindManager;
+import io.github.pnoker.center.auth.entity.model.LabelBindDO;
 import io.github.pnoker.center.auth.mapper.LabelBindMapper;
 import org.springframework.stereotype.Service;
 

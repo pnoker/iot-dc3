@@ -1,8 +1,8 @@
 package io.github.pnoker.center.auth.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.auth.entity.model.RoleDO;
 import io.github.pnoker.center.auth.dal.RoleManager;
+import io.github.pnoker.center.auth.entity.model.RoleDO;
 import io.github.pnoker.center.auth.mapper.RoleMapper;
 import org.springframework.stereotype.Service;
 

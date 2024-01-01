@@ -16,12 +16,18 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import io.github.pnoker.center.auth.entity.model.ResourceDO;
 import io.github.pnoker.center.auth.entity.vo.ResourceVO;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.entity.ext.ResourceExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -61,6 +67,17 @@ public interface ResourceBuilder {
     @Mapping(target = "deleted", ignore = true)
     ResourceDO buildDOByBO(ResourceBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(ResourceBO entityBO, @MappingTarget ResourceDO entityDO) {
+        ResourceExt entityExt = entityBO.getResourceExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setResourceExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -75,7 +92,19 @@ public interface ResourceBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "resourceExt", ignore = true)
     ResourceBO buildBOByDO(ResourceDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(ResourceDO entityDO, @MappingTarget ResourceBO entityBO) {
+        JsonExt entityExt = entityDO.getResourceExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            ResourceExt.ResourceExtBuilder<?, ?> builder = ResourceExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), ResourceExt.Content.class));
+            entityBO.setResourceExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList
