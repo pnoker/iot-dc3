@@ -25,7 +25,7 @@ import io.github.pnoker.center.data.service.DeviceStatusService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.utils.RedisUtil;
 import io.github.pnoker.common.utils.UserHeaderUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 @Service
 public class DeviceStatusServiceImpl implements DeviceStatusService {
 
-    @GrpcClient(ManagerServiceConstant.SERVICE_NAME)
+    @GrpcClient(ManagerConstant.SERVICE_NAME)
     private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
 
     @Resource

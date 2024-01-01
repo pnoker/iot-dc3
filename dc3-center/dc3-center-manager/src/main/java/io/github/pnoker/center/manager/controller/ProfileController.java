@@ -22,7 +22,7 @@ import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 import io.github.pnoker.center.manager.entity.query.ProfileQuery;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.base.Controller;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.PROFILE_URL_PREFIX)
+@RequestMapping(ManagerConstant.PROFILE_URL_PREFIX)
 public class ProfileController implements Controller {
 
     @Resource

@@ -23,7 +23,7 @@ import io.github.pnoker.center.auth.entity.query.LimitedIpQuery;
 import io.github.pnoker.center.auth.service.LimitedIpService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
-import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -42,7 +42,7 @@ import javax.validation.constraints.NotNull;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = AuthServiceConstant.LIMITED_IP_URL_PREFIX)
+@RequestMapping(value = AuthConstant.LIMITED_IP_URL_PREFIX)
 public class LimitedIpController implements Controller {
 
     @Resource

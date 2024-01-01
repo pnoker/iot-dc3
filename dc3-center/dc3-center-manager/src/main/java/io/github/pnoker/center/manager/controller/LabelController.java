@@ -23,7 +23,7 @@ import io.github.pnoker.center.manager.entity.query.LabelQuery;
 import io.github.pnoker.center.manager.service.LabelService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.LabelBO;
 import io.github.pnoker.common.entity.vo.LabelVO;
@@ -44,7 +44,7 @@ import javax.validation.constraints.NotNull;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.LABEL_URL_PREFIX)
+@RequestMapping(ManagerConstant.LABEL_URL_PREFIX)
 public class LabelController implements Controller {
 
     @Resource

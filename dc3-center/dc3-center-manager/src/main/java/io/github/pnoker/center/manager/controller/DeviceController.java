@@ -25,7 +25,7 @@ import io.github.pnoker.center.manager.entity.vo.DeviceVO;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.ResponseUtil;
 import io.github.pnoker.common.valid.Add;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.DEVICE_URL_PREFIX)
+@RequestMapping(ManagerConstant.DEVICE_URL_PREFIX)
 public class DeviceController implements Controller {
 
     @Resource

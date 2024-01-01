@@ -25,7 +25,7 @@ import io.github.pnoker.center.data.entity.vo.PointValueWriteVO;
 import io.github.pnoker.center.data.service.PointValueCommandService;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.enums.DeviceCommandTypeEnum;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +43,9 @@ import javax.annotation.Resource;
 @Service
 public class PointValueCommandServiceImpl implements PointValueCommandService {
 
-    @GrpcClient(ManagerServiceConstant.SERVICE_NAME)
+    @GrpcClient(ManagerConstant.SERVICE_NAME)
     private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
-    @GrpcClient(ManagerServiceConstant.SERVICE_NAME)
+    @GrpcClient(ManagerConstant.SERVICE_NAME)
     private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
 
     @Resource
