@@ -71,10 +71,13 @@ public interface AlarmRuleBuilder {
     default void afterProcess(AlarmRuleBO entityBO, @MappingTarget AlarmRuleDO entityDO) {
         AlarmRuleExt entityExt = entityBO.getAlarmRuleExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setAlarmRuleExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setAlarmRuleExt(ext);
         }
     }
 
@@ -99,10 +102,13 @@ public interface AlarmRuleBuilder {
     default void afterProcess(AlarmRuleDO entityDO, @MappingTarget AlarmRuleBO entityBO) {
         JsonExt entityExt = entityDO.getAlarmRuleExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            AlarmRuleExt.AlarmRuleExtBuilder<?, ?> builder = AlarmRuleExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), AlarmRuleExt.Content.class));
-            entityBO.setAlarmRuleExt(builder.build());
+            AlarmRuleExt ext = new AlarmRuleExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), AlarmRuleExt.Content.class));
+            entityBO.setAlarmRuleExt(ext);
         }
     }
 

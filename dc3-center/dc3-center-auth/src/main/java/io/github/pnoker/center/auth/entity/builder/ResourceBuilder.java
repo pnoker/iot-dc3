@@ -71,10 +71,13 @@ public interface ResourceBuilder {
     default void afterProcess(ResourceBO entityBO, @MappingTarget ResourceDO entityDO) {
         ResourceExt entityExt = entityBO.getResourceExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setResourceExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setResourceExt(ext);
         }
     }
 
@@ -99,10 +102,13 @@ public interface ResourceBuilder {
     default void afterProcess(ResourceDO entityDO, @MappingTarget ResourceBO entityBO) {
         JsonExt entityExt = entityDO.getResourceExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            ResourceExt.ResourceExtBuilder<?, ?> builder = ResourceExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), ResourceExt.Content.class));
-            entityBO.setResourceExt(builder.build());
+            ResourceExt ext = new ResourceExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ResourceExt.Content.class));
+            entityBO.setResourceExt(ext);
         }
     }
 

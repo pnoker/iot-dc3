@@ -124,7 +124,7 @@ public class ProfileController implements Controller {
     /**
      * 根据 ID 集合查询 Profile
      *
-     * @param profileIds Profile ID set
+     * @param profileIds 模版ID set
      * @return Map String:Profile
      */
     @PostMapping("/ids")

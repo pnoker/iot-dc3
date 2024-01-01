@@ -70,10 +70,13 @@ public interface TenantBuilder {
     default void afterProcess(TenantBO entityBO, @MappingTarget TenantDO entityDO) {
         TenantExt entityExt = entityBO.getTenantExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setTenantExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setTenantExt(ext);
         }
     }
 
@@ -98,10 +101,13 @@ public interface TenantBuilder {
     default void afterProcess(TenantDO entityDO, @MappingTarget TenantBO entityBO) {
         JsonExt entityExt = entityDO.getTenantExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            TenantExt.TenantExtBuilder<?, ?> builder = TenantExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), TenantExt.Content.class));
-            entityBO.setTenantExt(builder.build());
+            TenantExt ext = new TenantExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), TenantExt.Content.class));
+            entityBO.setTenantExt(ext);
         }
     }
 

@@ -71,10 +71,13 @@ public interface AlarmMessageProfileBuilder {
     default void afterProcess(AlarmMessageProfileBO entityBO, @MappingTarget AlarmMessageProfileDO entityDO) {
         AlarmMessageExt entityExt = entityBO.getAlarmMessageExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setAlarmMessageExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setAlarmMessageExt(ext);
         }
     }
 
@@ -99,10 +102,13 @@ public interface AlarmMessageProfileBuilder {
     default void afterProcess(AlarmMessageProfileDO entityDO, @MappingTarget AlarmMessageProfileBO entityBO) {
         JsonExt entityExt = entityDO.getAlarmMessageExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            AlarmMessageExt.AlarmMessageExtBuilder<?, ?> builder = AlarmMessageExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), AlarmMessageExt.Content.class));
-            entityBO.setAlarmMessageExt(builder.build());
+            AlarmMessageExt ext = new AlarmMessageExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), AlarmMessageExt.Content.class));
+            entityBO.setAlarmMessageExt(ext);
         }
     }
 

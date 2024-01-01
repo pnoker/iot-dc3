@@ -21,11 +21,7 @@ import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.RwFlagEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -37,7 +33,7 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(title = "PointQuery", description = "位号-查询")

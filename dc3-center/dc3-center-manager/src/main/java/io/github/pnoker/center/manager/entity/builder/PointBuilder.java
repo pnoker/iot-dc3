@@ -72,10 +72,13 @@ public interface PointBuilder {
     default void afterProcess(PointBO entityBO, @MappingTarget PointDO entityDO) {
         PointExt entityExt = entityBO.getPointExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setPointExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setPointExt(ext);
         }
     }
 
@@ -100,10 +103,13 @@ public interface PointBuilder {
     default void afterProcess(PointDO entityDO, @MappingTarget PointBO entityBO) {
         JsonExt entityExt = entityDO.getPointExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            PointExt.PointExtBuilder<?, ?> builder = PointExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), PointExt.Content.class));
-            entityBO.setPointExt(builder.build());
+            PointExt ext = new PointExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), PointExt.Content.class));
+            entityBO.setPointExt(ext);
         }
     }
 

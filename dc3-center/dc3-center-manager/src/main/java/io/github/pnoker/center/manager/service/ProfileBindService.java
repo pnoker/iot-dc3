@@ -68,7 +68,7 @@ public interface ProfileBindService extends Service<ProfileBindBO, ProfileBindQu
      * 根据 设备ID 查询关联的 模版ID 集合
      *
      * @param deviceId 设备ID
-     * @return Profile ID集
+     * @return 模版ID集
      */
     Set<Long> selectProfileIdsByDeviceId(Long deviceId);
 

@@ -71,10 +71,13 @@ public interface AlarmNotifyProfileBuilder {
     default void afterProcess(AlarmNotifyProfileBO entityBO, @MappingTarget AlarmNotifyProfileDO entityDO) {
         AlarmNotifyExt entityExt = entityBO.getAlarmNotifyExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setAlarmNotifyExt(builder.build());
+            JsonExt ext = new JsonExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setAlarmNotifyExt(ext);
         }
     }
 
@@ -99,10 +102,13 @@ public interface AlarmNotifyProfileBuilder {
     default void afterProcess(AlarmNotifyProfileDO entityDO, @MappingTarget AlarmNotifyProfileBO entityBO) {
         JsonExt entityExt = entityDO.getAlarmNotifyExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            AlarmNotifyExt.AlarmNotifyExtBuilder<?, ?> builder = AlarmNotifyExt.builder();
-            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
-            builder.content(JsonUtil.parseObject(entityExt.getContent(), AlarmNotifyExt.Content.class));
-            entityBO.setAlarmNotifyExt(builder.build());
+            AlarmNotifyExt ext = new AlarmNotifyExt();
+            ext.setType(entityExt.getType());
+            ext.setVersion(entityExt.getVersion());
+            ext.setVersion(entityExt.getVersion());
+            ext.setRemark(entityExt.getRemark());
+            ext.setContent(JsonUtil.parseObject(entityExt.getContent(), AlarmNotifyExt.Content.class));
+            entityBO.setAlarmNotifyExt(ext);
         }
     }
 

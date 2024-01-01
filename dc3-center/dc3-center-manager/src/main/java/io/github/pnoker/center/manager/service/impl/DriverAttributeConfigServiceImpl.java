@@ -22,13 +22,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.dal.DriverAttributeConfigManager;
-import io.github.pnoker.center.manager.dal.DriverAttributeManager;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.builder.DriverAttributeConfigBuilder;
 import io.github.pnoker.center.manager.entity.model.DriverAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
-import io.github.pnoker.center.manager.service.NotifyService;
+import io.github.pnoker.center.manager.service.DriverNotifyService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.entity.common.Pages;
@@ -54,12 +53,10 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     private DriverAttributeConfigBuilder driverAttributeConfigBuilder;
 
     @Resource
-    private DriverAttributeManager driverAttributeManager;
-    @Resource
     private DriverAttributeConfigManager driverAttributeConfigManager;
 
     @Resource
-    private NotifyService notifyService;
+    private DriverNotifyService driverNotifyService;
 
     @Override
     public void save(DriverAttributeConfigBO entityBO) {
@@ -73,7 +70,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         // 通知驱动新增
         entityDO = driverAttributeConfigManager.getById(entityDO.getId());
         entityBO = driverAttributeConfigBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.ADD, entityBO);
+        driverNotifyService.notifyDriverAttributeConfig(MetadataCommandTypeEnum.ADD, entityBO);
     }
 
     /**
@@ -88,7 +85,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         }
 
         DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.DELETE, entityBO);
+        driverNotifyService.notifyDriverAttributeConfig(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     /**
@@ -108,7 +105,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
 
         entityDO = driverAttributeConfigManager.getById(entityDO.getId());
         entityBO = driverAttributeConfigBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.UPDATE, entityBO);
+        driverNotifyService.notifyDriverAttributeConfig(MetadataCommandTypeEnum.UPDATE, entityBO);
     }
 
     @Override
@@ -121,8 +118,8 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      * {@inheritDoc}
      */
     @Override
-    public DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long driverAttributeId) {
-        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery().eq(DriverAttributeConfigDO::getDriverAttributeId, driverAttributeId).eq(DriverAttributeConfigDO::getDeviceId, deviceId).last(QueryWrapperConstant.LIMIT_ONE);
+    public DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId) {
+        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery().eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId).eq(DriverAttributeConfigDO::getDeviceId, deviceId).last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeConfigDO entityDO = wrapper.one();
         return driverAttributeConfigBuilder.buildBOByDO(entityDO);
     }
@@ -131,8 +128,8 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      * {@inheritDoc}
      */
     @Override
-    public List<DriverAttributeConfigBO> selectByAttributeId(Long driverAttributeId) {
-        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery().eq(DriverAttributeConfigDO::getDriverAttributeId, driverAttributeId);
+    public List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId) {
+        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery().eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId);
         List<DriverAttributeConfigDO> entityDO = wrapper.list();
         return driverAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }

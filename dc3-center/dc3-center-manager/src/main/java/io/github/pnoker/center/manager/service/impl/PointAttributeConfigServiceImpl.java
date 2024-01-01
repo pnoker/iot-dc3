@@ -22,13 +22,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.dal.PointAttributeConfigManager;
-import io.github.pnoker.center.manager.dal.PointAttributeManager;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeConfigBuilder;
 import io.github.pnoker.center.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
-import io.github.pnoker.center.manager.service.NotifyService;
+import io.github.pnoker.center.manager.service.DriverNotifyService;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -58,14 +57,12 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     private PointAttributeConfigBuilder pointAttributeConfigBuilder;
 
     @Resource
-    private PointAttributeManager pointAttributeManager;
-    @Resource
     private PointAttributeConfigManager pointAttributeConfigManager;
 
     @Resource
     private PointService pointService;
     @Resource
-    private NotifyService notifyService;
+    private DriverNotifyService driverNotifyService;
 
     /**
      * {@inheritDoc}
@@ -82,7 +79,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         // 通知驱动新增
         entityDO = pointAttributeConfigManager.getById(entityDO.getId());
         entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.ADD, entityBO);
+        driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.ADD, entityBO);
     }
 
     /**
@@ -97,7 +94,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         }
 
         PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.DELETE, entityBO);
+        driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     /**
@@ -117,7 +114,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
         entityDO = pointAttributeConfigManager.getById(entityDO.getId());
         entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
-        notifyService.notifyDriverPointInfo(MetadataCommandTypeEnum.UPDATE, entityBO);
+        driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.UPDATE, entityBO);
     }
 
     @Override

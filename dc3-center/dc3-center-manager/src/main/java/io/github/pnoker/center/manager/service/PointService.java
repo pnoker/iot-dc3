@@ -33,14 +33,6 @@ import java.util.Set;
 public interface PointService extends Service<PointBO, PointQuery> {
 
     /**
-     * 根据 设备ID 查询位号
-     *
-     * @param deviceId 设备ID
-     * @return Point Array
-     */
-    List<PointBO> selectByDeviceId(Long deviceId);
-
-    /**
      * 根据 模板ID 查询位号
      *
      * @param profileId 位号ID
@@ -49,10 +41,17 @@ public interface PointService extends Service<PointBO, PointQuery> {
     List<PointBO> selectByProfileId(Long profileId);
 
     /**
+     * 根据 设备ID 查询位号
+     *
+     * @param deviceId 设备ID
+     * @return Point Array
+     */
+    List<PointBO> selectByDeviceId(Long deviceId);
+
+    /**
      * 根据 模板ID 集查询位号
      *
-     * @param profileIds     Profile ID集
-     * @param throwException Throw Exception
+     * @param profileIds 模版ID集
      * @return Point Array
      */
     List<PointBO> selectByProfileIds(Set<Long> profileIds);

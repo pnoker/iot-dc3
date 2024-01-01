@@ -33,29 +33,28 @@ import java.util.Set;
 public interface ProfileService extends Service<ProfileBO, ProfileQuery> {
 
     /**
-     * 根据 模板Name 查询模版
+     * 根据 模板名称和模版类型 查询模版
      *
-     * @param name     模板名称
-     * @param type     模板类型 {@link ProfileTypeFlagEnum}
-     * @param tenantId 租户ID
+     * @param name 模板名称
+     * @param type 模板类型 {@link ProfileTypeFlagEnum}
      * @return ProfileBO
      */
-    ProfileBO selectByNameAndType(String name, ProfileTypeFlagEnum type, Long tenantId);
+    ProfileBO selectByNameAndType(String name, ProfileTypeFlagEnum type);
+
+    /**
+     * 根据 设备ID 查询模版
+     *
+     * @param deviceId 设备ID
+     * @return ProfileBO Array
+     */
+    List<ProfileBO> selectByDeviceId(Long deviceId);
 
     /**
      * 根据 模版ID集 查询模版
      *
-     * @param ids Profile ID集
+     * @param ids 模版ID集
      * @return ProfileBO Array
      */
     List<ProfileBO> selectByIds(Set<Long> ids);
-
-    /**
-     * 根据 设备Id 查询模版
-     *
-     * @param id 设备ID
-     * @return ProfileBO Array
-     */
-    List<ProfileBO> selectByDeviceId(Long id);
 
 }
