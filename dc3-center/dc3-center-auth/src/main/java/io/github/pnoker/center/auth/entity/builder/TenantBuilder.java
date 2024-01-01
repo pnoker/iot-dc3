@@ -69,15 +69,15 @@ public interface TenantBuilder {
     @AfterMapping
     default void afterProcess(TenantBO entityBO, @MappingTarget TenantDO entityDO) {
         TenantExt entityExt = entityBO.getTenantExt();
+        JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt ext = new JsonExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setTenantExt(ext);
         }
+        entityDO.setTenantExt(ext);
     }
 
     /**

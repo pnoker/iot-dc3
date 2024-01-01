@@ -110,28 +110,28 @@ public class DriverSyncServiceImpl implements DriverSyncService {
      * @param entityDTO DriverSyncUpDTO
      */
     private DriverDTO registerDriver(DriverSyncUpDTO entityDTO) {
-        // check tenant
-        GrpcRTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(entityDTO.getTenant()).build());
-        if (!rTenantDTO.getResult().getOk()) {
-            throw new ServiceException("Invalid {}, {}", entityDTO.getTenant(), rTenantDTO.getResult().getMessage());
+        GrpcRTenantDTO tenantDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(entityDTO.getTenant()).build());
+        if (!tenantDTO.getResult().getOk()) {
+            throw new ServiceException("无效租户: {}, 错误信息: {}", entityDTO.getTenant(), tenantDTO.getResult().getMessage());
         }
 
-        // register driver
-        DriverDTO entityDO = entityDTO.getDriver();
-        entityDO.setTenantId(rTenantDTO.getData().getBase().getId());
-        DriverBO entityBO = driverBuilder.buildBOByDTO(entityDO);
-        log.info("Register driver {}", entityDO);
-        try {
-            DriverBO byServiceName = driverService.selectByServiceName(entityDO.getServiceName(), entityDO.getTenantId(), true);
-            log.debug("Driver already registered, updating {} ", entityDO);
-            entityDO.setId(byServiceName.getId());
-            driverService.update(entityBO);
-        } catch (NotFoundException notFoundException1) {
-            log.debug("Driver does not registered, adding {} ", entityDO);
-            driverService.save(entityBO);
+        DriverDTO driverDTO = entityDTO.getDriver();
+        driverDTO.setTenantId(tenantDTO.getData().getBase().getId());
+        DriverBO driverBO = driverBuilder.buildBOByDTO(driverDTO);
+
+        log.info("注册驱动: {}", JsonUtil.toJsonString(driverBO));
+        DriverBO entityBO = driverService.selectByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
+        if (ObjectUtil.isNotNull(entityBO)) {
+            log.debug("驱动已注册, 执行更新: {}", JsonUtil.toJsonString(driverBO));
+            driverBO.setId(entityBO.getId());
+            driverService.update(driverBO);
+        } else {
+            log.debug("驱动未注册, 执行新增: {}", JsonUtil.toJsonString(driverBO));
+            driverService.save(driverBO);
         }
-        entityBO = driverService.selectById(entityDO.getId());
-        return driverBuilder.buildDTOByBO(entityBO);
+
+        driverBO = driverService.selectById(driverBO.getId());
+        return driverBuilder.buildDTOByBO(driverBO);
     }
 
     /**

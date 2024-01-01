@@ -38,7 +38,6 @@ spring:
       username: dc3
       password: dc3
       discovery:
-        ip: ${NODE_HOST:}
         group: ${spring.group}
         namespace: ${NODE_ENV:dev}
 

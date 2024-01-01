@@ -71,15 +71,15 @@ public interface DeviceBuilder {
     @AfterMapping
     default void afterProcess(DeviceBO entityBO, @MappingTarget DeviceDO entityDO) {
         DeviceExt entityExt = entityBO.getDeviceExt();
+        JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt ext = new JsonExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setDeviceExt(ext);
         }
+        entityDO.setDeviceExt(ext);
     }
 
     /**

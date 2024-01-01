@@ -70,15 +70,15 @@ public interface RoleBuilder {
     @AfterMapping
     default void afterProcess(RoleBO entityBO, @MappingTarget RoleDO entityDO) {
         RoleExt entityExt = entityBO.getRoleExt();
+        JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt ext = new JsonExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setRoleExt(ext);
         }
+        entityDO.setRoleExt(ext);
     }
 
     /**

@@ -71,15 +71,15 @@ public interface PointBuilder {
     @AfterMapping
     default void afterProcess(PointBO entityBO, @MappingTarget PointDO entityDO) {
         PointExt entityExt = entityBO.getPointExt();
+        JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt ext = new JsonExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setPointExt(ext);
         }
+        entityDO.setPointExt(ext);
     }
 
     /**

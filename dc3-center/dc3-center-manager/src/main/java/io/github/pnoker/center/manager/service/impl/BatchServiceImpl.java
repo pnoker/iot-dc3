@@ -77,7 +77,7 @@ public class BatchServiceImpl implements BatchService {
     @Override
     public DriverMetadataDTO batchDriverMetadata(String serviceName, Long tenantId) {
         DriverMetadataDTO driverMetadataDTO = new DriverMetadataDTO();
-        DriverBO entityDO = driverService.selectByServiceName(serviceName, tenantId, true);
+        DriverBO entityDO = driverService.selectByServiceName(serviceName, tenantId);
         driverMetadataDTO.setDriverId(entityDO.getId());
         driverMetadataDTO.setTenantId(entityDO.getTenantId());
 

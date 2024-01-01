@@ -60,7 +60,7 @@ public class ApiVO extends BaseVO {
     @NotBlank(message = "Api name can't be empty",
             groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "Invalid api name",
+            message = "无效接口名称",
             groups = {Add.class, Update.class})
     private String apiName;
 

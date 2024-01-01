@@ -71,25 +71,25 @@ public interface UserBuilder {
     @AfterMapping
     default void afterProcess(UserBO entityBO, @MappingTarget UserDO entityDO) {
         UserSocialExt entitySocialExt = entityBO.getSocialExt();
+        JsonExt socialExt = new JsonExt();
         if (ObjectUtil.isNotNull(entitySocialExt)) {
-            JsonExt ext = new JsonExt();
-            ext.setType(entitySocialExt.getType());
-            ext.setVersion(entitySocialExt.getVersion());
-            ext.setVersion(entitySocialExt.getVersion());
-            ext.setRemark(entitySocialExt.getRemark());
-            ext.setContent(JsonUtil.toJsonString(entitySocialExt.getContent()));
-            entityDO.setSocialExt(ext);
+            socialExt.setType(entitySocialExt.getType());
+            socialExt.setVersion(entitySocialExt.getVersion());
+            socialExt.setVersion(entitySocialExt.getVersion());
+            socialExt.setRemark(entitySocialExt.getRemark());
+            socialExt.setContent(JsonUtil.toJsonString(entitySocialExt.getContent()));
         }
+        entityDO.setSocialExt(socialExt);
         UserIdentityExt entityIdentityExt = entityBO.getIdentityExt();
+        JsonExt identityExt = new JsonExt();
         if (ObjectUtil.isNotNull(entityIdentityExt)) {
-            JsonExt ext = new JsonExt();
-            ext.setType(entityIdentityExt.getType());
-            ext.setVersion(entityIdentityExt.getVersion());
-            ext.setVersion(entityIdentityExt.getVersion());
-            ext.setRemark(entityIdentityExt.getRemark());
-            ext.setContent(JsonUtil.toJsonString(entityIdentityExt.getContent()));
-            entityDO.setIdentityExt(ext);
+            identityExt.setType(entityIdentityExt.getType());
+            identityExt.setVersion(entityIdentityExt.getVersion());
+            identityExt.setVersion(entityIdentityExt.getVersion());
+            identityExt.setRemark(entityIdentityExt.getRemark());
+            identityExt.setContent(JsonUtil.toJsonString(entityIdentityExt.getContent()));
         }
+        entityDO.setIdentityExt(identityExt);
     }
 
     /**

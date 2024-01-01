@@ -70,15 +70,15 @@ public interface AlarmNotifyProfileBuilder {
     @AfterMapping
     default void afterProcess(AlarmNotifyProfileBO entityBO, @MappingTarget AlarmNotifyProfileDO entityDO) {
         AlarmNotifyExt entityExt = entityBO.getAlarmNotifyExt();
+        JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
-            JsonExt ext = new JsonExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
-            entityDO.setAlarmNotifyExt(ext);
         }
+        entityDO.setAlarmNotifyExt(ext);
     }
 
     /**
