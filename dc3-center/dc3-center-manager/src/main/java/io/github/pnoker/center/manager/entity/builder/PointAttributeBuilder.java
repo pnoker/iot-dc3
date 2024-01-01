@@ -16,13 +16,19 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.entity.model.PointAttributeDO;
 import io.github.pnoker.center.manager.entity.vo.PointAttributeVO;
 import io.github.pnoker.common.entity.dto.PointAttributeDTO;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.entity.ext.PointAttributeExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -62,6 +68,17 @@ public interface PointAttributeBuilder {
     @Mapping(target = "deleted", ignore = true)
     PointAttributeDO buildDOByBO(PointAttributeBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(PointAttributeBO entityBO, @MappingTarget PointAttributeDO entityDO) {
+        PointAttributeExt entityExt = entityBO.getAttributeExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setAttributeExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -76,7 +93,19 @@ public interface PointAttributeBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "attributeExt", ignore = true)
     PointAttributeBO buildBOByDO(PointAttributeDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(PointAttributeDO entityDO, @MappingTarget PointAttributeBO entityBO) {
+        JsonExt entityExt = entityDO.getAttributeExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            PointAttributeExt.PointAttributeExtBuilder<?, ?> builder = PointAttributeExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), PointAttributeExt.Content.class));
+            entityBO.setAttributeExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList
@@ -124,7 +153,6 @@ public interface PointAttributeBuilder {
      * @param entityDTO EntityDTO
      * @return EntityBO
      */
-    @Mapping(target = "attributeExt", ignore = true)
     PointAttributeBO buildBOByDTO(PointAttributeDTO entityDTO);
 
     /**

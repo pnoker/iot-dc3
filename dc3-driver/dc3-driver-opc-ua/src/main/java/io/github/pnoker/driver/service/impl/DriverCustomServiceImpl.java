@@ -19,7 +19,7 @@ package io.github.pnoker.driver.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
+import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.exception.ConnectorException;
@@ -93,7 +93,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, DeviceDTO device, PointDTO point) {
+    public String read(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, PointDTO point) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
@@ -103,7 +103,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeInfoDTO> driverInfo, Map<String, AttributeInfoDTO> pointInfo, DeviceDTO device, AttributeInfoDTO value) {
+    public Boolean write(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, AttributeConfigDTO value) {
         /*
         !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
          */
@@ -118,7 +118,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverInfo 驱动信息
      * @return OpcUaClient
      */
-    private OpcUaClient getConnector(Long deviceId, Map<String, AttributeInfoDTO> driverInfo) {
+    private OpcUaClient getConnector(Long deviceId, Map<String, AttributeConfigDTO> driverInfo) {
         log.debug("Opc Ua Server Connection Info {}", JsonUtil.toJsonString(driverInfo));
         OpcUaClient opcUaClient = connectMap.get(deviceId);
         if (ObjectUtil.isNull(opcUaClient)) {
@@ -144,7 +144,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointInfo 位号信息
      * @return OpcUa Node
      */
-    private NodeId getNode(Map<String, AttributeInfoDTO> pointInfo) {
+    private NodeId getNode(Map<String, AttributeConfigDTO> pointInfo) {
         int namespace = attribute(pointInfo, "namespace");
         String tag = attribute(pointInfo, "tag");
         return new NodeId(namespace, tag);
@@ -157,7 +157,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointInfo 位号信息
      * @return Node Value
      */
-    private String readValue(OpcUaClient client, Map<String, AttributeInfoDTO> pointInfo) {
+    private String readValue(OpcUaClient client, Map<String, AttributeConfigDTO> pointInfo) {
         try {
             NodeId nodeId = getNode(pointInfo);
             client.connect().get();
@@ -180,7 +180,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointInfo 位号信息
      * @param value     写入值
      */
-    private boolean writeValue(OpcUaClient client, Map<String, AttributeInfoDTO> pointInfo, AttributeInfoDTO value) {
+    private boolean writeValue(OpcUaClient client, Map<String, AttributeConfigDTO> pointInfo, AttributeConfigDTO value) {
         try {
             NodeId nodeId = getNode(pointInfo);
 
@@ -206,7 +206,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws ExecutionException   ExecutionException
      * @throws InterruptedException InterruptedException
      */
-    private boolean writeNode(OpcUaClient client, NodeId nodeId, AttributeInfoDTO value) throws ExecutionException, InterruptedException {
+    private boolean writeNode(OpcUaClient client, NodeId nodeId, AttributeConfigDTO value) throws ExecutionException, InterruptedException {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(value.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
             throw new IllegalArgumentException("Unsupported type of " + value.getType());

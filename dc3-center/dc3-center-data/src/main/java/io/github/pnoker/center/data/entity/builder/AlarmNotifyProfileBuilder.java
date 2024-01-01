@@ -16,12 +16,18 @@
 
 package io.github.pnoker.center.data.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.bo.AlarmNotifyProfileBO;
 import io.github.pnoker.center.data.entity.model.AlarmNotifyProfileDO;
 import io.github.pnoker.center.data.entity.vo.AlarmNotifyProfileVO;
+import io.github.pnoker.common.entity.ext.AlarmNotifyExt;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -61,6 +67,17 @@ public interface AlarmNotifyProfileBuilder {
     @Mapping(target = "deleted", ignore = true)
     AlarmNotifyProfileDO buildDOByBO(AlarmNotifyProfileBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(AlarmNotifyProfileBO entityBO, @MappingTarget AlarmNotifyProfileDO entityDO) {
+        AlarmNotifyExt entityExt = entityBO.getAlarmNotifyExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setAlarmNotifyExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -75,7 +92,19 @@ public interface AlarmNotifyProfileBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "alarmNotifyExt", ignore = true)
     AlarmNotifyProfileBO buildBOByDO(AlarmNotifyProfileDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(AlarmNotifyProfileDO entityDO, @MappingTarget AlarmNotifyProfileBO entityBO) {
+        JsonExt entityExt = entityDO.getAlarmNotifyExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            AlarmNotifyExt.AlarmNotifyExtBuilder<?, ?> builder = AlarmNotifyExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), AlarmNotifyExt.Content.class));
+            entityBO.setAlarmNotifyExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList

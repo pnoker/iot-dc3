@@ -16,13 +16,19 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.model.PointDO;
 import io.github.pnoker.center.manager.entity.vo.PointVO;
 import io.github.pnoker.common.entity.dto.PointDTO;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.entity.ext.PointExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -62,6 +68,17 @@ public interface PointBuilder {
     @Mapping(target = "deleted", ignore = true)
     PointDO buildDOByBO(PointBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(PointBO entityBO, @MappingTarget PointDO entityDO) {
+        PointExt entityExt = entityBO.getPointExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setPointExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -76,7 +93,19 @@ public interface PointBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "pointExt", ignore = true)
     PointBO buildBOByDO(PointDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(PointDO entityDO, @MappingTarget PointBO entityBO) {
+        JsonExt entityExt = entityDO.getPointExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            PointExt.PointExtBuilder<?, ?> builder = PointExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), PointExt.Content.class));
+            entityBO.setPointExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList

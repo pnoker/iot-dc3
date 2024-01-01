@@ -16,12 +16,19 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserBO;
 import io.github.pnoker.center.auth.entity.model.UserDO;
 import io.github.pnoker.center.auth.entity.vo.UserVO;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.entity.ext.UserIdentityExt;
+import io.github.pnoker.common.entity.ext.UserSocialExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -61,6 +68,24 @@ public interface UserBuilder {
     @Mapping(target = "deleted", ignore = true)
     UserDO buildDOByBO(UserBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(UserBO entityBO, @MappingTarget UserDO entityDO) {
+        UserSocialExt entitySocialExt = entityBO.getSocialExt();
+        if (ObjectUtil.isNotNull(entitySocialExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entitySocialExt.getType()).version(entitySocialExt.getVersion()).remark(entitySocialExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entitySocialExt.getContent()));
+            entityDO.setSocialExt(builder.build());
+        }
+        UserIdentityExt entityIdentityExt = entityBO.getIdentityExt();
+        if (ObjectUtil.isNotNull(entityIdentityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityIdentityExt.getType()).version(entityIdentityExt.getVersion()).remark(entityIdentityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityIdentityExt.getContent()));
+            entityDO.setIdentityExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -75,7 +100,27 @@ public interface UserBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "socialExt", ignore = true)
+    @Mapping(target = "identityExt", ignore = true)
     UserBO buildBOByDO(UserDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(UserDO entityDO, @MappingTarget UserBO entityBO) {
+        JsonExt entitySocialExt = entityDO.getSocialExt();
+        if (ObjectUtil.isNotNull(entitySocialExt)) {
+            UserSocialExt.UserSocialExtBuilder<?, ?> builder = UserSocialExt.builder();
+            builder.type(entitySocialExt.getType()).version(entitySocialExt.getVersion()).remark(entitySocialExt.getRemark());
+            builder.content(JsonUtil.parseObject(entitySocialExt.getContent(), UserSocialExt.Content.class));
+            entityBO.setSocialExt(builder.build());
+        }
+        JsonExt entityIdentityExt = entityDO.getIdentityExt();
+        if (ObjectUtil.isNotNull(entityIdentityExt)) {
+            UserIdentityExt.UserIdentityExtBuilder<?, ?> builder = UserIdentityExt.builder();
+            builder.type(entityIdentityExt.getType()).version(entityIdentityExt.getVersion()).remark(entityIdentityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityIdentityExt.getContent(), UserIdentityExt.Content.class));
+            entityBO.setIdentityExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList

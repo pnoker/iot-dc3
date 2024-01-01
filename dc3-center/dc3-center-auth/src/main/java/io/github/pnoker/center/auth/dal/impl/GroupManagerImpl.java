@@ -1,8 +1,8 @@
 package io.github.pnoker.center.auth.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.auth.entity.model.GroupDO;
 import io.github.pnoker.center.auth.dal.GroupManager;
+import io.github.pnoker.center.auth.entity.model.GroupDO;
 import io.github.pnoker.center.auth.mapper.GroupMapper;
 import org.springframework.stereotype.Service;
 

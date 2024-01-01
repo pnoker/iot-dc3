@@ -16,12 +16,18 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.RoleBO;
 import io.github.pnoker.center.auth.entity.model.RoleDO;
 import io.github.pnoker.center.auth.entity.vo.RoleVO;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.entity.ext.RoleExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -61,6 +67,17 @@ public interface RoleBuilder {
     @Mapping(target = "deleted", ignore = true)
     RoleDO buildDOByBO(RoleBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(RoleBO entityBO, @MappingTarget RoleDO entityDO) {
+        RoleExt entityExt = entityBO.getRoleExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setRoleExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -75,7 +92,19 @@ public interface RoleBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "roleExt", ignore = true)
     RoleBO buildBOByDO(RoleDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(RoleDO entityDO, @MappingTarget RoleBO entityBO) {
+        JsonExt entityExt = entityDO.getRoleExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            RoleExt.RoleExtBuilder<?, ?> builder = RoleExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), RoleExt.Content.class));
+            entityBO.setRoleExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList

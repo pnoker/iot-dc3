@@ -1,8 +1,8 @@
 package io.github.pnoker.center.data.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.data.entity.model.AlarmNotifyProfileDO;
 import io.github.pnoker.center.data.dal.AlarmNotifyProfileManager;
+import io.github.pnoker.center.data.entity.model.AlarmNotifyProfileDO;
 import io.github.pnoker.center.data.mapper.AlarmNotifyProfileMapper;
 import org.springframework.stereotype.Service;
 

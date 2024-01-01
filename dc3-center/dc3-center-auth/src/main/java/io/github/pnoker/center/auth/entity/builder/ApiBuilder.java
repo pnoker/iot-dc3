@@ -16,12 +16,18 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.ApiBO;
 import io.github.pnoker.center.auth.entity.model.ApiDO;
 import io.github.pnoker.center.auth.entity.vo.ApiVO;
+import io.github.pnoker.common.entity.ext.ApiExt;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -61,6 +67,17 @@ public interface ApiBuilder {
     @Mapping(target = "deleted", ignore = true)
     ApiDO buildDOByBO(ApiBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(ApiBO entityBO, @MappingTarget ApiDO entityDO) {
+        ApiExt entityExt = entityBO.getApiExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setApiExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -75,7 +92,19 @@ public interface ApiBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "apiExt", ignore = true)
     ApiBO buildBOByDO(ApiDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(ApiDO entityDO, @MappingTarget ApiBO entityBO) {
+        JsonExt entityExt = entityDO.getApiExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            ApiExt.ApiExtBuilder<?, ?> builder = ApiExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), ApiExt.Content.class));
+            entityBO.setApiExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList

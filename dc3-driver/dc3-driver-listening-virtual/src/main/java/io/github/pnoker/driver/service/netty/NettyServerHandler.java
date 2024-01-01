@@ -18,7 +18,7 @@ package io.github.pnoker.driver.service.netty;
 
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.common.entity.dto.AttributeInfoDTO;
+import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.entity.dto.PointValueDTO;
@@ -72,10 +72,10 @@ public class NettyServerHandler {
         NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
 
         List<PointValueDTO> pointValues = new ArrayList<>(16);
-        Map<Long, Map<String, AttributeInfoDTO>> pointInfoMap = driverContext.getDriverMetadataDTO().getPointInfoMap().get(deviceId);
+        Map<Long, Map<String, AttributeConfigDTO>> pointInfoMap = driverContext.getDriverMetadataDTO().getPointInfoMap().get(deviceId);
         for (Long pointId : pointInfoMap.keySet()) {
             PointDTO point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
-            Map<String, AttributeInfoDTO> infoMap = pointInfoMap.get(pointId);
+            Map<String, AttributeConfigDTO> infoMap = pointInfoMap.get(pointId);
             int start = DriverUtil.value(infoMap.get("start").getType().getCode(), infoMap.get("start").getValue());
             int end = DriverUtil.value(infoMap.get("end").getType().getCode(), infoMap.get("end").getValue());
 

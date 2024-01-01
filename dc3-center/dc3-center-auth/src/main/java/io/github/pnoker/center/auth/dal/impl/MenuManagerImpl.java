@@ -1,8 +1,8 @@
 package io.github.pnoker.center.auth.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.auth.entity.model.MenuDO;
 import io.github.pnoker.center.auth.dal.MenuManager;
+import io.github.pnoker.center.auth.entity.model.MenuDO;
 import io.github.pnoker.center.auth.mapper.MenuMapper;
 import org.springframework.stereotype.Service;
 

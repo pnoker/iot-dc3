@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
-import io.github.pnoker.center.auth.entity.ext.UserIdentityExt;
-import io.github.pnoker.center.auth.entity.ext.UserSocialExt;
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.ext.UserIdentityExt;
+import io.github.pnoker.common.entity.ext.UserSocialExt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

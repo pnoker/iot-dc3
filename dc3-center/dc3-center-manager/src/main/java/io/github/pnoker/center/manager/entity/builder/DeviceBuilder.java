@@ -16,13 +16,19 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.vo.DeviceVO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
+import io.github.pnoker.common.entity.ext.DeviceExt;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -62,6 +68,17 @@ public interface DeviceBuilder {
     @Mapping(target = "deleted", ignore = true)
     DeviceDO buildDOByBO(DeviceBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(DeviceBO entityBO, @MappingTarget DeviceDO entityDO) {
+        DeviceExt entityExt = entityBO.getDeviceExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setDeviceExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -76,8 +93,20 @@ public interface DeviceBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "deviceExt", ignore = true)
     @Mapping(target = "profileIds", ignore = true)
     DeviceBO buildBOByDO(DeviceDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(DeviceDO entityDO, @MappingTarget DeviceBO entityBO) {
+        JsonExt entityExt = entityDO.getDeviceExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            DeviceExt.DeviceExtBuilder<?, ?> builder = DeviceExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), DeviceExt.Content.class));
+            entityBO.setDeviceExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList
@@ -136,4 +165,6 @@ public interface DeviceBuilder {
      */
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DeviceVO> buildVOPageByBOPage(Page<DeviceBO> entityPageBO);
+
+
 }

@@ -16,13 +16,19 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.model.DriverAttributeDO;
 import io.github.pnoker.center.manager.entity.vo.DriverAttributeVO;
 import io.github.pnoker.common.entity.dto.DriverAttributeDTO;
+import io.github.pnoker.common.entity.ext.DriverAttributeExt;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -62,6 +68,17 @@ public interface DriverAttributeBuilder {
     @Mapping(target = "deleted", ignore = true)
     DriverAttributeDO buildDOByBO(DriverAttributeBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(DriverAttributeBO entityBO, @MappingTarget DriverAttributeDO entityDO) {
+        DriverAttributeExt entityExt = entityBO.getAttributeExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setAttributeExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -76,7 +93,19 @@ public interface DriverAttributeBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "attributeExt", ignore = true)
     DriverAttributeBO buildBOByDO(DriverAttributeDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(DriverAttributeDO entityDO, @MappingTarget DriverAttributeBO entityBO) {
+        JsonExt entityExt = entityDO.getAttributeExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            DriverAttributeExt.DriverAttributeExtBuilder<?, ?> builder = DriverAttributeExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), DriverAttributeExt.Content.class));
+            entityBO.setAttributeExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList
@@ -124,7 +153,6 @@ public interface DriverAttributeBuilder {
      * @param entityDTO EntityDTO
      * @return EntityBO
      */
-    @Mapping(target = "attributeExt", ignore = true)
     DriverAttributeBO buildBOByDTO(DriverAttributeDTO entityDTO);
 
     /**

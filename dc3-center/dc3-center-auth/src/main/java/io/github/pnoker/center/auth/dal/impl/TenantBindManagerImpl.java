@@ -1,8 +1,8 @@
 package io.github.pnoker.center.auth.dal.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.pnoker.center.auth.entity.model.TenantBindDO;
 import io.github.pnoker.center.auth.dal.TenantBindManager;
+import io.github.pnoker.center.auth.entity.model.TenantBindDO;
 import io.github.pnoker.center.auth.mapper.TenantBindMapper;
 import org.springframework.stereotype.Service;
 

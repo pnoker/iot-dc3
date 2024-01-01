@@ -16,12 +16,18 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import io.github.pnoker.center.manager.entity.vo.ProfileVO;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.entity.ext.ProfileExt;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -61,6 +67,17 @@ public interface ProfileBuilder {
     @Mapping(target = "deleted", ignore = true)
     ProfileDO buildDOByBO(ProfileBO entityBO);
 
+    @AfterMapping
+    default void afterProcess(ProfileBO entityBO, @MappingTarget ProfileDO entityDO) {
+        ProfileExt entityExt = entityBO.getProfileExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            JsonExt.JsonExtBuilder<?, ?> builder = JsonExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.toJsonString(entityExt.getContent()));
+            entityDO.setProfileExt(builder.build());
+        }
+    }
+
     /**
      * BOList to DOList
      *
@@ -75,7 +92,19 @@ public interface ProfileBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "profileExt", ignore = true)
     ProfileBO buildBOByDO(ProfileDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(ProfileDO entityDO, @MappingTarget ProfileBO entityBO) {
+        JsonExt entityExt = entityDO.getProfileExt();
+        if (ObjectUtil.isNotNull(entityExt)) {
+            ProfileExt.ProfileExtBuilder<?, ?> builder = ProfileExt.builder();
+            builder.type(entityExt.getType()).version(entityExt.getVersion()).remark(entityExt.getRemark());
+            builder.content(JsonUtil.parseObject(entityExt.getContent(), ProfileExt.Content.class));
+            entityBO.setProfileExt(builder.build());
+        }
+    }
 
     /**
      * DOList to BOList
