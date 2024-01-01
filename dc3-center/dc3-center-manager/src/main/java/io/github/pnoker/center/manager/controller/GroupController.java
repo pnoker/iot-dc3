@@ -23,7 +23,7 @@ import io.github.pnoker.center.manager.entity.query.GroupQuery;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.GroupBO;
 import io.github.pnoker.common.entity.vo.GroupVO;
@@ -44,7 +44,7 @@ import javax.validation.constraints.NotNull;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.GROUP_URL_PREFIX)
+@RequestMapping(ManagerConstant.GROUP_URL_PREFIX)
 public class GroupController implements Controller {
 
     @Resource

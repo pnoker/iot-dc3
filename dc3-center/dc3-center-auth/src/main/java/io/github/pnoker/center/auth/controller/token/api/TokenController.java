@@ -24,7 +24,7 @@ import io.github.pnoker.center.auth.controller.token.vo.GenerateTokenVO;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
 import io.github.pnoker.center.auth.service.TokenService;
 import io.github.pnoker.common.base.Controller;
-import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.TimeUtil;
@@ -45,7 +45,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(AuthServiceConstant.TOKEN_URL_PREFIX)
+@RequestMapping(AuthConstant.TOKEN_URL_PREFIX)
 public class TokenController implements Controller {
 
     @Resource

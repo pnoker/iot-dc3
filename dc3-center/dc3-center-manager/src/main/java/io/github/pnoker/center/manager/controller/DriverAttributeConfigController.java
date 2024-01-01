@@ -22,7 +22,7 @@ import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.base.Controller;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -42,7 +42,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX)
+@RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX)
 public class DriverAttributeConfigController implements Controller {
 
     @Resource

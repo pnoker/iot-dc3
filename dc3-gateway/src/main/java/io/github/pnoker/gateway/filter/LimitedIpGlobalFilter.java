@@ -19,7 +19,7 @@ package io.github.pnoker.gateway.filter;
 import io.github.pnoker.api.center.auth.GrpcIpQuery;
 import io.github.pnoker.api.center.auth.GrpcRLimitedIpDTO;
 import io.github.pnoker.api.center.auth.LimitedIpApiGrpc;
-import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -40,7 +40,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class LimitedIpGlobalFilter implements GlobalFilter, Ordered {
 
-    @GrpcClient(AuthServiceConstant.SERVICE_NAME)
+    @GrpcClient(AuthConstant.SERVICE_NAME)
     private LimitedIpApiGrpc.LimitedIpApiBlockingStub limitedIpApiBlockingStub;
 
     @Override

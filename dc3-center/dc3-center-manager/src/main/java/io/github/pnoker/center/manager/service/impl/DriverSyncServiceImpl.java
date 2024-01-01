@@ -28,7 +28,7 @@ import io.github.pnoker.center.manager.entity.builder.DriverBuilder;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeBuilder;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
-import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.dto.*;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
@@ -60,7 +60,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
     @Resource
     private PointAttributeBuilder pointAttributeBuilder;
 
-    @GrpcClient(AuthServiceConstant.SERVICE_NAME)
+    @GrpcClient(AuthConstant.SERVICE_NAME)
     private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
 
     @Resource

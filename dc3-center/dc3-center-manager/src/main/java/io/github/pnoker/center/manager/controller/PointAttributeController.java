@@ -23,7 +23,7 @@ import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.entity.query.PointAttributeQuery;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.base.Controller;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
@@ -45,7 +45,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.POINT_ATTRIBUTE_URL_PREFIX)
+@RequestMapping(ManagerConstant.POINT_ATTRIBUTE_URL_PREFIX)
 public class PointAttributeController implements Controller {
 
     @Resource

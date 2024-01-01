@@ -28,7 +28,7 @@ import io.github.pnoker.center.data.service.DriverStatusService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.enums.DriverStatusEnum;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.utils.RedisUtil;
 import io.github.pnoker.common.utils.UserHeaderUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 @Service
 public class DriverStatusServiceImpl implements DriverStatusService {
 
-    @GrpcClient(ManagerServiceConstant.SERVICE_NAME)
+    @GrpcClient(ManagerConstant.SERVICE_NAME)
     private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
 
     @Resource

@@ -21,7 +21,7 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
-import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
@@ -47,13 +47,13 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
 
-    @GrpcClient(AuthServiceConstant.SERVICE_NAME)
+    @GrpcClient(AuthConstant.SERVICE_NAME)
     private UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub;
-    @GrpcClient(AuthServiceConstant.SERVICE_NAME)
+    @GrpcClient(AuthConstant.SERVICE_NAME)
     private UserApiGrpc.UserApiBlockingStub userApiBlockingStub;
-    @GrpcClient(AuthServiceConstant.SERVICE_NAME)
+    @GrpcClient(AuthConstant.SERVICE_NAME)
     private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
-    @GrpcClient(AuthServiceConstant.SERVICE_NAME)
+    @GrpcClient(AuthConstant.SERVICE_NAME)
     private TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
 
     @Override

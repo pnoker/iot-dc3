@@ -22,7 +22,7 @@ import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.center.data.entity.query.PointValueQuery;
 import io.github.pnoker.center.data.service.PointValueService;
 import io.github.pnoker.common.base.Controller;
-import io.github.pnoker.common.constant.service.DataServiceConstant;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,7 +40,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(DataServiceConstant.VALUE_URL_PREFIX)
+@RequestMapping(DataConstant.VALUE_URL_PREFIX)
 public class PointValueController implements Controller {
 
     @Resource
