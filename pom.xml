@@ -71,6 +71,7 @@
         <dc3.common.api.version>2024.1.0</dc3.common.api.version>
         <dc3.common.auth.version>2024.1.0</dc3.common.auth.version>
         <dc3.common.constant.version>2024.1.0</dc3.common.constant.version>
+        <dc3.common.driver.version>2024.1.0</dc3.common.driver.version>
         <dc3.common.exception.version>2024.1.0</dc3.common.exception.version>
         <dc3.common.influx.version>2024.1.0</dc3.common.influx.version>
         <dc3.common.log.version>2024.1.0</dc3.common.log.version>
@@ -121,12 +122,11 @@
     </profiles>
 
     <modules>
-        <module>dc3-gateway</module>
-        <module>dc3-center</module>
-        <module>dc3-driver</module>
         <module>dc3-api</module>
+        <module>dc3-center</module>
         <module>dc3-common</module>
-        <module>dc3-driver-sdk</module>
+        <module>dc3-driver</module>
+        <module>dc3-gateway</module>
     </modules>
 
     <dependencyManagement>
@@ -166,6 +166,11 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-constant</artifactId>
                 <version>${dc3.common.constant.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-driver</artifactId>
+                <version>${dc3.common.driver.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>

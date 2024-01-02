@@ -61,7 +61,3 @@ deploy.api:
 deploy.common:
 	cd dc3-common \
 	&& mvn clean deploy \
-
-deploy.sdk:
-	cd dc3-driver-sdk \
-	&& mvn clean deploy \
