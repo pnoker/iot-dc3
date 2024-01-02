@@ -29,11 +29,6 @@
 
     <description>IOT DC3 平台 设备协议驱动集合。</description>
 
-    <properties>
-        <!-- DC3 Driver 相关 -->
-        <dc3.driver.sdk.version>2024.1.0</dc3.driver.sdk.version>
-    </properties>
-
     <modules>
         <module>dc3-driver-dtu-yeecom</module>
         <module>dc3-driver-edge-gateway</module>
@@ -53,23 +48,10 @@
         <!-- DC3 Driver Sdk -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-driver-sdk</artifactId>
+            <artifactId>dc3-common-driver</artifactId>
         </dependency>
 
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-
-            <!-- DC3 Driver Sdk  -->
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-driver-sdk</artifactId>
-                <version>${dc3.driver.sdk.version}</version>
-            </dependency>
-
-        </dependencies>
-    </dependencyManagement>
 
     <repositories>
         <repository>
