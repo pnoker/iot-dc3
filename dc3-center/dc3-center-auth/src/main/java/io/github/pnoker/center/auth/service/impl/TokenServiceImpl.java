@@ -69,12 +69,13 @@ public class TokenServiceImpl implements TokenService {
     private RedisUtil redisUtil;
 
     @Override
-    public String generateSalt(String userName, String tenantName) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantName);
+    public String generateSalt(String loginName, String tenantCode) {
+        checkUserLimit(loginName, tenantCode);
+        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
         if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantBO.getId();
+        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
         String salt = redisUtil.getKey(redisSaltKey);
         if (CharSequenceUtil.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
@@ -84,47 +85,58 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String generateToken(String userName, String salt, String password, String tenantName) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantName);
+    public String generateToken(String loginName, String salt, String password, String tenantCode) {
+        checkUserLimit(loginName, tenantCode);
+        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
         if (ObjectUtil.isNull(tenantBO)) {
+            updateUserLimit(loginName, tenantCode);
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        checkUserLimit(userName, tenantBO.getId());
-        UserLoginBO userLogin = userLoginService.selectByLoginName(userName, false);
+        UserLoginBO userLogin = userLoginService.selectByLoginName(loginName, false);
         if (ObjectUtil.isNull(userLogin)) {
+            updateUserLimit(loginName, tenantCode);
             throw new NotFoundException("租户、用户信息不匹配");
         }
         TenantBindBO tenantBindBO = tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
         if (ObjectUtil.isNull(tenantBindBO)) {
+            updateUserLimit(loginName, tenantCode);
             throw new NotFoundException("租户、用户信息不匹配");
         }
         UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
-        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantBO.getId();
-        String redisSaltValue = redisUtil.getKey(redisSaltKey);
-        String md5Password = DecodeUtil.md5(userPasswordBO.getLoginPassword() + redisSaltValue);
-        if (CharSequenceUtil.isNotEmpty(redisSaltValue) && redisSaltValue.equals(salt) && md5Password.equals(password)) {
-            String redisTokenKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantBO.getId();
-            String token = KeyUtil.generateToken(userName, redisSaltValue, tenantBO.getId());
-            redisUtil.setKey(redisTokenKey, token, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
-            return token;
+        if (ObjectUtil.isNull(userPasswordBO)) {
+            updateUserLimit(loginName, tenantCode);
+            throw new NotFoundException("租户、用户信息不匹配");
         }
-        updateUserLimit(userName, tenantBO.getId(), true);
-        throw new ServiceException("租户、用户信息不匹配");
+        String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
+        String redisSaltValue = redisUtil.getKey(redisSaltKey);
+        if (CharSequenceUtil.isEmpty(redisSaltValue)) {
+            updateUserLimit(loginName, tenantCode);
+            throw new NotFoundException("租户、用户信息不匹配");
+        }
+        String md5Password = DecodeUtil.md5(userPasswordBO.getLoginPassword(), redisSaltValue);
+        if (!redisSaltValue.equals(salt) || !md5Password.equals(password)) {
+            updateUserLimit(loginName, tenantCode);
+            throw new ServiceException("租户、用户信息不匹配");
+        }
+        String redisTokenKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
+        String token = KeyUtil.generateToken(loginName, redisSaltValue, tenantBO.getId());
+        redisUtil.setKey(redisTokenKey, token, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
+        return token;
     }
 
     @Override
-    public TokenValid checkTokenValid(String userName, String salt, String token, String tenantName) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantName);
+    public TokenValid checkTokenValid(String loginName, String salt, String token, String tenantCode) {
+        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
         if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantBO.getId();
+        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
         String redisToken = redisUtil.getKey(redisKey);
         if (CharSequenceUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
         try {
-            Claims claims = KeyUtil.parserToken(userName, salt, token, tenantBO.getId());
+            Claims claims = KeyUtil.parserToken(loginName, salt, token, tenantBO.getId());
             return new TokenValid(true, claims.getExpiration());
         } catch (Exception e) {
             return new TokenValid(false, null);
@@ -132,12 +144,12 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public Boolean cancelToken(String userName, String tenantName) {
-        TenantBO tenantBO = tenantService.selectByCode(tenantName);
+    public Boolean cancelToken(String loginName, String tenantCode) {
+        TenantBO tenantBO = tenantService.selectByCode(tenantCode);
         if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("租户、用户信息不匹配");
         }
-        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantBO.getId();
+        String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
         redisUtil.deleteKey(redisKey);
         return true;
     }
@@ -145,45 +157,36 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 检测用户登录限制，返回该用户是否受限
      *
-     * @param userName 用户名称
-     * @param tenantId 租户ID
+     * @param loginName  登录名称
+     * @param tenantCode 租户编号
      */
-    private void checkUserLimit(String userName, Long tenantId) {
-        String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantId;
+    private void checkUserLimit(String loginName, String tenantCode) {
+        String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantCode;
+        Object key = redisUtil.getKey(redisKey);
         UserLimit limit = redisUtil.getKey(redisKey);
-        if (ObjectUtil.isNotNull(limit) && limit.getTimes() >= 5) {
-            boolean interval = limit.getExpireTime().isAfter(LocalDateTime.now());
-            if (interval) {
-                limit = updateUserLimit(userName, tenantId, false);
-                throw new ServiceException("Access restricted，Please try again after {}", LocalDateTimeUtil.completeFormat(limit.getExpireTime()));
-            }
+        if (ObjectUtil.isNull(limit) || limit.getTimes() < 5) {
+            return;
+        }
+        boolean isAfter = limit.getExpireTime().isAfter(LocalDateTime.now());
+        if (isAfter) {
+            throw new ServiceException("访问受限, 请在 {} 之后再重试", LocalDateTimeUtil.completeFormat(limit.getExpireTime()));
         }
     }
 
     /**
      * 更新用户登录限制
      *
-     * @param userName   用户名称
-     * @param tenantId   租户ID
-     * @param expireTime Expire Time
+     * @param loginName  登录名称
+     * @param tenantCode 租户编号
      * @return UserLimit
      */
-    private UserLimit updateUserLimit(String userName, Long tenantId, boolean expireTime) {
-        int amount = TimeoutConstant.USER_LIMIT_TIMEOUT;
-        String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + userName + SymbolConstant.HASHTAG + tenantId;
+    private UserLimit updateUserLimit(String loginName, String tenantCode) {
+        String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantCode;
         UserLimit userLimit = redisUtil.getKey(redisKey);
         UserLimit limit = Optional.ofNullable(userLimit).orElse(new UserLimit(0, LocalDateTime.now()));
         limit.setTimes(limit.getTimes() + 1);
-        if (limit.getTimes() > 20) {
-            //TODO 拉黑IP和锁定用户操作，然后通过Gateway进行拦截
-            amount = 24 * 60;
-        } else if (limit.getTimes() > 5) {
-            amount = limit.getTimes() * TimeoutConstant.USER_LIMIT_TIMEOUT;
-        }
-        if (expireTime) {
-            limit.setExpireTime(LocalDateTimeUtil.expireTime(amount, ChronoUnit.MINUTES));
-        }
-        redisUtil.setKey(redisKey, limit, 1, TimeUnit.DAYS);
+        limit.setExpireTime(LocalDateTimeUtil.expireTime(limit.getTimes() * TimeoutConstant.USER_LIMIT_TIMEOUT, ChronoUnit.MINUTES));
+        redisUtil.setKey(redisKey, limit, 7, TimeUnit.DAYS);
         return limit;
     }
 }

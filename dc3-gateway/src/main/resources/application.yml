@@ -55,7 +55,7 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        # auth token
+        # token
         - id: auth_route_token
           uri: lb://dc3-center-auth
           predicates:
@@ -71,7 +71,7 @@ spring:
             # args:
             #   name: default
             #   fallbackUri: 'forward:/fallback'
-        # auth other
+        # auth
         - id: auth_route_other
           uri: lb://dc3-center-auth
           predicates:

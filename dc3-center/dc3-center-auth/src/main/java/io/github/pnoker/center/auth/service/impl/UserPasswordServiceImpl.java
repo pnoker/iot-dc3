@@ -96,7 +96,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     public UserPasswordBO selectById(Long id) {
-        return null;
+        UserPasswordDO entityDO = getDOById(id, true);
+        return userPasswordBuilder.buildBOByDO(entityDO);
     }
 
     @Override

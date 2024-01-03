@@ -26,42 +26,42 @@ import io.github.pnoker.center.auth.entity.bean.TokenValid;
  */
 public interface TokenService {
     /**
-     * 生成用户的随机 salt
+     * 生成盐值
      *
-     * @param userName   用户名称
-     * @param tenantName 租户名称
+     * @param loginName  登录名称
+     * @param tenantCode 租户编号
      * @return String
      */
-    String generateSalt(String userName, String tenantName);
+    String generateSalt(String loginName, String tenantCode);
 
     /**
-     * 生成用户的Token令牌
+     * 生成令牌
      *
-     * @param userName   用户名称
+     * @param loginName  登录名称
      * @param salt       User Salt
      * @param password   User Password
-     * @param tenantName 租户名称
+     * @param tenantCode 租户编号
      * @return String
      */
-    String generateToken(String userName, String salt, String password, String tenantName);
+    String generateToken(String loginName, String salt, String password, String tenantCode);
 
     /**
-     * 校验用户的Token令牌是否有效
+     * 校验令牌
      *
-     * @param userName   用户名称
+     * @param loginName  登录名称
      * @param salt       盐值
      * @param token      Token
-     * @param tenantName 租户名称
+     * @param tenantCode 租户编号
      * @return TokenValid
      */
-    TokenValid checkTokenValid(String userName, String salt, String token, String tenantName);
+    TokenValid checkTokenValid(String loginName, String salt, String token, String tenantCode);
 
     /**
-     * 注销用户的Token令牌
+     * 注销令牌
      *
-     * @param userName   用户名称
-     * @param tenantName 租户名称
+     * @param loginName  登录名称
+     * @param tenantCode 租户编号
      * @return 是否注销
      */
-    Boolean cancelToken(String userName, String tenantName);
+    Boolean cancelToken(String loginName, String tenantCode);
 }
