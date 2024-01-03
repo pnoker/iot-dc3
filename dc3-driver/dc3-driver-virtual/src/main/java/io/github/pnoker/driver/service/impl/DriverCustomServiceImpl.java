@@ -17,14 +17,14 @@
 package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import io.github.pnoker.common.DriverContext;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
-import io.github.pnoker.driver.sdk.DriverContext;
-import io.github.pnoker.driver.sdk.service.DriverCustomService;
-import io.github.pnoker.driver.sdk.service.DriverSenderService;
+import io.github.pnoker.common.service.DriverCustomService;
+import io.github.pnoker.common.service.DriverSenderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

@@ -17,6 +17,7 @@
 package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import io.github.pnoker.common.DriverContext;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
@@ -24,15 +25,14 @@ import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.service.DriverCustomService;
+import io.github.pnoker.common.service.DriverSenderService;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.driver.api.S7Connector;
 import io.github.pnoker.driver.api.S7Serializer;
 import io.github.pnoker.driver.api.factory.S7ConnectorFactory;
 import io.github.pnoker.driver.api.factory.S7SerializerFactory;
 import io.github.pnoker.driver.bean.PlcS7PointVariable;
-import io.github.pnoker.driver.sdk.DriverContext;
-import io.github.pnoker.driver.sdk.service.DriverCustomService;
-import io.github.pnoker.driver.sdk.service.DriverSenderService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,8 +46,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static io.github.pnoker.driver.sdk.utils.DriverUtil.attribute;
-import static io.github.pnoker.driver.sdk.utils.DriverUtil.value;
+import static io.github.pnoker.common.utils.DriverUtil.attribute;
+import static io.github.pnoker.common.utils.DriverUtil.value;
 
 /**
  * @author pnoker

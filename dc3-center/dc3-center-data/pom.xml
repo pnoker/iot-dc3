@@ -44,22 +44,18 @@
             <artifactId>okhttp</artifactId>
         </dependency>
 
-        <!-- DC3 Api Auth -->
+        <!-- DC3 Api 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
-
-        <!-- DC3 Api Manager -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-manager</artifactId>
-        </dependency>
-
-        <!-- DC3 Api Data -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-manager</artifactId>
         </dependency>
 
         <!-- DC3 Common MySQL -->

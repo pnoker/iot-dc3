@@ -16,8 +16,8 @@
 
 package io.github.pnoker.driver.mqtt.service.impl;
 
-import io.github.pnoker.common.mqtt.entity.MqttMessage;
-import io.github.pnoker.common.mqtt.service.MqttReceiveService;
+import io.github.pnoker.common.entity.MqttMessage;
+import io.github.pnoker.common.service.MqttReceiveService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
