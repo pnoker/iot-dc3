@@ -68,7 +68,7 @@ request.interceptors.response.use(
         const responseType = response.config.responseType
 
         if (ok || responseType === 'blob') {
-            return JSONBigIntStr.parse(response)
+            return JSONBigIntStr.parse(response as any)
         }
 
         if (status === 401) {

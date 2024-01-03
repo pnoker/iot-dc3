@@ -8,7 +8,7 @@
 
 ## 一、准备
 
-- `nodejs` >= 12，推荐使用 14、16
+- `nodejs` >= 18，推荐使用 18
 - `git`
 - `Web Storm` 或者 `Visual Studio Code`
 
@@ -43,92 +43,4 @@ yarn
 
 # run
 yarn serve
-```
-
----
-## Visual Studio Code 配置
-
-> 可以参考setting.json
-
-```json
-{
-    "workbench.tree.indent": 16,
-    "workbench.editor.wrapTabs": true,
-    "workbench.editor.enablePreview": false,
-    "workbench.colorTheme": "Default Dark+",
-    "workbench.iconTheme": "vscode-jetbrains-icon-theme",
-    "workbench.tree.renderIndentGuides": "always",
-    "editor.hover.enabled": false,
-    "editor.fontFamily": "Monaco, Consolas, 'Courier New', monospace",
-    "editor.tabSize": 4,
-    "editor.formatOnSave": true,
-    "editor.formatOnPaste": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    },
-    "editor.detectIndentation": false,
-    "files.associations": {
-        "*.ttml": "html",
-        "*.ttss": "css",
-        "*.wxss": "css",
-        "*.wxml": "html"
-    },
-    "search.exclude": {
-        "**/node_modules": true,
-        "**/bower_components": true,
-        "**/target": true,
-        "**/logs": true,
-    },
-    "extensions.ignoreRecommendations": true,
-    "markdown.preview.openMarkdownLinks": "inEditor",
-    "typescript.updateImportsOnFileMove.enabled": "always",
-    "git.autofetch": true,
-    "git.enableSmartCommit": true,
-    "terminal.integrated.cursorBlinking": true,
-    "terminal.integrated.cursorStyle": "line",
-    "terminal.integrated.defaultProfile.windows": "GitBash",
-    "terminal.integrated.profiles.windows": {
-        "GitBash": {
-            "path": "D:\\Program Files\\Git\\bin\\bash.exe",
-            "args": [
-                "-li"
-            ]
-        }
-    },
-    "[json]": {
-        "editor.defaultFormatter": "vscode.json-language-features"
-    },
-    "[jsonc]": {
-        "editor.defaultFormatter": "vscode.json-language-features"
-    },
-    "[html]": {
-        "editor.defaultFormatter": "vscode.html-language-features"
-    },
-    "[javascript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
-    },
-    "[typescript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
-    },
-    "[vue]": {
-        "editor.defaultFormatter": "octref.vetur"
-    },
-    "[scss]": {
-        "editor.defaultFormatter": "vscode.css-language-features"
-    },
-    "vetur.format.options.useTabs": true,
-    "vetur.format.defaultFormatterOptions": {
-        "js-beautify-html": {
-            "wrap_attributes": "force-aligned"
-        },
-        "prettier": {
-            "printWidth": 180,
-            "semi": false,
-            "singleQuote": true,
-            "wrapAttributes": true,
-            "sortAttributes": true,
-            "eslintIntegration": true
-        }
-    }
-}
 ```

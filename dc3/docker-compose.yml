@@ -21,7 +21,7 @@ services:
     build:
       context: ../
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/iot-dc3-web:2023.4.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/iot-dc3-web:2024.1.1.dev
     restart: always
     ports:
       - 8080:80
