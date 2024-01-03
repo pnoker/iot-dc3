@@ -14,32 +14,47 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.controller.token.vo;
+package io.github.pnoker.center.auth.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 /**
- * GenerateSaltVO
+ * GenerateTokenVO
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Getter
 @Setter
-@Schema(title = "生成盐值请求体")
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class GenerateSaltVO {
+@Schema(description = "令牌相关请求体")
+public class TokenQuery {
 
-    @NotBlank(message = "租户不能为空")
-    @Schema(title = "租户", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "无效租户编号")
+    @Schema(description = "租户")
     private String tenant;
 
-    @NotBlank(message = "用户名不能为空")
-    @Schema(title = "用户名", requiredMode = Schema.RequiredMode.REQUIRED, description = "登陆使用的用户名")
+    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "无效的用户登录名")
+    @Schema(description = "登录名")
     private String name;
+
+    @Schema(description = "盐值")
+    private String salt;
+
+    @Schema(description = "密码")
+    private String password;
+
+    @Schema(description = "令牌")
+    private String token;
 }

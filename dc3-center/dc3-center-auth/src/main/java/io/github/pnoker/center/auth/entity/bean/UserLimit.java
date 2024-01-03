@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -33,7 +34,9 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserLimit {
+public class UserLimit implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /**
      * 登录验证错误次数
      */

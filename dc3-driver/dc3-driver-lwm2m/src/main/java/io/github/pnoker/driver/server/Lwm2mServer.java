@@ -19,7 +19,7 @@ package io.github.pnoker.driver.server;
 import io.github.pnoker.common.DriverContext;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
-import io.github.pnoker.common.service.DriverSenderService;
+import io.github.pnoker.common.driver.service.DriverSenderService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;

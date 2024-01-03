@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.controller.token.api;
+package io.github.pnoker.center.auth.controller;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.center.auth.controller.token.vo.CancelTokenVO;
-import io.github.pnoker.center.auth.controller.token.vo.CheckTokenVO;
-import io.github.pnoker.center.auth.controller.token.vo.GenerateSaltVO;
-import io.github.pnoker.center.auth.controller.token.vo.GenerateTokenVO;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
+import io.github.pnoker.center.auth.entity.query.TokenQuery;
 import io.github.pnoker.center.auth.service.TokenService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthConstant;
@@ -54,11 +51,11 @@ public class TokenController implements Controller {
     /**
      * 生成用户随机盐值
      *
-     * @param entityVO 生成盐值请求体 {@link GenerateSaltVO}
+     * @param entityVO 生成盐值请求体 {@link TokenQuery}
      * @return 盐值
      */
     @PostMapping("/salt")
-    public R<String> generateSalt(@Validated @RequestBody GenerateSaltVO entityVO) {
+    public R<String> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
         String salt = tokenService.generateSalt(entityVO.getName(), entityVO.getTenant());
         return ObjectUtil.isNotNull(salt) ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
     }
@@ -66,11 +63,11 @@ public class TokenController implements Controller {
     /**
      * 生成用户 Token 令牌
      *
-     * @param entityVO 生成令牌请求体 {@link GenerateTokenVO}
+     * @param entityVO 生成令牌请求体 {@link TokenQuery}
      * @return Token 令牌
      */
     @PostMapping("/generate")
-    public R<String> generateToken(@Validated @RequestBody GenerateTokenVO entityVO) {
+    public R<String> generateToken(@Validated @RequestBody TokenQuery entityVO) {
         String token = tokenService.generateToken(entityVO.getName(), entityVO.getSalt(), entityVO.getPassword(), entityVO.getTenant());
         return ObjectUtil.isNotNull(token) ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
     }
@@ -78,11 +75,11 @@ public class TokenController implements Controller {
     /**
      * 检测用户 Token 令牌是否有效
      *
-     * @param entityVO 校验令牌请求体 {@link CheckTokenVO}
+     * @param entityVO 校验令牌请求体 {@link TokenQuery}
      * @return 如果有效，返回过期时间
      */
     @PostMapping("/check")
-    public R<String> checkTokenValid(@Validated @RequestBody CheckTokenVO entityVO) {
+    public R<String> checkTokenValid(@Validated @RequestBody TokenQuery entityVO) {
         TokenValid tokenValid = tokenService.checkTokenValid(entityVO.getName(), entityVO.getSalt(), entityVO.getToken(), entityVO.getTenant());
         if (tokenValid.isValid()) {
             String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
@@ -94,11 +91,11 @@ public class TokenController implements Controller {
     /**
      * 注销用户的Token令牌
      *
-     * @param entityVO 注销令牌请求体 {@link CancelTokenVO}
+     * @param entityVO 注销令牌请求体 {@link TokenQuery}
      * @return 是否注销成功
      */
     @PostMapping("/cancel")
-    public R<Boolean> cancelToken(@Validated @RequestBody CancelTokenVO entityVO) {
+    public R<Boolean> cancelToken(@Validated @RequestBody TokenQuery entityVO) {
         return Boolean.TRUE.equals(tokenService.cancelToken(entityVO.getName(), entityVO.getTenant())) ? R.ok() : R.fail();
     }
 }
