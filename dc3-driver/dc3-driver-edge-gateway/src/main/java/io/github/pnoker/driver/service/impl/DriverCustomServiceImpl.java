@@ -16,14 +16,14 @@
 
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.DriverContext;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
-import io.github.pnoker.driver.sdk.DriverContext;
-import io.github.pnoker.driver.sdk.service.DriverCustomService;
-import io.github.pnoker.driver.sdk.service.DriverSenderService;
+import io.github.pnoker.common.service.DriverCustomService;
+import io.github.pnoker.common.service.DriverSenderService;
 import io.github.pnoker.driver.service.MqttSendService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static io.github.pnoker.driver.sdk.utils.DriverUtil.attribute;
+import static io.github.pnoker.common.utils.DriverUtil.attribute;
 
 /**
  * @author pnoker

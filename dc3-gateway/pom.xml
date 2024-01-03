@@ -108,34 +108,28 @@
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
-        <!-- DC3 Api Auth -->
+        <!-- DC3 Api 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
-        <!-- DC3 Common Public -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-public</artifactId>
-        </dependency>
-
-        <!-- DC3 Common Register -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-register</artifactId>
-        </dependency>
-
-        <!-- DC3 Common Log -->
+        <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-log</artifactId>
         </dependency>
-
-        <!-- DC3 Common Model -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-public</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-register</artifactId>
         </dependency>
 
     </dependencies>

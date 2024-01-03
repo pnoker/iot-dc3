@@ -65,6 +65,7 @@
         <!-- DC3 Api 相关 -->
         <dc3.api.auth.version>2024.1.0</dc3.api.auth.version>
         <dc3.api.data.version>2024.1.0</dc3.api.data.version>
+        <dc3.api.driver.version>2024.1.0</dc3.api.driver.version>
         <dc3.api.manager.version>2024.1.0</dc3.api.manager.version>
 
         <!-- DC3 Common 相关 -->
@@ -131,7 +132,7 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- DC3 Api -->
+            <!-- DC3 Api 相关 -->
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-api-auth</artifactId>
@@ -146,12 +147,18 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-api-driver</artifactId>
+                <version>${dc3.api.driver.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-api-manager</artifactId>
                 <version>${dc3.api.manager.version}</version>
                 <scope>compile</scope>
             </dependency>
 
-            <!-- DC3 Common -->
+            <!-- DC3 Common 相关 -->
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-api</artifactId>
