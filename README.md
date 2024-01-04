@@ -1,20 +1,20 @@
 <p align="center">
-	<img src="dc3/images/logo-blue.png" width="400">
+	<img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3 Logo">
 <br>
 <a href='https://gitee.com/pnoker/iot-dc3/stargazers'>
-    <img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp' alt='star'></img>
+    <img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp' alt='star'/>
 </a>
 <a href='https://gitee.com/pnoker/iot-dc3/members'>
-    <img src='https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp' alt='fork'></img>
+    <img src='https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp' alt='fork'/>
 </a>
 <br>
 <strong>DC3 是基于 Spring Cloud 的开源可分布式物联网 (IOT) 平台,用于快速开发、部署物联设备接入项目,是一整套物联系统解决方案。</strong>
 </p>
 
-🎉 亲爱的用户，感谢您使用我们的项目，点个 Star 为我们的项目加油助力吧！
+🎉 亲爱的用户，感谢您使用我们的项目，点个 Star 为我们的项目加油吧！
 
 我们一直在努力开发和维护这个项目，以确保它能够为您提供更好的体验和价值。 您的点赞助力将是对我们的最大鼓励和支持。
-这也将使我们更有动力，不断完善和改进我们的项目，以更好地服务于您和更广大的用户群体。 再次感谢您的支持和信任，我们期待着您的反馈和建议！
+这也将使我们更有动力，不断完善和改进我们的项目，以更好地服务于您和更广大的用户群体。
 
 ---
 
@@ -43,39 +43,15 @@
 -   [x] 云原生：Kubernetes;
 -   [x] 容器化：Docker。
 
-# 2 DC3 技术实现
+# 2 项目文档
 
-`DC3` 平台是基于 `Spring Cloud` 架构开发的,是一系列松耦合、开源的微服务集合。
-微服务集合由 4 个微服务层和两个增强的基础系统服务组成,提供从物理域数据采集到信息域数据处理等一系列的服务。
+请阅读 [`IOT DC3 DOC (https://doc.dc3.site)`](https://doc.dc3.site) 文档。
 
-![iot-dc3-architecture](dc3/images/architecture2.jpg)
+# 3 讨论区
 
-# 3 项目文档
+如果你在使用或者部署过程遇到问题，请在QQ群[224029423]中讨论。
 
-> 详情请阅读 [`IOT DC3 Wiki (https://doc.dc3.site)`](https://doc.dc3.site) 文档
->
-> **其中包括：安装配置文档、部署文档、项目结构说明、平台介绍等内容。**
-
-# 4 谁在使用
-
-> 我们由衷的感谢所有正在使用、即将使用、研究学习和支持 DC3 的用户！我们将开足马力，继续迭代动能，为广大用户提供更好的开源产品。
->
-> 我们愿意倾听您的声音，在这里（[Gitee](https://gitee.com/pnoker/iot-dc3/issues/I6I15G)
-> ），您可以登记相关信息, 不限于：使用场景、建议、公司等更多信息。
-> 仅展示已授权名称，排名不分先后。
-
-中国科学院沈阳自动化研究所、德琪医药(6996.HK)、榕湾科技、德数科技、Mars 数据库(工业实时数据库)、德沛数据。
-
-# 5 讨论区
-
-我们正在使用讨论作为与我们社区其他成员联系的地方。您可以在（[Gitee](https://gitee.com/pnoker/iot-dc3/issues/I6IKAL)
-下方发表你的评论，告诉大家你要讨论的问题、关于 DC3 好的发展建议、一些奇思妙想 🚀🛸🚤！
-
-# 6 协助计划
-
-如果你在使用或者部署过程遇到任何问题，请在 QQ 群[224029423]讨论。
-
-# 7 开源贡献
+# 4 开源贡献
 
 - 从 `main` 分支 `checkout` 一个新分支（**注**：请务必保证 `main` 代码是最新的）
 - 新分支命名格式：`feature/you_name/feature_description`，例如：`feature/pnoker/mqtt_driver`
@@ -83,7 +59,6 @@
 - 提交 `PR` 合并到 `develop` 分支，等待作者合并即可
 - 合并通过后我们会添加你的 UserID 到 [鸣谢](https://doc.dc3.site/contributor)
 
-# 8 开源协议
+# 5 开源协议
 
-`IOT DC3` 开源平台遵循 [Apache 2.0 协议](https://www.apache.org/licenses/LICENSE-2.0.html)。 允许商业使用，但务必保留类作者、Copyright
-信息。
+`IOT DC3` 开源平台遵循 [Apache 2.0 协议](https://www.apache.org/licenses/LICENSE-2.0.html)。 允许商业使用，但务必保留类作者、Copyright 信息。
