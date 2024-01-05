@@ -50,7 +50,7 @@ public class ManagerTopicConfig {
      * @return Queue
      */
     @Bean
-    Queue syncUpQueue() {
+    Queue driverRegister() {
         Map<String, Object> arguments = new HashMap<>();
         // 30秒：30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
@@ -60,13 +60,13 @@ public class ManagerTopicConfig {
     /**
      * 使用 * 匹配全部 Routing Key
      *
-     * @param syncUpQueue Queue
+     * @param driverRegister Queue
      * @return Binding
      */
     @Bean
-    Binding driverRegisterBinding(Queue syncUpQueue) {
+    Binding driverRegisterBinding(Queue driverRegister) {
         Binding binding = BindingBuilder
-                .bind(syncUpQueue)
+                .bind(driverRegister)
                 .to(syncExchange)
                 .with(RabbitConstant.ROUTING_SYNC_UP_PREFIX + SymbolConstant.ASTERISK);
         binding.addArgument(RabbitConstant.AUTO_DELETE, true);

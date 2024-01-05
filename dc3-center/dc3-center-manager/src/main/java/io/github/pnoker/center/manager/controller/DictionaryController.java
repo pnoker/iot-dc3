@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
-import io.github.pnoker.center.manager.service.DictionaryService;
+import io.github.pnoker.center.manager.biz.DictionaryService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;

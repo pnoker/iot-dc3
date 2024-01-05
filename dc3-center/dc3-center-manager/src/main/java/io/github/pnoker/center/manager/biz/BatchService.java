@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service;
+package io.github.pnoker.center.manager.biz;
 
-import io.github.pnoker.common.entity.dto.DriverSyncUpDTO;
+import io.github.pnoker.common.entity.dto.DriverMetadataDTO;
 
 /**
- * 驱动同步相关接口
+ * BatchInterface
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverSyncService {
+public interface BatchService {
 
     /**
-     * 驱动注册
+     * 获取驱动元数据
      *
-     * @param entityDTO DriverRegisterDTO
+     * @param serviceName 驱动服务名称
+     * @param tenantId    租户ID
+     * @return DriverMetadata
      */
-    void up(DriverSyncUpDTO entityDTO);
+    DriverMetadataDTO batchDriverMetadata(String serviceName, Long tenantId);
 
 }

@@ -31,7 +31,7 @@ import io.github.pnoker.center.manager.entity.model.PointDO;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.mapper.PointMapper;
-import io.github.pnoker.center.manager.service.DriverNotifyService;
+import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;

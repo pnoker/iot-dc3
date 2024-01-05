@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service.impl;
+package io.github.pnoker.center.manager.biz.impl;
 
 import io.github.pnoker.center.manager.entity.bo.*;
-import io.github.pnoker.center.manager.service.DriverNotifyService;
+import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;

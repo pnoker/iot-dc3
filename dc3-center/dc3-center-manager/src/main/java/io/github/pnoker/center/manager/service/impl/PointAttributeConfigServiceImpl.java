@@ -27,7 +27,7 @@ import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeConfigBuilder;
 import io.github.pnoker.center.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
-import io.github.pnoker.center.manager.service.DriverNotifyService;
+import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
