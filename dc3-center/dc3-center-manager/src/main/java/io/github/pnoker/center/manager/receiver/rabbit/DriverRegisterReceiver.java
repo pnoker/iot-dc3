@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service.rabbit;
+package io.github.pnoker.center.manager.receiver.rabbit;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.center.manager.service.DriverSyncService;
-import io.github.pnoker.common.entity.dto.DriverSyncUpDTO;
+import io.github.pnoker.center.manager.biz.DriverSyncService;
+import io.github.pnoker.common.entity.dto.DriverRegisterDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -31,7 +31,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 
 /**
- * 驱动注册
+ * 驱动注册消息接收
  *
  * @author pnoker
  * @since 2022.1.0
@@ -44,16 +44,15 @@ public class DriverRegisterReceiver {
     private DriverSyncService driverSyncService;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{syncUpQueue.name}")
-    public void driverRegisterReceive(Channel channel, Message message, DriverSyncUpDTO entityDTO) {
+    @RabbitListener(queues = "#{driverRegister.name}")
+    public void driverRegisterReceive(Channel channel, Message message, DriverRegisterDTO entityDTO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Receive driver register: {}", JsonUtil.toPrettyJsonString(entityDTO));
             if (ObjectUtil.isNull(entityDTO)) {
-                log.error("Invalid driver register: {}", entityDTO);
+                log.error("跳过: 接收到的驱动注册信息无效");
                 return;
             }
-
+            log.debug("接收到驱动注册信息: {}", JsonUtil.toPrettyJsonString(entityDTO));
             driverSyncService.up(entityDTO);
         } catch (IOException e) {
             log.error(e.getMessage(), e);

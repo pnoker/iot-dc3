@@ -27,7 +27,7 @@ import io.github.pnoker.center.manager.entity.builder.DriverAttributeConfigBuild
 import io.github.pnoker.center.manager.entity.model.DriverAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
-import io.github.pnoker.center.manager.service.DriverNotifyService;
+import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.entity.common.Pages;

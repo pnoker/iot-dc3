@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service.impl;
+package io.github.pnoker.center.manager.biz.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.GrpcCodeQuery;
 import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
+import io.github.pnoker.center.manager.biz.BatchService;
+import io.github.pnoker.center.manager.biz.DriverSyncService;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
@@ -81,7 +83,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public void up(DriverSyncUpDTO entityDTO) {
+    public void up(DriverRegisterDTO entityDTO) {
         if (ObjectUtil.isNull(entityDTO) || ObjectUtil.isNull(entityDTO.getDriver())) {
             return;
         }
@@ -107,9 +109,9 @@ public class DriverSyncServiceImpl implements DriverSyncService {
     /**
      * 注册驱动
      *
-     * @param entityDTO DriverSyncUpDTO
+     * @param entityDTO DriverRegisterDTO
      */
-    private DriverDTO registerDriver(DriverSyncUpDTO entityDTO) {
+    private DriverDTO registerDriver(DriverRegisterDTO entityDTO) {
         GrpcRTenantDTO tenantDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(entityDTO.getTenant()).build());
         if (!tenantDTO.getResult().getOk()) {
             throw new ServiceException("无效租户: {}, 错误信息: {}", entityDTO.getTenant(), tenantDTO.getResult().getMessage());
@@ -137,13 +139,13 @@ public class DriverSyncServiceImpl implements DriverSyncService {
     /**
      * 注册驱动属性
      *
-     * @param driverSyncUpDTO DriverSyncUpDTO
+     * @param driverRegisterDTO DriverRegisterDTO
      * @param entityDO        Driver
      */
-    private void registerDriverAttribute(DriverSyncUpDTO driverSyncUpDTO, DriverDTO entityDO) {
+    private void registerDriverAttribute(DriverRegisterDTO driverRegisterDTO, DriverDTO entityDO) {
         Map<String, DriverAttributeDTO> newDriverAttributeMap = new HashMap<>(8);
-        if (ObjectUtil.isNotNull(driverSyncUpDTO.getDriverAttributes()) && !driverSyncUpDTO.getDriverAttributes().isEmpty()) {
-            driverSyncUpDTO.getDriverAttributes().forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
+        if (ObjectUtil.isNotNull(driverRegisterDTO.getDriverAttributes()) && !driverRegisterDTO.getDriverAttributes().isEmpty()) {
+            driverRegisterDTO.getDriverAttributes().forEach(driverAttribute -> newDriverAttributeMap.put(driverAttribute.getAttributeName(), driverAttribute));
         }
 
         Map<String, DriverAttributeBO> oldDriverAttributeMap = new HashMap<>(8);
@@ -186,13 +188,13 @@ public class DriverSyncServiceImpl implements DriverSyncService {
     /**
      * 注册位号属性
      *
-     * @param driverSyncUpDTO DriverSyncUpDTO
+     * @param driverRegisterDTO DriverRegisterDTO
      * @param entityDO        Driver
      */
-    private void registerPointAttribute(DriverSyncUpDTO driverSyncUpDTO, DriverDTO entityDO) {
+    private void registerPointAttribute(DriverRegisterDTO driverRegisterDTO, DriverDTO entityDO) {
         Map<String, PointAttributeDTO> newPointAttributeMap = new HashMap<>(8);
-        if (ObjectUtil.isNotNull(driverSyncUpDTO.getPointAttributes()) && !driverSyncUpDTO.getPointAttributes().isEmpty()) {
-            driverSyncUpDTO.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
+        if (ObjectUtil.isNotNull(driverRegisterDTO.getPointAttributes()) && !driverRegisterDTO.getPointAttributes().isEmpty()) {
+            driverRegisterDTO.getPointAttributes().forEach(pointAttribute -> newPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
         }
 
         Map<String, PointAttributeBO> oldPointAttributeMap = new HashMap<>(8);

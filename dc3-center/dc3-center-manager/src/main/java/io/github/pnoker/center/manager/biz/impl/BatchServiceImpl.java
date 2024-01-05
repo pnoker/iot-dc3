@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service.impl;
+package io.github.pnoker.center.manager.biz.impl;
 
+import io.github.pnoker.center.manager.biz.BatchService;
 import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.center.manager.entity.builder.DriverAttributeBuilder;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.service;
+package io.github.pnoker.center.manager.biz;
 
 import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;

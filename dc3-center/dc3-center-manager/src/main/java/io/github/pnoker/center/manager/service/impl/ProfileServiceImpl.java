@@ -33,7 +33,7 @@ import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import io.github.pnoker.center.manager.entity.query.ProfileQuery;
 import io.github.pnoker.center.manager.mapper.ProfileMapper;
-import io.github.pnoker.center.manager.service.DriverNotifyService;
+import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
