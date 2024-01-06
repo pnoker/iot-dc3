@@ -55,9 +55,6 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
     @Resource
     private AlarmRuleManager alarmRuleManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(AlarmRuleBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -68,9 +65,6 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(Long id) {
         getDOById(id, true);
@@ -87,9 +81,6 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(AlarmRuleBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -103,18 +94,12 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public AlarmRuleBO selectById(Long id) {
         AlarmRuleDO entityDO = getDOById(id, true);
         return alarmRuleBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<AlarmRuleBO> selectByPage(AlarmRuleQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -127,13 +112,13 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
     /**
      * 构造模糊查询
      *
-     * @param query {@link AlarmRuleQuery}
+     * @param entityQuery {@link AlarmRuleQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<AlarmRuleDO> fuzzyQuery(AlarmRuleQuery query) {
+    private LambdaQueryWrapper<AlarmRuleDO> fuzzyQuery(AlarmRuleQuery entityQuery) {
         LambdaQueryWrapper<AlarmRuleDO> wrapper = Wrappers.<AlarmRuleDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmRuleName()), AlarmRuleDO::getAlarmRuleName, query.getAlarmRuleName());
-        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), AlarmRuleDO::getTenantId, getTenantId());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAlarmRuleName()), AlarmRuleDO::getAlarmRuleName, entityQuery.getAlarmRuleName());
+        wrapper.eq(AlarmRuleDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -148,7 +133,9 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
     private boolean checkDuplicate(AlarmRuleBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmRuleDO> wrapper = Wrappers.<AlarmRuleDO>query().lambda();
         wrapper.eq(AlarmRuleDO::getAlarmRuleName, entityBO.getAlarmRuleName());
-        wrapper.eq(AlarmRuleDO::getTenantId, getTenantId());
+        wrapper.eq(AlarmRuleDO::getAlarmRuleCode, entityBO.getAlarmRuleCode());
+        wrapper.eq(AlarmRuleDO::getPointId, entityBO.getPointId());
+        wrapper.eq(AlarmRuleDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmRuleDO one = alarmRuleManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -156,7 +143,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The alarmRule is duplicates");
+            throw new DuplicateException("报警规则重复");
         }
         return duplicate;
     }

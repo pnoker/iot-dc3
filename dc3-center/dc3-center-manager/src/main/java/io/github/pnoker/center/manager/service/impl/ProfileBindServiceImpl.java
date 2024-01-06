@@ -55,9 +55,6 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Resource
     private ProfileBindManager profileBindManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(ProfileBindBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -68,9 +65,6 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(Long id) {
         getDOById(id, true);
@@ -80,9 +74,6 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Boolean removeByDeviceId(Long deviceId) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
@@ -90,20 +81,14 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBindManager.remove(wrapper);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Boolean removeByDeviceIdAndProfileId(Long deviceId, Long profileId) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
-        wrapper.eq(ProfileBindDO::getDeviceId, deviceId)
-                .eq(ProfileBindDO::getProfileId, profileId);
+        wrapper.eq(ProfileBindDO::getDeviceId, deviceId);
+        wrapper.eq(ProfileBindDO::getProfileId, profileId);
         return profileBindManager.remove(wrapper);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(ProfileBindBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -123,9 +108,6 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBindBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ProfileBindBO selectByDeviceIdAndProfileId(Long deviceId, Long profileId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId).eq(ProfileBindDO::getProfileId, profileId).last(QueryWrapperConstant.LIMIT_ONE);
@@ -133,9 +115,6 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBindBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<Long> selectDeviceIdsByProfileId(Long profileId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getProfileId, profileId);
@@ -143,9 +122,6 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return entityDOS.stream().map(ProfileBindDO::getDeviceId).collect(Collectors.toSet());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<Long> selectProfileIdsByDeviceId(Long deviceId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId);
@@ -153,9 +129,6 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return entityDOS.stream().map(ProfileBindDO::getDeviceId).collect(Collectors.toSet());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<ProfileBindBO> selectByPage(ProfileBindQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -165,12 +138,11 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<ProfileBindDO> fuzzyQuery(ProfileBindQuery query) {
+    private LambdaQueryWrapper<ProfileBindDO> fuzzyQuery(ProfileBindQuery entityQuery) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            wrapper.eq(ObjectUtil.isNotEmpty(query.getProfileId()), ProfileBindDO::getProfileId, query.getProfileId());
-            wrapper.eq(ObjectUtil.isNotEmpty(query.getDeviceId()), ProfileBindDO::getDeviceId, query.getDeviceId());
-        }
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getProfileId()), ProfileBindDO::getProfileId, entityQuery.getProfileId());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDeviceId()), ProfileBindDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(ProfileBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -186,6 +158,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
         wrapper.eq(ProfileBindDO::getDeviceId, entityBO.getDeviceId());
         wrapper.eq(ProfileBindDO::getProfileId, entityBO.getProfileId());
+        wrapper.eq(ProfileBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileBindDO one = profileBindManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -193,7 +166,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The profile bind is duplicates");
+            throw new DuplicateException("模板绑定重复");
         }
         return duplicate;
     }

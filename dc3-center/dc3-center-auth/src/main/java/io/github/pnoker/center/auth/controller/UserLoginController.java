@@ -19,7 +19,10 @@ package io.github.pnoker.center.auth.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
+import io.github.pnoker.center.auth.entity.builder.UserLoginBuilder;
 import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
+import io.github.pnoker.center.auth.entity.vo.LimitedIpVO;
+import io.github.pnoker.center.auth.entity.vo.UserLoginVO;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.base.BaseController;
@@ -47,6 +50,9 @@ import javax.validation.constraints.NotNull;
 public class UserLoginController implements BaseController {
 
     @Resource
+    private UserLoginBuilder userLoginBuilder;
+
+    @Resource
     private UserLoginService userLoginService;
     @Resource
     private UserPasswordService userPasswordService;
@@ -54,14 +60,15 @@ public class UserLoginController implements BaseController {
     /**
      * 新增用户
      *
-     * @param userLogin 用户
-     * @return {@link UserLoginBO}
+     * @param entityVO {@link UserLoginVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody UserLoginBO userLogin) {
+    public R<String> add(@Validated(Add.class) @RequestBody UserLoginVO entityVO) {
         try {
-            userLoginService.save(userLogin);
-            return R.ok();
+            UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
+            userLoginService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -70,14 +77,14 @@ public class UserLoginController implements BaseController {
     /**
      * 根据 ID 删除用户
      *
-     * @param id 用户ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
             userLoginService.remove(Long.parseLong(id));
-            return R.ok();
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -90,15 +97,15 @@ public class UserLoginController implements BaseController {
      * <li>不支持更新: Name</li>
      * </ol>
      *
-     * @param userLogin 用户
-     * @return {@link UserLoginBO}
+     * @param entityVO {@link UserLoginVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody UserLoginBO userLogin) {
+    public R<String> update(@Validated(Update.class) @RequestBody UserLoginVO entityVO) {
         try {
-            userLogin.setLoginName(null);
-            userLoginService.update(userLogin);
-            return R.ok();
+            UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
+            userLoginService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -123,20 +130,18 @@ public class UserLoginController implements BaseController {
     /**
      * 根据 ID 查询用户
      *
-     * @param id 用户ID
-     * @return {@link UserLoginBO}
+     * @param id ID
+     * @return UserLoginVO {@link UserLoginVO}
      */
     @GetMapping("/id/{id}")
-    public R<UserLoginBO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<UserLoginVO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            UserLoginBO select = userLoginService.selectById(Long.parseLong(id));
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            UserLoginBO entityBO = userLoginService.selectById(Long.parseLong(id));
+            UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     /**
@@ -146,38 +151,34 @@ public class UserLoginController implements BaseController {
      * @return {@link UserLoginBO}
      */
     @GetMapping("/name/{name}")
-    public R<UserLoginBO> selectByName(@NotNull @PathVariable(value = "name") String name) {
+    public R<UserLoginVO> selectByName(@NotNull @PathVariable(value = "name") String name) {
         try {
-            UserLoginBO select = userLoginService.selectByLoginName(name, false);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            UserLoginBO entityBO = userLoginService.selectByLoginName(name, false);
+            UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     /**
      * 分页查询 User
      *
-     * @param userPageQuery 用户和分页参数
+     * @param entityQuery 用户和分页参数
      * @return 带分页的 {@link UserLoginBO}
      */
     @PostMapping("/list")
-    public R<Page<UserLoginBO>> list(@RequestBody(required = false) UserLoginQuery userPageQuery) {
+    public R<Page<UserLoginVO>> list(@RequestBody(required = false) UserLoginQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(userPageQuery)) {
-                userPageQuery = new UserLoginQuery();
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new UserLoginQuery();
             }
-            Page<UserLoginBO> page = userLoginService.selectByPage(userPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            Page<UserLoginBO> entityPageBO = userLoginService.selectByPage(entityQuery);
+            Page<UserLoginVO> entityPageVO = userLoginBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     /**

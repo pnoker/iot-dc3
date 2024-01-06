@@ -45,9 +45,6 @@ abstract public class ReadNumericRequest extends ModbusRequest {
         this.numberOfRegisters = numberOfRegisters;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
@@ -59,18 +56,12 @@ abstract public class ReadNumericRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, startOffset);
         ModbusUtils.pushShort(queue, numberOfRegisters);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readRequest(ByteQueue queue) {
         startOffset = ModbusUtils.popUnsignedShort(queue);
@@ -104,9 +95,6 @@ abstract public class ReadNumericRequest extends ModbusRequest {
      */
     abstract protected short getNumeric(ProcessImage processImage, int index) throws ModbusTransportException;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "ReadNumericRequest [startOffset=" + startOffset + ", numberOfRegisters=" + numberOfRegisters + "]";

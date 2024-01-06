@@ -20,9 +20,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
+import io.github.pnoker.center.manager.entity.vo.PointVO;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
@@ -36,7 +39,6 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -51,20 +53,24 @@ import java.util.stream.Collectors;
 public class PointController implements BaseController {
 
     @Resource
+    private PointBuilder pointBuilder;
+
+    @Resource
     private PointService pointService;
 
     /**
      * 新增 Point
      *
-     * @param pointBO Point
-     * @return Point
+     * @param entityVO {@link PointVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<PointBO> add(@Validated(Add.class) @RequestBody PointBO pointBO) {
+    public R<PointBO> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
         try {
-            pointBO.setTenantId(getTenantId());
-            pointService.save(pointBO);
-            return R.ok();
+            PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            pointService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -73,14 +79,14 @@ public class PointController implements BaseController {
     /**
      * 根据 ID 删除 Point
      *
-     * @param id 位号ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
             pointService.remove(Long.parseLong(id));
-            return R.ok();
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -89,15 +95,15 @@ public class PointController implements BaseController {
     /**
      * 更新 Point
      *
-     * @param pointBO Point
-     * @return Point
+     * @param entityVO {@link PointVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody PointBO pointBO) {
+    public R<String> update(@Validated(Update.class) @RequestBody PointVO entityVO) {
         try {
-            pointBO.setTenantId(getTenantId());
-            pointService.update(pointBO);
-            return R.ok();
+            PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
+            pointService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -106,35 +112,32 @@ public class PointController implements BaseController {
     /**
      * 根据 ID 查询 Point
      *
-     * @param id 位号ID
-     * @return Point
+     * @param id ID
+     * @return PointVO {@link PointVO}
      */
     @GetMapping("/id/{id}")
-    public R<PointBO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<PointVO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            PointBO select = pointService.selectById(Long.parseLong(id));
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            PointBO entityBO = pointService.selectById(Long.parseLong(id));
+            PointVO entityVO = pointBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
      * 根据 ID 集合查询 Point
      *
      * @param pointIds 位号ID集
-     * @return Map String:Point
+     * @return Map(ID, PointVO)
      */
     @PostMapping("/ids")
-    public R<Map<Long, PointBO>> selectByIds(@RequestBody Set<Long> pointIds) {
+    public R<Map<Long, PointVO>> selectByIds(@RequestBody Set<Long> pointIds) {
         try {
-            List<PointBO> pointBOS = pointService.selectByIds(pointIds);
-            Map<Long, PointBO> pointMap = pointBOS.stream().collect(Collectors.toMap(PointBO::getId, Function.identity()));
-            return R.ok(pointMap);
-            // todo 返回id为 long，前端无法解析
+            List<PointBO> entityBOS = pointService.selectByIds(pointIds);
+            Map<Long, PointVO> deviceMap = entityBOS.stream().collect(Collectors.toMap(PointBO::getId, entityBO -> pointBuilder.buildVOByBO(entityBO)));
+            return R.ok(deviceMap);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -147,16 +150,14 @@ public class PointController implements BaseController {
      * @return Point Array
      */
     @GetMapping("/profile_id/{profileId}")
-    public R<List<PointBO>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
+    public R<List<PointVO>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
         try {
-            List<PointBO> select = pointService.selectByProfileId(profileId);
-            if (CollUtil.isNotEmpty(select)) {
-                return R.ok(select);
-            }
+            List<PointBO> entityBOS = pointService.selectByProfileId(profileId);
+            List<PointVO> entityVOS = pointBuilder.buildVOListByBOList(entityBOS);
+            return R.ok(entityVOS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -166,38 +167,35 @@ public class PointController implements BaseController {
      * @return Point Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<PointBO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public R<List<PointVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<PointBO> select = pointService.selectByDeviceId(deviceId);
-            if (CollUtil.isNotEmpty(select)) {
-                return R.ok(select);
-            }
+            List<PointBO> entityBOS = pointService.selectByDeviceId(deviceId);
+            List<PointVO> entityVOS = pointBuilder.buildVOListByBOList(entityBOS);
+            return R.ok(entityVOS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
      * 分页查询 Point
      *
-     * @param pointPageQuery Point Dto
+     * @param entityQuery Point Dto
      * @return Page Of Point
      */
     @PostMapping("/list")
-    public R<Page<PointBO>> list(@RequestBody(required = false) PointQuery pointPageQuery) {
+    public R<Page<PointVO>> list(@RequestBody(required = false) PointQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(pointPageQuery)) {
-                pointPageQuery = new PointQuery();
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new PointQuery();
             }
-            Page<PointBO> page = pointService.selectByPage(pointPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<PointBO> entityPageBO = pointService.selectByPage(entityQuery);
+            Page<PointVO> entityPageVO = pointBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -214,7 +212,6 @@ public class PointController implements BaseController {
                 Map<Long, String> unitCodeMap = units.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                 return R.ok(unitCodeMap);
             }
-            // todo 返回id为 long，前端无法解析
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

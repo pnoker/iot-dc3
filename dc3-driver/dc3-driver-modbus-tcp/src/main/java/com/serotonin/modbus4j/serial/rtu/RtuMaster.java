@@ -62,9 +62,6 @@ public class RtuMaster extends SerialMaster {
         super(wrapper, validateResponse);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void init() throws ModbusInitException {
         try {
@@ -75,9 +72,6 @@ public class RtuMaster extends SerialMaster {
         initialized = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void openConnection(MessageControl toClose) throws Exception {
         super.openConnection(toClose);
@@ -90,9 +84,6 @@ public class RtuMaster extends SerialMaster {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void destroy() {
         closeMessageControl(conn);
@@ -100,9 +91,6 @@ public class RtuMaster extends SerialMaster {
         initialized = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
         // Wrap the modbus request in an rtu request.

@@ -47,9 +47,6 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
     @Resource
     private RabbitTemplate rabbitTemplate;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void notifyProfile(MetadataCommandTypeEnum command, ProfileBO profileBO) {
         try {
@@ -67,9 +64,6 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void notifyPoint(MetadataCommandTypeEnum command, PointBO pointBO) {
         try {
@@ -87,9 +81,6 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void notifyDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO) {
         try {
@@ -105,9 +96,6 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void notifyDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfigBO driverAttributeConfigBO) {
         try {
@@ -123,9 +111,6 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void notifyPointAttributeConfig(MetadataCommandTypeEnum command, PointAttributeConfigBO pointAttributeConfigBO) {
         try {

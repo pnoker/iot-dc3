@@ -33,17 +33,11 @@ public class ReadDiscreteInputsResponse extends ReadResponse {
         super(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.READ_DISCRETE_INPUTS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "ReadDiscreteInputsResponse [exceptionCode=" + exceptionCode + ", slaveId=" + slaveId

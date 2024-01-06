@@ -45,25 +45,16 @@ public class ExceptionRequest extends ModbusRequest {
         this.exceptionCode = exceptionCode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Modbus modbus) {
         // no op
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         throw new ShouldNeverHappenException("wha");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readRequest(ByteQueue queue) {
         queue.clear();
@@ -79,9 +70,6 @@ public class ExceptionRequest extends ModbusRequest {
         return getResponseInstance(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return functionCode;

@@ -24,7 +24,7 @@ import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.Bucket;
 import com.influxdb.client.domain.WritePrecision;
 import io.github.pnoker.center.data.entity.point.InfluxPoint;
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.repository.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
@@ -59,13 +59,13 @@ public class InfluxServiceImpl implements RepositoryService, InitializingBean {
     }
 
     @Override
-    public void savePointValue(PointValue pointValue) throws IOException {
-        if (!ObjectUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+    public void savePointValue(PointValueBO pointValueBO) throws IOException {
+        if (!ObjectUtil.isAllNotEmpty(pointValueBO.getDeviceId(), pointValueBO.getPointId())) {
             return;
         }
         ensurePointValueBucket();
         WriteApiBlocking writeApiBlocking = influxDBClient.getWriteApiBlocking();
-        writeApiBlocking.writeMeasurement(WritePrecision.MS, new InfluxPoint(pointValue));
+        writeApiBlocking.writeMeasurement(WritePrecision.MS, new InfluxPoint(pointValueBO));
     }
 
     private void ensurePointValueBucket() {
@@ -77,13 +77,13 @@ public class InfluxServiceImpl implements RepositoryService, InitializingBean {
     }
 
     @Override
-    public void savePointValues(Long deviceId, List<PointValue> pointValues) throws IOException {
+    public void savePointValues(Long deviceId, List<PointValueBO> pointValueBOS) throws IOException {
         if (ObjectUtil.isEmpty(deviceId)) {
             return;
         }
         ensurePointValueBucket();
         WriteApi writeApi = influxDBClient.makeWriteApi();
-        writeApi.writeMeasurements(WritePrecision.MS, pointValues.stream().map(InfluxPoint::new).collect(Collectors.toList()));
+        writeApi.writeMeasurements(WritePrecision.MS, pointValueBOS.stream().map(InfluxPoint::new).collect(Collectors.toList()));
         writeApi.flush();
     }
 

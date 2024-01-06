@@ -73,9 +73,6 @@ public class TcpSlave extends ModbusSlaveSet {
         executorService = Executors.newCachedThreadPool();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void start() throws ModbusInitException {
         try {
@@ -95,9 +92,6 @@ public class TcpSlave extends ModbusSlaveSet {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void stop() {
         // Close the socket first to prevent new messages.

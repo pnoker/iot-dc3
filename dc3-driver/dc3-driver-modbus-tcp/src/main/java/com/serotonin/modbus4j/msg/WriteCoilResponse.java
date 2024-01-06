@@ -30,9 +30,7 @@ public class WriteCoilResponse extends ModbusResponse {
     private int writeOffset;
     private boolean writeValue;
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_COIL;
@@ -48,18 +46,14 @@ public class WriteCoilResponse extends ModbusResponse {
         this.writeValue = writeValue;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     protected void writeResponse(ByteQueue queue) {
         ModbusUtils.pushShort(queue, writeOffset);
         ModbusUtils.pushShort(queue, writeValue ? 0xff00 : 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     protected void readResponse(ByteQueue queue) {
         writeOffset = ModbusUtils.popUnsignedShort(queue);

@@ -38,17 +38,11 @@ public class ReportSlaveIdResponse extends ModbusResponse {
         this.data = data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.REPORT_SLAVE_ID;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readResponse(ByteQueue queue) {
         int numberOfBytes = ModbusUtils.popUnsignedByte(queue);
@@ -59,9 +53,6 @@ public class ReportSlaveIdResponse extends ModbusResponse {
         queue.pop(data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeResponse(ByteQueue queue) {
         ModbusUtils.pushByte(queue, data.length);

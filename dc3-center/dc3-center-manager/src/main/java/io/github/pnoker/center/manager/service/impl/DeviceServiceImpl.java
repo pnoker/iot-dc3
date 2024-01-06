@@ -96,9 +96,6 @@ public class DeviceServiceImpl implements DeviceService {
     @Resource
     private DriverNotifyService driverNotifyService;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(DeviceBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -118,9 +115,6 @@ public class DeviceServiceImpl implements DeviceService {
         driverNotifyService.notifyDevice(MetadataCommandTypeEnum.ADD, deviceBO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional
     public void remove(Long id) {
@@ -140,9 +134,7 @@ public class DeviceServiceImpl implements DeviceService {
         driverNotifyService.notifyDevice(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void update(DeviceBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -175,9 +167,7 @@ public class DeviceServiceImpl implements DeviceService {
         driverNotifyService.notifyDevice(MetadataCommandTypeEnum.UPDATE, select);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public DeviceBO selectById(Long id) {
         DeviceDO entityDO = getDOById(id, true);
@@ -186,9 +176,6 @@ public class DeviceServiceImpl implements DeviceService {
         return entityBO;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public DeviceBO selectByName(String name, Long tenantId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
@@ -201,9 +188,6 @@ public class DeviceServiceImpl implements DeviceService {
         return entityBO;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public DeviceBO selectByCode(String code, Long tenantId) {
         LambdaQueryChainWrapper<DeviceDO> wrapper = deviceManager.lambdaQuery().eq(DeviceDO::getDeviceCode, code).eq(DeviceDO::getTenantId, tenantId).last(QueryWrapperConstant.LIMIT_ONE);
@@ -213,9 +197,6 @@ public class DeviceServiceImpl implements DeviceService {
         return entityBO;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<DeviceBO> selectByDriverId(Long driverId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
@@ -226,17 +207,11 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceBOS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<DeviceBO> selectByProfileId(Long profileId) {
         return selectByIds(profileBindService.selectDeviceIdsByProfileId(profileId));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<DeviceBO> selectByIds(Set<Long> ids) {
         List<DeviceDO> entityDOS = deviceManager.listByIds(ids);
@@ -245,15 +220,12 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceBOS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<DeviceBO> selectByPage(DeviceQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        Page<DeviceDO> entityPageDO = deviceMapper.selectPageWithProfile(PageUtil.page(entityQuery.getPage()), customFuzzyQuery(entityQuery), entityQuery.getProfileId());
+        Page<DeviceDO> entityPageDO = deviceMapper.selectPageWithProfile(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery), entityQuery.getProfileId());
         return deviceBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
@@ -324,7 +296,7 @@ public class DeviceServiceImpl implements DeviceService {
         return generateTemplate(workbook);
     }
 
-    private LambdaQueryWrapper<DeviceDO> customFuzzyQuery(DeviceQuery entityQuery) {
+    private LambdaQueryWrapper<DeviceDO> fuzzyQuery(DeviceQuery entityQuery) {
         QueryWrapper<DeviceDO> wrapper = Wrappers.query();
         wrapper.eq("dd.deleted", 0);
         if (ObjectUtil.isNotNull(entityQuery)) {
@@ -332,7 +304,7 @@ public class DeviceServiceImpl implements DeviceService {
             wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code", entityQuery.getDeviceCode());
             wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
             wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
-            wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), "dd.tenant_id", getTenantId());
+            wrapper.eq("dd.tenant_id", entityQuery.getTenantId());
         }
         return wrapper.lambda();
     }
@@ -567,7 +539,7 @@ public class DeviceServiceImpl implements DeviceService {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDeviceName, entityBO.getDeviceName());
         wrapper.eq(DeviceDO::getDeviceCode, entityBO.getDeviceCode());
-        wrapper.eq(DeviceDO::getTenantId, getTenantId());
+        wrapper.eq(DeviceDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO one = deviceManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -575,7 +547,7 @@ public class DeviceServiceImpl implements DeviceService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The device is duplicates");
+            throw new DuplicateException("设备重复");
         }
         return duplicate;
     }

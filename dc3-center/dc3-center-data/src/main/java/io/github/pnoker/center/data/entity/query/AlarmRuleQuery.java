@@ -46,6 +46,12 @@ public class AlarmRuleQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    /**
+     * 租户ID
+     */
+    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Long tenantId;
+
     // 查询字段
 
     /**

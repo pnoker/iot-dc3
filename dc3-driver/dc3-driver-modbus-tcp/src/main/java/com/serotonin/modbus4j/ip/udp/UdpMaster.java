@@ -80,9 +80,6 @@ public class UdpMaster extends ModbusMaster {
         return nextTransactionId++;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void init() throws ModbusInitException {
         if (ipParameters.isEncapsulated())
@@ -99,18 +96,12 @@ public class UdpMaster extends ModbusMaster {
         initialized = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void destroy() {
         socket.close();
         initialized = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
         // Wrap the modbus request in an ip request.

@@ -71,9 +71,6 @@ public class PointServiceImpl implements PointService {
     @Resource
     private DriverNotifyService driverNotifyService;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(PointBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -89,9 +86,6 @@ public class PointServiceImpl implements PointService {
         driverNotifyService.notifyPoint(MetadataCommandTypeEnum.ADD, entityBO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(Long id) {
         PointDO entityDO = getDOById(id, true);
@@ -104,9 +98,6 @@ public class PointServiceImpl implements PointService {
         driverNotifyService.notifyPoint(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(PointBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -130,18 +121,12 @@ public class PointServiceImpl implements PointService {
         return pointBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PointBO> selectByIds(Set<Long> ids) {
         List<PointDO> entityDOS = pointManager.listByIds(ids);
         return pointBuilder.buildBOListByDOList(entityDOS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PointBO> selectByDeviceId(Long deviceId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId);
@@ -150,9 +135,6 @@ public class PointServiceImpl implements PointService {
         return selectByProfileIds(profileIds);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PointBO> selectByProfileId(Long profileId) {
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, profileId);
@@ -160,9 +142,6 @@ public class PointServiceImpl implements PointService {
         return pointBuilder.buildBOListByDOList(entityDOS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PointBO> selectByProfileIds(Set<Long> profileIds) {
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().in(PointDO::getProfileId, profileIds);
@@ -170,9 +149,6 @@ public class PointServiceImpl implements PointService {
         return pointBuilder.buildBOListByDOList(entityDOS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<PointBO> selectByPage(PointQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -182,27 +158,22 @@ public class PointServiceImpl implements PointService {
         return pointBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<Long, String> unit(Set<Long> pointIds) {
         List<PointDO> pointDOS = pointManager.listByIds(pointIds);
         return pointDOS.stream().collect(Collectors.toMap(PointDO::getId, PointDO::getUnit));
     }
 
-    private LambdaQueryWrapper<PointDO> fuzzyQuery(PointQuery pointPageQuery) {
+    private LambdaQueryWrapper<PointDO> fuzzyQuery(PointQuery entityQuery) {
         QueryWrapper<PointDO> wrapper = Wrappers.query();
         wrapper.eq("dp.deleted", 0);
-        if (ObjectUtil.isNotNull(pointPageQuery)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(pointPageQuery.getPointName()), "dp.point_name", pointPageQuery.getPointName());
-            wrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointCode()), "dp.point_code", pointPageQuery.getPointTypeFlag());
-            wrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getPointTypeFlag()), "dp.point_type_flag", pointPageQuery.getPointTypeFlag());
-            wrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getRwFlag()), "dp.rw_flag", pointPageQuery.getRwFlag());
-            wrapper.eq(ObjectUtil.isNotEmpty(pointPageQuery.getProfileId()), "dp.profile_id", pointPageQuery.getProfileId());
-            wrapper.eq(ObjectUtil.isNotNull(pointPageQuery.getEnableFlag()), "dp.enable_flag", pointPageQuery.getEnableFlag());
-            wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), "dp.tenant_id", getTenantId());
-        }
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getPointName()), "dp.point_name", entityQuery.getPointName());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getPointCode()), "dp.point_code", entityQuery.getPointTypeFlag());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getPointTypeFlag()), "dp.point_type_flag", entityQuery.getPointTypeFlag());
+        wrapper.eq(ObjectUtil.isNotNull(entityQuery.getRwFlag()), "dp.rw_flag", entityQuery.getRwFlag());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getProfileId()), "dp.profile_id", entityQuery.getProfileId());
+        wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
+        wrapper.eq("dp.tenant_id", entityQuery.getTenantId());
         return wrapper.lambda();
     }
 
@@ -217,8 +188,9 @@ public class PointServiceImpl implements PointService {
     private boolean checkDuplicate(PointBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<PointDO> wrapper = Wrappers.<PointDO>query().lambda();
         wrapper.eq(PointDO::getPointName, entityBO.getPointName());
+        wrapper.eq(PointDO::getPointCode, entityBO.getPointCode());
         wrapper.eq(PointDO::getProfileId, entityBO.getProfileId());
-        wrapper.eq(PointDO::getTenantId, getTenantId());
+        wrapper.eq(PointDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointDO one = pointManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -226,7 +198,7 @@ public class PointServiceImpl implements PointService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The point is duplicates");
+            throw new DuplicateException("位号重复");
         }
         return duplicate;
     }

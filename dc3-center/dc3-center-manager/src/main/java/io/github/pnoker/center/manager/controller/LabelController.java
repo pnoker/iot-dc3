@@ -63,6 +63,7 @@ public class LabelController implements BaseController {
     public R<String> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
         try {
             LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
             labelService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
@@ -107,7 +108,7 @@ public class LabelController implements BaseController {
      * 单个查询
      *
      * @param id ID
-     * @return R of LabelVO
+     * @return LabelVO {@link LabelVO}
      */
     @GetMapping("/id/{id}")
     public R<LabelVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
@@ -132,6 +133,7 @@ public class LabelController implements BaseController {
             if (ObjectUtil.isEmpty(entityQuery)) {
                 entityQuery = new LabelQuery();
             }
+            entityQuery.setTenantId(getTenantId());
             Page<LabelBO> entityPageBO = labelService.selectByPage(entityQuery);
             Page<LabelVO> entityPageVO = labelForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);

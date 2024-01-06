@@ -27,11 +27,9 @@ import io.github.pnoker.center.auth.entity.builder.ResourceBuilder;
 import io.github.pnoker.center.auth.entity.model.ResourceDO;
 import io.github.pnoker.center.auth.entity.query.ResourceQuery;
 import io.github.pnoker.center.auth.service.ResourceService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DeleteException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,11 +50,11 @@ public class ResourceServiceImpl implements ResourceService {
     @Resource
     private ResourceManager resourceManager;
 
-
     @Override
     public void save(ResourceBO entityBO) {
-        ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
+        checkDuplicate(entityBO, false, true);
 
+        ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
         if (!resourceManager.save(entityDO)) {
             throw new AddException("The resource add failed");
         }
@@ -64,7 +62,8 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public void remove(Long id) {
-        selectById(id);
+        getDOById(id, true);
+
         if (!resourceManager.removeById(id)) {
             throw new DeleteException("The resource delete failed");
         }
@@ -72,8 +71,12 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public void update(ResourceBO entityBO) {
-        selectById(entityBO.getId());
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
         ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
         if (!resourceManager.updateById(entityDO)) {
             throw new UpdateException("The resource update failed");
         }
@@ -81,7 +84,8 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public ResourceBO selectById(Long id) {
-        return null;
+        ResourceDO entityDO = getDOById(id, true);
+        return resourceBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -89,21 +93,47 @@ public class ResourceServiceImpl implements ResourceService {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        Page<ResourceDO> entityPageDO = resourceManager.page(PageUtil.page(entityQuery.getPage()), buildQueryWrapper(entityQuery));
+        Page<ResourceDO> entityPageDO = resourceManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
         return resourceBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<ResourceDO> buildQueryWrapper(ResourceQuery pageQuery) {
+    private LambdaQueryWrapper<ResourceDO> fuzzyQuery(ResourceQuery entityQuery) {
         LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
-        if (ObjectUtil.isNotNull(pageQuery)) {
-            wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), ResourceDO::getTenantId, getTenantId());
-            wrapper.like(CharSequenceUtil.isNotEmpty(pageQuery.getResourceName()), ResourceDO::getResourceName, pageQuery.getResourceName());
-            wrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceCode()), ResourceDO::getResourceCode, pageQuery.getResourceCode());
-            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, pageQuery.getResourceTypeFlag());
-            wrapper.eq(ObjectUtil.isNotEmpty(pageQuery.getEnableFlag()), ResourceDO::getEnableFlag, pageQuery.getEnableFlag());
-
-        }
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getResourceName()), ResourceDO::getResourceName, entityQuery.getResourceName());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getResourceCode()), ResourceDO::getResourceCode, entityQuery.getResourceCode());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, entityQuery.getResourceTypeFlag());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag, entityQuery.getEnableFlag());
+        wrapper.eq(ResourceDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link ResourceBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(ResourceBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
+        wrapper.eq(ResourceDO::getParentResourceId, entityBO.getParentResourceId());
+        wrapper.eq(ResourceDO::getResourceName, entityBO.getResourceName());
+        wrapper.eq(ResourceDO::getResourceCode, entityBO.getResourceCode());
+        wrapper.eq(ResourceDO::getResourceTypeFlag, entityBO.getResourceTypeFlag());
+        wrapper.eq(ResourceDO::getResourceScopeFlag, entityBO.getResourceScopeFlag());
+        wrapper.eq(ResourceDO::getEntityId, entityBO.getEntityId());
+        wrapper.eq(ResourceDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        ResourceDO one = resourceManager.getOne(wrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("资源重复");
+        }
+        return duplicate;
     }
 
     /**

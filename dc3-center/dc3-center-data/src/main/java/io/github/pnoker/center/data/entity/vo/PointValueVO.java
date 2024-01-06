@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.entity.point;
+package io.github.pnoker.center.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.pnoker.common.constant.common.TimeConstant;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * MongoDB 位号数据
+ * PointValue VO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -37,44 +38,46 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PointValue implements Serializable {
+@Schema(title = "PointValueRead", description = "位号值")
+public class PointValueVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String id;
+    /**
+     * ID
+     */
+    private Long id;
 
     /**
-     * 设备ID，同MySQl中等 设备ID 一致
+     * 设备ID
      */
     private Long deviceId;
 
     /**
-     * 位号ID，同MySQl中等 位号ID 一致
+     * 位号ID
      */
     private Long pointId;
-
-    /**
-     * 处理值，进行过缩放、格式化等操作
-     */
-    private String value;
 
     /**
      * 原始值
      */
     private String rawValue;
 
-    private List<String> children;
+    /**
+     * 处理值
+     */
+    private String value;
 
+    private List<String> history;
+
+    /**
+     * 原始时间
+     */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime originTime;
 
+    /**
+     * 创建时间
+     */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
-
-    public PointValue(Long deviceId, Long pointId, String rawValue, String value) {
-        this.deviceId = deviceId;
-        this.pointId = pointId;
-        this.rawValue = rawValue;
-        this.value = value;
-        this.originTime = LocalDateTime.now();
-    }
 }

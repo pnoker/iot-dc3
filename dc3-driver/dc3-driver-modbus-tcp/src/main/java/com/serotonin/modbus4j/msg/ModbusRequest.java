@@ -121,9 +121,6 @@ abstract public class ModbusRequest extends ModbusMessage {
 
     abstract ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     final protected void writeImpl(ByteQueue queue) {
         queue.push(getFunctionCode());

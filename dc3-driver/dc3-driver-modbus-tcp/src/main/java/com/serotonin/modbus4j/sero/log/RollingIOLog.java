@@ -68,9 +68,6 @@ public class RollingIOLog extends BaseIOLog {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void sizeCheck() {
         // Check if the file should be rolled.

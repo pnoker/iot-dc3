@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.repository.impl;
 
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.entity.point.TaosPointValue;
 import io.github.pnoker.center.data.mapper.TaosPointValueMapper;
 import io.github.pnoker.center.data.repository.RepositoryService;
@@ -53,15 +53,15 @@ public class TDengineServiceImpl implements RepositoryService, InitializingBean 
     }
 
     @Override
-    public void savePointValue(PointValue pointValue) throws IOException {
-        taosPointValueMapper.createDeviceTable(pointValue.getDeviceId(), pointValue.getPointId());
-        taosPointValueMapper.insertOne(new TaosPointValue(pointValue));
+    public void savePointValue(PointValueBO pointValueBO) throws IOException {
+        taosPointValueMapper.createDeviceTable(pointValueBO.getDeviceId(), pointValueBO.getPointId());
+        taosPointValueMapper.insertOne(new TaosPointValue(pointValueBO));
     }
 
     @Override
-    public void savePointValues(Long deviceId, List<PointValue> pointValues) throws IOException {
-        taosPointValueMapper.createDeviceTable(deviceId, pointValues.get(0).getPointId());
-        taosPointValueMapper.batchInsert(pointValues.stream().map(TaosPointValue::new).collect(Collectors.toList()));
+    public void savePointValues(Long deviceId, List<PointValueBO> pointValueBOS) throws IOException {
+        taosPointValueMapper.createDeviceTable(deviceId, pointValueBOS.get(0).getPointId());
+        taosPointValueMapper.batchInsert(pointValueBOS.stream().map(TaosPointValue::new).collect(Collectors.toList()));
 
     }
 

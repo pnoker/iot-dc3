@@ -45,12 +45,12 @@ public class DeviceEvent implements Serializable {
     private ObjectId id;
 
     /**
-     * 设备ID，同MySQl中等 设备ID 一致
+     * 设备ID
      */
     private Long deviceId;
 
     /**
-     * 位号ID，同MySQl中等 位号ID 一致
+     * 位号ID
      */
     private Long pointId;
 

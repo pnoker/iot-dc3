@@ -48,9 +48,6 @@ public class WriteCoilsRequest extends ModbusRequest {
         data = convertToBytes(bdata);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
@@ -62,9 +59,6 @@ public class WriteCoilsRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, startOffset);
@@ -81,9 +75,6 @@ public class WriteCoilsRequest extends ModbusRequest {
         return new WriteCoilsResponse(slaveId, startOffset, numberOfBits);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_COILS;
@@ -94,9 +85,6 @@ public class WriteCoilsRequest extends ModbusRequest {
         return new WriteCoilsResponse(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readRequest(ByteQueue queue) {
         startOffset = ModbusUtils.popUnsignedShort(queue);

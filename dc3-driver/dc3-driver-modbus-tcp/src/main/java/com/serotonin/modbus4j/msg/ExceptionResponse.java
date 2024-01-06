@@ -41,25 +41,16 @@ public class ExceptionResponse extends ModbusResponse {
         setException(exceptionCode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return functionCode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readResponse(ByteQueue queue) {
         // no op
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeResponse(ByteQueue queue) {
         // no op

@@ -46,9 +46,6 @@ public class WriteRegisterRequest extends ModbusRequest {
         this.writeValue = writeValue;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(writeOffset);
@@ -58,9 +55,6 @@ public class WriteRegisterRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, writeOffset);
@@ -73,9 +67,6 @@ public class WriteRegisterRequest extends ModbusRequest {
         return new WriteRegisterResponse(slaveId, writeOffset, writeValue);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_REGISTER;
@@ -86,9 +77,6 @@ public class WriteRegisterRequest extends ModbusRequest {
         return new WriteRegisterResponse(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readRequest(ByteQueue queue) {
         writeOffset = ModbusUtils.popUnsignedShort(queue);

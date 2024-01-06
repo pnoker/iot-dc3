@@ -120,9 +120,6 @@ abstract public class ModbusResponse extends ModbusMessage {
         return exceptionCode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     final protected void writeImpl(ByteQueue queue) {
         if (isException()) {

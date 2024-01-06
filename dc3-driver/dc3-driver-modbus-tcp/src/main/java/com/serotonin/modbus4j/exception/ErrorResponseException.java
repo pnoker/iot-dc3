@@ -59,9 +59,6 @@ public class ErrorResponseException extends Exception {
         return originalRequest;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getMessage() {
         return errorResponse.getExceptionMessage();

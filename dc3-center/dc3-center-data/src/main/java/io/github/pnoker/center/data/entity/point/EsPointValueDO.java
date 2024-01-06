@@ -16,11 +16,12 @@
 
 package io.github.pnoker.center.data.entity.point;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * MongoDB 位号数据
@@ -30,13 +31,39 @@ import org.springframework.data.annotation.Id;
  */
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class EsPointValue extends PointValue {
+public class EsPointValueDO implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     private String id;
 
-    public EsPointValue(PointValue pointValue) {
-        BeanUtil.copyProperties(pointValue, this);
-    }
+    /**
+     * 设备ID
+     */
+    private Long deviceId;
+
+    /**
+     * 位号ID
+     */
+    private Long pointId;
+
+    /**
+     * 原始值
+     */
+    private String rawValue;
+
+    /**
+     * 处理值
+     */
+    private String value;
+
+    /**
+     * 原始时间
+     */
+    private LocalDateTime originTime;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
 }

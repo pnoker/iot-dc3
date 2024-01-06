@@ -55,9 +55,6 @@ public class GroupServiceImpl implements GroupService {
     @Resource
     private GroupManager groupManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(GroupBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -68,9 +65,7 @@ public class GroupServiceImpl implements GroupService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void remove(Long id) {
         getDOById(id, true);
@@ -87,9 +82,7 @@ public class GroupServiceImpl implements GroupService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void update(GroupBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -103,18 +96,14 @@ public class GroupServiceImpl implements GroupService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public GroupBO selectById(Long id) {
         GroupDO entityDO = getDOById(id, true);
         return groupForDataBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public Page<GroupBO> selectByPage(GroupQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -127,13 +116,13 @@ public class GroupServiceImpl implements GroupService {
     /**
      * 构造模糊查询
      *
-     * @param query {@link GroupQuery}
+     * @param entityQuery {@link GroupQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupQuery query) {
+    private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupQuery entityQuery) {
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getGroupName()), GroupDO::getGroupName, query.getGroupName());
-        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), GroupDO::getTenantId, getTenantId());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getGroupName()), GroupDO::getGroupName, entityQuery.getGroupName());
+        wrapper.eq(GroupDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -148,7 +137,9 @@ public class GroupServiceImpl implements GroupService {
     private boolean checkDuplicate(GroupBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
         wrapper.eq(GroupDO::getGroupName, entityBO.getGroupName());
-        wrapper.eq(GroupDO::getTenantId, getTenantId());
+        wrapper.eq(GroupDO::getGroupTypeFlag, entityBO.getGroupTypeFlag());
+        wrapper.eq(GroupDO::getParentGroupId, entityBO.getParentGroupId());
+        wrapper.eq(GroupDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         GroupDO one = groupManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -156,7 +147,7 @@ public class GroupServiceImpl implements GroupService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The group is duplicates");
+            throw new DuplicateException("分组重复");
         }
         return duplicate;
     }

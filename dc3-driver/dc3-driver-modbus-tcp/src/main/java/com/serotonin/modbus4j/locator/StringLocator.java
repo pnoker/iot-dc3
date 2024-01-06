@@ -79,34 +79,26 @@ public class StringLocator extends BaseLocator<String> {
             throw new IllegalDataTypeException("Invalid data type");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public int getDataType() {
         return dataType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public int getRegisterCount() {
         return registerCount;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public String toString() {
         return "StringLocator(slaveId=" + getSlaveId() + ", range=" + range + ", offset=" + offset + ", dataType="
                 + dataType + ", registerCount=" + registerCount + ", charset=" + charset + ")";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public String bytesToValueRealOffset(byte[] data, int offset) {
         offset *= 2;
@@ -132,9 +124,7 @@ public class StringLocator extends BaseLocator<String> {
         throw new RuntimeException("Unsupported data type: " + dataType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public short[] valueToShorts(String value) {
         short[] result = new short[registerCount];

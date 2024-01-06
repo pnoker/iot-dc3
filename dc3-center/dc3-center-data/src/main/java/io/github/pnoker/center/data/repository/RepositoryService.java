@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.repository;
 
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,17 +39,17 @@ public interface RepositoryService {
     /**
      * 保存 PointValue
      *
-     * @param pointValue PointValue
+     * @param pointValueBO PointValue
      * @throws IOException IOException
      */
-    void savePointValue(PointValue pointValue) throws IOException;
+    void savePointValue(PointValueBO pointValueBO) throws IOException;
 
     /**
      * 保存 PointValue 集合
      *
      * @param deviceId    设备ID
-     * @param pointValues PointValue Array
+     * @param pointValueBOS PointValue Array
      * @throws IOException IOException
      */
-    void savePointValues(Long deviceId, List<PointValue> pointValues) throws IOException;
+    void savePointValues(Long deviceId, List<PointValueBO> pointValueBOS) throws IOException;
 }

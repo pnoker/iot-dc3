@@ -36,7 +36,7 @@ public interface LimitedIpService extends BaseService<LimitedIpBO, LimitedIpQuer
     LimitedIpBO selectByIp(String ip);
 
     /**
-     * 根据 Ip 是否在Ip黑名单列表
+     * 根据 Ip 是否在限制IP列表
      *
      * @param ip IP
      * @return boolean

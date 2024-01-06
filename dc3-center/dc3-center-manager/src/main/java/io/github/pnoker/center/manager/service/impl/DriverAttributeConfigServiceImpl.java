@@ -73,9 +73,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         driverNotifyService.notifyDriverAttributeConfig(MetadataCommandTypeEnum.ADD, entityBO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(Long id) {
         DriverAttributeConfigDO entityDO = getDOById(id, true);
@@ -88,9 +85,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         driverNotifyService.notifyDriverAttributeConfig(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(DriverAttributeConfigBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -114,9 +108,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         return driverAttributeConfigBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId) {
         LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery().eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId).eq(DriverAttributeConfigDO::getDeviceId, deviceId).last(QueryWrapperConstant.LIMIT_ONE);
@@ -124,9 +115,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         return driverAttributeConfigBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId) {
         LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery().eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId);
@@ -134,9 +122,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         return driverAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId) {
         LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery().eq(DriverAttributeConfigDO::getDeviceId, deviceId);
@@ -144,9 +129,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         return driverAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<DriverAttributeConfigBO> selectByPage(DriverAttributeConfigQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -156,12 +138,11 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         return driverAttributeConfigBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<DriverAttributeConfigDO> fuzzyQuery(DriverAttributeConfigQuery query) {
+    private LambdaQueryWrapper<DriverAttributeConfigDO> fuzzyQuery(DriverAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            wrapper.eq(ObjectUtil.isNotEmpty(query.getDriverAttributeId()), DriverAttributeConfigDO::getDriverAttributeId, query.getDriverAttributeId());
-            wrapper.eq(ObjectUtil.isNotEmpty(query.getDeviceId()), DriverAttributeConfigDO::getDeviceId, query.getDeviceId());
-        }
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverAttributeId()), DriverAttributeConfigDO::getDriverAttributeId, entityQuery.getDriverAttributeId());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDeviceId()), DriverAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(DriverAttributeConfigDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -177,7 +158,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
         wrapper.eq(DriverAttributeConfigDO::getDriverAttributeId, entityBO.getDriverAttributeId());
         wrapper.eq(DriverAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
-        wrapper.eq(DriverAttributeConfigDO::getTenantId, getTenantId());
+        wrapper.eq(DriverAttributeConfigDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeConfigDO one = driverAttributeConfigManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

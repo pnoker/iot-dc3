@@ -21,18 +21,16 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.center.auth.biz.DictionaryService;
 import io.github.pnoker.center.auth.dal.LimitedIpManager;
 import io.github.pnoker.center.auth.dal.TenantManager;
-import io.github.pnoker.center.auth.dal.UserLoginManager;
-import io.github.pnoker.center.auth.entity.builder.DictionaryForAuthBuilder;
 import io.github.pnoker.center.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.center.auth.entity.model.TenantDO;
-import io.github.pnoker.center.auth.entity.model.UserLoginDO;
+import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author pnoker
@@ -43,55 +41,37 @@ import java.util.List;
 public class DictionaryServiceImpl implements DictionaryService {
 
     @Resource
-    private DictionaryForAuthBuilder dictionaryBuilder;
-
-    @Resource
     private TenantManager tenantManager;
-    @Resource
-    private UserLoginManager userLoginManager;
     @Resource
     private LimitedIpManager limitedIpManager;
 
     @Override
     public List<DictionaryBO> tenantDictionary() {
-        List<DictionaryBO> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
-        List<TenantDO> tenantBOList = tenantManager.list(wrapper);
-        for (TenantDO tenantBO : tenantBOList) {
-            DictionaryBO driverDictionary = new DictionaryBO();
-            driverDictionary.setLabel(tenantBO.getTenantName());
-            driverDictionary.setValue(tenantBO.getId());
-            dictionaryList.add(driverDictionary);
-        }
-        return dictionaryList;
-    }
+        wrapper.eq(TenantDO::getEnableFlag, EnableFlagEnum.ENABLE);
+        List<TenantDO> entityDOS = tenantManager.list(wrapper);
 
-    @Override
-    public List<DictionaryBO> userLoginDictionary(Long tenantId) {
-        List<DictionaryBO> dictionaryList = new ArrayList<>(16);
-        LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
-        List<UserLoginDO> userLoginList = userLoginManager.list(wrapper);
-        for (UserLoginDO userLogin : userLoginList) {
+        return entityDOS.stream().map(entityDO -> {
             DictionaryBO driverDictionary = new DictionaryBO();
-            driverDictionary.setLabel(userLogin.getLoginName());
-            driverDictionary.setValue(userLogin.getId());
-            dictionaryList.add(driverDictionary);
-        }
-        return dictionaryList;
+            driverDictionary.setLabel(entityDO.getTenantName());
+            driverDictionary.setValue(entityDO.getId());
+            return driverDictionary;
+        }).collect(Collectors.toList());
     }
 
     @Override
     public List<DictionaryBO> limitedIpDictionary(Long tenantId) {
-        List<DictionaryBO> dictionaryList = new ArrayList<>(16);
         LambdaQueryWrapper<LimitedIpDO> wrapper = Wrappers.<LimitedIpDO>query().lambda();
-        List<LimitedIpDO> limitedIpBOList = limitedIpManager.list(wrapper);
-        for (LimitedIpDO limitedIpBO : limitedIpBOList) {
+        wrapper.eq(LimitedIpDO::getTenantId, tenantId);
+        wrapper.eq(LimitedIpDO::getEnableFlag, EnableFlagEnum.ENABLE);
+        List<LimitedIpDO> entityDOS = limitedIpManager.list(wrapper);
+
+        return entityDOS.stream().map(entityDO -> {
             DictionaryBO driverDictionary = new DictionaryBO();
-            driverDictionary.setLabel(limitedIpBO.getIp());
-            driverDictionary.setValue(limitedIpBO.getId());
-            dictionaryList.add(driverDictionary);
-        }
-        return dictionaryList;
+            driverDictionary.setLabel(entityDO.getIp());
+            driverDictionary.setValue(entityDO.getId());
+            return driverDictionary;
+        }).collect(Collectors.toList());
     }
 
 }

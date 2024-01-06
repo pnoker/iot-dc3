@@ -27,11 +27,9 @@ import io.github.pnoker.center.auth.entity.model.UserPasswordDO;
 import io.github.pnoker.center.auth.entity.query.UserPasswordQuery;
 import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DeleteException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
+import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -59,21 +57,18 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     @Override
     @Transactional
     public void save(UserPasswordBO entityBO) {
-        entityBO.setLoginPassword(DecodeUtil.md5(entityBO.getLoginPassword()));
+        checkDuplicate(entityBO, false, true);
+
         UserPasswordDO entityDO = userPasswordBuilder.buildDOByBO(entityBO);
-        // 插入 userPassword 数据，并返回插入后的 userPassword
+        entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
         if (!userPasswordManager.save(entityDO)) {
             throw new AddException("The user password add failed: {}", entityBO.toString());
         }
     }
 
     @Override
-    @Transactional
     public void remove(Long id) {
-        UserPasswordBO userPasswordBO = selectById(id);
-        if (ObjectUtil.isNull(userPasswordBO)) {
-            throw new NotFoundException("The user password does not exist");
-        }
+        getDOById(id, true);
 
         if (!userPasswordManager.removeById(id)) {
             throw new DeleteException("The user password delete failed");
@@ -82,13 +77,13 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     public void update(UserPasswordBO entityBO) {
-        UserPasswordBO selectById = selectById(entityBO.getId());
-        if (ObjectUtil.isNull(selectById)) {
-            throw new NotFoundException();
-        }
-        entityBO.setLoginPassword(DecodeUtil.md5(entityBO.getLoginPassword()));
-        entityBO.setOperateTime(null);
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
         UserPasswordDO entityDO = userPasswordBuilder.buildDOByBO(entityBO);
+        entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
+        entityDO.setOperateTime(null);
         if (!userPasswordManager.updateById(entityDO)) {
             throw new UpdateException("The user password update failed");
         }
@@ -118,8 +113,31 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         }
     }
 
-    private LambdaQueryWrapper<UserPasswordDO> fuzzyQuery(UserPasswordQuery query) {
+    private LambdaQueryWrapper<UserPasswordDO> fuzzyQuery(UserPasswordQuery entityQuery) {
         return Wrappers.<UserPasswordDO>query().lambda();
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link UserPasswordBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(UserPasswordBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<UserPasswordDO> wrapper = Wrappers.<UserPasswordDO>query().lambda();
+        wrapper.eq(UserPasswordDO::getLoginPassword, entityBO.getLoginPassword());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        UserPasswordDO one = userPasswordManager.getOne(wrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("用户密码重复");
+        }
+        return duplicate;
     }
 
     /**

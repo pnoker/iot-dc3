@@ -62,15 +62,16 @@ public class DeviceController implements BaseController {
     private DeviceService deviceService;
 
     /**
-     * 新增 Device
+     * 新增设备
      *
-     * @param entityVO {@link  DeviceVO}
+     * @param entityVO {@link DeviceVO}
      * @return R of String
      */
     @PostMapping("/add")
     public R<String> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
             deviceService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
@@ -79,9 +80,9 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除 Device
+     * 根据 ID 删除设备
      *
-     * @param id 设备ID
+     * @param id ID
      * @return R of String
      */
     @PostMapping("/delete/{id}")
@@ -95,9 +96,9 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 更新 Device
+     * 更新设备
      *
-     * @param entityVO {@link  DeviceVO}
+     * @param entityVO {@link DeviceVO}
      * @return R of String
      */
     @PostMapping("/update")
@@ -114,8 +115,8 @@ public class DeviceController implements BaseController {
     /**
      * 根据 ID 查询 Device
      *
-     * @param id 设备ID
-     * @return R of DeviceVO
+     * @param id ID
+     * @return DeviceVO {@link DeviceVO}
      */
     @GetMapping("/id/{id}")
     public R<DeviceVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
@@ -132,7 +133,7 @@ public class DeviceController implements BaseController {
      * 根据 ID 集合查询 Device
      *
      * @param deviceIds 设备ID集
-     * @return Map String:Device
+     * @return Map(ID, DeviceVO)
      */
     @PostMapping("/ids")
     public R<Map<Long, DeviceVO>> selectByIds(@RequestBody Set<Long> deviceIds) {
@@ -148,16 +149,17 @@ public class DeviceController implements BaseController {
     /**
      * 分页查询 Device
      *
-     * @param devicePageQuery 设备和分页参数
+     * @param entityQuery 设备和分页参数
      * @return R Of DeviceVO Page
      */
     @PostMapping("/list")
-    public R<Page<DeviceVO>> list(@RequestBody(required = false) DeviceQuery devicePageQuery) {
+    public R<Page<DeviceVO>> list(@RequestBody(required = false) DeviceQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(devicePageQuery)) {
-                devicePageQuery = new DeviceQuery();
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new DeviceQuery();
             }
-            Page<DeviceBO> entityPageBO = deviceService.selectByPage(devicePageQuery);
+            entityQuery.setTenantId(getTenantId());
+            Page<DeviceBO> entityPageBO = deviceService.selectByPage(entityQuery);
             Page<DeviceVO> entityPageVO = deviceBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
@@ -168,7 +170,7 @@ public class DeviceController implements BaseController {
     /**
      * 导入 Device
      *
-     * @param entityVO {@link  DeviceVO}
+     * @param entityVO {@link DeviceVO}
      * @return R of String
      */
     @PostMapping("/import")
@@ -185,7 +187,7 @@ public class DeviceController implements BaseController {
     /**
      * 下载导入模板
      *
-     * @param entityVO {@link  DeviceVO}
+     * @param entityVO {@link DeviceVO}
      * @return 模板文件流
      */
     @PostMapping("/export/import_template")

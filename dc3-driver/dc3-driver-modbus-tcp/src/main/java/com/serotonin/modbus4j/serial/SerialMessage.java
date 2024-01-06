@@ -45,9 +45,6 @@ abstract public class SerialMessage {
         return modbusMessage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "SerialMessage [modbusMessage=" + modbusMessage + "]";

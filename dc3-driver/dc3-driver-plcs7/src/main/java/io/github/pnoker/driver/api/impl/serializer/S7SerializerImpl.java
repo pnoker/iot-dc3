@@ -143,9 +143,6 @@ public final class S7SerializerImpl implements S7Serializer {
         this.connector = connector;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized <T> T dispense(final Class<T> beanClass, final int dbNum, final int byteOffset) throws S7Exception {
         try {
@@ -157,9 +154,6 @@ public final class S7SerializerImpl implements S7Serializer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized <T> T dispense(final Class<T> beanClass, final int dbNum, final int byteOffset, final int blockSize) throws S7Exception {
         try {
@@ -183,9 +177,6 @@ public final class S7SerializerImpl implements S7Serializer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void store(final Object bean, final int dbNum, final int byteOffset) {
         try {

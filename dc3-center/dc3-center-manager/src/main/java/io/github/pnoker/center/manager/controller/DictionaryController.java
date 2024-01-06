@@ -16,14 +16,15 @@
 
 package io.github.pnoker.center.manager.controller;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.biz.DictionaryService;
+import io.github.pnoker.center.manager.entity.builder.DictionaryForManagerBuilder;
 import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
-import io.github.pnoker.common.entity.builder.DictionaryBuilder;
 import io.github.pnoker.common.entity.vo.DictionaryVO;
 import io.github.pnoker.common.valid.Parent;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ import javax.annotation.Resource;
 public class DictionaryController implements BaseController {
 
     @Resource
-    private DictionaryBuilder dictionaryBuilder;
+    private DictionaryForManagerBuilder dictionaryForManagerBuilder;
 
     @Resource
     private DictionaryService dictionaryService;
@@ -61,8 +62,12 @@ public class DictionaryController implements BaseController {
     @PostMapping("/driver")
     public R<Page<DictionaryVO>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new DictionaryQuery();
+            }
+            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.driverDictionary(entityQuery);
-            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -78,8 +83,12 @@ public class DictionaryController implements BaseController {
     @PostMapping("/profile")
     public R<Page<DictionaryVO>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new DictionaryQuery();
+            }
+            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.profileDictionary(entityQuery);
-            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -95,8 +104,12 @@ public class DictionaryController implements BaseController {
     @PostMapping("/profile_point")
     public R<Page<DictionaryVO>> pointDictionaryForProfile(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new DictionaryQuery();
+            }
+            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.pointDictionaryForProfile(entityQuery);
-            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -112,8 +125,12 @@ public class DictionaryController implements BaseController {
     @PostMapping("/device_point")
     public R<Page<DictionaryVO>> pointDictionaryForDevice(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new DictionaryQuery();
+            }
+            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.pointDictionaryForDevice(entityQuery);
-            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -129,8 +146,12 @@ public class DictionaryController implements BaseController {
     @PostMapping("/device")
     public R<Page<DictionaryVO>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new DictionaryQuery();
+            }
+            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.deviceDictionary(entityQuery);
-            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -146,8 +167,12 @@ public class DictionaryController implements BaseController {
     @PostMapping("/driver_device")
     public R<Page<DictionaryVO>> deviceDictionaryForDriver(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new DictionaryQuery();
+            }
+            entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.deviceDictionaryForDriver(entityQuery);
-            Page<DictionaryVO> entityPageVO = dictionaryBuilder.buildVOPageByBOPage(entityPageBO);
+            Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());

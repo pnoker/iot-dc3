@@ -45,9 +45,6 @@ abstract public class ReadBinaryRequest extends ModbusRequest {
         this.numberOfBits = numberOfBits;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
@@ -59,18 +56,12 @@ abstract public class ReadBinaryRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, startOffset);
         ModbusUtils.pushShort(queue, numberOfBits);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readRequest(ByteQueue queue) {
         startOffset = ModbusUtils.popUnsignedShort(queue);
@@ -105,9 +96,6 @@ abstract public class ReadBinaryRequest extends ModbusRequest {
      */
     abstract protected boolean getBinary(ProcessImage processImage, int index) throws ModbusTransportException;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "ReadBinaryRequest [startOffset=" + startOffset + ", numberOfBits=" + numberOfBits + "]";

@@ -44,9 +44,6 @@ abstract public class SerialSlave extends ModbusSlaveSet {
         this.wrapper = wrapper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void start() throws ModbusInitException {
         try {
@@ -59,9 +56,6 @@ abstract public class SerialSlave extends ModbusSlaveSet {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void stop() {
         try {

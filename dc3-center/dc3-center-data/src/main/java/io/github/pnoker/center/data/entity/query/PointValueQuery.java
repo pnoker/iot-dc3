@@ -50,6 +50,12 @@ public class PointValueQuery implements Serializable {
     private Long deviceId;
 
     /**
+     * 设备名称
+     */
+    @Schema(description = "设备名称")
+    private String deviceName;
+
+    /**
      * 位号ID
      */
     @Schema(description = "位号ID")

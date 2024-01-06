@@ -36,15 +36,7 @@ public interface DictionaryService {
     List<DictionaryBO> tenantDictionary();
 
     /**
-     * 获取用户字典
-     *
-     * @param tenantId 租户ID
-     * @return Dictionary Array
-     */
-    List<DictionaryBO> userLoginDictionary(Long tenantId);
-
-    /**
-     * 获取 Ip 黑名单字典
+     * 获取限制IP字典
      *
      * @param tenantId 租户ID
      * @return Dictionary Array

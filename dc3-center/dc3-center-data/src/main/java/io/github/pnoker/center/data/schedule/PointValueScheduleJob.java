@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.schedule;
 
 import io.github.pnoker.center.data.biz.PointValueService;
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.quartz.JobExecutionContext;
@@ -55,7 +55,7 @@ public class PointValueScheduleJob extends QuartzJobBean {
     public static final AtomicLong valueCount = new AtomicLong(0);
     public static final AtomicLong valueSpeed = new AtomicLong(0);
 
-    private static final List<PointValue> pointValues = new ArrayList<>();
+    private static final List<PointValueBO> POINT_VALUE_BOS = new ArrayList<>();
 
     /**
      * 获取 PointValue 长度
@@ -63,23 +63,23 @@ public class PointValueScheduleJob extends QuartzJobBean {
      * @return Point Value Size
      */
     public static int getPointValuesSize() {
-        return pointValues.size();
+        return POINT_VALUE_BOS.size();
     }
 
     /**
      * 清空 PointValue
      */
     public static void clearPointValues() {
-        pointValues.clear();
+        POINT_VALUE_BOS.clear();
     }
 
     /**
      * 添加 PointValue
      *
-     * @param pointValue PointValue
+     * @param pointValueBO PointValue
      */
-    public static void addPointValues(PointValue pointValue) {
-        pointValues.add(pointValue);
+    public static void addPointValues(PointValueBO pointValueBO) {
+        POINT_VALUE_BOS.add(pointValueBO);
     }
 
     @Override
@@ -95,8 +95,8 @@ public class PointValueScheduleJob extends QuartzJobBean {
         // Save point value array to Redis & MongoDB
         threadPoolExecutor.execute(() -> {
             valueLock.writeLock().lock();
-            if (!pointValues.isEmpty()) {
-                pointValueService.savePointValues(pointValues);
+            if (!POINT_VALUE_BOS.isEmpty()) {
+                pointValueService.savePointValues(POINT_VALUE_BOS);
                 clearPointValues();
             }
             valueLock.writeLock().unlock();

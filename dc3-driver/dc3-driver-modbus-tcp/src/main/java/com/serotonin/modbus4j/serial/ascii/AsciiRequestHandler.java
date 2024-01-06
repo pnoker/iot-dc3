@@ -38,9 +38,7 @@ public class AsciiRequestHandler extends BaseRequestHandler {
         super(slave);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     public OutgoingResponseMessage handleRequest(IncomingRequestMessage req) throws Exception {
         AsciiMessageRequest asciiRequest = (AsciiMessageRequest) req;
         ModbusRequest request = asciiRequest.getModbusRequest();

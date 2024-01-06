@@ -45,9 +45,6 @@ public class EventServiceImpl implements EventService {
     @Resource
     private MongoTemplate mongoTemplate;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addDriverEvent(DriverEvent driverEvent) {
         if (ObjectUtil.isNotNull(driverEvent)) {
@@ -55,9 +52,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addDriverEvents(List<DriverEvent> driverEvents) {
         if (ObjectUtil.isNotNull(driverEvents) && !driverEvents.isEmpty()) {
@@ -65,9 +59,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addDeviceEvent(DeviceEvent deviceEvent) {
         if (ObjectUtil.isNotNull(deviceEvent)) {
@@ -75,9 +66,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addDeviceEvents(List<DeviceEvent> deviceEvents) {
         if (ObjectUtil.isNotNull(deviceEvents) && !deviceEvents.isEmpty()) {
@@ -85,17 +73,11 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<DriverEvent> driverEvent(DriverEventQuery driverEventQuery) {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<DeviceEvent> deviceEvent(DeviceEventQuery deviceEventQuery) {
         Criteria criteria = new Criteria();

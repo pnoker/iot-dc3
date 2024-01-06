@@ -65,9 +65,6 @@ abstract public class SerialMaster extends ModbusMaster {
         this.validateResponse = validateResponse;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void init() throws ModbusInitException {
         try {

@@ -58,9 +58,6 @@ public class BasicProcessImage implements ProcessImage {
         this.slaveId = slaveId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getSlaveId() {
         return slaveId;
@@ -441,26 +438,17 @@ public class BasicProcessImage implements ProcessImage {
     //
     // Coils
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized boolean getCoil(int offset) throws IllegalDataAddressException {
         return getBoolean(offset, coils);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void setCoil(int offset, boolean value) {
         validateOffset(offset);
         coils.put(offset, value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void writeCoil(int offset, boolean value) throws IllegalDataAddressException {
         boolean old = getBoolean(offset, coils);
@@ -473,17 +461,11 @@ public class BasicProcessImage implements ProcessImage {
     //
     // Inputs
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized boolean getInput(int offset) throws IllegalDataAddressException {
         return getBoolean(offset, inputs);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void setInput(int offset, boolean value) {
         validateOffset(offset);
@@ -493,26 +475,17 @@ public class BasicProcessImage implements ProcessImage {
     //
     // Holding registers
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized short getHoldingRegister(int offset) throws IllegalDataAddressException {
         return getShort(offset, holdingRegisters);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void setHoldingRegister(int offset, short value) {
         validateOffset(offset);
         holdingRegisters.put(offset, value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void writeHoldingRegister(int offset, short value) throws IllegalDataAddressException {
         short old = getShort(offset, holdingRegisters);
@@ -525,17 +498,11 @@ public class BasicProcessImage implements ProcessImage {
     //
     // Input registers
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized short getInputRegister(int offset) throws IllegalDataAddressException {
         return getShort(offset, inputRegisters);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void setInputRegister(int offset, short value) {
         validateOffset(offset);
@@ -545,9 +512,6 @@ public class BasicProcessImage implements ProcessImage {
     //
     // Exception status
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getExceptionStatus() {
         return exceptionStatus;
@@ -556,9 +520,6 @@ public class BasicProcessImage implements ProcessImage {
     //
     // Report slave id
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte[] getReportSlaveIdData() {
         return new byte[0];

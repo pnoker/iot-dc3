@@ -45,14 +45,14 @@ public interface EventService {
     void addDriverEvents(List<DriverEvent> driverEvents);
 
     /**
-     * 新增 DeviceEvent
+     * 新增设备事件
      *
      * @param deviceEvent DeviceEvent
      */
     void addDeviceEvent(DeviceEvent deviceEvent);
 
     /**
-     * 批量新增 DeviceEvent
+     * 批量新增设备事件
      *
      * @param deviceEvents DeviceEvent Array
      */

@@ -30,17 +30,11 @@ import com.serotonin.modbus4j.sero.messaging.WaitingRoomKeyFactory;
 public class SerialWaitingRoomKeyFactory implements WaitingRoomKeyFactory {
     private static final Sync sync = new Sync();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public WaitingRoomKey createWaitingRoomKey(OutgoingRequestMessage request) {
         return sync;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public WaitingRoomKey createWaitingRoomKey(IncomingResponseMessage response) {
         return sync;

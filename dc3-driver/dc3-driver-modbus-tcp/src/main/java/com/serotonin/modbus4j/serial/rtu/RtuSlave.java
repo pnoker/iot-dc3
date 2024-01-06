@@ -41,9 +41,7 @@ public class RtuSlave extends SerialSlave {
         super(wrapper);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void start() throws ModbusInitException {
         super.start();
@@ -62,9 +60,7 @@ public class RtuSlave extends SerialSlave {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void stop() {
         conn.close();

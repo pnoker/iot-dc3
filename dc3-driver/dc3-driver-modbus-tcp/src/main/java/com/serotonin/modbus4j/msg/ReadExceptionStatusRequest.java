@@ -38,25 +38,16 @@ public class ReadExceptionStatusRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Modbus modbus) {
         // no op
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         // no op
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readRequest(ByteQueue queue) {
         // no op
@@ -72,9 +63,6 @@ public class ReadExceptionStatusRequest extends ModbusRequest {
         return new ReadExceptionStatusResponse(slaveId, processImage.getExceptionStatus());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.READ_EXCEPTION_STATUS;

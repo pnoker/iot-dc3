@@ -74,9 +74,7 @@ public class EpollStreamTransportCharSpaced extends EpollStreamTransport {
         out.flush();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     public void write(byte[] data, int len) throws IOException {
         try {
             long waited = 0, writeStart, writeEnd, waitRemaining;

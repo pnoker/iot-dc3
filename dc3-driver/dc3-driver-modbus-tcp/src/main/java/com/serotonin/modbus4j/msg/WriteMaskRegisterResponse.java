@@ -31,9 +31,6 @@ public class WriteMaskRegisterResponse extends ModbusResponse {
     private int andMask;
     private int orMask;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_MASK_REGISTER;
@@ -50,9 +47,6 @@ public class WriteMaskRegisterResponse extends ModbusResponse {
         this.orMask = orMask;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeResponse(ByteQueue queue) {
         ModbusUtils.pushShort(queue, writeOffset);
@@ -60,9 +54,6 @@ public class WriteMaskRegisterResponse extends ModbusResponse {
         ModbusUtils.pushShort(queue, orMask);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readResponse(ByteQueue queue) {
         writeOffset = ModbusUtils.popUnsignedShort(queue);

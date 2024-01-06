@@ -55,12 +55,9 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public void save(TenantBO entityBO) {
-        TenantBO select = selectByCode(entityBO.getTenantName());
-        if (ObjectUtil.isNotNull(select)) {
-            throw new DuplicateException("The tenant already exists");
-        }
-        TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
+        checkDuplicate(entityBO, false, true);
 
+        TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
         if (!tenantManager.save(entityDO)) {
             throw new AddException("The tenant {} add failed", entityBO.getTenantName());
         }
@@ -68,10 +65,7 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public void remove(Long id) {
-        TenantBO tenantBO = selectById(id);
-        if (ObjectUtil.isNull(tenantBO)) {
-            throw new NotFoundException("The tenant does not exist");
-        }
+        getDOById(id, true);
 
         if (!tenantManager.removeById(id)) {
             throw new DeleteException("The tenant delete failed");
@@ -80,17 +74,21 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public void update(TenantBO entityBO) {
-        entityBO.setTenantName(null);
-        entityBO.setOperateTime(null);
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
         TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
         if (!tenantManager.updateById(entityDO)) {
-            throw new UpdateException("The tenant update failed");
+            throw new UpdateException("租户更新失败");
         }
     }
 
     @Override
     public TenantBO selectById(Long id) {
-        return null;
+        TenantDO entityDO = getDOById(id, true);
+        return tenantBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -112,12 +110,34 @@ public class TenantServiceImpl implements TenantService {
         return tenantBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<TenantDO> fuzzyQuery(TenantQuery query) {
+    private LambdaQueryWrapper<TenantDO> fuzzyQuery(TenantQuery entityQuery) {
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getTenantName()), TenantDO::getTenantName, query.getTenantName());
-        }
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getTenantName()), TenantDO::getTenantName, entityQuery.getTenantName());
         return wrapper;
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link TenantBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(TenantBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
+        wrapper.eq(TenantDO::getTenantName, entityBO.getTenantName());
+        wrapper.eq(TenantDO::getTenantCode, entityBO.getTenantCode());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        TenantDO one = tenantManager.getOne(wrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("租户重复");
+        }
+        return duplicate;
     }
 
     /**

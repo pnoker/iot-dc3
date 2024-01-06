@@ -54,9 +54,6 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Resource
     private DriverAttributeManager driverAttributeManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(DriverAttributeBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -67,9 +64,6 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(Long id) {
         getDOById(id, true);
@@ -79,9 +73,6 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(DriverAttributeBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -101,9 +92,6 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         return driverAttributeBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public DriverAttributeBO selectByNameAndDriverId(String name, Long driverId) {
         LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery().eq(DriverAttributeDO::getAttributeName, name).eq(DriverAttributeDO::getDriverId, driverId).last(QueryWrapperConstant.LIMIT_ONE);
@@ -111,9 +99,6 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         return driverAttributeBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<DriverAttributeBO> selectByDriverId(Long driverId) {
         LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery().eq(DriverAttributeDO::getDriverId, driverId);
@@ -121,9 +106,6 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         return driverAttributeBuilder.buildBOListByDOList(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<DriverAttributeBO> selectByPage(DriverAttributeQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -133,12 +115,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         return driverAttributeBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<DriverAttributeDO> fuzzyQuery(DriverAttributeQuery query) {
+    private LambdaQueryWrapper<DriverAttributeDO> fuzzyQuery(DriverAttributeQuery entityQuery) {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAttributeName()), DriverAttributeDO::getAttributeName, query.getAttributeName());
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getDisplayName()), DriverAttributeDO::getDisplayName, query.getDisplayName());
-        wrapper.eq(ObjectUtil.isNotNull(query.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, query.getAttributeTypeFlag());
-        wrapper.eq(ObjectUtil.isNotEmpty(query.getDriverId()), DriverAttributeDO::getDriverId, query.getDriverId());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName, entityQuery.getAttributeName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), DriverAttributeDO::getDisplayName, entityQuery.getDisplayName());
+        wrapper.eq(ObjectUtil.isNotNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
+        wrapper.eq(DriverAttributeDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -154,7 +137,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
         wrapper.eq(DriverAttributeDO::getAttributeName, entityBO.getAttributeName());
         wrapper.eq(DriverAttributeDO::getDriverId, entityBO.getDriverId());
-        wrapper.eq(DriverAttributeDO::getTenantId, getTenantId());
+        wrapper.eq(DriverAttributeDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeDO one = driverAttributeManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

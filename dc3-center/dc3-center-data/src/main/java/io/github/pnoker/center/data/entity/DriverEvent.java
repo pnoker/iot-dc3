@@ -58,6 +58,9 @@ public class DriverEvent implements Serializable {
     private Boolean confirm = false;
     private Object content;
 
+    /**
+     * 创建时间
+     */
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 

@@ -151,7 +151,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param modbusMaster ModbusMaster
      * @param pointInfo    Point Attribute Config
      * @param type         Value Type
-     * @return String Value
+     * @return R of String Value
      */
     private String readValue(ModbusMaster modbusMaster, Map<String, AttributeConfigDTO> pointInfo, String type) {
         int slaveId = attribute(pointInfo, "slaveId");

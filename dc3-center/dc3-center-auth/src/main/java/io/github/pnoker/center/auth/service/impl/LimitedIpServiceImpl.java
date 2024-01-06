@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 /**
- * 用户服务接口实现类
+ * 限制IP服务接口实现类
  *
  * @author pnoker
  * @since 2022.1.0
@@ -53,13 +53,10 @@ public class LimitedIpServiceImpl implements LimitedIpService {
     @Resource
     private LimitedIpManager limitedIpManager;
 
-
     @Override
     public void save(LimitedIpBO entityBO) {
-        LimitedIpBO select = selectByIp(entityBO.getIp());
-        if (ObjectUtil.isNotNull(select)) {
-            throw new DuplicateException("The ip already exists in the blacklist");
-        }
+        checkDuplicate(entityBO, false, true);
+
         LimitedIpDO entityDO = limitedIpBuilder.buildDOByBO(entityBO);
         if (!limitedIpManager.save(entityDO)) {
             throw new AddException("The ip {} add to the blacklist failed", entityBO.getIp());
@@ -68,10 +65,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
 
     @Override
     public void remove(Long id) {
-        LimitedIpBO limitedIpBO = selectById(id);
-        if (ObjectUtil.isNull(limitedIpBO)) {
-            throw new NotFoundException("The ip does not exist in the blacklist");
-        }
+        getDOById(id, true);
 
         if (!limitedIpManager.removeById(id)) {
             throw new DeleteException("The ip delete failed");
@@ -80,17 +74,21 @@ public class LimitedIpServiceImpl implements LimitedIpService {
 
     @Override
     public void update(LimitedIpBO entityBO) {
-        entityBO.setIp(null);
-        entityBO.setOperateTime(null);
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
         LimitedIpDO entityDO = limitedIpBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
         if (limitedIpManager.updateById(entityDO)) {
-            throw new UpdateException("The ip update failed in the blacklist");
+            throw new UpdateException("限制IP更新失败");
         }
     }
 
     @Override
     public LimitedIpBO selectById(Long id) {
-        return null;
+        LimitedIpDO entityDO = getDOById(id, true);
+        return limitedIpBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -118,12 +116,35 @@ public class LimitedIpServiceImpl implements LimitedIpService {
         return ObjectUtil.isNotNull(limitedIpBO);
     }
 
-    private LambdaQueryWrapper<LimitedIpDO> fuzzyQuery(LimitedIpQuery query) {
+    private LambdaQueryWrapper<LimitedIpDO> fuzzyQuery(LimitedIpQuery entityQuery) {
         LambdaQueryWrapper<LimitedIpDO> wrapper = Wrappers.<LimitedIpDO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getIp()), LimitedIpDO::getIp, query.getIp());
-        }
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getIp()), LimitedIpDO::getIp, entityQuery.getIp());
+        wrapper.eq(LimitedIpDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link LimitedIpBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(LimitedIpBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<LimitedIpDO> wrapper = Wrappers.<LimitedIpDO>query().lambda();
+        wrapper.eq(LimitedIpDO::getIp, entityBO.getIp());
+        wrapper.eq(LimitedIpDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        LimitedIpDO one = limitedIpManager.getOne(wrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("限制IP重复");
+        }
+        return duplicate;
     }
 
     /**

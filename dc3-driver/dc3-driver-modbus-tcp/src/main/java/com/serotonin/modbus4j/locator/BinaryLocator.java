@@ -90,34 +90,26 @@ public class BinaryLocator extends BaseLocator<Boolean> {
         return bit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public int getDataType() {
         return DataType.BINARY;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public int getRegisterCount() {
         return 1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public String toString() {
         return "BinaryLocator(slaveId=" + getSlaveId() + ", range=" + range + ", offset=" + offset + ", bit=" + bit
                 + ")";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public Boolean bytesToValueRealOffset(byte[] data, int offset) {
         // If this is a coil or input, convert to boolean.
@@ -131,9 +123,7 @@ public class BinaryLocator extends BaseLocator<Boolean> {
         return new Boolean((((data[offset + 1 - bit / 8] & 0xff) >> (bit % 8)) & 0x1) == 1);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public short[] valueToShorts(Boolean value) {
         throw new NotImplementedException();

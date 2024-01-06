@@ -35,9 +35,6 @@ public class EncapMessageParser extends BaseMessageParser {
         super(master);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected IncomingMessage parseMessageImpl(ByteQueue queue) throws Exception {
         if (master)

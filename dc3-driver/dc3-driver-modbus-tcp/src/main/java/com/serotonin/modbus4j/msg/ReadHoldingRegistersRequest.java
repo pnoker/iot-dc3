@@ -43,9 +43,7 @@ public class ReadHoldingRegistersRequest extends ReadNumericRequest {
         super(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public byte getFunctionCode() {
         return FunctionCode.READ_HOLDING_REGISTERS;
@@ -56,9 +54,7 @@ public class ReadHoldingRegistersRequest extends ReadNumericRequest {
         return new ReadHoldingRegistersResponse(slaveId, getData(processImage));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     protected short getNumeric(ProcessImage processImage, int index) throws ModbusTransportException {
         return processImage.getHoldingRegister(index);
@@ -69,9 +65,7 @@ public class ReadHoldingRegistersRequest extends ReadNumericRequest {
         return new ReadHoldingRegistersResponse(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public String toString() {
         return "ReadHoldingRegistersRequest [slaveId=" + slaveId + ", getFunctionCode()=" + getFunctionCode()
