@@ -17,10 +17,10 @@
 package io.github.pnoker.center.auth.controller;
 
 import cn.hutool.core.util.ObjectUtil;
+import io.github.pnoker.center.auth.biz.TokenService;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
 import io.github.pnoker.center.auth.entity.query.TokenQuery;
-import io.github.pnoker.center.auth.biz.TokenService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.UnAuthorizedException;
@@ -43,7 +43,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.TOKEN_URL_PREFIX)
-public class TokenController implements Controller {
+public class TokenController implements BaseController {
 
     @Resource
     private TokenService tokenService;

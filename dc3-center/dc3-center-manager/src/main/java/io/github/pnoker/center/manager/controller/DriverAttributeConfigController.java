@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
@@ -43,7 +43,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX)
-public class DriverAttributeConfigController implements Controller {
+public class DriverAttributeConfigController implements BaseController {
 
     @Resource
     private DriverAttributeConfigService driverAttributeConfigService;

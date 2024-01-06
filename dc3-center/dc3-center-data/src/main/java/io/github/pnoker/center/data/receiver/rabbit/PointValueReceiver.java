@@ -18,9 +18,9 @@ package io.github.pnoker.center.data.receiver.rabbit;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.center.data.entity.point.PointValue;
-import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.biz.PointValueRepositoryService;
+import io.github.pnoker.center.data.biz.PointValueService;
+import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.center.data.schedule.PointValueScheduleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;

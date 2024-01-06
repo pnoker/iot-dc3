@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.query.TenantQuery;
 import io.github.pnoker.center.auth.service.TenantService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
@@ -43,7 +43,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.TENANT_URL_PREFIX)
-public class TenantController implements Controller {
+public class TenantController implements BaseController {
 
     @Resource
     private TenantService tenantService;

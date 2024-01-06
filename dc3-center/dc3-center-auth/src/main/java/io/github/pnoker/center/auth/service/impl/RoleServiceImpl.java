@@ -148,7 +148,7 @@ public class RoleServiceImpl implements RoleService {
     private boolean checkDuplicate(RoleBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
         wrapper.eq(RoleDO::getRoleName, entityBO.getRoleName());
-        wrapper.eq(RoleDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(RoleDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RoleDO one = roleManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

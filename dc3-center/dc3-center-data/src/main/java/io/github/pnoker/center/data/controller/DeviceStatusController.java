@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.data.controller;
 
-import io.github.pnoker.center.data.entity.query.DeviceQuery;
 import io.github.pnoker.center.data.biz.DeviceStatusService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.center.data.entity.query.DeviceQuery;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DEVICE_STATUS_URL_PREFIX)
-public class DeviceStatusController implements Controller {
+public class DeviceStatusController implements BaseController {
 
     @Resource
     private DeviceStatusService deviceStatusService;

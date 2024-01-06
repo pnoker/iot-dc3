@@ -148,7 +148,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
     private boolean checkDuplicate(AlarmRuleBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmRuleDO> wrapper = Wrappers.<AlarmRuleDO>query().lambda();
         wrapper.eq(AlarmRuleDO::getAlarmRuleName, entityBO.getAlarmRuleName());
-        wrapper.eq(AlarmRuleDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(AlarmRuleDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmRuleDO one = alarmRuleManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

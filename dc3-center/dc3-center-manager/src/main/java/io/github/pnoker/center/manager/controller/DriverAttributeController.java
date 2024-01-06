@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -46,7 +46,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_URL_PREFIX)
-public class DriverAttributeController implements Controller {
+public class DriverAttributeController implements BaseController {
 
     @Resource
     private DriverAttributeService driverAttributeService;

@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
-import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.base.BaseService;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointService extends Service<PointBO, PointQuery> {
+public interface PointService extends BaseService<PointBO, PointQuery> {
 
     /**
      * 根据 模板ID 查询位号

@@ -22,7 +22,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.service.PointService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.POINT_URL_PREFIX)
-public class PointController implements Controller {
+public class PointController implements BaseController {
 
     @Resource
     private PointService pointService;

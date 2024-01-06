@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
-import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.base.BaseService;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointAttributeConfigService extends Service<PointAttributeConfigBO, PointAttributeConfigQuery> {
+public interface PointAttributeConfigService extends BaseService<PointAttributeConfigBO, PointAttributeConfigQuery> {
 
     /**
      * 根据 设备ID 查询

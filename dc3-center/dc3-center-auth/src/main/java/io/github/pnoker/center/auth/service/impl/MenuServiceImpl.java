@@ -148,7 +148,7 @@ public class MenuServiceImpl implements MenuService {
     private boolean checkDuplicate(MenuBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
         wrapper.eq(MenuDO::getMenuName, entityBO.getMenuName());
-        wrapper.eq(MenuDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(MenuDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         MenuDO one = menuManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

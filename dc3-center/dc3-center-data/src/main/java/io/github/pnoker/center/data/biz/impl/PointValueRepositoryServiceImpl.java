@@ -16,8 +16,8 @@
 
 package io.github.pnoker.center.data.biz.impl;
 
-import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.center.data.biz.PointValueRepositoryService;
+import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.center.data.repository.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.driver.StrategyConstant;

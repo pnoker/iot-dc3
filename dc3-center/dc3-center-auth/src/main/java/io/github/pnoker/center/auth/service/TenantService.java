@@ -18,7 +18,7 @@ package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.query.TenantQuery;
-import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.base.BaseService;
 
 /**
  * Tenant Interface
@@ -26,7 +26,7 @@ import io.github.pnoker.common.base.Service;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface TenantService extends Service<TenantBO, TenantQuery> {
+public interface TenantService extends BaseService<TenantBO, TenantQuery> {
 
     /**
      * 根据租户Code查询租户

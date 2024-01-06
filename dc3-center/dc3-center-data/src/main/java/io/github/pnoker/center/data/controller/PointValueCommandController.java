@@ -16,10 +16,10 @@
 
 package io.github.pnoker.center.data.controller;
 
+import io.github.pnoker.center.data.biz.PointValueCommandService;
 import io.github.pnoker.center.data.entity.vo.PointValueReadVO;
 import io.github.pnoker.center.data.entity.vo.PointValueWriteVO;
-import io.github.pnoker.center.data.biz.PointValueCommandService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.VALUE_COMMAND_URL_PREFIX)
-public class PointValueCommandController implements Controller {
+public class PointValueCommandController implements BaseController {
 
     @Resource
     private PointValueCommandService pointValueCommandService;

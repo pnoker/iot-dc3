@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 import io.github.pnoker.center.manager.entity.query.ProfileQuery;
 import io.github.pnoker.center.manager.service.ProfileService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.PROFILE_URL_PREFIX)
-public class ProfileController implements Controller {
+public class ProfileController implements BaseController {
 
     @Resource
     private ProfileService profileService;

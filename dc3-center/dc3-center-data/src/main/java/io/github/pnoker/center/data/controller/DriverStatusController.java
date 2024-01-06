@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.data.controller;
 
-import io.github.pnoker.center.data.entity.query.DriverQuery;
 import io.github.pnoker.center.data.biz.DriverStatusService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.center.data.entity.query.DriverQuery;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.DRIVER_STATUS_URL_PREFIX)
-public class DriverStatusController implements Controller {
+public class DriverStatusController implements BaseController {
 
     @Resource
     private DriverStatusService driverStatusService;

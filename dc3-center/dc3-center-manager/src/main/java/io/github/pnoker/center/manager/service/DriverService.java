@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.query.DriverQuery;
-import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.base.BaseService;
 
 import java.util.List;
 import java.util.Set;
@@ -29,7 +29,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverService extends Service<DriverBO, DriverQuery> {
+public interface DriverService extends BaseService<DriverBO, DriverQuery> {
 
     /**
      * 根据 驱动ServiceName 查询 驱动

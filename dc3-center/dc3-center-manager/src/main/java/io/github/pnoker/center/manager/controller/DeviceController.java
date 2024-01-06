@@ -23,7 +23,7 @@ import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.center.manager.entity.vo.DeviceVO;
 import io.github.pnoker.center.manager.service.DeviceService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DEVICE_URL_PREFIX)
-public class DeviceController implements Controller {
+public class DeviceController implements BaseController {
 
     @Resource
     private DeviceBuilder deviceBuilder;
@@ -71,7 +71,6 @@ public class DeviceController implements Controller {
     public R<String> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
             deviceService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
@@ -105,7 +104,6 @@ public class DeviceController implements Controller {
     public R<String> update(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
             deviceService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
@@ -177,7 +175,6 @@ public class DeviceController implements Controller {
     public R<String> importDevice(@Validated(Update.class) DeviceVO entityVO, @RequestParam("file") MultipartFile multipartFile) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
             deviceService.importDevice(entityBO, multipartFile);
         } catch (Exception e) {
             return R.fail(e.getMessage());
@@ -195,7 +192,6 @@ public class DeviceController implements Controller {
     public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
             Path filePath = deviceService.generateImportTemplate(entityBO);
             return ResponseUtil.responseFile(filePath);
         } catch (Exception e) {

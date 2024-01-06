@@ -140,7 +140,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
      * 注册驱动属性
      *
      * @param driverRegisterDTO DriverRegisterDTO
-     * @param entityDO        Driver
+     * @param entityDO          Driver
      */
     private void registerDriverAttribute(DriverRegisterDTO driverRegisterDTO, DriverDTO entityDO) {
         Map<String, DriverAttributeDTO> newDriverAttributeMap = new HashMap<>(8);
@@ -189,7 +189,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
      * 注册位号属性
      *
      * @param driverRegisterDTO DriverRegisterDTO
-     * @param entityDO        Driver
+     * @param entityDO          Driver
      */
     private void registerPointAttribute(DriverRegisterDTO driverRegisterDTO, DriverDTO entityDO) {
         Map<String, PointAttributeDTO> newPointAttributeMap = new HashMap<>(8);

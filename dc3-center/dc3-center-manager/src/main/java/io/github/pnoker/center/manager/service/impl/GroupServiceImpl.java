@@ -148,7 +148,7 @@ public class GroupServiceImpl implements GroupService {
     private boolean checkDuplicate(GroupBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
         wrapper.eq(GroupDO::getGroupName, entityBO.getGroupName());
-        wrapper.eq(GroupDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(GroupDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         GroupDO one = groupManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

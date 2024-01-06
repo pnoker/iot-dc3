@@ -21,13 +21,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.dal.DriverAttributeConfigManager;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.builder.DriverAttributeConfigBuilder;
 import io.github.pnoker.center.manager.entity.model.DriverAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.entity.common.Pages;
@@ -177,7 +177,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
         wrapper.eq(DriverAttributeConfigDO::getDriverAttributeId, entityBO.getDriverAttributeId());
         wrapper.eq(DriverAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
-        wrapper.eq(DriverAttributeConfigDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(DriverAttributeConfigDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeConfigDO one = driverAttributeConfigManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
