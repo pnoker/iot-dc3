@@ -23,7 +23,7 @@ import io.github.pnoker.api.center.auth.GrpcRTokenDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
-import io.github.pnoker.center.auth.service.TokenService;
+import io.github.pnoker.center.auth.biz.TokenService;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.utils.TimeUtil;
 import io.grpc.stub.StreamObserver;

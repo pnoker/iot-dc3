@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.PointValueReadVO;
 import io.github.pnoker.center.data.entity.vo.PointValueWriteVO;
-import io.github.pnoker.center.data.service.PointValueCommandService;
+import io.github.pnoker.center.data.biz.PointValueCommandService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;

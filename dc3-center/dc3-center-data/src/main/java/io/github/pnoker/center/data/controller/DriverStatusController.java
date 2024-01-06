@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.query.DriverQuery;
-import io.github.pnoker.center.data.service.DriverStatusService;
+import io.github.pnoker.center.data.biz.DriverStatusService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;

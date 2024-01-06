@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.controller;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.center.auth.service.DictionaryService;
+import io.github.pnoker.center.auth.biz.DictionaryService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;

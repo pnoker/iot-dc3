@@ -23,7 +23,7 @@ import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.entity.dto.PointValueDTO;
-import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.driver.biz.DriverSenderService;
 import io.github.pnoker.common.utils.ConvertUtil;
 import io.github.pnoker.common.utils.DriverUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;

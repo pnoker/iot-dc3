@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.strategy;
 
-import io.github.pnoker.center.data.service.RepositoryService;
+import io.github.pnoker.center.data.repository.RepositoryService;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
 
