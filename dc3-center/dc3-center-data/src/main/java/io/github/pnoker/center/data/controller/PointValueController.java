@@ -18,10 +18,10 @@ package io.github.pnoker.center.data.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.center.data.entity.query.PointValueQuery;
-import io.github.pnoker.center.data.biz.PointValueService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.VALUE_URL_PREFIX)
-public class PointValueController implements Controller {
+public class PointValueController implements BaseController {
 
     @Resource
     private PointValueService pointValueService;

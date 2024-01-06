@@ -154,7 +154,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
         wrapper.eq(DriverAttributeDO::getAttributeName, entityBO.getAttributeName());
         wrapper.eq(DriverAttributeDO::getDriverId, entityBO.getDriverId());
-        wrapper.eq(DriverAttributeDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(DriverAttributeDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeDO one = driverAttributeManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

@@ -21,13 +21,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeConfigBuilder;
 import io.github.pnoker.center.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -200,7 +200,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         wrapper.eq(PointAttributeConfigDO::getPointAttributeId, entityBO.getPointAttributeId());
         wrapper.eq(PointAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
         wrapper.eq(PointAttributeConfigDO::getPointId, entityBO.getPointId());
-        wrapper.eq(PointAttributeConfigDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(PointAttributeConfigDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointAttributeConfigDO one = pointAttributeConfigManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

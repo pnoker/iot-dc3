@@ -18,6 +18,7 @@ package io.github.pnoker.center.auth.biz.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import io.github.pnoker.center.auth.biz.DictionaryService;
 import io.github.pnoker.center.auth.dal.LimitedIpManager;
 import io.github.pnoker.center.auth.dal.TenantManager;
 import io.github.pnoker.center.auth.dal.UserLoginManager;
@@ -25,7 +26,6 @@ import io.github.pnoker.center.auth.entity.builder.DictionaryForAuthBuilder;
 import io.github.pnoker.center.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.center.auth.entity.model.TenantDO;
 import io.github.pnoker.center.auth.entity.model.UserLoginDO;
-import io.github.pnoker.center.auth.biz.DictionaryService;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

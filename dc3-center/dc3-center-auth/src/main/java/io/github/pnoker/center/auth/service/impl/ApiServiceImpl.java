@@ -140,7 +140,7 @@ public class ApiServiceImpl implements ApiService {
     private boolean checkDuplicate(ApiBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
         wrapper.eq(ApiDO::getApiName, entityBO.getApiName());
-        wrapper.eq(ApiDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(ApiDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ApiDO one = apiManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

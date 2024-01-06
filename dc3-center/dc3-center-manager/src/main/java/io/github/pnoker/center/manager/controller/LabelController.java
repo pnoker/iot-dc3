@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.builder.LabelForManagerBuilder;
 import io.github.pnoker.center.manager.entity.query.LabelQuery;
 import io.github.pnoker.center.manager.service.LabelService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
@@ -45,7 +45,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.LABEL_URL_PREFIX)
-public class LabelController implements Controller {
+public class LabelController implements BaseController {
 
     @Resource
     private LabelForManagerBuilder labelForManagerBuilder;
@@ -63,7 +63,6 @@ public class LabelController implements Controller {
     public R<String> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
         try {
             LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
             labelService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
@@ -97,7 +96,6 @@ public class LabelController implements Controller {
     public R<String> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
         try {
             LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
             labelService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {

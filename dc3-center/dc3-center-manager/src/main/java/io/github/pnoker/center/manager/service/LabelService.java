@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.query.LabelQuery;
-import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.base.BaseService;
 import io.github.pnoker.common.entity.bo.LabelBO;
 
 /**
@@ -26,5 +26,5 @@ import io.github.pnoker.common.entity.bo.LabelBO;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface LabelService extends Service<LabelBO, LabelQuery> {
+public interface LabelService extends BaseService<LabelBO, LabelQuery> {
 }

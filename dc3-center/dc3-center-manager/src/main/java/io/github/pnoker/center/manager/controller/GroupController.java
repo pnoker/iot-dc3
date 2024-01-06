@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.builder.GroupForManagerBuilder;
 import io.github.pnoker.center.manager.entity.query.GroupQuery;
 import io.github.pnoker.center.manager.service.GroupService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
@@ -45,7 +45,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.GROUP_URL_PREFIX)
-public class GroupController implements Controller {
+public class GroupController implements BaseController {
 
     @Resource
     private GroupForManagerBuilder groupForManagerBuilder;
@@ -97,7 +97,6 @@ public class GroupController implements Controller {
     public R<String> update(@Validated(Update.class) @RequestBody GroupVO entityVO) {
         try {
             GroupBO entityBO = groupForManagerBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
             groupService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {

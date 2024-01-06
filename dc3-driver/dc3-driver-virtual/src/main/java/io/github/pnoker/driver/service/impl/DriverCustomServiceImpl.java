@@ -20,11 +20,11 @@ import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.DriverContext;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.driver.service.DriverCustomService;
+import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
-import io.github.pnoker.common.driver.service.DriverCustomService;
-import io.github.pnoker.common.driver.service.DriverSenderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

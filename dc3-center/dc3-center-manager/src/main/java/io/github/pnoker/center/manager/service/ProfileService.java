@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 import io.github.pnoker.center.manager.entity.query.ProfileQuery;
-import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.base.BaseService;
 import io.github.pnoker.common.constant.enums.ProfileTypeFlagEnum;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface ProfileService extends Service<ProfileBO, ProfileQuery> {
+public interface ProfileService extends BaseService<ProfileBO, ProfileQuery> {
 
     /**
      * 根据 模板名称和模版类型 查询模版

@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.service;
 
 import io.github.pnoker.center.data.entity.bo.AlarmRuleBO;
 import io.github.pnoker.center.data.entity.query.AlarmRuleQuery;
-import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.base.BaseService;
 
 /**
  * AlarmRule Interface
@@ -26,6 +26,6 @@ import io.github.pnoker.common.base.Service;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface AlarmRuleService extends Service<AlarmRuleBO, AlarmRuleQuery> {
+public interface AlarmRuleService extends BaseService<AlarmRuleBO, AlarmRuleQuery> {
 
 }

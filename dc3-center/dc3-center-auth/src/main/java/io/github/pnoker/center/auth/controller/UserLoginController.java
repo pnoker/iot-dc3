@@ -22,7 +22,7 @@ import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.center.auth.service.UserPasswordService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
@@ -44,7 +44,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.USER_URL_PREFIX)
-public class UserLoginController implements Controller {
+public class UserLoginController implements BaseController {
 
     @Resource
     private UserLoginService userLoginService;

@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.service;
 
 import io.github.pnoker.center.data.entity.bo.AlarmNotifyProfileBO;
 import io.github.pnoker.center.data.entity.query.AlarmNotifyProfileQuery;
-import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.base.BaseService;
 
 /**
  * AlarmNotifyProfile Interface
@@ -26,6 +26,6 @@ import io.github.pnoker.common.base.Service;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface AlarmNotifyProfileService extends Service<AlarmNotifyProfileBO, AlarmNotifyProfileQuery> {
+public interface AlarmNotifyProfileService extends BaseService<AlarmNotifyProfileBO, AlarmNotifyProfileQuery> {
 
 }

@@ -192,7 +192,7 @@ public class DriverServiceImpl implements DriverService {
     private boolean checkDuplicate(DriverBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
         wrapper.eq(DriverDO::getDriverName, entityBO.getDriverName());
-        wrapper.eq(DriverDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(DriverDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DriverDO one = driverManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

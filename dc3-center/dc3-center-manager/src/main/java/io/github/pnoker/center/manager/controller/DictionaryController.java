@@ -17,9 +17,9 @@
 package io.github.pnoker.center.manager.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
 import io.github.pnoker.center.manager.biz.DictionaryService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.center.manager.entity.query.DictionaryQuery;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
@@ -44,7 +44,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DICTIONARY_URL_PREFIX)
-public class DictionaryController implements Controller {
+public class DictionaryController implements BaseController {
 
     @Resource
     private DictionaryBuilder dictionaryBuilder;

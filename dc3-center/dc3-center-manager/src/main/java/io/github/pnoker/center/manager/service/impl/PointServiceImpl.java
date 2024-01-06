@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.dal.PointManager;
 import io.github.pnoker.center.manager.dal.ProfileBindManager;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
@@ -31,7 +32,6 @@ import io.github.pnoker.center.manager.entity.model.PointDO;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.mapper.PointMapper;
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
@@ -218,7 +218,7 @@ public class PointServiceImpl implements PointService {
         LambdaQueryWrapper<PointDO> wrapper = Wrappers.<PointDO>query().lambda();
         wrapper.eq(PointDO::getPointName, entityBO.getPointName());
         wrapper.eq(PointDO::getProfileId, entityBO.getProfileId());
-        wrapper.eq(PointDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(PointDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointDO one = pointManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

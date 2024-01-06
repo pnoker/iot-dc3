@@ -137,7 +137,7 @@ public class LabelServiceImpl implements LabelService {
         wrapper.like(CharSequenceUtil.isNotEmpty(query.getLabelName()), LabelDO::getLabelName, query.getLabelName());
         wrapper.eq(ObjectUtil.isNotNull(query.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, query.getEntityTypeFlag());
         wrapper.eq(CharSequenceUtil.isNotEmpty(query.getColor()), LabelDO::getColor, query.getColor());
-        wrapper.eq(ObjectUtil.isNotEmpty(query.getTenantId()), LabelDO::getTenantId, query.getTenantId());
+        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), LabelDO::getTenantId, getTenantId());
         return wrapper;
     }
 
@@ -152,7 +152,7 @@ public class LabelServiceImpl implements LabelService {
     private boolean checkDuplicate(LabelBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
         wrapper.eq(LabelDO::getLabelName, entityBO.getLabelName());
-        wrapper.eq(LabelDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(LabelDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         LabelDO one = labelManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

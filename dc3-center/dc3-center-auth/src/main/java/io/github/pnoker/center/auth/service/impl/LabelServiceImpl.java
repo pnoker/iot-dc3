@@ -152,7 +152,7 @@ public class LabelServiceImpl implements LabelService {
     private boolean checkDuplicate(LabelBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
         wrapper.eq(LabelDO::getLabelName, entityBO.getLabelName());
-        wrapper.eq(LabelDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(LabelDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         LabelDO one = labelManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

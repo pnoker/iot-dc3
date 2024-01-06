@@ -156,7 +156,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
         wrapper.eq(PointAttributeDO::getAttributeName, entityBO.getAttributeName());
         wrapper.eq(PointAttributeDO::getDriverId, entityBO.getDriverId());
-        wrapper.eq(PointAttributeDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(PointAttributeDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointAttributeDO one = pointAttributeManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

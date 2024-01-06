@@ -18,7 +18,7 @@ package io.github.pnoker.center.auth.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.biz.DictionaryService;
-import io.github.pnoker.common.base.Controller;
+import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
@@ -39,7 +39,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
-public class DictionaryController implements Controller {
+public class DictionaryController implements BaseController {
 
     @Resource
     private DictionaryService dictionaryService;

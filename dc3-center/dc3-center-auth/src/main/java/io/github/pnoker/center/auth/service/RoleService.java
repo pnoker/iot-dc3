@@ -18,7 +18,7 @@ package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.center.auth.entity.bo.RoleBO;
 import io.github.pnoker.center.auth.entity.query.RoleQuery;
-import io.github.pnoker.common.base.Service;
+import io.github.pnoker.common.base.BaseService;
 
 /**
  * Role Interface
@@ -26,5 +26,5 @@ import io.github.pnoker.common.base.Service;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface RoleService extends Service<RoleBO, RoleQuery> {
+public interface RoleService extends BaseService<RoleBO, RoleQuery> {
 }

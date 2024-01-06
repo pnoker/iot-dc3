@@ -567,7 +567,7 @@ public class DeviceServiceImpl implements DeviceService {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDeviceName, entityBO.getDeviceName());
         wrapper.eq(DeviceDO::getDeviceCode, entityBO.getDeviceCode());
-        wrapper.eq(DeviceDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(DeviceDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO one = deviceManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

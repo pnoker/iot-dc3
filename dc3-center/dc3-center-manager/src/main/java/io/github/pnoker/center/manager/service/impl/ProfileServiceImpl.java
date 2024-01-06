@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.dal.PointManager;
 import io.github.pnoker.center.manager.dal.ProfileBindManager;
 import io.github.pnoker.center.manager.dal.ProfileManager;
@@ -33,7 +34,6 @@ import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import io.github.pnoker.center.manager.entity.query.ProfileQuery;
 import io.github.pnoker.center.manager.mapper.ProfileMapper;
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
@@ -186,7 +186,7 @@ public class ProfileServiceImpl implements ProfileService {
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
         wrapper.eq(ProfileDO::getProfileName, entityBO.getProfileName());
         wrapper.eq(ProfileDO::getProfileTypeFlag, entityBO.getProfileTypeFlag());
-        wrapper.eq(ProfileDO::getTenantId, entityBO.getTenantId());
+        wrapper.eq(ProfileDO::getTenantId, getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileDO one = profileManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
