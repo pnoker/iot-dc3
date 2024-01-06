@@ -20,7 +20,7 @@ import com.mchange.v2.lang.StringUtils;
 import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
-import io.github.pnoker.common.driver.biz.DriverCustomService;
+import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.driver.server.Lwm2mServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
