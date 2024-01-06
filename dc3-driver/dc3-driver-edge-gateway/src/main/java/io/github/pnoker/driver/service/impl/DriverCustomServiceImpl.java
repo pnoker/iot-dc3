@@ -16,7 +16,7 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import io.github.pnoker.common.DriverContext;
+import io.github.pnoker.common.driver.context.DriverContext;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.driver.service.DriverCustomService;

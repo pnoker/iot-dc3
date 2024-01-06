@@ -18,7 +18,7 @@ package io.github.pnoker.driver.service.netty;
 
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.common.DriverContext;
+import io.github.pnoker.common.driver.context.DriverContext;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
