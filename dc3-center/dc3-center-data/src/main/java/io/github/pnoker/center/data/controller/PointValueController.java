@@ -20,7 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.point.PointValue;
 import io.github.pnoker.center.data.entity.query.PointValueQuery;
-import io.github.pnoker.center.data.service.PointValueService;
+import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.common.base.Controller;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
