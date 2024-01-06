@@ -90,9 +90,6 @@ public abstract class S7BaseConnection implements S7Connector {
         this.dc = dc;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized byte[] read(final DaveArea area, final int areaNumber, final int bytes, final int offset) {
         if (bytes > MAX_SIZE) {
@@ -115,9 +112,6 @@ public abstract class S7BaseConnection implements S7Connector {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void write(final DaveArea area, final int areaNumber, final int offset, final byte[] buffer) {
         if (buffer.length > MAX_SIZE) {

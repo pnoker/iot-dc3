@@ -32,7 +32,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
- * 自定义Ip黑名单过滤器
+ * 自定义限制IP过滤器
  *
  * @author pnoker
  * @since 2022.1.0

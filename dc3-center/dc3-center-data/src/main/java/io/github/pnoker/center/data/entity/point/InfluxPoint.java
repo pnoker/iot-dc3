@@ -18,6 +18,7 @@ package io.github.pnoker.center.data.entity.point;
 
 import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,10 +40,10 @@ public class InfluxPoint {
     @Column(timestamp = true)
     private Long time;
 
-    public InfluxPoint(PointValue pointValue) {
-        this.deviceId = pointValue.getDeviceId();
-        this.pointId = pointValue.getPointId();
-        this.pointValue = pointValue.getValue();
-        this.time = LocalDateTimeUtil.milliSeconds(pointValue.getCreateTime());
+    public InfluxPoint(PointValueBO pointValueBO) {
+        this.deviceId = pointValueBO.getDeviceId();
+        this.pointId = pointValueBO.getPointId();
+        this.pointValue = pointValueBO.getValue();
+        this.time = LocalDateTimeUtil.milliSeconds(pointValueBO.getCreateTime());
     }
 }

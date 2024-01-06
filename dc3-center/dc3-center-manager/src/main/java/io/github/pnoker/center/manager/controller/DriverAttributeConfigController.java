@@ -19,9 +19,12 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.builder.DriverAttributeConfigBuilder;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
+import io.github.pnoker.center.manager.entity.vo.DriverAttributeConfigVO;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
@@ -46,19 +49,24 @@ import java.util.List;
 public class DriverAttributeConfigController implements BaseController {
 
     @Resource
+    private DriverAttributeConfigBuilder driverAttributeConfigBuilder;
+
+    @Resource
     private DriverAttributeConfigService driverAttributeConfigService;
 
     /**
      * 新增 DriverInfo
      *
-     * @param driverAttributeConfigBO DriverInfo
-     * @return DriverInfo
+     * @param entityVO {@link DriverAttributeConfigVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody DriverAttributeConfigBO driverAttributeConfigBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
         try {
-            driverAttributeConfigService.save(driverAttributeConfigBO);
-            return R.ok();
+            DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            driverAttributeConfigService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -67,14 +75,14 @@ public class DriverAttributeConfigController implements BaseController {
     /**
      * 根据 ID 删除 DriverInfo
      *
-     * @param id 驱动信息ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
             driverAttributeConfigService.remove(Long.parseLong(id));
-            return R.ok();
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -83,14 +91,15 @@ public class DriverAttributeConfigController implements BaseController {
     /**
      * 更新 DriverInfo
      *
-     * @param driverAttributeConfigBO DriverInfo
-     * @return DriverInfo
+     * @param entityVO {@link DriverAttributeConfigVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody DriverAttributeConfigBO driverAttributeConfigBO) {
+    public R<String> update(@Validated(Update.class) @RequestBody DriverAttributeConfigVO entityVO) {
         try {
-            driverAttributeConfigService.update(driverAttributeConfigBO);
-            return R.ok();
+            DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
+            driverAttributeConfigService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -99,20 +108,18 @@ public class DriverAttributeConfigController implements BaseController {
     /**
      * 根据 ID 查询 DriverInfo
      *
-     * @param id 驱动信息ID
-     * @return DriverInfo
+     * @param id ID
+     * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
      */
     @GetMapping("/id/{id}")
-    public R<DriverAttributeConfigBO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<DriverAttributeConfigVO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            DriverAttributeConfigBO select = driverAttributeConfigService.selectById(Long.parseLong(id));
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectById(Long.parseLong(id));
+            DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -123,17 +130,15 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverInfo
      */
     @GetMapping("/device_id/{deviceId}/attribute_id/{attributeId}")
-    public R<DriverAttributeConfigBO> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") String deviceId,
+    public R<DriverAttributeConfigVO> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") String deviceId,
                                                                      @NotNull @PathVariable(value = "attributeId") String attributeId) {
         try {
-            DriverAttributeConfigBO select = driverAttributeConfigService.selectByAttributeIdAndDeviceId(Long.parseLong(deviceId), Long.parseLong(attributeId));
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectByAttributeIdAndDeviceId(Long.parseLong(deviceId), Long.parseLong(attributeId));
+            DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
@@ -143,38 +148,35 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverInfo Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<DriverAttributeConfigBO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public R<List<DriverAttributeConfigVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<DriverAttributeConfigBO> select = driverAttributeConfigService.selectByDeviceId(deviceId);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            List<DriverAttributeConfigBO> entityBOS = driverAttributeConfigService.selectByDeviceId(deviceId);
+            List<DriverAttributeConfigVO> entityVOS = driverAttributeConfigBuilder.buildVOListByBOList(entityBOS);
+            return R.ok(entityVOS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
      * 分页查询 DriverInfo
      *
-     * @param driverInfoPageQuery DriverInfo Dto
+     * @param entityQuery DriverInfo Dto
      * @return Page Of DriverInfo
      */
     @PostMapping("/list")
-    public R<Page<DriverAttributeConfigBO>> list(@RequestBody(required = false) DriverAttributeConfigQuery driverInfoPageQuery) {
+    public R<Page<DriverAttributeConfigVO>> list(@RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(driverInfoPageQuery)) {
-                driverInfoPageQuery = new DriverAttributeConfigQuery();
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new DriverAttributeConfigQuery();
             }
-            Page<DriverAttributeConfigBO> page = driverAttributeConfigService.selectByPage(driverInfoPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<DriverAttributeConfigBO> entityPageBO = driverAttributeConfigService.selectByPage(entityQuery);
+            Page<DriverAttributeConfigVO> entityPageVO = driverAttributeConfigBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
 }

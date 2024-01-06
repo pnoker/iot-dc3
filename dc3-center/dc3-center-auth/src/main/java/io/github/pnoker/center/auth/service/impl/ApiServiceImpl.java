@@ -54,9 +54,6 @@ public class ApiServiceImpl implements ApiService {
     @Resource
     private ApiManager apiManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(ApiBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -67,9 +64,7 @@ public class ApiServiceImpl implements ApiService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void remove(Long id) {
         getDOById(id, true);
@@ -79,9 +74,7 @@ public class ApiServiceImpl implements ApiService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void update(ApiBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -95,18 +88,14 @@ public class ApiServiceImpl implements ApiService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public ApiBO selectById(Long id) {
         ApiDO entityDO = getDOById(id, true);
         return apiBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public Page<ApiBO> selectByPage(ApiQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -119,13 +108,13 @@ public class ApiServiceImpl implements ApiService {
     /**
      * 构造模糊查询
      *
-     * @param query {@link ApiQuery}
+     * @param entityQuery {@link ApiQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<ApiDO> fuzzyQuery(ApiQuery query) {
+    private LambdaQueryWrapper<ApiDO> fuzzyQuery(ApiQuery entityQuery) {
         LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getApiName()), ApiDO::getApiName, query.getApiName());
-        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), ApiDO::getTenantId, getTenantId());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getApiName()), ApiDO::getApiName, entityQuery.getApiName());
+        wrapper.eq(ApiDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -139,8 +128,10 @@ public class ApiServiceImpl implements ApiService {
      */
     private boolean checkDuplicate(ApiBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
+        wrapper.eq(ApiDO::getApiTypeFlag, entityBO.getApiTypeFlag());
         wrapper.eq(ApiDO::getApiName, entityBO.getApiName());
-        wrapper.eq(ApiDO::getTenantId, getTenantId());
+        wrapper.eq(ApiDO::getApiCode, entityBO.getApiCode());
+        wrapper.eq(ApiDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ApiDO one = apiManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -148,7 +139,7 @@ public class ApiServiceImpl implements ApiService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The api is duplicates");
+            throw new DuplicateException("接口重复");
         }
         return duplicate;
     }

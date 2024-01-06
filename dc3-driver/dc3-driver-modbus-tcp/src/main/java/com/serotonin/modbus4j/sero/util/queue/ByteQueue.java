@@ -808,9 +808,6 @@ public class ByteQueue implements Cloneable {
         queue = newb;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object clone() {
         try {
@@ -823,9 +820,6 @@ public class ByteQueue implements Cloneable {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         if (size == 0)

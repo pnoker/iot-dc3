@@ -55,9 +55,6 @@ public class MenuServiceImpl implements MenuService {
     @Resource
     private MenuManager menuManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(MenuBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -68,9 +65,6 @@ public class MenuServiceImpl implements MenuService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(Long id) {
         getDOById(id, true);
@@ -87,9 +81,6 @@ public class MenuServiceImpl implements MenuService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(MenuBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -103,18 +94,12 @@ public class MenuServiceImpl implements MenuService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public MenuBO selectById(Long id) {
         MenuDO entityDO = getDOById(id, true);
         return menuBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<MenuBO> selectByPage(MenuQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -127,13 +112,13 @@ public class MenuServiceImpl implements MenuService {
     /**
      * 构造模糊查询
      *
-     * @param query {@link MenuQuery}
+     * @param entityQuery {@link MenuQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<MenuDO> fuzzyQuery(MenuQuery query) {
+    private LambdaQueryWrapper<MenuDO> fuzzyQuery(MenuQuery entityQuery) {
         LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getMenuName()), MenuDO::getMenuName, query.getMenuName());
-        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), MenuDO::getTenantId, getTenantId());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getMenuName()), MenuDO::getMenuName, entityQuery.getMenuName());
+        wrapper.eq(MenuDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -147,8 +132,11 @@ public class MenuServiceImpl implements MenuService {
      */
     private boolean checkDuplicate(MenuBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
+        wrapper.eq(MenuDO::getParentMenuId, entityBO.getParentMenuId());
+        wrapper.eq(MenuDO::getMenuTypeFlag, entityBO.getMenuTypeFlag());
         wrapper.eq(MenuDO::getMenuName, entityBO.getMenuName());
-        wrapper.eq(MenuDO::getTenantId, getTenantId());
+        wrapper.eq(MenuDO::getMenuCode, entityBO.getMenuCode());
+        wrapper.eq(MenuDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         MenuDO one = menuManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -156,7 +144,7 @@ public class MenuServiceImpl implements MenuService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The menu is duplicates");
+            throw new DuplicateException("菜单重复");
         }
         return duplicate;
     }

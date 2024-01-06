@@ -16,12 +16,13 @@
 
 package io.github.pnoker.center.auth.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.biz.DictionaryService;
+import io.github.pnoker.center.auth.entity.builder.DictionaryForAuthBuilder;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
+import io.github.pnoker.common.entity.vo.DictionaryVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +43,9 @@ import java.util.List;
 public class DictionaryController implements BaseController {
 
     @Resource
+    private DictionaryForAuthBuilder dictionaryForAuthBuilder;
+
+    @Resource
     private DictionaryService dictionaryService;
 
     /**
@@ -50,52 +54,30 @@ public class DictionaryController implements BaseController {
      * @return 字典列表
      */
     @GetMapping("/tenant")
-    public R<List<DictionaryBO>> tenantDictionary() {
+    public R<List<DictionaryVO>> tenantDictionary() {
         try {
-            List<DictionaryBO> dictionaryList = dictionaryService.tenantDictionary();
-            if (ObjectUtil.isNotNull(dictionaryList)) {
-                return R.ok(dictionaryList);
-            }
+            List<DictionaryBO> entityBOS = dictionaryService.tenantDictionary();
+            List<DictionaryVO> entityVOS = dictionaryForAuthBuilder.buildVOListByBOList(entityBOS);
+            return R.ok(entityVOS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
-     * 查询用户字典列表
-     *
-     * @return 字典列表
-     */
-    @GetMapping("/user")
-    public R<List<DictionaryBO>> userDictionary() {
-        try {
-            List<DictionaryBO> dictionaryList = dictionaryService.userLoginDictionary(getTenantId());
-            if (ObjectUtil.isNotNull(dictionaryList)) {
-                return R.ok(dictionaryList);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
-    }
-
-    /**
-     * 查询 Ip 黑名单字典列表
+     * 查询限制IP字典列表
      *
      * @return 字典列表
      */
     @GetMapping("/limited_ip")
-    public R<List<DictionaryBO>> limitedIpDictionary() {
+    public R<List<DictionaryVO>> limitedIpDictionary() {
         try {
-            List<DictionaryBO> dictionaryList = dictionaryService.limitedIpDictionary(getTenantId());
-            if (ObjectUtil.isNotNull(dictionaryList)) {
-                return R.ok(dictionaryList);
-            }
+            List<DictionaryBO> entityBOS = dictionaryService.limitedIpDictionary(getTenantId());
+            List<DictionaryVO> entityVOS = dictionaryForAuthBuilder.buildVOListByBOList(entityBOS);
+            return R.ok(entityVOS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
 }

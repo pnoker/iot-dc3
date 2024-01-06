@@ -55,9 +55,6 @@ public class RoleServiceImpl implements RoleService {
     @Resource
     private RoleManager roleManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(RoleBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -68,9 +65,7 @@ public class RoleServiceImpl implements RoleService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void remove(Long id) {
         getDOById(id, true);
@@ -87,9 +82,7 @@ public class RoleServiceImpl implements RoleService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void update(RoleBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -103,18 +96,14 @@ public class RoleServiceImpl implements RoleService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public RoleBO selectById(Long id) {
         RoleDO entityDO = getDOById(id, true);
         return roleBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public Page<RoleBO> selectByPage(RoleQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -127,13 +116,14 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 构造模糊查询
      *
-     * @param query {@link RoleQuery}
+     * @param entityQuery {@link RoleQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<RoleDO> fuzzyQuery(RoleQuery query) {
+    private LambdaQueryWrapper<RoleDO> fuzzyQuery(RoleQuery entityQuery) {
         LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getRoleName()), RoleDO::getRoleName, query.getRoleName());
-        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), RoleDO::getTenantId, getTenantId());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getRoleName()), RoleDO::getRoleName, entityQuery.getRoleName());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getRoleCode()), RoleDO::getRoleCode, entityQuery.getRoleCode());
+        wrapper.eq(RoleDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -147,8 +137,10 @@ public class RoleServiceImpl implements RoleService {
      */
     private boolean checkDuplicate(RoleBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
+        wrapper.eq(RoleDO::getParentRoleId, entityBO.getParentRoleId());
         wrapper.eq(RoleDO::getRoleName, entityBO.getRoleName());
-        wrapper.eq(RoleDO::getTenantId, getTenantId());
+        wrapper.eq(RoleDO::getRoleCode, entityBO.getRoleCode());
+        wrapper.eq(RoleDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RoleDO one = roleManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -156,7 +148,7 @@ public class RoleServiceImpl implements RoleService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The role is duplicates");
+            throw new DuplicateException("角色重复");
         }
         return duplicate;
     }

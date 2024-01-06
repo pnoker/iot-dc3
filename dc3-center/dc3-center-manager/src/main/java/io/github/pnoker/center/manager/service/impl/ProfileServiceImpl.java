@@ -170,7 +170,7 @@ public class ProfileServiceImpl implements ProfileService {
         wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getProfileCode()), "dp.profile_code", entityQuery.getProfileCode());
         wrapper.eq(ObjectUtil.isNotNull(entityQuery.getProfileShareFlag()), "dp.profile_share_flag", entityQuery.getProfileShareFlag());
         wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
-        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), "dp.tenant_id", getTenantId());
+        wrapper.eq("dp.tenant_id", entityQuery.getTenantId());
         return wrapper.lambda();
     }
 
@@ -185,8 +185,9 @@ public class ProfileServiceImpl implements ProfileService {
     private boolean checkDuplicate(ProfileBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
         wrapper.eq(ProfileDO::getProfileName, entityBO.getProfileName());
+        wrapper.eq(ProfileDO::getProfileCode, entityBO.getProfileCode());
         wrapper.eq(ProfileDO::getProfileTypeFlag, entityBO.getProfileTypeFlag());
-        wrapper.eq(ProfileDO::getTenantId, getTenantId());
+        wrapper.eq(ProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileDO one = profileManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -194,7 +195,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The profile is duplicates");
+            throw new DuplicateException("模板重复");
         }
         return duplicate;
     }

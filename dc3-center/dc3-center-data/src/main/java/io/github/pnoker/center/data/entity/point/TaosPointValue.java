@@ -19,6 +19,7 @@ package io.github.pnoker.center.data.entity.point;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,17 +41,17 @@ public class TaosPointValue {
     private String id;
 
     /**
-     * 设备ID，同MySQl中等 设备ID 一致
+     * 设备ID
      */
     private Long deviceId;
 
     /**
-     * 位号ID，同MySQl中等 位号ID 一致
+     * 位号ID
      */
     private Long pointId;
 
     /**
-     * 处理值，进行过缩放、格式化等操作
+     * 处理值
      */
     private String pointValue;
 
@@ -63,10 +64,10 @@ public class TaosPointValue {
 
     private Timestamp originTime;
 
-    public TaosPointValue(PointValue pointValue) {
-        BeanUtil.copyProperties(pointValue, this);
-        this.setPointValue(pointValue.getValue());
-        this.setCreateTime(new Timestamp(LocalDateTimeUtil.milliSeconds(pointValue.getCreateTime())));
-        this.setOriginTime(new Timestamp(LocalDateTimeUtil.milliSeconds(pointValue.getOriginTime())));
+    public TaosPointValue(PointValueBO pointValueBO) {
+        BeanUtil.copyProperties(pointValueBO, this);
+        this.setPointValue(pointValueBO.getValue());
+        this.setCreateTime(new Timestamp(LocalDateTimeUtil.milliSeconds(pointValueBO.getCreateTime())));
+        this.setOriginTime(new Timestamp(LocalDateTimeUtil.milliSeconds(pointValueBO.getOriginTime())));
     }
 }

@@ -188,7 +188,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * 读取 Opc Da 位号值
      *
      * @param item Opc Item
-     * @return String Value
+     * @return R of String Value
      * @throws JIException JIException
      */
     public String readItem(Item item) throws JIException {

@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.biz;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.entity.query.PointValueQuery;
 
 import java.util.List;
@@ -31,16 +31,16 @@ public interface PointValueService {
     /**
      * 新增 PointValue
      *
-     * @param pointValue PointValue
+     * @param pointValueBO PointValue
      */
-    void savePointValue(PointValue pointValue);
+    void savePointValue(PointValueBO pointValueBO);
 
     /**
      * 批量新增 PointValue
      *
-     * @param pointValues PointValue Array
+     * @param pointValueBOS PointValue Array
      */
-    void savePointValues(List<PointValue> pointValues);
+    void savePointValues(List<PointValueBO> pointValueBOS);
 
     /**
      * 获取带分页、排序
@@ -48,7 +48,7 @@ public interface PointValueService {
      * @param pointValueQuery PointValueDto
      * @return Page Of PointValue
      */
-    Page<PointValue> latest(PointValueQuery pointValueQuery);
+    Page<PointValueBO> latest(PointValueQuery pointValueQuery);
 
     /**
      * 获取带分页、排序
@@ -56,6 +56,6 @@ public interface PointValueService {
      * @param pointValueQuery PointValueDto
      * @return Page Of PointValue
      */
-    Page<PointValue> list(PointValueQuery pointValueQuery);
+    Page<PointValueBO> list(PointValueQuery pointValueQuery);
 
 }

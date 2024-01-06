@@ -14,42 +14,58 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.entity.query;
+package io.github.pnoker.center.data.entity.point;
 
-import io.github.pnoker.common.entity.common.Pages;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
- * DriverEvent Query
+ * MongoDB 位号数据
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Schema(title = "DriverEvent", description = "驱动事件-查询")
-public class DriverEventQuery implements Serializable {
+@Document
+public class MgPointValueDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
-    private Pages page;
+    @MongoId
+    private String id;
 
     /**
-     * 租户ID
+     * 设备ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    private Long tenantId;
-
-    // 查询字段
+    private Long deviceId;
 
     /**
-     * 驱动ID
+     * 位号ID
      */
-    private Long driverId;
+    private Long pointId;
+
+    /**
+     * 原始值
+     */
+    private String rawValue;
+
+    /**
+     * 处理值
+     */
+    private String value;
+
+    /**
+     * 原始时间
+     */
+    private LocalDateTime originTime;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
 }

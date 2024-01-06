@@ -103,9 +103,7 @@ public class TcpListener extends ModbusMaster {
         return nextTransactionId++;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     synchronized public void init() throws ModbusInitException {
         LOG.debug("Init TcpListener Port: " + ipParameters.getPort());
@@ -129,9 +127,7 @@ public class TcpListener extends ModbusMaster {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     synchronized public void destroy() {
         LOG.debug("Destroy TCPListener Port: " + ipParameters.getPort());
@@ -167,9 +163,7 @@ public class TcpListener extends ModbusMaster {
         handler = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     synchronized public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
 

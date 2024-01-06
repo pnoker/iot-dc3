@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.repository.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.google.common.collect.Lists;
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.entity.point.TsPointValue;
 import io.github.pnoker.center.data.repository.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
@@ -66,21 +66,21 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
     }
 
     @Override
-    public void savePointValue(PointValue pointValue) {
-        if (!ObjectUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+    public void savePointValue(PointValueBO pointValueBO) {
+        if (!ObjectUtil.isAllNotEmpty(pointValueBO.getDeviceId(), pointValueBO.getPointId())) {
             return;
         }
 
-        savePointValues(pointValue.getDeviceId(), Collections.singletonList(pointValue));
+        savePointValues(pointValueBO.getDeviceId(), Collections.singletonList(pointValueBO));
     }
 
     @Override
-    public void savePointValues(Long deviceId, List<PointValue> pointValues) {
+    public void savePointValues(Long deviceId, List<PointValueBO> pointValueBOS) {
         if (ObjectUtil.isEmpty(deviceId)) {
             return;
         }
 
-        List<TsPointValue> tsPointValues = pointValues.stream()
+        List<TsPointValue> tsPointValues = pointValueBOS.stream()
                 .filter(pointValue -> ObjectUtil.isNotEmpty(pointValue.getPointId()))
                 .map(pointValue -> convertPointValues(StorageConstant.POINT_VALUE_PREFIX + deviceId, pointValue))
                 .flatMap(Collection::stream)
@@ -95,10 +95,10 @@ public class OpentsdbServiceImpl implements RepositoryService, InitializingBean 
         RepositoryStrategyFactory.put(StrategyConstant.Storage.STRATEGY_OPENTSDB, this);
     }
 
-    private List<TsPointValue> convertPointValues(String metric, PointValue pointValue) {
-        Long point = pointValue.getPointId();
-        String value = pointValue.getValue();
-        long timestamp = LocalDateTimeUtil.milliSeconds(pointValue.getOriginTime());
+    private List<TsPointValue> convertPointValues(String metric, PointValueBO pointValueBO) {
+        Long point = pointValueBO.getPointId();
+        String value = pointValueBO.getValue();
+        long timestamp = LocalDateTimeUtil.milliSeconds(pointValueBO.getOriginTime());
 
         List<TsPointValue> tsPointValues = new ArrayList<>(2);
 

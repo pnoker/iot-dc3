@@ -55,9 +55,6 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
     @Resource
     private AlarmNotifyProfileManager alarmNotifyProfileManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(AlarmNotifyProfileBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -68,9 +65,6 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(Long id) {
         getDOById(id, true);
@@ -87,9 +81,6 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(AlarmNotifyProfileBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -103,18 +94,12 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public AlarmNotifyProfileBO selectById(Long id) {
         AlarmNotifyProfileDO entityDO = getDOById(id, true);
         return alarmNotifyProfileBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<AlarmNotifyProfileBO> selectByPage(AlarmNotifyProfileQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -127,13 +112,13 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
     /**
      * 构造模糊查询
      *
-     * @param query {@link AlarmNotifyProfileQuery}
+     * @param entityQuery {@link AlarmNotifyProfileQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<AlarmNotifyProfileDO> fuzzyQuery(AlarmNotifyProfileQuery query) {
+    private LambdaQueryWrapper<AlarmNotifyProfileDO> fuzzyQuery(AlarmNotifyProfileQuery entityQuery) {
         LambdaQueryWrapper<AlarmNotifyProfileDO> wrapper = Wrappers.<AlarmNotifyProfileDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmNotifyName()), AlarmNotifyProfileDO::getAlarmNotifyName, query.getAlarmNotifyName());
-        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), AlarmNotifyProfileDO::getTenantId, getTenantId());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAlarmNotifyName()), AlarmNotifyProfileDO::getAlarmNotifyName, entityQuery.getAlarmNotifyName());
+        wrapper.eq(AlarmNotifyProfileDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -148,7 +133,8 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
     private boolean checkDuplicate(AlarmNotifyProfileBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmNotifyProfileDO> wrapper = Wrappers.<AlarmNotifyProfileDO>query().lambda();
         wrapper.eq(AlarmNotifyProfileDO::getAlarmNotifyName, entityBO.getAlarmNotifyName());
-        wrapper.eq(AlarmNotifyProfileDO::getTenantId, getTenantId());
+        wrapper.eq(AlarmNotifyProfileDO::getAlarmNotifyCode, entityBO.getAlarmNotifyCode());
+        wrapper.eq(AlarmNotifyProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmNotifyProfileDO one = alarmNotifyProfileManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -156,7 +142,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The alarmNotifyProfile is duplicates");
+            throw new DuplicateException("报警通知模板重复");
         }
         return duplicate;
     }

@@ -22,8 +22,9 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
-import io.github.pnoker.center.data.entity.point.EsPointValue;
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
+import io.github.pnoker.center.data.entity.builder.PointValueBuilder;
+import io.github.pnoker.center.data.entity.point.EsPointValueDO;
 import io.github.pnoker.center.data.repository.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.driver.StorageConstant;
@@ -47,6 +48,9 @@ import java.util.List;
 public class ElasticsearchServiceImpl implements RepositoryService, InitializingBean {
 
     @Resource
+    private PointValueBuilder pointValueBuilder;
+
+    @Resource
     private ElasticsearchClient elasticsearchClient;
 
     @Override
@@ -55,35 +59,34 @@ public class ElasticsearchServiceImpl implements RepositoryService, Initializing
     }
 
     @Override
-    public void savePointValue(PointValue pointValue) throws IOException {
-        if (!ObjectUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+    public void savePointValue(PointValueBO entityBO) throws IOException {
+        if (!ObjectUtil.isAllNotEmpty(entityBO.getDeviceId(), entityBO.getPointId())) {
             return;
         }
 
-        final String index = StorageConstant.POINT_VALUE_PREFIX + pointValue.getDeviceId();
-        IndexRequest<EsPointValue> indexRequest = new IndexRequest.Builder<EsPointValue>()
+        final String index = StorageConstant.POINT_VALUE_PREFIX + entityBO.getDeviceId();
+        EsPointValueDO entityDO = pointValueBuilder.buildESDOByBO(entityBO);
+        IndexRequest<EsPointValueDO> indexRequest = new IndexRequest.Builder<EsPointValueDO>()
                 .index(index)
-                .document(new EsPointValue(pointValue))
+                .document(entityDO)
                 .build();
         elasticsearchClient.index(indexRequest);
     }
 
     @Override
-    public void savePointValues(Long deviceId, List<PointValue> pointValues) throws IOException {
+    public void savePointValues(Long deviceId, List<PointValueBO> entityBOS) throws IOException {
         if (ObjectUtil.isEmpty(deviceId)) {
             return;
         }
 
         final String index = StorageConstant.POINT_VALUE_PREFIX + deviceId;
         BulkRequest.Builder bulkRequestBuilder = new BulkRequest.Builder();
-        pointValues.stream()
+        entityBOS.stream()
                 .filter(pointValue -> ObjectUtil.isNotNull(pointValue.getPointId()))
-                .forEach(pointValue -> bulkRequestBuilder.operations(operation -> operation
-                        .index(builder -> builder
-                                .index(index)
-                                .document(new EsPointValue(pointValue))
-                        )
-                ));
+                .forEach(entityBO -> {
+                    EsPointValueDO entityDO = pointValueBuilder.buildESDOByBO(entityBO);
+                    bulkRequestBuilder.operations(operation -> operation.index(builder -> builder.index(index).document(entityDO)));
+                });
 
         BulkResponse response = elasticsearchClient.bulk(bulkRequestBuilder.build());
         if (response.errors()) {

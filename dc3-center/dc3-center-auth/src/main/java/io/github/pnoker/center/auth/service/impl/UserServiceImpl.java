@@ -57,13 +57,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void save(UserBO entityBO) {
-        // 判断用户是否存在
-        UserBO selectByUserNameBO = selectByUserName(entityBO.getUserName(), false);
-        if (ObjectUtil.isNotNull(selectByUserNameBO)) {
-            throw new DuplicateException("The user already exists with userName: {}", entityBO.getUserName());
-        }
+        checkDuplicate(entityBO, false, true);
 
-        // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用
+        // 判断手机号是否存在，如果有手机号不为空，检查该手机号是否被占用
         if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
             UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
             if (ObjectUtil.isNotNull(selectByPhone)) {
@@ -71,7 +67,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // 判断 email 是否存在，如果有 email 不为空，检查该 email 是否被占用
+        // 判断邮箱是否存在，如果有邮箱不为空，检查该邮箱是否被占用
         if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
             UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
             if (ObjectUtil.isNotNull(selectByEmail)) {
@@ -79,7 +75,6 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // 插入 user 数据，并返回插入后的 user
         UserDO entityDO = userBuilder.buildDOByBO(entityBO);
         if (!userManager.save(entityDO)) {
             throw new AddException("The user add failed: {}", entityBO.toString());
@@ -87,12 +82,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public void remove(Long id) {
-        UserBO userBO = selectById(id);
-        if (ObjectUtil.isNull(userBO)) {
-            throw new NotFoundException("The user does not exist");
-        }
+        getDOById(id, true);
 
         if (!userManager.removeById(id)) {
             throw new DeleteException("The user delete failed");
@@ -101,8 +92,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void update(UserBO entityBO) {
-        UserBO selectById = selectById(entityBO.getId());
-        // 判断 phone 是否更新
+        UserDO selectById = getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
+        // 判断手机号是否更新
         if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
             if (!entityBO.getPhone().equals(selectById.getPhone())) {
                 UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
@@ -110,11 +104,9 @@ public class UserServiceImpl implements UserService {
                     throw new DuplicateException("The user already exists with phone {}", entityBO.getPhone());
                 }
             }
-        } else {
-            entityBO.setPhone(null);
         }
 
-        // 判断 email 是否更新
+        // 判断邮箱是否更新
         if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
             if (!entityBO.getEmail().equals(selectById.getEmail())) {
                 UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
@@ -122,13 +114,10 @@ public class UserServiceImpl implements UserService {
                     throw new DuplicateException("The user already exists with email {}", entityBO.getEmail());
                 }
             }
-        } else {
-            entityBO.setEmail(null);
         }
 
-        entityBO.setUserName(null);
-        entityBO.setOperateTime(null);
         UserDO entityDO = userBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
         if (!userManager.updateById(entityDO)) {
             throw new UpdateException("The user update failed");
         }
@@ -136,7 +125,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserBO selectById(Long id) {
-        return null;
+        UserDO entityDO = getDOById(id, true);
+        return userBuilder.buildBOByDO(entityDO);
     }
 
     public UserBO selectByUserName(String userName, boolean throwException) {
@@ -183,14 +173,12 @@ public class UserServiceImpl implements UserService {
         return userBuilder.buildBOPageByDOPage(page);
     }
 
-    private LambdaQueryWrapper<UserDO> fuzzyQuery(UserQuery query) {
+    private LambdaQueryWrapper<UserDO> fuzzyQuery(UserQuery entityQuery) {
         LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getNickName()), UserDO::getNickName, query.getNickName());
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getUserName()), UserDO::getUserName, query.getUserName());
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getPhone()), UserDO::getPhone, query.getPhone());
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getEmail()), UserDO::getEmail, query.getEmail());
-        }
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getNickName()), UserDO::getNickName, entityQuery.getNickName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getUserName()), UserDO::getUserName, entityQuery.getUserName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getPhone()), UserDO::getPhone, entityQuery.getPhone());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getEmail()), UserDO::getEmail, entityQuery.getEmail());
         return wrapper;
     }
 
@@ -206,6 +194,29 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         return userBuilder.buildBOByDO(userDO);
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link UserBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(UserBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
+        wrapper.eq(UserDO::getUserName, entityBO.getUserName());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        UserDO one = userManager.getOne(wrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("用户重复");
+        }
+        return duplicate;
     }
 
     /**

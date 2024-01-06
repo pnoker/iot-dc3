@@ -62,8 +62,8 @@ public class GroupController implements BaseController {
     @PostMapping("/add")
     public R<String> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
         try {
-            entityVO.setTenantId(getTenantId());
             GroupBO entityBO = groupForManagerBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
             groupService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public class GroupController implements BaseController {
     /**
      * 更新
      *
-     * @param entityVO Group
+     * @param entityVO {@link GroupVO}
      * @return R of String
      */
     @PostMapping("/update")
@@ -108,7 +108,7 @@ public class GroupController implements BaseController {
      * 单个查询
      *
      * @param id ID
-     * @return R of GroupVO
+     * @return GroupVO {@link GroupVO}
      */
     @GetMapping("/id/{id}")
     public R<GroupVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
@@ -133,6 +133,7 @@ public class GroupController implements BaseController {
             if (ObjectUtil.isEmpty(entityQuery)) {
                 entityQuery = new GroupQuery();
             }
+            entityQuery.setTenantId(getTenantId());
             Page<GroupBO> entityPageBO = groupService.selectByPage(entityQuery);
             Page<GroupVO> entityPageVO = groupForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);

@@ -20,7 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.PointValueRepositoryService;
 import io.github.pnoker.center.data.biz.PointValueService;
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.schedule.PointValueScheduleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -56,26 +56,26 @@ public class PointValueReceiver {
 
     @RabbitHandler
     @RabbitListener(queues = "#{pointValueQueue.name}", containerFactory = "")
-    public void pointValueReceive(Channel channel, Message message, PointValue pointValue) {
+    public void pointValueReceive(Channel channel, Message message, PointValueBO pointValueBO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            if (ObjectUtil.isNull(pointValue) || ObjectUtil.isNull(pointValue.getDeviceId())) {
-                log.error("Invalid point value: {}", pointValue);
+            if (ObjectUtil.isNull(pointValueBO) || ObjectUtil.isNull(pointValueBO.getDeviceId())) {
+                log.error("Invalid point value: {}", pointValueBO);
                 return;
             }
             PointValueScheduleJob.valueCount.getAndIncrement();
-            log.debug("Point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValue);
+            log.debug("Point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValueBO);
 
             // Judge whether to process data in batch according to the data transmission speed
             if (PointValueScheduleJob.valueSpeed.get() < batchSpeed) {
                 threadPoolExecutor.execute(() ->
                         // Save point value to Redis & MongoDB
-                        pointValueService.savePointValue(pointValue)
+                        pointValueService.savePointValue(pointValueBO)
                 );
             } else {
                 // Save point value to schedule
                 PointValueScheduleJob.valueLock.writeLock().lock();
-                PointValueScheduleJob.addPointValues(pointValue);
+                PointValueScheduleJob.addPointValues(pointValueBO);
                 PointValueScheduleJob.valueLock.writeLock().unlock();
             }
         } catch (Exception e) {

@@ -52,9 +52,6 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Resource
     private LabelBindManager labelBindManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(LabelBindBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -65,9 +62,7 @@ public class LabelBindServiceImpl implements LabelBindService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void remove(Long id) {
         getDOById(id, true);
@@ -77,9 +72,7 @@ public class LabelBindServiceImpl implements LabelBindService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void update(LabelBindBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -93,18 +86,14 @@ public class LabelBindServiceImpl implements LabelBindService {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public LabelBindBO selectById(Long id) {
         LabelBindDO entityDO = getDOById(id, false);
         return labelBindForAuthBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public Page<LabelBindBO> selectByPage(LabelBindQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -117,13 +106,13 @@ public class LabelBindServiceImpl implements LabelBindService {
     /**
      * 构造模糊查询
      *
-     * @param query {@link LabelBindQuery}
+     * @param entityQuery {@link LabelBindQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery query) {
+    private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery entityQuery) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
-        wrapper.eq(CharSequenceUtil.isNotEmpty(query.getLabelId()), LabelBindDO::getLabelId, query.getLabelId());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(query.getEntityId()), LabelBindDO::getEntityId, query.getEntityId());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
         return wrapper;
     }
 
@@ -137,8 +126,10 @@ public class LabelBindServiceImpl implements LabelBindService {
      */
     private boolean checkDuplicate(LabelBindBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
+        wrapper.eq(LabelBindDO::getEntityTypeFlag, entityBO.getEntityTypeFlag());
         wrapper.eq(LabelBindDO::getLabelId, entityBO.getLabelId());
         wrapper.eq(LabelBindDO::getEntityId, entityBO.getEntityId());
+        wrapper.eq(LabelBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         LabelBindDO one = labelBindManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -146,7 +137,7 @@ public class LabelBindServiceImpl implements LabelBindService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The label bind is duplicates");
+            throw new DuplicateException("标签绑定重复");
         }
         return duplicate;
     }

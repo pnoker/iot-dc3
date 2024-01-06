@@ -104,9 +104,6 @@ public final class TCPConnection extends S7Connection {
         return this.negPDUlengthRequest();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int exchange(final PDU p1) {
         this.msgOut[4] = (byte) 0x02;

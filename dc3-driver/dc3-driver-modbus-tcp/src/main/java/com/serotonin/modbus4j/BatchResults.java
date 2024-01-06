@@ -87,9 +87,7 @@ public class BatchResults<K> {
         return (Float) getValue(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public String toString() {
         return data.toString();

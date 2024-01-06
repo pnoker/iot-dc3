@@ -30,7 +30,7 @@ public interface TokenService {
      *
      * @param loginName  登录名称
      * @param tenantCode 租户编号
-     * @return String
+     * @return R of String
      */
     String generateSalt(String loginName, String tenantCode);
 
@@ -41,7 +41,7 @@ public interface TokenService {
      * @param salt       User Salt
      * @param password   User Password
      * @param tenantCode 租户编号
-     * @return String
+     * @return R of String
      */
     String generateToken(String loginName, String salt, String password, String tenantCode);
 

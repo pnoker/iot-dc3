@@ -57,26 +57,17 @@ public class UserLoginServiceImpl implements UserLoginService {
     @Override
     @Transactional
     public void save(UserLoginBO entityBO) {
-        // 判断登录名称是否存在
-        UserLoginBO selectByLoginName = selectByLoginName(entityBO.getLoginName(), false);
-        if (ObjectUtil.isNotNull(selectByLoginName)) {
-            throw new DuplicateException("The user already exists with login name: {}", entityBO.getLoginName());
-        }
+        checkDuplicate(entityBO, false, true);
 
         UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
-        // 插入 user 数据，并返回插入后的 user
         if (!userLoginManager.save(entityDO)) {
             throw new AddException("The user add failed: {}", entityBO.toString());
         }
     }
 
     @Override
-    @Transactional
     public void remove(Long id) {
-        UserLoginBO userLogin = selectById(id);
-        if (ObjectUtil.isNull(userLogin)) {
-            throw new NotFoundException("The user login does not exist");
-        }
+        getDOById(id, true);
 
         if (!userLoginManager.removeById(id)) {
             throw new DeleteException("The user login delete failed");
@@ -85,13 +76,12 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     public void update(UserLoginBO entityBO) {
-        UserLoginBO selectById = selectById(entityBO.getId());
-        if (ObjectUtil.isNull(selectById)) {
-            throw new NotFoundException("The user login does not exist");
-        }
-        entityBO.setLoginName(null);
-        entityBO.setOperateTime(null);
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
         UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
         if (!userLoginManager.updateById(entityDO)) {
             throw new UpdateException("The user login update failed");
         }
@@ -99,7 +89,8 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     public UserLoginBO selectById(Long id) {
-        return null;
+        UserLoginDO entityDO = getDOById(id, true);
+        return userLoginBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -141,12 +132,34 @@ public class UserLoginServiceImpl implements UserLoginService {
         return false;
     }
 
-    private LambdaQueryWrapper<UserLoginDO> fuzzyQuery(UserLoginQuery query) {
+    private LambdaQueryWrapper<UserLoginDO> fuzzyQuery(UserLoginQuery entityQuery) {
         LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            wrapper.like(CharSequenceUtil.isNotEmpty(query.getLoginName()), UserLoginDO::getLoginName, query.getLoginName());
-        }
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getLoginName()), UserLoginDO::getLoginName, entityQuery.getLoginName());
         return wrapper;
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link UserLoginBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(UserLoginBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
+        wrapper.eq(UserLoginDO::getLoginName, entityBO.getLoginName());
+        wrapper.eq(UserLoginDO::getUserId, entityBO.getUserId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        UserLoginDO one = userLoginManager.getOne(wrapper);
+        if (ObjectUtil.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("用户登录重复");
+        }
+        return duplicate;
     }
 
     /**

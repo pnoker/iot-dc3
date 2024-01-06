@@ -19,7 +19,10 @@ package io.github.pnoker.center.auth.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
+import io.github.pnoker.center.auth.entity.builder.TenantBuilder;
 import io.github.pnoker.center.auth.entity.query.TenantQuery;
+import io.github.pnoker.center.auth.entity.vo.LimitedIpVO;
+import io.github.pnoker.center.auth.entity.vo.TenantVO;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
@@ -46,19 +49,23 @@ import javax.validation.constraints.NotNull;
 public class TenantController implements BaseController {
 
     @Resource
+    private TenantBuilder tenantBuilder;
+
+    @Resource
     private TenantService tenantService;
 
     /**
      * 新增租户
      *
-     * @param tenantBO 租户
-     * @return {@link TenantBO}
+     * @param entityVO {@link TenantVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody TenantBO tenantBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody TenantVO entityVO) {
         try {
-            tenantService.save(tenantBO);
-            return R.ok();
+            TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);
+            tenantService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -67,14 +74,14 @@ public class TenantController implements BaseController {
     /**
      * 根据 ID 删除租户
      *
-     * @param id 租户ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
             tenantService.remove(Long.parseLong(id));
-            return R.ok();
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -87,15 +94,15 @@ public class TenantController implements BaseController {
      * <li>不支持更新: Name</li>
      * </ol>
      *
-     * @param tenantBO Tenant
-     * @return {@link TenantBO}
+     * @param entityVO {@link TenantVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody TenantBO tenantBO) {
+    public R<String> update(@Validated(Update.class) @RequestBody TenantVO entityVO) {
         try {
-            tenantBO.setTenantName(null);
-            tenantService.update(tenantBO);
-            return R.ok();
+            TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);
+            tenantService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -104,20 +111,18 @@ public class TenantController implements BaseController {
     /**
      * 根据 ID 查询租户
      *
-     * @param id 租户ID
-     * @return {@link TenantBO}
+     * @param id ID
+     * @return TenantVO {@link TenantVO}
      */
     @GetMapping("/id/{id}")
-    public R<TenantBO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<TenantVO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            TenantBO select = tenantService.selectById(Long.parseLong(id));
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            TenantBO entityBO = tenantService.selectById(Long.parseLong(id));
+            TenantVO entityVO = tenantBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     /**
@@ -142,23 +147,21 @@ public class TenantController implements BaseController {
     /**
      * 分页查询租户
      *
-     * @param tenantPageQuery 租户和分页参数
+     * @param entityQuery 租户和分页参数
      * @return 带分页的 {@link TenantBO}
      */
     @PostMapping("/list")
-    public R<Page<TenantBO>> list(@RequestBody(required = false) TenantQuery tenantPageQuery) {
+    public R<Page<TenantVO>> list(@RequestBody(required = false) TenantQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(tenantPageQuery)) {
-                tenantPageQuery = new TenantQuery();
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new TenantQuery();
             }
-            Page<TenantBO> page = tenantService.selectByPage(tenantPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            Page<TenantBO> entityPageBO = tenantService.selectByPage(entityQuery);
+            Page<TenantVO> entityPageVO = tenantBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
 }

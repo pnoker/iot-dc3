@@ -58,9 +58,6 @@ public class KeyedModbusLocator<K> {
         return locator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "KeyedModbusLocator(key=" + key + ", locator=" + locator + ")";

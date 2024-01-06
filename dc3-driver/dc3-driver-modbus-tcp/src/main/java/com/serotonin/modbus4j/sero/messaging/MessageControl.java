@@ -318,9 +318,7 @@ public class MessageControl implements DataConsumer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     public void handleIOException(IOException e) {
         exceptionHandler.receivedException(e);
     }

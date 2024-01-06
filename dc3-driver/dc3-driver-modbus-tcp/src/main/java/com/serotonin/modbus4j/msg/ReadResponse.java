@@ -38,9 +38,6 @@ abstract public class ReadResponse extends ModbusResponse {
         this.data = data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readResponse(ByteQueue queue) {
         int numberOfBytes = ModbusUtils.popUnsignedByte(queue);
@@ -51,9 +48,6 @@ abstract public class ReadResponse extends ModbusResponse {
         queue.pop(data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeResponse(ByteQueue queue) {
         ModbusUtils.pushByte(queue, data.length);

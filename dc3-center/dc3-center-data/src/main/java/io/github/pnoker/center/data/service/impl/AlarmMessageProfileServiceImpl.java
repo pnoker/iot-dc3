@@ -55,9 +55,6 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
     @Resource
     private AlarmMessageProfileManager alarmMessageProfileManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(AlarmMessageProfileBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -68,9 +65,6 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(Long id) {
         getDOById(id, true);
@@ -87,9 +81,6 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(AlarmMessageProfileBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -103,18 +94,12 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public AlarmMessageProfileBO selectById(Long id) {
         AlarmMessageProfileDO entityDO = getDOById(id, true);
         return alarmMessageProfileBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<AlarmMessageProfileBO> selectByPage(AlarmMessageProfileQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -127,13 +112,13 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
     /**
      * 构造模糊查询
      *
-     * @param query {@link AlarmMessageProfileQuery}
+     * @param entityQuery {@link AlarmMessageProfileQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<AlarmMessageProfileDO> fuzzyQuery(AlarmMessageProfileQuery query) {
+    private LambdaQueryWrapper<AlarmMessageProfileDO> fuzzyQuery(AlarmMessageProfileQuery entityQuery) {
         LambdaQueryWrapper<AlarmMessageProfileDO> wrapper = Wrappers.<AlarmMessageProfileDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(query.getAlarmMessageTitle()), AlarmMessageProfileDO::getAlarmMessageTitle, query.getAlarmMessageTitle());
-        wrapper.eq(ObjectUtil.isNotEmpty(getTenantId()), AlarmMessageProfileDO::getTenantId, getTenantId());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAlarmMessageTitle()), AlarmMessageProfileDO::getAlarmMessageTitle, entityQuery.getAlarmMessageTitle());
+        wrapper.eq(AlarmMessageProfileDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -148,7 +133,8 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
     private boolean checkDuplicate(AlarmMessageProfileBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<AlarmMessageProfileDO> wrapper = Wrappers.<AlarmMessageProfileDO>query().lambda();
         wrapper.eq(AlarmMessageProfileDO::getAlarmMessageTitle, entityBO.getAlarmMessageTitle());
-        wrapper.eq(AlarmMessageProfileDO::getTenantId, getTenantId());
+        wrapper.eq(AlarmMessageProfileDO::getAlarmMessageCode, entityBO.getAlarmMessageCode());
+        wrapper.eq(AlarmMessageProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmMessageProfileDO one = alarmMessageProfileManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {
@@ -156,7 +142,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("The alarmMessageProfile is duplicates");
+            throw new DuplicateException("报警信息模板重复");
         }
         return duplicate;
     }
@@ -171,7 +157,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
     private AlarmMessageProfileDO getDOById(Long id, boolean throwException) {
         AlarmMessageProfileDO entityDO = alarmMessageProfileManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("分组不存在");
+            throw new NotFoundException("报警信息模板不存在");
         }
         return entityDO;
     }

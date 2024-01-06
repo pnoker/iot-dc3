@@ -38,15 +38,23 @@ public class RoleUserBindQuery implements Serializable {
     @Schema(description = "分页")
     private Pages page;
 
+    /**
+     * 租户ID
+     */
+    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private Long tenantId;
+
     // 查询字段
 
     /**
      * 角色ID
      */
+    @Schema(description = "角色ID")
     private String roleId;
 
     /**
      * 用户ID
      */
+    @Schema(description = "用户ID")
     private Long userId;
 }

@@ -17,8 +17,9 @@
 package io.github.pnoker.center.data.repository.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.center.data.entity.point.MgPointValue;
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.builder.PointValueBuilder;
+import io.github.pnoker.center.data.entity.point.MgPointValueDO;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.repository.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.driver.StorageConstant;
@@ -43,6 +44,9 @@ import java.util.stream.Collectors;
 public class MongoServiceImpl implements RepositoryService, InitializingBean {
 
     @Resource
+    private PointValueBuilder pointValueBuilder;
+
+    @Resource
     private MongoTemplate mongoTemplate;
 
     @Override
@@ -51,29 +55,34 @@ public class MongoServiceImpl implements RepositoryService, InitializingBean {
     }
 
     @Override
-    public void savePointValue(PointValue pointValue) {
-        if (!ObjectUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+    public void savePointValue(PointValueBO entityBO) {
+        if (!ObjectUtil.isAllNotEmpty(entityBO.getDeviceId(), entityBO.getPointId())) {
             return;
         }
 
-        final String collection = StorageConstant.POINT_VALUE_PREFIX + pointValue.getDeviceId();
+        final String collection = StorageConstant.POINT_VALUE_PREFIX + entityBO.getDeviceId();
         ensurePointValueIndex(collection);
-        mongoTemplate.insert(new MgPointValue(pointValue), collection);
+        MgPointValueDO entityDO = pointValueBuilder.buildMgDOByBO(entityBO);
+        mongoTemplate.insert(entityDO, collection);
     }
 
     @Override
-    public void savePointValues(Long deviceId, List<PointValue> pointValues) {
+    public void savePointValues(Long deviceId, List<PointValueBO> pointValueBOS) {
         if (ObjectUtil.isEmpty(deviceId)) {
             return;
         }
 
         final String collection = StorageConstant.POINT_VALUE_PREFIX + deviceId;
         ensurePointValueIndex(collection);
-        final List<MgPointValue> batch = pointValues.stream()
-                .filter(pointValue -> ObjectUtil.isNotEmpty(pointValue.getPointId()))
-                .map(MgPointValue::new)
+        final List<MgPointValueDO> entityDOS = pointValueBOS.stream()
+                .filter(entityBO -> ObjectUtil.isNotEmpty(entityBO.getPointId()))
+                .map(entityBO -> {
+                    MgPointValueDO entityDO = pointValueBuilder.buildMgDOByBO(entityBO);
+                    entityDO.setDeviceId(deviceId);
+                    return entityDO;
+                })
                 .collect(Collectors.toList());
-        mongoTemplate.insert(batch, collection);
+        mongoTemplate.insert(entityDOS, collection);
     }
 
     @Override

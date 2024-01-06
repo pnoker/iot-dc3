@@ -109,9 +109,6 @@ public final class S7TCPConnection extends S7BaseConnection {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void finalize() throws Throwable {
         this.close();

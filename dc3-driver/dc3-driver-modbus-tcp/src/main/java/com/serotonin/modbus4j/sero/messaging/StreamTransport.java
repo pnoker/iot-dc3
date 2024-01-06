@@ -79,9 +79,7 @@ public class StreamTransport implements Transport, Runnable {
         listener.run();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     public void setConsumer(DataConsumer consumer) {
         listener = new InputStreamListener(in, consumer);
     }
@@ -105,9 +103,7 @@ public class StreamTransport implements Transport, Runnable {
         out.flush();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     public void write(byte[] data, int len) throws IOException {
         out.write(data, 0, len);
         out.flush();

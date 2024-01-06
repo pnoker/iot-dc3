@@ -37,9 +37,6 @@ abstract public class BaseMessageParser implements MessageParser {
         this.master = master;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public IncomingMessage parseMessage(ByteQueue queue) throws Exception {
         try {

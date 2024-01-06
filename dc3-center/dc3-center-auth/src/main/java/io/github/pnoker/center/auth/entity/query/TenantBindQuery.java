@@ -45,11 +45,13 @@ public class TenantBindQuery implements Serializable {
     /**
      * 租户ID
      */
+    @Schema(description = "租户ID")
     private Long tenantId;
 
     /**
      * 用户ID
      */
+    @Schema(description = "用户ID")
     private Long userId;
 
 }

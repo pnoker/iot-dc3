@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.repository.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.repository.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.common.PrefixConstant;
@@ -50,23 +50,23 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
     }
 
     @Override
-    public void savePointValue(PointValue pointValue) {
-        if (!ObjectUtil.isAllNotEmpty(pointValue.getDeviceId(), pointValue.getPointId())) {
+    public void savePointValue(PointValueBO pointValueBO) {
+        if (!ObjectUtil.isAllNotEmpty(pointValueBO.getDeviceId(), pointValueBO.getPointId())) {
             return;
         }
 
-        final String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + pointValue.getDeviceId() + SymbolConstant.DOT;
-        redisUtil.setKey(prefix + pointValue.getPointId(), pointValue);
+        final String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + pointValueBO.getDeviceId() + SymbolConstant.DOT;
+        redisUtil.setKey(prefix + pointValueBO.getPointId(), pointValueBO);
     }
 
     @Override
-    public void savePointValues(Long deviceId, List<PointValue> pointValues) {
+    public void savePointValues(Long deviceId, List<PointValueBO> pointValueBOS) {
         if (ObjectUtil.isEmpty(deviceId)) {
             return;
         }
 
         final String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + deviceId + SymbolConstant.DOT;
-        Map<String, PointValue> collect = pointValues.stream()
+        Map<String, PointValueBO> collect = pointValueBOS.stream()
                 .filter(pointValue -> ObjectUtil.isNotEmpty(pointValue.getPointId()))
                 .collect(Collectors.toMap(pointValue -> prefix + pointValue.getPointId(), pointValue -> pointValue));
         redisUtil.setKey(collect);

@@ -19,7 +19,9 @@ package io.github.pnoker.center.auth.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.LimitedIpBO;
+import io.github.pnoker.center.auth.entity.builder.LimitedIpBuilder;
 import io.github.pnoker.center.auth.entity.query.LimitedIpQuery;
+import io.github.pnoker.center.auth.entity.vo.LimitedIpVO;
 import io.github.pnoker.center.auth.service.LimitedIpService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
@@ -35,7 +37,7 @@ import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 
 /**
- * Ip 黑名单 Controller
+ * 限制IP Controller
  *
  * @author pnoker
  * @since 2022.1.0
@@ -46,19 +48,24 @@ import javax.validation.constraints.NotNull;
 public class LimitedIpController implements BaseController {
 
     @Resource
+    private LimitedIpBuilder limitedIpBuilder;
+
+    @Resource
     private LimitedIpService limitedIpService;
 
     /**
      * 新增 LimitedIp
      *
-     * @param limitedIpBO LimitedIp
-     * @return {@link LimitedIpBO}
+     * @param entityVO {@link LimitedIpVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody LimitedIpBO limitedIpBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody LimitedIpVO entityVO) {
         try {
-            limitedIpService.save(limitedIpBO);
-            return R.ok();
+            LimitedIpBO entityBO = limitedIpBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            limitedIpService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -68,33 +75,34 @@ public class LimitedIpController implements BaseController {
      * 根据 ID 删除 LimitedIp
      *
      * @param id ID
-     * @return 是否删除
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
             limitedIpService.remove(Long.parseLong(id));
-            return R.ok();
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
     }
 
     /**
-     * 更新 LimitedIp
+     * 更新限制IP
      * <ol>
      * <li>支持更新: Enable</li>
      * <li>不支持更新: Ip</li>
      * </ol>
      *
-     * @param limitedIpBO LimitedIp
-     * @return {@link LimitedIpBO}
+     * @param entityVO {@link LimitedIpVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody LimitedIpBO limitedIpBO) {
+    public R<String> update(@Validated(Update.class) @RequestBody LimitedIpVO entityVO) {
         try {
-            limitedIpService.update(limitedIpBO);
-            return R.ok();
+            LimitedIpBO entityBO = limitedIpBuilder.buildBOByVO(entityVO);
+            limitedIpService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -104,19 +112,17 @@ public class LimitedIpController implements BaseController {
      * 根据 ID 查询 LimitedIp
      *
      * @param id ID
-     * @return {@link LimitedIpBO}
+     * @return LimitedIpVO {@link LimitedIpVO}
      */
     @GetMapping("/id/{id}")
-    public R<LimitedIpBO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<LimitedIpVO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            LimitedIpBO select = limitedIpService.selectById(Long.parseLong(id));
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            LimitedIpBO entityBO = limitedIpService.selectById(Long.parseLong(id));
+            LimitedIpVO entityVO = limitedIpBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     /**
@@ -126,45 +132,42 @@ public class LimitedIpController implements BaseController {
      * @return {@link LimitedIpBO}
      */
     @GetMapping("/ip/{ip}")
-    public R<LimitedIpBO> selectByIp(@NotNull @PathVariable(value = "ip") String ip) {
+    public R<LimitedIpVO> selectByIp(@NotNull @PathVariable(value = "ip") String ip) {
         try {
-            LimitedIpBO select = limitedIpService.selectByIp(ip);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            LimitedIpBO entityBO = limitedIpService.selectByIp(ip);
+            LimitedIpVO entityVO = limitedIpBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     /**
      * 分页查询 LimitedIp
      *
-     * @param limitedIpPageQuery LimitedIp和分页参数
+     * @param entityQuery LimitedIp和分页参数
      * @return 带分页的 {@link LimitedIpBO}
      */
     @PostMapping("/list")
-    public R<Page<LimitedIpBO>> list(@RequestBody(required = false) LimitedIpQuery limitedIpPageQuery) {
+    public R<Page<LimitedIpVO>> list(@RequestBody(required = false) LimitedIpQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(limitedIpPageQuery)) {
-                limitedIpPageQuery = new LimitedIpQuery();
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new LimitedIpQuery();
             }
-            Page<LimitedIpBO> page = limitedIpService.selectByPage(limitedIpPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<LimitedIpBO> entityPageBO = limitedIpService.selectByPage(entityQuery);
+            Page<LimitedIpVO> entityPageVO = limitedIpBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
     }
 
     /**
-     * 检测 Ip 是否在 Ip 黑名单列表
+     * 检测 Ip 是否在限制IP列表
      *
-     * @param ip Black Ip
-     * @return 当前IP是否在黑名单中
+     * @param ip Limited Ip
+     * @return 当前IP是否在限制IP中
      */
     @GetMapping("/check/{ip}")
     public R<Boolean> checkLimitedIpValid(@NotNull @PathVariable(value = "ip") String ip) {

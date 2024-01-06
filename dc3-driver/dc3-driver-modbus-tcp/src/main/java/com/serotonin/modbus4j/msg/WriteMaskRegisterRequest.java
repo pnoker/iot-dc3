@@ -73,9 +73,6 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
         this.orMask = orMask;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(writeOffset);
@@ -105,9 +102,6 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, writeOffset);
@@ -123,9 +117,6 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
         return new WriteMaskRegisterResponse(slaveId, writeOffset, andMask, orMask);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_MASK_REGISTER;
@@ -136,9 +127,6 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
         return new WriteMaskRegisterResponse(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readRequest(ByteQueue queue) {
         writeOffset = ModbusUtils.popUnsignedShort(queue);

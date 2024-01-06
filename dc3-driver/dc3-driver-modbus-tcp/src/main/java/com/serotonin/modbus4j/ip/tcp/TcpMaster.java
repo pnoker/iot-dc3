@@ -153,9 +153,6 @@ public class TcpMaster extends ModbusMaster {
         return nextTransactionId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     synchronized public void init() throws ModbusInitException {
         try {
@@ -167,18 +164,12 @@ public class TcpMaster extends ModbusMaster {
         initialized = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     synchronized public void destroy() {
         closeConnection();
         initialized = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     synchronized public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
         try {

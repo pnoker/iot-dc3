@@ -19,7 +19,7 @@ package io.github.pnoker.center.data.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.biz.PointValueService;
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.entity.query.PointValueQuery;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
@@ -50,15 +50,15 @@ public class PointValueController implements BaseController {
      * 查询最新 PointValue 集合
      *
      * @param pointValueQuery 位号值和分页参数
-     * @return 带分页的 {@link PointValue}
+     * @return 带分页的 {@link PointValueBO}
      */
     @PostMapping("/latest")
-    public R<Page<PointValue>> latest(@RequestBody PointValueQuery pointValueQuery) {
+    public R<Page<PointValueBO>> latest(@RequestBody PointValueQuery pointValueQuery) {
         try {
             if (ObjectUtil.isEmpty(pointValueQuery)) {
                 pointValueQuery = new PointValueQuery();
             }
-            Page<PointValue> page = pointValueService.latest(pointValueQuery);
+            Page<PointValueBO> page = pointValueService.latest(pointValueQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);
             }
@@ -71,18 +71,18 @@ public class PointValueController implements BaseController {
     /**
      * 分页查询 PointValue
      *
-     * @param pointValueQuery 位号值和分页参数
-     * @return 带分页的 {@link PointValue}
+     * @param entityQuery 位号值和分页参数
+     * @return 带分页的 {@link PointValueBO}
      */
     @PostMapping("/list")
-    public R<Page<PointValue>> list(@RequestBody(required = false) PointValueQuery pointValueQuery) {
+    public R<Page<PointValueBO>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(pointValueQuery)) {
-                pointValueQuery = new PointValueQuery();
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new PointValueQuery();
             }
-            Page<PointValue> page = pointValueService.list(pointValueQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
+            Page<PointValueBO> entityPageBO = pointValueService.list(entityQuery);
+            if (ObjectUtil.isNotNull(entityPageBO)) {
+                return R.ok(entityPageBO);
             }
         } catch (Exception e) {
             return R.fail(e.getMessage());

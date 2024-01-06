@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.biz.impl;
 
 import io.github.pnoker.center.data.biz.PointValueRepositoryService;
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.repository.RepositoryService;
 import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
@@ -57,38 +57,38 @@ public class PointValueRepositoryServiceImpl implements PointValueRepositoryServ
     private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
-    public void save(PointValue pointValue) {
+    public void save(PointValueBO pointValueBO) {
         // 保存单个数据到 Redis & Mongo
-        savePointValueToRepository(pointValue, redisRepositoryService, mongoRepositoryService);
+        savePointValueToRepository(pointValueBO, redisRepositoryService, mongoRepositoryService);
 
         // 保存单个数据到 Influxdb
         if (Boolean.TRUE.equals(enableInfluxdb)) {
             RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.INFLUXDB);
-            savePointValueToRepository(pointValue, repositoryService);
+            savePointValueToRepository(pointValueBO, repositoryService);
         }
 
         // 保存单个数据到 TDengine
         if (Boolean.TRUE.equals(enableTDengine)) {
             RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.TDENGINE);
-            savePointValueToRepository(pointValue, repositoryService);
+            savePointValueToRepository(pointValueBO, repositoryService);
         }
 
         // 保存单个数据到 Opentsdb
         if (Boolean.TRUE.equals(enableOpentsdb)) {
             RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_OPENTSDB);
-            savePointValueToRepository(pointValue, repositoryService);
+            savePointValueToRepository(pointValueBO, repositoryService);
         }
 
         // 保存单个数据到 Elasticsearch
         if (Boolean.TRUE.equals(enableElasticsearch)) {
             RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_ELASTICSEARCH);
-            savePointValueToRepository(pointValue, repositoryService);
+            savePointValueToRepository(pointValueBO, repositoryService);
         }
     }
 
     @Override
-    public void save(List<PointValue> pointValues) {
-        final Map<Long, List<PointValue>> group = pointValues.stream().collect(Collectors.groupingBy(PointValue::getDeviceId));
+    public void save(List<PointValueBO> pointValueBOS) {
+        final Map<Long, List<PointValueBO>> group = pointValueBOS.stream().collect(Collectors.groupingBy(PointValueBO::getDeviceId));
 
         group.forEach((deviceId, values) -> {
             // 保存批量数据到 Redis & Mongo
@@ -123,14 +123,14 @@ public class PointValueRepositoryServiceImpl implements PointValueRepositoryServ
     /**
      * 保存 PointValue 到指定存储服务
      *
-     * @param pointValue         PointValue
+     * @param pointValueBO         PointValue
      * @param repositoryServices RepositoryService Array
      */
-    private void savePointValueToRepository(PointValue pointValue, RepositoryService... repositoryServices) {
+    private void savePointValueToRepository(PointValueBO pointValueBO, RepositoryService... repositoryServices) {
         for (RepositoryService repositoryService : repositoryServices) {
             threadPoolExecutor.execute(() -> {
                 try {
-                    repositoryService.savePointValue(pointValue);
+                    repositoryService.savePointValue(pointValueBO);
                 } catch (Exception e) {
                     log.error("Save point value to {} error {}", repositoryService.getRepositoryName(), e.getMessage());
                 }
@@ -143,14 +143,14 @@ public class PointValueRepositoryServiceImpl implements PointValueRepositoryServ
      * 保存 PointValues 到指定存储服务
      *
      * @param deviceId           设备ID
-     * @param pointValues        PointValue Array
+     * @param pointValueBOS        PointValue Array
      * @param repositoryServices RepositoryService Array
      */
-    private void savePointValuesToRepository(Long deviceId, List<PointValue> pointValues, RepositoryService... repositoryServices) {
+    private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOS, RepositoryService... repositoryServices) {
         for (RepositoryService repositoryService : repositoryServices) {
             threadPoolExecutor.execute(() -> {
                 try {
-                    repositoryService.savePointValues(deviceId, pointValues);
+                    repositoryService.savePointValues(deviceId, pointValueBOS);
                 } catch (Exception e) {
                     log.error("Save point values to {} error {}", repositoryService.getRepositoryName(), e.getMessage());
                 }

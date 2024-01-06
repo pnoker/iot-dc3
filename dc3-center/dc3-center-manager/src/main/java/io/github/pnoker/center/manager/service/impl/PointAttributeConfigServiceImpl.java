@@ -64,9 +64,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     @Resource
     private DriverNotifyService driverNotifyService;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(PointAttributeConfigBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -82,9 +79,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.ADD, entityBO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove(Long id) {
         PointAttributeConfigDO entityDO = getDOById(id, true);
@@ -97,9 +91,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(PointAttributeConfigBO entityBO) {
         getDOById(entityBO.getId(), true);
@@ -123,9 +114,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         return pointAttributeConfigBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery().eq(PointAttributeConfigDO::getDeviceId, deviceId).eq(PointAttributeConfigDO::getPointId, pointId).last(QueryWrapperConstant.LIMIT_ONE);
@@ -133,9 +121,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         return pointAttributeConfigBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PointAttributeConfigBO> selectByAttributeId(Long attributeId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery().eq(PointAttributeConfigDO::getPointAttributeId, attributeId);
@@ -143,9 +128,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PointAttributeConfigBO> selectByDeviceId(Long deviceId) {
         List<PointBO> pointBOS = pointService.selectByDeviceId(deviceId);
@@ -155,9 +137,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery().eq(PointAttributeConfigDO::getDeviceId, deviceId).eq(PointAttributeConfigDO::getPointId, pointId);
@@ -165,9 +144,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Page<PointAttributeConfigBO> selectByPage(PointAttributeConfigQuery entityQuery) {
         if (ObjectUtil.isNull(entityQuery.getPage())) {
@@ -177,13 +153,12 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         return pointAttributeConfigBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery query) {
+    private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            wrapper.eq(ObjectUtil.isNotEmpty(query.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, query.getPointAttributeId());
-            wrapper.eq(ObjectUtil.isNotEmpty(query.getDeviceId()), PointAttributeConfigDO::getDeviceId, query.getDeviceId());
-            wrapper.eq(ObjectUtil.isNotEmpty(query.getPointId()), PointAttributeConfigDO::getPointId, query.getPointId());
-        }
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, entityQuery.getPointAttributeId());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getPointId()), PointAttributeConfigDO::getPointId, entityQuery.getPointId());
+        wrapper.eq(PointAttributeConfigDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -200,7 +175,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         wrapper.eq(PointAttributeConfigDO::getPointAttributeId, entityBO.getPointAttributeId());
         wrapper.eq(PointAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
         wrapper.eq(PointAttributeConfigDO::getPointId, entityBO.getPointId());
-        wrapper.eq(PointAttributeConfigDO::getTenantId, getTenantId());
+        wrapper.eq(PointAttributeConfigDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointAttributeConfigDO one = pointAttributeConfigManager.getOne(wrapper);
         if (ObjectUtil.isNull(one)) {

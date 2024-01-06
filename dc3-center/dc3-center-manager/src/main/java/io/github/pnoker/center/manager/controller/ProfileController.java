@@ -19,9 +19,12 @@ package io.github.pnoker.center.manager.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
+import io.github.pnoker.center.manager.entity.builder.ProfileBuilder;
 import io.github.pnoker.center.manager.entity.query.ProfileQuery;
+import io.github.pnoker.center.manager.entity.vo.ProfileVO;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
@@ -35,7 +38,6 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -50,20 +52,24 @@ import java.util.stream.Collectors;
 public class ProfileController implements BaseController {
 
     @Resource
+    private ProfileBuilder profileBuilder;
+
+    @Resource
     private ProfileService profileService;
 
     /**
      * 新增 Profile
      *
-     * @param profileBO Profile
-     * @return Profile
+     * @param entityVO {@link ProfileVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody ProfileBO profileBO) {
+    public R<String> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
         try {
-            profileBO.setTenantId(getTenantId());
-            profileService.save(profileBO);
-            return R.ok();
+            ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            profileService.save(entityBO);
+            return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -72,14 +78,14 @@ public class ProfileController implements BaseController {
     /**
      * 根据 ID 删除 Profile
      *
-     * @param id 模板ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
     public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
         try {
             profileService.remove(Long.parseLong(id));
-            return R.ok();
+            return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -88,15 +94,15 @@ public class ProfileController implements BaseController {
     /**
      * 更新 Profile
      *
-     * @param profileBO Profile
-     * @return Profile
+     * @param entityVO {@link ProfileVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody ProfileBO profileBO) {
+    public R<String> update(@Validated(Update.class) @RequestBody ProfileVO entityVO) {
         try {
-            profileBO.setTenantId(getTenantId());
-            profileService.update(profileBO);
-            return R.ok();
+            ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
+            profileService.update(entityBO);
+            return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -105,36 +111,32 @@ public class ProfileController implements BaseController {
     /**
      * 根据 ID 查询 Profile
      *
-     * @param id 模板ID
-     * @return Profile
+     * @param id ID
+     * @return ProfileVO {@link ProfileVO}
      */
     @GetMapping("/id/{id}")
-    public R<ProfileBO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<ProfileVO> selectById(@NotNull @PathVariable(value = "id") String id) {
         try {
-            ProfileBO select = profileService.selectById(Long.parseLong(id));
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            ProfileBO entityBO = profileService.selectById(Long.parseLong(id));
+            ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
+            return R.ok(entityVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
      * 根据 ID 集合查询 Profile
      *
-     * @param profileIds 模版ID set
-     * @return Map String:Profile
+     * @param profileIds 模板ID集
+     * @return Map(ID, ProfileVO)
      */
     @PostMapping("/ids")
-    public R<Map<Long, ProfileBO>> selectByIds(@RequestBody Set<String> profileIds) {
+    public R<Map<Long, ProfileVO>> selectByIds(@RequestBody Set<Long> profileIds) {
         try {
-            Set<Long> collect = profileIds.stream().map(Long::parseLong).collect(Collectors.toSet());
-            List<ProfileBO> profileBOS = profileService.selectByIds(collect);
-            Map<Long, ProfileBO> profileMap = profileBOS.stream().collect(Collectors.toMap(ProfileBO::getId, Function.identity()));
-            return R.ok(profileMap);
-            // todo   返回 long id 前端你无法解析
+            List<ProfileBO> entityBOS = profileService.selectByIds(profileIds);
+            Map<Long, ProfileVO> deviceMap = entityBOS.stream().collect(Collectors.toMap(ProfileBO::getId, entityBO -> profileBuilder.buildVOByBO(entityBO)));
+            return R.ok(deviceMap);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
@@ -147,38 +149,35 @@ public class ProfileController implements BaseController {
      * @return Profile Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<ProfileBO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public R<List<ProfileVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<ProfileBO> select = profileService.selectByDeviceId(deviceId);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            List<ProfileBO> entityBOS = profileService.selectByDeviceId(deviceId);
+            List<ProfileVO> entityVOS = profileBuilder.buildVOListByBOList(entityBOS);
+            return R.ok(entityVOS);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
      * 分页查询 Profile
      *
-     * @param profilePageQuery Profile Dto
+     * @param entityQuery Profile Dto
      * @return Page Of Profile
      */
     @PostMapping("/list")
-    public R<Page<ProfileBO>> list(@RequestBody(required = false) ProfileQuery profilePageQuery) {
+    public R<Page<ProfileVO>> list(@RequestBody(required = false) ProfileQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(profilePageQuery)) {
-                profilePageQuery = new ProfileQuery();
+            if (ObjectUtil.isEmpty(entityQuery)) {
+                entityQuery = new ProfileQuery();
             }
-            Page<ProfileBO> page = profileService.selectByPage(profilePageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<ProfileBO> entityPageBO = profileService.selectByPage(entityQuery);
+            Page<ProfileVO> entityPageVO = profileBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
 }

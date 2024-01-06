@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.biz;
 
-import io.github.pnoker.center.data.entity.point.PointValue;
+import io.github.pnoker.center.data.entity.bo.PointValueBO;
 
 import java.util.List;
 
@@ -31,15 +31,15 @@ public interface PointValueRepositoryService {
     /**
      * 自定义数据处理，此处可以自定义逻辑，将数据存放到别的数据库，或者发送到别的地方
      *
-     * @param pointValue PointValue
+     * @param pointValueBO PointValue
      */
-    void save(PointValue pointValue);
+    void save(PointValueBO pointValueBO);
 
     /**
      * 自定义数据处理，此处可以自定义逻辑，将数据存放到别的数据库，或者发送到别的地方
      *
-     * @param pointValues PointValue Array
+     * @param pointValueBOS PointValue Array
      */
-    void save(List<PointValue> pointValues);
+    void save(List<PointValueBO> pointValueBOS);
 
 }

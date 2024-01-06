@@ -57,9 +57,6 @@ public class AsciiMaster extends SerialMaster {
         super(wrapper, validateResponse);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void init() throws ModbusInitException {
         try {
@@ -81,9 +78,6 @@ public class AsciiMaster extends SerialMaster {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void destroy() {
         closeMessageControl(conn);
@@ -91,9 +85,6 @@ public class AsciiMaster extends SerialMaster {
         initialized = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
         // Wrap the modbus request in an ascii request.

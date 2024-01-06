@@ -14,35 +14,64 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.entity.point;
+package io.github.pnoker.center.data.entity.bo;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * MongoDB 位号数据
+ * 位号值
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Getter
 @Setter
-@Document
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class MgPointValue extends PointValue {
+public class PointValueBO implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    @MongoId
-    private String id;
+    /**
+     * ID
+     */
+    private Long id;
 
-    public MgPointValue(PointValue pointValue) {
-        BeanUtil.copyProperties(pointValue, this);
-    }
+    /**
+     * 设备ID
+     */
+    private Long deviceId;
+
+    /**
+     * 位号ID
+     */
+    private Long pointId;
+
+    /**
+     * 原始值
+     */
+    private String rawValue;
+
+    /**
+     * 处理值
+     */
+    private String value;
+
+    private List<String> children;
+
+    /**
+     * 原始时间
+     */
+    private LocalDateTime originTime;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
 }
