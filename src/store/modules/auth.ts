@@ -60,19 +60,19 @@ const auth = {
                 lock: true,
                 text: '登录中,请稍后...',
             })
-            const login = {
+            const login: Login = {
                 tenant: form.tenant,
                 name: form.name,
-            } as Login
+            }
             generateSalt(login)
                 .then((res) => {
-                    const salt = res.data.data
-                    const login = {
+                    const salt: string = res.data
+                    const login: Login = {
                         tenant: form.tenant,
                         name: form.name,
                         salt: salt,
                         password: Md5.hashStr(Md5.hashStr(form.password) + salt),
-                    } as Login
+                    }
 
                     generateToken(login)
                         .then((res) => {
@@ -80,7 +80,7 @@ const auth = {
                                 tenant: login.tenant,
                                 name: login.name,
                                 salt: login.salt,
-                                token: res.data.data,
+                                token: res.data,
                             })
                             router.push({ path: '/' }).then(() => loading.close())
                         })

@@ -104,7 +104,7 @@ export default defineComponent({
                 ...reactiveData.query,
             })
                 .then((res) => {
-                    const data = res.data.data
+                    const data = res.data
                     reactiveData.page.total = data.total
                     reactiveData.listData = data.records
 
@@ -112,7 +112,7 @@ export default defineComponent({
                     const driverIds = Array.from(new Set(reactiveData.listData.map((device) => device.driverId)))
                     getDriverByIds(driverIds)
                         .then((res) => {
-                            reactiveData.driverTable = res.data.data
+                            reactiveData.driverTable = res.data
                         })
                         .catch(() => {
                             // nothing to do
@@ -130,7 +130,7 @@ export default defineComponent({
                 ...reactiveData.query,
             })
                 .then((res) => {
-                    reactiveData.statusTable = res.data.data
+                    reactiveData.statusTable = res.data
                 })
                 .catch(() => {
                     // nothing to do
@@ -189,9 +189,9 @@ export default defineComponent({
 
         const importTemplate = (form, done) => {
             importDeviceTemplate(form)
-                .then((response) => {
-                    const url = window.URL.createObjectURL(new Blob([response.data as BlobPart]))
-                    const name = response.headers['content-disposition'].split(';')[1].split('filename=')[1]
+                .then((res) => {
+                    const url = window.URL.createObjectURL(new Blob([res.data as BlobPart]))
+                    const name = res.headers['content-disposition'].split(';')[1].split('filename=')[1]
                     const link = document.createElement('a')
                     link.href = url
                     link.setAttribute('download', name)

@@ -92,7 +92,7 @@ export default defineComponent({
                 label: reactiveData.driverQuery,
             })
                 .then((res) => {
-                    const data = res.data.data
+                    const data = res.data
                     reactiveData.driverPage.total = data.total
                     reactiveData.driverDictionary = data.records
                 })
@@ -119,7 +119,7 @@ export default defineComponent({
                 label: reactiveData.profileQuery,
             })
                 .then((res) => {
-                    const data = res.data.data
+                    const data = res.data
                     reactiveData.profilePage.total = data.total
                     reactiveData.profileDictionary = data.records
                 })

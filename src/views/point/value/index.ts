@@ -109,20 +109,20 @@ export default defineComponent({
         }
 
         const loadPointValueList = (res) => {
-            reactiveData.listData = res.data.data.records.map((record) => {
+            reactiveData.listData = res.data.records.map((record) => {
                 const tempDate1 = new Date(record.createTime)
                 const tempDate2 = new Date(record.originTime)
                 record.interval = tempDate1.getTime() - tempDate2.getTime()
                 return record
             })
-            reactiveData.page.total = res.data.data.total
+            reactiveData.page.total = res.data.total
 
             // device
             const deviceIds = Array.from(new Set(reactiveData.listData.map((pointValue) => pointValue.deviceId)))
             if (deviceIds.length > 0) {
                 getDeviceByIds(deviceIds)
                     .then((res) => {
-                        reactiveData.deviceTable = res.data.data
+                        reactiveData.deviceTable = res.data
                     })
                     .catch(() => {
                         // nothing to do
@@ -134,7 +134,7 @@ export default defineComponent({
             if (pointIds.length > 0) {
                 getPointByIds(pointIds)
                     .then((res) => {
-                        reactiveData.pointTable = res.data.data
+                        reactiveData.pointTable = res.data
                     })
                     .catch(() => {
                         // nothing to do
@@ -142,7 +142,7 @@ export default defineComponent({
 
                 getPointUnit(pointIds)
                     .then((res) => {
-                        reactiveData.unitTable = res.data.data
+                        reactiveData.unitTable = res.data
                     })
                     .catch(() => {
                         // nothing to do

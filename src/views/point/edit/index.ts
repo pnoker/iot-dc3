@@ -88,8 +88,8 @@ export default defineComponent({
             const id = route.query.id as string
             getPointById(id)
                 .then((res) => {
-                    reactiveData.pointFormData = res.data.data
-                    reactiveData.oldPointFormData = { ...res.data.data }
+                    reactiveData.pointFormData = res.data
+                    reactiveData.oldPointFormData = { ...res.data }
                 })
                 .catch(() => {
                     // nothing to do
@@ -102,7 +102,7 @@ export default defineComponent({
                 if (valid) {
                     getPointUpdate(reactiveData.pointFormData)
                         .then((res) => {
-                            reactiveData.oldPointFormData = { ...res.data.data }
+                            reactiveData.oldPointFormData = { ...res.data }
                         })
                         .catch(() => {
                             // nothing to do

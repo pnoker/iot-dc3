@@ -74,7 +74,7 @@ export default defineComponent({
                 label: reactiveData.driverQuery,
             })
                 .then((res) => {
-                    const data = res.data.data
+                    const data = res.data
                     reactiveData.driverPage.total = data.total
                     reactiveData.driverDictionary = data.records
                 })

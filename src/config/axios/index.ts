@@ -30,6 +30,15 @@ const request: AxiosInstance = axios.create({
     withCredentials: true,
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
     validateStatus: (status) => status >= 200 && status <= 500,
+    transformResponse: [
+        function (data) {
+            try {
+                return JSONBigIntStr.parse(data)
+            } catch (err) {
+                return { data }
+            }
+        },
+    ],
 })
 
 request.interceptors.request.use(
@@ -68,7 +77,7 @@ request.interceptors.response.use(
         const responseType = response.config.responseType
 
         if (ok || responseType === 'blob') {
-            return JSONBigIntStr.parse(response as any)
+            return response.data
         }
 
         if (status === 401) {

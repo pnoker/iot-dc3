@@ -18,11 +18,11 @@
  * 登录信息
  */
 export type Login = {
-    tenant: string
-    name: string
-    salt: string
-    password: string
-    token: string
+    tenant?: string
+    name?: string
+    salt?: string
+    password?: string
+    token?: string
 }
 
 /**

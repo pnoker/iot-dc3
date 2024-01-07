@@ -79,7 +79,7 @@ export default defineComponent({
                 label: reactiveData.deviceQuery,
             })
                 .then((res) => {
-                    const data = res.data.data
+                    const data = res.data
                     reactiveData.devicePage.total = data.total
                     reactiveData.deviceDictionary = data.records
                 })
@@ -100,7 +100,7 @@ export default defineComponent({
                 parentValue2: reactiveData.formData.deviceId,
             })
                 .then((res) => {
-                    const data = res.data.data
+                    const data = res.data
                     reactiveData.pointPage.total = data.total
                     reactiveData.pointDictionary = data.records
                 })

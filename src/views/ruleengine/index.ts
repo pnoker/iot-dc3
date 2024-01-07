@@ -62,7 +62,7 @@ export default defineComponent({
                 page: reactiveData.page,
                 ...reactiveData.query,
             }).then((res) => {
-                const data = res.data.data
+                const data = res.data
                 reactiveData.page.total = data.total
                 reactiveData.listData = data.records
                 reactiveData.loading = false

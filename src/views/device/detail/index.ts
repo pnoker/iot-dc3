@@ -108,12 +108,12 @@ export default defineComponent({
         const device = () => {
             getDeviceById(reactiveData.id)
                 .then((res) => {
-                    reactiveData.data = res.data.data
+                    reactiveData.data = res.data
                     reactiveData.deviceTable[reactiveData.data.id] = reactiveData.data.deviceName
 
                     getDriverById(reactiveData.data.driverId)
                         .then((res) => {
-                            reactiveData.driver = res.data.data
+                            reactiveData.driver = res.data
                         })
                         .catch(() => {
                             // nothing to do
@@ -127,13 +127,13 @@ export default defineComponent({
         const profiles = () => {
             getProfileByDeviceId(reactiveData.id)
                 .then((res) => {
-                    reactiveData.listProfileData = res.data.data
+                    reactiveData.listProfileData = res.data
 
                     // profile
                     const profileIds = Array.from(new Set(reactiveData.listProfileData.map((pointValue) => pointValue.id)))
                     getProfileByIds(profileIds)
                         .then((res) => {
-                            reactiveData.profileTable = res.data.data
+                            reactiveData.profileTable = res.data
                         })
                         .catch(() => {
                             // nothing to do

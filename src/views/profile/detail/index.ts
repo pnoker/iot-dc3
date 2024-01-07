@@ -77,7 +77,7 @@ export default defineComponent({
 
         const profile = () => {
             getProfileById(reactiveData.id).then((res) => {
-                reactiveData.data = res.data.data
+                reactiveData.data = res.data
             })
         }
 

@@ -60,7 +60,7 @@ export default defineComponent({
         const driver = () => {
             getDriverById(reactiveData.id)
                 .then((res) => {
-                    reactiveData.data = res.data.data
+                    reactiveData.data = res.data
                 })
                 .catch(() => {
                     // nothing to do
@@ -70,13 +70,13 @@ export default defineComponent({
         const device = () => {
             getDeviceByDriverId(reactiveData.id)
                 .then((res) => {
-                    reactiveData.listDeviceData = res.data.data
+                    reactiveData.listDeviceData = res.data
 
                     // driver
                     const driverIds = Array.from(new Set(reactiveData.listDeviceData.map((device) => device.driverId)))
                     getDriverByIds(driverIds)
                         .then((res) => {
-                            reactiveData.driverTable = res.data.data
+                            reactiveData.driverTable = res.data
                         })
                         .catch(() => {
                             // nothing to do
@@ -88,12 +88,12 @@ export default defineComponent({
                             reactiveData.listDeviceData.reduce((pre, cur) => {
                                 pre.push(...cur.profileIds)
                                 return pre
-                            }, [])
-                        )
+                            }, []),
+                        ),
                     )
                     getProfileByIds(profileIds)
                         .then((res) => {
-                            reactiveData.profileTable = res.data.data
+                            reactiveData.profileTable = res.data
                         })
                         .catch(() => {
                             // nothing to do
@@ -105,7 +105,7 @@ export default defineComponent({
 
             getDeviceStatusByDriverId(reactiveData.id)
                 .then((res) => {
-                    reactiveData.statusTable = res.data.data
+                    reactiveData.statusTable = res.data
                 })
                 .catch(() => {
                     // nothing to do

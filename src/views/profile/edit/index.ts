@@ -87,8 +87,8 @@ export default defineComponent({
         const profile = () => {
             const id = route.query.id as string
             getProfileById(id).then((res) => {
-                reactiveData.profileFormData = res.data.data
-                reactiveData.oldProfileFormData = { ...res.data.data }
+                reactiveData.profileFormData = res.data
+                reactiveData.oldProfileFormData = { ...res.data }
             })
         }
 
@@ -97,7 +97,7 @@ export default defineComponent({
             form?.validate((valid) => {
                 if (valid) {
                     updateProfile(reactiveData.profileFormData).then((res) => {
-                        reactiveData.oldProfileFormData = { ...res.data.data }
+                        reactiveData.oldProfileFormData = { ...res.data }
                     })
                 }
             })

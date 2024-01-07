@@ -111,7 +111,7 @@ export default defineComponent({
                 ...reactiveData.query,
             })
                 .then((res) => {
-                    const data = res.data.data
+                    const data = res.data
                     reactiveData.page.total = data.total
                     reactiveData.listData = data.records
 
@@ -119,7 +119,7 @@ export default defineComponent({
                     const profileIds = Array.from(new Set(reactiveData.listData.map((point) => point.profileId)))
                     getProfileByIds(profileIds)
                         .then((res) => {
-                            reactiveData.profileTable = res.data.data
+                            reactiveData.profileTable = res.data
                         })
                         .catch(() => {
                             // nothing to do
