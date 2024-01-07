@@ -67,6 +67,7 @@ public class GroupController implements BaseController {
             groupService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -83,6 +84,7 @@ public class GroupController implements BaseController {
             groupService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -100,6 +102,7 @@ public class GroupController implements BaseController {
             groupService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -117,6 +120,7 @@ public class GroupController implements BaseController {
             GroupVO entityVO = groupForManagerBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -138,6 +142,7 @@ public class GroupController implements BaseController {
             Page<GroupVO> entityPageVO = groupForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }

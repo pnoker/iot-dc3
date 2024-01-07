@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.entity.builder.UserLoginBuilder;
 import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
-import io.github.pnoker.center.auth.entity.vo.LimitedIpVO;
 import io.github.pnoker.center.auth.entity.vo.UserLoginVO;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.center.auth.service.UserPasswordService;
@@ -70,6 +69,7 @@ public class UserLoginController implements BaseController {
             userLoginService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -86,6 +86,7 @@ public class UserLoginController implements BaseController {
             userLoginService.remove(Long.parseLong(id));
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -107,6 +108,7 @@ public class UserLoginController implements BaseController {
             userLoginService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -123,6 +125,7 @@ public class UserLoginController implements BaseController {
             userPasswordService.restPassword(Long.parseLong(id));
             return R.ok();
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -140,6 +143,7 @@ public class UserLoginController implements BaseController {
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -157,6 +161,7 @@ public class UserLoginController implements BaseController {
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }

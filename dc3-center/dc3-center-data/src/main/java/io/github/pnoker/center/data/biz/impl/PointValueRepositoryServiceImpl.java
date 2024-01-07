@@ -123,7 +123,7 @@ public class PointValueRepositoryServiceImpl implements PointValueRepositoryServ
     /**
      * 保存 PointValue 到指定存储服务
      *
-     * @param pointValueBO         PointValue
+     * @param pointValueBO       PointValue
      * @param repositoryServices RepositoryService Array
      */
     private void savePointValueToRepository(PointValueBO pointValueBO, RepositoryService... repositoryServices) {
@@ -143,7 +143,7 @@ public class PointValueRepositoryServiceImpl implements PointValueRepositoryServ
      * 保存 PointValues 到指定存储服务
      *
      * @param deviceId           设备ID
-     * @param pointValueBOS        PointValue Array
+     * @param pointValueBOS      PointValue Array
      * @param repositoryServices RepositoryService Array
      */
     private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOS, RepositoryService... repositoryServices) {

@@ -57,6 +57,7 @@ public class DriverStatusController implements BaseController {
             Map<Long, String> statuses = driverStatusService.driver(driverQuery);
             return R.ok(statuses);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }

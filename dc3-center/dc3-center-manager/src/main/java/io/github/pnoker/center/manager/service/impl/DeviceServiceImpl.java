@@ -56,6 +56,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -214,6 +215,9 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public List<DeviceBO> selectByIds(Set<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         List<DeviceDO> entityDOS = deviceManager.listByIds(ids);
         List<DeviceBO> deviceBOS = deviceBuilder.buildBOListByDOList(entityDOS);
         deviceBOS.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));

@@ -67,6 +67,7 @@ public class LimitedIpController implements BaseController {
             limitedIpService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -83,6 +84,7 @@ public class LimitedIpController implements BaseController {
             limitedIpService.remove(Long.parseLong(id));
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -104,6 +106,7 @@ public class LimitedIpController implements BaseController {
             limitedIpService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -121,6 +124,7 @@ public class LimitedIpController implements BaseController {
             LimitedIpVO entityVO = limitedIpBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -138,6 +142,7 @@ public class LimitedIpController implements BaseController {
             LimitedIpVO entityVO = limitedIpBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -159,6 +164,7 @@ public class LimitedIpController implements BaseController {
             Page<LimitedIpVO> entityPageVO = limitedIpBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -174,6 +180,7 @@ public class LimitedIpController implements BaseController {
         try {
             return Boolean.TRUE.equals(limitedIpService.checkLimitedIpValid(ip)) ? R.ok() : R.fail();
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }

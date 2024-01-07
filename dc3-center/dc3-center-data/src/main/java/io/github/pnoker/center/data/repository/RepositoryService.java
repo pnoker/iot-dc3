@@ -47,7 +47,7 @@ public interface RepositoryService {
     /**
      * 保存 PointValue 集合
      *
-     * @param deviceId    设备ID
+     * @param deviceId      设备ID
      * @param pointValueBOS PointValue Array
      * @throws IOException IOException
      */

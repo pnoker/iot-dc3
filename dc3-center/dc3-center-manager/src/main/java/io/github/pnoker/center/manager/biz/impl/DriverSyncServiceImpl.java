@@ -97,8 +97,8 @@ public class DriverSyncServiceImpl implements DriverSyncService {
             DriverSyncDownDTO driverSyncDownDTO = DriverSyncDownDTO.builder().content(JsonUtil.toJsonString(driverMetadataDTO)).build();
 
             rabbitTemplate.convertAndSend(
-                    RabbitConstant.TOPIC_EXCHANGE_SYNC,
-                    RabbitConstant.ROUTING_SYNC_DOWN_PREFIX + entityDTO.getClient(),
+                    RabbitConstant.TOPIC_EXCHANGE_REGISTER,
+                    RabbitConstant.ROUTING_REGISTER_DOWN_PREFIX + entityDTO.getClient(),
                     driverSyncDownDTO
             );
         } catch (Exception e) {

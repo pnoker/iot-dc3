@@ -56,6 +56,7 @@ public class PointValueCommandController implements BaseController {
         try {
             pointValueCommandService.read(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
         return R.ok();
@@ -72,6 +73,7 @@ public class PointValueCommandController implements BaseController {
         try {
             pointValueCommandService.write(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
         return R.ok();

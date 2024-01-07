@@ -71,6 +71,7 @@ public class DriverController implements BaseController {
             driverService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -87,6 +88,7 @@ public class DriverController implements BaseController {
             driverService.remove(Long.parseLong(id));
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -104,6 +106,7 @@ public class DriverController implements BaseController {
             driverService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -121,6 +124,7 @@ public class DriverController implements BaseController {
             DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -138,6 +142,7 @@ public class DriverController implements BaseController {
             Map<Long, DriverVO> driverMap = entityBOS.stream().collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
             return R.ok(driverMap);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -155,6 +160,7 @@ public class DriverController implements BaseController {
             DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -176,6 +182,7 @@ public class DriverController implements BaseController {
             Page<DriverVO> entityPageVO = driverBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
