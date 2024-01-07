@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.builder.TenantBuilder;
 import io.github.pnoker.center.auth.entity.query.TenantQuery;
-import io.github.pnoker.center.auth.entity.vo.LimitedIpVO;
 import io.github.pnoker.center.auth.entity.vo.TenantVO;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.base.BaseController;
@@ -67,6 +66,7 @@ public class TenantController implements BaseController {
             tenantService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -83,6 +83,7 @@ public class TenantController implements BaseController {
             tenantService.remove(Long.parseLong(id));
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -104,6 +105,7 @@ public class TenantController implements BaseController {
             tenantService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -121,6 +123,7 @@ public class TenantController implements BaseController {
             TenantVO entityVO = tenantBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -139,6 +142,7 @@ public class TenantController implements BaseController {
                 return R.ok(select);
             }
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
         return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
@@ -160,6 +164,7 @@ public class TenantController implements BaseController {
             Page<TenantVO> entityPageVO = tenantBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }

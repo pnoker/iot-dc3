@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -42,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -123,6 +125,9 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public List<PointBO> selectByIds(Set<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         List<PointDO> entityDOS = pointManager.listByIds(ids);
         return pointBuilder.buildBOListByDOList(entityDOS);
     }
@@ -159,8 +164,11 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public Map<Long, String> unit(Set<Long> pointIds) {
-        List<PointDO> pointDOS = pointManager.listByIds(pointIds);
+    public Map<Long, String> unit(Set<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyMap();
+        }
+        List<PointDO> pointDOS = pointManager.listByIds(ids);
         return pointDOS.stream().collect(Collectors.toMap(PointDO::getId, PointDO::getUnit));
     }
 

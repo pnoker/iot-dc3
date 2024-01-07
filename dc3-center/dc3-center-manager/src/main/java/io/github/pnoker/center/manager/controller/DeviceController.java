@@ -75,6 +75,7 @@ public class DeviceController implements BaseController {
             deviceService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -91,6 +92,7 @@ public class DeviceController implements BaseController {
             deviceService.remove(Long.parseLong(id));
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -108,6 +110,7 @@ public class DeviceController implements BaseController {
             deviceService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -125,6 +128,7 @@ public class DeviceController implements BaseController {
             DeviceVO entityVO = deviceBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -142,6 +146,7 @@ public class DeviceController implements BaseController {
             Map<Long, DeviceVO> deviceMap = entityBOS.stream().collect(Collectors.toMap(DeviceBO::getId, entityBO -> deviceBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -163,6 +168,7 @@ public class DeviceController implements BaseController {
             Page<DeviceVO> entityPageVO = deviceBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -179,6 +185,7 @@ public class DeviceController implements BaseController {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
             deviceService.importDevice(entityBO, multipartFile);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
         return R.ok();

@@ -60,6 +60,7 @@ public class DictionaryController implements BaseController {
             List<DictionaryVO> entityVOS = dictionaryForAuthBuilder.buildVOListByBOList(entityBOS);
             return R.ok(entityVOS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -76,6 +77,7 @@ public class DictionaryController implements BaseController {
             List<DictionaryVO> entityVOS = dictionaryForAuthBuilder.buildVOListByBOList(entityBOS);
             return R.ok(entityVOS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }

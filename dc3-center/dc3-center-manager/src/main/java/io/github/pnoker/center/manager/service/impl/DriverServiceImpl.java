@@ -115,6 +115,9 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public List<DriverBO> selectByIds(Set<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
         List<DriverDO> entityDOS = driverManager.listByIds(ids);
         return driverBuilder.buildBOListByDOList(entityDOS);
     }
@@ -128,8 +131,11 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public List<DriverBO> selectByProfileId(Long profileId) {
-        Set<Long> deviceIds = profileBindService.selectDeviceIdsByProfileId(profileId);
-        List<DeviceDO> deviceDOS = deviceManager.listByIds(deviceIds);
+        Set<Long> ids = profileBindService.selectDeviceIdsByProfileId(profileId);
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        List<DeviceDO> deviceDOS = deviceManager.listByIds(ids);
         Set<Long> driverIds = deviceDOS.stream().map(DeviceDO::getDriverId).collect(Collectors.toSet());
         List<DriverBO> entityDOList = selectByIds(driverIds);
         if (CollUtil.isEmpty(entityDOList)) {

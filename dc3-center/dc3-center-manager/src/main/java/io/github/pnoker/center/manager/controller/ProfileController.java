@@ -71,6 +71,7 @@ public class ProfileController implements BaseController {
             profileService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -87,6 +88,7 @@ public class ProfileController implements BaseController {
             profileService.remove(Long.parseLong(id));
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -104,6 +106,7 @@ public class ProfileController implements BaseController {
             profileService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -121,6 +124,7 @@ public class ProfileController implements BaseController {
             ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -138,6 +142,7 @@ public class ProfileController implements BaseController {
             Map<Long, ProfileVO> deviceMap = entityBOS.stream().collect(Collectors.toMap(ProfileBO::getId, entityBO -> profileBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -155,6 +160,7 @@ public class ProfileController implements BaseController {
             List<ProfileVO> entityVOS = profileBuilder.buildVOListByBOList(entityBOS);
             return R.ok(entityVOS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }

@@ -44,7 +44,7 @@ public class DriverRegisterReceiver {
     private DriverSyncService driverSyncService;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{driverRegister.name}")
+    @RabbitListener(queues = "#{driverRegisterQueue.name}")
     public void driverRegisterReceive(Channel channel, Message message, DriverRegisterDTO entityDTO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);

@@ -68,6 +68,7 @@ public class PointAttributeConfigController implements BaseController {
             pointAttributeConfigService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -84,6 +85,7 @@ public class PointAttributeConfigController implements BaseController {
             pointAttributeConfigService.remove(Long.parseLong(id));
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -101,6 +103,7 @@ public class PointAttributeConfigController implements BaseController {
             pointAttributeConfigService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -118,6 +121,7 @@ public class PointAttributeConfigController implements BaseController {
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -139,6 +143,7 @@ public class PointAttributeConfigController implements BaseController {
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -158,6 +163,7 @@ public class PointAttributeConfigController implements BaseController {
             List<PointAttributeConfigVO> entityVOS = pointAttributeConfigBuilder.buildVOListByBOList(entityBOS);
             return R.ok(entityVOS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }

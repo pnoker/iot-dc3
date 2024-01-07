@@ -68,6 +68,7 @@ public class DriverAttributeConfigController implements BaseController {
             driverAttributeConfigService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -84,6 +85,7 @@ public class DriverAttributeConfigController implements BaseController {
             driverAttributeConfigService.remove(Long.parseLong(id));
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -101,6 +103,7 @@ public class DriverAttributeConfigController implements BaseController {
             driverAttributeConfigService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -118,6 +121,7 @@ public class DriverAttributeConfigController implements BaseController {
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -137,6 +141,7 @@ public class DriverAttributeConfigController implements BaseController {
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -154,6 +159,7 @@ public class DriverAttributeConfigController implements BaseController {
             List<DriverAttributeConfigVO> entityVOS = driverAttributeConfigBuilder.buildVOListByBOList(entityBOS);
             return R.ok(entityVOS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -175,6 +181,7 @@ public class DriverAttributeConfigController implements BaseController {
             Page<DriverAttributeConfigVO> entityPageVO = driverAttributeConfigBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }

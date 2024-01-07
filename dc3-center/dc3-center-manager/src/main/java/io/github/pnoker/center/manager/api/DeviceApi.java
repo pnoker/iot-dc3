@@ -129,7 +129,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         pageQuery.setProfileId(request.getProfileId());
         pageQuery.setDeviceName(device.getDeviceName());
         pageQuery.setDriverId(device.getDriverId());
-        pageQuery.setEnableFlag(EnableFlagEnum.values()[device.getEnableFlag()]);
+        pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) device.getEnableFlag()));
 
         return pageQuery;
     }

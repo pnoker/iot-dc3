@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
@@ -72,6 +71,7 @@ public class PointController implements BaseController {
             pointService.save(entityBO);
             return R.ok(ResponseEnum.ADD_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -88,6 +88,7 @@ public class PointController implements BaseController {
             pointService.remove(Long.parseLong(id));
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -105,6 +106,7 @@ public class PointController implements BaseController {
             pointService.update(entityBO);
             return R.ok(ResponseEnum.UPDATE_SUCCESS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -122,6 +124,7 @@ public class PointController implements BaseController {
             PointVO entityVO = pointBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -139,6 +142,7 @@ public class PointController implements BaseController {
             Map<Long, PointVO> deviceMap = entityBOS.stream().collect(Collectors.toMap(PointBO::getId, entityBO -> pointBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -156,6 +160,7 @@ public class PointController implements BaseController {
             List<PointVO> entityVOS = pointBuilder.buildVOListByBOList(entityBOS);
             return R.ok(entityVOS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -173,6 +178,7 @@ public class PointController implements BaseController {
             List<PointVO> entityVOS = pointBuilder.buildVOListByBOList(entityBOS);
             return R.ok(entityVOS);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -194,6 +200,7 @@ public class PointController implements BaseController {
             Page<PointVO> entityPageVO = pointBuilder.buildVOPageByBOPage(entityPageBO);
             return R.ok(entityPageVO);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
     }
@@ -213,6 +220,7 @@ public class PointController implements BaseController {
                 return R.ok(unitCodeMap);
             }
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
         return R.fail();

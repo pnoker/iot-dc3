@@ -72,7 +72,7 @@ spring:
             #   name: default
             #   fallbackUri: 'forward:/fallback'
         # auth
-        - id: auth_route_other
+        - id: auth_route
           uri: lb://dc3-center-auth
           predicates:
             - Path=/api/v3/auth/user/**,/api/v3/auth/limited_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**

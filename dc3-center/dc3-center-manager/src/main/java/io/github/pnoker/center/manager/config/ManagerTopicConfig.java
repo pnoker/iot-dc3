@@ -42,33 +42,33 @@ import java.util.Map;
 public class ManagerTopicConfig {
 
     @Resource
-    private TopicExchange syncExchange;
+    private TopicExchange registerExchange;
 
     /**
-     * 该 Queue 用于接收来自驱动端的上行数据同步
+     * 该 Queue 用于接收来自驱动端上行的注册数据
      *
      * @return Queue
      */
     @Bean
-    Queue driverRegister() {
+    Queue driverRegisterQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 30秒：30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_SYNC_UP, false, false, false, arguments);
+        return new Queue(RabbitConstant.QUEUE_REGISTER_UP, false, false, false, arguments);
     }
 
     /**
      * 使用 * 匹配全部 Routing Key
      *
-     * @param driverRegister Queue
+     * @param driverRegisterQueue Queue
      * @return Binding
      */
     @Bean
-    Binding driverRegisterBinding(Queue driverRegister) {
+    Binding driverRegisterBinding(Queue driverRegisterQueue) {
         Binding binding = BindingBuilder
-                .bind(driverRegister)
-                .to(syncExchange)
-                .with(RabbitConstant.ROUTING_SYNC_UP_PREFIX + SymbolConstant.ASTERISK);
+                .bind(driverRegisterQueue)
+                .to(registerExchange)
+                .with(RabbitConstant.ROUTING_REGISTER_UP_PREFIX + SymbolConstant.ASTERISK);
         binding.addArgument(RabbitConstant.AUTO_DELETE, true);
         return binding;
     }

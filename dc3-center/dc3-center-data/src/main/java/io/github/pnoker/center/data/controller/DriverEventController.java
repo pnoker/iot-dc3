@@ -63,6 +63,7 @@ public class DriverEventController implements BaseController {
                 return R.ok(page);
             }
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
         return R.fail();
