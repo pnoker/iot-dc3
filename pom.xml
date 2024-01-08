@@ -97,6 +97,7 @@
             <properties>
                 <!-- You can configure environment variables commonly used in development -->
                 <NODE_ENV>dev</NODE_ENV>
+                <JM.LOG.PATH>dc3/logs</JM.LOG.PATH>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
