@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 /**
@@ -54,7 +55,7 @@ public class ResourceVO extends BaseVO {
     @Schema(description = "权限资源父级ID")
     @NotBlank(message = "Resource parent id can't be empty",
             groups = {Add.class, Update.class})
-    private String parentResourceId;
+    private Long parentResourceId;
 
     /**
      * 权限资源名称
@@ -96,9 +97,9 @@ public class ResourceVO extends BaseVO {
      * 权限资源实体ID
      */
     @Schema(description = "权限资源实体ID")
-    @NotBlank(message = "实体ID不能为空",
+    @NotNull(message = "实体ID不能为空",
             groups = {Add.class, Update.class})
-    private String entityId;
+    private Long entityId;
 
     /**
      * 资源拓展信息

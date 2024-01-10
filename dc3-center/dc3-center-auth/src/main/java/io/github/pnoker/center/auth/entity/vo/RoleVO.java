@@ -30,6 +30,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 /**
@@ -50,9 +51,9 @@ public class RoleVO extends BaseVO {
      * 角色父级ID
      */
     @Schema(description = "角色父级ID")
-    @NotBlank(message = "Role parent id can't be empty",
+    @NotNull(message = "Role parent id can't be empty",
             groups = {Add.class, Update.class})
-    private String parentRoleId;
+    private Long parentRoleId;
 
     /**
      * 角色名称

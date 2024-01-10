@@ -41,7 +41,7 @@ public class ResourceBO extends BaseBO {
     /**
      * 权限资源父级ID
      */
-    private String parentResourceId;
+    private Long parentResourceId;
 
     /**
      * 权限资源名称
@@ -73,7 +73,7 @@ public class ResourceBO extends BaseBO {
     /**
      * 权限资源实体ID
      */
-    private String entityId;
+    private Long entityId;
 
     /**
      * 资源拓展信息

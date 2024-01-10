@@ -81,9 +81,9 @@ public class UserLoginController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            userLoginService.remove(Long.parseLong(id));
+            userLoginService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -120,9 +120,9 @@ public class UserLoginController implements BaseController {
      * @return 是否重置
      */
     @PostMapping("/reset/{id}")
-    public R<Boolean> restPassword(@NotNull @PathVariable(value = "id") String id) {
+    public R<Boolean> restPassword(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            userPasswordService.restPassword(Long.parseLong(id));
+            userPasswordService.restPassword(id);
             return R.ok();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -137,9 +137,9 @@ public class UserLoginController implements BaseController {
      * @return UserLoginVO {@link UserLoginVO}
      */
     @GetMapping("/id/{id}")
-    public R<UserLoginVO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<UserLoginVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            UserLoginBO entityBO = userLoginService.selectById(Long.parseLong(id));
+            UserLoginBO entityBO = userLoginService.selectById(id);
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
