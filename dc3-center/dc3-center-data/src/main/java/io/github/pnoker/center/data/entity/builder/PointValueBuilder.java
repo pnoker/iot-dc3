@@ -22,6 +22,8 @@ import io.github.pnoker.center.data.entity.point.MgPointValueDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 /**
  * PointValue Builder
  *
@@ -42,11 +44,19 @@ public interface PointValueBuilder {
     /**
      * Mongo DO to BO
      *
-     * @param entityDO EntityBO
-     * @return EntityDO
+     * @param entityDO EntityDO
+     * @return EntityBO
      */
     @Mapping(target = "children", ignore = true)
     PointValueBO buildBOByMgDO(MgPointValueDO entityDO);
+
+    /**
+     * Mongo DOList to BOList
+     *
+     * @param entityDOList EntityDO Array
+     * @return EntityBO Array
+     */
+    List<PointValueBO> buildBOListByDOList(List<MgPointValueDO> entityDOList);
 
     /**
      * BO to ES DO
@@ -59,8 +69,8 @@ public interface PointValueBuilder {
     /**
      * ES DO to BO
      *
-     * @param entityDO EntityBO
-     * @return EntityDO
+     * @param entityDO EntityDO
+     * @return EntityBO
      */
     @Mapping(target = "children", ignore = true)
     PointValueBO buildBOByESDO(EsPointValueDO entityDO);

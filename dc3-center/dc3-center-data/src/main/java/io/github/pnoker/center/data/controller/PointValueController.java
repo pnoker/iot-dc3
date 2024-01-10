@@ -58,6 +58,7 @@ public class PointValueController implements BaseController {
             if (ObjectUtil.isEmpty(pointValueQuery)) {
                 pointValueQuery = new PointValueQuery();
             }
+            pointValueQuery.setTenantId(getTenantId());
             Page<PointValueBO> page = pointValueService.latest(pointValueQuery);
             if (ObjectUtil.isNotNull(page)) {
                 return R.ok(page);

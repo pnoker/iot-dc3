@@ -41,7 +41,7 @@ public class PointValueBO implements Serializable {
     /**
      * ID
      */
-    private Long id;
+    private String id;
 
     /**
      * 设备ID
