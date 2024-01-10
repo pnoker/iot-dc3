@@ -52,6 +52,7 @@ public class DeviceStatusController implements BaseController {
     @PostMapping("/device")
     public R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         try {
+            deviceQuery.setTenantId(getTenantId());
             Map<Long, String> statuses = deviceStatusService.device(deviceQuery);
             return R.ok(statuses);
         } catch (Exception e) {

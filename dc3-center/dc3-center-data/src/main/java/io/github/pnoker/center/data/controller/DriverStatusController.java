@@ -54,6 +54,7 @@ public class DriverStatusController implements BaseController {
     @PostMapping("/driver")
     public R<Map<Long, String>> driverStatus(@RequestBody(required = false) DriverQuery driverQuery) {
         try {
+            driverQuery.setTenantId(getTenantId());
             Map<Long, String> statuses = driverStatusService.driver(driverQuery);
             return R.ok(statuses);
         } catch (Exception e) {

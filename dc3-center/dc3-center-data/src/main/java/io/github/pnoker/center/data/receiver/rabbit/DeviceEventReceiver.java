@@ -16,12 +16,13 @@
 
 package io.github.pnoker.center.data.receiver.rabbit;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
+import io.github.pnoker.center.data.biz.DeviceEventService;
 import io.github.pnoker.center.data.biz.EventService;
-import io.github.pnoker.center.data.entity.DeviceEvent;
-import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.constant.driver.EventConstant;
+import io.github.pnoker.common.entity.dto.DeviceEventDTO;
+import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -50,33 +51,31 @@ public class DeviceEventReceiver {
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
+    @Resource
+    private DeviceEventService deviceEventService;
+
     @RabbitHandler
     @RabbitListener(queues = "#{deviceEventQueue.name}")
-    public void deviceEventReceive(Channel channel, Message message, DeviceEvent deviceEvent) {
+    public void deviceEventReceive(Channel channel, Message message, DeviceEventDTO entityDTO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            if (ObjectUtil.isNull(deviceEvent) || ObjectUtil.isNull(deviceEvent.getDeviceId())) {
-                log.error("Invalid device event: {}", deviceEvent);
+            log.debug("Receive device event: {}", JsonUtil.toPrettyJsonString(entityDTO));
+            if (ObjectUtil.isNull(entityDTO)
+                    || ObjectUtil.isNull(entityDTO.getType())
+                    || CharSequenceUtil.isEmpty(entityDTO.getContent())) {
+                log.error("Invalid device event: {}", entityDTO);
                 return;
             }
-            log.debug("Device {} event, From: {}, Event: {}", deviceEvent.getType(), message.getMessageProperties().getReceivedRoutingKey(), deviceEvent);
 
-            switch (deviceEvent.getType()) {
+            switch (entityDTO.getType()) {
                 // Save device heartbeat to Redis
-                case EventConstant.Device.STATUS:
-                    redisUtil.setKey(
-                            PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceEvent.getDeviceId(),
-                            deviceEvent.getContent(),
-                            deviceEvent.getTimeOut(),
-                            deviceEvent.getTimeUnit()
-                    );
+                case HEARTBEAT:
+                    deviceEventService.heartbeatEvent(entityDTO);
                     break;
-                case EventConstant.Device.ERROR:
-                    //TODO 去重
-                    threadPoolExecutor.execute(() -> eventService.addDeviceEvent(deviceEvent));
+                case ALARM:
                     break;
                 default:
-                    log.error("Invalid event type, {}", deviceEvent.getType());
+                    log.error("Invalid event type, {}", entityDTO.getType());
                     break;
             }
         } catch (IOException e) {

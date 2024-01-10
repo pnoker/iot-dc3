@@ -70,7 +70,8 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         getDOById(id, true);
 
         // 删除分组之前需要检查该分组是否存在关联
-        LambdaQueryChainWrapper<AlarmMessageProfileDO> wrapper = alarmMessageProfileManager.lambdaQuery().eq(AlarmMessageProfileDO::getTenantId, id);
+        LambdaQueryChainWrapper<AlarmMessageProfileDO> wrapper = alarmMessageProfileManager.lambdaQuery()
+                .eq(AlarmMessageProfileDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
             throw new AssociatedException("分组删除失败，该分组下存在子分组");
