@@ -94,14 +94,18 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
     @Override
     public PointAttributeBO selectByNameAndDriverId(String name, Long driverId) {
-        LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery().eq(PointAttributeDO::getAttributeName, name).eq(PointAttributeDO::getDriverId, driverId).last(QueryWrapperConstant.LIMIT_ONE);
+        LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery()
+                .eq(PointAttributeDO::getAttributeName, name)
+                .eq(PointAttributeDO::getDriverId, driverId)
+                .last(QueryWrapperConstant.LIMIT_ONE);
         PointAttributeDO entityDO = wrapper.one();
         return pointAttributeBuilder.buildBOByDO(entityDO);
     }
 
     @Override
     public List<PointAttributeBO> selectByDriverId(Long driverId, boolean throwException) {
-        LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery().eq(PointAttributeDO::getDriverId, driverId);
+        LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery()
+                .eq(PointAttributeDO::getDriverId, driverId);
         List<PointAttributeDO> entityDO = wrapper.list();
         return pointAttributeBuilder.buildBOListByDOList(entityDO);
     }

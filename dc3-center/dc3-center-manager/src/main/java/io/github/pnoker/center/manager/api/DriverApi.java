@@ -131,6 +131,8 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
         pageQuery.setServiceHost(driver.getServiceHost());
         pageQuery.setDriverTypeFlag(DriverTypeFlagEnum.ofIndex((byte) driver.getDriverTypeFlag()));
         pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) driver.getEnableFlag()));
+        pageQuery.setTenantId(driver.getTenantId());
+
         return pageQuery;
     }
 

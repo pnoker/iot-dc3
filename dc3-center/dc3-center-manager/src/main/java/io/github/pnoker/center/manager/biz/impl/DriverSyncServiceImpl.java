@@ -130,10 +130,10 @@ public class DriverSyncServiceImpl implements DriverSyncService {
         } else {
             log.debug("驱动未注册, 执行新增: {}", JsonUtil.toJsonString(driverBO));
             driverService.save(driverBO);
+            entityBO = driverService.selectByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
         }
 
-        driverBO = driverService.selectById(driverBO.getId());
-        return driverBuilder.buildDTOByBO(driverBO);
+        return driverBuilder.buildDTOByBO(entityBO);
     }
 
     /**
@@ -158,15 +158,15 @@ public class DriverSyncServiceImpl implements DriverSyncService {
 
         for (Map.Entry<String, DriverAttributeDTO> entry : newDriverAttributeMap.entrySet()) {
             String name = entry.getKey();
-            DriverAttributeDTO info = newDriverAttributeMap.get(name);
-            info.setDriverId(entityDO.getId());
-            DriverAttributeBO entityBO = driverAttributeBuilder.buildBOByDTO(info);
+            DriverAttributeDTO attribute = newDriverAttributeMap.get(name);
+            attribute.setDriverId(entityDO.getId());
+            DriverAttributeBO entityBO = driverAttributeBuilder.buildBOByDTO(attribute);
             if (oldDriverAttributeMap.containsKey(name)) {
-                info.setId(oldDriverAttributeMap.get(name).getId());
-                log.debug("Driver attribute registered, updating: {}", info);
+                entityBO.setId(oldDriverAttributeMap.get(name).getId());
+                log.debug("驱动属性已注册, 执行更新: {}", JsonUtil.toJsonString(entityBO));
                 driverAttributeService.update(entityBO);
             } else {
-                log.debug("Driver attribute does not registered, adding: {}", info);
+                log.debug("驱动属性未注册, 执行新增: {}", JsonUtil.toJsonString(entityBO));
                 driverAttributeService.save(entityBO);
             }
         }
@@ -211,11 +211,11 @@ public class DriverSyncServiceImpl implements DriverSyncService {
             attribute.setDriverId(entityDO.getId());
             PointAttributeBO entityBO = pointAttributeBuilder.buildBOByDTO(attribute);
             if (oldPointAttributeMap.containsKey(name)) {
-                attribute.setId(oldPointAttributeMap.get(name).getId());
-                log.debug("Point attribute registered, updating: {}", attribute);
+                entityBO.setId(oldPointAttributeMap.get(name).getId());
+                log.debug("位号属性已注册, 执行更新: {}", JsonUtil.toJsonString(entityBO));
                 pointAttributeService.update(entityBO);
             } else {
-                log.debug("Point attribute registered, adding: {}", attribute);
+                log.debug("位号属性未注册, 执行更新: {}", JsonUtil.toJsonString(entityBO));
                 pointAttributeService.save(entityBO);
             }
         }

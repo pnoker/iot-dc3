@@ -27,6 +27,7 @@ import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
 import io.github.pnoker.common.entity.common.Pages;
@@ -126,10 +127,11 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         pageQuery.setPage(pages);
 
         DeviceDTO device = request.getDevice();
-        pageQuery.setProfileId(request.getProfileId());
+        pageQuery.setProfileId(request.getProfileId() > DefaultConstant.DEFAULT_INT ? request.getProfileId() : null);
         pageQuery.setDeviceName(device.getDeviceName());
-        pageQuery.setDriverId(device.getDriverId());
+        pageQuery.setDriverId(device.getDriverId() > DefaultConstant.DEFAULT_INT ? device.getDriverId() : null);
         pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) device.getEnableFlag()));
+        pageQuery.setTenantId(device.getTenantId());
 
         return pageQuery;
     }

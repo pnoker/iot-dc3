@@ -83,9 +83,9 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            pointService.remove(Long.parseLong(id));
+            pointService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -118,9 +118,9 @@ public class PointController implements BaseController {
      * @return PointVO {@link PointVO}
      */
     @GetMapping("/id/{id}")
-    public R<PointVO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<PointVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            PointBO entityBO = pointService.selectById(Long.parseLong(id));
+            PointBO entityBO = pointService.selectById(id);
             PointVO entityVO = pointBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {

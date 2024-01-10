@@ -26,7 +26,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -55,7 +54,7 @@ public class ProfileBindVO extends BaseVO {
      * 设备ID
      */
     @Schema(description = "设备ID")
-    @NotBlank(message = "设备ID不能为空",
+    @NotNull(message = "设备ID不能为空",
             groups = {Add.class, Update.class})
     private Long deviceId;
 }

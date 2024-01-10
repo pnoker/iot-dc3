@@ -149,6 +149,9 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public List<PointBO> selectByProfileIds(Set<Long> profileIds) {
+        if (CollUtil.isEmpty(profileIds)) {
+            return Collections.emptyList();
+        }
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().in(PointDO::getProfileId, profileIds);
         List<PointDO> entityDOS = wrapper.list();
         return pointBuilder.buildBOListByDOList(entityDOS);
