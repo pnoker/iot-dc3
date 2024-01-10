@@ -63,7 +63,7 @@ export const getProfileDictionary = (dictionary: any) =>
  */
 export const getPointDictionary = (dictionary: any) =>
     request<R>({
-        url: `api/v3/manager/dictionary/point`,
+        url: `api/v3/manager/dictionary/device_point`,
         method: 'post',
         data: dictionary,
     })

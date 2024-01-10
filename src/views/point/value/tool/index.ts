@@ -97,7 +97,7 @@ export default defineComponent({
             getPointDictionary({
                 page: reactiveData.pointPage,
                 label: reactiveData.pointQuery,
-                parentValue2: reactiveData.formData.deviceId,
+                parentId: reactiveData.formData.deviceId,
             })
                 .then((res) => {
                     const data = res.data
