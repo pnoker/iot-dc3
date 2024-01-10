@@ -28,6 +28,8 @@ import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.biz.PointValueRepositoryService;
 import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.entity.bo.PointValueBO;
+import io.github.pnoker.center.data.entity.builder.PointValueBuilder;
+import io.github.pnoker.center.data.entity.point.MgPointValueDO;
 import io.github.pnoker.center.data.entity.query.PointValueQuery;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
@@ -66,6 +68,9 @@ public class PointValueServiceImpl implements PointValueService {
 
     @GrpcClient(ManagerConstant.SERVICE_NAME)
     private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
+
+    @Resource
+    private PointValueBuilder pointValueBuilder;
 
     @Resource
     private PointValueRepositoryService pointValueRepositoryService;
@@ -157,7 +162,8 @@ public class PointValueServiceImpl implements PointValueService {
         long count = mongoTemplate.count(query, collection);
         query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
         query.with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValueBO::getCreateTime)));
-        List<PointValueBO> pointValueBOS = mongoTemplate.find(query, PointValueBO.class, collection);
+        List<MgPointValueDO> pointValueDOS = mongoTemplate.find(query, MgPointValueDO.class, collection);
+        List<PointValueBO> pointValueBOS = pointValueBuilder.buildBOListByDOList(pointValueDOS);
         pointValuePage.setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(pointValueBOS);
         return pointValuePage;
     }
@@ -176,11 +182,13 @@ public class PointValueServiceImpl implements PointValueService {
         }
         builder.setPointTypeFlag(DefaultConstant.DEFAULT_INT);
         builder.setRwFlag(DefaultConstant.DEFAULT_INT);
+        builder.setProfileId(DefaultConstant.DEFAULT_INT);
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
             builder.setEnableFlag(pageQuery.getEnableFlag().getIndex());
         } else {
             builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
         }
+        builder.setTenantId(pageQuery.getTenantId());
         return builder;
     }
 
