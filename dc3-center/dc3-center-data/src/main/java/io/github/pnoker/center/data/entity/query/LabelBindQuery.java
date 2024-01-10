@@ -52,11 +52,11 @@ public class LabelBindQuery implements Serializable {
      * 标签ID
      */
     @Schema(description = "标签ID")
-    private String labelId;
+    private Long labelId;
 
     /**
      * 实体ID
      */
     @Schema(description = "实体ID")
-    private String entityId;
+    private Long entityId;
 }

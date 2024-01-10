@@ -20,6 +20,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.DriverEventService;
+import io.github.pnoker.common.constant.enums.DriverEventTypeEnum;
 import io.github.pnoker.common.entity.dto.DriverEventDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;

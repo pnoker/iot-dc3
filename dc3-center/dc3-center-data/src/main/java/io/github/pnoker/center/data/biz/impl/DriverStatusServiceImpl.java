@@ -30,7 +30,6 @@ import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.enums.DriverStatusEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.utils.RedisUtil;
-import io.github.pnoker.common.utils.UserHeaderUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
@@ -104,8 +103,8 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         } else {
             builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
         }
-        if (ObjectUtil.isNotEmpty(UserHeaderUtil.getUserHeader().getTenantId())) {
-            builder.setTenantId(UserHeaderUtil.getUserHeader().getTenantId());
+        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
+            builder.setTenantId(pageQuery.getTenantId());
         }
 
         return builder;
