@@ -82,9 +82,9 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            pointAttributeService.remove(Long.parseLong(id));
+            pointAttributeService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -117,9 +117,9 @@ public class PointAttributeController implements BaseController {
      * @return PointAttributeVO {@link PointAttributeVO}
      */
     @GetMapping("/id/{id}")
-    public R<PointAttributeVO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<PointAttributeVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            PointAttributeBO entityBO = pointAttributeService.selectById(Long.parseLong(id));
+            PointAttributeBO entityBO = pointAttributeService.selectById(id);
             PointAttributeVO entityVO = pointAttributeBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
@@ -135,9 +135,9 @@ public class PointAttributeController implements BaseController {
      * @return PointAttribute Array
      */
     @GetMapping("/driver_id/{id}")
-    public R<List<PointAttributeVO>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
+    public R<List<PointAttributeVO>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            List<PointAttributeBO> entityBOS = pointAttributeService.selectByDriverId(Long.parseLong(id), true);
+            List<PointAttributeBO> entityBOS = pointAttributeService.selectByDriverId(id, true);
             List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOS);
             return R.ok(entityVO);
         } catch (NotFoundException ne) {

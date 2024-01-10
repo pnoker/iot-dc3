@@ -80,9 +80,9 @@ public class PointAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            pointAttributeConfigService.remove(Long.parseLong(id));
+            pointAttributeConfigService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -115,9 +115,9 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointAttributeConfigVO {@link PointAttributeConfigVO}
      */
     @GetMapping("/id/{id}")
-    public R<PointAttributeConfigVO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<PointAttributeConfigVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            PointAttributeConfigBO entityBO = pointAttributeConfigService.selectById(Long.parseLong(id));
+            PointAttributeConfigBO entityBO = pointAttributeConfigService.selectById(id);
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
@@ -135,11 +135,11 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointInfo
      */
     @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}/point_id/{pointId}")
-    public R<PointAttributeConfigVO> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") String attributeId,
-                                                                              @NotNull @PathVariable(value = "deviceId") String deviceId,
-                                                                              @NotNull @PathVariable(value = "pointId") String pointId) {
+    public R<PointAttributeConfigVO> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") Long attributeId,
+                                                                              @NotNull @PathVariable(value = "deviceId") Long deviceId,
+                                                                              @NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
-            PointAttributeConfigBO entityBO = pointAttributeConfigService.selectByAttributeIdAndDeviceIdAndPointId(Long.parseLong(attributeId), Long.parseLong(deviceId), Long.parseLong(pointId));
+            PointAttributeConfigBO entityBO = pointAttributeConfigService.selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
             PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {

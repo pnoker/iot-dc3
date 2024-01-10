@@ -83,9 +83,9 @@ public class ProfileController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            profileService.remove(Long.parseLong(id));
+            profileService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -118,9 +118,9 @@ public class ProfileController implements BaseController {
      * @return ProfileVO {@link ProfileVO}
      */
     @GetMapping("/id/{id}")
-    public R<ProfileVO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<ProfileVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            ProfileBO entityBO = profileService.selectById(Long.parseLong(id));
+            ProfileBO entityBO = profileService.selectById(id);
             ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {

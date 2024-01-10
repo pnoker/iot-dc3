@@ -94,14 +94,18 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     @Override
     public DriverAttributeBO selectByNameAndDriverId(String name, Long driverId) {
-        LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery().eq(DriverAttributeDO::getAttributeName, name).eq(DriverAttributeDO::getDriverId, driverId).last(QueryWrapperConstant.LIMIT_ONE);
+        LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery()
+                .eq(DriverAttributeDO::getAttributeName, name)
+                .eq(DriverAttributeDO::getDriverId, driverId)
+                .last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeDO entityDO = wrapper.one();
         return driverAttributeBuilder.buildBOByDO(entityDO);
     }
 
     @Override
     public List<DriverAttributeBO> selectByDriverId(Long driverId) {
-        LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery().eq(DriverAttributeDO::getDriverId, driverId);
+        LambdaQueryChainWrapper<DriverAttributeDO> wrapper = driverAttributeManager.lambdaQuery()
+                .eq(DriverAttributeDO::getDriverId, driverId);
         List<DriverAttributeDO> entityDO = wrapper.list();
         return driverAttributeBuilder.buildBOListByDOList(entityDO);
     }

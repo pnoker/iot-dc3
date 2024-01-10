@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -107,8 +106,8 @@ public class LabelBindServiceImpl implements LabelBindService {
      */
     private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery entityQuery) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
         wrapper.eq(LabelBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

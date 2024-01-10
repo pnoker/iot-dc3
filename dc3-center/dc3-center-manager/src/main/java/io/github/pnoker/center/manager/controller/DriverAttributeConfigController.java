@@ -80,9 +80,9 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            driverAttributeConfigService.remove(Long.parseLong(id));
+            driverAttributeConfigService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -115,9 +115,9 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
      */
     @GetMapping("/id/{id}")
-    public R<DriverAttributeConfigVO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<DriverAttributeConfigVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectById(Long.parseLong(id));
+            DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectById(id);
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
@@ -134,10 +134,10 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverInfo
      */
     @GetMapping("/device_id/{deviceId}/attribute_id/{attributeId}")
-    public R<DriverAttributeConfigVO> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") String deviceId,
-                                                                     @NotNull @PathVariable(value = "attributeId") String attributeId) {
+    public R<DriverAttributeConfigVO> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
+                                                                     @NotNull @PathVariable(value = "attributeId") Long attributeId) {
         try {
-            DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectByAttributeIdAndDeviceId(Long.parseLong(deviceId), Long.parseLong(attributeId));
+            DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectByAttributeIdAndDeviceId(deviceId, attributeId);
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {

@@ -27,7 +27,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -48,7 +47,7 @@ public class PointAttributeConfigVO extends BaseVO {
      * 位号属性ID
      */
     @Schema(description = "位号属性ID")
-    @NotBlank(message = "位号属性ID不能为空",
+    @NotNull(message = "位号属性ID不能为空",
             groups = {Add.class, Update.class})
     private Long pointAttributeId;
 

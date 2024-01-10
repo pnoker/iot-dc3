@@ -83,9 +83,9 @@ public class DriverController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            driverService.remove(Long.parseLong(id));
+            driverService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -118,9 +118,9 @@ public class DriverController implements BaseController {
      * @return DriverVO {@link DriverVO}
      */
     @GetMapping("/id/{id}")
-    public R<DriverVO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<DriverVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            DriverBO entityBO = driverService.selectById(Long.parseLong(id));
+            DriverBO entityBO = driverService.selectById(id);
             DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {

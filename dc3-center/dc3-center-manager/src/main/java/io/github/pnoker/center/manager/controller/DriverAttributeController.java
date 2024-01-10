@@ -82,9 +82,9 @@ public class DriverAttributeController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            driverAttributeService.remove(Long.parseLong(id));
+            driverAttributeService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -117,9 +117,9 @@ public class DriverAttributeController implements BaseController {
      * @return DriverAttributeVO {@link DriverAttributeVO}
      */
     @GetMapping("/id/{id}")
-    public R<DriverAttributeVO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<DriverAttributeVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            DriverAttributeBO entityBO = driverAttributeService.selectById(Long.parseLong(id));
+            DriverAttributeBO entityBO = driverAttributeService.selectById(id);
             DriverAttributeVO entityVO = driverAttributeBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
@@ -135,9 +135,9 @@ public class DriverAttributeController implements BaseController {
      * @return DriverAttribute
      */
     @GetMapping("/driver_id/{id}")
-    public R<List<DriverAttributeVO>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
+    public R<List<DriverAttributeVO>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            List<DriverAttributeBO> entityBOS = driverAttributeService.selectByDriverId(Long.parseLong(id));
+            List<DriverAttributeBO> entityBOS = driverAttributeService.selectByDriverId(id);
             List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOS);
             return R.ok(entityVO);
         } catch (NotFoundException ne) {

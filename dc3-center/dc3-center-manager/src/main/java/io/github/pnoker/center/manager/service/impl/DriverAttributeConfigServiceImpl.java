@@ -110,21 +110,26 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
 
     @Override
     public DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId) {
-        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery().eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId).eq(DriverAttributeConfigDO::getDeviceId, deviceId).last(QueryWrapperConstant.LIMIT_ONE);
+        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery()
+                .eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId)
+                .eq(DriverAttributeConfigDO::getDeviceId, deviceId)
+                .last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeConfigDO entityDO = wrapper.one();
         return driverAttributeConfigBuilder.buildBOByDO(entityDO);
     }
 
     @Override
     public List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId) {
-        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery().eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId);
+        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery()
+                .eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId);
         List<DriverAttributeConfigDO> entityDO = wrapper.list();
         return driverAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
 
     @Override
     public List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId) {
-        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery().eq(DriverAttributeConfigDO::getDeviceId, deviceId);
+        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery()
+                .eq(DriverAttributeConfigDO::getDeviceId, deviceId);
         List<DriverAttributeConfigDO> entityDO = wrapper.list();
         return driverAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }

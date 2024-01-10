@@ -110,23 +110,28 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     public ProfileBindBO selectByDeviceIdAndProfileId(Long deviceId, Long profileId) {
-        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId).eq(ProfileBindDO::getProfileId, profileId).last(QueryWrapperConstant.LIMIT_ONE);
+        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
+                .eq(ProfileBindDO::getDeviceId, deviceId)
+                .eq(ProfileBindDO::getProfileId, profileId)
+                .last(QueryWrapperConstant.LIMIT_ONE);
         ProfileBindDO entityDO = wrapper.one();
         return profileBindBuilder.buildBOByDO(entityDO);
     }
 
     @Override
     public Set<Long> selectDeviceIdsByProfileId(Long profileId) {
-        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getProfileId, profileId);
+        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
+                .eq(ProfileBindDO::getProfileId, profileId);
         List<ProfileBindDO> entityDOS = wrapper.list();
         return entityDOS.stream().map(ProfileBindDO::getDeviceId).collect(Collectors.toSet());
     }
 
     @Override
     public Set<Long> selectProfileIdsByDeviceId(Long deviceId) {
-        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId);
+        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
+                .eq(ProfileBindDO::getDeviceId, deviceId);
         List<ProfileBindDO> entityDOS = wrapper.list();
-        return entityDOS.stream().map(ProfileBindDO::getDeviceId).collect(Collectors.toSet());
+        return entityDOS.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
     }
 
     @Override

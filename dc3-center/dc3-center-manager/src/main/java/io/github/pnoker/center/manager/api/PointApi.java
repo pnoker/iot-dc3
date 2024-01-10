@@ -26,6 +26,7 @@ import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.service.PointService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.constant.enums.ResponseEnum;
@@ -102,12 +103,13 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         pageQuery.setPage(pages);
 
         GrpcPointDTO point = request.getPoint();
-        pageQuery.setDeviceId(request.getDeviceId());
+        pageQuery.setDeviceId(request.getDeviceId() > DefaultConstant.DEFAULT_INT ? request.getDeviceId() : null);
         pageQuery.setPointName(point.getPointName());
-        pageQuery.setProfileId(point.getProfileId());
+        pageQuery.setProfileId(point.getProfileId() > DefaultConstant.DEFAULT_INT ? point.getProfileId() : null);
         pageQuery.setPointTypeFlag(PointTypeFlagEnum.ofIndex((byte) point.getPointTypeFlag()));
         pageQuery.setRwFlag(RwFlagEnum.ofIndex((byte) point.getRwFlag()));
         pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) point.getEnableFlag()));
+        pageQuery.setTenantId(point.getTenantId());
 
         return pageQuery;
     }

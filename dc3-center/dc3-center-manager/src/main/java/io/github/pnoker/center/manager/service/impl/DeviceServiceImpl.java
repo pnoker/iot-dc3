@@ -106,12 +106,11 @@ public class DeviceServiceImpl implements DeviceService {
             throw new AddException("设备创建失败");
         }
 
-        addProfileBind(entityBO.getId(), entityBO.getProfileIds());
+        addProfileBind(entityDO, entityBO.getProfileIds());
 
         // 通知驱动新增
-        DeviceBO deviceBO = selectById(entityBO.getId());
-        List<ProfileBO> profileBOS = profileService.selectByDeviceId(entityBO.getId());
-        // ?/pnoker 同步给驱动的设备需要profile id set吗
+        DeviceBO deviceBO = selectById(entityDO.getId());
+        List<ProfileBO> profileBOS = profileService.selectByDeviceId(entityDO.getId());
         deviceBO.setProfileIds(profileBOS.stream().map(ProfileBO::getId).collect(Collectors.toSet()));
         driverNotifyService.notifyDevice(MetadataCommandTypeEnum.ADD, deviceBO);
     }
@@ -138,7 +137,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public void update(DeviceBO entityBO) {
-        getDOById(entityBO.getId(), true);
+        DeviceDO entityDO = getDOById(entityBO.getId(), true);
 
         checkDuplicate(entityBO, true, true);
 
@@ -148,14 +147,14 @@ public class DeviceServiceImpl implements DeviceService {
         // 新增的模板
         Set<Long> add = new HashSet<>(newProfileIds);
         add.removeAll(oldProfileIds);
-        addProfileBind(entityBO.getId(), add);
+        addProfileBind(entityDO, add);
 
         // 删除的模板
         Set<Long> delete = new HashSet<>(oldProfileIds);
         delete.removeAll(newProfileIds);
         delete.forEach(profileId -> profileBindService.removeByDeviceIdAndProfileId(entityBO.getId(), profileId));
 
-        DeviceDO entityDO = deviceBuilder.buildDOByBO(entityBO);
+        entityDO = deviceBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
         if (!deviceManager.updateById(entityDO)) {
             throw new UpdateException("The device update failed");
@@ -191,7 +190,10 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public DeviceBO selectByCode(String code, Long tenantId) {
-        LambdaQueryChainWrapper<DeviceDO> wrapper = deviceManager.lambdaQuery().eq(DeviceDO::getDeviceCode, code).eq(DeviceDO::getTenantId, tenantId).last(QueryWrapperConstant.LIMIT_ONE);
+        LambdaQueryChainWrapper<DeviceDO> wrapper = deviceManager.lambdaQuery()
+                .eq(DeviceDO::getDeviceCode, code)
+                .eq(DeviceDO::getTenantId, tenantId)
+                .last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO entityDO = wrapper.one();
         DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
         entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(entityDO.getId()));
@@ -509,7 +511,7 @@ public class DeviceServiceImpl implements DeviceService {
         return path;
     }
 
-    private void addProfileBind(Long deviceId, Set<Long> profileIds) {
+    private void addProfileBind(DeviceDO entityDO, Set<Long> profileIds) {
         if (CollUtil.isEmpty(profileIds)) {
             return;
         }
@@ -518,7 +520,8 @@ public class DeviceServiceImpl implements DeviceService {
             try {
                 ProfileBindBO entityBO = new ProfileBindBO();
                 entityBO.setProfileId(profileId);
-                entityBO.setDeviceId(deviceId);
+                entityBO.setDeviceId(entityDO.getId());
+                entityBO.setTenantId(entityDO.getTenantId());
                 profileBindService.save(entityBO);
 
                 List<PointBO> pointBOS = pointService.selectByProfileId(profileId);
