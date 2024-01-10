@@ -26,7 +26,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * TenantBind VO
@@ -46,7 +46,7 @@ public class TenantBindVO extends BaseVO {
      * 租户ID
      */
     @Schema(description = "租户ID")
-    @NotBlank(message = "Tenant id can't be empty",
+    @NotNull(message = "Tenant id can't be empty",
             groups = {Add.class, Update.class})
     private Long tenantId;
 
@@ -54,7 +54,7 @@ public class TenantBindVO extends BaseVO {
      * 用户ID
      */
     @Schema(description = "用户ID")
-    @NotBlank(message = "User id can't be empty",
+    @NotNull(message = "User id can't be empty",
             groups = {Add.class, Update.class})
     private Long userId;
 }

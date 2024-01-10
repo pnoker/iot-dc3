@@ -26,7 +26,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * RoleResourceBind VO
@@ -46,15 +46,15 @@ public class RoleResourceBindVO extends BaseVO {
      * 角色ID
      */
     @Schema(description = "角色ID")
-    @NotBlank(message = "Role id can't be empty",
+    @NotNull(message = "Role id can't be empty",
             groups = {Add.class, Update.class})
-    private String roleId;
+    private Long roleId;
 
     /**
      * 权限资源ID
      */
     @Schema(description = "权限资源ID")
-    @NotBlank(message = "Resource id can't be empty",
+    @NotNull(message = "Resource id can't be empty",
             groups = {Add.class, Update.class})
-    private String resourceId;
+    private Long resourceId;
 }

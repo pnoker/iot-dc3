@@ -78,9 +78,9 @@ public class TenantController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            tenantService.remove(Long.parseLong(id));
+            tenantService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -117,9 +117,9 @@ public class TenantController implements BaseController {
      * @return TenantVO {@link TenantVO}
      */
     @GetMapping("/id/{id}")
-    public R<TenantVO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<TenantVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            TenantBO entityBO = tenantService.selectById(Long.parseLong(id));
+            TenantBO entityBO = tenantService.selectById(id);
             TenantVO entityVO = tenantBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {

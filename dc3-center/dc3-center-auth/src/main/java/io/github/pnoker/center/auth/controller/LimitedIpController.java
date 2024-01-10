@@ -79,9 +79,9 @@ public class LimitedIpController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            limitedIpService.remove(Long.parseLong(id));
+            limitedIpService.remove(id);
             return R.ok(ResponseEnum.DELETE_SUCCESS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -118,9 +118,9 @@ public class LimitedIpController implements BaseController {
      * @return LimitedIpVO {@link LimitedIpVO}
      */
     @GetMapping("/id/{id}")
-    public R<LimitedIpVO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public R<LimitedIpVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            LimitedIpBO entityBO = limitedIpService.selectById(Long.parseLong(id));
+            LimitedIpBO entityBO = limitedIpService.selectById(id);
             LimitedIpVO entityVO = limitedIpBuilder.buildVOByBO(entityBO);
             return R.ok(entityVO);
         } catch (Exception e) {
