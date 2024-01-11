@@ -81,7 +81,7 @@ request.interceptors.response.use(
         }
 
         if (status === 401) {
-            logout()
+            logout(true)
         } else {
             failMessage('接口请求异常，请联系系统管理员。', response.data.code, response.data)
         }
