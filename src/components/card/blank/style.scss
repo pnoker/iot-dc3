@@ -15,6 +15,9 @@
  */
 
 .blank-card {
+    border-radius: 5px;
+    box-sizing: border-box;
+
     ul {
         list-style: none;
 
@@ -22,6 +25,11 @@
             font-size: 13px;
             margin-top: 8px;
         }
+    }
+
+    .el-card {
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .el-card.blank-card-body {

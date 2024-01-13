@@ -17,32 +17,32 @@
 <template>
     <div class="container">
         <div class="header">
-            <el-col :span="4" class="header_item">
+            <el-col class="header_item" :span="4">
                 <img class="header_logo" src="/images/logo/logo.png" />
             </el-col>
-            <el-col :span="16" class="header_item">
-                <el-menu :default-active="handleMenuEnter($route.path)" mode="horizontal" :router="true" class="header_menu">
+            <el-col class="header_item" :span="16">
+                <el-menu class="header_menu" :default-active="handleMenuEnter($route.path)" mode="horizontal" :router="true">
                     <el-menu-item index="/home">
                         <el-icon>
                             <HomeFilled />
                         </el-icon>
                         首页
                     </el-menu-item>
-                    <template v-for="menu in menus">
-                        <el-sub-menu v-if="menu.children" :key="menu.name" :index="menu.path">
-                            <template #title>{{ menu.meta.title }}</template>
-                            <el-menu-item v-for="m in menu.children" :key="m.path" :index="m.path">{{ m.meta.title }}</el-menu-item>
+                    <template v-for="menusItem in menus">
+                        <el-sub-menu v-if="menusItem.children" :key="menusItem.path" :index="menusItem.path">
+                            <template #title>{{ (menusItem.meta as any).title }}</template>
+                            <el-menu-item v-for="item in menusItem.children" :key="item.path" :index="item.path">{{ (menusItem.meta as any).title }}</el-menu-item>
                         </el-sub-menu>
-                        <el-menu-item v-else :key="menu.name" :index="menu.path">
+                        <el-menu-item v-else :key="menusItem.path" :index="menusItem.path">
                             <el-icon>
-                                <component :is="menu.meta.icon"></component>
+                                <component :is="(menusItem.meta as any).icon"></component>
                             </el-icon>
-                            {{ menu.meta.title }}
+                            {{ (menusItem.meta as any).title }}
                         </el-menu-item>
                     </template>
                 </el-menu>
             </el-col>
-            <el-col :span="4" class="header_item header_user">
+            <el-col class="header_item header_user" :span="4">
                 <el-dropdown class="user_avatar" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
                         <el-avatar>
@@ -56,8 +56,8 @@
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
-                <el-badge :value="3" :max="99" class="user_badge" type="primary">
-                    <span class="small" @click="handleMessage">管理员</span>
+                <el-badge class="user_badge" :value="3" :max="99" type="primary">
+                    <span class="user_name" @click="handleMessage">管理员</span>
                 </el-badge>
             </el-col>
         </div>
@@ -76,12 +76,13 @@ import { warning } from '@/utils/MessageUtils'
 import { HomeFilled } from '@element-plus/icons-vue'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { RouteRecordRaw } from 'vue-router'
 
 const store = useStore()
 
 const menus = computed(() => {
-    const children = menu?.children || []
-    return children.filter((view) => view.name !== 'home')
+    const children: RouteRecordRaw[] = menu?.children || []
+    return children.filter((view) => view.path !== '/home')
 })
 
 const handleMenuEnter = (index: string) => {

@@ -30,7 +30,7 @@
                 <el-input v-model="reactiveData.formData.deviceName" placeholder="请输入设备名称" clearable></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
-                <el-select v-model="reactiveData.formData.driverId" class="edit-form-special" placeholder="请选择所属驱动" clearable @visible-change="driverDictionaryVisible">
+                <el-select class="edit-form-special" v-model="reactiveData.formData.driverId" placeholder="请选择所属驱动" clearable @visible-change="driverDictionaryVisible">
                     <div class="tool-select">
                         <el-form-item class="tool-select-input">
                             <el-input v-model="reactiveData.driverQuery" placeholder="请选择所属驱动" clearable @input="driverDictionary" />

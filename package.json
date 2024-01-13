@@ -3,7 +3,7 @@
   "version": "2024.1.1",
   "private": true,
   "author": "pnoker",
-  "description": "DC3 IoT 平台前端页面",
+  "description": "IoT DC3 平台前端页面",
   "engines": {
     "node": ">=18.0.0"
   },

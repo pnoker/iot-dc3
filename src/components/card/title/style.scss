@@ -15,29 +15,29 @@
  */
 
 .title-card {
-  border-radius: 5px;
-  box-sizing: border-box;
-
-  .title-card__header {
-    font-size: 14px;
-    font-weight: bold;
-  }
-
-  .el-card {
-    width: 100%;
+    border-radius: 5px;
     box-sizing: border-box;
-  }
 
-  .el-card__header {
-    padding: 10px;
-  }
+    .title-card__header {
+        font-size: 14px;
+        font-weight: bold;
+    }
 
-  .el-card__body {
-    padding: 10px 3px;
-  }
+    .el-card__header {
+        padding: 10px;
+    }
 
-  &:first-child {
-    padding-top: 0;
-    padding-left: 0;
-  }
+    .el-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .el-card__body {
+        padding: 10px 3px;
+    }
+
+    &:first-child {
+        padding-top: 0;
+        padding-left: 0;
+    }
 }

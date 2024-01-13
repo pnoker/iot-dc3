@@ -31,7 +31,7 @@
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '设备ID')">
                         {{ data.deviceName }}
                     </div>
-                    <div title="状态" class="things-card-header-status">
+                    <div class="things-card-header-status" title="状态">
                         <el-tag v-if="status === 'ONLINE'" type="success" effect="plain">在线</el-tag>
                         <el-tag v-else-if="status === 'MAINTAIN'" type="warning" effect="plain">维护</el-tag>
                         <el-tag v-else-if="status === 'FAULT'" type="danger" effect="plain">故障</el-tag>
@@ -62,13 +62,13 @@
                             </li>
                         </ul>
                     </div>
-                    <div title="设备描述信息" class="things-card-body-content">
+                    <div class="things-card-body-content" title="设备描述信息">
                         <p class="nowrap-description">
                             {{ data.remark ? data.remark : '无描述信息' }}
                         </p>
                     </div>
                 </div>
-                <div v-if="!embedded" class="things-card__footer">
+                <div class="things-card__footer" v-if="!embedded">
                     <div class="things-card-footer-operation">
                         <el-popconfirm title="是否确定停用该设备？" placement="top" :icon="SwitchButton" icon-color="#e6a23c" @confirm="disableThing">
                             <template #reference>

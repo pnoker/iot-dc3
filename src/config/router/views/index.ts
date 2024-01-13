@@ -23,7 +23,6 @@ const routes: RouteRecordRaw = {
     component: Layout,
     children: [
         {
-            name: 'home',
             path: '/home',
             meta: {
                 title: '首页',
@@ -31,7 +30,6 @@ const routes: RouteRecordRaw = {
             component: () => import('@/views/home/Home.vue'),
         },
         {
-            name: 'driver',
             path: '/driver',
             meta: {
                 icon: 'Promotion',
@@ -40,7 +38,6 @@ const routes: RouteRecordRaw = {
             component: () => import('@/views/driver/Driver.vue'),
         },
         {
-            name: 'profile',
             path: '/profile',
             meta: {
                 icon: 'List',
@@ -49,7 +46,6 @@ const routes: RouteRecordRaw = {
             component: () => import('@/views/profile/Profile.vue'),
         },
         {
-            name: 'device',
             path: '/device',
             meta: {
                 icon: 'Management',
@@ -58,7 +54,6 @@ const routes: RouteRecordRaw = {
             component: () => import('@/views/device/Device.vue'),
         },
         {
-            name: 'pointValue',
             path: '/point_value',
             meta: {
                 icon: 'Histogram',
@@ -67,7 +62,6 @@ const routes: RouteRecordRaw = {
             component: () => import('@/views/point/value/PointValue.vue'),
         } /*
         {
-            name: 'ruleEngine',
             path: '/rule_engine',
             meta: {
                 icon: 'Connection',

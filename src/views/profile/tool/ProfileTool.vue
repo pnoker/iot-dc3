@@ -23,7 +23,7 @@
                         <el-input v-model="reactiveData.formData.profileName" class="edit-form-default" placeholder="请输入模板名称" clearable @keyup.enter="search"></el-input>
                     </el-form-item>
                     <el-form-item prop="enableFlag" label="使能">
-                        <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
+                        <el-select class="edit-form-small" v-model="reactiveData.formData.enableFlag" placeholder="请选择使能" clearable>
                             <el-option label="启用" value="ENABLE"></el-option>
                             <el-option label="停用" value="DISABLE"></el-option>
                         </el-select>

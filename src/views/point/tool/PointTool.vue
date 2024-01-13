@@ -52,7 +52,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="使能" prop="enableFlag">
-                        <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
+                        <el-select class="edit-form-small" v-model="reactiveData.formData.enableFlag" placeholder="请选择使能" clearable>
                             <el-option label="启用" value="ENABLE"></el-option>
                             <el-option label="停用" value="DISABLE"></el-option>
                         </el-select>

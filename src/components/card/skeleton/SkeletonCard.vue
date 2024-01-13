@@ -20,7 +20,7 @@
             <div class="things-card">
                 <el-card shadow="hover">
                     <div class="things-card-content">
-                        <div v-if="!header" class="things-card__header">
+                        <div class="things-card__header" v-if="!header">
                             <el-skeleton-item class="things-card-header-icon skeleton" ariant="image" />
                             <el-skeleton-item class="things-card-header-name skeleton" variant="text" />
                         </div>
@@ -39,11 +39,11 @@
                                     </div>
                                 </ul>
                             </div>
-                            <div v-if="!header" class="things-card-body-content">
+                            <div class="things-card-body-content" v-if="!header">
                                 <el-skeleton-item class="nowrap-description skeleton" variant="text" />
                             </div>
                         </div>
-                        <div v-if="!footer" class="things-card__footer">
+                        <div class="things-card__footer" v-if="!footer">
                             <div class="things-card-footer-operation">
                                 <el-skeleton-item class="operation-tooltip skeleton" variant="button" />
                                 <el-skeleton-item class="operation-tooltip skeleton" variant="button" />

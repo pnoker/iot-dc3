@@ -69,13 +69,13 @@
                             </li>
                         </ul>
                     </div>
-                    <div :title="data.remark ? data.remark : '驱动描述信息'" class="things-card-body-content">
+                    <div class="things-card-body-content" :title="data.remark ? data.remark : '驱动描述信息'">
                         <p class="nowrap-description">
                             {{ data.remark ? data.remark : '无描述信息' }}
                         </p>
                     </div>
                 </div>
-                <div v-if="!footer" class="things-card__footer">
+                <div class="things-card__footer" v-if="!footer">
                     <div class="things-card-footer-operation">
                         <el-button type="primary" link @click="detail">详情</el-button>
                     </div>

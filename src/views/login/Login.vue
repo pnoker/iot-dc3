@@ -16,16 +16,16 @@
 
 <template>
     <div class="login-container">
-        <div class="login-wrapper-left animated bounceInDown">
+        <div class="login-wrapper-left animated bounce-in-down">
             <div class="login-left">
                 <img class="img" src="/images/logo/logo-white.png" />
             </div>
         </div>
         <particles />
-        <div class="login-wrapper-right animated bounceInDown">
+        <div class="login-wrapper-right animated bounce-in-down">
             <div class="login-right">
                 <div class="login-main">
-                    <h4 class="login-title">DC3 IoT 平台</h4>
+                    <h4 class="login-title">IoT DC3 平台</h4>
                     <el-form ref="formDataRef" class="login-form" status-icon :rules="formRule" :model="reactiveData.formData">
                         <el-form-item prop="tenant">
                             <el-input v-model="reactiveData.formData.tenant" :prefix-icon="Box" placeholder="请输入租户名" auto-complete="off" @keyup.enter="handleLogin">

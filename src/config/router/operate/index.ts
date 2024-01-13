@@ -23,7 +23,6 @@ const routes: Array<RouteRecordRaw> = [
         component: Layout,
         children: [
             {
-                name: 'dashboard',
                 path: '/home/dashboard',
                 meta: {
                     icon: 'el-icon-s-home',
@@ -32,7 +31,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/dashboard/Dashboard.vue'),
             },
             {
-                name: 'application',
                 path: '/home/application',
                 meta: {
                     icon: 'el-icon-s-home',
@@ -47,7 +45,6 @@ const routes: Array<RouteRecordRaw> = [
         component: Layout,
         children: [
             {
-                name: 'driverDetail',
                 path: '/driver/detail',
                 meta: {
                     icon: 'el-icon-s-promotion',
@@ -62,7 +59,6 @@ const routes: Array<RouteRecordRaw> = [
         component: Layout,
         children: [
             {
-                name: 'deviceDetail',
                 path: '/device/detail',
                 meta: {
                     icon: 'el-icon-s-finance',
@@ -71,7 +67,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/device/detail/DeviceDetail.vue'),
             },
             {
-                name: 'deviceEdit',
                 path: '/device/edit',
                 meta: {
                     icon: 'el-icon-s-finance',
@@ -86,7 +81,6 @@ const routes: Array<RouteRecordRaw> = [
         component: Layout,
         children: [
             {
-                name: 'profileDetail',
                 path: '/profile/detail',
                 meta: {
                     icon: 'el-icon-s-order',
@@ -95,7 +89,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/profile/detail/ProfileDetail.vue'),
             },
             {
-                name: 'profileEdit',
                 path: '/profile/edit',
                 meta: {
                     icon: 'el-icon-s-order',
@@ -104,7 +97,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/profile/edit/ProfileEdit.vue'),
             },
             {
-                name: 'pointDetail',
                 path: '/profile/point/detail',
                 meta: {
                     icon: 'el-icon-s-order',
@@ -113,7 +105,6 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import('@/views/point/detail/PointDetail.vue'),
             },
             {
-                name: 'pointEdit',
                 path: '/profile/point/edit',
                 meta: {
                     icon: 'el-icon-s-order',

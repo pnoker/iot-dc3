@@ -18,7 +18,6 @@ import { RouteRecordRaw } from 'vue-router'
 
 const routes: Array<RouteRecordRaw> = [
     {
-        name: 'login',
         path: '/login',
         meta: {
             title: 'IoT DC3 Web',
@@ -26,7 +25,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/login/Login.vue'),
     },
     {
-        name: '403',
         path: '/403',
         meta: {
             title: '403',
@@ -34,7 +32,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/components/error/403.vue'),
     },
     {
-        name: '404',
         path: '/404',
         meta: {
             title: '404',
@@ -42,7 +39,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/components/error/404.vue'),
     },
     {
-        name: '500',
         path: '/500',
         meta: {
             title: '500',

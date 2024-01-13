@@ -20,7 +20,7 @@
   align-items: center;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, #ffffff, #1296db);
+  background: radial-gradient(circle, #ffffff, #409eff);
 }
 
 .login-wrapper-left {
@@ -54,7 +54,7 @@
   border-bottom-left-radius: 5px;
   justify-content: center;
   flex-direction: column;
-  background-color: #55b5e5;
+  background-color: #409eff;
   color: #ffffff;
   float: left;
   width: 100%;
@@ -99,7 +99,7 @@
   font-size: 18px;
   letter-spacing: 2px;
   font-weight: 300;
-  color: #1296db;
+  color: #409eff;
   cursor: pointer;
   margin-top: 30px;
   transition: 0.25s;
@@ -109,6 +109,6 @@
   margin: 10px 0;
 
   i {
-    color: #1296db;
+    color: #409eff;
   }
 }

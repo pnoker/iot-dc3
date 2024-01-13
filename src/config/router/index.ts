@@ -16,10 +16,6 @@
 
 import { createRouter, createWebHashHistory, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
-import CommonConstant from '@/config/constant/common'
-import { logout } from '@/utils/CommonUtils'
-import { getStorage } from '@/utils/StorageUtils'
-import { isNull } from '@/utils/utils'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import commonRouters from './common'
@@ -38,16 +34,6 @@ const router = createRouter({
 
 router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
     NProgress.start()
-
-    if (to.path !== '/login') {
-        const tenant = getStorage(CommonConstant.X_AUTH_TENANT)
-        const user = getStorage(CommonConstant.X_AUTH_LOGIN)
-        const token = getStorage(CommonConstant.X_AUTH_TOKEN)
-
-        if (isNull(tenant) || isNull(user) || isNull(token)) {
-            logout()
-        }
-    }
 
     const meta = to.meta || {}
     if (meta.title) {

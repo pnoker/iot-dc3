@@ -23,7 +23,7 @@
                         <el-input v-model="reactiveData.formData.ruleName" class="edit-form-default" placeholder="请输入规则名称" clearable @keyup.enter="search" />
                     </el-form-item>
                     <el-form-item label="使能" prop="enableFlag">
-                        <el-select v-model="reactiveData.formData.flowDisabled" class="edit-form-small" placeholder="请选择使能" clearable>
+                        <el-select class="edit-form-small" v-model="reactiveData.formData.flowDisabled" placeholder="请选择使能" clearable>
                             <el-option label="启用" :value="0"></el-option>
                             <el-option label="停用" :value="1"></el-option>
                         </el-select>

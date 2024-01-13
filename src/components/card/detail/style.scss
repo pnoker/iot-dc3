@@ -15,11 +15,12 @@
  */
 
 .detail-card {
+    border-radius: 5px;
+    box-sizing: border-box;
+
     margin-left: 3px;
     margin-right: 3px;
     margin-bottom: 6px;
-    border-radius: 5px;
-    box-sizing: border-box;
 
     ul {
         list-style: none;

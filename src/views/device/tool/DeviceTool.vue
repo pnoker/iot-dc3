@@ -17,10 +17,10 @@
 <template>
     <div class="tool-card">
         <el-card :shadow="embedded == '' ? 'hover' : 'never'">
-            <el-form ref="formDataRef" class="tool-card-body" :model="reactiveData.formData" :rules="formRule" :inline="true">
+            <el-form class="tool-card-body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="deviceName" label="设备名称">
-                        <el-input v-model="reactiveData.formData.deviceName" class="edit-form-default" placeholder="请输入设备名称" clearable @keyup.enter="search" />
+                        <el-input class="edit-form-default" v-model="reactiveData.formData.deviceName" placeholder="请输入设备名称" clearable @keyup.enter="search" />
                     </el-form-item>
                     <el-form-item v-if="embedded != 'driver'" prop="driverId" label="所属驱动">
                         <el-select
@@ -51,7 +51,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="使能" prop="enableFlag">
-                        <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
+                        <el-select class="edit-form-small" v-model="reactiveData.formData.enableFlag" placeholder="请选择使能" clearable>
                             <el-option label="启用" value="ENABLE"></el-option>
                             <el-option label="停用" value="DISABLE"></el-option>
                         </el-select>
