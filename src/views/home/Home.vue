@@ -16,9 +16,6 @@
 
 <template>
     <div>
-        <title-card class="home-dashboard">
-            <div id="container"></div>
-        </title-card>
         <title-card class="home-count">
             <div id="count-data" ref="countDataChartRef"></div>
         </title-card>

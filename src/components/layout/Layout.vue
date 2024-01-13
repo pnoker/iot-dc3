@@ -69,7 +69,43 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script setup lang="ts">
+import router from '@/config/router'
+import menu from '@/config/router/views'
+import { warning } from '@/utils/MessageUtils'
+import { HomeFilled } from '@element-plus/icons-vue'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+const menus = computed(() => {
+    const children = menu?.children || []
+    return children.filter((view) => view.name !== 'home')
+})
+
+const handleMenuEnter = (index: string) => {
+    if (index.indexOf('/') === 0) {
+        const split = index.split('/')
+        if (split.length > 2) {
+            return '/' + split[1]
+        }
+    }
+    return index
+}
+
+const handleMessage = () => {
+    warning('待开发')
+}
+
+const handleCommand = (command: string) => {
+    if (command === 'logout') {
+        store.dispatch('auth/logout').then(() => router.push({ path: '/login' }))
+    } else if (command === 'help') {
+        window.open('https://doc.dc3.site')
+    }
+}
+</script>
 
 <style lang="scss">
 @import '@/components/layout/style.scss';

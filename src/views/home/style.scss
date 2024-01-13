@@ -32,23 +32,6 @@
     }
 }
 
-.home-dashboard {
-    margin-bottom: 4px;
-
-    .dashboard-item {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .el-card {
-        border: 1px solid #ffffff;
-    }
-
-    .el-card__body {
-        padding-bottom: 0;
-    }
-}
-
 .home-count {
     #count-data {
         width: 100%;

@@ -23,7 +23,7 @@
         </div>
         <particles />
         <div class="login-wrapper-right animated bounceInDown">
-            <div class="login-border">
+            <div class="login-right">
                 <div class="login-main">
                     <h4 class="login-title">DC3 IoT 平台</h4>
                     <el-form ref="formDataRef" class="login-form" status-icon :rules="formRule" :model="reactiveData.formData">
