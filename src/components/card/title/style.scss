@@ -23,8 +23,9 @@
         font-weight: bold;
     }
 
-    .el-card__header {
-        padding: 10px;
+    &:first-child {
+        padding-top: 0;
+        padding-left: 0;
     }
 
     .el-card {
@@ -32,12 +33,15 @@
         box-sizing: border-box;
     }
 
+    .el-card__header {
+        padding: 10px;
+    }
+
     .el-card__body {
         padding: 10px 3px;
     }
 
-    &:first-child {
-        padding-top: 0;
-        padding-left: 0;
+    .el-tabs__nav {
+        margin: 0 5px 0 5px;
     }
 }
