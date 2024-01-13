@@ -73,10 +73,10 @@ export default defineComponent({
             Refresh,
         }
 
-        const deviceDictionary = () => {
+        const deviceDictionary = (qq?: string) => {
             getDeviceDictionary({
                 page: reactiveData.devicePage,
-                label: reactiveData.deviceQuery,
+                label: qq ? qq : reactiveData.deviceQuery,
             })
                 .then((res) => {
                     const data = res.data

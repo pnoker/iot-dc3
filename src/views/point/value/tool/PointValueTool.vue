@@ -24,14 +24,17 @@
                             v-model="reactiveData.formData.deviceId"
                             class="edit-form-special"
                             placeholder="请选择设备"
+                            filterable
+                            remote
+                            :remote-method="deviceDictionary"
                             clearable
                             @change="pointDictionaryChange"
                             @visible-change="deviceDictionaryVisible"
                         >
                             <div class="tool-select">
-                                <el-form-item class="tool-select-input">
+                                <!-- <el-form-item class="tool-select-input">
                                     <el-input v-model="reactiveData.deviceQuery" placeholder="请输入设备名称" clearable @input="deviceDictionary" />
-                                </el-form-item>
+                                </el-form-item> -->
                                 <el-pagination
                                     class="tool-select-pagination"
                                     :hide-on-single-page="true"
