@@ -17,19 +17,19 @@
 <template>
     <div class="tool-card">
         <el-card shadow="hover">
-            <el-form ref="formDataRef" class="tool-card-body" :rules="formRule" :model="reactiveData.formData" :inline="true">
+            <el-form class="tool-card-body" ref="formDataRef" :rules="formRule" :model="reactiveData.formData" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="name" label="驱动名称">
-                        <el-input v-model="reactiveData.formData.driverName" class="edit-form-default" placeholder="请输入驱动名称" clearable @keyup.enter="search"></el-input>
+                        <el-input class="edit-form-default" v-model="reactiveData.formData.driverName" placeholder="请输入驱动名称" clearable @keyup.enter="search"></el-input>
                     </el-form-item>
                     <el-form-item prop="serviceName" label="服务名称">
-                        <el-input v-model="reactiveData.formData.serviceName" class="edit-form-default" placeholder="请输入服务名称" clearable @keyup.enter="search"></el-input>
+                        <el-input class="edit-form-default" v-model="reactiveData.formData.serviceName" placeholder="请输入服务名称" clearable @keyup.enter="search"></el-input>
                     </el-form-item>
                     <el-form-item prop="host" label="主机">
-                        <el-input v-model="reactiveData.formData.serviceHost" class="edit-form-default" placeholder="请输入主机" clearable @keyup.enter="search"></el-input>
+                        <el-input class="edit-form-default" v-model="reactiveData.formData.serviceHost" placeholder="请输入主机" clearable @keyup.enter="search"></el-input>
                     </el-form-item>
                     <el-form-item label="使能" prop="enableFlag">
-                        <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
+                        <el-select class="edit-form-small" v-model="reactiveData.formData.enableFlag" placeholder="请选择使能" clearable>
                             <el-option label="启用" value="ENABLE"></el-option>
                             <el-option label="停用" value="DISABLE"></el-option>
                         </el-select>

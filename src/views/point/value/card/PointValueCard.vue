@@ -31,7 +31,7 @@
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.pointId, '位号值ID')">
                         {{ point.pointName }}
                     </div>
-                    <div title="读写标识" class="things-card-header-status">
+                    <div class="things-card-header-status" title="读写标识">
                         <el-tag v-if="data.rwFlag === 'R'" type="warning" effect="plain">只读</el-tag>
                         <el-tag v-else-if="data.rwFlagrw === 'W'" type="info" effect="plain">只写</el-tag>
                         <el-tag v-else-if="data.rwFlag === 'RW'" type="success" effect="plain">读写</el-tag>
@@ -40,14 +40,14 @@
                 <div class="things-card__body">
                     <div class="things-card-body-content">
                         <ul class="things-card-body-content-value">
-                            <li title="处理值，点击复制" class="nowrap-item value" @click="copyValue(data)">{{ data.value }} {{ unit }}</li>
-                            <li title="计算值" class="nowrap-item">
+                            <li class="nowrap-item value" title="处理值，点击复制" @click="copyValue(data)">{{ data.value }} {{ unit }}</li>
+                            <li class="nowrap-item" title="计算值">
                                 {{ data.calculateValue || '-' }}
                             </li>
                             <li class="nowrap-item">
                                 <el-icon><Sunrise /></el-icon> 原始值: {{ data.rawValue }}
                             </li>
-                            <li v-if="embedded == ''" class="nowrap-item value-point">
+                            <li class="nowrap-item value-point" v-if="embedded == ''">
                                 <el-icon> <Management /> </el-icon> 所属设备: {{ device.deviceName }}
                             </li>
                             <li class="nowrap-item">
@@ -61,11 +61,11 @@
                             </li>
                         </ul>
                     </div>
-                    <div v-if="embedded != ''" class="things-card-body-content-time">
+                    <div class="things-card-body-content-time" v-if="embedded != ''">
                         <div :id="data.pointId"></div>
                     </div>
                 </div>
-                <div v-if="embedded == ''" class="things-card__footer">
+                <div class="things-card__footer" v-if="embedded == ''">
                     <div class="things-card-footer-operation">
                         <el-popconfirm title="是否确定删除该数据？该数据下的配置将会被全部删除，且该操作不可恢复！" placement="top" :icon="CircleClose" icon-color="#f56c6c">
                             <template #reference>

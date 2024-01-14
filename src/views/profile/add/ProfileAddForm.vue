@@ -16,8 +16,8 @@
 
 <template>
     <el-dialog
-        v-model="reactiveData.formVisible"
         class="things-dialog"
+        v-model="reactiveData.formVisible"
         title="新增模板"
         :show-close="false"
         :append-to-body="true"

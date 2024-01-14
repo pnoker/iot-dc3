@@ -31,7 +31,7 @@
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '驱动ID')">
                         {{ data.driverName }}
                     </div>
-                    <div title="状态" class="things-card-header-status">
+                    <div class="things-card-header-status" title="状态">
                         <el-tag v-if="status === 'ONLINE'" type="success" effect="plain">在线</el-tag>
                         <el-tag v-else-if="status === 'MAINTAIN'" type="warning" effect="plain">维护</el-tag>
                         <el-tag v-else-if="status === 'FAULT'" type="danger" effect="plain">故障</el-tag>

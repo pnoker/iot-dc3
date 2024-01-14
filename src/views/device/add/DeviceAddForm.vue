@@ -16,8 +16,8 @@
 
 <template>
     <el-dialog
-        v-model="reactiveData.formVisible"
         class="things-dialog"
+        v-model="reactiveData.formVisible"
         title="新增设备"
         :show-close="false"
         :append-to-body="true"
@@ -53,8 +53,8 @@
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="关联模板" prop="profileIds">
                 <el-select
-                    v-model="reactiveData.formData.profileIds"
                     class="edit-form-special"
+                    v-model="reactiveData.formData.profileIds"
                     placeholder="请选择关联模板"
                     :multiple="true"
                     clearable

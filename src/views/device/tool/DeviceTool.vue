@@ -24,8 +24,8 @@
                     </el-form-item>
                     <el-form-item v-if="embedded != 'driver'" prop="driverId" label="所属驱动">
                         <el-select
-                            v-model="reactiveData.formData.driverId"
                             class="edit-form-special"
+                            v-model="reactiveData.formData.driverId"
                             placeholder="请选择所属驱动"
                             clearable
                             @visible-change="driverDictionaryVisible"

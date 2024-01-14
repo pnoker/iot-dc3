@@ -30,13 +30,13 @@
                 <el-divider content-position="left">位号信息配置</el-divider>
                 <el-form ref="formDataRef" :inline="true" :model="reactiveData.pointFormData" :rules="pointFormRule">
                     <div class="edit-form-item">
-                        <el-form-item label="位号名称" prop="pointName" class="edit-form-large">
+                        <el-form-item class="edit-form-large" label="位号名称" prop="pointName">
                             <el-input v-model="reactiveData.pointFormData.pointName" placeholder="请输入位号名称" clearable></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="数据类型" prop="pointTypeFlag" class="edit-form-large">
-                            <el-select v-model="reactiveData.pointFormData.pointTypeFlag" class="edit-form-large" placeholder="请选择数据类型" clearable>
+                        <el-form-item class="edit-form-large" label="数据类型" prop="pointTypeFlag">
+                            <el-select class="edit-form-large" v-model="reactiveData.pointFormData.pointTypeFlag" placeholder="请选择数据类型" clearable>
                                 <el-option label="字符串(string)" value="STRING"></el-option>
                                 <el-option label="字节(byte)" value="BYTE"></el-option>
                                 <el-option label="短整数(short)" value="SHORT"></el-option>
@@ -49,8 +49,8 @@
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="读写标识" prop="rwFlag" class="edit-form-large">
-                            <el-select v-model="reactiveData.pointFormData.rwFlag" class="edit-form-large" placeholder="请选择读写标识" clearable>
+                        <el-form-item class="edit-form-large" label="读写标识" prop="rwFlag">
+                            <el-select class="edit-form-large" v-model="reactiveData.pointFormData.rwFlag" placeholder="请选择读写标识" clearable>
                                 <el-option label="只读" value="R"></el-option>
                                 <el-option label="只写" value="W"></el-option>
                                 <el-option label="读写" value="RW"></el-option>
@@ -58,35 +58,35 @@
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="使能" prop="enableFlag" class="edit-form-large">
-                            <el-select v-model="reactiveData.pointFormData.enableFlag" class="edit-form-large" placeholder="请选择使能" clearable>
+                        <el-form-item class="edit-form-large" label="使能" prop="enableFlag">
+                            <el-select class="edit-form-large" v-model="reactiveData.pointFormData.enableFlag" placeholder="请选择使能" clearable>
                                 <el-option label="启用" value="ENABLE"></el-option>
                                 <el-option label="停用" value="DISABLE"></el-option>
                             </el-select>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="数据精度" prop="valueDecimal" class="edit-form-large">
+                        <el-form-item class="edit-form-large" label="数据精度" prop="valueDecimal">
                             <el-input v-model="reactiveData.pointFormData.valueDecimal" placeholder="请输入数据精度" clearable></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="单位" prop="unit" class="edit-form-large">
-                            <el-input v-model="reactiveData.pointFormData.unit" class="edit-form-large" placeholder="请输入单位" clearable> </el-input>
+                        <el-form-item class="edit-form-large" label="单位" prop="unit">
+                            <el-input class="edit-form-large" v-model="reactiveData.pointFormData.unit" placeholder="请输入单位" clearable> </el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="基础值" prop="baseValue" class="edit-form-large">
+                        <el-form-item class="edit-form-large" label="基础值" prop="baseValue">
                             <el-input v-model="reactiveData.pointFormData.baseValue" placeholder="请输入基础值" clearable></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="比例系数" prop="multiple" class="edit-form-large">
+                        <el-form-item class="edit-form-large" label="比例系数" prop="multiple">
                             <el-input v-model="reactiveData.pointFormData.multiple" placeholder="请输入比例系数" clearable></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="位号描述" prop="remark" class="edit-form-large">
+                        <el-form-item class="edit-form-large" label="位号描述" prop="remark">
                             <el-input v-model="reactiveData.pointFormData.remark" placeholder="请输入位号描述" type="textarea" maxlength="300" show-word-limit clearable>
                             </el-input>
                         </el-form-item>

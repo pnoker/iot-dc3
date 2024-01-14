@@ -20,7 +20,7 @@
             <el-form ref="formDataRef" class="tool-card-body" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="name" label="模板名称">
-                        <el-input v-model="reactiveData.formData.profileName" class="edit-form-default" placeholder="请输入模板名称" clearable @keyup.enter="search"></el-input>
+                        <el-input class="edit-form-default" v-model="reactiveData.formData.profileName" placeholder="请输入模板名称" clearable @keyup.enter="search"></el-input>
                     </el-form-item>
                     <el-form-item prop="enableFlag" label="使能">
                         <el-select class="edit-form-small" v-model="reactiveData.formData.enableFlag" placeholder="请选择使能" clearable>

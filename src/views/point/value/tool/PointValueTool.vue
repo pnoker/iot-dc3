@@ -17,12 +17,12 @@
 <template>
     <div class="tool-card">
         <el-card :shadow="embedded == '' ? 'hover' : 'never'">
-            <el-form ref="formDataRef" class="tool-card-body" :model="reactiveData.formData" :rules="formRule" :inline="true">
+            <el-form class="tool-card-body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item v-if="embedded == ''" prop="deviceId" label="设备">
                         <el-select
-                            v-model="reactiveData.formData.deviceId"
                             class="edit-form-special"
+                            v-model="reactiveData.formData.deviceId"
                             placeholder="请选择设备"
                             filterable
                             remote
@@ -52,7 +52,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item v-if="embedded == ''" prop="pointId" label="位号">
-                        <el-select v-model="reactiveData.formData.pointId" class="edit-form-special" placeholder="请选择位号" clearable @visible-change="pointDictionaryVisible">
+                        <el-select class="edit-form-special" v-model="reactiveData.formData.pointId" placeholder="请选择位号" clearable @visible-change="pointDictionaryVisible">
                             <div class="tool-select">
                                 <el-form-item class="tool-select-input">
                                     <el-input v-model="reactiveData.pointQuery" placeholder="请输入位号名称" clearable @input="pointDictionary" />
@@ -74,10 +74,10 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item v-if="embedded == 'device'" prop="pointName" label="位号名称">
-                        <el-input v-model="reactiveData.formData.pointName" class="edit-form-default" placeholder="请输入位号名称" clearable @keyup.enter="search"> </el-input>
+                        <el-input class="edit-form-default" v-model="reactiveData.formData.pointName" placeholder="请输入位号名称" clearable @keyup.enter="search"> </el-input>
                     </el-form-item>
                     <el-form-item v-if="embedded == 'device'" prop="enableFlag" label="使能">
-                        <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" placeholder="请选择使能" clearable>
+                        <el-select class="edit-form-small" v-model="reactiveData.formData.enableFlag" placeholder="请选择使能" clearable>
                             <el-option label="启用" value="ENABLE"></el-option>
                             <el-option label="停用" value="DISABLE"></el-option>
                         </el-select>

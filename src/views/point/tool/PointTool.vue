@@ -17,15 +17,15 @@
 <template>
     <div class="tool-card">
         <el-card :shadow="embedded == '' ? 'hover' : 'never'">
-            <el-form ref="formDataRef" class="tool-card-body" :model="reactiveData.formData" :rules="formRule" :inline="true">
+            <el-form class="tool-card-body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="pointName" label="位号名称">
-                        <el-input v-model="reactiveData.formData.pointName" class="edit-form-default" placeholder="请输入位号名称" clearable @keyup.enter="search"> </el-input>
+                        <el-input class="edit-form-default" v-model="reactiveData.formData.pointName" placeholder="请输入位号名称" clearable @keyup.enter="search"> </el-input>
                     </el-form-item>
                     <el-form-item v-if="embedded != 'profile' && embedded != 'edit'" prop="profileId" label="所属模板">
                         <el-select
-                            v-model="reactiveData.formData.profileId"
                             class="edit-form-special"
+                            v-model="reactiveData.formData.profileId"
                             placeholder="请选择所属模板"
                             clearable
                             @visible-change="profileDictionaryVisible"

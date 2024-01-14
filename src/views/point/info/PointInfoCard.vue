@@ -33,7 +33,7 @@
                 <div class="things-card__body">
                     <div class="things-card-body-content">
                         <ul>
-                            <li v-for="attribute in attributes" :key="attribute.id" class="nowrap-item">
+                            <li class="nowrap-item" v-for="attribute in attributes" :key="attribute.id">
                                 <el-icon>
                                     <Goblet />
                                 </el-icon>

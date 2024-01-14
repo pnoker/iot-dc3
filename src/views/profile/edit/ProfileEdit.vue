@@ -31,20 +31,20 @@
                 <el-divider content-position="left">模板信息配置</el-divider>
                 <el-form ref="formDataRef" :inline="true" :model="reactiveData.profileFormData" :rules="formRule">
                     <div class="edit-form-item">
-                        <el-form-item label="模板名称" prop="name" class="edit-form-large">
+                        <el-form-item class="edit-form-large" label="模板名称" prop="name">
                             <el-input v-model="reactiveData.profileFormData.profileName" clearable placeholder="请输入模板名称"></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="使能" prop="enableFlag" class="edit-form-large">
-                            <el-select v-model="reactiveData.profileFormData.enableFlag" class="edit-form-large" clearable placeholder="请选择使能">
+                        <el-form-item class="edit-form-large" label="使能" prop="enableFlag">
+                            <el-select class="edit-form-large" v-model="reactiveData.profileFormData.enableFlag" clearable placeholder="请选择使能">
                                 <el-option label="启用" value="ENABLE"></el-option>
                                 <el-option label="停用" value="DISABLE"></el-option>
                             </el-select>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
-                        <el-form-item label="模板描述" prop="remark" class="edit-form-large">
+                        <el-form-item class="edit-form-large" label="模板描述" prop="remark">
                             <el-input v-model="reactiveData.profileFormData.remark" clearable type="textarea" maxlength="300" show-word-limit placeholder="请输入模板描述">
                             </el-input>
                         </el-form-item>

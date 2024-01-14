@@ -16,9 +16,9 @@
 
 <template>
     <el-dialog
+        class="things-dialog"
         v-model="reactiveData.formVisible"
         v-loading="reactiveData.formLoading"
-        class="things-dialog"
         title="导入设备"
         :show-close="false"
         :append-to-body="true"
@@ -33,7 +33,7 @@
             </el-alert>
             <dev></dev>
             <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
-                <el-select v-model="reactiveData.formData.driverId" class="edit-form-special" placeholder="请选择所属驱动" clearable @visible-change="driverDictionaryVisible">
+                <el-select class="edit-form-special" v-model="reactiveData.formData.driverId" placeholder="请选择所属驱动" clearable @visible-change="driverDictionaryVisible">
                     <div class="tool-select">
                         <el-form-item class="tool-select-input">
                             <el-input v-model="reactiveData.driverQuery" placeholder="请选择所属驱动" clearable @input="driverDictionary" />
@@ -56,8 +56,8 @@
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="关联模板" prop="profileIds">
                 <el-select
-                    v-model="reactiveData.formData.profileIds"
                     class="edit-form-special"
+                    v-model="reactiveData.formData.profileIds"
                     placeholder="请选择关联模板"
                     :multiple="true"
                     clearable
@@ -83,7 +83,7 @@
                     <el-option v-for="dictionary in reactiveData.profileDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                 </el-select>
             </el-form-item>
-            <el-upload ref="formUploadRef" class="things-dialog-upload" :http-request="uploadRequest" :limit="1" :on-exceed="handleExceed" :auto-upload="false" accept=".xlsx" drag>
+            <el-upload class="things-dialog-upload" ref="formUploadRef" :http-request="uploadRequest" :limit="1" :on-exceed="handleExceed" :auto-upload="false" accept=".xlsx" drag>
                 <el-icon class="el-upload__icon">
                     <UploadFilled />
                 </el-icon>
