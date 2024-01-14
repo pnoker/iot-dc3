@@ -22,8 +22,37 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script name="DetailCard" setup lang="ts" />
 
 <style lang="scss">
-@import './style.scss';
+.detail-card {
+    border-radius: 5px;
+    box-sizing: border-box;
+
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-bottom: 6px;
+
+    ul {
+        list-style: none;
+
+        li {
+            font-size: 13px;
+            margin-top: 8px;
+        }
+    }
+
+    .el-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .el-card__body {
+        padding: 10px 5px 0px 5px;
+    }
+
+    .el-tabs__nav {
+        margin: 0 5px 0 5px;
+    }
+}
 </style>

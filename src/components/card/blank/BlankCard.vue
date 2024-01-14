@@ -16,14 +16,50 @@
 
 <template>
     <div class="blank-card">
-        <el-card class="blank-card-body" :shadow="!embedded ? 'hover' : 'never'">
+        <el-card class="blank-card-body" :shadow="!props.embedded ? 'hover' : 'never'">
             <slot />
         </el-card>
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script name="BlankCard" setup lang="ts">
+const props = defineProps({
+    embedded: {
+        type: Boolean,
+        default: false,
+    },
+})
+</script>
 
 <style lang="scss">
-@import './style.scss';
+.blank-card {
+    border-radius: 5px;
+    box-sizing: border-box;
+
+    ul {
+        list-style: none;
+
+        li {
+            font-size: 13px;
+            margin-top: 8px;
+        }
+    }
+
+    .el-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .el-card.blank-card-body {
+        border: 0;
+    }
+
+    .el-card__body {
+        padding: 10px 5px 0px 5px;
+    }
+
+    .el-tabs__nav {
+        margin: 0 5px 0 5px;
+    }
+}
 </style>

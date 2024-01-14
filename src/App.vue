@@ -26,4 +26,8 @@
     height: 100%;
     overflow: hidden;
 }
+
+#nprogress .bar {
+    background: #409eff !important;
+}
 </style>

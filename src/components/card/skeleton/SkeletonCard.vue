@@ -15,41 +15,35 @@
   -->
 
 <template>
-    <el-skeleton :loading="loading" animated>
+    <el-skeleton :loading="props.loading" animated>
         <template #template>
-            <div class="things-card">
+            <div class="skeleton-card">
                 <el-card shadow="hover">
-                    <div class="things-card-content">
-                        <div class="things-card__header" v-if="!header">
-                            <el-skeleton-item class="things-card-header-icon skeleton" ariant="image" />
-                            <el-skeleton-item class="things-card-header-name skeleton" variant="text" />
+                    <div class="skeleton-card-container">
+                        <div class="skeleton-card__header">
+                            <el-skeleton-item class="skeleton-card-icon" ariant="image" />
+                            <el-skeleton-item class="skeleton-card-name" variant="text" />
                         </div>
-                        <div class="things-card__body">
-                            <div class="things-card-body-content" :class="{ left: header, center: !header }">
+                        <div class="skeleton-card__body">
+                            <div class="skeleton-card-content">
                                 <ul>
-                                    <el-skeleton-item class="nowrap-item skeleton" variant="text" />
-                                    <el-skeleton-item class="nowrap-item skeleton" variant="text" />
-                                    <el-skeleton-item class="nowrap-item skeleton" variant="text" />
-                                    <el-skeleton-item class="nowrap-item skeleton" variant="text" />
-                                    <div v-if="header">
-                                        <el-skeleton-item class="nowrap-item skeleton" variant="text" />
-                                        <el-skeleton-item class="nowrap-item skeleton" variant="text" />
-                                        <el-skeleton-item class="nowrap-item skeleton" variant="text" />
-                                        <el-skeleton-item class="nowrap-item skeleton" variant="text" />
-                                    </div>
+                                    <el-skeleton-item class="skeleton-card-text" variant="text" />
+                                    <el-skeleton-item class="skeleton-card-text" variant="text" />
+                                    <el-skeleton-item class="skeleton-card-text" variant="text" />
+                                    <el-skeleton-item class="skeleton-card-text" variant="text" />
                                 </ul>
                             </div>
-                            <div class="things-card-body-content" v-if="!header">
-                                <el-skeleton-item class="nowrap-description skeleton" variant="text" />
+                            <div class="skeleton-card-content">
+                                <el-skeleton-item class="skeleton-card-description" variant="text" />
                             </div>
                         </div>
-                        <div class="things-card__footer" v-if="!footer">
-                            <div class="things-card-footer-operation">
-                                <el-skeleton-item class="operation-tooltip skeleton" variant="button" />
-                                <el-skeleton-item class="operation-tooltip skeleton" variant="button" />
-                                <el-skeleton-item class="operation-tooltip skeleton" variant="button" />
-                                <el-skeleton-item class="operation-tooltip skeleton" variant="button" />
-                                <el-skeleton-item class="operation-tooltip skeleton" variant="button" />
+                        <div class="skeleton-card__footer" v-if="!props.footer">
+                            <div class="skeleton-card-operation">
+                                <el-skeleton-item class="skeleton-card-button" variant="button" />
+                                <el-skeleton-item class="skeleton-card-button" variant="button" />
+                                <el-skeleton-item class="skeleton-card-button" variant="button" />
+                                <el-skeleton-item class="skeleton-card-button" variant="button" />
+                                <el-skeleton-item class="skeleton-card-button" variant="button" />
                             </div>
                         </div>
                     </div>
@@ -59,8 +53,111 @@
     </el-skeleton>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script name="SkeletonCard" setup lang="ts">
+const props = defineProps({
+    loading: {
+        type: Boolean,
+        default: () => {
+            return false
+        },
+    },
+    footer: {
+        type: Boolean,
+        default: () => {
+            return false
+        },
+    },
+})
+</script>
 
 <style lang="scss">
-@import './style.scss';
+.skeleton-card {
+    border-radius: 5px;
+    box-sizing: border-box;
+
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-bottom: 6px;
+}
+
+.skeleton-card-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .skeleton-card__header {
+        width: 100%;
+        height: 55px;
+        display: flex;
+        border-bottom: 1px solid #dcdfe6;
+
+        .skeleton-card-icon {
+            width: 55px;
+            height: 48px;
+            margin-right: 12px;
+            border-radius: 5px;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        .skeleton-card-name {
+            height: 28px;
+            margin-top: 10px;
+            line-height: 48px;
+        }
+    }
+
+    .skeleton-card__body {
+        display: flex;
+        flex-direction: column;
+
+        .skeleton-card-content {
+            display: flex;
+            justify-content: space-around;
+
+            ul {
+                width: 100%;
+                padding-inline-start: 25px;
+                list-style: none;
+
+                li {
+                    font-size: 13px;
+                    margin-top: 8px;
+                }
+            }
+
+            .skeleton-card-text {
+                margin-top: 2px;
+            }
+
+            .skeleton-card-description {
+                margin-top: 10px;
+            }
+        }
+    }
+
+    .skeleton-card__footer {
+        height: 35px;
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        border-top: 1px solid #dcdfe6;
+
+        .skeleton-card-operation {
+            display: flex;
+
+            .skeleton-card-button {
+                width: 28px;
+                height: 20px;
+                margin-right: 10px;
+            }
+        }
+    }
+}
 </style>
