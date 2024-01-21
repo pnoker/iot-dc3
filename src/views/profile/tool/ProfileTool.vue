@@ -17,7 +17,7 @@
 <template>
     <div class="tool-card">
         <el-card :shadow="embedded == '' ? 'hover' : 'never'">
-            <el-form ref="formDataRef" class="tool-card-body" :model="reactiveData.formData" :rules="formRule" :inline="true">
+            <el-form class="tool-card__body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="name" label="模板名称">
                         <el-input class="edit-form-default" v-model="reactiveData.formData.profileName" placeholder="请输入模板名称" clearable @keyup.enter="search"></el-input>
@@ -34,14 +34,14 @@
                     <el-button :icon="RefreshRight" @click="reset">重置</el-button>
                 </el-form-item>
             </el-form>
-            <div class="tool-card-footer">
+            <div class="tool-card__footer">
                 <div class="tool-card-footer-button">
                     <el-button v-if="embedded == ''" type="success" :icon="Plus" @click="showAdd"> 新增 </el-button>
                 </div>
                 <div class="tool-card-footer-page">
                     <el-pagination
                         layout="total, prev, pager, next, sizes"
-                        :page-sizes="[6, 12, 24, 36, 48]"
+                        :page-sizes="[6, 12, 24, 36, 48, 96]"
                         :page-size="+page.size"
                         :current-page="+page.current"
                         :total="+page.total"

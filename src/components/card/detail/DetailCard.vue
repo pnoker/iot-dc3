@@ -17,12 +17,14 @@
 <template>
     <div class="detail-card">
         <el-card shadow="hover">
-            <slot />
+            <div class="detail-card__container">
+                <slot />
+            </div>
         </el-card>
     </div>
 </template>
 
-<script name="DetailCard" setup lang="ts" />
+<script setup lang="ts" />
 
 <style lang="scss">
 .detail-card {

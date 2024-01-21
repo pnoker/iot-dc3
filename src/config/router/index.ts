@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-import { createRouter, createWebHashHistory, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import { createRouter, createWebHashHistory, NavigationGuardNext, RouteLocationNormalized, RouteMeta } from 'vue-router'
 
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import commonRouters from './common'
 import operateRouters from './operate'
 import viewsRouters from './views'
+import { getStorage } from '@/utils/StorageUtils'
+import { isNull } from '@/utils/utils'
+import CommonConstant from '@/config/constant/common'
+import { checkTokenValid } from '@/api/token'
+import { Login } from '@/config/types'
+import { logout } from '@/utils/CommonUtils'
 
 NProgress.configure({
     easing: 'ease',
@@ -35,12 +41,40 @@ const router = createRouter({
 router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
     NProgress.start()
 
-    const meta = to.meta || {}
-    if (meta.title) {
-        document.title = to.meta.title as string
+    if (from.name === 'login' || to.name === 'login') {
+        next()
+        return
     }
 
-    next()
+    const tenant = getStorage(CommonConstant.X_AUTH_TENANT)
+    const user = getStorage(CommonConstant.X_AUTH_LOGIN)
+    const token = getStorage(CommonConstant.X_AUTH_TOKEN)
+    if (isNull(tenant) || isNull(user) || isNull(token)) {
+        next({ path: '/login' })
+        return
+    }
+
+    const login: Login = {
+        tenant: tenant,
+        name: user,
+        ...token,
+    }
+
+    checkTokenValid(login)
+        .then((res) => {
+            if (!res.data) {
+                logout()
+                return
+            }
+
+            const meta: RouteMeta = to.meta || {}
+            if (meta.title) {
+                document.title = to.meta.title as string
+            }
+
+            next()
+        })
+        .catch(() => {})
 })
 
 router.afterEach(() => {

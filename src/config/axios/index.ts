@@ -17,8 +17,7 @@
 import axios, { AxiosInstance } from 'axios'
 
 import CommonConstant from '@/config/constant/common'
-import { logout } from '@/utils/CommonUtils'
-import { failMessage } from '@/utils/NotificationUtils'
+import { failMessage, warnMessage } from '@/utils/NotificationUtils'
 import { getStorage } from '@/utils/StorageUtils'
 import { isNull } from '@/utils/utils'
 import { encode } from 'js-base64'
@@ -81,7 +80,7 @@ request.interceptors.response.use(
         }
 
         if (status === 401) {
-            logout(true)
+            warnMessage('检测到您未登录或登陆凭证已失效，请重新登录!', '登录凭证失效')
         } else {
             failMessage('接口请求异常，请联系系统管理员。', response.data.code, response.data)
         }

@@ -68,10 +68,10 @@ export default defineComponent({
             Sort,
         }
 
-        const driverDictionary = () => {
+        const driverDictionary = (query?: string) => {
             getDriverDictionary({
                 page: reactiveData.driverPage,
-                label: reactiveData.driverQuery,
+                label: query ? query : reactiveData.driverQuery,
             })
                 .then((res) => {
                     const data = res.data
@@ -83,7 +83,7 @@ export default defineComponent({
                 })
         }
 
-        const driverCurrentChange = (current) => {
+        const driverCurrentChange = (current: number) => {
             reactiveData.driverPage.current = current
             driverDictionary()
         }
@@ -126,11 +126,11 @@ export default defineComponent({
             emit('sort')
         }
 
-        const sizeChange = (size) => {
+        const sizeChange = (size: number) => {
             emit('size-change', size)
         }
 
-        const currentChange = (current) => {
+        const currentChange = (current: number) => {
             emit('current-change', current)
         }
 

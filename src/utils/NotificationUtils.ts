@@ -20,9 +20,10 @@ import { isNull } from './utils'
 /**
  * 成功操作
  *
- * @param message
+ * @param message 消息内容
+ * @param title 消息标题
  */
-export const successMessage = (message?: string, title = '成功') => {
+export const successMessage = (message?: string, title: string = '成功') => {
     if (isNull(message)) {
         message = '操作成功!'
     }
@@ -38,8 +39,9 @@ export const successMessage = (message?: string, title = '成功') => {
 /**
  * 警告操作
  *
- * @param message
- * @param error
+ * @param message 消息内容
+ * @param title 消息标题
+ * @param error 错误信息
  */
 export const warnMessage = (message?: string, title = '警告', error?: any) => {
     if (isNull(message)) {
@@ -61,8 +63,9 @@ export const warnMessage = (message?: string, title = '警告', error?: any) => 
 /**
  * 失败操作
  *
- * @param message
- * @param error
+ * @param message 消息内容
+ * @param title 消息标题
+ * @param error 错误信息
  */
 export const failMessage = (message?: string, title = '错误', error?: any) => {
     if (isNull(message)) {

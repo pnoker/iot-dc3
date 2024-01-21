@@ -101,7 +101,7 @@ const handleMessage = () => {
 
 const handleCommand = (command: string) => {
     if (command === 'logout') {
-        store.dispatch('auth/logout').then(() => router.push({ path: '/login' }))
+        store.dispatch('auth/logout').then(() => router.push({ name: 'login' }))
     } else if (command === 'help') {
         window.open('https://doc.dc3.site')
     }

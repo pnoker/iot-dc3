@@ -17,7 +17,7 @@
 <template>
     <div class="tool-card">
         <el-card :shadow="embedded == '' ? 'hover' : 'never'">
-            <el-form class="tool-card-body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
+            <el-form class="tool-card__body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="deviceName" label="设备名称">
                         <el-input class="edit-form-default" v-model="reactiveData.formData.deviceName" placeholder="请输入设备名称" clearable @keyup.enter="search" />
@@ -27,13 +27,14 @@
                             class="edit-form-special"
                             v-model="reactiveData.formData.driverId"
                             placeholder="请选择所属驱动"
+                            filterable
+                            remote
+                            :remote-method="driverDictionary"
                             clearable
+                            @change="driverCurrentChange"
                             @visible-change="driverDictionaryVisible"
                         >
                             <div class="tool-select">
-                                <el-form-item class="tool-select-input">
-                                    <el-input v-model="reactiveData.driverQuery" placeholder="请输入驱动名称" clearable @input="driverDictionary" />
-                                </el-form-item>
                                 <el-pagination
                                     class="tool-select-pagination"
                                     :hide-on-single-page="true"
@@ -62,7 +63,7 @@
                     <el-button :icon="RefreshRight" @click="reset">重置</el-button>
                 </el-form-item>
             </el-form>
-            <div class="tool-card-footer">
+            <div class="tool-card__footer">
                 <div class="tool-card-footer-button">
                     <el-button v-if="embedded == ''" type="success" :icon="Plus" @click="showAdd">新增</el-button>
                     <el-button v-if="embedded == ''" type="primary" :icon="Upload" @click="showImport">导入</el-button>
@@ -70,7 +71,7 @@
                 <div class="tool-card-footer-page">
                     <el-pagination
                         layout="total, prev, pager, next, sizes"
-                        :page-sizes="[6, 12, 24, 36, 48]"
+                        :page-sizes="[6, 12, 24, 36, 48, 96]"
                         :page-size="+page.size"
                         :current-page="+page.current"
                         :total="+page.total"

@@ -95,7 +95,7 @@ export default defineComponent({
         }
 
         const detail = () => {
-            router.push({ path: '/device/detail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
+            router.push({ name: 'deviceDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
                 // nothing to do
             })
         }

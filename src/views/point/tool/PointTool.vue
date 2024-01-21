@@ -17,7 +17,7 @@
 <template>
     <div class="tool-card">
         <el-card :shadow="embedded == '' ? 'hover' : 'never'">
-            <el-form class="tool-card-body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
+            <el-form class="tool-card__body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="pointName" label="位号名称">
                         <el-input class="edit-form-default" v-model="reactiveData.formData.pointName" placeholder="请输入位号名称" clearable @keyup.enter="search"> </el-input>
@@ -65,14 +65,14 @@
                     <el-button v-if="pre" type="warning" :icon="Check" plain @click="nextHandle">下一步</el-button>
                 </el-form-item>
             </el-form>
-            <div class="tool-card-footer">
+            <div class="tool-card__footer">
                 <div class="tool-card-footer-button">
                     <el-button v-if="embedded == '' || embedded == 'edit'" type="success" :icon="Plus" @click="showAdd">新增</el-button>
                 </div>
                 <div class="tool-card-footer-page">
                     <el-pagination
                         layout="total, prev, pager, next, sizes"
-                        :page-sizes="[6, 12, 24, 36, 48]"
+                        :page-sizes="[6, 12, 24, 36, 48, 96]"
                         :page-size="+page.size"
                         :current-page="+page.current"
                         :total="+page.total"

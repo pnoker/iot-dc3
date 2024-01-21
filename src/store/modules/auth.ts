@@ -82,7 +82,7 @@ const auth = {
                                 salt: login.salt,
                                 token: res.data,
                             })
-                            router.push({ path: '/' }).then(() => loading.close())
+                            router.push({ name: 'home' }).then(() => loading.close())
                         })
                         .catch(() => loading.close())
                 })

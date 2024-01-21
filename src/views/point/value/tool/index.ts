@@ -16,7 +16,7 @@
 
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
-import { Plus, RefreshRight, Search, Refresh } from '@element-plus/icons-vue'
+import { Plus, Refresh, RefreshRight, Search } from '@element-plus/icons-vue'
 import { Dictionary, Order } from '@/config/types'
 import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary'
 
@@ -73,10 +73,10 @@ export default defineComponent({
             Refresh,
         }
 
-        const deviceDictionary = (qq?: string) => {
+        const deviceDictionary = (query?: string) => {
             getDeviceDictionary({
                 page: reactiveData.devicePage,
-                label: qq ? qq : reactiveData.deviceQuery,
+                label: query ? query : reactiveData.deviceQuery,
             })
                 .then((res) => {
                     const data = res.data
@@ -88,15 +88,15 @@ export default defineComponent({
                 })
         }
 
-        const deviceCurrentChange = (current) => {
+        const deviceCurrentChange = (current: number) => {
             reactiveData.devicePage.current = current
             deviceDictionary()
         }
 
-        const pointDictionary = () => {
+        const pointDictionary = (query?: string) => {
             getPointDictionary({
                 page: reactiveData.pointPage,
-                label: reactiveData.pointQuery,
+                label: query ? query : reactiveData.pointQuery,
                 parentId: reactiveData.formData.deviceId,
             })
                 .then((res) => {
@@ -109,14 +109,14 @@ export default defineComponent({
                 })
         }
 
-        const pointCurrentChange = (current) => {
+        const pointCurrentChange = (current: number) => {
             reactiveData.pointPage.current = current
             pointDictionary()
         }
 
-        const pointDictionaryChange = () => {
-            reactiveData.formData.pointId = ''
-            pointDictionary()
+        const deviceDictionaryChange = () => {
+            reactiveData.formData.deviceId = ''
+            deviceDictionary()
         }
 
         const deviceDictionaryVisible = (visible: boolean) => {
@@ -124,6 +124,11 @@ export default defineComponent({
                 reactiveData.deviceQuery = ''
                 deviceDictionary()
             }
+        }
+
+        const pointDictionaryChange = () => {
+            reactiveData.formData.pointId = ''
+            pointDictionary()
         }
 
         const pointDictionaryVisible = (visible: boolean) => {
@@ -147,13 +152,16 @@ export default defineComponent({
             form?.resetFields()
             emit('reset')
         }
+
         const refresh = () => {
             emit('refresh')
         }
-        const sizeChange = (size) => {
+
+        const sizeChange = (size: number) => {
             emit('size-change', size)
         }
-        const currentChange = (current) => {
+
+        const currentChange = (current: number) => {
             emit('current-change', current)
         }
 
@@ -165,8 +173,9 @@ export default defineComponent({
             deviceCurrentChange,
             pointDictionary,
             pointCurrentChange,
-            pointDictionaryChange,
+            deviceDictionaryChange,
             deviceDictionaryVisible,
+            pointDictionaryChange,
             pointDictionaryVisible,
             search,
             reset,

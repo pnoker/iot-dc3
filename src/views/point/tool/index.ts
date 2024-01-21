@@ -98,7 +98,7 @@ export default defineComponent({
                 })
         }
 
-        const profileCurrentChange = (current) => {
+        const profileCurrentChange = (current: number) => {
             reactiveData.profilePage.current = current
             profileDictionary()
         }
@@ -132,10 +132,10 @@ export default defineComponent({
         const sort = () => {
             emit('sort')
         }
-        const sizeChange = (size) => {
+        const sizeChange = (size: number) => {
             emit('size-change', size)
         }
-        const currentChange = (current) => {
+        const currentChange = (current: number) => {
             emit('current-change', current)
         }
         const preHandle = () => {

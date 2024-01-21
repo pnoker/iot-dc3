@@ -17,12 +17,14 @@
 <template>
     <div class="base-card">
         <el-card shadow="hover">
-            <slot />
+            <div class="base-card__container">
+                <slot />
+            </div>
         </el-card>
     </div>
 </template>
 
-<script name="BaseCard" setup lang="ts" />
+<script setup lang="ts"></script>
 
 <style lang="scss">
 .base-card {

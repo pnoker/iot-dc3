@@ -19,7 +19,7 @@
         <template #template>
             <div class="skeleton-card">
                 <el-card shadow="hover">
-                    <div class="skeleton-card-container">
+                    <div class="skeleton-card__container">
                         <div class="skeleton-card__header">
                             <el-skeleton-item class="skeleton-card-icon" ariant="image" />
                             <el-skeleton-item class="skeleton-card-name" variant="text" />
@@ -53,7 +53,7 @@
     </el-skeleton>
 </template>
 
-<script name="SkeletonCard" setup lang="ts">
+<script setup lang="ts">
 const props = defineProps({
     loading: {
         type: Boolean,
@@ -80,7 +80,7 @@ const props = defineProps({
     margin-bottom: 6px;
 }
 
-.skeleton-card-container {
+.skeleton-card__container {
     height: 100%;
     display: flex;
     flex-direction: column;

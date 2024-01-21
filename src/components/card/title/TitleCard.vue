@@ -17,15 +17,17 @@
 <template>
     <div class="title-card">
         <el-card shadow="hover">
-            <slot name="header">
-                <span class="title-card__header">{{ props.title }}</span>
-            </slot>
-            <slot />
+            <div class="title-card__container">
+                <slot name="header">
+                    <span class="title-card__header">{{ props.title }}</span>
+                </slot>
+                <slot />
+            </div>
         </el-card>
     </div>
 </template>
 
-<script name="TitleCard" setup lang="ts">
+<script setup lang="ts">
 const props = defineProps({
     title: {
         type: String,

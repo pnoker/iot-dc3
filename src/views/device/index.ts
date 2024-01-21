@@ -268,12 +268,12 @@ export default defineComponent({
             list()
         }
 
-        const sizeChange = (size) => {
+        const sizeChange = (size: number) => {
             reactiveData.page.size = size
             list()
         }
 
-        const currentChange = (current) => {
+        const currentChange = (current: number) => {
             reactiveData.page.current = current
             list()
         }

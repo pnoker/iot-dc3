@@ -17,7 +17,7 @@
 <template>
     <div class="tool-card">
         <el-card :shadow="embedded == '' ? 'hover' : 'never'">
-            <el-form class="tool-card-body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
+            <el-form class="tool-card__body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item v-if="embedded == ''" prop="deviceId" label="设备">
                         <el-select
@@ -28,13 +28,10 @@
                             remote
                             :remote-method="deviceDictionary"
                             clearable
-                            @change="pointDictionaryChange"
+                            @change="deviceCurrentChange"
                             @visible-change="deviceDictionaryVisible"
                         >
                             <div class="tool-select">
-                                <!-- <el-form-item class="tool-select-input">
-                                    <el-input v-model="reactiveData.deviceQuery" placeholder="请输入设备名称" clearable @input="deviceDictionary" />
-                                </el-form-item> -->
                                 <el-pagination
                                     class="tool-select-pagination"
                                     :hide-on-single-page="true"
@@ -52,11 +49,18 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item v-if="embedded == ''" prop="pointId" label="位号">
-                        <el-select class="edit-form-special" v-model="reactiveData.formData.pointId" placeholder="请选择位号" clearable @visible-change="pointDictionaryVisible">
+                        <el-select
+                            class="edit-form-special"
+                            v-model="reactiveData.formData.pointId"
+                            placeholder="请选择位号"
+                            filterable
+                            remote
+                            :remote-method="pointDictionary"
+                            clearable
+                            @change="pointCurrentChange"
+                            @visible-change="pointDictionaryVisible"
+                        >
                             <div class="tool-select">
-                                <el-form-item class="tool-select-input">
-                                    <el-input v-model="reactiveData.pointQuery" placeholder="请输入位号名称" clearable @input="pointDictionary" />
-                                </el-form-item>
                                 <el-pagination
                                     class="tool-select-pagination"
                                     :hide-on-single-page="true"
@@ -74,7 +78,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item v-if="embedded == 'device'" prop="pointName" label="位号名称">
-                        <el-input class="edit-form-default" v-model="reactiveData.formData.pointName" placeholder="请输入位号名称" clearable @keyup.enter="search"> </el-input>
+                        <el-input class="edit-form-default" v-model="reactiveData.formData.pointName" placeholder="请输入位号名称" clearable @keyup.enter="search"></el-input>
                     </el-form-item>
                     <el-form-item v-if="embedded == 'device'" prop="enableFlag" label="使能">
                         <el-select class="edit-form-small" v-model="reactiveData.formData.enableFlag" placeholder="请选择使能" clearable>
@@ -88,14 +92,14 @@
                     <el-button :icon="RefreshRight" @click="reset">重置</el-button>
                 </el-form-item>
             </el-form>
-            <div class="tool-card-footer">
+            <div class="tool-card__footer">
                 <div class="tool-card-footer-button">
                     <el-button v-if="embedded == ''" type="success" :icon="Plus" disabled>新增</el-button>
                 </div>
                 <div class="tool-card-footer-page">
                     <el-pagination
                         layout="total, prev, pager, next, sizes"
-                        :page-sizes="[6, 12, 24, 36, 48]"
+                        :page-sizes="[6, 12, 24, 36, 48, 96]"
                         :page-size="+page.size"
                         :current-page="+page.current"
                         :total="+page.total"

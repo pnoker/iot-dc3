@@ -96,7 +96,7 @@ export default defineComponent({
                 })
         }
 
-        const driverCurrentChange = (current) => {
+        const driverCurrentChange = (current: number) => {
             reactiveData.driverPage.current = current
             driverDictionary()
         }
@@ -123,7 +123,7 @@ export default defineComponent({
                 })
         }
 
-        const profileCurrentChange = (current) => {
+        const profileCurrentChange = (current: number) => {
             reactiveData.driverPage.current = current
             profileDictionary()
         }

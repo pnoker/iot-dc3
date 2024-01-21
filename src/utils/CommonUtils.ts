@@ -28,9 +28,7 @@ export const timestamp = (timestamp: string): string => {
     return dateFormat(new Date(timestamp))
 }
 
-export const logout = (withWarn: boolean = false) => {
-    if (withWarn) {
-        warnMessage('检测到您未登录或登陆凭证已失效，请重新登录!', '登录凭证失效')
-    }
-    store.dispatch('auth/logout').then(() => router.push({ path: '/login' }))
+export const logout = () => {
+    warnMessage('检测到您未登录或登陆凭证已失效，请重新登录!', '登录凭证失效')
+    store.dispatch('auth/logout').then(() => router.push({ name: 'login' }))
 }
