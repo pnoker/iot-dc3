@@ -18,6 +18,13 @@
 FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.13.14 AS runtime
 MAINTAINER pnoker <pnokers.icloud.com>
 
+# default env
+ENV PARAMS
+ENV NODE_ENV dev
+ENV TCP_PORT 9001
+ENV UDP_PORT 9002
+
+# default jvm & gc env
 ENV JAVA_OPS -server \
              -Xms128m \
              -Xmx1024m \
@@ -34,7 +41,7 @@ ENV GC_LOG   -XX:+PrintGCDetails \
              -XX:+UseGCLogFileRotation \
              -XX:NumberOfGCLogFiles=10 \
              -XX:GCLogFileSize=10M \
-             -Xloggc:dc3/logs/driver/dtu-yeecom/gc/dc3-driver-dtu-yeecom-gc.log
+             -Xloggc:dc3/logs/driver/dtu-yeecom/gc/gc.log
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
@@ -42,8 +49,9 @@ WORKDIR /dc3-driver/dc3-driver-dtu-yeecom
 
 ADD ./target/dc3-driver-dtu-yeecom.jar ./
 
-EXPOSE 8700
+EXPOSE ${TCP_PORT}
+EXPOSE ${UDP_PORT}
 VOLUME /dc3-driver/dc3-driver-dtu-yeecom/dc3/logs
 
 CMD mkdir -p /dc3-driver/dc3-driver-dtu-yeecom/dc3/logs/driver/dtu-yeecom/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-driver-dtu-yeecom.jar
+    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-driver-dtu-yeecom.jar ${PARAMS}

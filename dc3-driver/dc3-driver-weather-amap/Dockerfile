@@ -18,6 +18,11 @@
 FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.13.14 AS runtime
 MAINTAINER pnoker <pnokers.icloud.com>
 
+# default env
+ENV PARAMS
+ENV NODE_ENV dev
+
+# default jvm & gc env
 ENV JAVA_OPS -server \
              -Xms128m \
              -Xmx1024m \
@@ -34,7 +39,7 @@ ENV GC_LOG   -XX:+PrintGCDetails \
              -XX:+UseGCLogFileRotation \
              -XX:NumberOfGCLogFiles=10 \
              -XX:GCLogFileSize=10M \
-             -Xloggc:dc3/logs/driver/weather-amap/gc/dc3-driver-weather-amap.log
+             -Xloggc:dc3/logs/driver/weather-amap/gc/gc.log
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
@@ -42,8 +47,7 @@ WORKDIR /dc3-driver/dc3-driver-weather-amap
 
 ADD ./target/dc3-driver-weather-amap.jar ./
 
-EXPOSE 8600
 VOLUME /dc3-driver/dc3-driver-weather-amap/dc3/logs
 
 CMD mkdir -p /dc3-driver/dc3-driver-weather-amap/dc3/logs/driver/weather-amap/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-driver-weather-amap.jar
+    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-driver-weather-amap.jar ${PARAMS}

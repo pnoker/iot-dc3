@@ -18,6 +18,12 @@
 FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.13.14 AS runtime
 MAINTAINER pnoker <pnokers.icloud.com>
 
+# default env
+ENV PARAMS
+ENV NODE_ENV dev
+ENV SERVER_PORT 8000
+
+# default jvm & gc env
 ENV JAVA_OPS -server \
              -Xms128m \
              -Xmx1024m \
@@ -34,7 +40,7 @@ ENV GC_LOG   -XX:+PrintGCDetails \
              -XX:+UseGCLogFileRotation \
              -XX:NumberOfGCLogFiles=10 \
              -XX:GCLogFileSize=10M \
-             -Xloggc:dc3/logs/gateway/gc/dc3-center-gateway.log
+             -Xloggc:dc3/logs/gateway/gc/gc.log
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
@@ -42,8 +48,8 @@ WORKDIR /dc3-gateway
 
 ADD ./target/dc3-gateway.jar ./
 
-EXPOSE 8000
+EXPOSE ${SERVER_PORT}
 VOLUME /dc3-gateway/dc3/logs
 
 CMD mkdir -p /dc3-gateway/dc3/logs/gateway/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-gateway.jar
+    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-gateway.jar ${PARAMS}

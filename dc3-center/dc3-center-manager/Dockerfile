@@ -19,8 +19,8 @@ FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.13.14 AS runt
 MAINTAINER pnoker <pnokers.icloud.com>
 
 # default env
+ENV PARAMS
 ENV NODE_ENV dev
-ENV EUREKA_TLS_ENABLE false
 ENV SERVER_PORT 8400
 
 # default jvm & gc env
@@ -40,7 +40,7 @@ ENV GC_LOG   -XX:+PrintGCDetails \
              -XX:+UseGCLogFileRotation \
              -XX:NumberOfGCLogFiles=10 \
              -XX:GCLogFileSize=10M \
-             -Xloggc:dc3/logs/center/manager/gc/dc3-center-manager.log
+             -Xloggc:dc3/logs/center/manager/gc/gc.log
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
@@ -52,4 +52,4 @@ EXPOSE ${SERVER_PORT}
 VOLUME /dc3-center/dc3-center-manager/dc3/logs
 
 CMD mkdir -p /dc3-center/dc3-center-manager/dc3/logs/center/manager/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-center-manager.jar
+    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-center-manager.jar ${PARAMS}

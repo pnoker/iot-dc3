@@ -22,9 +22,9 @@ driver:
   remark: @project.description@
   custom:
     tcp:
-      port: 6270
+      port: ${TCP_PORT:6270}
     udp:
-      port: 6271
+      port: ${UDP_PORT:6271}
   schedule:
     # 定时读数据
     read:

@@ -22,9 +22,9 @@ driver:
   remark: @project.description@
   custom:
     tcp:
-      port: 9001
+      port: ${TCP_PORT:9001}
     udp:
-      port: 9002
+      port: ${UDP_PORT:9002}
   schedule:
     # 定时读数据
     read:
