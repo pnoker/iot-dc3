@@ -49,25 +49,23 @@
             <artifactId>dc3-api-manager</artifactId>
         </dependency>
 
-        <!-- DC3 Common MySQL -->
+        <!-- DC3 Common 相关 -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-job</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mysql</artifactId>
         </dependency>
-
-        <!-- DC3 Common Redis -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-redis</artifactId>
         </dependency>
-
-        <!-- DC3 Common Mongo -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mongo</artifactId>
         </dependency>
-
-        <!-- DC3 Common RabbitMQ -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-rabbitmq</artifactId>

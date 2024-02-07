@@ -49,6 +49,7 @@ services:
       dc3net:
         aliases:
           - dc3-register
+
   mysql:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2024.1.1.dev
     restart: always
@@ -160,9 +161,31 @@ services:
         aliases:
           - dc3-emqx
 
+  job:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-job:2024.1.1.dev
+    restart: always
+    ports:
+      - '8100:8100'
+    environment:
+      - DB_HOST=dc3-mysql
+      - MYSQL_PORT=3306
+      - DB_NAME=dc3_xxl_job
+    container_name: dc3-job
+    hostname: dc3-job
+    volumes:
+      - logs:/dc3-center/dc3-job/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-job
 
   prometheus:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-prometheus:2023.11.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-prometheus:2024.1.1.dev
     restart: always
     ports:
       - '9090:9090'
@@ -181,7 +204,7 @@ services:
           - dc3-prometheus
 
   grafana:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-grafana:2023.11.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-grafana:2024.1.1.dev
     restart: always
     ports:
       - '3000:3000'
@@ -223,6 +246,7 @@ services:
           - dc3-portainer
 
 volumes:
+  logs:
   register:
   mysql_lib:
   mysql_data:

@@ -72,31 +72,23 @@
             <artifactId>grpc-spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- DC3 Common Register -->
+        <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-register</artifactId>
         </dependency>
-
-        <!-- DC3 Common Web -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-web</artifactId>
         </dependency>
-
-        <!-- DC3 Common Thread -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-thread</artifactId>
         </dependency>
-
-        <!-- DC3 Common Log -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-log</artifactId>
         </dependency>
-
-        <!-- DC3 Common Model -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-model</artifactId>
