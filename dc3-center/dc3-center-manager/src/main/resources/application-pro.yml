@@ -43,3 +43,7 @@ spring:
       password: dc3
       discovery:
         namespace: ${NODE_ENV:pro}
+
+xxl:
+  job:
+    admin-addresses: http://${XXL_JOB_HOST:dc3-job}:${XXL_JOB_PORT:8100}/xxl-job-admin

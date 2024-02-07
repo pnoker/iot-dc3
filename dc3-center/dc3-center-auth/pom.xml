@@ -37,25 +37,21 @@
             <artifactId>spring-security-oauth2</artifactId>
         </dependency>-->
 
-        <!-- DC3 Api -->
+        <!-- DC3 Api 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-auth</artifactId>
         </dependency>
 
-        <!-- DC3 Common MySQL -->
+        <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mysql</artifactId>
         </dependency>
-
-        <!-- DC3 Common Redis -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-redis</artifactId>
         </dependency>
-
-        <!-- DC3 Common Auth -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-auth</artifactId>

@@ -47,6 +47,10 @@ spring:
         group: ${spring.group}
         namespace: ${NODE_ENV:dev}
 
+xxl:
+  job:
+    admin-addresses: http://${XXL_JOB_HOST:dc3-job}:${XXL_JOB_PORT:8100}/xxl-job-admin
+
 logging:
   level:
     io.github.pnoker: DEBUG

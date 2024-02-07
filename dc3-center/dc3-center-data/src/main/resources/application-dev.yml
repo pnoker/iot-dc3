@@ -68,6 +68,10 @@ data:
         host: dc3-elasticsearch
         port: 9200
 
+xxl:
+  job:
+    admin-addresses: http://${XXL_JOB_HOST:dc3-job}:${XXL_JOB_PORT:8100}/xxl-job-admin
+
 logging:
   level:
     io.github.pnoker: DEBUG
