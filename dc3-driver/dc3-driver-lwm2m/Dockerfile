@@ -19,9 +19,9 @@ FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.13.14 AS runt
 MAINTAINER pnoker <pnokers.icloud.com>
 
 # default env
-ENV PARAMS
-ENV NODE_ENV dev
-ENV COAP_PORT 5683
+ENV PARAMS     ''
+ENV NODE_ENV   dev
+ENV COAP_PORT  5683
 ENV COAPS_PORT 5684
 
 # default jvm & gc env

@@ -19,8 +19,8 @@ FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.13.14 AS runt
 MAINTAINER pnoker <pnokers.icloud.com>
 
 # default env
-ENV PARAMS
-ENV NODE_ENV dev
+ENV PARAMS        ''
+ENV NODE_ENV      dev
 ENV SERVER_PORT   8500
 ENV GRPC_PORT     9500
 ENV EXECUTOR_PORT 7500
