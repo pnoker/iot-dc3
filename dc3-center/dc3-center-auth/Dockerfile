@@ -22,6 +22,7 @@ MAINTAINER pnoker <pnokers.icloud.com>
 ENV PARAMS
 ENV NODE_ENV dev
 ENV SERVER_PORT 8300
+ENV GRPC_PORT   9300
 
 # default jvm & gc env
 ENV JAVA_OPS -server \
@@ -49,6 +50,7 @@ WORKDIR /dc3-center/dc3-center-auth
 ADD ./target/dc3-center-auth.jar ./
 
 EXPOSE ${SERVER_PORT}
+EXPOSE ${GRPC_PORT}
 VOLUME /dc3-center/dc3-center-auth/dc3/logs
 
 CMD mkdir -p /dc3-center/dc3-center-auth/dc3/logs/center/auth/gc \
