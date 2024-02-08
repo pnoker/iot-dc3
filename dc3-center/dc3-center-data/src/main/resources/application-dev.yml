@@ -45,14 +45,14 @@ spring:
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}
-  cloud:
-    nacos:
-      server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
-      username: dc3
-      password: dc3
-      discovery:
-        group: ${spring.group}
-        namespace: ${NODE_ENV:dev}
+
+grpc:
+  client:
+    dc3-center-manager:
+      address: 'static://dc3-center-manager:9400'
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
 
 data:
   point:
@@ -70,6 +70,8 @@ data:
 
 xxl:
   job:
+    access-token: default_token
+    executor-port: ${EXECUTOR_PORT:7500}
     admin-addresses: http://${XXL_JOB_HOST:dc3-job}:${XXL_JOB_PORT:8100}/xxl-job-admin
 
 logging:

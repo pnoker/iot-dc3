@@ -75,23 +75,25 @@
         <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-register</artifactId>
+            <artifactId>dc3-common-log</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-web</artifactId>
+            <artifactId>dc3-common-model</artifactId>
         </dependency>
+        <!--
+        开发环境无需注册中心，暂时停用
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-register</artifactId>
+        </dependency>-->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-thread</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-log</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-model</artifactId>
+            <artifactId>dc3-common-web</artifactId>
         </dependency>
 
     </dependencies>

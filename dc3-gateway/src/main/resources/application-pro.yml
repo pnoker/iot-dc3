@@ -30,3 +30,79 @@ spring:
       password: dc3
       discovery:
         namespace: ${NODE_ENV:pro}
+    gateway:
+      routes:
+        # token
+        - id: auth_route_token
+          uri: lb://dc3-center-auth
+          predicates:
+            - Path=/api/v3/auth/token/**
+          filters:
+            - StripPrefix=2
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@hostKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: CircuitBreaker
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        # auth
+        - id: auth_route
+          uri: lb://dc3-center-auth
+          predicates:
+            - Path=/api/v3/auth/user/**,/api/v3/auth/limited_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
+          filters:
+            - StripPrefix=2
+            - Authentic
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@hostKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: CircuitBreaker
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        # manager
+        - id: manager_route
+          uri: lb://dc3-center-manager
+          predicates:
+            - Path=/api/v3/manager/**
+          filters:
+            - StripPrefix=2
+            - Authentic
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@hostKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: CircuitBreaker
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+        # data
+        - id: data_route
+          uri: lb://dc3-center-data
+          predicates:
+            - Path=/api/v3/data/**
+          filters:
+            - StripPrefix=2
+            - Authentic
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@hostKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+            - name: CircuitBreaker
+              args:
+                name: default
+                fallbackUri: 'forward:/fallback'
+
+grpc:
+  client:
+    dc3-center-auth:
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext

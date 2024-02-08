@@ -21,7 +21,9 @@ MAINTAINER pnoker <pnokers.icloud.com>
 # default env
 ENV PARAMS
 ENV NODE_ENV dev
-ENV SERVER_PORT 8400
+ENV SERVER_PORT   8400
+ENV GRPC_PORT     9400
+ENV EXECUTOR_PORT 7400
 
 # default jvm & gc env
 ENV JAVA_OPS -server \
@@ -49,6 +51,7 @@ WORKDIR /dc3-center/dc3-center-manager
 ADD ./target/dc3-center-manager.jar ./
 
 EXPOSE ${SERVER_PORT}
+EXPOSE ${GRPC_PORT}
 VOLUME /dc3-center/dc3-center-manager/dc3/logs
 
 CMD mkdir -p /dc3-center/dc3-center-manager/dc3/logs/center/manager/gc \

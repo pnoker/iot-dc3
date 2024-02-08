@@ -63,20 +63,10 @@
 
     <dependencies>
 
-        <!-- Undertow Web 容器 -->
+        <!-- Web Flux -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-netty</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
 
         <!-- Gateway -->
@@ -127,10 +117,12 @@
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-public</artifactId>
         </dependency>
+        <!--
+        开发环境无需注册中心，暂时停用
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-register</artifactId>
-        </dependency>
+        </dependency>-->
 
     </dependencies>
 

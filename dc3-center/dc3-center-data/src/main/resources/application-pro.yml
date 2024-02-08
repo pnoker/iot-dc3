@@ -51,6 +51,13 @@ spring:
       discovery:
         namespace: ${NODE_ENV:pro}
 
+grpc:
+  client:
+    dc3-center-manager:
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
+
 data:
   point:
     sava:
@@ -67,4 +74,6 @@ data:
 
 xxl:
   job:
+    access-token: default_token
+    executor-port: ${EXECUTOR_PORT:7500}
     admin-addresses: http://${XXL_JOB_HOST:dc3-job}:${XXL_JOB_PORT:8100}/xxl-job-admin
