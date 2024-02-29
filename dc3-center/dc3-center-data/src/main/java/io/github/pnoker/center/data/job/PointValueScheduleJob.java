@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.schedule;
+package io.github.pnoker.center.data.job;
 
 import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.entity.bo.PointValueBO;

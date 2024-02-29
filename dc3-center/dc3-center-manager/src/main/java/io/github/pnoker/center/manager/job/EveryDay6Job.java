@@ -14,29 +14,36 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.init;
+package io.github.pnoker.center.manager.job;
 
-import io.github.pnoker.center.manager.biz.ScheduleService;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import lombok.extern.slf4j.Slf4j;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
 /**
- * 初始化
+ * 通用：每天早上6点执行任务
  *
  * @author pnoker
  * @since 2022.1.0
  */
+@Slf4j
 @Component
-public class ManagerInitRunner implements ApplicationRunner {
+public class EveryDay6Job extends QuartzJobBean {
 
-    @Resource
-    private ScheduleService scheduleService;
-
+    /**
+     * 任务执行
+     * * <p>
+     * * 具体逻辑请在 biz service 中定义
+     *
+     * @param context JobExecutionContext
+     * @throws JobExecutionException JobExecutionException
+     */
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        scheduleService.initial();
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        log.info("everyDay6JobHandler: {}", LocalDateTime.now());
     }
 }

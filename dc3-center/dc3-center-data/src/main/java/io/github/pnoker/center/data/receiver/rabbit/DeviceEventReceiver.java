@@ -23,7 +23,7 @@ import io.github.pnoker.center.data.biz.DeviceEventService;
 import io.github.pnoker.center.data.biz.EventService;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -45,7 +45,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class DeviceEventReceiver {
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisService redisService;
     @Resource
     private EventService eventService;
     @Resource
