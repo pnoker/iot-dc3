@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.entity.builder;
 
 import io.github.pnoker.center.data.entity.bo.PointValueBO;
-import io.github.pnoker.center.data.entity.point.EsPointValueDO;
 import io.github.pnoker.center.data.entity.point.MgPointValueDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -57,23 +56,5 @@ public interface PointValueBuilder {
      * @return EntityBO Array
      */
     List<PointValueBO> buildBOListByDOList(List<MgPointValueDO> entityDOList);
-
-    /**
-     * BO to ES DO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDO
-     */
-    EsPointValueDO buildESDOByBO(PointValueBO entityBO);
-
-    /**
-     * ES DO to BO
-     *
-     * @param entityDO EntityDO
-     * @return EntityBO
-     */
-    @Mapping(target = "children", ignore = true)
-    PointValueBO buildBOByESDO(EsPointValueDO entityDO);
-
 
 }
