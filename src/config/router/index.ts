@@ -74,7 +74,9 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
 
             next()
         })
-        .catch(() => {})
+        .catch(() => {
+            logout()
+        })
 })
 
 router.afterEach(() => {

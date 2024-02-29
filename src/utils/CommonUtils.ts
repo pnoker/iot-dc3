@@ -16,8 +16,6 @@
 
 import router from '@/config/router'
 import store from '@/store'
-
-import { warnMessage } from '@/utils/NotificationUtils'
 import { dateFormat, setCopyContent } from '@/utils/utils'
 
 export const copy = (content: string, message: string) => {
@@ -29,6 +27,5 @@ export const timestamp = (timestamp: string): string => {
 }
 
 export const logout = () => {
-    warnMessage('检测到您未登录或登陆凭证已失效，请重新登录!', '登录凭证失效')
     store.dispatch('auth/logout').then(() => router.push({ name: 'login' }))
 }
