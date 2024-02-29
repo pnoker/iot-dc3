@@ -26,7 +26,7 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
@@ -52,7 +52,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
     @Override
     public Map<Long, String> device(DeviceQuery pageQuery) {
@@ -128,7 +128,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         Set<Long> deviceIds = devices.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
         deviceIds.forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
-            String status = redisUtil.getKey(key);
+            String status = redisService.getKey(key);
             status = ObjectUtil.isNotNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
             statusMap.put(id, status);
         });

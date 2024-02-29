@@ -14,29 +14,15 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.init;
-
-import io.github.pnoker.center.manager.biz.ScheduleService;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
+package io.github.pnoker.center.manager.biz;
 
 /**
- * 初始化
- *
  * @author pnoker
  * @since 2022.1.0
  */
-@Component
-public class ManagerInitRunner implements ApplicationRunner {
-
-    @Resource
-    private ScheduleService scheduleService;
-
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        scheduleService.initial();
-    }
+public interface ScheduleService {
+    /**
+     * 初始化调度任务
+     */
+    void initial();
 }

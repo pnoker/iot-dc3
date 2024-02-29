@@ -21,7 +21,7 @@ import io.github.pnoker.center.data.biz.DeviceEventService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +38,7 @@ import javax.annotation.Resource;
 public class DeviceEventServiceImpl implements DeviceEventService {
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
 
     @Override
@@ -47,7 +47,7 @@ public class DeviceEventServiceImpl implements DeviceEventService {
         if (ObjectUtil.isNull(deviceStatus)) {
             return;
         }
-        redisUtil.setKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceStatus.getDeviceId(), deviceStatus.getStatus(), deviceStatus.getTimeOut(), deviceStatus.getTimeUnit());
+        redisService.setKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceStatus.getDeviceId(), deviceStatus.getStatus(), deviceStatus.getTimeOut(), deviceStatus.getTimeUnit());
     }
 
 }

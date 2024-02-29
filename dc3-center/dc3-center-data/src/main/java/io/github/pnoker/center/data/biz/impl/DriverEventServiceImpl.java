@@ -21,7 +21,7 @@ import io.github.pnoker.center.data.biz.DriverEventService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.entity.dto.DriverEventDTO;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 public class DriverEventServiceImpl implements DriverEventService {
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
 
     @Override
@@ -48,7 +48,7 @@ public class DriverEventServiceImpl implements DriverEventService {
         if (ObjectUtil.isNull(driverStatus)) {
             return;
         }
-        redisUtil.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getDriverId(), driverStatus.getStatus(), 10, TimeUnit.SECONDS);
+        redisService.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getDriverId(), driverStatus.getStatus(), 10, TimeUnit.SECONDS);
     }
 
 }

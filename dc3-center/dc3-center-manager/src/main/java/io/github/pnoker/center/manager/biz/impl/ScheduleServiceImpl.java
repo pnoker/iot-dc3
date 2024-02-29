@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.biz.impl;
+package io.github.pnoker.center.manager.biz.impl;
 
-import io.github.pnoker.center.data.biz.ScheduleService;
-import io.github.pnoker.center.data.job.EveryDay6Job;
-import io.github.pnoker.center.data.job.HourlyJob;
-import io.github.pnoker.center.data.job.PointValueScheduleJob;
+import io.github.pnoker.center.manager.biz.ScheduleService;
+import io.github.pnoker.center.manager.job.EveryDay6Job;
+import io.github.pnoker.center.manager.job.HourlyJob;
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.quartz.QuartzService;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.DateBuilder;
 import org.quartz.SchedulerException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -38,17 +35,12 @@ import javax.annotation.Resource;
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
 
-    @Value("${data.point.batch.interval}")
-    private Integer interval;
-
     @Resource
     private QuartzService quartzService;
 
     @Override
     public void initial() {
         try {
-            quartzService.createJobWithInterval(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-point-value-schedule-job", interval, DateBuilder.IntervalUnit.SECOND, PointValueScheduleJob.class);
-
             // 自定义调度
             quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-every-day-6-job", "0 0 6 * * ?", EveryDay6Job.class);
             quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-hourly-job", "0/30 * * * * ?", HourlyJob.class);

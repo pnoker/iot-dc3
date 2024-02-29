@@ -17,7 +17,9 @@
 package io.github.pnoker.center.manager.job;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -30,17 +32,19 @@ import java.time.LocalDateTime;
  */
 @Slf4j
 @Component
-public class HourlyJob {
+public class HourlyJob extends QuartzJobBean {
 
     /**
      * 任务执行
-     * <p>
-     * 具体逻辑请在 biz service 中定义
+     * * <p>
+     * * 具体逻辑请在 biz service 中定义
      *
-     * @throws Exception 异常
+     * @param context JobExecutionContext
+     * @throws JobExecutionException JobExecutionException
      */
-    @Scheduled(cron = "0 0 * * * ?")
-    public void hourlyJobHandler() throws Exception {
-        log.info("hourlyJobHandler:{}", LocalDateTime.now());
+    @Override
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        // 暂时调整为30秒，仅供测试
+        log.info("hourlyJobHandler: {}", LocalDateTime.now());
     }
 }

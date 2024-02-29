@@ -23,7 +23,7 @@ import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
-import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class RedisServiceImpl implements RepositoryService, InitializingBean {
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
     @Override
     public String getRepositoryName() {
@@ -56,7 +56,7 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
         }
 
         final String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + pointValueBO.getDeviceId() + SymbolConstant.DOT;
-        redisUtil.setKey(prefix + pointValueBO.getPointId(), pointValueBO);
+        redisService.setKey(prefix + pointValueBO.getPointId(), pointValueBO);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class RedisServiceImpl implements RepositoryService, InitializingBean {
         Map<String, PointValueBO> collect = pointValueBOS.stream()
                 .filter(pointValue -> ObjectUtil.isNotEmpty(pointValue.getPointId()))
                 .collect(Collectors.toMap(pointValue -> prefix + pointValue.getPointId(), pointValue -> pointValue));
-        redisUtil.setKey(collect);
+        redisService.setKey(collect);
     }
 
     @Override

@@ -29,7 +29,7 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.enums.DriverStatusEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
@@ -55,7 +55,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
     @Override
     public Map<Long, String> driver(DriverQuery pageQuery) {
@@ -121,7 +121,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         Set<Long> driverIds = drivers.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
         driverIds.forEach(id -> {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + id;
-            String status = redisUtil.getKey(key);
+            String status = redisService.getKey(key);
             status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
             statusMap.put(id, status);
         });

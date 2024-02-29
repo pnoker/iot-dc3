@@ -18,10 +18,9 @@ package io.github.pnoker.center.data.receiver.rabbit;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.center.data.biz.PointValueRepositoryService;
 import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.entity.bo.PointValueBO;
-import io.github.pnoker.center.data.schedule.PointValueScheduleJob;
+import io.github.pnoker.center.data.job.PointValueScheduleJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -49,8 +48,6 @@ public class PointValueReceiver {
 
     @Resource
     private PointValueService pointValueService;
-    @Resource
-    private PointValueRepositoryService pointValueRepositoryService;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 

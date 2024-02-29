@@ -39,7 +39,7 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
-import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.common.redis.RedisService;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -70,7 +70,7 @@ public class TokenServiceImpl implements TokenService {
     private TenantBindService tenantBindService;
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisService redisService;
 
     @Override
     public String generateSalt(String loginName, String tenantCode) {
@@ -80,10 +80,10 @@ public class TokenServiceImpl implements TokenService {
             throw new NotFoundException("租户、用户信息不匹配");
         }
         String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
-        String salt = redisUtil.getKey(redisSaltKey);
+        String salt = redisService.getKey(redisSaltKey);
         if (CharSequenceUtil.isBlank(salt)) {
             salt = RandomUtil.randomString(16);
-            redisUtil.setKey(redisSaltKey, salt, TimeoutConstant.SALT_CACHE_TIMEOUT, TimeUnit.MINUTES);
+            redisService.setKey(redisSaltKey, salt, TimeoutConstant.SALT_CACHE_TIMEOUT, TimeUnit.MINUTES);
         }
         return salt;
     }
@@ -112,7 +112,7 @@ public class TokenServiceImpl implements TokenService {
             throw new NotFoundException("租户、用户信息不匹配");
         }
         String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
-        String redisSaltValue = redisUtil.getKey(redisSaltKey);
+        String redisSaltValue = redisService.getKey(redisSaltKey);
         if (CharSequenceUtil.isEmpty(redisSaltValue)) {
             updateUserLimit(loginName, tenantCode);
             throw new NotFoundException("租户、用户信息不匹配");
@@ -124,7 +124,7 @@ public class TokenServiceImpl implements TokenService {
         }
         String redisTokenKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
         String token = KeyUtil.generateToken(loginName, redisSaltValue, tenantBO.getId());
-        redisUtil.setKey(redisTokenKey, token, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
+        redisService.setKey(redisTokenKey, token, TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS);
         return token;
     }
 
@@ -135,7 +135,7 @@ public class TokenServiceImpl implements TokenService {
             throw new NotFoundException("租户、用户信息不匹配");
         }
         String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
-        String redisToken = redisUtil.getKey(redisKey);
+        String redisToken = redisService.getKey(redisKey);
         if (CharSequenceUtil.isBlank(redisToken) || !redisToken.equals(token)) {
             return new TokenValid(false, null);
         }
@@ -154,7 +154,7 @@ public class TokenServiceImpl implements TokenService {
             throw new NotFoundException("租户、用户信息不匹配");
         }
         String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
-        redisUtil.deleteKey(redisKey);
+        redisService.deleteKey(redisKey);
         return true;
     }
 
@@ -166,8 +166,8 @@ public class TokenServiceImpl implements TokenService {
      */
     private void checkUserLimit(String loginName, String tenantCode) {
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantCode;
-        Object key = redisUtil.getKey(redisKey);
-        UserLimit limit = redisUtil.getKey(redisKey);
+        Object key = redisService.getKey(redisKey);
+        UserLimit limit = redisService.getKey(redisKey);
         if (ObjectUtil.isNull(limit) || limit.getTimes() < 5) {
             return;
         }
@@ -186,11 +186,11 @@ public class TokenServiceImpl implements TokenService {
      */
     private UserLimit updateUserLimit(String loginName, String tenantCode) {
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantCode;
-        UserLimit userLimit = redisUtil.getKey(redisKey);
+        UserLimit userLimit = redisService.getKey(redisKey);
         UserLimit limit = Optional.ofNullable(userLimit).orElse(new UserLimit(0, LocalDateTime.now()));
         limit.setTimes(limit.getTimes() + 1);
         limit.setExpireTime(LocalDateTimeUtil.expireTime(limit.getTimes() * TimeoutConstant.USER_LIMIT_TIMEOUT, ChronoUnit.MINUTES));
-        redisUtil.setKey(redisKey, limit, 7, TimeUnit.DAYS);
+        redisService.setKey(redisKey, limit, 7, TimeUnit.DAYS);
         return limit;
     }
 }

@@ -39,7 +39,7 @@ import io.github.pnoker.common.constant.driver.StorageConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.utils.FieldUtil;
-import io.github.pnoker.common.utils.RedisUtil;
+import io.github.pnoker.common.redis.RedisService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -76,7 +76,7 @@ public class PointValueServiceImpl implements PointValueService {
     private PointValueRepositoryService pointValueRepositoryService;
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisService redisService;
     @Resource
     private MongoTemplate mongoTemplate;
     @Resource
@@ -199,7 +199,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + deviceId + SymbolConstant.DOT;
         List<String> keys = pointIds.stream().map(pointId -> prefix + pointId).collect(Collectors.toList());
-        List<PointValueBO> pointValueBOS = redisUtil.getKey(keys);
+        List<PointValueBO> pointValueBOS = redisService.getKey(keys);
         return pointValueBOS.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
