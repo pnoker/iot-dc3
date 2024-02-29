@@ -19,10 +19,7 @@ package io.github.pnoker.center.data.biz.impl;
 import io.github.pnoker.center.data.biz.PointValueRepositoryService;
 import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.repository.RepositoryService;
-import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
-import io.github.pnoker.common.constant.driver.StrategyConstant;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -39,15 +36,6 @@ import java.util.stream.Collectors;
 @Service
 public class PointValueRepositoryServiceImpl implements PointValueRepositoryService {
 
-    @Value("${data.point.sava.influxdb.enable}")
-    private Boolean enableInfluxdb;
-    @Value("${data.point.sava.tdengine.enable}")
-    private Boolean enableTDengine;
-    @Value("${data.point.sava.opentsdb.enable}")
-    private Boolean enableOpentsdb;
-    @Value("${data.point.sava.elasticsearch.enable}")
-    private Boolean enableElasticsearch;
-
     @Resource(name = "redisServiceImpl")
     private RepositoryService redisRepositoryService;
     @Resource(name = "mongoServiceImpl")
@@ -60,30 +48,6 @@ public class PointValueRepositoryServiceImpl implements PointValueRepositoryServ
     public void save(PointValueBO pointValueBO) {
         // 保存单个数据到 Redis & Mongo
         savePointValueToRepository(pointValueBO, redisRepositoryService, mongoRepositoryService);
-
-        // 保存单个数据到 Influxdb
-        if (Boolean.TRUE.equals(enableInfluxdb)) {
-            RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.INFLUXDB);
-            savePointValueToRepository(pointValueBO, repositoryService);
-        }
-
-        // 保存单个数据到 TDengine
-        if (Boolean.TRUE.equals(enableTDengine)) {
-            RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.TDENGINE);
-            savePointValueToRepository(pointValueBO, repositoryService);
-        }
-
-        // 保存单个数据到 Opentsdb
-        if (Boolean.TRUE.equals(enableOpentsdb)) {
-            RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_OPENTSDB);
-            savePointValueToRepository(pointValueBO, repositoryService);
-        }
-
-        // 保存单个数据到 Elasticsearch
-        if (Boolean.TRUE.equals(enableElasticsearch)) {
-            RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_ELASTICSEARCH);
-            savePointValueToRepository(pointValueBO, repositoryService);
-        }
     }
 
     @Override
@@ -93,30 +57,6 @@ public class PointValueRepositoryServiceImpl implements PointValueRepositoryServ
         group.forEach((deviceId, values) -> {
             // 保存批量数据到 Redis & Mongo
             savePointValuesToRepository(deviceId, values, redisRepositoryService, mongoRepositoryService);
-
-            // 保存批量数据到 Influxdb
-            if (Boolean.TRUE.equals(enableInfluxdb)) {
-                RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.INFLUXDB);
-                savePointValuesToRepository(deviceId, values, repositoryService);
-            }
-
-            // 保存批量数据到 tdengine
-            if (Boolean.TRUE.equals(enableTDengine)) {
-                RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.INFLUXDB);
-                savePointValuesToRepository(deviceId, values, repositoryService);
-            }
-
-            // 保存批量数据到 Opentsdb
-            if (Boolean.TRUE.equals(enableOpentsdb)) {
-                RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_OPENTSDB);
-                savePointValuesToRepository(deviceId, values, repositoryService);
-            }
-
-            // 保存批量数据到 Elasticsearch
-            if (Boolean.TRUE.equals(enableElasticsearch)) {
-                RepositoryService repositoryService = RepositoryStrategyFactory.get(StrategyConstant.Storage.STRATEGY_ELASTICSEARCH);
-                savePointValuesToRepository(deviceId, values, repositoryService);
-            }
         });
     }
 

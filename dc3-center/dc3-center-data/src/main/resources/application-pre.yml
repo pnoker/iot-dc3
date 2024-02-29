@@ -57,17 +57,3 @@ grpc:
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
-
-data:
-  point:
-    sava:
-      influxdb:
-        enable: false
-      opentsdb:
-        enable: false
-        host: dc3-opentsdb
-        port: 4242
-      elasticsearch:
-        enable: false
-        host: dc3-elasticsearch
-        port: 9200
