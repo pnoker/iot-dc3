@@ -16,8 +16,8 @@
 
 package io.github.pnoker.center.data.job;
 
-import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ public class EveryDay6Job {
      *
      * @throws Exception 异常
      */
-    @XxlJob("EveryDay6JobHandler")
+    @Scheduled(cron = "0 0 6 * * ?")
     public void everyDay6JobHandler() throws Exception {
         log.info("everyDay6JobHandler: {}", LocalDateTime.now());
     }

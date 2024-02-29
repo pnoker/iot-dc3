@@ -106,6 +106,11 @@ public interface RoleUserBindBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<RoleUserBindBO> buildBOPageByDOPage(Page<RoleUserBindDO> entityPageDO);
 
@@ -115,6 +120,11 @@ public interface RoleUserBindBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<RoleUserBindVO> buildVOPageByBOPage(Page<RoleUserBindBO> entityPageBO);
 }

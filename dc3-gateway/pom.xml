@@ -118,7 +118,7 @@
             <artifactId>dc3-common-public</artifactId>
         </dependency>
         <!--
-        开发环境无需注册中心，暂时停用
+        开发环境无需注册中心
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-register</artifactId>

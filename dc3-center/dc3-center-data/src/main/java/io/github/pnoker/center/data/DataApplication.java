@@ -19,6 +19,7 @@ package io.github.pnoker.center.data;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -27,8 +28,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @author pnoker
  * @since 2022.1.0
  */
+@EnableScheduling
 @SpringBootApplication
-//@EnableDiscoveryClient
+// 开发环境无需注册中心
+// @EnableDiscoveryClient
 @EnableTransactionManagement
 @MapperScan("io.github.pnoker.center.data.mapper")
 public class DataApplication {

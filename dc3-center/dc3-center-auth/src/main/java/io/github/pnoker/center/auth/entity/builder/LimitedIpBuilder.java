@@ -106,6 +106,11 @@ public interface LimitedIpBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<LimitedIpBO> buildBOPageByDOPage(Page<LimitedIpDO> entityPageDO);
 
@@ -115,6 +120,11 @@ public interface LimitedIpBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<LimitedIpVO> buildVOPageByBOPage(Page<LimitedIpBO> entityPageBO);
 }

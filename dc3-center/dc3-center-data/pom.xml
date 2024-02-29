@@ -59,10 +59,12 @@
         </dependency>
 
         <!-- DC3 Common 相关 -->
+        <!--
+        开发环境无需任务中心
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-job</artifactId>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mysql</artifactId>
