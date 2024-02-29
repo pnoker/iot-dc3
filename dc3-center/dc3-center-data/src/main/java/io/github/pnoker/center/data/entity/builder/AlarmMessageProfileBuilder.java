@@ -142,6 +142,11 @@ public interface AlarmMessageProfileBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<AlarmMessageProfileBO> buildBOPageByDOPage(Page<AlarmMessageProfileDO> entityPageDO);
 
@@ -151,6 +156,11 @@ public interface AlarmMessageProfileBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<AlarmMessageProfileVO> buildVOPageByBOPage(Page<AlarmMessageProfileBO> entityPageBO);
 }

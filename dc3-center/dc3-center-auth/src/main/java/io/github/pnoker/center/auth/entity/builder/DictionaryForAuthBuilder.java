@@ -52,6 +52,11 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByTenantBOPage(Page<TenantBO> entityPageBO);
 
@@ -73,6 +78,11 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByUserLoginBOPage(Page<UserLoginBO> entityPageBO);
 
@@ -94,6 +104,11 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByLimitedIpBOPage(Page<LimitedIpBO> entityPageBO);
 

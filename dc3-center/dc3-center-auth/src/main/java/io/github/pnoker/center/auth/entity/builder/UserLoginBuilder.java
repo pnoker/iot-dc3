@@ -105,6 +105,11 @@ public interface UserLoginBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<UserLoginBO> buildBOPageByDOPage(Page<UserLoginDO> entityPageDO);
 
@@ -114,6 +119,11 @@ public interface UserLoginBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<UserLoginVO> buildVOPageByBOPage(Page<UserLoginBO> entityPageBO);
 }

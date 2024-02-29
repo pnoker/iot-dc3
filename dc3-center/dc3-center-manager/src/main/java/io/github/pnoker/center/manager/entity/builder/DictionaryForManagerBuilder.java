@@ -53,6 +53,11 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByDriverBOPage(Page<DriverBO> entityPageBO);
 
@@ -74,6 +79,11 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByProfileBOPage(Page<ProfileBO> entityPageBO);
 
@@ -95,6 +105,11 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByPointBOPage(Page<PointBO> entityPageBO);
 
@@ -116,6 +131,11 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByDeviceBOPage(Page<DeviceBO> entityPageBO);
 }
