@@ -39,7 +39,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 @Component
-public class PointValueScheduleJob extends QuartzJobBean {
+public class PointValueJob extends QuartzJobBean {
 
     @Value("${data.point.batch.speed}")
     private Integer batchSpeed;

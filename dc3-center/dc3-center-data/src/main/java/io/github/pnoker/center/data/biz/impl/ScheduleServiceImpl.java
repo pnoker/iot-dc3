@@ -18,8 +18,9 @@ package io.github.pnoker.center.data.biz.impl;
 
 import io.github.pnoker.center.data.biz.ScheduleService;
 import io.github.pnoker.center.data.job.EveryDay6Job;
+import io.github.pnoker.center.data.job.EveryMinuteJob;
 import io.github.pnoker.center.data.job.HourlyJob;
-import io.github.pnoker.center.data.job.PointValueScheduleJob;
+import io.github.pnoker.center.data.job.PointValueJob;
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.quartz.QuartzService;
 import lombok.extern.slf4j.Slf4j;
@@ -47,11 +48,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public void initial() {
         try {
-            quartzService.createJobWithInterval(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-point-value-schedule-job", interval, DateBuilder.IntervalUnit.SECOND, PointValueScheduleJob.class);
+            quartzService.createJobWithInterval(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-point-value-schedule-job", interval, DateBuilder.IntervalUnit.SECOND, PointValueJob.class);
 
             // 自定义调度
+            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-every-minute-job", "0 0/1 * * * ?", EveryMinuteJob.class);
             quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-every-day-6-job", "0 0 6 * * ?", EveryDay6Job.class);
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-hourly-job", "0/30 * * * * ?", HourlyJob.class);
+            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-hourly-job", "0 0 0/1 * * ?", HourlyJob.class);
 
             quartzService.startScheduler();
         } catch (SchedulerException e) {

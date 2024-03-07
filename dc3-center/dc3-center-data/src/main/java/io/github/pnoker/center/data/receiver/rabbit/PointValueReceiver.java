@@ -20,7 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.entity.bo.PointValueBO;
-import io.github.pnoker.center.data.job.PointValueScheduleJob;
+import io.github.pnoker.center.data.job.PointValueJob;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -60,20 +60,20 @@ public class PointValueReceiver {
                 log.error("Invalid point value: {}", pointValueBO);
                 return;
             }
-            PointValueScheduleJob.valueCount.getAndIncrement();
+            PointValueJob.valueCount.getAndIncrement();
             log.debug("Point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValueBO);
 
             // Judge whether to process data in batch according to the data transmission speed
-            if (PointValueScheduleJob.valueSpeed.get() < batchSpeed) {
+            if (PointValueJob.valueSpeed.get() < batchSpeed) {
                 threadPoolExecutor.execute(() ->
                         // Save point value to Redis & MongoDB
                         pointValueService.savePointValue(pointValueBO)
                 );
             } else {
                 // Save point value to schedule
-                PointValueScheduleJob.valueLock.writeLock().lock();
-                PointValueScheduleJob.addPointValues(pointValueBO);
-                PointValueScheduleJob.valueLock.writeLock().unlock();
+                PointValueJob.valueLock.writeLock().lock();
+                PointValueJob.addPointValues(pointValueBO);
+                PointValueJob.valueLock.writeLock().unlock();
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

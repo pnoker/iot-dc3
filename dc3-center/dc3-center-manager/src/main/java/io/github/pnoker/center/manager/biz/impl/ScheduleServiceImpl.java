@@ -43,7 +43,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         try {
             // 自定义调度
             quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-every-day-6-job", "0 0 6 * * ?", EveryDay6Job.class);
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-hourly-job", "0/30 * * * * ?", HourlyJob.class);
+            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-hourly-job", "0 0 0/1 * * ?", HourlyJob.class);
 
             quartzService.startScheduler();
         } catch (SchedulerException e) {
