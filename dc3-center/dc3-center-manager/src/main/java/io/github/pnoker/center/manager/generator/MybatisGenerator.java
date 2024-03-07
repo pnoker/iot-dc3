@@ -49,8 +49,8 @@ public class MybatisGenerator {
                         .serviceImpl("dal.impl")
                         .mapper("mapper")
                         .pathInfo(ImmutableMap.of(
-                                OutputFile.service, path + "/java/io/github/pnoker/center/manager/manager",
-                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/center/manager/manager/impl",
+                                OutputFile.service, path + "/java/io/github/pnoker/center/manager/dal",
+                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/center/manager/dal/impl",
                                 OutputFile.xml, path + "/resources/mapping"))
                 ).templateConfig(builder -> builder.disable(TemplateType.CONTROLLER))
                 .templateEngine(new VelocityTemplateEngine())

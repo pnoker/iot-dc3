@@ -38,7 +38,7 @@ public class MybatisGenerator {
     }
 
     public static void generator() {
-        String path = System.getProperty("user.dir") + "/dc3-center/dc3-center-manager/src/main";
+        String path = System.getProperty("user.dir") + "/dc3-center/dc3-center-data/src/main";
         MybatisUtil.defaultGenerator("dc3-mysql", "3306", "dc3_data", "root", "dc3")
                 .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
                 .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
@@ -49,8 +49,8 @@ public class MybatisGenerator {
                         .serviceImpl("dal.impl")
                         .mapper("mapper")
                         .pathInfo(ImmutableMap.of(
-                                OutputFile.service, path + "/java/io/github/pnoker/center/data/manager",
-                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/center/data/manager/impl",
+                                OutputFile.service, path + "/java/io/github/pnoker/center/data/dal",
+                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/center/data/dal/impl",
                                 OutputFile.xml, path + "/resources/mapping"))
                 ).templateConfig(builder -> builder.disable(TemplateType.CONTROLLER))
                 .templateEngine(new VelocityTemplateEngine())
