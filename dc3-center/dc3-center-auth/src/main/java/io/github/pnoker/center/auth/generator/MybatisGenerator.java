@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.generator;
 
-import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.config.TemplateType;
 import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
@@ -39,12 +38,8 @@ public class MybatisGenerator {
     }
 
     public static void generator() {
-        String path = System.getProperty("user.dir") + "/dc3-center/dc3-center-auth/src/main";
-        FastAutoGenerator.create(
-                        "jdbc:mysql://dc3-mysql:33306/dc3_auth?useSSL=false",
-                        "root",
-                        "dc3"
-                )
+        String path = System.getProperty("user.dir") + "/dc3-center/dc3-center-manager/src/main";
+        MybatisUtil.defaultGenerator("dc3-mysql", "3306", "dc3_auth", "root", "dc3")
                 .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
                 .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
                 .packageConfig(builder -> builder

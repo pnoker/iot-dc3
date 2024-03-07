@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.controller;
+package io.github.pnoker.center.auth.config;
 
 import io.github.pnoker.common.utils.OpenAPIUtil;
 import io.swagger.v3.oas.models.OpenAPI;
