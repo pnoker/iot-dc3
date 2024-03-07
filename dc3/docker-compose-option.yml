@@ -83,9 +83,9 @@ services:
     ports:
       - '8100:8100'
     environment:
-      - DB_HOST=dc3-mysql
+      - MYSQL_HOST=dc3-mysql
       - MYSQL_PORT=3306
-      - DB_NAME=dc3_xxl_job
+      - MYSQL_DB=dc3_xxl_job
     container_name: dc3-job
     hostname: dc3-job
     volumes:
