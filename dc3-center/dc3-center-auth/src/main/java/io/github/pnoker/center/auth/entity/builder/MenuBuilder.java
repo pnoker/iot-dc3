@@ -23,6 +23,7 @@ import io.github.pnoker.center.auth.entity.model.MenuDO;
 import io.github.pnoker.center.auth.entity.vo.MenuVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.MenuExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -64,6 +65,7 @@ public interface MenuBuilder {
      * @return EntityDO
      */
     @Mapping(target = "menuExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     MenuDO buildDOByBO(MenuBO entityBO);
 
@@ -78,6 +80,9 @@ public interface MenuBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setMenuExt(ext);
+
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
     }
 
     /**
@@ -95,6 +100,7 @@ public interface MenuBuilder {
      * @return EntityBO
      */
     @Mapping(target = "menuExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     MenuBO buildBOByDO(MenuDO entityDO);
 
     @AfterMapping
@@ -108,6 +114,9 @@ public interface MenuBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), MenuExt.Content.class));
             entityBO.setMenuExt(ext);
         }
+
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**

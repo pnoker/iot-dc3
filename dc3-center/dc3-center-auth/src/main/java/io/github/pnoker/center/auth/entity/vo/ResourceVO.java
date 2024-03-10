@@ -17,11 +17,11 @@
 package io.github.pnoker.center.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.entity.ext.ResourceExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
 import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
-import io.github.pnoker.common.entity.base.BaseVO;
-import io.github.pnoker.common.entity.ext.ResourceExt;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;

@@ -23,6 +23,7 @@ import io.github.pnoker.center.auth.entity.model.RoleDO;
 import io.github.pnoker.center.auth.entity.vo.RoleVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RoleExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -64,6 +65,7 @@ public interface RoleBuilder {
      * @return EntityDO
      */
     @Mapping(target = "roleExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     RoleDO buildDOByBO(RoleBO entityBO);
 
@@ -78,6 +80,9 @@ public interface RoleBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setRoleExt(ext);
+
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
     }
 
     /**
@@ -95,6 +100,7 @@ public interface RoleBuilder {
      * @return EntityBO
      */
     @Mapping(target = "roleExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     RoleBO buildBOByDO(RoleDO entityDO);
 
     @AfterMapping
@@ -108,6 +114,9 @@ public interface RoleBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), RoleExt.Content.class));
             entityBO.setRoleExt(ext);
         }
+
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**

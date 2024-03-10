@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.GroupTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -74,7 +73,7 @@ public class GroupDO implements Serializable {
      * 使能标识
      */
     @TableField("enable_flag")
-    private EnableFlagEnum enableFlag;
+    private Byte enableFlag;
 
     /**
      * 租户ID

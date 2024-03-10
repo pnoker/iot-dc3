@@ -20,8 +20,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.LimitedIpBO;
 import io.github.pnoker.center.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.center.auth.entity.vo.LimitedIpVO;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -57,8 +60,15 @@ public interface LimitedIpBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     LimitedIpDO buildDOByBO(LimitedIpBO entityBO);
+
+    @AfterMapping
+    default void afterProcess(LimitedIpBO entityBO, @MappingTarget LimitedIpDO entityDO) {
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
+    }
 
     /**
      * BOList to DOList
@@ -74,7 +84,14 @@ public interface LimitedIpBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "enableFlag", ignore = true)
     LimitedIpBO buildBOByDO(LimitedIpDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(LimitedIpDO entityDO, @MappingTarget LimitedIpBO entityBO) {
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+    }
 
     /**
      * DOList to BOList

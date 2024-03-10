@@ -20,8 +20,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.vo.PointAttributeConfigVO;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -57,8 +60,15 @@ public interface PointAttributeConfigBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     PointAttributeConfigDO buildDOByBO(PointAttributeConfigBO entityBO);
+
+    @AfterMapping
+    default void afterProcess(PointAttributeConfigBO entityBO, @MappingTarget PointAttributeConfigDO entityDO) {
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
+    }
 
     /**
      * BOList to DOList
@@ -74,7 +84,14 @@ public interface PointAttributeConfigBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "enableFlag", ignore = true)
     PointAttributeConfigBO buildBOByDO(PointAttributeConfigDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(PointAttributeConfigDO entityDO, @MappingTarget PointAttributeConfigBO entityBO) {
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+    }
 
     /**
      * DOList to BOList

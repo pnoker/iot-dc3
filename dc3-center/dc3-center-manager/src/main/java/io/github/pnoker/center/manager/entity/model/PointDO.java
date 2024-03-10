@@ -18,10 +18,9 @@ package io.github.pnoker.center.manager.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.RwFlagEnum;
-import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -132,7 +131,7 @@ public class PointDO implements Serializable {
      * 使能标识
      */
     @TableField("enable_flag")
-    private EnableFlagEnum enableFlag;
+    private Byte enableFlag;
 
     /**
      * 租户ID

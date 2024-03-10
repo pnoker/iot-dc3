@@ -80,6 +80,7 @@ public interface UserBuilder {
             socialExt.setContent(JsonUtil.toJsonString(entitySocialExt.getContent()));
         }
         entityDO.setSocialExt(socialExt);
+
         UserIdentityExt entityIdentityExt = entityBO.getIdentityExt();
         JsonExt identityExt = new JsonExt();
         if (ObjectUtil.isNotNull(entityIdentityExt)) {
@@ -122,6 +123,7 @@ public interface UserBuilder {
             ext.setContent(JsonUtil.parseObject(entitySocialExt.getContent(), UserSocialExt.Content.class));
             entityBO.setSocialExt(ext);
         }
+
         JsonExt entityIdentityExt = entityDO.getIdentityExt();
         if (ObjectUtil.isNotNull(entityIdentityExt)) {
             UserIdentityExt ext = new UserIdentityExt();

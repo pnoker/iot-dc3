@@ -23,6 +23,7 @@ import io.github.pnoker.center.auth.entity.model.ResourceDO;
 import io.github.pnoker.center.auth.entity.vo.ResourceVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.ResourceExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -64,6 +65,7 @@ public interface ResourceBuilder {
      * @return EntityDO
      */
     @Mapping(target = "resourceExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ResourceDO buildDOByBO(ResourceBO entityBO);
 
@@ -78,6 +80,9 @@ public interface ResourceBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setResourceExt(ext);
+
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
     }
 
     /**
@@ -95,6 +100,7 @@ public interface ResourceBuilder {
      * @return EntityBO
      */
     @Mapping(target = "resourceExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     ResourceBO buildBOByDO(ResourceDO entityDO);
 
     @AfterMapping
@@ -108,6 +114,9 @@ public interface ResourceBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ResourceExt.Content.class));
             entityBO.setResourceExt(ext);
         }
+
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**
