@@ -29,6 +29,8 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,7 @@ import javax.validation.constraints.NotNull;
  */
 @Slf4j
 @RestController
+@Tag(name = "接口-限制IP")
 @RequestMapping(value = AuthConstant.LIMITED_IP_URL_PREFIX)
 public class LimitedIpController implements BaseController {
 
@@ -60,6 +63,7 @@ public class LimitedIpController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
+    @Operation(summary = "新增-限制IP")
     public R<String> add(@Validated(Add.class) @RequestBody LimitedIpVO entityVO) {
         try {
             LimitedIpBO entityBO = limitedIpBuilder.buildBOByVO(entityVO);

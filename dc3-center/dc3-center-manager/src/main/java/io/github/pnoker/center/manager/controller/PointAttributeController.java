@@ -30,6 +30,8 @@ import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +49,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
+@Tag(name = "接口-位号属性")
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_URL_PREFIX)
 public class PointAttributeController implements BaseController {
 
@@ -63,6 +66,7 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
+    @Operation(summary = "新增-位号属性")
     public R<PointAttributeBO> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
         try {
             PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
