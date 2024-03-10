@@ -75,7 +75,6 @@ public interface DriverAttributeBuilder {
         if (ObjectUtil.isNotNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
-            ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
@@ -105,7 +104,6 @@ public interface DriverAttributeBuilder {
         if (ObjectUtil.isNotNull(entityExt)) {
             DriverAttributeExt ext = new DriverAttributeExt();
             ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DriverAttributeExt.Content.class));

@@ -74,7 +74,6 @@ public interface AlarmNotifyProfileBuilder {
         if (ObjectUtil.isNotNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
-            ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
@@ -104,7 +103,6 @@ public interface AlarmNotifyProfileBuilder {
         if (ObjectUtil.isNotNull(entityExt)) {
             AlarmNotifyExt ext = new AlarmNotifyExt();
             ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), AlarmNotifyExt.Content.class));
