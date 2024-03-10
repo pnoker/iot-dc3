@@ -75,7 +75,6 @@ public interface DeviceBuilder {
         if (ObjectUtil.isNotNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
-            ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
@@ -106,7 +105,6 @@ public interface DeviceBuilder {
         if (ObjectUtil.isNotNull(entityExt)) {
             DeviceExt ext = new DeviceExt();
             ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DeviceExt.Content.class));

@@ -74,7 +74,6 @@ public interface MenuBuilder {
         if (ObjectUtil.isNotNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
-            ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
@@ -104,7 +103,6 @@ public interface MenuBuilder {
         if (ObjectUtil.isNotNull(entityExt)) {
             MenuExt ext = new MenuExt();
             ext.setType(entityExt.getType());
-            ext.setVersion(entityExt.getVersion());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), MenuExt.Content.class));
