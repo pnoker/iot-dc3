@@ -27,6 +27,7 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import io.github.pnoker.common.entity.vo.DictionaryVO;
 import io.github.pnoker.common.valid.Parent;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
+@Tag(name = "接口-字典")
 @RequestMapping(ManagerConstant.DICTIONARY_URL_PREFIX)
 public class DictionaryController implements BaseController {
 
