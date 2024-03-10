@@ -53,16 +53,16 @@ public class TokenApi extends TokenApiGrpc.TokenApiImplBase {
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getMessage());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
         } else if (!select.isValid()) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.TOKEN_INVALID.getCode());
-            rBuilder.setMessage(ResponseEnum.TOKEN_INVALID.getMessage());
+            rBuilder.setMessage(ResponseEnum.TOKEN_INVALID.getText());
         } else {
             String expireTime = TimeUtil.completeFormat(select.getExpireTime());
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getMessage());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
             builder.setData(expireTime);
         }
 

@@ -50,11 +50,11 @@ public class LimitedIpApi extends LimitedIpApiGrpc.LimitedIpApiImplBase {
         if (!Boolean.TRUE.equals(ipValid)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.IP_INVALID.getCode());
-            rBuilder.setMessage(ResponseEnum.IP_INVALID.getMessage());
+            rBuilder.setMessage(ResponseEnum.IP_INVALID.getText());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getMessage());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
             builder.setData(true);
         }
 
