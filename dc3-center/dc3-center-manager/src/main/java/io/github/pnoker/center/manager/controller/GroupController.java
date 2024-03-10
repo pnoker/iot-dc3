@@ -22,7 +22,7 @@ import io.github.pnoker.center.manager.entity.builder.GroupForManagerBuilder;
 import io.github.pnoker.center.manager.entity.query.GroupQuery;
 import io.github.pnoker.center.manager.service.GroupService;
 import io.github.pnoker.common.base.BaseController;
-import io.github.pnoker.common.constant.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.GroupBO;

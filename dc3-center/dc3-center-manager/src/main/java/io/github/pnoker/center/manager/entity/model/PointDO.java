@@ -18,9 +18,9 @@ package io.github.pnoker.center.manager.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import io.github.pnoker.common.constant.enums.EnableFlagEnum;
-import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
-import io.github.pnoker.common.constant.enums.RwFlagEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.RwFlagEnum;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;

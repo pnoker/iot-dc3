@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
-import io.github.pnoker.common.constant.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -35,7 +35,7 @@ import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.mapper.PointMapper;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
-import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;

@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
-import io.github.pnoker.common.base.BaseService;
+import io.github.pnoker.common.base.service.BaseService;
 
 import java.util.List;
 

@@ -27,7 +27,7 @@ import io.github.pnoker.center.data.biz.DriverStatusService;
 import io.github.pnoker.center.data.entity.query.DriverQuery;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.constant.enums.DriverStatusEnum;
+import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;

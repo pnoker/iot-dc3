@@ -17,8 +17,8 @@
 package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
-import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
-import io.github.pnoker.common.constant.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.driver.context.DriverContext;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;

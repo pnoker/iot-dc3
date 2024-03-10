@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.service;
 
 import io.github.pnoker.center.data.entity.bo.AlarmMessageProfileBO;
 import io.github.pnoker.center.data.entity.query.AlarmMessageProfileQuery;
-import io.github.pnoker.common.base.BaseService;
+import io.github.pnoker.common.base.service.BaseService;
 
 /**
  * AlarmMessageProfile Interface

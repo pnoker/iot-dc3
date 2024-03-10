@@ -24,7 +24,7 @@ import io.github.pnoker.center.data.biz.PointValueCommandService;
 import io.github.pnoker.center.data.entity.vo.PointValueReadVO;
 import io.github.pnoker.center.data.entity.vo.PointValueWriteVO;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
-import io.github.pnoker.common.constant.enums.DeviceCommandTypeEnum;
+import io.github.pnoker.common.enums.DeviceCommandTypeEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 import io.github.pnoker.common.utils.JsonUtil;

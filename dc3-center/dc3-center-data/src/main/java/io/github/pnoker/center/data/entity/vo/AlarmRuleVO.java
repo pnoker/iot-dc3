@@ -17,8 +17,8 @@
 package io.github.pnoker.center.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.constant.enums.AlarmTypeFlagEnum;
-import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.entity.ext.AlarmRuleExt;
 import io.swagger.v3.oas.annotations.media.Schema;

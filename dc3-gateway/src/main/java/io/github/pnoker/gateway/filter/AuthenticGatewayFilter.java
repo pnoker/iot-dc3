@@ -20,7 +20,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
