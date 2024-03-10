@@ -81,7 +81,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
 
             exchange.mutate().request(build).build();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("AuthenticGatewayFilter error: {}, Url: {}", e.getMessage(), request.getURI(), e);
             ServerHttpResponse response = exchange.getResponse();
             response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
