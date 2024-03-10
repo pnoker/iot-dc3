@@ -20,8 +20,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.entity.model.UserLoginDO;
 import io.github.pnoker.center.auth.entity.vo.UserLoginVO;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -56,8 +59,15 @@ public interface UserLoginBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     UserLoginDO buildDOByBO(UserLoginBO entityBO);
+
+    @AfterMapping
+    default void afterProcess(UserLoginBO entityBO, @MappingTarget UserLoginDO entityDO) {
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
+    }
 
     /**
      * BOList to DOList
@@ -73,7 +83,14 @@ public interface UserLoginBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "enableFlag", ignore = true)
     UserLoginBO buildBOByDO(UserLoginDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(UserLoginDO entityDO, @MappingTarget UserLoginBO entityBO) {
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+    }
 
     /**
      * DOList to BOList

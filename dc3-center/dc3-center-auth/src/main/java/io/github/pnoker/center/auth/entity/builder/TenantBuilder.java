@@ -23,6 +23,7 @@ import io.github.pnoker.center.auth.entity.model.TenantDO;
 import io.github.pnoker.center.auth.entity.vo.TenantVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.TenantExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -63,6 +64,7 @@ public interface TenantBuilder {
      * @return EntityDO
      */
     @Mapping(target = "tenantExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     TenantDO buildDOByBO(TenantBO entityBO);
 
@@ -77,6 +79,9 @@ public interface TenantBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setTenantExt(ext);
+
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
     }
 
     /**
@@ -94,6 +99,7 @@ public interface TenantBuilder {
      * @return EntityBO
      */
     @Mapping(target = "tenantExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     TenantBO buildBOByDO(TenantDO entityDO);
 
     @AfterMapping
@@ -107,6 +113,9 @@ public interface TenantBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), TenantExt.Content.class));
             entityBO.setTenantExt(ext);
         }
+
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**

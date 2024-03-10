@@ -16,10 +16,10 @@
 
 package io.github.pnoker.center.data.entity.bo;
 
-import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.AlarmRuleExt;
+import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

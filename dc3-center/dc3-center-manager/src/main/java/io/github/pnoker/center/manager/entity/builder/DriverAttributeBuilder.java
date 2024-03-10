@@ -24,6 +24,7 @@ import io.github.pnoker.center.manager.entity.vo.DriverAttributeVO;
 import io.github.pnoker.common.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.entity.ext.DriverAttributeExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -65,6 +66,7 @@ public interface DriverAttributeBuilder {
      * @return EntityDO
      */
     @Mapping(target = "attributeExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     DriverAttributeDO buildDOByBO(DriverAttributeBO entityBO);
 
@@ -79,6 +81,9 @@ public interface DriverAttributeBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setAttributeExt(ext);
+
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
     }
 
     /**
@@ -96,6 +101,7 @@ public interface DriverAttributeBuilder {
      * @return EntityBO
      */
     @Mapping(target = "attributeExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     DriverAttributeBO buildBOByDO(DriverAttributeDO entityDO);
 
     @AfterMapping
@@ -109,6 +115,9 @@ public interface DriverAttributeBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DriverAttributeExt.Content.class));
             entityBO.setAttributeExt(ext);
         }
+
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**

@@ -23,6 +23,7 @@ import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import io.github.pnoker.center.manager.entity.vo.ProfileVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.ProfileExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -64,6 +65,7 @@ public interface ProfileBuilder {
      * @return EntityDO
      */
     @Mapping(target = "profileExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ProfileDO buildDOByBO(ProfileBO entityBO);
 
@@ -78,6 +80,9 @@ public interface ProfileBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setProfileExt(ext);
+
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
     }
 
     /**
@@ -95,6 +100,7 @@ public interface ProfileBuilder {
      * @return EntityBO
      */
     @Mapping(target = "profileExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     ProfileBO buildBOByDO(ProfileDO entityDO);
 
     @AfterMapping
@@ -108,6 +114,9 @@ public interface ProfileBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ProfileExt.Content.class));
             entityBO.setProfileExt(ext);
         }
+
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**

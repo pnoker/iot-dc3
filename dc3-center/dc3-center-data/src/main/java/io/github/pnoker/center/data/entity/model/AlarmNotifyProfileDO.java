@@ -18,9 +18,8 @@ package io.github.pnoker.center.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import io.github.pnoker.common.enums.AutoConfirmFlagEnum;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.AutoConfirmFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -82,7 +81,7 @@ public class AlarmNotifyProfileDO implements Serializable {
      * 使能标识
      */
     @TableField("enable_flag")
-    private EnableFlagEnum enableFlag;
+    private Byte enableFlag;
 
     /**
      * 租户ID

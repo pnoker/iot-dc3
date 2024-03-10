@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -68,7 +67,7 @@ public class LabelDO implements Serializable {
      * 使能标识
      */
     @TableField("enable_flag")
-    private EnableFlagEnum enableFlag;
+    private Byte enableFlag;
 
     /**
      * 租户ID

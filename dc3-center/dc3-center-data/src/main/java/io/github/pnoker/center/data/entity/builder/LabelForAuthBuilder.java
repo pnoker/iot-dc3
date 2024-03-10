@@ -20,8 +20,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.model.LabelDO;
 import io.github.pnoker.common.entity.bo.LabelBO;
 import io.github.pnoker.common.entity.builder.LabelBuilder;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -40,8 +43,15 @@ public interface LabelForAuthBuilder extends LabelBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     LabelDO buildDOByBO(LabelBO entityBO);
+
+    @AfterMapping
+    default void afterProcess(LabelBO entityBO, @MappingTarget LabelDO entityDO) {
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
+    }
 
     /**
      * BOList to DOList
@@ -57,7 +67,14 @@ public interface LabelForAuthBuilder extends LabelBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "enableFlag", ignore = true)
     LabelBO buildBOByDO(LabelDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(LabelDO entityDO, @MappingTarget LabelBO entityBO) {
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+    }
 
     /**
      * DOList to BOList

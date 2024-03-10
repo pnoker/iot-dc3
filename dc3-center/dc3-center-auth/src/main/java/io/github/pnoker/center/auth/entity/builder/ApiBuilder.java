@@ -23,6 +23,7 @@ import io.github.pnoker.center.auth.entity.model.ApiDO;
 import io.github.pnoker.center.auth.entity.vo.ApiVO;
 import io.github.pnoker.common.entity.ext.ApiExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -64,6 +65,7 @@ public interface ApiBuilder {
      * @return EntityDO
      */
     @Mapping(target = "apiExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ApiDO buildDOByBO(ApiBO entityBO);
 
@@ -78,6 +80,9 @@ public interface ApiBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setApiExt(ext);
+
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
     }
 
     /**
@@ -95,6 +100,7 @@ public interface ApiBuilder {
      * @return EntityBO
      */
     @Mapping(target = "apiExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     ApiBO buildBOByDO(ApiDO entityDO);
 
     @AfterMapping
@@ -108,6 +114,9 @@ public interface ApiBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ApiExt.Content.class));
             entityBO.setApiExt(ext);
         }
+
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**

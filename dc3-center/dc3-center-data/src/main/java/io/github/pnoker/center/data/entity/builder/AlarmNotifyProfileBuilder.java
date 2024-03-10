@@ -23,6 +23,7 @@ import io.github.pnoker.center.data.entity.model.AlarmNotifyProfileDO;
 import io.github.pnoker.center.data.entity.vo.AlarmNotifyProfileVO;
 import io.github.pnoker.common.entity.ext.AlarmNotifyExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -64,6 +65,7 @@ public interface AlarmNotifyProfileBuilder {
      * @return EntityDO
      */
     @Mapping(target = "alarmNotifyExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     AlarmNotifyProfileDO buildDOByBO(AlarmNotifyProfileBO entityBO);
 
@@ -78,6 +80,9 @@ public interface AlarmNotifyProfileBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setAlarmNotifyExt(ext);
+
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
     }
 
     /**
@@ -95,6 +100,7 @@ public interface AlarmNotifyProfileBuilder {
      * @return EntityBO
      */
     @Mapping(target = "alarmNotifyExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     AlarmNotifyProfileBO buildBOByDO(AlarmNotifyProfileDO entityDO);
 
     @AfterMapping
@@ -108,6 +114,9 @@ public interface AlarmNotifyProfileBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), AlarmNotifyExt.Content.class));
             entityBO.setAlarmNotifyExt(ext);
         }
+
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**

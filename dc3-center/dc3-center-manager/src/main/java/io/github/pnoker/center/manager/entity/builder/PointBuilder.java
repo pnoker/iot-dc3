@@ -24,6 +24,7 @@ import io.github.pnoker.center.manager.entity.vo.PointVO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.PointExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -65,6 +66,7 @@ public interface PointBuilder {
      * @return EntityDO
      */
     @Mapping(target = "pointExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     PointDO buildDOByBO(PointBO entityBO);
 
@@ -79,6 +81,9 @@ public interface PointBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setPointExt(ext);
+
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
     }
 
     /**
@@ -96,6 +101,7 @@ public interface PointBuilder {
      * @return EntityBO
      */
     @Mapping(target = "pointExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     PointBO buildBOByDO(PointDO entityDO);
 
     @AfterMapping
@@ -109,6 +115,9 @@ public interface PointBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), PointExt.Content.class));
             entityBO.setPointExt(ext);
         }
+
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**

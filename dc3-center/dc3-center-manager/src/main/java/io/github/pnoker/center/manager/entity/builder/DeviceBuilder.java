@@ -24,6 +24,7 @@ import io.github.pnoker.center.manager.entity.vo.DeviceVO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.ext.DeviceExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -65,6 +66,7 @@ public interface DeviceBuilder {
      * @return EntityDO
      */
     @Mapping(target = "deviceExt", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     DeviceDO buildDOByBO(DeviceBO entityBO);
 
@@ -79,6 +81,9 @@ public interface DeviceBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setDeviceExt(ext);
+
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        entityDO.setEnableFlag(enableFlag.getIndex());
     }
 
     /**
@@ -97,6 +102,7 @@ public interface DeviceBuilder {
      */
     @Mapping(target = "deviceExt", ignore = true)
     @Mapping(target = "profileIds", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     DeviceBO buildBOByDO(DeviceDO entityDO);
 
     @AfterMapping
@@ -110,6 +116,9 @@ public interface DeviceBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DeviceExt.Content.class));
             entityBO.setDeviceExt(ext);
         }
+
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
     /**
