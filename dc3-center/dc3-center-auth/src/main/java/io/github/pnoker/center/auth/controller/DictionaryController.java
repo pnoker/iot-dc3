@@ -41,7 +41,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@Tag(name = "字典")
+@Tag(name = "接口-字典")
 @RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
 public class DictionaryController implements BaseController {
 
@@ -57,7 +57,7 @@ public class DictionaryController implements BaseController {
      * @return 字典列表
      */
     @GetMapping("/tenant")
-    @Operation(summary = "租户字典列表")
+    @Operation(summary = "查询-租户字典列表")
     public R<List<DictionaryVO>> tenantDictionary() {
         try {
             List<DictionaryBO> entityBOS = dictionaryService.tenantDictionary();
@@ -75,7 +75,7 @@ public class DictionaryController implements BaseController {
      * @return 字典列表
      */
     @GetMapping("/limited_ip")
-    @Operation(summary = "限制IP列表")
+    @Operation(summary = "查询-限制IP列表")
     public R<List<DictionaryVO>> limitedIpDictionary() {
         try {
             List<DictionaryBO> entityBOS = dictionaryService.limitedIpDictionary(getTenantId());
