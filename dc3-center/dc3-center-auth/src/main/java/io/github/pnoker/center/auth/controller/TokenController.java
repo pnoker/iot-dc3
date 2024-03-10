@@ -23,7 +23,6 @@ import io.github.pnoker.center.auth.entity.query.TokenQuery;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -76,16 +75,23 @@ public class TokenController implements BaseController {
      * 检测用户 Token 令牌是否有效
      *
      * @param entityVO 校验令牌请求体 {@link TokenQuery}
-     * @return 如果有效，返回过期时间
+     * @return 是否有效，并返回过期时间
      */
     @PostMapping("/check")
-    public R<String> checkTokenValid(@Validated @RequestBody TokenQuery entityVO) {
+    public R<Boolean> checkTokenValid(@Validated @RequestBody TokenQuery entityVO) {
         TokenValid tokenValid = tokenService.checkTokenValid(entityVO.getName(), entityVO.getSalt(), entityVO.getToken(), entityVO.getTenant());
-        if (tokenValid.isValid()) {
+
+        boolean valid = tokenValid.isValid();
+        String message = "The token has expired";
+        if (valid && ObjectUtil.isNotNull(tokenValid.getExpireTime())) {
             String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
-            return R.ok(expireTime, "The token will expire in " + expireTime);
+            message = "The token will expire in " + expireTime;
+        } else if (!valid && ObjectUtil.isNotNull(tokenValid.getExpireTime())) {
+            String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
+            message = "The token has expired in " + expireTime;
         }
-        throw new UnAuthorizedException("Token invalid");
+
+        return R.ok(valid, message);
     }
 
     /**
