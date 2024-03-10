@@ -19,7 +19,7 @@ package io.github.pnoker.center.auth.service;
 import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import io.github.pnoker.center.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.center.auth.entity.query.RoleResourceBindQuery;
-import io.github.pnoker.common.base.BaseService;
+import io.github.pnoker.common.base.service.BaseService;
 
 import java.util.List;
 

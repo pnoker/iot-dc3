@@ -24,7 +24,7 @@ import io.github.pnoker.center.data.biz.DeviceStatusService;
 import io.github.pnoker.center.data.entity.query.DeviceQuery;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;

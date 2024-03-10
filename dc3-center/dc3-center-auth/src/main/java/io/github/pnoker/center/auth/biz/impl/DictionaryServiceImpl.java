@@ -23,7 +23,7 @@ import io.github.pnoker.center.auth.dal.LimitedIpManager;
 import io.github.pnoker.center.auth.dal.TenantManager;
 import io.github.pnoker.center.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.center.auth.entity.model.TenantDO;
-import io.github.pnoker.common.constant.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

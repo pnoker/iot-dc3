@@ -17,7 +17,7 @@
 package io.github.pnoker.center.manager.biz;
 
 import io.github.pnoker.center.manager.entity.bo.*;
-import io.github.pnoker.common.constant.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 
 /**
  * Driver Notify Interface

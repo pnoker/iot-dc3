@@ -18,8 +18,8 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 import io.github.pnoker.center.manager.entity.query.ProfileQuery;
-import io.github.pnoker.common.base.BaseService;
-import io.github.pnoker.common.constant.enums.ProfileTypeFlagEnum;
+import io.github.pnoker.common.base.service.BaseService;
+import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 
 import java.util.List;
 import java.util.Set;

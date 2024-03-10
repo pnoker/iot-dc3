@@ -17,7 +17,7 @@
 package io.github.pnoker.driver.server;
 
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.driver.context.DriverContext;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import lombok.extern.slf4j.Slf4j;

@@ -24,7 +24,7 @@ import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.center.manager.entity.vo.DeviceVO;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.base.BaseController;
-import io.github.pnoker.common.constant.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.ResponseUtil;

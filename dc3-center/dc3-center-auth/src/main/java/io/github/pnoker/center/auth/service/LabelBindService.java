@@ -17,7 +17,7 @@
 package io.github.pnoker.center.auth.service;
 
 import io.github.pnoker.center.auth.entity.query.LabelBindQuery;
-import io.github.pnoker.common.base.BaseService;
+import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.entity.bo.LabelBindBO;
 
 /**

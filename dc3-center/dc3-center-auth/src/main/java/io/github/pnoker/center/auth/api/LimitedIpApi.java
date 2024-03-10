@@ -22,7 +22,7 @@ import io.github.pnoker.api.center.auth.GrpcRLimitedIpDTO;
 import io.github.pnoker.api.center.auth.LimitedIpApiGrpc;
 import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.auth.service.LimitedIpService;
-import io.github.pnoker.common.constant.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;

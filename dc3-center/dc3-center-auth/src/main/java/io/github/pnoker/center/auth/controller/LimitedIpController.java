@@ -24,7 +24,7 @@ import io.github.pnoker.center.auth.entity.query.LimitedIpQuery;
 import io.github.pnoker.center.auth.entity.vo.LimitedIpVO;
 import io.github.pnoker.center.auth.service.LimitedIpService;
 import io.github.pnoker.common.base.BaseController;
-import io.github.pnoker.common.constant.enums.ResponseEnum;
+import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
