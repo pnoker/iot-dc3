@@ -63,11 +63,11 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
         if (ObjectUtil.isNull(driverPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getMessage());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getMessage());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
 
             GrpcPageDriverDTO.Builder pageDriverBuilder = GrpcPageDriverDTO.newBuilder();
             GrpcPageDTO.Builder pageBuilder = GrpcPageDTO.newBuilder();
@@ -96,11 +96,11 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
         if (ObjectUtil.isNull(entityDO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getMessage());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getMessage());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
 
             GrpcDriverDTO driverDTO = buildDTOByDO(entityDO);
 

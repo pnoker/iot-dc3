@@ -145,7 +145,7 @@ public class TenantController implements BaseController {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getMessage());
+        return R.fail(ResponseEnum.NO_RESOURCE.getText());
     }
 
     /**

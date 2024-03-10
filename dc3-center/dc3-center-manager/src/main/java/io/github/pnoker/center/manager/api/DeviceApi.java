@@ -64,11 +64,11 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         if (ObjectUtil.isNull(devicePage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getMessage());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getMessage());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
 
             GrpcPageDeviceDTO.Builder pageDeviceBuilder = GrpcPageDeviceDTO.newBuilder();
             GrpcPageDTO.Builder pageBuilder = GrpcPageDTO.newBuilder();
@@ -97,11 +97,11 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         if (CollUtil.isEmpty(deviceBOS)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getMessage());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
         } else {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getMessage());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
 
             List<DeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).collect(Collectors.toList());
 

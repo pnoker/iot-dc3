@@ -36,8 +36,6 @@ services:
       - JVM_MMS=256m
     container_name: dc3-register
     hostname: dc3-register
-    depends_on:
-      - mysql
     volumes:
       - register:/home/nacos/logs
     logging:
@@ -61,8 +59,6 @@ services:
       - EMQX_NODE_NAME=dc3@dc3-emqx
     container_name: dc3-emqx
     hostname: dc3-emqx
-    depends_on:
-      - mysql
     volumes:
       - emqx_data:/opt/emqx/data
       - emqx_log:/opt/emqx/log
@@ -126,8 +122,6 @@ services:
       - '3000:3000'
     container_name: dc3-grafana
     hostname: dc3-grafana
-    depends_on:
-      - mysql
     volumes:
       - grafana:/var/lib/grafana
     logging:
