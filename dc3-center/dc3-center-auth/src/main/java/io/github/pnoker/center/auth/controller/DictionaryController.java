@@ -23,6 +23,8 @@ import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import io.github.pnoker.common.entity.vo.DictionaryVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +41,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
+@Tag(name = "字典")
 @RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
 public class DictionaryController implements BaseController {
 
@@ -54,6 +57,7 @@ public class DictionaryController implements BaseController {
      * @return 字典列表
      */
     @GetMapping("/tenant")
+    @Operation(summary = "租户字典列表")
     public R<List<DictionaryVO>> tenantDictionary() {
         try {
             List<DictionaryBO> entityBOS = dictionaryService.tenantDictionary();
@@ -71,6 +75,7 @@ public class DictionaryController implements BaseController {
      * @return 字典列表
      */
     @GetMapping("/limited_ip")
+    @Operation(summary = "限制IP列表")
     public R<List<DictionaryVO>> limitedIpDictionary() {
         try {
             List<DictionaryBO> entityBOS = dictionaryService.limitedIpDictionary(getTenantId());
