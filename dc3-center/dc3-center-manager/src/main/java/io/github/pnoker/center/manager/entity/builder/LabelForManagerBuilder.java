@@ -44,8 +44,8 @@ public interface LabelForManagerBuilder extends LabelBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
-    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "entityTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     LabelDO buildDOByBO(LabelBO entityBO);
 

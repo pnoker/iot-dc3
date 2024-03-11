@@ -23,6 +23,7 @@ import io.github.pnoker.center.data.entity.model.AlarmMessageProfileDO;
 import io.github.pnoker.center.data.entity.vo.AlarmMessageProfileVO;
 import io.github.pnoker.common.entity.ext.AlarmMessageExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
@@ -65,6 +66,7 @@ public interface AlarmMessageProfileBuilder {
      * @return EntityDO
      */
     @Mapping(target = "alarmMessageExt", ignore = true)
+    @Mapping(target = "alarmMessageLevel", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     AlarmMessageProfileDO buildDOByBO(AlarmMessageProfileBO entityBO);
@@ -81,6 +83,10 @@ public interface AlarmMessageProfileBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setAlarmMessageExt(ext);
+
+        // AlarmMessageLevel Flag
+        AlarmMessageLevelFlagEnum alarmMessageLevel = entityBO.getAlarmMessageLevel();
+        entityDO.setAlarmMessageLevel(alarmMessageLevel.getIndex());
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
@@ -102,6 +108,7 @@ public interface AlarmMessageProfileBuilder {
      * @return EntityBO
      */
     @Mapping(target = "alarmMessageExt", ignore = true)
+    @Mapping(target = "alarmMessageLevel", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     AlarmMessageProfileBO buildBOByDO(AlarmMessageProfileDO entityDO);
 
@@ -117,6 +124,10 @@ public interface AlarmMessageProfileBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), AlarmMessageExt.Content.class));
             entityBO.setAlarmMessageExt(ext);
         }
+
+        // AlarmMessageLevel Flag
+        Byte alarmMessageLevel = entityDO.getAlarmMessageLevel();
+        entityBO.setAlarmMessageLevel(AlarmMessageLevelFlagEnum.ofIndex(alarmMessageLevel));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

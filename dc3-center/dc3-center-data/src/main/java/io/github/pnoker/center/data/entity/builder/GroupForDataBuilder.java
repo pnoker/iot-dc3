@@ -21,6 +21,7 @@ import io.github.pnoker.center.data.entity.model.GroupDO;
 import io.github.pnoker.common.entity.bo.GroupBO;
 import io.github.pnoker.common.entity.builder.GroupBuilder;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.GroupTypeFlagEnum;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -44,12 +45,17 @@ public interface GroupForDataBuilder extends GroupBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "groupTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     GroupDO buildDOByBO(GroupBO entityBO);
 
     @AfterMapping
     default void afterProcess(GroupBO entityBO, @MappingTarget GroupDO entityDO) {
+        // GroupType Flag
+        GroupTypeFlagEnum groupTypeFlag = entityBO.getGroupTypeFlag();
+        entityDO.setGroupTypeFlag(groupTypeFlag.getIndex());
+
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
@@ -69,11 +75,16 @@ public interface GroupForDataBuilder extends GroupBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "groupTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     GroupBO buildBOByDO(GroupDO entityDO);
 
     @AfterMapping
     default void afterProcess(GroupDO entityDO, @MappingTarget GroupBO entityBO) {
+        // GroupType Flag
+        Byte groupTypeFlag = entityDO.getGroupTypeFlag();
+        entityBO.setGroupTypeFlag(GroupTypeFlagEnum.ofIndex(groupTypeFlag));
+
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
