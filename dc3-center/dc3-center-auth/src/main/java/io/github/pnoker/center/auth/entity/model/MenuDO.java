@@ -58,7 +58,7 @@ public class MenuDO implements Serializable {
      * 菜单类型标识
      */
     @TableField("menu_type_flag")
-    private MenuTypeFlagEnum menuTypeFlag;
+    private Byte menuTypeFlag;
 
     /**
      * 菜单名称
@@ -76,7 +76,7 @@ public class MenuDO implements Serializable {
      * 菜单层级
      */
     @TableField("menu_level")
-    private MenuLevelFlagEnum menuLevel;
+    private Byte menuLevel;
 
     /**
      * 菜单顺序

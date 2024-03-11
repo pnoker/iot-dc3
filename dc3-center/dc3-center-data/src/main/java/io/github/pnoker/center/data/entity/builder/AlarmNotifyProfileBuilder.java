@@ -71,6 +71,7 @@ public interface AlarmNotifyProfileBuilder {
 
     @AfterMapping
     default void afterProcess(AlarmNotifyProfileBO entityBO, @MappingTarget AlarmNotifyProfileDO entityDO) {
+        // Json Ext
         AlarmNotifyExt entityExt = entityBO.getAlarmNotifyExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -81,6 +82,7 @@ public interface AlarmNotifyProfileBuilder {
         }
         entityDO.setAlarmNotifyExt(ext);
 
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -105,6 +107,7 @@ public interface AlarmNotifyProfileBuilder {
 
     @AfterMapping
     default void afterProcess(AlarmNotifyProfileDO entityDO, @MappingTarget AlarmNotifyProfileBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getAlarmNotifyExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             AlarmNotifyExt ext = new AlarmNotifyExt();
@@ -115,6 +118,7 @@ public interface AlarmNotifyProfileBuilder {
             entityBO.setAlarmNotifyExt(ext);
         }
 
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

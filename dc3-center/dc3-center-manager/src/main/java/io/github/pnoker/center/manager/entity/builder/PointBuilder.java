@@ -72,6 +72,7 @@ public interface PointBuilder {
 
     @AfterMapping
     default void afterProcess(PointBO entityBO, @MappingTarget PointDO entityDO) {
+        // Json Ext
         PointExt entityExt = entityBO.getPointExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -82,6 +83,7 @@ public interface PointBuilder {
         }
         entityDO.setPointExt(ext);
 
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -106,6 +108,7 @@ public interface PointBuilder {
 
     @AfterMapping
     default void afterProcess(PointDO entityDO, @MappingTarget PointBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getPointExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             PointExt ext = new PointExt();
@@ -116,6 +119,7 @@ public interface PointBuilder {
             entityBO.setPointExt(ext);
         }
 
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

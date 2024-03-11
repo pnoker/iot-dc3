@@ -66,6 +66,7 @@ public interface DriverAttributeConfigBuilder {
 
     @AfterMapping
     default void afterProcess(DriverAttributeConfigBO entityBO, @MappingTarget DriverAttributeConfigDO entityDO) {
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -89,6 +90,7 @@ public interface DriverAttributeConfigBuilder {
 
     @AfterMapping
     default void afterProcess(DriverAttributeConfigDO entityDO, @MappingTarget DriverAttributeConfigBO entityBO) {
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

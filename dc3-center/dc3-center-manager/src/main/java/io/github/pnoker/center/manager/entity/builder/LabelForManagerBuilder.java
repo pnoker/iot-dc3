@@ -49,6 +49,7 @@ public interface LabelForManagerBuilder extends LabelBuilder {
 
     @AfterMapping
     default void afterProcess(LabelBO entityBO, @MappingTarget LabelDO entityDO) {
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -72,6 +73,7 @@ public interface LabelForManagerBuilder extends LabelBuilder {
 
     @AfterMapping
     default void afterProcess(LabelDO entityDO, @MappingTarget LabelBO entityBO) {
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

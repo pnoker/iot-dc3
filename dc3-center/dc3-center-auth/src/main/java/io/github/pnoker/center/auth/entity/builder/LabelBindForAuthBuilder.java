@@ -20,8 +20,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.model.LabelBindDO;
 import io.github.pnoker.common.entity.bo.LabelBindBO;
 import io.github.pnoker.common.entity.builder.LabelBindBuilder;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -40,8 +43,16 @@ public interface LabelBindForAuthBuilder extends LabelBindBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "entityTypeFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     LabelBindDO buildDOByBO(LabelBindBO entityBO);
+
+    @AfterMapping
+    default void afterProcess(LabelBindBO entityBO, @MappingTarget LabelBindDO entityDO) {
+        // EntityType Flag
+        EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
+        entityDO.setEntityTypeFlag(entityTypeFlag.getIndex());
+    }
 
     /**
      * BOList to DOList
@@ -57,7 +68,15 @@ public interface LabelBindForAuthBuilder extends LabelBindBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "entityTypeFlag", ignore = true)
     LabelBindBO buildBOByDO(LabelBindDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(LabelBindDO entityDO, @MappingTarget LabelBindBO entityBO) {
+        // EntityType Flag
+        Byte groupTypeFlag = entityDO.getEntityTypeFlag();
+        entityBO.setEntityTypeFlag(EntityTypeFlagEnum.ofIndex(groupTypeFlag));
+    }
 
     /**
      * DOList to BOList

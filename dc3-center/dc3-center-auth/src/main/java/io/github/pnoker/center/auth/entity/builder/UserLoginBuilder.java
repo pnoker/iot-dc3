@@ -65,6 +65,7 @@ public interface UserLoginBuilder {
 
     @AfterMapping
     default void afterProcess(UserLoginBO entityBO, @MappingTarget UserLoginDO entityDO) {
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -88,6 +89,7 @@ public interface UserLoginBuilder {
 
     @AfterMapping
     default void afterProcess(UserLoginDO entityDO, @MappingTarget UserLoginBO entityBO) {
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

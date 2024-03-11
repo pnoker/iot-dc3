@@ -71,6 +71,7 @@ public interface AlarmMessageProfileBuilder {
 
     @AfterMapping
     default void afterProcess(AlarmMessageProfileBO entityBO, @MappingTarget AlarmMessageProfileDO entityDO) {
+        // Json Ext
         AlarmMessageExt entityExt = entityBO.getAlarmMessageExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -81,6 +82,7 @@ public interface AlarmMessageProfileBuilder {
         }
         entityDO.setAlarmMessageExt(ext);
 
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -105,6 +107,7 @@ public interface AlarmMessageProfileBuilder {
 
     @AfterMapping
     default void afterProcess(AlarmMessageProfileDO entityDO, @MappingTarget AlarmMessageProfileBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getAlarmMessageExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             AlarmMessageExt ext = new AlarmMessageExt();
@@ -115,6 +118,7 @@ public interface AlarmMessageProfileBuilder {
             entityBO.setAlarmMessageExt(ext);
         }
 
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

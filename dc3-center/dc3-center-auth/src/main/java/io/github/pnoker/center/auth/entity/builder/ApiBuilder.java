@@ -23,6 +23,7 @@ import io.github.pnoker.center.auth.entity.model.ApiDO;
 import io.github.pnoker.center.auth.entity.vo.ApiVO;
 import io.github.pnoker.common.entity.ext.ApiExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.ApiTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
@@ -65,12 +66,14 @@ public interface ApiBuilder {
      * @return EntityDO
      */
     @Mapping(target = "apiExt", ignore = true)
+    @Mapping(target = "apiTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ApiDO buildDOByBO(ApiBO entityBO);
 
     @AfterMapping
     default void afterProcess(ApiBO entityBO, @MappingTarget ApiDO entityDO) {
+        // Json Ext
         ApiExt entityExt = entityBO.getApiExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -81,6 +84,11 @@ public interface ApiBuilder {
         }
         entityDO.setApiExt(ext);
 
+        // ApiType Flag
+        ApiTypeFlagEnum apiTypeFlag = entityBO.getApiTypeFlag();
+        entityDO.setApiTypeFlag(apiTypeFlag.getIndex());
+
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -100,11 +108,13 @@ public interface ApiBuilder {
      * @return EntityBO
      */
     @Mapping(target = "apiExt", ignore = true)
+    @Mapping(target = "apiTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     ApiBO buildBOByDO(ApiDO entityDO);
 
     @AfterMapping
     default void afterProcess(ApiDO entityDO, @MappingTarget ApiBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getApiExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             ApiExt ext = new ApiExt();
@@ -115,6 +125,11 @@ public interface ApiBuilder {
             entityBO.setApiExt(ext);
         }
 
+        // ApiType Flag
+        Byte apiTypeFlag = entityDO.getApiTypeFlag();
+        entityBO.setApiTypeFlag(ApiTypeFlagEnum.ofIndex(apiTypeFlag));
+
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

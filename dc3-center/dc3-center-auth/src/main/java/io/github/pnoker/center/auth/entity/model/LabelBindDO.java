@@ -49,7 +49,7 @@ public class LabelBindDO implements Serializable {
      * 实体类型标识
      */
     @TableField("entity_type_flag")
-    private EntityTypeFlagEnum entityTypeFlag;
+    private Byte entityTypeFlag;
 
     /**
      * 标签ID

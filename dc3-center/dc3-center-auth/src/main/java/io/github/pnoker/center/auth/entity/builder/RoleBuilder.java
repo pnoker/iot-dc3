@@ -71,6 +71,7 @@ public interface RoleBuilder {
 
     @AfterMapping
     default void afterProcess(RoleBO entityBO, @MappingTarget RoleDO entityDO) {
+        // Json Ext
         RoleExt entityExt = entityBO.getRoleExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -81,6 +82,7 @@ public interface RoleBuilder {
         }
         entityDO.setRoleExt(ext);
 
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -105,6 +107,7 @@ public interface RoleBuilder {
 
     @AfterMapping
     default void afterProcess(RoleDO entityDO, @MappingTarget RoleBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getRoleExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             RoleExt ext = new RoleExt();
@@ -115,6 +118,7 @@ public interface RoleBuilder {
             entityBO.setRoleExt(ext);
         }
 
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

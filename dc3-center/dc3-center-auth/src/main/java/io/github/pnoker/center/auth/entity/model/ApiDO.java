@@ -19,7 +19,6 @@ package io.github.pnoker.center.auth.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.ApiTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -51,7 +50,7 @@ public class ApiDO implements Serializable {
      * Api接口类型标识
      */
     @TableField("api_type_flag")
-    private ApiTypeFlagEnum apiTypeFlag;
+    private Byte apiTypeFlag;
 
     /**
      * Api接口名称

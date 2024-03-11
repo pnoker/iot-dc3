@@ -50,6 +50,7 @@ public interface GroupForManagerBuilder extends GroupBuilder {
 
     @AfterMapping
     default void afterProcess(GroupBO entityBO, @MappingTarget GroupDO entityDO) {
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -73,6 +74,7 @@ public interface GroupForManagerBuilder extends GroupBuilder {
 
     @AfterMapping
     default void afterProcess(GroupDO entityDO, @MappingTarget GroupBO entityBO) {
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
