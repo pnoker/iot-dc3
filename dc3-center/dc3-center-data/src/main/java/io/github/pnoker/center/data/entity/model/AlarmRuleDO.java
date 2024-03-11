@@ -81,7 +81,7 @@ public class AlarmRuleDO implements Serializable {
      * 报警类型标识
      */
     @TableField("alarm_type_flag")
-    private AlarmTypeFlagEnum alarmTypeFlag;
+    private Byte alarmTypeFlag;
 
     /**
      * 报警规则

@@ -23,6 +23,7 @@ import io.github.pnoker.center.data.entity.model.AlarmNotifyProfileDO;
 import io.github.pnoker.center.data.entity.vo.AlarmNotifyProfileVO;
 import io.github.pnoker.common.entity.ext.AlarmNotifyExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
@@ -65,6 +66,7 @@ public interface AlarmNotifyProfileBuilder {
      * @return EntityDO
      */
     @Mapping(target = "alarmNotifyExt", ignore = true)
+    @Mapping(target = "autoConfirmFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     AlarmNotifyProfileDO buildDOByBO(AlarmNotifyProfileBO entityBO);
@@ -81,6 +83,10 @@ public interface AlarmNotifyProfileBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setAlarmNotifyExt(ext);
+
+        // AutoConfirm Flag
+        AutoConfirmFlagEnum autoConfirmFlag = entityBO.getAutoConfirmFlag();
+        entityDO.setEnableFlag(autoConfirmFlag.getIndex());
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
@@ -102,6 +108,7 @@ public interface AlarmNotifyProfileBuilder {
      * @return EntityBO
      */
     @Mapping(target = "alarmNotifyExt", ignore = true)
+    @Mapping(target = "autoConfirmFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     AlarmNotifyProfileBO buildBOByDO(AlarmNotifyProfileDO entityDO);
 
@@ -117,6 +124,10 @@ public interface AlarmNotifyProfileBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), AlarmNotifyExt.Content.class));
             entityBO.setAlarmNotifyExt(ext);
         }
+
+        // AutoConfirm Flag
+        Byte autoConfirmFlag = entityDO.getAutoConfirmFlag();
+        entityBO.setAutoConfirmFlag(AutoConfirmFlagEnum.ofIndex(autoConfirmFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

@@ -63,7 +63,7 @@ public class AlarmNotifyProfileDO implements Serializable {
      * 自动确认标识
      */
     @TableField("auto_confirm_flag")
-    private AutoConfirmFlagEnum autoConfirmFlag;
+    private Byte autoConfirmFlag;
 
     /**
      * 报警通知间隔，毫秒

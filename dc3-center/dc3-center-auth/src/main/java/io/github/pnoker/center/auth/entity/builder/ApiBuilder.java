@@ -66,8 +66,8 @@ public interface ApiBuilder {
      * @return EntityDO
      */
     @Mapping(target = "apiExt", ignore = true)
-    @Mapping(target = "apiTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "apiTypeFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ApiDO buildDOByBO(ApiBO entityBO);
 

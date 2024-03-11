@@ -63,7 +63,7 @@ public class AlarmMessageProfileDO implements Serializable {
      * 报警信息模板等级
      */
     @TableField("alarm_message_level")
-    private AlarmMessageLevelFlagEnum alarmMessageLevel;
+    private Byte alarmMessageLevel;
 
     /**
      * 报警信息模板内容

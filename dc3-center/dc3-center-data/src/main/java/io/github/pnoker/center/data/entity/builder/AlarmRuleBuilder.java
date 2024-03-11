@@ -23,6 +23,7 @@ import io.github.pnoker.center.data.entity.model.AlarmRuleDO;
 import io.github.pnoker.center.data.entity.vo.AlarmRuleVO;
 import io.github.pnoker.common.entity.ext.AlarmRuleExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
@@ -65,6 +66,7 @@ public interface AlarmRuleBuilder {
      * @return EntityDO
      */
     @Mapping(target = "alarmRuleExt", ignore = true)
+    @Mapping(target = "alarmTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     AlarmRuleDO buildDOByBO(AlarmRuleBO entityBO);
@@ -81,6 +83,10 @@ public interface AlarmRuleBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setAlarmRuleExt(ext);
+
+        // AlarmType Flag
+        AlarmTypeFlagEnum alarmTypeFlag = entityBO.getAlarmTypeFlag();
+        entityDO.setAlarmTypeFlag(alarmTypeFlag.getIndex());
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
@@ -102,6 +108,7 @@ public interface AlarmRuleBuilder {
      * @return EntityBO
      */
     @Mapping(target = "alarmRuleExt", ignore = true)
+    @Mapping(target = "alarmTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     AlarmRuleBO buildBOByDO(AlarmRuleDO entityDO);
 
@@ -117,6 +124,10 @@ public interface AlarmRuleBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), AlarmRuleExt.Content.class));
             entityBO.setAlarmRuleExt(ext);
         }
+
+        // AlarmType Flag
+        Byte alarmTypeFlag = entityDO.getAlarmTypeFlag();
+        entityBO.setAlarmTypeFlag(AlarmTypeFlagEnum.ofIndex(alarmTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
