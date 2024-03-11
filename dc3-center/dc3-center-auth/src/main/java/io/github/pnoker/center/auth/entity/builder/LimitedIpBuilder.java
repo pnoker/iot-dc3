@@ -66,6 +66,7 @@ public interface LimitedIpBuilder {
 
     @AfterMapping
     default void afterProcess(LimitedIpBO entityBO, @MappingTarget LimitedIpDO entityDO) {
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -89,6 +90,7 @@ public interface LimitedIpBuilder {
 
     @AfterMapping
     default void afterProcess(LimitedIpDO entityDO, @MappingTarget LimitedIpBO entityBO) {
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

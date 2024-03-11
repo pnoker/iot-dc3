@@ -24,6 +24,8 @@ import io.github.pnoker.center.auth.entity.vo.MenuVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.MenuExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.MenuLevelFlagEnum;
+import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -65,12 +67,15 @@ public interface MenuBuilder {
      * @return EntityDO
      */
     @Mapping(target = "menuExt", ignore = true)
+    @Mapping(target = "menuTypeFlag", ignore = true)
+    @Mapping(target = "menuLevel", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     MenuDO buildDOByBO(MenuBO entityBO);
 
     @AfterMapping
     default void afterProcess(MenuBO entityBO, @MappingTarget MenuDO entityDO) {
+        // Json Ext
         MenuExt entityExt = entityBO.getMenuExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -81,6 +86,15 @@ public interface MenuBuilder {
         }
         entityDO.setMenuExt(ext);
 
+        // MenuType Flag
+        MenuTypeFlagEnum menuTypeFlag = entityBO.getMenuTypeFlag();
+        entityDO.setMenuTypeFlag(menuTypeFlag.getIndex());
+
+        // MenuLevel Flag
+        MenuLevelFlagEnum menuLevel = entityBO.getMenuLevel();
+        entityDO.setMenuLevel(menuLevel.getIndex());
+
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -100,11 +114,14 @@ public interface MenuBuilder {
      * @return EntityBO
      */
     @Mapping(target = "menuExt", ignore = true)
+    @Mapping(target = "menuTypeFlag", ignore = true)
+    @Mapping(target = "menuLevel", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     MenuBO buildBOByDO(MenuDO entityDO);
 
     @AfterMapping
     default void afterProcess(MenuDO entityDO, @MappingTarget MenuBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getMenuExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             MenuExt ext = new MenuExt();
@@ -115,6 +132,15 @@ public interface MenuBuilder {
             entityBO.setMenuExt(ext);
         }
 
+        // MenuType Flag
+        Byte menuTypeFlag = entityDO.getMenuTypeFlag();
+        entityBO.setMenuTypeFlag(MenuTypeFlagEnum.ofIndex(menuTypeFlag));
+
+        // MenuLevel Flag
+        Byte menuLevel = entityDO.getMenuLevel();
+        entityBO.setMenuLevel(MenuLevelFlagEnum.ofIndex(menuLevel));
+
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

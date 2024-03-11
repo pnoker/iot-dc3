@@ -71,6 +71,7 @@ public interface ProfileBuilder {
 
     @AfterMapping
     default void afterProcess(ProfileBO entityBO, @MappingTarget ProfileDO entityDO) {
+        // Json Ext
         ProfileExt entityExt = entityBO.getProfileExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -81,6 +82,7 @@ public interface ProfileBuilder {
         }
         entityDO.setProfileExt(ext);
 
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -105,6 +107,7 @@ public interface ProfileBuilder {
 
     @AfterMapping
     default void afterProcess(ProfileDO entityDO, @MappingTarget ProfileBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getProfileExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             ProfileExt ext = new ProfileExt();
@@ -115,6 +118,7 @@ public interface ProfileBuilder {
             entityBO.setProfileExt(ext);
         }
 
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

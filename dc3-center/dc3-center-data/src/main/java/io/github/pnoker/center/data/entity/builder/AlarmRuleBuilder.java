@@ -71,6 +71,7 @@ public interface AlarmRuleBuilder {
 
     @AfterMapping
     default void afterProcess(AlarmRuleBO entityBO, @MappingTarget AlarmRuleDO entityDO) {
+        // Json Ext
         AlarmRuleExt entityExt = entityBO.getAlarmRuleExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -81,6 +82,7 @@ public interface AlarmRuleBuilder {
         }
         entityDO.setAlarmRuleExt(ext);
 
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -105,6 +107,7 @@ public interface AlarmRuleBuilder {
 
     @AfterMapping
     default void afterProcess(AlarmRuleDO entityDO, @MappingTarget AlarmRuleBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getAlarmRuleExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             AlarmRuleExt ext = new AlarmRuleExt();
@@ -115,6 +118,7 @@ public interface AlarmRuleBuilder {
             entityBO.setAlarmRuleExt(ext);
         }
 
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

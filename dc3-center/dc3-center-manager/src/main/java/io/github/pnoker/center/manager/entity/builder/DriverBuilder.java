@@ -72,6 +72,7 @@ public interface DriverBuilder {
 
     @AfterMapping
     default void afterProcess(DriverBO entityBO, @MappingTarget DriverDO entityDO) {
+        // Json Ext
         DriverExt entityExt = entityBO.getDriverExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -82,6 +83,7 @@ public interface DriverBuilder {
         }
         entityDO.setDriverExt(ext);
 
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -106,6 +108,7 @@ public interface DriverBuilder {
 
     @AfterMapping
     default void afterProcess(DriverDO entityDO, @MappingTarget DriverBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getDriverExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             DriverExt ext = new DriverExt();
@@ -116,6 +119,7 @@ public interface DriverBuilder {
             entityBO.setDriverExt(ext);
         }
 
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

@@ -70,6 +70,7 @@ public interface TenantBuilder {
 
     @AfterMapping
     default void afterProcess(TenantBO entityBO, @MappingTarget TenantDO entityDO) {
+        // Json Ext
         TenantExt entityExt = entityBO.getTenantExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -80,6 +81,7 @@ public interface TenantBuilder {
         }
         entityDO.setTenantExt(ext);
 
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -104,6 +106,7 @@ public interface TenantBuilder {
 
     @AfterMapping
     default void afterProcess(TenantDO entityDO, @MappingTarget TenantBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getTenantExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             TenantExt ext = new TenantExt();
@@ -114,6 +117,7 @@ public interface TenantBuilder {
             entityBO.setTenantExt(ext);
         }
 
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

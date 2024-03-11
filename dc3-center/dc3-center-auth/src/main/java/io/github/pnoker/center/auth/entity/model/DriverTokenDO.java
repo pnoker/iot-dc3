@@ -67,7 +67,7 @@ public class DriverTokenDO implements Serializable {
      * 失效标识
      */
     @TableField("expire_flag")
-    private ExpireFlagEnum expireFlag;
+    private Byte expireFlag;
 
     /**
      * 失效时间

@@ -72,6 +72,7 @@ public interface DeviceBuilder {
 
     @AfterMapping
     default void afterProcess(DeviceBO entityBO, @MappingTarget DeviceDO entityDO) {
+        // Json Ext
         DeviceExt entityExt = entityBO.getDeviceExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -82,6 +83,7 @@ public interface DeviceBuilder {
         }
         entityDO.setDeviceExt(ext);
 
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -107,6 +109,7 @@ public interface DeviceBuilder {
 
     @AfterMapping
     default void afterProcess(DeviceDO entityDO, @MappingTarget DeviceBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getDeviceExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             DeviceExt ext = new DeviceExt();
@@ -117,6 +120,7 @@ public interface DeviceBuilder {
             entityBO.setDeviceExt(ext);
         }
 
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

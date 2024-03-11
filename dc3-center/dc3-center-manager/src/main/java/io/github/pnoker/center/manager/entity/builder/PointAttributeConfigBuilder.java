@@ -66,6 +66,7 @@ public interface PointAttributeConfigBuilder {
 
     @AfterMapping
     default void afterProcess(PointAttributeConfigBO entityBO, @MappingTarget PointAttributeConfigDO entityDO) {
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -89,6 +90,7 @@ public interface PointAttributeConfigBuilder {
 
     @AfterMapping
     default void afterProcess(PointAttributeConfigDO entityDO, @MappingTarget PointAttributeConfigBO entityBO) {
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }

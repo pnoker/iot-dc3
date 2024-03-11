@@ -70,13 +70,13 @@ public class ResourceDO implements Serializable {
      * 权限资源类型标识
      */
     @TableField("resource_type_flag")
-    private ResourceTypeFlagEnum resourceTypeFlag;
+    private Byte resourceTypeFlag;
 
     /**
      * 权限资源范围标识
      */
     @TableField("resource_scope_flag")
-    private ResourceScopeFlagEnum resourceScopeFlag;
+    private Byte resourceScopeFlag;
 
     /**
      * 权限资源实体ID

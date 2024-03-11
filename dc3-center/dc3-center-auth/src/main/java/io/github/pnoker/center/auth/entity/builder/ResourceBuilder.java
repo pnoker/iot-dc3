@@ -24,6 +24,8 @@ import io.github.pnoker.center.auth.entity.vo.ResourceVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.ResourceExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
+import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -65,12 +67,15 @@ public interface ResourceBuilder {
      * @return EntityDO
      */
     @Mapping(target = "resourceExt", ignore = true)
+    @Mapping(target = "resourceTypeFlag", ignore = true)
+    @Mapping(target = "resourceScopeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ResourceDO buildDOByBO(ResourceBO entityBO);
 
     @AfterMapping
     default void afterProcess(ResourceBO entityBO, @MappingTarget ResourceDO entityDO) {
+        // Json Ext
         ResourceExt entityExt = entityBO.getResourceExt();
         JsonExt ext = new JsonExt();
         if (ObjectUtil.isNotNull(entityExt)) {
@@ -81,6 +86,15 @@ public interface ResourceBuilder {
         }
         entityDO.setResourceExt(ext);
 
+        // ResourceType Flag
+        ResourceTypeFlagEnum resourceTypeFlag = entityBO.getResourceTypeFlag();
+        entityDO.setResourceTypeFlag(resourceTypeFlag.getIndex());
+
+        // ResourceScope Flag
+        ResourceScopeFlagEnum resourceScopeFlag = entityBO.getResourceScopeFlag();
+        entityDO.setResourceScopeFlag(resourceScopeFlag.getIndex());
+
+        // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
     }
@@ -100,11 +114,14 @@ public interface ResourceBuilder {
      * @return EntityBO
      */
     @Mapping(target = "resourceExt", ignore = true)
+    @Mapping(target = "resourceTypeFlag", ignore = true)
+    @Mapping(target = "resourceScopeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     ResourceBO buildBOByDO(ResourceDO entityDO);
 
     @AfterMapping
     default void afterProcess(ResourceDO entityDO, @MappingTarget ResourceBO entityBO) {
+        // Json Ext
         JsonExt entityExt = entityDO.getResourceExt();
         if (ObjectUtil.isNotNull(entityExt)) {
             ResourceExt ext = new ResourceExt();
@@ -115,6 +132,15 @@ public interface ResourceBuilder {
             entityBO.setResourceExt(ext);
         }
 
+        // ResourceType Flag
+        Byte resourceTypeFlag = entityDO.getResourceTypeFlag();
+        entityBO.setResourceTypeFlag(ResourceTypeFlagEnum.ofIndex(resourceTypeFlag));
+
+        // ResourceScope Flag
+        Byte resourceScopeFlag = entityDO.getResourceScopeFlag();
+        entityBO.setResourceScopeFlag(ResourceScopeFlagEnum.ofIndex(resourceScopeFlag));
+
+        // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
