@@ -24,6 +24,8 @@ import io.github.pnoker.center.manager.entity.vo.ProfileVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.ProfileExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.ProfileShareFlagEnum;
+import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -65,6 +67,8 @@ public interface ProfileBuilder {
      * @return EntityDO
      */
     @Mapping(target = "profileExt", ignore = true)
+    @Mapping(target = "profileShareFlag", ignore = true)
+    @Mapping(target = "profileTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     ProfileDO buildDOByBO(ProfileBO entityBO);
@@ -81,6 +85,14 @@ public interface ProfileBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setProfileExt(ext);
+
+        // ProfileShare Flag
+        ProfileShareFlagEnum profileShareFlag = entityBO.getProfileShareFlag();
+        entityDO.setProfileShareFlag(profileShareFlag.getIndex());
+
+        // ProfileType Flag
+        ProfileTypeFlagEnum profileTypeFlag = entityBO.getProfileTypeFlag();
+        entityDO.setProfileTypeFlag(profileTypeFlag.getIndex());
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
@@ -102,6 +114,8 @@ public interface ProfileBuilder {
      * @return EntityBO
      */
     @Mapping(target = "profileExt", ignore = true)
+    @Mapping(target = "profileShareFlag", ignore = true)
+    @Mapping(target = "profileTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     ProfileBO buildBOByDO(ProfileDO entityDO);
 
@@ -117,6 +131,14 @@ public interface ProfileBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), ProfileExt.Content.class));
             entityBO.setProfileExt(ext);
         }
+
+        // ProfileShare Flag
+        Byte profileShareFlag = entityDO.getProfileShareFlag();
+        entityBO.setProfileShareFlag(ProfileShareFlagEnum.ofIndex(profileShareFlag));
+
+        // ProfileType Flag
+        Byte profileTypeFlag = entityDO.getProfileTypeFlag();
+        entityBO.setProfileTypeFlag(ProfileTypeFlagEnum.ofIndex(profileTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

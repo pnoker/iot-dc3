@@ -67,7 +67,7 @@ public class GroupDO implements Serializable {
      * 分组类型标识
      */
     @TableField("group_type_flag")
-    private GroupTypeFlagEnum groupTypeFlag;
+    private Byte groupTypeFlag;
 
     /**
      * 使能标识

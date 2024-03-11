@@ -19,8 +19,6 @@ package io.github.pnoker.center.manager.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.ProfileShareFlagEnum;
-import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -64,13 +62,13 @@ public class ProfileDO implements Serializable {
      * 模板共享类型标识
      */
     @TableField("profile_share_flag")
-    private ProfileShareFlagEnum profileShareFlag;
+    private Byte profileShareFlag;
 
     /**
      * 模板类型标识
      */
     @TableField("profile_type_flag")
-    private ProfileTypeFlagEnum profileTypeFlag;
+    private Byte profileTypeFlag;
 
     /**
      * 分组ID

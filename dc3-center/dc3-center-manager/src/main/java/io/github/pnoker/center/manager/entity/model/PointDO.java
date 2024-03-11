@@ -65,13 +65,13 @@ public class PointDO implements Serializable {
      * 位号类型标识
      */
     @TableField("point_type_flag")
-    private PointTypeFlagEnum pointTypeFlag;
+    private Byte pointTypeFlag;
 
     /**
      * 读写标识
      */
     @TableField("rw_flag")
-    private RwFlagEnum rwFlag;
+    private Byte rwFlag;
 
     /**
      * 基础值

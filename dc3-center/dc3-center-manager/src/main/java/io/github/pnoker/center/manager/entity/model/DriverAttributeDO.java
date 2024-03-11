@@ -63,7 +63,7 @@ public class DriverAttributeDO implements Serializable {
      * 属性类型标识
      */
     @TableField("attribute_type_flag")
-    private AttributeTypeFlagEnum attributeTypeFlag;
+    private Byte attributeTypeFlag;
 
     /**
      * 默认值

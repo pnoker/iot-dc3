@@ -24,6 +24,7 @@ import io.github.pnoker.center.manager.entity.vo.DriverAttributeVO;
 import io.github.pnoker.common.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.entity.ext.DriverAttributeExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
@@ -66,6 +67,7 @@ public interface DriverAttributeBuilder {
      * @return EntityDO
      */
     @Mapping(target = "attributeExt", ignore = true)
+    @Mapping(target = "attributeTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     DriverAttributeDO buildDOByBO(DriverAttributeBO entityBO);
@@ -82,6 +84,10 @@ public interface DriverAttributeBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setAttributeExt(ext);
+
+        // AttributeType Flag
+        AttributeTypeFlagEnum attributeTypeFlag = entityBO.getAttributeTypeFlag();
+        entityDO.setAttributeTypeFlag(attributeTypeFlag.getIndex());
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
@@ -103,6 +109,7 @@ public interface DriverAttributeBuilder {
      * @return EntityBO
      */
     @Mapping(target = "attributeExt", ignore = true)
+    @Mapping(target = "attributeTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     DriverAttributeBO buildBOByDO(DriverAttributeDO entityDO);
 
@@ -118,6 +125,10 @@ public interface DriverAttributeBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), DriverAttributeExt.Content.class));
             entityBO.setAttributeExt(ext);
         }
+
+        // AttributeType Flag
+        Byte attributeTypeFlag = entityDO.getAttributeTypeFlag();
+        entityBO.setAttributeTypeFlag(AttributeTypeFlagEnum.ofIndex(attributeTypeFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();

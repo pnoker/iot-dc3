@@ -75,7 +75,7 @@ public class DriverDO implements Serializable {
      * 驱动类型标识
      */
     @TableField("driver_type_flag")
-    private DriverTypeFlagEnum driverTypeFlag;
+    private Byte driverTypeFlag;
 
     /**
      * 驱动拓展信息
