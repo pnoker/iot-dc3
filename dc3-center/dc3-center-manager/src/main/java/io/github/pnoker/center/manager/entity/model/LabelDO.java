@@ -61,7 +61,7 @@ public class LabelDO implements Serializable {
      * 实体类型标识
      */
     @TableField("entity_type_flag")
-    private EntityTypeFlagEnum entityTypeFlag;
+    private Byte entityTypeFlag;
 
     /**
      * 使能标识

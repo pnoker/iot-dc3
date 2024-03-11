@@ -21,6 +21,7 @@ import io.github.pnoker.center.manager.entity.model.LabelDO;
 import io.github.pnoker.common.entity.bo.LabelBO;
 import io.github.pnoker.common.entity.builder.LabelBuilder;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -44,11 +45,16 @@ public interface LabelForManagerBuilder extends LabelBuilder {
      * @return EntityDO
      */
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "entityTypeFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     LabelDO buildDOByBO(LabelBO entityBO);
 
     @AfterMapping
     default void afterProcess(LabelBO entityBO, @MappingTarget LabelDO entityDO) {
+        // EntityType Flag
+        EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
+        entityDO.setEntityTypeFlag(entityTypeFlag.getIndex());
+
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         entityDO.setEnableFlag(enableFlag.getIndex());
@@ -68,11 +74,16 @@ public interface LabelForManagerBuilder extends LabelBuilder {
      * @param entityDO EntityDO
      * @return EntityBO
      */
+    @Mapping(target = "entityTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     LabelBO buildBOByDO(LabelDO entityDO);
 
     @AfterMapping
     default void afterProcess(LabelDO entityDO, @MappingTarget LabelBO entityBO) {
+        // EntityType Flag
+        Byte entityTypeFlag = entityDO.getEntityTypeFlag();
+        entityBO.setEntityTypeFlag(EntityTypeFlagEnum.ofIndex(entityTypeFlag));
+
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));

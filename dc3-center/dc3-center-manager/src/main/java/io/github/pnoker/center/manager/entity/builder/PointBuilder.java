@@ -25,6 +25,8 @@ import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.PointTypeFlagEnum;
+import io.github.pnoker.common.enums.RwFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -66,6 +68,8 @@ public interface PointBuilder {
      * @return EntityDO
      */
     @Mapping(target = "pointExt", ignore = true)
+    @Mapping(target = "pointTypeFlag", ignore = true)
+    @Mapping(target = "rwFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     PointDO buildDOByBO(PointBO entityBO);
@@ -82,6 +86,14 @@ public interface PointBuilder {
             ext.setContent(JsonUtil.toJsonString(entityExt.getContent()));
         }
         entityDO.setPointExt(ext);
+
+        // PointType Flag
+        PointTypeFlagEnum pointTypeFlag = entityBO.getPointTypeFlag();
+        entityDO.setPointTypeFlag(pointTypeFlag.getIndex());
+
+        // Rw Flag
+        RwFlagEnum rwFlag = entityBO.getRwFlag();
+        entityDO.setRwFlag(rwFlag.getIndex());
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
@@ -103,6 +115,8 @@ public interface PointBuilder {
      * @return EntityBO
      */
     @Mapping(target = "pointExt", ignore = true)
+    @Mapping(target = "pointTypeFlag", ignore = true)
+    @Mapping(target = "rwFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     PointBO buildBOByDO(PointDO entityDO);
 
@@ -118,6 +132,14 @@ public interface PointBuilder {
             ext.setContent(JsonUtil.parseObject(entityExt.getContent(), PointExt.Content.class));
             entityBO.setPointExt(ext);
         }
+
+        // PointType Flag
+        Byte pointTypeFlag = entityDO.getPointTypeFlag();
+        entityBO.setPointTypeFlag(PointTypeFlagEnum.ofIndex(pointTypeFlag));
+
+        // Rw Flag
+        Byte rwFlag = entityDO.getRwFlag();
+        entityBO.setRwFlag(RwFlagEnum.ofIndex(rwFlag));
 
         // Enable Flag
         Byte enableFlag = entityDO.getEnableFlag();
