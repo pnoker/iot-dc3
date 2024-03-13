@@ -1,10 +1,10 @@
-package io.github.pnoker.center.manager.service.impl;
+package io.github.pnoker.center.manager.dal.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.pnoker.center.manager.entity.model.PointDataVolumeHistoryDO;
 import io.github.pnoker.center.manager.mapper.PointDataVolumeHistoryMapper;
-import io.github.pnoker.center.manager.service.PointDataVolumeHistoryService;
+import io.github.pnoker.center.manager.dal.PointDataVolumeHistoryManager;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,6 +16,6 @@ import org.springframework.stereotype.Service;
  * @since 2024-03-06
  */
 @Service
-public class PointDataVolumeHistoryServiceImpl extends ServiceImpl<PointDataVolumeHistoryMapper, PointDataVolumeHistoryDO> implements PointDataVolumeHistoryService {
+public class PointDataVolumeHistoryManagerImpl extends ServiceImpl<PointDataVolumeHistoryMapper, PointDataVolumeHistoryDO> implements PointDataVolumeHistoryManager {
 
 }

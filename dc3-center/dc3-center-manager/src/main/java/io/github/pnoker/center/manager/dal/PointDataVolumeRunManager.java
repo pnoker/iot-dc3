@@ -1,4 +1,4 @@
-package io.github.pnoker.center.manager.service;
+package io.github.pnoker.center.manager.dal;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -12,6 +12,6 @@ import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
  * @author fukq
  * @since 2024-03-06
  */
-public interface PointDataVolumeRunService extends IService<PointDataVolumeRunDO> {
+public interface PointDataVolumeRunManager extends IService<PointDataVolumeRunDO> {
 
 }

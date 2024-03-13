@@ -1,4 +1,4 @@
-package io.github.pnoker.center.manager.service;
+package io.github.pnoker.center.manager.dal;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.center.manager.entity.model.PointDataVolumeHistoryDO;
@@ -11,6 +11,6 @@ import io.github.pnoker.center.manager.entity.model.PointDataVolumeHistoryDO;
  * @author fukq
  * @since 2024-03-06
  */
-public interface PointDataVolumeHistoryService extends IService<PointDataVolumeHistoryDO> {
+public interface PointDataVolumeHistoryManager extends IService<PointDataVolumeHistoryDO> {
 
 }
