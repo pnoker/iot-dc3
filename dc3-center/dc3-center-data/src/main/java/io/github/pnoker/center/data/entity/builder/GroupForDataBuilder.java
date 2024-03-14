@@ -28,6 +28,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Group Builder
@@ -54,11 +55,11 @@ public interface GroupForDataBuilder extends GroupBuilder {
     default void afterProcess(GroupBO entityBO, @MappingTarget GroupDO entityDO) {
         // GroupType Flag
         GroupTypeFlagEnum groupTypeFlag = entityBO.getGroupTypeFlag();
-        entityDO.setGroupTypeFlag(groupTypeFlag.getIndex());
+        Optional.ofNullable(groupTypeFlag).ifPresent(value -> entityDO.setGroupTypeFlag(value.getIndex()));
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**

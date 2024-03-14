@@ -27,6 +27,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * LabelBind Builder
@@ -51,7 +52,7 @@ public interface LabelBindForAuthBuilder extends LabelBindBuilder {
     default void afterProcess(LabelBindBO entityBO, @MappingTarget LabelBindDO entityDO) {
         // EntityType Flag
         EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
-        entityDO.setEntityTypeFlag(entityTypeFlag.getIndex());
+        Optional.ofNullable(entityTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
     }
 
     /**

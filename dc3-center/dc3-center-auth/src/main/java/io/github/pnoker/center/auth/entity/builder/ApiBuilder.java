@@ -32,6 +32,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Api Builder
@@ -87,10 +88,11 @@ public interface ApiBuilder {
         // ApiType Flag
         ApiTypeFlagEnum apiTypeFlag = entityBO.getApiTypeFlag();
         entityDO.setApiTypeFlag(apiTypeFlag.getIndex());
+        Optional.ofNullable(apiTypeFlag).ifPresent(value -> entityDO.setApiTypeFlag(value.getIndex()));
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**
