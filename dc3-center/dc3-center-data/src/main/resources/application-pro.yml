@@ -51,6 +51,17 @@ spring:
       discovery:
         namespace: ${NODE_ENV:pro}
 
+driver:
+  mqtt:
+    url: ${MQTT_BROKER_URL:tcp://dc3-rabbitmq:1883}
+    auth-type: USERNAME
+    username: ${MQTT_USERNAME:dc3}
+    password: ${MQTT_PASSWORD:dc3}
+    topic-prefix: dc3/${spring.application.name}/
+    default-send-topic:
+      qos: 1
+      name: device
+
 grpc:
   client:
     dc3-center-manager:

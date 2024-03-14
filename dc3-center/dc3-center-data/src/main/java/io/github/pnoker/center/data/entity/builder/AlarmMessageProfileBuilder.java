@@ -32,6 +32,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * AlarmMessageProfile Builder
@@ -86,11 +87,11 @@ public interface AlarmMessageProfileBuilder {
 
         // AlarmMessageLevel Flag
         AlarmMessageLevelFlagEnum alarmMessageLevel = entityBO.getAlarmMessageLevel();
-        entityDO.setAlarmMessageLevel(alarmMessageLevel.getIndex());
+        Optional.ofNullable(alarmMessageLevel).ifPresent(value -> entityDO.setAlarmMessageLevel(value.getIndex()));
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**

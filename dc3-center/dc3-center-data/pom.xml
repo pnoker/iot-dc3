@@ -65,6 +65,10 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-mqtt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mysql</artifactId>
         </dependency>
         <dependency>

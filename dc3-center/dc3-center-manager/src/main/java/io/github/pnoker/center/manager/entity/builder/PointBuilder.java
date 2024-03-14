@@ -34,6 +34,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Point Builder
@@ -89,15 +90,15 @@ public interface PointBuilder {
 
         // PointType Flag
         PointTypeFlagEnum pointTypeFlag = entityBO.getPointTypeFlag();
-        entityDO.setPointTypeFlag(pointTypeFlag.getIndex());
+        Optional.ofNullable(pointTypeFlag).ifPresent(value -> entityDO.setPointTypeFlag(value.getIndex()));
 
         // Rw Flag
         RwFlagEnum rwFlag = entityBO.getRwFlag();
-        entityDO.setRwFlag(rwFlag.getIndex());
+        Optional.ofNullable(rwFlag).ifPresent(value -> entityDO.setRwFlag(value.getIndex()));
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**
