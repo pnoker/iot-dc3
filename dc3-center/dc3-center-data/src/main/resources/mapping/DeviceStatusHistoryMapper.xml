@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.pnoker.center.data.mapper.DeviceStatusHistoryMapper">
+
+    <select id="selectRecently2Data"
+            resultType="io.github.pnoker.center.data.entity.model.DeviceStatusHistoryDO">
+        select id,
+               device_id,
+               driver_id,
+               device_name,
+               status,
+               create_time
+        from dc3_device_status_history
+        where device_id=#{id}
+          and deleted=0
+        order by create_time desc
+            limit 2;
+    </select>
+</mapper>
