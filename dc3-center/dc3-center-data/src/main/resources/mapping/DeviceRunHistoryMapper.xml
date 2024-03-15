@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.pnoker.center.data.mapper.DeviceRunHistoryMapper">
+
+    <select id="getDurationDay" resultType="io.github.pnoker.center.data.entity.model.DeviceRunDO">
+        select
+            driver_id,
+            device_id,
+            status,
+            SUM(duration) as duration
+        from
+            dc3_device_run_history
+        where
+            device_id =#{id}
+          and status =#{status}
+          and create_time between #{startOfDay} and #{endOfDay}
+        GROUP BY device_id ,driver_id
+    </select>
+</mapper>
