@@ -43,17 +43,22 @@ spring:
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:15M}
-  cloud:
-    nacos:
-      server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
-      username: dc3
-      password: dc3
-      discovery:
-        namespace: ${NODE_ENV:test}
 
 grpc:
   client:
     dc3-center-manager:
+      address: 'static://dc3-center-manager:9400'
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
+
+driver:
+  mqtt:
+    url: ${MQTT_BROKER_URL:tcp://dc3-rabbitmq:1883}
+    auth-type: USERNAME
+    username: ${MQTT_USERNAME:dc3}
+    password: ${MQTT_PASSWORD:dc3}
+    topic-prefix: dc3/${spring.application.name}/
+    default-send-topic:
+      qos: 1
+      name: device

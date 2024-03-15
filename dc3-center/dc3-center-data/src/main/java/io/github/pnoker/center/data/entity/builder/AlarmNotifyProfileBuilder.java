@@ -32,6 +32,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * AlarmNotifyProfile Builder
@@ -86,11 +87,11 @@ public interface AlarmNotifyProfileBuilder {
 
         // AutoConfirm Flag
         AutoConfirmFlagEnum autoConfirmFlag = entityBO.getAutoConfirmFlag();
-        entityDO.setEnableFlag(autoConfirmFlag.getIndex());
+        Optional.ofNullable(autoConfirmFlag).ifPresent(value -> entityDO.setAutoConfirmFlag(value.getIndex()));
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**

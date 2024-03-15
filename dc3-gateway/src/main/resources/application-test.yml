@@ -24,17 +24,11 @@ spring:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:15M}
   cloud:
-    nacos:
-      server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
-      username: dc3
-      password: dc3
-      discovery:
-        namespace: ${NODE_ENV:test}
     gateway:
       routes:
         # token
         - id: auth_route_token
-          uri: lb://dc3-center-auth
+          uri: http://dc3-center-auth:8300/
           predicates:
             - Path=/api/v3/auth/token/**
           filters:
@@ -44,13 +38,9 @@ spring:
                 key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # auth
         - id: auth_route
-          uri: lb://dc3-center-auth
+          uri: http://dc3-center-auth:8300
           predicates:
             - Path=/api/v3/auth/user/**,/api/v3/auth/limited_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
           filters:
@@ -61,13 +51,9 @@ spring:
                 key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # manager
         - id: manager_route
-          uri: lb://dc3-center-manager
+          uri: http://dc3-center-manager:8400
           predicates:
             - Path=/api/v3/manager/**
           filters:
@@ -78,13 +64,9 @@ spring:
                 key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # data
         - id: data_route
-          uri: lb://dc3-center-data
+          uri: http://dc3-center-data:8500
           predicates:
             - Path=/api/v3/data/**
           filters:
@@ -95,14 +77,11 @@ spring:
                 key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
 
 grpc:
   client:
     dc3-center-auth:
+      address: 'static://dc3-center-auth:9300'
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext

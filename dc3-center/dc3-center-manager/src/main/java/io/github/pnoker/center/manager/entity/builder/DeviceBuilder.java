@@ -32,6 +32,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Device Builder
@@ -85,7 +86,7 @@ public interface DeviceBuilder {
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**

@@ -33,6 +33,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Resource Builder
@@ -88,15 +89,15 @@ public interface ResourceBuilder {
 
         // ResourceType Flag
         ResourceTypeFlagEnum resourceTypeFlag = entityBO.getResourceTypeFlag();
-        entityDO.setResourceTypeFlag(resourceTypeFlag.getIndex());
+        Optional.ofNullable(resourceTypeFlag).ifPresent(value -> entityDO.setResourceTypeFlag(value.getIndex()));
 
         // ResourceScope Flag
         ResourceScopeFlagEnum resourceScopeFlag = entityBO.getResourceScopeFlag();
-        entityDO.setResourceScopeFlag(resourceScopeFlag.getIndex());
+        Optional.ofNullable(resourceScopeFlag).ifPresent(value -> entityDO.setResourceScopeFlag(value.getIndex()));
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**

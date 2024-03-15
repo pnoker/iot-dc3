@@ -120,6 +120,8 @@ services:
     restart: always
     ports:
       - '3000:3000'
+    environment:
+      - GF_SERVER_ROOT_URL=http://dc3-grafana:3000
     container_name: dc3-grafana
     hostname: dc3-grafana
     volumes:
