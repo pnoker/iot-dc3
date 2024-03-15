@@ -27,7 +27,6 @@ services:
       - '8000:8000'
     environment:
       - NODE_ENV=dev
-      - REDIS_PORT=6379
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -53,8 +52,6 @@ services:
       - '9300:9300'
     environment:
       - NODE_ENV=dev
-      - MYSQL_PORT=3306
-      - REDIS_PORT=6379
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
@@ -81,8 +78,6 @@ services:
       - '9400:9400'
     environment:
       - NODE_ENV=dev
-      - MYSQL_PORT=3306
-      - REDIS_PORT=6379
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
@@ -109,8 +104,6 @@ services:
       - '9500:9500'
     environment:
       - NODE_ENV=dev
-      - MYSQL_PORT=3306
-      - REDIS_PORT=6379
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
