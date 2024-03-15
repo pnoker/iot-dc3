@@ -20,6 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.builder.PointBuilder;
+import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.entity.vo.PointVO;
 import io.github.pnoker.center.manager.service.PointService;
@@ -34,12 +35,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +57,7 @@ public class PointController implements BaseController {
 
     @Resource
     private PointService pointService;
+
 
     /**
      * 新增 Point
@@ -228,6 +227,47 @@ public class PointController implements BaseController {
             return R.fail(e.getMessage());
         }
         return R.fail();
+    }
+
+
+    /**
+     * 查询位号被多少设备引用
+     * 选择点位统计设备信息
+     *
+     * @param pointId 点位id
+     * @return {@link R}<{@link Set}<{@link Long}>>
+     */
+    @GetMapping("/selectPointStatisticsWithDevice/{pointId}")
+    @Operation(summary = "查询-位号被多少设备引用")
+    public R<Set<Long>> selectPointStatisticsWithDevice(@NotNull @PathVariable(value = "pointId") Long pointId) {
+        try {
+            Set<Long> deviceIds = pointService.selectPointStatisticsWithDevice(pointId);
+            return R.ok(deviceIds);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+
+
+    /**
+     * 查询位号在不同设备下的数据量
+     * 按设备id统计位号数量
+     *
+     * @param pointId   点位id
+     * @param deviceIds 设备id
+     * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
+     */
+    @PostMapping("/selectPointStatisticsByDeviceId/{pointId}")
+    @Operation(summary = "查询-位号在不同设备下的数据量")
+    public R<List<List<PointDataVolumeRunDO>>> selectPointStatisticsByDeviceId(@NotNull @PathVariable(value = "pointId") Long pointId, @NotNull @RequestBody Set<Long> deviceIds) {
+        try {
+            List<List<PointDataVolumeRunDO>> list = pointService.selectPointStatisticsByDeviceId(pointId,deviceIds);
+            return R.ok(list);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
     }
 
 }

@@ -25,15 +25,20 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.biz.DriverNotifyService;
+import io.github.pnoker.center.manager.dal.PointDataVolumeRunManager;
 import io.github.pnoker.center.manager.dal.PointManager;
 import io.github.pnoker.center.manager.dal.ProfileBindManager;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.entity.model.PointDO;
+import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.mapper.PointMapper;
+import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
+import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
@@ -43,10 +48,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -64,6 +68,7 @@ public class PointServiceImpl implements PointService {
 
     @Resource
     private PointManager pointManager;
+
     @Resource
     private ProfileBindManager profileBindManager;
 
@@ -72,6 +77,15 @@ public class PointServiceImpl implements PointService {
 
     @Resource
     private DriverNotifyService driverNotifyService;
+
+    @Resource
+    private PointDataVolumeRunManager pointDataVolumeRunManager;
+
+    @Resource
+    private ProfileBindService profileBindService;
+
+    @Resource
+    private PointAttributeConfigService pointAttributeConfigService;
 
     @Override
     public void save(PointBO entityBO) {
@@ -173,6 +187,32 @@ public class PointServiceImpl implements PointService {
         }
         List<PointDO> pointDOS = pointManager.listByIds(ids);
         return pointDOS.stream().collect(Collectors.toMap(PointDO::getId, PointDO::getUnit));
+    }
+
+    @Override
+    public Set<Long> selectPointStatisticsWithDevice(Long pointId) {
+        PointBO pointBO = selectById(pointId);
+        Set<Long> deviceIds = new HashSet<>();
+
+        profileBindService.selectDeviceIdsByProfileId(pointBO.getProfileId()).forEach(deviceId -> {
+            List<PointAttributeConfigBO> dos = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId,pointId);
+            if (dos.size()!=0){
+                deviceIds.add(deviceId);
+            }
+        });
+        return deviceIds;
+    }
+
+    @Override
+    public List<List<PointDataVolumeRunDO>> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds) {
+        List<List<PointDataVolumeRunDO>> list = new ArrayList<>();
+        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(7);
+        deviceIds.forEach(deviceId -> {
+            LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
+            wrapper.eq(PointDataVolumeRunDO::getPointId, pointId).eq(PointDataVolumeRunDO::getDeviceId, deviceId).ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo);
+            list.add(pointDataVolumeRunManager.list(wrapper));
+        });
+        return list;
     }
 
     private LambdaQueryWrapper<PointDO> fuzzyQuery(PointQuery entityQuery) {
