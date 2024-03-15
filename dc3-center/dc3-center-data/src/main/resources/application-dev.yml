@@ -54,6 +54,17 @@ grpc:
       keep-alive-without-calls: true
       negotiation-type: plaintext
 
+driver:
+  mqtt:
+    url: ${MQTT_BROKER_URL:tcp://dc3-rabbitmq:2883}
+    auth-type: USERNAME
+    username: ${MQTT_USERNAME:dc3}
+    password: ${MQTT_PASSWORD:dc3}
+    topic-prefix: dc3/${spring.application.name}/
+    default-send-topic:
+      qos: 1
+      name: device
+
 logging:
   level:
     io.github.pnoker: DEBUG

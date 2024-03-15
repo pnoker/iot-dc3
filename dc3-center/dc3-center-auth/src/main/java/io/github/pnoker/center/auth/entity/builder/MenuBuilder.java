@@ -33,6 +33,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Menu Builder
@@ -88,15 +89,15 @@ public interface MenuBuilder {
 
         // MenuType Flag
         MenuTypeFlagEnum menuTypeFlag = entityBO.getMenuTypeFlag();
-        entityDO.setMenuTypeFlag(menuTypeFlag.getIndex());
+        Optional.ofNullable(menuTypeFlag).ifPresent(value -> entityDO.setMenuTypeFlag(value.getIndex()));
 
         // MenuLevel Flag
         MenuLevelFlagEnum menuLevel = entityBO.getMenuLevel();
-        entityDO.setMenuLevel(menuLevel.getIndex());
+        Optional.ofNullable(menuLevel).ifPresent(value -> entityDO.setMenuLevel(value.getIndex()));
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**

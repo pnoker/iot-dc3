@@ -27,6 +27,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * PointAttributeConfig Builder
@@ -68,7 +69,7 @@ public interface PointAttributeConfigBuilder {
     default void afterProcess(PointAttributeConfigBO entityBO, @MappingTarget PointAttributeConfigDO entityDO) {
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**

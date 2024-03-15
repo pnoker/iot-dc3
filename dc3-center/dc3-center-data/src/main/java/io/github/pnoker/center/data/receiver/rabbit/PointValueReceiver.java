@@ -21,6 +21,9 @@ import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.job.PointValueJob;
+import io.github.pnoker.center.data.mqtt.service.MqttSendService;
+import io.github.pnoker.common.entity.property.MqttProperties;
+import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -47,7 +50,12 @@ public class PointValueReceiver {
     private Integer batchSpeed;
 
     @Resource
+    private MqttProperties mqttProperties;
+
+    @Resource
     private PointValueService pointValueService;
+    @Resource
+    private MqttSendService mqttSendService;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
@@ -75,6 +83,11 @@ public class PointValueReceiver {
                 PointValueJob.addPointValues(pointValueBO);
                 PointValueJob.valueLock.writeLock().unlock();
             }
+
+            // Forward data to MQTT
+            String topic = mqttProperties.getDefaultSendTopic().getName() + "/" + pointValueBO.getDeviceId();
+            log.debug("Forward dat to device: {}:{}", pointValueBO.getDeviceId(), topic);
+            mqttSendService.sendToMqtt(topic, JsonUtil.toJsonString(pointValueBO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

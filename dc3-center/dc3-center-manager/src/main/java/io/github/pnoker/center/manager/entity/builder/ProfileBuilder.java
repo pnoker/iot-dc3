@@ -33,6 +33,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Profile Builder
@@ -88,15 +89,15 @@ public interface ProfileBuilder {
 
         // ProfileShare Flag
         ProfileShareFlagEnum profileShareFlag = entityBO.getProfileShareFlag();
-        entityDO.setProfileShareFlag(profileShareFlag.getIndex());
+        Optional.ofNullable(profileShareFlag).ifPresent(value -> entityDO.setProfileShareFlag(value.getIndex()));
 
         // ProfileType Flag
         ProfileTypeFlagEnum profileTypeFlag = entityBO.getProfileTypeFlag();
-        entityDO.setProfileTypeFlag(profileTypeFlag.getIndex());
+        Optional.ofNullable(profileTypeFlag).ifPresent(value -> entityDO.setProfileTypeFlag(value.getIndex()));
 
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**

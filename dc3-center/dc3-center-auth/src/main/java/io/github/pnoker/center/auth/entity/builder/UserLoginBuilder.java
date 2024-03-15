@@ -27,6 +27,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * UserLogin Builder
@@ -67,7 +68,7 @@ public interface UserLoginBuilder {
     default void afterProcess(UserLoginBO entityBO, @MappingTarget UserLoginDO entityDO) {
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**

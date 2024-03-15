@@ -27,6 +27,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * LimitedIp Builder
@@ -68,7 +69,7 @@ public interface LimitedIpBuilder {
     default void afterProcess(LimitedIpBO entityBO, @MappingTarget LimitedIpDO entityDO) {
         // Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        entityDO.setEnableFlag(enableFlag.getIndex());
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
     /**
