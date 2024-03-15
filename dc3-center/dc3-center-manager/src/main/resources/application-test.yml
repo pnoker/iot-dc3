@@ -43,21 +43,16 @@ spring:
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:15M}
-  cloud:
-    nacos:
-      server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
-      username: dc3
-      password: dc3
-      discovery:
-        namespace: ${NODE_ENV:test}
 
 grpc:
   client:
     dc3-center-auth:
+      address: 'static://dc3-center-auth:9300'
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
     dc3-center-data:
+      address: 'static://dc3-center-data:9500'
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
