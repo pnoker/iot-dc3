@@ -1,10 +1,8 @@
 package io.github.pnoker.center.manager.entity.model;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -113,6 +111,7 @@ public class PointDataVolumeHistoryDO implements Serializable {
     /**
      * 逻辑删除标识,0:未删除,1:已删除
      */
+    @TableLogic
     @TableField("deleted")
     private Integer deleted;
 

@@ -99,7 +99,7 @@ public class PointStatisticsServiceImpl implements PointStatisticsService {
             PointDataVolumeHistoryDO pointDataVolumeHistoryDO = pointDataVolumeHistoryManager.getOne(wrapper);
             long count;
             if (ObjectUtil.isEmpty(pointDataVolumeHistoryDO)) {
-                count = getPointCount(deviceId, pointId,LocalDateTime.MIN, this.datetime);
+                count = getPointCount(deviceId, pointId,LocalDateTime.of(1970, 1, 1, 0, 0), this.datetime);
             } else {
                 count = getPointCount(deviceId, pointId, pointDataVolumeHistoryDO.getCreateTime(), this.datetime);
             }
