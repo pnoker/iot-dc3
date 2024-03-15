@@ -30,10 +30,3 @@ spring:
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:15M}
-  cloud:
-    nacos:
-      server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
-      username: dc3
-      password: dc3
-      discovery:
-        namespace: ${NODE_ENV:test}
