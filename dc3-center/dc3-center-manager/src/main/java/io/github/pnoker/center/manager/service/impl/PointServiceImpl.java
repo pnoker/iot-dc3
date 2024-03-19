@@ -271,6 +271,13 @@ public class PointServiceImpl implements PointService {
         return entityDO;
     }
 
+    /**
+     * 根据 设备ID 和 位号ID 查询位号是否已配置
+     *
+     * @param deviceId 设备ID
+     * @param pointId  位号ID
+     * @return PointInfo Array
+     */
     private List<PointAttributeConfigDO> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
                 .eq(PointAttributeConfigDO::getDeviceId, deviceId)
