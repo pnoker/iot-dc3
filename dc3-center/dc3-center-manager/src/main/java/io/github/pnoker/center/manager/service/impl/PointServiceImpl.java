@@ -25,12 +25,14 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.biz.DriverNotifyService;
+import io.github.pnoker.center.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.center.manager.dal.PointDataVolumeRunManager;
 import io.github.pnoker.center.manager.dal.PointManager;
 import io.github.pnoker.center.manager.dal.ProfileBindManager;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.builder.PointBuilder;
+import io.github.pnoker.center.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.model.PointDO;
 import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
@@ -85,7 +87,7 @@ public class PointServiceImpl implements PointService {
     private ProfileBindService profileBindService;
 
     @Resource
-    private PointAttributeConfigService pointAttributeConfigService;
+    private PointAttributeConfigManager pointAttributeConfigManager;
 
     @Override
     public void save(PointBO entityBO) {
@@ -195,7 +197,7 @@ public class PointServiceImpl implements PointService {
         Set<Long> deviceIds = new HashSet<>();
 
         profileBindService.selectDeviceIdsByProfileId(pointBO.getProfileId()).forEach(deviceId -> {
-            List<PointAttributeConfigBO> dos = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId,pointId);
+            List<PointAttributeConfigDO> dos = selectByDeviceIdAndPointId(deviceId,pointId);
             if (dos.size()!=0){
                 deviceIds.add(deviceId);
             }
@@ -266,6 +268,14 @@ public class PointServiceImpl implements PointService {
         if (throwException && ObjectUtil.isNull(entityDO)) {
             throw new NotFoundException("位号不存在");
         }
+        return entityDO;
+    }
+
+    private List<PointAttributeConfigDO> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
+        LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
+                .eq(PointAttributeConfigDO::getDeviceId, deviceId)
+                .eq(PointAttributeConfigDO::getPointId, pointId);
+        List<PointAttributeConfigDO> entityDO = wrapper.list();
         return entityDO;
     }
 
