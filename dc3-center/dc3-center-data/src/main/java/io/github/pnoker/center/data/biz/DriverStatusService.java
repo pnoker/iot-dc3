@@ -17,8 +17,11 @@
 package io.github.pnoker.center.data.biz;
 
 
+import io.github.pnoker.center.data.entity.bo.DriverRunBO;
 import io.github.pnoker.center.data.entity.query.DriverQuery;
+import io.github.pnoker.center.data.entity.vo.DriverRunVO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,4 +39,10 @@ public interface DriverStatusService {
      * @return Map String:String
      */
     Map<Long, String> driver(DriverQuery driverQuery);
+
+    List<DriverRunBO> selectOnlineByDriverId(Long driverId);
+
+    List<DriverRunBO> selectOfflineByDriverId(Long driverId);
+
+    String getDeviceOnlineByDriverId(Long driverId);
 }

@@ -17,18 +17,20 @@
 package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.biz.DriverStatusService;
+import io.github.pnoker.center.data.entity.bo.DriverRunBO;
+import io.github.pnoker.center.data.entity.builder.DriverDurationBuilder;
 import io.github.pnoker.center.data.entity.query.DriverQuery;
+import io.github.pnoker.center.data.entity.vo.DriverRunVO;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +47,9 @@ public class DriverStatusController implements BaseController {
 
     @Resource
     private DriverStatusService driverStatusService;
+
+    @Resource
+    private DriverDurationBuilder driverDurationBuilder;
 
     /**
      * 查询 Driver 服务状态
@@ -64,5 +69,66 @@ public class DriverStatusController implements BaseController {
             return R.fail(e.getMessage());
         }
     }
+
+    /**
+     * 查询 Driver 在线总时长
+     *
+     * @param driverId
+     * @return
+     */
+    @GetMapping("/driverOnline/{driverId}")
+    public R<List<DriverRunVO>> selectOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+        try {
+            List<DriverRunBO> duration=   driverStatusService.selectOnlineByDriverId(driverId);
+            List<DriverRunVO>  result= driverDurationBuilder.buildVOByBOList(duration);
+            return R.ok(result);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 查询 Driver 离线总时长
+     *
+     * @param driverId
+     * @return
+     */
+    @GetMapping("/driverOffline/{driverId}")
+    public R<List<DriverRunVO>> selectOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+        try {
+            List<DriverRunBO> duration=   driverStatusService.selectOfflineByDriverId(driverId);
+            List<DriverRunVO>  result= driverDurationBuilder.buildVOByBOList(duration);
+            return R.ok(result);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 查询 Driver 下当前时刻在线设备数量
+     *
+     * @param driverId
+     * @return
+     */
+    @GetMapping("/getDeviceOnlineByDriverId/{driverId}")
+    public R<String> getDeviceOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+        try {
+           String result= driverStatusService.getDeviceOnlineByDriverId(driverId);
+            return R.ok(result);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 查询 Driver 下当前时刻离线设备数量
+     * ONLINE, OFFLINE
+     *
+     * @param driverQuery 驱动和分页参数
+     * @return Map String:String
+     */
 
 }

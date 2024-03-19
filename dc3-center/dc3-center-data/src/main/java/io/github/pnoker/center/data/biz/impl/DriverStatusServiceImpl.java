@@ -18,16 +18,21 @@ package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.manager.DriverApiGrpc;
-import io.github.pnoker.api.center.manager.GrpcDriverDTO;
-import io.github.pnoker.api.center.manager.GrpcPageDriverQueryDTO;
-import io.github.pnoker.api.center.manager.GrpcRPageDriverDTO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.biz.DriverStatusService;
+import io.github.pnoker.center.data.dal.DriverRunManager;
+import io.github.pnoker.center.data.entity.bo.DriverRunBO;
+import io.github.pnoker.center.data.entity.builder.DriverDurationBuilder;
+import io.github.pnoker.center.data.entity.model.DriverRunDO;
 import io.github.pnoker.center.data.entity.query.DriverQuery;
+import io.github.pnoker.center.data.entity.vo.DriverRunVO;
+import io.github.pnoker.center.data.service.DriverRunService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +40,7 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +58,14 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
     @Resource
     private RedisService redisService;
+    @Resource
+    private DriverRunService driverRunService;
+
+    @Resource
+    private DriverDurationBuilder driverDurationBuilder;
+
+    @GrpcClient(ManagerConstant.SERVICE_NAME)
+    private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
 
     @Override
     public Map<Long, String> driver(DriverQuery pageQuery) {
@@ -74,6 +84,48 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
         List<GrpcDriverDTO> drivers = rPageDriverDTO.getData().getDataList();
         return getStatusMap(drivers);
+    }
+
+    @Override
+    public List<DriverRunBO> selectOnlineByDriverId(Long driverId) {
+      List<DriverRunDO> driverRunDOS= driverRunService.get7daysDuration(driverId,DriverStatusEnum.ONLINE.getCode());
+        if (ObjectUtil.isEmpty(driverRunDOS)){
+            return null;
+        }
+        List<DriverRunBO> driverRunBOS=driverDurationBuilder.buildBOByDOList(driverRunDOS);
+        return driverRunBOS;
+    }
+
+    @Override
+    public List<DriverRunBO> selectOfflineByDriverId(Long driverId) {
+        List<DriverRunDO> driverRunDOS= driverRunService.get7daysDuration(driverId,DriverStatusEnum.OFFLINE.getCode());
+        if (ObjectUtil.isEmpty(driverRunDOS)){
+            return null;
+        }
+        List<DriverRunBO> driverRunBOS=driverDurationBuilder.buildBOByDOList(driverRunDOS);
+        return driverRunBOS;
+    }
+
+    @Override
+    public String getDeviceOnlineByDriverId(Long driverId) {
+        GrpcBYOnlineDriver query = GrpcBYOnlineDriver.newBuilder()
+                .setDriverId(driverId)
+                .build();
+        GrpcBYOnlineDriverDTO onlineByDriverId = deviceApiBlockingStub.getDeviceOnlineByDriverId(query);
+        if (!onlineByDriverId.getResult().getOk()) {
+            return null;
+        }
+        List<DeviceDTO> devices = onlineByDriverId.getDataList();
+        Set<Long> deviceIds = devices.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
+        List<String> list = new ArrayList<>();
+        deviceIds.forEach(id -> {
+            String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
+            String status = redisService.getKey(key);
+            status = ObjectUtil.isNotNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
+            list.add(status);
+        });
+        long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.ONLINE.getCode())).count();
+        return String.valueOf(count);
     }
 
     /**

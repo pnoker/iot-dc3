@@ -87,7 +87,26 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
-
+    @Override
+   public void getDeviceOnlineByDriverId(GrpcBYOnlineDriver driver, StreamObserver<GrpcBYOnlineDriverDTO> responseObserver){
+        GrpcBYOnlineDriverDTO.Builder builder = GrpcBYOnlineDriverDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
+        List<DeviceBO> deviceBOS = deviceService.selectByDriverId(driver.getDriverId());
+        if (CollUtil.isEmpty(deviceBOS)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
+            List<DeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            builder.addAllData(deviceDTOS);
+        }
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
     @Override
     public void selectByProfileId(GrpcByProfileQueryDTO request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
