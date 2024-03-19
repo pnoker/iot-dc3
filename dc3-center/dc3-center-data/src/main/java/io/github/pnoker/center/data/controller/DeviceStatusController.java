@@ -101,4 +101,20 @@ public class DeviceStatusController implements BaseController {
         }
     }
 
+    /**
+     * 查询 Device 在线总时长
+     * ONLINE, OFFLINE
+     *
+     * @param driverQuery 驱动和分页参数
+     * @return Map String:String
+     */
+
+    /**
+     * 查询 Device 离线总时长
+     * ONLINE, OFFLINE
+     *
+     * @param driverQuery 驱动和分页参数
+     * @return Map String:String
+     */
+
 }
