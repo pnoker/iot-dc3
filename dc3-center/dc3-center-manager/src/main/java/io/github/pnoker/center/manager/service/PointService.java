@@ -98,4 +98,18 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      */
     List<List<PointDataVolumeRunDO>> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds);
 
+
+
+    /**
+     *
+     * 当前位号下数据量
+     * 按位号id统计位号数据量
+     *
+     * @param pointId   点位id
+     * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
+     */
+    PointDataVolumeRunDO selectPointStatisticsByPointId(Long pointId);
+
+
+
 }

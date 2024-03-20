@@ -197,8 +197,8 @@ public class PointServiceImpl implements PointService {
         Set<Long> deviceIds = new HashSet<>();
 
         profileBindService.selectDeviceIdsByProfileId(pointBO.getProfileId()).forEach(deviceId -> {
-            List<PointAttributeConfigDO> dos = selectByDeviceIdAndPointId(deviceId,pointId);
-            if (dos.size()!=0){
+            List<PointAttributeConfigDO> dos = selectByDeviceIdAndPointId(deviceId, pointId);
+            if (dos.size() != 0) {
                 deviceIds.add(deviceId);
             }
         });
@@ -215,6 +215,14 @@ public class PointServiceImpl implements PointService {
             list.add(pointDataVolumeRunManager.list(wrapper));
         });
         return list;
+    }
+
+    @Override
+    public PointDataVolumeRunDO selectPointStatisticsByPointId(Long pointId) {
+        QueryWrapper<PointDataVolumeRunDO> wrapper = new QueryWrapper<>();
+        wrapper.select("sum(total) as total");
+        wrapper.lambda().eq(PointDataVolumeRunDO::getPointId, pointId);
+        return pointDataVolumeRunManager.getOne(wrapper);
     }
 
     private LambdaQueryWrapper<PointDO> fuzzyQuery(PointQuery entityQuery) {
