@@ -40,8 +40,8 @@
         dp.deleted
         from dc3_profile dp
         <if test="deviceId != null and deviceId != ''">
-            inner join dc3_profile_bind dpb on dp.id = dpb.profile_id
-            inner join dc3_device dd on dpb.device_id = dd.id and dd.id = #{deviceId}
+            inner join dc3_profile_bind dpb on dp.id = dpb.profile_id and dpb.deleted = 0
+            inner join dc3_device dd on dpb.device_id = dd.id and dd.id = #{deviceId} and dd.deleted = 0
         </if>
         ${ew.customSqlSegment}
     </select>
