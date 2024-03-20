@@ -46,7 +46,7 @@
         dp.deleted
         from dc3_point dp
         <if test="deviceId != null and deviceId != ''">
-            inner join dc3_profile_bind dpb on dp.profile_id = dpb.profile_id and dpb.device_id = #{deviceId}
+            inner join dc3_profile_bind dpb on dp.profile_id = dpb.profile_id and dpb.device_id = #{deviceId} and dpb.deleted = 0
         </if>
         ${ew.customSqlSegment}
     </select>

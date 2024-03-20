@@ -161,7 +161,7 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         DeviceBO select = selectById(entityBO.getId());
-        select.setProfileIds(newProfileIds);
+        select.setProfileIds(CollUtil.isEmpty(newProfileIds) ? oldProfileIds : newProfileIds);
         entityBO.setDeviceName(select.getDeviceName());
         // 通知驱动更新设备
         driverNotifyService.notifyDevice(MetadataCommandTypeEnum.UPDATE, select);
