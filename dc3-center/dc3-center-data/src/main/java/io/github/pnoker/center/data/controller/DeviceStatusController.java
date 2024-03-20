@@ -17,7 +17,12 @@
 package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.biz.DeviceStatusService;
+import io.github.pnoker.center.data.entity.bo.DeviceRunBO;
+import io.github.pnoker.center.data.entity.bo.DriverRunBO;
+import io.github.pnoker.center.data.entity.builder.DeviceDurationBuilder;
 import io.github.pnoker.center.data.entity.query.DeviceQuery;
+import io.github.pnoker.center.data.entity.vo.DeviceRunVO;
+import io.github.pnoker.center.data.entity.vo.DriverRunVO;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
@@ -27,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +49,9 @@ public class DeviceStatusController implements BaseController {
 
     @Resource
     private DeviceStatusService deviceStatusService;
+
+    @Resource
+    private DeviceDurationBuilder deviceDurationBuilder;
 
     /**
      * 查询 Device 服务状态
@@ -102,19 +111,39 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * 查询 Device 在线总时长
-     * ONLINE, OFFLINE
+     * 查询 device 在线总时长
      *
-     * @param driverQuery 驱动和分页参数
-     * @return Map String:String
+     * @param deviceId
+     * @return
      */
+    @GetMapping("/deviceOnline/{deviceId}")
+    public R<DeviceRunVO> selectOnlineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+        try {
+            DeviceRunBO duration=   deviceStatusService.selectOnlineByDeviceId(deviceId);
+            DeviceRunVO  result= deviceDurationBuilder.buildVOByBOList(duration);
+            return R.ok(result);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
 
     /**
-     * 查询 Device 离线总时长
-     * ONLINE, OFFLINE
+     * 查询 device 离线总时长
      *
-     * @param driverQuery 驱动和分页参数
-     * @return Map String:String
+     * @param deviceId
+     * @return
      */
+    @GetMapping("/deviceOffline/{deviceId}")
+    public R<DeviceRunVO> selectOfflineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+        try {
+            DeviceRunBO duration=   deviceStatusService.selectOfflineByDeviceId(deviceId);
+            DeviceRunVO  result= deviceDurationBuilder.buildVOByBOList(duration);
+            return R.ok(result);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
 
 }

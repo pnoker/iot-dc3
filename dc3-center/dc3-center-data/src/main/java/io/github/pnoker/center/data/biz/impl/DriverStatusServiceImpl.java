@@ -37,6 +37,7 @@ import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -87,27 +88,65 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     }
 
     @Override
-    public List<DriverRunBO> selectOnlineByDriverId(Long driverId) {
-      List<DriverRunDO> driverRunDOS= driverRunService.get7daysDuration(driverId,DriverStatusEnum.ONLINE.getCode());
+    public DriverRunBO selectOnlineByDriverId(Long driverId) {
+         List<DriverRunDO> driverRunDOS= driverRunService.get7daysDuration(driverId,DriverStatusEnum.ONLINE.getCode());
+         DriverRunBO driverRunBO= new DriverRunBO();
+         List<Long> zeroList = Collections.nCopies(7, 0L);
+        ArrayList<Long> list = new ArrayList<>(zeroList);
+        driverRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
         if (ObjectUtil.isEmpty(driverRunDOS)){
-            return null;
+            driverRunBO.setDuration(list);
+            return driverRunBO;
         }
-        List<DriverRunBO> driverRunBOS=driverDurationBuilder.buildBOByDOList(driverRunDOS);
-        return driverRunBOS;
+        for (int i = 0; i < driverRunDOS.size(); i++) {
+            list.set(i,driverRunDOS.get(i).getDuration());
+        }
+        driverRunBO.setDuration(list);
+        return driverRunBO;
     }
 
     @Override
-    public List<DriverRunBO> selectOfflineByDriverId(Long driverId) {
+    public DriverRunBO selectOfflineByDriverId(Long driverId) {
         List<DriverRunDO> driverRunDOS= driverRunService.get7daysDuration(driverId,DriverStatusEnum.OFFLINE.getCode());
+        DriverRunBO driverRunBO= new DriverRunBO();
+        List<Long> zeroList = Collections.nCopies(7, 0L);
+        ArrayList<Long> list = new ArrayList<>(zeroList);
+        driverRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         if (ObjectUtil.isEmpty(driverRunDOS)){
-            return null;
+            driverRunBO.setDuration(list);
+            return driverRunBO;
         }
-        List<DriverRunBO> driverRunBOS=driverDurationBuilder.buildBOByDOList(driverRunDOS);
-        return driverRunBOS;
+        for (int i = 0; i < driverRunDOS.size(); i++) {
+            list.set(i,driverRunDOS.get(i).getDuration());
+        }
+        driverRunBO.setDuration(list);
+        return driverRunBO;
     }
 
     @Override
     public String getDeviceOnlineByDriverId(Long driverId) {
+        List<String> list = getList(driverId);
+        if (list == null) return null;
+        long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.ONLINE.getCode())).count();
+        return String.valueOf(count);
+    }
+
+    @Override
+    public String getDeviceOfflineByDriverId(Long driverId) {
+        List<String> list = getList(driverId);
+        if (list == null) return null;
+        long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.OFFLINE.getCode())).count();
+        return String.valueOf(count);
+    }
+
+    /**
+     * get deviceList  Online/Offline BY driverId
+     *
+     * @param driverId
+     * @return
+     */
+    @Nullable
+    private List<String> getList(Long driverId) {
         GrpcBYOnlineDriver query = GrpcBYOnlineDriver.newBuilder()
                 .setDriverId(driverId)
                 .build();
@@ -124,8 +163,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
             status = ObjectUtil.isNotNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
             list.add(status);
         });
-        long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.ONLINE.getCode())).count();
-        return String.valueOf(count);
+        return list;
     }
 
     /**

@@ -2,6 +2,9 @@ package io.github.pnoker.center.data.mapper;
 
 import io.github.pnoker.center.data.entity.model.DeviceRunDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface DeviceRunMapper extends BaseMapper<DeviceRunDO> {
 
+    List<DeviceRunDO> get7daysDuration(@Param("driverId") Long driverId, @Param("status") String status);
 }

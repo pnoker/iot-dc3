@@ -1,6 +1,5 @@
 package io.github.pnoker.center.data.entity.bo;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DriverRunBO {
+public class DeviceRunBO {
 
     /**
      * 驱动状态
@@ -21,7 +20,7 @@ public class DriverRunBO {
     private String status;
 
     /**
-     * 驱动在线时长 /分钟
+     * 设备在线时长 /分钟
      */
     private List<Long> duration;
 }

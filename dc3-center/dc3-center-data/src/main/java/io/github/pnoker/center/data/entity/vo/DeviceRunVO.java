@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -14,15 +15,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "Driver", description = "驱动7天在线/离线时长")
-public class DriverRunVO {
+@Schema(title = "Device", description = "设备7天在线/离线时长")
+public class DeviceRunVO {
 
 
-
-    @Schema(description ="驱动状态")
+    @Schema(description ="设备状态")
     private String status;
 
-    @Schema(description = "驱动在线时长 /分钟")
+    @Schema(description = "设备在线时长 /分钟")
     private List<Long> duration;
 
 
