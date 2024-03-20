@@ -9,7 +9,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface DriverDurationBuilder {
-    List<DriverRunVO> buildVOByBOList(List<DriverRunBO> duration);
 
-    List<DriverRunBO> buildBOByDOList(List<DriverRunDO> driverRunDOS);
+    DriverRunVO buildVOByBOList(DriverRunBO duration);
 }

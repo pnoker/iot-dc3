@@ -71,7 +71,7 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
                         if (driverStatusHistoryDOS.size() > 1) {
                             Duration duration = Duration.between(driverStatusHistoryDOS.get(1).getCreateTime(), driverStatusHistoryDOS.get(0).getCreateTime());
                             DriverRunHistoryDO driverRunHistoryDO = new DriverRunHistoryDO();
-                            long minutes = duration.getSeconds() % 3600;
+                            long minutes = duration.toMinutes();
                             driverRunHistoryDO.setDuration(minutes);
                             driverRunHistoryDO.setDriverName(driverDO.getDriverName());
                             driverRunHistoryDO.setDriverId(driverDO.getBase().getId());
