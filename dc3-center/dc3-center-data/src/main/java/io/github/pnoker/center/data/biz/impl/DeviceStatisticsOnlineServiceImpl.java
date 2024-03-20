@@ -75,7 +75,7 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
                         if (deviceStatusHistoryDOS.size() > 1) {
                             Duration duration = Duration.between(deviceStatusHistoryDOS.get(1).getCreateTime(), deviceStatusHistoryDOS.get(0).getCreateTime());
                             DeviceRunHistoryDO deviceRunHistoryDO = new DeviceRunHistoryDO();
-                            long minutes = duration.getSeconds() % 3600;
+                            long minutes = duration.toMinutes();
                             deviceRunHistoryDO.setDuration(minutes);
                             deviceRunHistoryDO.setDeviceName(driverDO.getDeviceName());
                             deviceRunHistoryDO.setDriverId(driverDO.getDriverId());

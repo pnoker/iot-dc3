@@ -2,4 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.center.data.mapper.DeviceRunMapper">
 
+    <select id="get7daysDuration" resultType="io.github.pnoker.center.data.entity.model.DeviceRunDO">
+        SELECT duration,create_time
+        FROM dc3_device_run
+        WHERE create_time  >= DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY)
+          and device_id=#{driverId}
+          and status=#{status};
+    </select>
 </mapper>

@@ -40,9 +40,11 @@ public interface DriverStatusService {
      */
     Map<Long, String> driver(DriverQuery driverQuery);
 
-    List<DriverRunBO> selectOnlineByDriverId(Long driverId);
+    DriverRunBO selectOnlineByDriverId(Long driverId);
 
-    List<DriverRunBO> selectOfflineByDriverId(Long driverId);
+    DriverRunBO selectOfflineByDriverId(Long driverId);
 
     String getDeviceOnlineByDriverId(Long driverId);
+
+    String getDeviceOfflineByDriverId(Long driverId);
 }
