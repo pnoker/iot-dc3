@@ -77,10 +77,10 @@ public class DriverStatusController implements BaseController {
      * @return
      */
     @GetMapping("/driverOnline/{driverId}")
-    public R<List<DriverRunVO>> selectOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public R<DriverRunVO> selectOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
-            List<DriverRunBO> duration=   driverStatusService.selectOnlineByDriverId(driverId);
-            List<DriverRunVO>  result= driverDurationBuilder.buildVOByBOList(duration);
+            DriverRunBO duration=   driverStatusService.selectOnlineByDriverId(driverId);
+            DriverRunVO  result= driverDurationBuilder.buildVOByBOList(duration);
             return R.ok(result);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -95,10 +95,10 @@ public class DriverStatusController implements BaseController {
      * @return
      */
     @GetMapping("/driverOffline/{driverId}")
-    public R<List<DriverRunVO>> selectOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public R<DriverRunVO> selectOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
-            List<DriverRunBO> duration=   driverStatusService.selectOfflineByDriverId(driverId);
-            List<DriverRunVO>  result= driverDurationBuilder.buildVOByBOList(duration);
+            DriverRunBO duration=   driverStatusService.selectOfflineByDriverId(driverId);
+            DriverRunVO  result= driverDurationBuilder.buildVOByBOList(duration);
             return R.ok(result);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -125,10 +125,19 @@ public class DriverStatusController implements BaseController {
 
     /**
      * 查询 Driver 下当前时刻离线设备数量
-     * ONLINE, OFFLINE
      *
-     * @param driverQuery 驱动和分页参数
-     * @return Map String:String
+     * @param driverId
+     * @return
      */
+    @GetMapping("/getDeviceOfflineByDriverId/{driverId}")
+    public R<String> getDeviceOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+        try {
+            String result= driverStatusService.getDeviceOfflineByDriverId(driverId);
+            return R.ok(result);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
 
 }

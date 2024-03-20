@@ -21,21 +21,25 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.biz.DeviceStatusService;
+import io.github.pnoker.center.data.entity.bo.DeviceRunBO;
+import io.github.pnoker.center.data.entity.bo.DriverRunBO;
+import io.github.pnoker.center.data.entity.builder.DeviceDurationBuilder;
+import io.github.pnoker.center.data.entity.model.DeviceRunDO;
+import io.github.pnoker.center.data.entity.model.DriverRunDO;
 import io.github.pnoker.center.data.entity.query.DeviceQuery;
+import io.github.pnoker.center.data.service.DeviceRunService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.redis.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +57,12 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Resource
     private RedisService redisService;
+
+    @Resource
+    private DeviceDurationBuilder deviceDurationBuilder;
+
+    @Resource
+    private DeviceRunService deviceRunService;
 
     @Override
     public Map<Long, String> device(DeviceQuery pageQuery) {
@@ -88,6 +98,42 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
         List<DeviceDTO> devices = rDeviceListDTO.getDataList();
         return getStatusMap(devices);
+    }
+
+    @Override
+    public DeviceRunBO selectOnlineByDeviceId(Long deviceId) {
+        List<DeviceRunDO> deviceRunDOS= deviceRunService.get7daysDuration(deviceId,DriverStatusEnum.ONLINE.getCode());
+        DeviceRunBO deviceRunBO= new DeviceRunBO();
+        List<Long> zeroList = Collections.nCopies(7, 0L);
+        ArrayList<Long> list = new ArrayList<>(zeroList);
+        deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
+        if (ObjectUtil.isEmpty(deviceRunDOS)){
+            deviceRunBO.setDuration(list);
+            return deviceRunBO;
+        }
+        for (int i = 0; i < deviceRunDOS.size(); i++) {
+            list.set(i,deviceRunDOS.get(i).getDuration());
+        }
+        deviceRunBO.setDuration(list);
+        return deviceRunBO;
+    }
+
+    @Override
+    public DeviceRunBO selectOfflineByDeviceId(Long deviceId) {
+        List<DeviceRunDO> deviceRunDOS= deviceRunService.get7daysDuration(deviceId,DriverStatusEnum.OFFLINE.getCode());
+        DeviceRunBO deviceRunBO= new DeviceRunBO();
+        List<Long> zeroList = Collections.nCopies(7, 0L);
+        ArrayList<Long> list = new ArrayList<>(zeroList);
+        deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
+        if (ObjectUtil.isEmpty(deviceRunDOS)){
+            deviceRunBO.setDuration(list);
+            return deviceRunBO;
+        }
+        for (int i = 0; i < deviceRunDOS.size(); i++) {
+            list.set(i,deviceRunDOS.get(i).getDuration());
+        }
+        deviceRunBO.setDuration(list);
+        return deviceRunBO;
     }
 
     /**
