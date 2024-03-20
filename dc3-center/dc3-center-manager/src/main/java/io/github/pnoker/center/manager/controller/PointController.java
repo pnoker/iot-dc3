@@ -35,6 +35,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -262,8 +263,27 @@ public class PointController implements BaseController {
     @Operation(summary = "查询-位号在不同设备下的数据量")
     public R<List<List<PointDataVolumeRunDO>>> selectPointStatisticsByDeviceId(@NotNull @PathVariable(value = "pointId") Long pointId, @NotNull @RequestBody Set<Long> deviceIds) {
         try {
-            List<List<PointDataVolumeRunDO>> list = pointService.selectPointStatisticsByDeviceId(pointId,deviceIds);
+            List<List<PointDataVolumeRunDO>> list = pointService.selectPointStatisticsByDeviceId(pointId, deviceIds);
             return R.ok(list);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 当前位号下数据量
+     * 按位号id统计位号数据量
+     *
+     * @param pointId 点位id
+     * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
+     */
+    @GetMapping("/selectPointStatisticsByPointId/{pointId}")
+    @Operation(summary = "查询-当前位号数据总量")
+    public R<Long> selectPointStatisticsByPointId(@NotNull @PathVariable(value = "pointId") Long pointId) {
+        try {
+            PointDataVolumeRunDO pointDataVolumeRunDO = pointService.selectPointStatisticsByPointId(pointId);
+            return R.ok(ObjectUtil.isEmpty(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
