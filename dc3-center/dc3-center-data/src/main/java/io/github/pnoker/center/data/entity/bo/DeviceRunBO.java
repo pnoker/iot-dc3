@@ -13,9 +13,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeviceRunBO {
+    /**
+     * 设备名称
+     */
+    private String deviceName;
 
     /**
-     * 驱动状态
+     * 设备状态
      */
     private String status;
 

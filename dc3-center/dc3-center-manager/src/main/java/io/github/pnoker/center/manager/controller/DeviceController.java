@@ -212,4 +212,15 @@ public class DeviceController implements BaseController {
         }
     }
 
+    @GetMapping("/getDeviceByDriverId/{driverId}")
+    public R<String> getDeviceByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+        try {
+            List<DeviceBO> deviceBOS = deviceService.selectByDriverId(driverId);
+            return R.ok(String.valueOf(deviceBOS.size()));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+
 }

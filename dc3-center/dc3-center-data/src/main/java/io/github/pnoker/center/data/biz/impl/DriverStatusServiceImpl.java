@@ -90,9 +90,16 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public DriverRunBO selectOnlineByDriverId(Long driverId) {
          List<DriverRunDO> driverRunDOS= driverRunService.get7daysDuration(driverId,DriverStatusEnum.ONLINE.getCode());
+        GrpcByDriverQueryDTO.Builder builder = GrpcByDriverQueryDTO.newBuilder();
+        builder.setDriverId(driverId);
+        GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
+        if (!rDriverDTO.getResult().getOk()) {
+            throw new RuntimeException("Grpc Failed");
+        }
          DriverRunBO driverRunBO= new DriverRunBO();
          List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
+        driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         driverRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
         if (ObjectUtil.isEmpty(driverRunDOS)){
             driverRunBO.setDuration(list);
@@ -108,10 +115,17 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public DriverRunBO selectOfflineByDriverId(Long driverId) {
         List<DriverRunDO> driverRunDOS= driverRunService.get7daysDuration(driverId,DriverStatusEnum.OFFLINE.getCode());
+        GrpcByDriverQueryDTO.Builder builder = GrpcByDriverQueryDTO.newBuilder();
+        builder.setDriverId(driverId);
+        GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
+        if (!rDriverDTO.getResult().getOk()) {
+            throw new RuntimeException("Grpc Failed");
+        }
         DriverRunBO driverRunBO= new DriverRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         driverRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
+        driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         if (ObjectUtil.isEmpty(driverRunDOS)){
             driverRunBO.setDuration(list);
             return driverRunBO;
