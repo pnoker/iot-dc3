@@ -90,4 +90,5 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * @return File Path
      */
     Path generateImportTemplate(DeviceBO entityBO);
+
 }

@@ -14,7 +14,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DriverRunBO {
-
+    /**
+     * 驱动名称
+     */
+    private String driverName;
     /**
      * 驱动状态
      */

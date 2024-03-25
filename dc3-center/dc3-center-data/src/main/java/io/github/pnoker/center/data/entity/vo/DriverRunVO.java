@@ -17,7 +17,8 @@ import java.util.List;
 @Schema(title = "Driver", description = "驱动7天在线/离线时长")
 public class DriverRunVO {
 
-
+    @Schema(description ="驱动名称")
+    private String driverName;
 
     @Schema(description ="驱动状态")
     private String status;

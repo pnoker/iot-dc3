@@ -103,10 +103,17 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     @Override
     public DeviceRunBO selectOnlineByDeviceId(Long deviceId) {
         List<DeviceRunDO> deviceRunDOS= deviceRunService.get7daysDuration(deviceId,DriverStatusEnum.ONLINE.getCode());
+        GrpcByDeviceDTO.Builder builder = GrpcByDeviceDTO.newBuilder();
+        builder.setDeviceId(deviceId);
+        GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
+        if (!rDeviceDTO.getResult().getOk()) {
+            throw new RuntimeException("Grpc Failed");
+        }
         DeviceRunBO deviceRunBO= new DeviceRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
+        deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
         if (ObjectUtil.isEmpty(deviceRunDOS)){
             deviceRunBO.setDuration(list);
             return deviceRunBO;
@@ -121,10 +128,17 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     @Override
     public DeviceRunBO selectOfflineByDeviceId(Long deviceId) {
         List<DeviceRunDO> deviceRunDOS= deviceRunService.get7daysDuration(deviceId,DriverStatusEnum.OFFLINE.getCode());
+        GrpcByDeviceDTO.Builder builder = GrpcByDeviceDTO.newBuilder();
+        builder.setDeviceId(deviceId);
+        GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
+        if (!rDeviceDTO.getResult().getOk()) {
+            throw new RuntimeException("Grpc Failed");
+        }
         DeviceRunBO deviceRunBO= new DeviceRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
+        deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
         if (ObjectUtil.isEmpty(deviceRunDOS)){
             deviceRunBO.setDuration(list);
             return deviceRunBO;

@@ -25,6 +25,7 @@ import io.github.pnoker.api.common.GrpcBaseDTO;
 import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
@@ -37,7 +38,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import javax.annotation.Resource;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -125,6 +128,32 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             List<DeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).collect(Collectors.toList());
 
             builder.addAllData(deviceDTOS);
+        }
+
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void selectByDeviceId(GrpcByDeviceDTO request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
+        GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
+        Set<Long> ids =new HashSet<>();
+        ids.add(request.getDeviceId());
+        List<DeviceBO> deviceBOS = deviceService.selectByIds(ids);
+        if (ObjectUtil.isNull(deviceBOS)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
+
+            DeviceDTO deviceDTO = buildDTOByDO(deviceBOS.get(0));
+
+            builder.setData(deviceDTO);
         }
 
         builder.setResult(rBuilder);

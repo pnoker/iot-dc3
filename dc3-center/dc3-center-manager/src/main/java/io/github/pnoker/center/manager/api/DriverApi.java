@@ -36,7 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import javax.annotation.Resource;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -103,6 +105,32 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
             GrpcDriverDTO driverDTO = buildDTOByDO(entityDO);
+
+            builder.setData(driverDTO);
+        }
+
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void selectByDriverId(GrpcByDriverQueryDTO request, StreamObserver<GrpcRDriverDTO> responseObserver) {
+        GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
+        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
+        Set<Long> ids =new HashSet<>();
+        ids.add(request.getDriverId());
+        List<DriverBO> driverBOS = driverService.selectByIds(ids);
+        if (ObjectUtil.isNull(driverBOS)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
+
+            GrpcDriverDTO driverDTO = buildDTOByDO(driverBOS.get(0));
 
             builder.setData(driverDTO);
         }
