@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
@@ -32,9 +48,10 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
 
     @Resource
     private DriverStatusHistoryManager driverStatusHistoryService;
+
     @Override
     public void driverOnline() {
-        DriverQuery driverQuery =new DriverQuery();
+        DriverQuery driverQuery = new DriverQuery();
         driverQuery.setTenantId(1L);
         driverQuery.setPage(new Pages());
         driverQuery.getPage().setCurrent(1);
@@ -49,9 +66,9 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
         GrpcRPageDriverDTO list = driverApiBlockingStub.list(query.build());
         GrpcPageDriverDTO data = list.getData();
         List<GrpcDriverDTO> dataList = data.getDataList();
-        if (ObjectUtils.isNotEmpty(dataList)){
+        if (ObjectUtils.isNotEmpty(dataList)) {
             List<DriverStatusHistoryDO> driverStatusHistoryDOS = new ArrayList<>();
-            dataList.forEach(driverDO->{
+            dataList.forEach(driverDO -> {
                 String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverDO.getBase().getId();
                 String status = redisService.getKey(key);
                 status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
@@ -61,11 +78,12 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
                 driverStatusHistoryDO.setStatus(status);
                 driverStatusHistoryDOS.add(driverStatusHistoryDO);
             });
-            if (driverStatusHistoryDOS!=null&&driverStatusHistoryDOS.size()>0){
+            if (driverStatusHistoryDOS != null && driverStatusHistoryDOS.size() > 0) {
                 driverStatusHistoryService.saveBatch(driverStatusHistoryDOS);
             }
         }
     }
+
     private static GrpcDriverDTO.Builder buildDTOByQuery(DriverQuery pageQuery) {
         GrpcDriverDTO.Builder builder = GrpcDriverDTO.newBuilder();
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverName())) {

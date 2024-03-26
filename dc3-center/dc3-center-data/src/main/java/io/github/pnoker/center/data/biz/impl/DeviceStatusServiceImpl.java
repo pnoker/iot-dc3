@@ -22,10 +22,8 @@ import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.biz.DeviceStatusService;
 import io.github.pnoker.center.data.entity.bo.DeviceRunBO;
-import io.github.pnoker.center.data.entity.bo.DriverRunBO;
 import io.github.pnoker.center.data.entity.builder.DeviceDurationBuilder;
 import io.github.pnoker.center.data.entity.model.DeviceRunDO;
-import io.github.pnoker.center.data.entity.model.DriverRunDO;
 import io.github.pnoker.center.data.entity.query.DeviceQuery;
 import io.github.pnoker.center.data.service.DeviceRunService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
@@ -102,24 +100,24 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Override
     public DeviceRunBO selectOnlineByDeviceId(Long deviceId) {
-        List<DeviceRunDO> deviceRunDOS= deviceRunService.get7daysDuration(deviceId,DriverStatusEnum.ONLINE.getCode());
+        List<DeviceRunDO> deviceRunDOS = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
         GrpcByDeviceDTO.Builder builder = GrpcByDeviceDTO.newBuilder();
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDeviceDTO.getResult().getOk()) {
             throw new RuntimeException("Grpc Failed");
         }
-        DeviceRunBO deviceRunBO= new DeviceRunBO();
+        DeviceRunBO deviceRunBO = new DeviceRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
-        if (ObjectUtil.isEmpty(deviceRunDOS)){
+        if (ObjectUtil.isEmpty(deviceRunDOS)) {
             deviceRunBO.setDuration(list);
             return deviceRunBO;
         }
         for (int i = 0; i < deviceRunDOS.size(); i++) {
-            list.set(i,deviceRunDOS.get(i).getDuration());
+            list.set(i, deviceRunDOS.get(i).getDuration());
         }
         deviceRunBO.setDuration(list);
         return deviceRunBO;
@@ -127,24 +125,24 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Override
     public DeviceRunBO selectOfflineByDeviceId(Long deviceId) {
-        List<DeviceRunDO> deviceRunDOS= deviceRunService.get7daysDuration(deviceId,DriverStatusEnum.OFFLINE.getCode());
+        List<DeviceRunDO> deviceRunDOS = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
         GrpcByDeviceDTO.Builder builder = GrpcByDeviceDTO.newBuilder();
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDeviceDTO.getResult().getOk()) {
             throw new RuntimeException("Grpc Failed");
         }
-        DeviceRunBO deviceRunBO= new DeviceRunBO();
+        DeviceRunBO deviceRunBO = new DeviceRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
-        if (ObjectUtil.isEmpty(deviceRunDOS)){
+        if (ObjectUtil.isEmpty(deviceRunDOS)) {
             deviceRunBO.setDuration(list);
             return deviceRunBO;
         }
         for (int i = 0; i < deviceRunDOS.size(); i++) {
-            list.set(i,deviceRunDOS.get(i).getDuration());
+            list.set(i, deviceRunDOS.get(i).getDuration());
         }
         deviceRunBO.setDuration(list);
         return deviceRunBO;

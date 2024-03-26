@@ -18,11 +18,9 @@ package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.biz.DeviceStatusService;
 import io.github.pnoker.center.data.entity.bo.DeviceRunBO;
-import io.github.pnoker.center.data.entity.bo.DriverRunBO;
 import io.github.pnoker.center.data.entity.builder.DeviceDurationBuilder;
 import io.github.pnoker.center.data.entity.query.DeviceQuery;
 import io.github.pnoker.center.data.entity.vo.DeviceRunVO;
-import io.github.pnoker.center.data.entity.vo.DriverRunVO;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
@@ -32,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -119,8 +116,8 @@ public class DeviceStatusController implements BaseController {
     @GetMapping("/deviceOnline/{deviceId}")
     public R<DeviceRunVO> selectOnlineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            DeviceRunBO duration=   deviceStatusService.selectOnlineByDeviceId(deviceId);
-            DeviceRunVO  result= deviceDurationBuilder.buildVOByBOList(duration);
+            DeviceRunBO duration = deviceStatusService.selectOnlineByDeviceId(deviceId);
+            DeviceRunVO result = deviceDurationBuilder.buildVOByBOList(duration);
             return R.ok(result);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -137,8 +134,8 @@ public class DeviceStatusController implements BaseController {
     @GetMapping("/deviceOffline/{deviceId}")
     public R<DeviceRunVO> selectOfflineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            DeviceRunBO duration=   deviceStatusService.selectOfflineByDeviceId(deviceId);
-            DeviceRunVO  result= deviceDurationBuilder.buildVOByBOList(duration);
+            DeviceRunBO duration = deviceStatusService.selectOfflineByDeviceId(deviceId);
+            DeviceRunVO result = deviceDurationBuilder.buildVOByBOList(duration);
             return R.ok(result);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

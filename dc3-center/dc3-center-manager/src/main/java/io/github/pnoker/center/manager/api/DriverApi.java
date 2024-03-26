@@ -118,7 +118,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
     public void selectByDriverId(GrpcByDriverQueryDTO request, StreamObserver<GrpcRDriverDTO> responseObserver) {
         GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
         GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
-        Set<Long> ids =new HashSet<>();
+        Set<Long> ids = new HashSet<>();
         ids.add(request.getDriverId());
         List<DriverBO> driverBOS = driverService.selectByIds(ids);
         if (ObjectUtil.isNull(driverBOS)) {

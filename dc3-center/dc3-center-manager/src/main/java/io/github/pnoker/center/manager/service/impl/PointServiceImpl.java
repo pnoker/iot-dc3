@@ -29,17 +29,13 @@ import io.github.pnoker.center.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.center.manager.dal.PointDataVolumeRunManager;
 import io.github.pnoker.center.manager.dal.PointManager;
 import io.github.pnoker.center.manager.dal.ProfileBindManager;
-import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.DeviceByPointBO;
-import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.entity.model.*;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.mapper.PointMapper;
-import io.github.pnoker.center.manager.service.DeviceService;
-import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -206,9 +202,9 @@ public class PointServiceImpl implements PointService {
                 deviceIds.add(deviceId);
             }
         });
-        DeviceByPointBO deviceByPointBO=new DeviceByPointBO();
-        if (ObjectUtil.isNotNull(deviceIds)){
-            List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId,deviceIds));
+        DeviceByPointBO deviceByPointBO = new DeviceByPointBO();
+        if (ObjectUtil.isNotNull(deviceIds)) {
+            List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
             deviceByPointBO.setDevices(deviceDOS);
             deviceByPointBO.setCount(deviceDOS.stream().count());
         }

@@ -19,7 +19,6 @@ package io.github.pnoker.center.data.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 
