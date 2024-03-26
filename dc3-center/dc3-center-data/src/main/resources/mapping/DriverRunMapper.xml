@@ -5,7 +5,7 @@
     <select id="get7daysDuration" resultType="io.github.pnoker.center.data.entity.model.DriverRunDO">
         SELECT duration,create_time
         FROM dc3_driver_run
-        WHERE create_time  >= DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY)
+        WHERE create_time  >= DATE_SUB(CURRENT_DATE, INTERVAL 6 DAY)
                and driver_id=#{driverId}
                and status=#{status};
     </select>

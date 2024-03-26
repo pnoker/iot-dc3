@@ -18,10 +18,13 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.bo.DeviceByPointBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
+import io.github.pnoker.center.manager.entity.vo.DeviceByPointVO;
 import io.github.pnoker.center.manager.entity.vo.PointVO;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.base.BaseController;
@@ -58,6 +61,9 @@ public class PointController implements BaseController {
 
     @Resource
     private PointService pointService;
+
+    @Resource
+    private DeviceBuilder deviceBuilder;
 
 
     /**
@@ -240,10 +246,11 @@ public class PointController implements BaseController {
      */
     @GetMapping("/selectPointStatisticsWithDevice/{pointId}")
     @Operation(summary = "查询-位号被多少设备引用")
-    public R<Set<Long>> selectPointStatisticsWithDevice(@NotNull @PathVariable(value = "pointId") Long pointId) {
+    public R<DeviceByPointVO> selectPointStatisticsWithDevice(@NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
-            Set<Long> deviceIds = pointService.selectPointStatisticsWithDevice(pointId);
-            return R.ok(deviceIds);
+            DeviceByPointBO deviceByPointBO= pointService.selectPointStatisticsWithDevice(pointId);
+            DeviceByPointVO deviceByPointVO= deviceBuilder.buildVOPointByBO(deviceByPointBO);
+            return R.ok(deviceByPointVO);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
