@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,8 +78,8 @@ public class DriverStatusController implements BaseController {
     @GetMapping("/driverOnline/{driverId}")
     public R<DriverRunVO> selectOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
-            DriverRunBO duration=   driverStatusService.selectOnlineByDriverId(driverId);
-            DriverRunVO  result= driverDurationBuilder.buildVOByBOList(duration);
+            DriverRunBO duration = driverStatusService.selectOnlineByDriverId(driverId);
+            DriverRunVO result = driverDurationBuilder.buildVOByBOList(duration);
             return R.ok(result);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -97,8 +96,8 @@ public class DriverStatusController implements BaseController {
     @GetMapping("/driverOffline/{driverId}")
     public R<DriverRunVO> selectOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
-            DriverRunBO duration=   driverStatusService.selectOfflineByDriverId(driverId);
-            DriverRunVO  result= driverDurationBuilder.buildVOByBOList(duration);
+            DriverRunBO duration = driverStatusService.selectOfflineByDriverId(driverId);
+            DriverRunVO result = driverDurationBuilder.buildVOByBOList(duration);
             return R.ok(result);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -115,7 +114,7 @@ public class DriverStatusController implements BaseController {
     @GetMapping("/getDeviceOnlineByDriverId/{driverId}")
     public R<String> getDeviceOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
-           String result= driverStatusService.getDeviceOnlineByDriverId(driverId);
+            String result = driverStatusService.getDeviceOnlineByDriverId(driverId);
             return R.ok(result);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -132,7 +131,7 @@ public class DriverStatusController implements BaseController {
     @GetMapping("/getDeviceOfflineByDriverId/{driverId}")
     public R<String> getDeviceOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
-            String result= driverStatusService.getDeviceOfflineByDriverId(driverId);
+            String result = driverStatusService.getDeviceOfflineByDriverId(driverId);
             return R.ok(result);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
