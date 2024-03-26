@@ -29,10 +29,7 @@ import io.github.pnoker.center.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.center.manager.dal.PointDataVolumeRunManager;
 import io.github.pnoker.center.manager.dal.PointManager;
 import io.github.pnoker.center.manager.dal.ProfileBindManager;
-import io.github.pnoker.center.manager.entity.bo.DeviceBO;
-import io.github.pnoker.center.manager.entity.bo.DeviceByPointBO;
-import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
-import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.entity.model.*;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
@@ -216,13 +213,25 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public List<List<PointDataVolumeRunDO>> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds) {
-        List<List<PointDataVolumeRunDO>> list = new ArrayList<>();
+    public List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds) {
+        List<PointDataVolumeRunBO> list = new ArrayList<>();
         LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(7);
-        deviceIds.forEach(deviceId -> {
+        List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId,deviceIds));
+        List<Long> zero = Collections.nCopies(7, 0L);
+        ArrayList<Long> zeroList = new ArrayList<>(zero);
+        deviceDOS.forEach(deviceDO -> {
             LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
-            wrapper.eq(PointDataVolumeRunDO::getPointId, pointId).eq(PointDataVolumeRunDO::getDeviceId, deviceId).ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo);
-            list.add(pointDataVolumeRunManager.list(wrapper));
+            wrapper.eq(PointDataVolumeRunDO::getPointId, pointId).eq(PointDataVolumeRunDO::getDeviceId, deviceDO.getId()).ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo);
+            PointDataVolumeRunBO pointDataVolumeRunBO= new PointDataVolumeRunBO();
+            pointDataVolumeRunBO.setDeviceName(deviceDO.getDeviceName());
+            List<PointDataVolumeRunDO> pointDataVolumeRunDOS = pointDataVolumeRunManager.list(wrapper);
+            if (ObjectUtil.isNotEmpty(pointDataVolumeRunDOS)){
+                for (int i = 0; i < 7; i++) {
+                    zeroList.set(i,pointDataVolumeRunDOS.get(i).getTotal());
+                }
+            }
+            pointDataVolumeRunBO.setTotal(zeroList);
+            list.add(pointDataVolumeRunBO);
         });
         return list;
     }

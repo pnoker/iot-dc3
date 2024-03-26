@@ -19,7 +19,9 @@ package io.github.pnoker.center.manager.entity.builder;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.bo.PointDataVolumeRunBO;
 import io.github.pnoker.center.manager.entity.model.PointDO;
+import io.github.pnoker.center.manager.entity.vo.PointDataVolumeRunVO;
 import io.github.pnoker.center.manager.entity.vo.PointVO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
@@ -214,4 +216,6 @@ public interface PointBuilder {
     @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<PointVO> buildVOPageByBOPage(Page<PointBO> entityPageBO);
+
+    List<PointDataVolumeRunVO> buildVOPointDataByBO(List<PointDataVolumeRunBO> list);
 }
