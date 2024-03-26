@@ -18,6 +18,7 @@ package io.github.pnoker.center.manager.service;
 
 import io.github.pnoker.center.manager.entity.bo.DeviceByPointBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.bo.PointDataVolumeRunBO;
 import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.common.base.service.BaseService;
@@ -97,7 +98,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * @param deviceIds 设备id
      * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
      */
-    List<List<PointDataVolumeRunDO>> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds);
+    List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds);
 
 
 
