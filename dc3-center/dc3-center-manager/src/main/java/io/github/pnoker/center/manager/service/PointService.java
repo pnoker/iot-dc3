@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service;
 
+import io.github.pnoker.center.manager.entity.bo.DeviceByPointBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
@@ -85,7 +86,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * @param pointId 点位id
      * @return {@link Set}<{@link Long}>
      */
-    Set<Long> selectPointStatisticsWithDevice(Long pointId);
+    DeviceByPointBO selectPointStatisticsWithDevice(Long pointId);
 
     /**
      * 

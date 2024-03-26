@@ -5,7 +5,7 @@
     <select id="get7daysDuration" resultType="io.github.pnoker.center.data.entity.model.DeviceRunDO">
         SELECT duration,create_time
         FROM dc3_device_run
-        WHERE create_time  >= DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY)
+        WHERE create_time  >= DATE_SUB(CURRENT_DATE, INTERVAL 6 DAY)
           and device_id=#{driverId}
           and status=#{status};
     </select>

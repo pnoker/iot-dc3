@@ -19,7 +19,9 @@ package io.github.pnoker.center.manager.entity.builder;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.bo.DeviceByPointBO;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
+import io.github.pnoker.center.manager.entity.vo.DeviceByPointVO;
 import io.github.pnoker.center.manager.entity.vo.DeviceVO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.ext.DeviceExt;
@@ -195,4 +197,5 @@ public interface DeviceBuilder {
     Page<DeviceVO> buildVOPageByBOPage(Page<DeviceBO> entityPageBO);
 
 
+    DeviceByPointVO buildVOPointByBO(DeviceByPointBO deviceByPointBO);
 }
