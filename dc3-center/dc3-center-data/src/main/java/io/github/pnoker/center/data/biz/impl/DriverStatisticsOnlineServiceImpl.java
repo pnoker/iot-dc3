@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
@@ -46,9 +62,10 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
 
     @Resource
     private DriverRunManager driverRunManager;
+
     @Override
     public void driverStatisticsOnline() {
-        DriverQuery driverQuery =new DriverQuery();
+        DriverQuery driverQuery = new DriverQuery();
         driverQuery.setTenantId(1L);
         driverQuery.setPage(new Pages());
         driverQuery.getPage().setCurrent(1);
@@ -105,31 +122,29 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
         Set<Long> driverIds = driverRunHistoryDOS.stream().map(e -> e.getDriverId()).collect(Collectors.toSet());
         LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
-        if (driverIds!=null){
+        if (driverIds != null) {
             driverIds.forEach(
                     id -> {
                         //查出每天统计表在线时长是否有数据
                         DriverRunDO runDO = driverRunManager.getOne(new LambdaQueryWrapper<DriverRunDO>().eq(DriverRunDO::getDriverId, id)
-                                .eq(DriverRunDO::getStatus,DriverStatusEnum.ONLINE.getCode())
-                                .between(DriverRunDO::getCreateTime,startOfDay,endOfDay));
-                        DriverRunDO driverRunDO = driverRunHistoryService.getDurationDay(id,DriverStatusEnum.ONLINE.getCode(),startOfDay,endOfDay);
-                        if (runDO!=null&& driverRunDO!=null){
+                                .eq(DriverRunDO::getStatus, DriverStatusEnum.ONLINE.getCode())
+                                .between(DriverRunDO::getCreateTime, startOfDay, endOfDay));
+                        DriverRunDO driverRunDO = driverRunHistoryService.getDurationDay(id, DriverStatusEnum.ONLINE.getCode(), startOfDay, endOfDay);
+                        if (runDO != null && driverRunDO != null) {
                             driverRunDO.setId(runDO.getId());
                             driverRunManager.updateById(driverRunDO);
-                        }
-                        else if (ObjectUtils.isEmpty(runDO)&& driverRunDO!=null){
+                        } else if (ObjectUtils.isEmpty(runDO) && driverRunDO != null) {
                             driverRunManager.save(driverRunDO);
                         }
                         //查出每天统计表离线时长是否有数据
                         DriverRunDO runOffDO = driverRunManager.getOne(new LambdaQueryWrapper<DriverRunDO>().eq(DriverRunDO::getDriverId, id)
-                                .eq(DriverRunDO::getStatus,DriverStatusEnum.OFFLINE.getCode())
-                                .between(DriverRunDO::getCreateTime,startOfDay,endOfDay));
-                        DriverRunDO driverOffRunDO = driverRunHistoryService.getDurationDay(id,DriverStatusEnum.OFFLINE.getCode(),startOfDay,endOfDay);
-                        if (runOffDO!=null&& driverOffRunDO!=null){
+                                .eq(DriverRunDO::getStatus, DriverStatusEnum.OFFLINE.getCode())
+                                .between(DriverRunDO::getCreateTime, startOfDay, endOfDay));
+                        DriverRunDO driverOffRunDO = driverRunHistoryService.getDurationDay(id, DriverStatusEnum.OFFLINE.getCode(), startOfDay, endOfDay);
+                        if (runOffDO != null && driverOffRunDO != null) {
                             driverOffRunDO.setId(runOffDO.getId());
                             driverRunManager.updateById(driverOffRunDO);
-                        }
-                        else if (ObjectUtils.isEmpty(runOffDO)&& driverOffRunDO!=null){
+                        } else if (ObjectUtils.isEmpty(runOffDO) && driverOffRunDO != null) {
                             driverRunManager.save(driverOffRunDO);
                         }
                     }
@@ -137,6 +152,7 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
         }
 
     }
+
     private static GrpcDriverDTO.Builder buildDTOByQuery(DriverQuery pageQuery) {
         GrpcDriverDTO.Builder builder = GrpcDriverDTO.newBuilder();
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverName())) {

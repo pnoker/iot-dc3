@@ -22,11 +22,7 @@ import io.github.pnoker.center.manager.entity.bo.PointDataVolumeRunBO;
 import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.common.base.service.BaseService;
-import io.github.pnoker.common.entity.R;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +76,6 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     Map<Long, String> unit(Set<Long> pointIds);
 
     /**
-     *
      * 位号被多少设备引用
      * 选择点位统计设备信息
      *
@@ -90,7 +85,6 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     DeviceByPointBO selectPointStatisticsWithDevice(Long pointId);
 
     /**
-     * 
      * 位号在不同设备下的数据量
      * 按设备id统计位号数量
      *
@@ -101,17 +95,14 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds);
 
 
-
     /**
-     *
      * 当前位号下数据量
      * 按位号id统计位号数据量
      *
-     * @param pointId   点位id
+     * @param pointId 点位id
      * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
      */
     PointDataVolumeRunDO selectPointStatisticsByPointId(Long pointId);
-
 
 
 }

@@ -18,16 +18,13 @@ package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.biz.DriverStatusService;
-import io.github.pnoker.center.data.dal.DriverRunManager;
 import io.github.pnoker.center.data.entity.bo.DriverRunBO;
 import io.github.pnoker.center.data.entity.builder.DriverDurationBuilder;
 import io.github.pnoker.center.data.entity.model.DriverRunDO;
 import io.github.pnoker.center.data.entity.query.DriverQuery;
-import io.github.pnoker.center.data.entity.vo.DriverRunVO;
 import io.github.pnoker.center.data.service.DriverRunService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
@@ -89,24 +86,24 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
     @Override
     public DriverRunBO selectOnlineByDriverId(Long driverId) {
-         List<DriverRunDO> driverRunDOS= driverRunService.get7daysDuration(driverId,DriverStatusEnum.ONLINE.getCode());
+        List<DriverRunDO> driverRunDOS = driverRunService.get7daysDuration(driverId, DriverStatusEnum.ONLINE.getCode());
         GrpcByDriverQueryDTO.Builder builder = GrpcByDriverQueryDTO.newBuilder();
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
             throw new RuntimeException("Grpc Failed");
         }
-         DriverRunBO driverRunBO= new DriverRunBO();
-         List<Long> zeroList = Collections.nCopies(7, 0L);
+        DriverRunBO driverRunBO = new DriverRunBO();
+        List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         driverRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
-        if (ObjectUtil.isEmpty(driverRunDOS)){
+        if (ObjectUtil.isEmpty(driverRunDOS)) {
             driverRunBO.setDuration(list);
             return driverRunBO;
         }
         for (int i = 0; i < driverRunDOS.size(); i++) {
-            list.set(i,driverRunDOS.get(i).getDuration());
+            list.set(i, driverRunDOS.get(i).getDuration());
         }
         driverRunBO.setDuration(list);
         return driverRunBO;
@@ -114,24 +111,24 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
     @Override
     public DriverRunBO selectOfflineByDriverId(Long driverId) {
-        List<DriverRunDO> driverRunDOS= driverRunService.get7daysDuration(driverId,DriverStatusEnum.OFFLINE.getCode());
+        List<DriverRunDO> driverRunDOS = driverRunService.get7daysDuration(driverId, DriverStatusEnum.OFFLINE.getCode());
         GrpcByDriverQueryDTO.Builder builder = GrpcByDriverQueryDTO.newBuilder();
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
             throw new RuntimeException("Grpc Failed");
         }
-        DriverRunBO driverRunBO= new DriverRunBO();
+        DriverRunBO driverRunBO = new DriverRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         driverRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
-        if (ObjectUtil.isEmpty(driverRunDOS)){
+        if (ObjectUtil.isEmpty(driverRunDOS)) {
             driverRunBO.setDuration(list);
             return driverRunBO;
         }
         for (int i = 0; i < driverRunDOS.size(); i++) {
-            list.set(i,driverRunDOS.get(i).getDuration());
+            list.set(i, driverRunDOS.get(i).getDuration());
         }
         driverRunBO.setDuration(list);
         return driverRunBO;

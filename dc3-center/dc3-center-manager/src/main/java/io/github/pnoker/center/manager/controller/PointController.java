@@ -43,7 +43,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -250,8 +252,8 @@ public class PointController implements BaseController {
     @Operation(summary = "查询-位号被多少设备引用")
     public R<DeviceByPointVO> selectPointStatisticsWithDevice(@NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
-            DeviceByPointBO deviceByPointBO= pointService.selectPointStatisticsWithDevice(pointId);
-            DeviceByPointVO deviceByPointVO= deviceBuilder.buildVOPointByBO(deviceByPointBO);
+            DeviceByPointBO deviceByPointBO = pointService.selectPointStatisticsWithDevice(pointId);
+            DeviceByPointVO deviceByPointVO = deviceBuilder.buildVOPointByBO(deviceByPointBO);
             return R.ok(deviceByPointVO);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

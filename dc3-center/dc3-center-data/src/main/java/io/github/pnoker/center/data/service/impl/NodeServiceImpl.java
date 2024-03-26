@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.pnoker.center.data.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +45,7 @@ public class NodeServiceImpl implements NodeService {
         try {
             // 构建原始 PromQL 查询字符串
             String promQLQuery = "sum(rabbitmq_build_info * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
-            return queryPromethues(promQLQuery,false);
+            return queryPromethues(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -40,7 +56,7 @@ public class NodeServiceImpl implements NodeService {
     public List<RabbitMQNodeVo> queryNodeTable(String cluster) {
         try {
             // 构建原始 PromQL 查询字符串
-            String promQLQuery = "rabbitmq_build_info * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='"+cluster+"', namespace=''}";
+            String promQLQuery = "rabbitmq_build_info * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}";
             // 将原始查询字符串转换为 URL 编码格式
             String encodedQuery = URLEncoder.encode(promQLQuery, "UTF-8");
             // 构建查询 URL
@@ -74,7 +90,7 @@ public class NodeServiceImpl implements NodeService {
                 rabbitMQNodeVo.setValue(valueItem);
                 rabbitMQNodeVoList.add(rabbitMQNodeVo);
             }
-             return rabbitMQNodeVoList;
+            return rabbitMQNodeVoList;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,7 +98,7 @@ public class NodeServiceImpl implements NodeService {
     }
 
     //处理Promethues接口调用，接收数据
-    private RabbitMQDataVo queryPromethues(String promQLQuery,boolean iord) throws Exception {
+    private RabbitMQDataVo queryPromethues(String promQLQuery, boolean iord) throws Exception {
         // 将原始查询字符串转换为 URL 编码格式
         String encodedQuery = URLEncoder.encode(promQLQuery, "UTF-8");
         // 构建查询 URL
@@ -97,10 +113,10 @@ public class NodeServiceImpl implements NodeService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(jsonResponse);
             JsonNode resultNode = rootNode.path("data").path("result").get(0);
-            if(iord == true){//根据iord判断给前端的值时double类型，还是int类型
+            if (iord == true) {//根据iord判断给前端的值时double类型，还是int类型
                 double value = resultNode.path("value").get(1).asDouble();
                 values.add(value);
-            }else {
+            } else {
                 int ivalue = resultNode.path("value").get(1).asInt();
                 ivalues.add(ivalue);
             }
@@ -111,6 +127,7 @@ public class NodeServiceImpl implements NodeService {
         rabbitMQDataVo.setIvalues(ivalues);
         return rabbitMQDataVo;
     }
+
     // 发送 HTTP GET 请求并返回响应内容
     private static String sendGetRequest(String queryUrl) throws IOException {
         StringBuilder response = new StringBuilder();
@@ -125,6 +142,7 @@ public class NodeServiceImpl implements NodeService {
         }
         return response.toString();
     }
+
     private List<Long> TimeUnix() {
         // 获取当前时间并转换为 UTC 时间
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -141,6 +159,7 @@ public class NodeServiceImpl implements NodeService {
         }
         return timestamps;
     }
+
     public static String UnTimeUnix(Double dtime) {
         // 将 UNIX 时间戳转换为 Instant 对象
         Instant instant = Instant.ofEpochSecond(Math.round(dtime));// 2024-03-18 08:04:00
