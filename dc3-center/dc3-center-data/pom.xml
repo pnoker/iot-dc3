@@ -83,7 +83,11 @@
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-redis</artifactId>
         </dependency>
-
+        <!-- Webflux -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
