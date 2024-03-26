@@ -203,9 +203,9 @@ public class PointServiceImpl implements PointService {
                 deviceIds.add(deviceId);
             }
         });
-        DeviceByPointBO deviceByPointBO=new DeviceByPointBO();
-        if (ObjectUtil.isNotNull(deviceIds)){
-            List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId,deviceIds));
+        DeviceByPointBO deviceByPointBO = new DeviceByPointBO();
+        if (ObjectUtil.isNotNull(deviceIds)) {
+            List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
             deviceByPointBO.setDevices(deviceDOS);
             deviceByPointBO.setCount(deviceDOS.stream().count());
         }
@@ -216,18 +216,18 @@ public class PointServiceImpl implements PointService {
     public List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds) {
         List<PointDataVolumeRunBO> list = new ArrayList<>();
         LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(7);
-        List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId,deviceIds));
+        List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
         List<Long> zero = Collections.nCopies(7, 0L);
         ArrayList<Long> zeroList = new ArrayList<>(zero);
         deviceDOS.forEach(deviceDO -> {
             LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
             wrapper.eq(PointDataVolumeRunDO::getPointId, pointId).eq(PointDataVolumeRunDO::getDeviceId, deviceDO.getId()).ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo);
-            PointDataVolumeRunBO pointDataVolumeRunBO= new PointDataVolumeRunBO();
+            PointDataVolumeRunBO pointDataVolumeRunBO = new PointDataVolumeRunBO();
             pointDataVolumeRunBO.setDeviceName(deviceDO.getDeviceName());
             List<PointDataVolumeRunDO> pointDataVolumeRunDOS = pointDataVolumeRunManager.list(wrapper);
-            if (ObjectUtil.isNotEmpty(pointDataVolumeRunDOS)){
+            if (ObjectUtil.isNotEmpty(pointDataVolumeRunDOS)) {
                 for (int i = 0; i < 7; i++) {
-                    zeroList.set(i,pointDataVolumeRunDOS.get(i).getTotal());
+                    zeroList.set(i, pointDataVolumeRunDOS.get(i).getTotal());
                 }
             }
             pointDataVolumeRunBO.setTotal(zeroList);
