@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
@@ -5,13 +21,9 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.biz.DeviceOnlineJobService;
-import io.github.pnoker.center.data.biz.DriverOnlineJobService;
 import io.github.pnoker.center.data.dal.DeviceStatusHistoryManager;
-import io.github.pnoker.center.data.dal.DriverStatusHistoryManager;
 import io.github.pnoker.center.data.entity.model.DeviceStatusHistoryDO;
-import io.github.pnoker.center.data.entity.model.DriverStatusHistoryDO;
 import io.github.pnoker.center.data.entity.query.DeviceQuery;
-import io.github.pnoker.center.data.entity.query.DriverQuery;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -36,9 +48,10 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
 
     @Resource
     private DeviceStatusHistoryManager deviceStatusHistoryService;
+
     @Override
     public void deviceOnline() {
-        DeviceQuery deviceQuery =new DeviceQuery();
+        DeviceQuery deviceQuery = new DeviceQuery();
         deviceQuery.setTenantId(1L);
         deviceQuery.setPage(new Pages());
         deviceQuery.getPage().setCurrent(1);
@@ -53,9 +66,9 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
         GrpcRPageDeviceDTO list = deviceApiBlockingStub.list(query.build());
         GrpcPageDeviceDTO data = list.getData();
         List<DeviceDTO> dataList = data.getDataList();
-        if (ObjectUtils.isNotEmpty(dataList)){
+        if (ObjectUtils.isNotEmpty(dataList)) {
             List<DeviceStatusHistoryDO> deviceStatusHistoryDOS = new ArrayList<>();
-            dataList.forEach(driverDO->{
+            dataList.forEach(driverDO -> {
                 String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + driverDO.getBase().getId();
                 String status = redisService.getKey(key);
                 status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
@@ -66,11 +79,12 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
                 deviceStatusHistoryDO.setStatus(status);
                 deviceStatusHistoryDOS.add(deviceStatusHistoryDO);
             });
-            if (deviceStatusHistoryDOS!=null&&deviceStatusHistoryDOS.size()>0){
+            if (deviceStatusHistoryDOS != null && deviceStatusHistoryDOS.size() > 0) {
                 deviceStatusHistoryService.saveBatch(deviceStatusHistoryDOS);
             }
         }
     }
+
     private static DeviceDTO.Builder buildDTOByQuery(DeviceQuery pageQuery) {
         DeviceDTO.Builder builder = DeviceDTO.newBuilder();
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {

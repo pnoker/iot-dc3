@@ -25,7 +25,6 @@ import io.github.pnoker.api.common.GrpcBaseDTO;
 import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.api.common.GrpcRDTO;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
-import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
@@ -90,8 +89,9 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
+
     @Override
-   public void getDeviceOnlineByDriverId(GrpcBYOnlineDriver driver, StreamObserver<GrpcBYOnlineDriverDTO> responseObserver){
+    public void getDeviceOnlineByDriverId(GrpcBYOnlineDriver driver, StreamObserver<GrpcBYOnlineDriverDTO> responseObserver) {
         GrpcBYOnlineDriverDTO.Builder builder = GrpcBYOnlineDriverDTO.newBuilder();
         GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
         List<DeviceBO> deviceBOS = deviceService.selectByDriverId(driver.getDriverId());
@@ -110,6 +110,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
+
     @Override
     public void selectByProfileId(GrpcByProfileQueryDTO request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
@@ -139,7 +140,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
     public void selectByDeviceId(GrpcByDeviceDTO request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
         GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
         GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
-        Set<Long> ids =new HashSet<>();
+        Set<Long> ids = new HashSet<>();
         ids.add(request.getDeviceId());
         List<DeviceBO> deviceBOS = deviceService.selectByIds(ids);
         if (ObjectUtil.isNull(deviceBOS)) {

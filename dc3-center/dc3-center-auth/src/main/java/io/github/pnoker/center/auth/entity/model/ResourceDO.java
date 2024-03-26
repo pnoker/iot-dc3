@@ -19,8 +19,6 @@ package io.github.pnoker.center.auth.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
-import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
 import lombok.Getter;
 import lombok.Setter;
 

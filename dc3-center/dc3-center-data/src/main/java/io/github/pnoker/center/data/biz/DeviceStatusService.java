@@ -19,7 +19,6 @@ package io.github.pnoker.center.data.biz;
 import io.github.pnoker.center.data.entity.bo.DeviceRunBO;
 import io.github.pnoker.center.data.entity.query.DeviceQuery;
 
-import java.util.List;
 import java.util.Map;
 
 /**
