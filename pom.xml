@@ -86,6 +86,7 @@
         <dc3.common.rabbitmq.version>2024.1.0</dc3.common.rabbitmq.version>
         <dc3.common.redis.version>2024.1.0</dc3.common.redis.version>
         <dc3.common.register.version>2024.1.0</dc3.common.register.version>
+        <dc3.common.repository.version>2024.1.0</dc3.common.repository.version>
         <dc3.common.tdengine.version>2024.1.0</dc3.common.tdengine.version>
         <dc3.common.thread.version>2024.1.0</dc3.common.thread.version>
         <dc3.common.transfer.version>2024.1.0</dc3.common.transfer.version>
@@ -244,6 +245,11 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-register</artifactId>
                 <version>${dc3.common.register.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-repository</artifactId>
+                <version>${dc3.common.repository.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>

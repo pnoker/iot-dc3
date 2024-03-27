@@ -53,12 +53,6 @@
         </dependency>
 
         <!-- DC3 Common 相关 -->
-        <!--
-        开发环境无需任务中心
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-job</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mongo</artifactId>
@@ -83,10 +77,9 @@
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-redis</artifactId>
         </dependency>
-        <!-- Webflux -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-repository</artifactId>
         </dependency>
     </dependencies>
 

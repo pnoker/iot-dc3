@@ -27,7 +27,7 @@ import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.common.GrpcPageDTO;
 import io.github.pnoker.center.data.biz.PointValueRepositoryService;
 import io.github.pnoker.center.data.biz.PointValueService;
-import io.github.pnoker.center.data.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.entity.builder.PointValueBuilder;
 import io.github.pnoker.center.data.entity.point.MgPointValueDO;
 import io.github.pnoker.center.data.entity.query.PointValueQuery;

@@ -17,8 +17,8 @@
 package io.github.pnoker.center.data.biz.impl;
 
 import io.github.pnoker.center.data.biz.PointValueRepositoryService;
-import io.github.pnoker.center.data.entity.bo.PointValueBO;
-import io.github.pnoker.center.data.repository.RepositoryService;
+import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.repository.RepositoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

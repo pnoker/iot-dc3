@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.entity.builder;
 
-import io.github.pnoker.center.data.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.entity.point.MgPointValueDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.biz;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.data.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.entity.query.PointValueQuery;
 
 import java.util.List;

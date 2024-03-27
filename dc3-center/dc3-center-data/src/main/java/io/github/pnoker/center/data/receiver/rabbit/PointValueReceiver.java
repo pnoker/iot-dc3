@@ -19,7 +19,7 @@ package io.github.pnoker.center.data.receiver.rabbit;
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.PointValueService;
-import io.github.pnoker.center.data.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.job.PointValueJob;
 import io.github.pnoker.center.data.mqtt.service.MqttSendService;
 import io.github.pnoker.common.entity.property.MqttProperties;
