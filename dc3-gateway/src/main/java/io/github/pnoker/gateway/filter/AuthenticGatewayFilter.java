@@ -21,7 +21,6 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
@@ -33,12 +32,7 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.core.Ordered;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -65,7 +59,8 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
-        try {
+        // 20240327 先去掉登录限制
+        /*try {
             // Tenant, Login
             GrpcRTenantDTO rTenantDTO = getTenantDTO(request);
             GrpcRUserLoginDTO rUserLoginDTO = getLoginDTO(request);
@@ -87,7 +82,18 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(e.getMessage())));
             return response.writeWith(Mono.just(dataBuffer));
-        }
+        }*/
+
+        // 20240327 先去掉登录限制，新增一个默认的登录信息逻辑
+        ServerHttpRequest build = request.mutate().headers(headers -> {
+            RequestHeader.UserHeader entityBO = new RequestHeader.UserHeader();
+            entityBO.setUserId(1L);
+            entityBO.setNickName("张红元");
+            entityBO.setUserName("pnoker");
+            entityBO.setTenantId(1L);
+            headers.set(RequestConstant.Header.X_AUTH_USER, DecodeUtil.byteToString(DecodeUtil.encode(JsonUtil.toJsonBytes(entityBO))));
+        }).build();
+        exchange.mutate().request(build).build();
 
         return chain.filter(exchange);
     }
