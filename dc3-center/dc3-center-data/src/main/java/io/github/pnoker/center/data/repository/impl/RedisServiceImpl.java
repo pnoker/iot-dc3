@@ -17,9 +17,9 @@
 package io.github.pnoker.center.data.repository.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.center.data.entity.bo.PointValueBO;
-import io.github.pnoker.center.data.repository.RepositoryService;
-import io.github.pnoker.center.data.strategy.RepositoryStrategyFactory;
+import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.repository.RepositoryService;
+import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.StrategyConstant;

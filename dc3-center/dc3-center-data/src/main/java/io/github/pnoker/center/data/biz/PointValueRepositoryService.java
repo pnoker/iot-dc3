@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.biz;
 
-import io.github.pnoker.center.data.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.PointValueBO;
 
 import java.util.List;
 
