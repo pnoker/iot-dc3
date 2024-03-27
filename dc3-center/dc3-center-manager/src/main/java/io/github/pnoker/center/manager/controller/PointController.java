@@ -18,16 +18,12 @@ package io.github.pnoker.center.manager.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.bo.DeviceByPointBO;
-import io.github.pnoker.center.manager.entity.bo.PointBO;
-import io.github.pnoker.center.manager.entity.bo.PointDataVolumeRunBO;
+import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
-import io.github.pnoker.center.manager.entity.vo.DeviceByPointVO;
-import io.github.pnoker.center.manager.entity.vo.PointDataVolumeRunVO;
-import io.github.pnoker.center.manager.entity.vo.PointVO;
+import io.github.pnoker.center.manager.entity.vo.*;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -302,4 +298,60 @@ public class PointController implements BaseController {
         }
     }
 
+    /**
+     * 设备下位号数量
+     *
+     * @param deviceId
+     * @return
+     */
+    @GetMapping("/selectPointByDeviceId/{deviceId}")
+    @Operation(summary = "查询-设备下位号数量")
+    public R<Long> selectPointByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+        try {
+            Long count = pointService.selectPointByDeviceId(deviceId);
+            return R.ok(count);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+    /**
+     * 设备下已配置位号数量 下拉框
+     *
+     * @param deviceId
+     * @return
+     */
+    @GetMapping("/selectPointConfigByDeviceId/{deviceId}")
+    @Operation(summary = "查询-设备下已配置位号数量 下拉框")
+    public R<PointConfigByDeviceVO> selectPointConfigByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+        try {
+            PointConfigByDeviceBO pointConfigByDeviceBO = pointService.selectPointConfigByDeviceId(deviceId);
+            PointConfigByDeviceVO pointConfigByDeviceVO= pointBuilder.buildVODeviceByBO(pointConfigByDeviceBO);
+            return R.ok(pointConfigByDeviceVO);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+
+
+    /**
+     * 位号在不同位号下的数据量
+     *
+     * @param deviceId
+     * @param pointIds
+     * @return
+     */
+    @PostMapping("/selectDeviceStatisticsByPointId/{deviceId}")
+    @Operation(summary = "查询-设备在不同位号下的数据量")
+    public R<List<DeviceDataVolumeRunVO>> selectDeviceStatisticsByPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @RequestBody Set<Long> pointIds) {
+        try {
+            List<DeviceDataVolumeRunBO> list = pointService.selectDeviceStatisticsByPointId(deviceId, pointIds);
+            List<DeviceDataVolumeRunVO> deviceDataVolumeRunVOS=  pointBuilder.buildVODeviceDataByBO(list);
+            return R.ok(deviceDataVolumeRunVOS);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
 }

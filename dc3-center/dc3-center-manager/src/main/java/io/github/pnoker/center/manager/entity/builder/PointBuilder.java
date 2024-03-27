@@ -18,9 +18,13 @@ package io.github.pnoker.center.manager.entity.builder;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.manager.entity.bo.DeviceDataVolumeRunBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.bo.PointConfigByDeviceBO;
 import io.github.pnoker.center.manager.entity.bo.PointDataVolumeRunBO;
 import io.github.pnoker.center.manager.entity.model.PointDO;
+import io.github.pnoker.center.manager.entity.vo.DeviceDataVolumeRunVO;
+import io.github.pnoker.center.manager.entity.vo.PointConfigByDeviceVO;
 import io.github.pnoker.center.manager.entity.vo.PointDataVolumeRunVO;
 import io.github.pnoker.center.manager.entity.vo.PointVO;
 import io.github.pnoker.common.entity.dto.PointDTO;
@@ -218,4 +222,8 @@ public interface PointBuilder {
     Page<PointVO> buildVOPageByBOPage(Page<PointBO> entityPageBO);
 
     List<PointDataVolumeRunVO> buildVOPointDataByBO(List<PointDataVolumeRunBO> list);
+
+    PointConfigByDeviceVO buildVODeviceByBO(PointConfigByDeviceBO pointConfigByDeviceBO);
+
+    List<DeviceDataVolumeRunVO> buildVODeviceDataByBO(List<DeviceDataVolumeRunBO> list);
 }

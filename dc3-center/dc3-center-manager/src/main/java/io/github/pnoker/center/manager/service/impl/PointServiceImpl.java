@@ -244,6 +244,75 @@ public class PointServiceImpl implements PointService {
         return pointDataVolumeRunManager.getOne(wrapper);
     }
 
+    @Override
+    public Long selectPointByDeviceId(Long deviceId) {
+        ProfileBindDO bindDO = profileBindManager.getOne(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
+        Long count = 0L;
+        if (ObjectUtil.isNotEmpty(bindDO)) {
+            List<PointDO> list = pointManager.list(new LambdaQueryWrapper<PointDO>().eq(PointDO::getProfileId, bindDO.getProfileId()));
+            count = list.stream().count();
+        }
+        return count;
+    }
+
+    @Override
+    public PointConfigByDeviceBO selectPointConfigByDeviceId(Long deviceId) {
+        PointConfigByDeviceBO pointConfigByDeviceBO = new PointConfigByDeviceBO();
+        ProfileBindDO bindDO = profileBindManager.getOne(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
+        List<Long> configCount = new ArrayList<>();
+        List<Long> unConfigCount =new ArrayList<>();
+        if (ObjectUtil.isNotEmpty(bindDO)) {
+            List<PointDO> list = pointManager.list(new LambdaQueryWrapper<PointDO>().eq(PointDO::getProfileId, bindDO.getProfileId()));
+            if (ObjectUtil.isNotEmpty(list)) {
+                List<Long> profileList = list.stream().map(e -> e.getId()).collect(Collectors.toList());
+                List<PointAttributeConfigDO> list2 = pointAttributeConfigManager.list(new LambdaQueryWrapper<PointAttributeConfigDO>().eq(PointAttributeConfigDO::getDeviceId, deviceId));
+                if (ObjectUtil.isNotEmpty(list2)) {
+                    List<Long> attrList = list2.stream().map(e -> e.getPointId()).collect(Collectors.toList());
+                    //取交集
+                    attrList.retainAll(profileList);
+                    configCount.addAll(attrList);
+                    unConfigCount.addAll(profileList);
+                }
+                else {
+                    unConfigCount.addAll(profileList);
+                }
+            }
+        }
+        pointConfigByDeviceBO.setConfigCount(0L);
+        if (ObjectUtil.isNotEmpty(configCount) && ObjectUtil.isNotEmpty(unConfigCount)) {
+            List<PointDO> list = pointManager.list(new LambdaQueryWrapper<PointDO>().in(PointDO::getId, configCount));
+            pointConfigByDeviceBO.setPoints(list);
+            pointConfigByDeviceBO.setConfigCount(list.stream().count());
+        }
+        pointConfigByDeviceBO.setUnConfigCount(unConfigCount.stream().count() - pointConfigByDeviceBO.getConfigCount());
+        return pointConfigByDeviceBO;
+    }
+
+    @Override
+    public List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds) {
+        List<DeviceDataVolumeRunBO> list = new ArrayList<>();
+        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(7);
+        List<PointDO> pointDOS = pointManager.list(new LambdaQueryWrapper<PointDO>().in(PointDO::getId, pointIds));
+        List<Long> zero = Collections.nCopies(7, 0L);
+        ArrayList<Long> zeroList = new ArrayList<>(zero);
+        pointDOS.forEach(pointDO -> {
+            LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
+            wrapper.eq(PointDataVolumeRunDO::getPointId, pointDO.getId()).eq(PointDataVolumeRunDO::getDeviceId, deviceId).ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo);
+            DeviceDataVolumeRunBO deviceDataVolumeRunBO = new DeviceDataVolumeRunBO();
+            deviceDataVolumeRunBO.setPointName(pointDO.getPointName());
+            List<PointDataVolumeRunDO> pointDataVolumeRunDOS = pointDataVolumeRunManager.list(wrapper);
+            if (ObjectUtil.isNotEmpty(pointDataVolumeRunDOS)) {
+                for (int i = 0; i < 7; i++) {
+                    zeroList.set(i, pointDataVolumeRunDOS.get(i).getTotal());
+                }
+            }
+            deviceDataVolumeRunBO.setTotal(zeroList);
+            list.add(deviceDataVolumeRunBO);
+        });
+        return list;
+    }
+
+
     private LambdaQueryWrapper<PointDO> fuzzyQuery(PointQuery entityQuery) {
         QueryWrapper<PointDO> wrapper = Wrappers.query();
         wrapper.eq("dp.deleted", 0);
