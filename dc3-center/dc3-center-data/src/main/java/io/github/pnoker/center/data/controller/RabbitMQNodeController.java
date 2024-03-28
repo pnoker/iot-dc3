@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
 import io.github.pnoker.center.data.entity.vo.RabbitMQNodeVo;
-import io.github.pnoker.center.data.service.NodeService;
+import io.github.pnoker.center.data.service.RabbitMQNodeService;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -29,18 +29,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
-
+/**
+ * RabbitMQ节点 Controller
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Slf4j
 @RestController
-@RequestMapping(DataConstant.RABBITMQ_NODES_URL_PREFIX)
+@RequestMapping(DataConstant.RABBITMQ_NODE_URL_PREFIX)
 public class RabbitMQNodeController {
     @Resource
-    private NodeService nodeService;
+    private RabbitMQNodeService rabbitMQNodeService;
 
-    @GetMapping("/Nodes")
+    @GetMapping("/nodes")
     public R<RabbitMQDataVo> queryNodes(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = nodeService.queryNode(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQNodeService.queryNode(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -51,10 +56,10 @@ public class RabbitMQNodeController {
         return R.fail();
     }
 
-    @GetMapping("/NodesTable")
+    @GetMapping("/nodes_table")
     public R<List<RabbitMQNodeVo>> queryNodesTable(@RequestParam String cluster) {
         try {
-            List<RabbitMQNodeVo> rabbbit = nodeService.queryNodeTable(cluster);
+            List<RabbitMQNodeVo> rabbbit = rabbitMQNodeService.queryNodeTable(cluster);
             if (rabbbit != null) {
                 return R.ok(rabbbit);
             }

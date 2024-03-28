@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.ChannelService;
+import io.github.pnoker.center.data.service.RabbitMQChannelService;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -27,20 +27,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-
+/**
+ * RabbitMQ通道 Controller
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Slf4j
 @RestController
-@RequestMapping(DataConstant.RABBITMQ_CHANNELS_URL_PREFIX)
+@RequestMapping(DataConstant.RABBITMQ_CHANNEL_URL_PREFIX)
 public class RabbitMQChannelController {
 
 
     @Resource
-    private ChannelService channelService;
+    private RabbitMQChannelService rabbitMQChannelService;
 
-    @GetMapping("/Chans")
+    @GetMapping("/channels")
     public R<RabbitMQDataVo> queryChans(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = channelService.queryChan(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQChannelService.queryChan(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -51,10 +56,10 @@ public class RabbitMQChannelController {
         return R.fail();
     }
 
-    @GetMapping("/ToChan")
+    @GetMapping("/channels_total")
     public R<RabbitMQDataVo> queryToChans(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = channelService.queryToChan(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQChannelService.queryToChan(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -65,10 +70,10 @@ public class RabbitMQChannelController {
         return R.fail();
     }
 
-    @GetMapping("/ChanOpen")
+    @GetMapping("/channels_open")
     public R<RabbitMQDataVo> queryChansOpen(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = channelService.queryChanOpen(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQChannelService.queryChanOpen(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -79,10 +84,10 @@ public class RabbitMQChannelController {
         return R.fail();
     }
 
-    @GetMapping("/ChanClose")
+    @GetMapping("/channels_close")
     public R<RabbitMQDataVo> queryChansClose(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = channelService.queryChanClose(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQChannelService.queryChanClose(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }

@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.data.controller;
 
-import io.github.pnoker.center.data.service.ClusterService;
+import io.github.pnoker.center.data.service.RabbitMQClusterService;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -26,19 +26,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
-
+/**
+ * RabbitMQ集群 Controller
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.RABBITMQ_CLUSTER_URL_PREFIX)
 public class RabbitMQClusterController {
 
     @Resource
-    private ClusterService clusterService;
+    private RabbitMQClusterService rabbitMQClusterService;
 
-    @GetMapping("/Cluster")
+    @GetMapping("/clusters")
     public R<List<String>> queryCluster() {
         try {
-            List<String> rabbbit = clusterService.queryCluster();
+            List<String> rabbbit = rabbitMQClusterService.queryCluster();
             if (rabbbit != null) {
                 return R.ok(rabbbit);
             }

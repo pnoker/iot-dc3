@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.PublisherService;
+import io.github.pnoker.center.data.service.RabbitMQPublisherService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
@@ -28,18 +28,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-
+/**
+ * RabbitMQ发布者 Controller
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Slf4j
 @RestController
-@RequestMapping(DataConstant.RABBITMQ_PUBLISHERS_URL_PREFIX)
+@RequestMapping(DataConstant.RABBITMQ_PUBLISHER_URL_PREFIX)
 public class RabbitMQPublisherController implements BaseController {
     @Resource
-    private PublisherService publisherService;
+    private RabbitMQPublisherService rabbitMQPublisherService;
 
-    @GetMapping("/Pubs")
+    @GetMapping("/publishers")
     public R<RabbitMQDataVo> queryPubs(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = publisherService.queryPub(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQPublisherService.queryPub(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }

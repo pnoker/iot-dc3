@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.ConsumerService;
+import io.github.pnoker.center.data.service.RabbitMQConsumerService;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -27,18 +27,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-
+/**
+ * RabbitMQ消费者 Controller
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Slf4j
 @RestController
-@RequestMapping(DataConstant.RABBITMQ_CONSUMERS_URL_PREFIX)
+@RequestMapping(DataConstant.RABBITMQ_CONSUMER_URL_PREFIX)
 public class RabbitMQConsumerController {
     @Resource
-    private ConsumerService consumerService;
+    private RabbitMQConsumerService rabbitMQConsumerService;
 
-    @GetMapping("/Cons")
+    @GetMapping("/consumers")
     public R<RabbitMQDataVo> queryCons(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = consumerService.queryCon(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQConsumerService.queryCon(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }

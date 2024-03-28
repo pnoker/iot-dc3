@@ -19,7 +19,10 @@ package io.github.pnoker.center.data.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.ChannelService;
+import io.github.pnoker.center.data.service.RabbitMQPublisherService;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -32,50 +35,21 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * <p>
+ * RabbitMQPublisher Service Impl
+ * </p>
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Service
-public class ChannelServiceImpl implements ChannelService {
+public class RabbitMQPublisherServiceImpl implements RabbitMQPublisherService {
     @Override
-    public RabbitMQDataVo queryChan(String cluster) {
+    public RabbitMQDataVo queryPub(String cluster) {
         try {
             // 构建原始 PromQL 查询字符串
-            String promQLQuery = "sum(rabbitmq_channels * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
-            return queryPromethues(promQLQuery, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public RabbitMQDataVo queryToChan(String cluster) {
-        try {
-            // 构建原始 PromQL 查询字符串
-            String promQLQuery = "rabbitmq_channels * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}";
-            return queryPromethues(promQLQuery, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public RabbitMQDataVo queryChanOpen(String cluster) {
-        try {
-            // 构建原始 PromQL 查询字符串
-            String promQLQuery = "sum(rate(rabbitmq_channels_opened_total[60s]) * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
-            return queryPromethues(promQLQuery, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public RabbitMQDataVo queryChanClose(String cluster) {
-        try {
-            // 构建原始 PromQL 查询字符串
-            String promQLQuery = "sum(rate(rabbitmq_channels_closed_total[60s]) * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
+            String promQLQuery = "sum(rabbitmq_global_publishers * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
             return queryPromethues(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,17 +90,16 @@ public class ChannelServiceImpl implements ChannelService {
 
     // 发送 HTTP GET 请求并返回响应内容
     private static String sendGetRequest(String queryUrl) throws IOException {
-        StringBuilder response = new StringBuilder();
-        URL url = new URL(queryUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                response.append(line);
-            }
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(queryUrl)
+                .get()
+                .build();
+        Response response = client.newCall(request).execute();
+        if (!response.isSuccessful() || response.body() == null) {
+            throw new IOException("Request failed or empty response");
         }
-        return response.toString();
+        return response.body().string();
     }
 
     private List<Long> TimeUnix() {
@@ -147,3 +120,5 @@ public class ChannelServiceImpl implements ChannelService {
     }
 
 }
+
+
