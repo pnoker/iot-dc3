@@ -17,7 +17,18 @@
 package io.github.pnoker.center.data.service;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
+/**
+ * RabbitMQCluster Interface
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
+public interface RabbitMQConnectionService {
+    RabbitMQDataVo queryConn(String cluster);
 
-public interface PublisherService {
-    RabbitMQDataVo queryPub(String cluster);
+    RabbitMQDataVo queryToConn(String cluster);
+
+    RabbitMQDataVo queryConnOpen(String cluster);
+
+    RabbitMQDataVo queryConnClose(String cluster);
 }

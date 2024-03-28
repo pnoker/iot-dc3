@@ -17,19 +17,18 @@
 package io.github.pnoker.center.data.service;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
+/**
+ * RabbitMQChannel Interface
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
+public interface RabbitMQChannelService {
+    RabbitMQDataVo queryChan(String cluster);
 
-public interface QueueService {
-    RabbitMQDataVo queryQue(String cluster);
+    RabbitMQDataVo queryToChan(String cluster);
 
-    RabbitMQDataVo readyToCons(String cluster);
+    RabbitMQDataVo queryChanOpen(String cluster);
 
-    RabbitMQDataVo pendToCons(String cluster);
-
-    RabbitMQDataVo queryToQue(String cluster);
-
-    RabbitMQDataVo queryQueDec(String cluster);
-
-    RabbitMQDataVo queryQueCre(String cluster);
-
-    RabbitMQDataVo queryQueDel(String cluster);
+    RabbitMQDataVo queryChanClose(String cluster);
 }
