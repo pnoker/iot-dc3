@@ -212,6 +212,11 @@ public class DeviceController implements BaseController {
         }
     }
 
+    /**
+     * 驱动下设备数量
+     * @param driverId
+     * @return
+     */
     @GetMapping("/getDeviceByDriverId/{driverId}")
     public R<String> getDeviceByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {

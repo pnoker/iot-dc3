@@ -104,12 +104,15 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
 
     /**
      * 设备下位号数量
+     *
      * @param deviceId
      * @return
      */
     Long selectPointByDeviceId(Long deviceId);
+
     /**
      * 设备下位号数量 已配置
+     *
      * @param deviceId
      * @return
      */
@@ -117,9 +120,34 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
 
     /**
      * 设备在不同位号下的数据量
+     *
      * @param deviceId
      * @param pointIds
      * @return
      */
     List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds);
+
+    /**
+     * 驱动下位号数量
+     *
+     * @param driverId
+     * @return
+     */
+    PointDataVolumeRunDO selectPointDataByDriverId(Long driverId);
+
+    /**
+     * 驱动下位号数量
+     *
+     * @param driverId
+     * @return
+     */
+    Long selectPointByDriverId(Long driverId);
+
+    /**
+     * 统计7天驱动下位号数据量
+     *
+     * @param driverId
+     * @return
+     */
+    PointDataStatisticsByDriverIdBO selectPointDataStatisticsByDriverId(Long driverId);
 }
