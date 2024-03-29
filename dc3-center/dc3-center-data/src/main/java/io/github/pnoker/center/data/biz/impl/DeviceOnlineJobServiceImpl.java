@@ -29,7 +29,7 @@ import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverStatusEnum;
-import io.github.pnoker.common.redis.RedisService;
+import io.github.pnoker.common.redis.service.RedisService;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
