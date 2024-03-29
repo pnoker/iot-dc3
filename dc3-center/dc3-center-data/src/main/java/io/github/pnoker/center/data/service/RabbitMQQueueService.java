@@ -17,12 +17,24 @@
 package io.github.pnoker.center.data.service;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.entity.vo.RabbitMQNodeVo;
+/**
+ * RabbitMQQueue Interface
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
+public interface RabbitMQQueueService {
+    RabbitMQDataVo queryQue(String cluster);
 
-import java.util.List;
+    RabbitMQDataVo readyToCons(String cluster);
 
-public interface NodeService {
-    RabbitMQDataVo queryNode(String cluster);
+    RabbitMQDataVo pendToCons(String cluster);
 
-    List<RabbitMQNodeVo> queryNodeTable(String cluster);
+    RabbitMQDataVo queryToQue(String cluster);
+
+    RabbitMQDataVo queryQueDec(String cluster);
+
+    RabbitMQDataVo queryQueCre(String cluster);
+
+    RabbitMQDataVo queryQueDel(String cluster);
 }

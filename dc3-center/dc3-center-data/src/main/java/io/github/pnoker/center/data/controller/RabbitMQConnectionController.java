@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.ConnectionService;
+import io.github.pnoker.center.data.service.RabbitMQConnectionService;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -27,18 +27,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-
+/**
+ * RabbitMQ连接 Controller
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Slf4j
 @RestController
-@RequestMapping(DataConstant.RABBITMQ_CONNECTIONS_URL_PREFIX)
+@RequestMapping(DataConstant.RABBITMQ_CONNECTION_URL_PREFIX)
 public class RabbitMQConnectionController {
     @Resource
-    private ConnectionService connectionService;
+    private RabbitMQConnectionService rabbitMQConnectionService;
 
-    @GetMapping("/Conns")
+    @GetMapping("/connections")
     public R<RabbitMQDataVo> queryConns(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = connectionService.queryConn(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQConnectionService.queryConn(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -49,10 +54,10 @@ public class RabbitMQConnectionController {
         return R.fail();
     }
 
-    @GetMapping("/ToConn")
+    @GetMapping("/connections_total")
     public R<RabbitMQDataVo> queryToConns(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = connectionService.queryToConn(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQConnectionService.queryToConn(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -63,10 +68,10 @@ public class RabbitMQConnectionController {
         return R.fail();
     }
 
-    @GetMapping("/ConnOpen")
+    @GetMapping("/connections_open")
     public R<RabbitMQDataVo> queryConnsOpen(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = connectionService.queryConnOpen(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQConnectionService.queryConnOpen(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -77,10 +82,10 @@ public class RabbitMQConnectionController {
         return R.fail();
     }
 
-    @GetMapping("/ConnClose")
+    @GetMapping("/connections_close")
     public R<RabbitMQDataVo> queryConnsClose(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = connectionService.queryConnClose(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQConnectionService.queryConnClose(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
