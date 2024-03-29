@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.service;
+package io.github.pnoker.center.data.biz;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
+
 /**
- * RabbitMQCluster Interface
+ * RabbitMQPublisher Interface
  *
  * @author wangshuai
  * @since 2024.3.26
  */
-public interface RabbitMQConnectionService {
-    RabbitMQDataVo queryConn(String cluster);
-
-    RabbitMQDataVo queryToConn(String cluster);
-
-    RabbitMQDataVo queryConnOpen(String cluster);
-
-    RabbitMQDataVo queryConnClose(String cluster);
+public interface RabbitMQPublisherService {
+    RabbitMQDataVo queryPub(String cluster);
 }

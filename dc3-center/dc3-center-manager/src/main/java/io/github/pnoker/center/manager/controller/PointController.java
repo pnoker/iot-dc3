@@ -271,7 +271,7 @@ public class PointController implements BaseController {
     public R<List<PointDataVolumeRunVO>> selectPointStatisticsByDeviceId(@NotNull @PathVariable(value = "pointId") Long pointId, @NotNull @RequestBody Set<Long> deviceIds) {
         try {
             List<PointDataVolumeRunBO> list = pointService.selectPointStatisticsByDeviceId(pointId, deviceIds);
-            List<PointDataVolumeRunVO> pointDataVolumeRunVO=  pointBuilder.buildVOPointDataByBO(list);
+            List<PointDataVolumeRunVO> pointDataVolumeRunVO = pointBuilder.buildVOPointDataByBO(list);
             return R.ok(pointDataVolumeRunVO);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -315,6 +315,7 @@ public class PointController implements BaseController {
             return R.fail(e.getMessage());
         }
     }
+
     /**
      * 设备下已配置位号数量 下拉框
      *
@@ -326,7 +327,7 @@ public class PointController implements BaseController {
     public R<PointConfigByDeviceVO> selectPointConfigByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             PointConfigByDeviceBO pointConfigByDeviceBO = pointService.selectPointConfigByDeviceId(deviceId);
-            PointConfigByDeviceVO pointConfigByDeviceVO= pointBuilder.buildVODeviceByBO(pointConfigByDeviceBO);
+            PointConfigByDeviceVO pointConfigByDeviceVO = pointBuilder.buildVODeviceByBO(pointConfigByDeviceBO);
             return R.ok(pointConfigByDeviceVO);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -347,7 +348,7 @@ public class PointController implements BaseController {
     public R<List<DeviceDataVolumeRunVO>> selectDeviceStatisticsByPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @RequestBody Set<Long> pointIds) {
         try {
             List<DeviceDataVolumeRunBO> list = pointService.selectDeviceStatisticsByPointId(deviceId, pointIds);
-            List<DeviceDataVolumeRunVO> deviceDataVolumeRunVOS=  pointBuilder.buildVODeviceDataByBO(list);
+            List<DeviceDataVolumeRunVO> deviceDataVolumeRunVOS = pointBuilder.buildVODeviceDataByBO(list);
             return R.ok(deviceDataVolumeRunVOS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

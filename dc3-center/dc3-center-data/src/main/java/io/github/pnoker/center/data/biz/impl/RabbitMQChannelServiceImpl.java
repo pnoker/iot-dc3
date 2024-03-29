@@ -14,42 +14,75 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.service.impl;
+package io.github.pnoker.center.data.biz.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.RabbitMQPublisherService;
+import io.github.pnoker.center.data.biz.RabbitMQChannelService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * <p>
- * RabbitMQPublisher Service Impl
+ * RabbitMQChannel Service Impl
  * </p>
  *
  * @author wangshuai
  * @since 2024.3.26
  */
 @Service
-public class RabbitMQPublisherServiceImpl implements RabbitMQPublisherService {
+public class RabbitMQChannelServiceImpl implements RabbitMQChannelService {
     @Override
-    public RabbitMQDataVo queryPub(String cluster) {
+    public RabbitMQDataVo queryChan(String cluster) {
         try {
             // 构建原始 PromQL 查询字符串
-            String promQLQuery = "sum(rabbitmq_global_publishers * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
+            String promQLQuery = "sum(rabbitmq_channels * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
+            return queryPromethues(promQLQuery, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public RabbitMQDataVo queryToChan(String cluster) {
+        try {
+            // 构建原始 PromQL 查询字符串
+            String promQLQuery = "rabbitmq_channels * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}";
+            return queryPromethues(promQLQuery, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public RabbitMQDataVo queryChanOpen(String cluster) {
+        try {
+            // 构建原始 PromQL 查询字符串
+            String promQLQuery = "sum(rate(rabbitmq_channels_opened_total[60s]) * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
+            return queryPromethues(promQLQuery, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public RabbitMQDataVo queryChanClose(String cluster) {
+        try {
+            // 构建原始 PromQL 查询字符串
+            String promQLQuery = "sum(rate(rabbitmq_channels_closed_total[60s]) * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
             return queryPromethues(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -120,5 +153,3 @@ public class RabbitMQPublisherServiceImpl implements RabbitMQPublisherService {
     }
 
 }
-
-

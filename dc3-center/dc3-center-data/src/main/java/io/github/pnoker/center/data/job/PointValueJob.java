@@ -96,7 +96,7 @@ public class PointValueJob extends QuartzJobBean {
         threadPoolExecutor.execute(() -> {
             valueLock.writeLock().lock();
             if (!POINT_VALUE_BOS.isEmpty()) {
-                pointValueService.savePointValues(POINT_VALUE_BOS);
+                pointValueService.save(POINT_VALUE_BOS);
                 clearPointValues();
             }
             valueLock.writeLock().unlock();

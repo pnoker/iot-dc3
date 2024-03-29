@@ -25,36 +25,23 @@ import io.github.pnoker.api.center.manager.GrpcPointDTO;
 import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.common.GrpcPageDTO;
-import io.github.pnoker.center.data.biz.PointValueRepositoryService;
 import io.github.pnoker.center.data.biz.PointValueService;
-import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.center.data.entity.builder.PointValueBuilder;
-import io.github.pnoker.center.data.entity.point.MgPointValueDO;
-import io.github.pnoker.center.data.entity.query.PointValueQuery;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.constant.common.SuffixConstant;
-import io.github.pnoker.common.constant.common.SymbolConstant;
-import io.github.pnoker.common.constant.driver.StorageConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
+import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.redis.RedisService;
-import io.github.pnoker.common.utils.FieldUtil;
+import io.github.pnoker.common.entity.query.PointValueQuery;
+import io.github.pnoker.common.repository.RepositoryService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -69,112 +56,108 @@ public class PointValueServiceImpl implements PointValueService {
     @GrpcClient(ManagerConstant.SERVICE_NAME)
     private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
-    @Resource
-    private PointValueBuilder pointValueBuilder;
+    @Resource(name = "redisRepositoryServiceImpl")
+    private RepositoryService redisRepositoryService;
+    @Resource(name = "mongoRepositoryServiceImpl")
+    private RepositoryService mongoRepositoryService;
 
-    @Resource
-    private PointValueRepositoryService pointValueRepositoryService;
-
-    @Resource
-    private RedisService redisService;
-    @Resource
-    private MongoTemplate mongoTemplate;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
-    public void savePointValue(PointValueBO pointValueBO) {
+    public void save(PointValueBO pointValueBO) {
         if (ObjectUtil.isNull(pointValueBO)) {
             return;
         }
 
         pointValueBO.setCreateTime(LocalDateTime.now());
-        pointValueRepositoryService.save(pointValueBO);
+        savePointValueToRepository(pointValueBO, redisRepositoryService, mongoRepositoryService);
     }
 
     @Override
-    public void savePointValues(List<PointValueBO> pointValueBOS) {
+    public void save(List<PointValueBO> pointValueBOS) {
         if (CollUtil.isEmpty(pointValueBOS)) {
             return;
         }
 
-        pointValueBOS.forEach(pointValue -> pointValue.setCreateTime(LocalDateTime.now()));
-        pointValueRepositoryService.save(pointValueBOS);
+        final Map<Long, List<PointValueBO>> group = pointValueBOS.stream()
+                .map(pointValue -> {
+                    pointValue.setCreateTime(LocalDateTime.now());
+                    return pointValue;
+                })
+                .collect(Collectors.groupingBy(PointValueBO::getDeviceId));
+
+
+        group.forEach((deviceId, values) -> {
+            // 保存批量数据到 Redis & Mongo
+            savePointValuesToRepository(deviceId, values, redisRepositoryService, mongoRepositoryService);
+        });
     }
 
     @Override
-    public Page<PointValueBO> latest(PointValueQuery pageQuery) {
-        Page<PointValueBO> pointValuePage = new Page<>();
-        if (ObjectUtil.isEmpty(pageQuery.getPage())) pageQuery.setPage(new Pages());
-        pointValuePage.setCurrent(pageQuery.getPage().getCurrent()).setSize(pageQuery.getPage().getSize());
-
-        GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
-                .setSize(pageQuery.getPage().getSize())
-                .setCurrent(pageQuery.getPage().getCurrent());
-        GrpcPointDTO.Builder builder = buildDTOByQuery(pageQuery);
-        GrpcPagePointQueryDTO.Builder query = GrpcPagePointQueryDTO.newBuilder()
-                .setPage(page)
-                .setPoint(builder);
-        if (ObjectUtil.isNotEmpty(pageQuery.getDeviceId())) {
-            query.setDeviceId(pageQuery.getDeviceId());
+    public List<String> history(Long deviceId, Long pointId, int count) {
+        if (!ObjectUtil.isAllNotEmpty(deviceId, pointId)) {
+            return Collections.emptyList();
         }
-        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.list(query.build());
+        if (count < 1) {
+            count = 100;
+        }
+        if (count > 500) {
+            count = 500;
+        }
 
+        return mongoRepositoryService.selectHistoryPointValue(deviceId, pointId, count);
+    }
+
+    @Override
+    public Page<PointValueBO> latest(PointValueQuery entityQuery) {
+        if (ObjectUtil.isEmpty(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+
+        Page<PointValueBO> entityPageBO = new Page<>();
+        entityPageBO.setCurrent(entityQuery.getPage().getCurrent()).setSize(entityQuery.getPage().getSize());
+
+        GrpcPageDTO.Builder entityPageGrpcDTO = GrpcPageDTO.newBuilder()
+                .setSize(entityQuery.getPage().getSize())
+                .setCurrent(entityQuery.getPage().getCurrent());
+        GrpcPointDTO entityGrpcDTO = buildDTOByQuery(entityQuery);
+        GrpcPagePointQueryDTO.Builder entityQueryGrpcDTO = GrpcPagePointQueryDTO.newBuilder()
+                .setPage(entityPageGrpcDTO)
+                .setPoint(entityGrpcDTO);
+        if (ObjectUtil.isNotEmpty(entityQuery.getDeviceId())) {
+            entityQueryGrpcDTO.setDeviceId(entityQuery.getDeviceId());
+        }
+        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.list(entityQueryGrpcDTO.build());
         if (!rPagePointDTO.getResult().getOk()) {
-            return pointValuePage;
+            return entityPageBO;
         }
 
         List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
         List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).collect(Collectors.toList());
-        List<PointValueBO> pointValueBOS = realtime(pageQuery.getDeviceId(), pointIds);
-        if (CollUtil.isEmpty(pointValueBOS)) {
-            pointValueBOS = latest(pageQuery.getDeviceId(), pointIds);
-        }
-        pointValuePage.setCurrent(rPagePointDTO.getData().getPage().getCurrent()).setSize(rPagePointDTO.getData().getPage().getSize()).setTotal(rPagePointDTO.getData().getPage().getTotal()).setRecords(pointValueBOS);
+        List<PointValueBO> pointValueBOS = mongoRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
+        entityPageBO.setCurrent(rPagePointDTO.getData().getPage().getCurrent()).setSize(rPagePointDTO.getData().getPage().getSize()).setTotal(rPagePointDTO.getData().getPage().getTotal()).setRecords(pointValueBOS);
 
-        // 返回最近100个非字符类型的历史值
-        if (Boolean.TRUE.equals(pageQuery.getHistory())) {
-            pointValueBOS.parallelStream().forEach(pointValue -> pointValue.setChildren(historyPointValue(pageQuery.getDeviceId(), pointValue.getPointId(), 100)));
-        }
-
-        return pointValuePage;
+        return entityPageBO;
     }
 
     @Override
     @SneakyThrows
-    public Page<PointValueBO> list(PointValueQuery pageQuery) {
-        Page<PointValueBO> pointValuePage = new Page<>();
-        if (ObjectUtil.isEmpty(pageQuery.getPage())) pageQuery.setPage(new Pages());
-
-        Criteria criteria = new Criteria();
-        Query query = new Query(criteria);
-        if (ObjectUtil.isNotEmpty(pageQuery.getDeviceId()))
-            criteria.and(FieldUtil.getField(PointValueBO::getDeviceId)).is(pageQuery.getDeviceId());
-        if (ObjectUtil.isNotEmpty(pageQuery.getPointId()))
-            criteria.and(FieldUtil.getField(PointValueBO::getPointId)).is(pageQuery.getPointId());
-
-        Pages pages = pageQuery.getPage();
-        if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
-            criteria.and(FieldUtil.getField(PointValueBO::getCreateTime)).gte(new Date(pages.getStartTime())).lte(new Date(pages.getEndTime()));
+    public Page<PointValueBO> page(PointValueQuery entityQuery) {
+        if (ObjectUtil.isEmpty(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
 
-        final String collection = ObjectUtil.isNotEmpty(pageQuery.getDeviceId()) ? StorageConstant.POINT_VALUE_PREFIX + pageQuery.getDeviceId() : PrefixConstant.POINT + SuffixConstant.VALUE;
-        long count = mongoTemplate.count(query, collection);
-        query.limit((int) pages.getSize()).skip(pages.getSize() * (pages.getCurrent() - 1));
-        query.with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValueBO::getCreateTime)));
-        List<MgPointValueDO> pointValueDOS = mongoTemplate.find(query, MgPointValueDO.class, collection);
-        List<PointValueBO> pointValueBOS = pointValueBuilder.buildBOListByDOList(pointValueDOS);
-        pointValuePage.setCurrent(pages.getCurrent()).setSize(pages.getSize()).setTotal(count).setRecords(pointValueBOS);
-        return pointValuePage;
+        return mongoRepositoryService.selectPagePointValue(entityQuery);
     }
 
     /**
      * Query to DTO
      *
      * @param pageQuery PointValuePageQuery
-     * @return PointDTO Builder
+     * @return PointDTO
      */
-    private static GrpcPointDTO.Builder buildDTOByQuery(PointValueQuery pageQuery) {
+    private static GrpcPointDTO buildDTOByQuery(PointValueQuery pageQuery) {
         GrpcPointDTO.Builder builder = GrpcPointDTO.newBuilder();
 
         if (CharSequenceUtil.isNotEmpty(pageQuery.getPointName())) {
@@ -189,45 +172,45 @@ public class PointValueServiceImpl implements PointValueService {
             builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
         }
         builder.setTenantId(pageQuery.getTenantId());
-        return builder;
+        return builder.build();
     }
 
-    public List<PointValueBO> realtime(Long deviceId, List<Long> pointIds) {
-        if (CollUtil.isEmpty(pointIds)) {
-            return Collections.emptyList();
+    /**
+     * 保存 PointValue 到指定存储服务
+     *
+     * @param pointValueBO       PointValue
+     * @param repositoryServices RepositoryService Array
+     */
+    private void savePointValueToRepository(PointValueBO pointValueBO, RepositoryService... repositoryServices) {
+        for (RepositoryService repositoryService : repositoryServices) {
+            threadPoolExecutor.execute(() -> {
+                try {
+                    repositoryService.savePointValue(pointValueBO);
+                } catch (Exception e) {
+                    log.error("Save point value to {} error {}", repositoryService.getRepositoryName(), e.getMessage());
+                }
+            });
         }
 
-        String prefix = PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + deviceId + SymbolConstant.DOT;
-        List<String> keys = pointIds.stream().map(pointId -> prefix + pointId).collect(Collectors.toList());
-        List<PointValueBO> pointValueBOS = redisService.getKey(keys);
-        return pointValueBOS.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public List<PointValueBO> latest(Long deviceId, List<Long> pointIds) {
-        if (CollUtil.isEmpty(pointIds)) {
-            return Collections.emptyList();
+    /**
+     * 保存 PointValues 到指定存储服务
+     *
+     * @param deviceId           设备ID
+     * @param pointValueBOS      PointValue Array
+     * @param repositoryServices RepositoryService Array
+     */
+    private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOS, RepositoryService... repositoryServices) {
+        for (RepositoryService repositoryService : repositoryServices) {
+            threadPoolExecutor.execute(() -> {
+                try {
+                    repositoryService.savePointValue(deviceId, pointValueBOS);
+                } catch (Exception e) {
+                    log.error("Save point values to {} error {}", repositoryService.getRepositoryName(), e.getMessage());
+                }
+            });
         }
-
-        return pointIds.stream().map(pointId -> latestPointValue(deviceId, pointId)).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private PointValueBO latestPointValue(Long deviceId, Long pointId) {
-        Criteria criteria = new Criteria();
-        Query query = new Query(criteria);
-        criteria.and(FieldUtil.getField(PointValueBO::getPointId)).is(pointId);
-        query.with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValueBO::getCreateTime)));
-
-        return mongoTemplate.findOne(query, PointValueBO.class, StorageConstant.POINT_VALUE_PREFIX + deviceId);
-    }
-
-    private List<String> historyPointValue(Long deviceId, Long pointId, int count) {
-        Criteria criteria = new Criteria();
-        Query query = new Query(criteria);
-        criteria.and(FieldUtil.getField(PointValueBO::getDeviceId)).is(deviceId).and(FieldUtil.getField(PointValueBO::getPointId)).is(pointId);
-        query.fields().include(FieldUtil.getField(PointValueBO::getValue)).exclude(FieldUtil.getField(PointValueBO::getId));
-        query.limit(count).with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(PointValueBO::getCreateTime)));
-
-        List<PointValueBO> pointValueBOS = mongoTemplate.find(query, PointValueBO.class, StorageConstant.POINT_VALUE_PREFIX + deviceId);
-        return pointValueBOS.stream().map(PointValueBO::getValue).collect(Collectors.toList());
-    }
 }

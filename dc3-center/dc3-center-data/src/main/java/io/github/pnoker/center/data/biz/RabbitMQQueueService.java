@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.service;
+package io.github.pnoker.center.data.biz;
 
-import java.util.List;
+import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
+
 /**
- * RabbitMQCluster Interface
+ * RabbitMQQueue Interface
  *
  * @author wangshuai
  * @since 2024.3.26
  */
-public interface RabbitMQClusterService {
+public interface RabbitMQQueueService {
+    RabbitMQDataVo queryQue(String cluster);
 
-    List<String> queryCluster();
+    RabbitMQDataVo readyToCons(String cluster);
+
+    RabbitMQDataVo pendToCons(String cluster);
+
+    RabbitMQDataVo queryToQue(String cluster);
+
+    RabbitMQDataVo queryQueDec(String cluster);
+
+    RabbitMQDataVo queryQueCre(String cluster);
+
+    RabbitMQDataVo queryQueDel(String cluster);
 }
