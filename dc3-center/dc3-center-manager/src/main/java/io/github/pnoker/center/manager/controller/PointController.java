@@ -355,4 +355,54 @@ public class PointController implements BaseController {
             return R.fail(e.getMessage());
         }
     }
+
+    /**
+     * 驱动下位号数据量
+     *
+     * @param driverId
+     * @return
+     */
+    @GetMapping("/selectPointDataByDriverId/{driverId}")
+    @Operation(summary = "查询-驱动下位号数据量")
+    public R<Long> selectPointDataByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+        try {
+            PointDataVolumeRunDO pointDataVolumeRunDO = pointService.selectPointDataByDriverId(driverId);
+            return R.ok(ObjectUtil.isEmpty(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 驱动下位号数量
+     *
+     * @param driverId
+     * @return
+     */
+    @GetMapping("/selectPointByDriverId/{driverId}")
+    @Operation(summary = "查询-驱动下位号数量")
+    public R<Long> selectPointByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+        try {
+            Long result = pointService.selectPointByDriverId(driverId);
+            return R.ok(result);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+
+    @GetMapping("/selectPointDataStatisticsByDriverId/{driverId}")
+    @Operation(summary = "查询-统计7天驱动下位号数据量")
+    public R<PointDataStatisticsByDriverIdVO> selectPointDataStatisticsByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+        try {
+            PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOS = pointService.selectPointDataStatisticsByDriverId(driverId);
+            PointDataStatisticsByDriverIdVO pointDataStatisticsByDriverIdVOS = pointBuilder.buildVOPointDataDriverByBO(pointDataStatisticsByDriverIdBOS);
+            return R.ok(pointDataStatisticsByDriverIdVOS);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
+    }
+
 }

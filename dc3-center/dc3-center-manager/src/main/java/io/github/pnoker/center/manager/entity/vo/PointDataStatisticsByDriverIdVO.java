@@ -14,11 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "DeviceDataVolumeRun", description = "设备在不同位号下的数据量 7天")
-public class DeviceDataVolumeRunVO {
+@Schema(title = " PointDataStatisticsByDriver", description = "统计7天驱动下位号数据量")
+public class PointDataStatisticsByDriverIdVO {
 
-    @Schema(description = "位号名称")
-    private  String pointName;
+    @Schema(description = "驱动名称")
+    private String driverName;
 
     @Schema(description = "7天数据量")
     private List<Long> total;
