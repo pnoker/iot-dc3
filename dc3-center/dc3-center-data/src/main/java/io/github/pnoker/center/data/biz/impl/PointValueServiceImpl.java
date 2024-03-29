@@ -17,6 +17,7 @@
 package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -31,7 +32,10 @@ import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
+import io.github.pnoker.common.exception.RepositoryException;
+import io.github.pnoker.common.redis.service.RedisRepositoryService;
 import io.github.pnoker.common.repository.RepositoryService;
+import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -42,6 +46,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -56,10 +61,8 @@ public class PointValueServiceImpl implements PointValueService {
     @GrpcClient(ManagerConstant.SERVICE_NAME)
     private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
-    @Resource(name = "redisRepositoryService")
-    private RepositoryService redisRepositoryService;
-    @Resource(name = "mongoRepositoryService")
-    private RepositoryService mongoRepositoryService;
+    @Resource
+    private RedisRepositoryService redisRepositoryService;
 
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
@@ -71,7 +74,7 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         pointValueBO.setCreateTime(LocalDateTime.now());
-        savePointValueToRepository(pointValueBO, redisRepositoryService, mongoRepositoryService);
+        savePointValueToRepository(pointValueBO);
     }
 
     @Override
@@ -87,11 +90,7 @@ public class PointValueServiceImpl implements PointValueService {
                 })
                 .collect(Collectors.groupingBy(PointValueBO::getDeviceId));
 
-
-        group.forEach((deviceId, values) -> {
-            // 保存批量数据到 Redis & Mongo
-            savePointValuesToRepository(deviceId, values, redisRepositoryService, mongoRepositoryService);
-        });
+        group.forEach(this::savePointValuesToRepository);
     }
 
     @Override
@@ -106,7 +105,8 @@ public class PointValueServiceImpl implements PointValueService {
             count = 500;
         }
 
-        return mongoRepositoryService.selectHistoryPointValue(deviceId, pointId, count);
+        RepositoryService repositoryService = getFirstRepositoryService();
+        return repositoryService.selectHistoryPointValue(deviceId, pointId, count);
     }
 
     @Override
@@ -135,8 +135,16 @@ public class PointValueServiceImpl implements PointValueService {
 
         List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
         List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).collect(Collectors.toList());
-        List<PointValueBO> pointValueBOS = mongoRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
-        entityPageBO.setCurrent(rPagePointDTO.getData().getPage().getCurrent()).setSize(rPagePointDTO.getData().getPage().getSize()).setTotal(rPagePointDTO.getData().getPage().getTotal()).setRecords(pointValueBOS);
+
+        List<PointValueBO> pointValueBOS = redisRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
+        if (CollUtil.isEmpty(pointValueBOS)) {
+            RepositoryService repositoryService = getFirstRepositoryService();
+            pointValueBOS = repositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
+        }
+        entityPageBO.setCurrent(rPagePointDTO.getData().getPage().getCurrent())
+                .setSize(rPagePointDTO.getData().getPage().getSize())
+                .setTotal(rPagePointDTO.getData().getPage().getTotal())
+                .setRecords(pointValueBOS);
 
         return entityPageBO;
     }
@@ -148,7 +156,8 @@ public class PointValueServiceImpl implements PointValueService {
             entityQuery.setPage(new Pages());
         }
 
-        return mongoRepositoryService.selectPagePointValue(entityQuery);
+        RepositoryService repositoryService = getFirstRepositoryService();
+        return repositoryService.selectPagePointValue(entityQuery);
     }
 
     /**
@@ -178,39 +187,60 @@ public class PointValueServiceImpl implements PointValueService {
     /**
      * 保存 PointValue 到指定存储服务
      *
-     * @param pointValueBO       PointValue
-     * @param repositoryServices RepositoryService Array
+     * @param pointValueBO PointValue
      */
-    private void savePointValueToRepository(PointValueBO pointValueBO, RepositoryService... repositoryServices) {
-        for (RepositoryService repositoryService : repositoryServices) {
-            threadPoolExecutor.execute(() -> {
-                try {
-                    repositoryService.savePointValue(pointValueBO);
-                } catch (Exception e) {
-                    log.error("Save point value to {} error {}", repositoryService.getRepositoryName(), e.getMessage());
-                }
-            });
-        }
+    private void savePointValueToRepository(PointValueBO pointValueBO) {
+        try {
+            // redis repository
+            redisRepositoryService.savePointValue(pointValueBO);
 
+            // other repository
+            RepositoryService repositoryService = getFirstRepositoryService();
+            repositoryService.savePointValue(pointValueBO);
+        } catch (Exception e) {
+            log.error("Save point value to error {}", e.getMessage());
+        }
     }
 
     /**
      * 保存 PointValues 到指定存储服务
      *
-     * @param deviceId           设备ID
-     * @param pointValueBOS      PointValue Array
-     * @param repositoryServices RepositoryService Array
+     * @param deviceId      设备ID
+     * @param pointValueBOS PointValue Array
      */
-    private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOS, RepositoryService... repositoryServices) {
-        for (RepositoryService repositoryService : repositoryServices) {
-            threadPoolExecutor.execute(() -> {
-                try {
-                    repositoryService.savePointValue(deviceId, pointValueBOS);
-                } catch (Exception e) {
-                    log.error("Save point values to {} error {}", repositoryService.getRepositoryName(), e.getMessage());
-                }
-            });
+    private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOS) {
+        try {
+            // redis repository
+            redisRepositoryService.savePointValue(deviceId, pointValueBOS);
+
+            // other repository
+            RepositoryService repositoryService = getFirstRepositoryService();
+            List<List<PointValueBO>> splitPointValueBOS = ListUtil.split(pointValueBOS, 100);
+            for (List<PointValueBO> splitPointValueBO : splitPointValueBOS) {
+                repositoryService.savePointValue(deviceId, splitPointValueBO);
+            }
+        } catch (Exception e) {
+            log.error("Save point values to error {}", e.getMessage());
         }
+    }
+
+    /**
+     * 获取数据存储服务
+     *
+     * @return RepositoryService
+     */
+    private RepositoryService getFirstRepositoryService() {
+        List<RepositoryService> repositoryServices = RepositoryStrategyFactory.get();
+        if (!repositoryServices.isEmpty() && repositoryServices.size() > 1) {
+            throw new RepositoryException("Save point values to repository error: There are multiple repository, only one is supported.");
+        }
+
+        Optional<RepositoryService> first = repositoryServices.stream().findFirst();
+        if (!first.isPresent()) {
+            throw new RepositoryException("Save point values to repository error: Please configure at least one repository.");
+        }
+
+        return first.get();
     }
 
 }
