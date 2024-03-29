@@ -14,42 +14,41 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.service.impl;
+package io.github.pnoker.center.data.biz.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.RabbitMQChannelService;
+import io.github.pnoker.center.data.biz.RabbitMQConsumerService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * <p>
- * RabbitMQChannel Service Impl
+ * RabbitMQConsumer Service Impl
  * </p>
  *
  * @author wangshuai
  * @since 2024.3.26
  */
+
 @Service
-public class RabbitMQChannelServiceImpl implements RabbitMQChannelService {
+public class RabbitMQConsumerServiceImpl implements RabbitMQConsumerService {
     @Override
-    public RabbitMQDataVo queryChan(String cluster) {
+    public RabbitMQDataVo queryCon(String cluster) {
         try {
             // 构建原始 PromQL 查询字符串
-            String promQLQuery = "sum(rabbitmq_channels * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
+            String promQLQuery = "sum(rabbitmq_consumers * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
+
             return queryPromethues(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,41 +56,6 @@ public class RabbitMQChannelServiceImpl implements RabbitMQChannelService {
         return null;
     }
 
-    @Override
-    public RabbitMQDataVo queryToChan(String cluster) {
-        try {
-            // 构建原始 PromQL 查询字符串
-            String promQLQuery = "rabbitmq_channels * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}";
-            return queryPromethues(promQLQuery, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public RabbitMQDataVo queryChanOpen(String cluster) {
-        try {
-            // 构建原始 PromQL 查询字符串
-            String promQLQuery = "sum(rate(rabbitmq_channels_opened_total[60s]) * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
-            return queryPromethues(promQLQuery, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public RabbitMQDataVo queryChanClose(String cluster) {
-        try {
-            // 构建原始 PromQL 查询字符串
-            String promQLQuery = "sum(rate(rabbitmq_channels_closed_total[60s]) * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
-            return queryPromethues(promQLQuery, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     //处理Promethues接口调用，接收数据
     private RabbitMQDataVo queryPromethues(String promQLQuery, boolean iord) throws Exception {
@@ -154,5 +118,4 @@ public class RabbitMQChannelServiceImpl implements RabbitMQChannelService {
         }
         return timestamps;
     }
-
 }

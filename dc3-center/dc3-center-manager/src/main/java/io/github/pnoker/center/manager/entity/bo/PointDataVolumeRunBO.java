@@ -15,7 +15,7 @@ public class PointDataVolumeRunBO {
     /**
      * 设备名称
      */
-    private  String deviceName;
+    private String deviceName;
     /**
      * 设备数据量 7天
      */

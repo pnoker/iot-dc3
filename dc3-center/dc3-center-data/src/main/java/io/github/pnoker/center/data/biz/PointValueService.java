@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.biz;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.center.data.entity.query.PointValueQuery;
+import io.github.pnoker.common.entity.query.PointValueQuery;
 
 import java.util.List;
 
@@ -33,29 +33,39 @@ public interface PointValueService {
      *
      * @param pointValueBO PointValue
      */
-    void savePointValue(PointValueBO pointValueBO);
+    void save(PointValueBO pointValueBO);
 
     /**
      * 批量新增 PointValue
      *
      * @param pointValueBOS PointValue Array
      */
-    void savePointValues(List<PointValueBO> pointValueBOS);
+    void save(List<PointValueBO> pointValueBOS);
 
     /**
-     * 获取带分页、排序
+     * 获取历史 PointValue
      *
-     * @param pointValueQuery PointValueDto
-     * @return Page Of PointValue
+     * @param deviceId 设备ID
+     * @param pointId  位号ID
+     * @param count    数量
+     * @return History Value Array
+     */
+    List<String> history(Long deviceId, Long pointId, int count);
+
+    /**
+     * 获取带分页、排序 最新 PointValue
+     *
+     * @param pointValueQuery Entry of Query
+     * @return Entity of BO Page
      */
     Page<PointValueBO> latest(PointValueQuery pointValueQuery);
 
     /**
-     * 获取带分页、排序
+     * 获取带分页、排序 历史 PointValue
      *
-     * @param pointValueQuery PointValueDto
-     * @return Page Of PointValue
+     * @param pointValueQuery Entry of Query
+     * @return Entity of BO Page
      */
-    Page<PointValueBO> list(PointValueQuery pointValueQuery);
+    Page<PointValueBO> page(PointValueQuery pointValueQuery);
 
 }

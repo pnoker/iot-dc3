@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.RabbitMQConnectionService;
+import io.github.pnoker.center.data.biz.RabbitMQConnectionService;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+
 /**
  * RabbitMQ连接 Controller
  *

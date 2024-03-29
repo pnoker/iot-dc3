@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.RabbitMQPublisherService;
+import io.github.pnoker.center.data.biz.RabbitMQPublisherService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+
 /**
  * RabbitMQ发布者 Controller
  *

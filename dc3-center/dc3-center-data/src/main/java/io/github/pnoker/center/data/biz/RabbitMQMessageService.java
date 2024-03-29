@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.service;
+package io.github.pnoker.center.data.biz;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
+
 /**
  * RabbitMQMessage Interface
  *

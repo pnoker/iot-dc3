@@ -104,12 +104,15 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
 
     /**
      * 设备下位号数量
+     *
      * @param deviceId
      * @return
      */
     Long selectPointByDeviceId(Long deviceId);
+
     /**
      * 设备下位号数量 已配置
+     *
      * @param deviceId
      * @return
      */
@@ -117,6 +120,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
 
     /**
      * 设备在不同位号下的数据量
+     *
      * @param deviceId
      * @param pointIds
      * @return

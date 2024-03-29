@@ -18,7 +18,7 @@ import java.util.List;
 public class PointDataVolumeRunVO {
 
     @Schema(description = "设备名称")
-    private  String deviceName;
+    private String deviceName;
     @Schema(description = "7天数据量")
     private List<Long> total;
 }

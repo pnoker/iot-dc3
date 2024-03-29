@@ -19,9 +19,9 @@ package io.github.pnoker.center.data.receiver.rabbit;
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.PointValueService;
-import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.center.data.job.PointValueJob;
 import io.github.pnoker.center.data.mqtt.service.MqttSendService;
+import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.property.MqttProperties;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +75,7 @@ public class PointValueReceiver {
             if (PointValueJob.valueSpeed.get() < batchSpeed) {
                 threadPoolExecutor.execute(() ->
                         // Save point value to Redis & MongoDB
-                        pointValueService.savePointValue(pointValueBO)
+                        pointValueService.save(pointValueBO)
                 );
             } else {
                 // Save point value to schedule

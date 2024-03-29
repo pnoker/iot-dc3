@@ -16,30 +16,15 @@
 
 package io.github.pnoker.center.data.biz;
 
-import io.github.pnoker.common.entity.bo.PointValueBO;
-
 import java.util.List;
 
 /**
- * 用户自定义数据处理服务接口
+ * RabbitMQCluster Interface
  *
- * @author pnoker
- * @since 2022.1.0
+ * @author wangshuai
+ * @since 2024.3.26
  */
-public interface PointValueRepositoryService {
+public interface RabbitMQClusterService {
 
-    /**
-     * 自定义数据处理，此处可以自定义逻辑，将数据存放到别的数据库，或者发送到别的地方
-     *
-     * @param pointValueBO PointValue
-     */
-    void save(PointValueBO pointValueBO);
-
-    /**
-     * 自定义数据处理，此处可以自定义逻辑，将数据存放到别的数据库，或者发送到别的地方
-     *
-     * @param pointValueBOS PointValue Array
-     */
-    void save(List<PointValueBO> pointValueBOS);
-
+    List<String> queryCluster();
 }

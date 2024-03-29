@@ -35,8 +35,6 @@ import io.github.pnoker.center.manager.entity.model.*;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.mapper.PointMapper;
-import io.github.pnoker.center.manager.service.DeviceService;
-import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -260,7 +258,7 @@ public class PointServiceImpl implements PointService {
         PointConfigByDeviceBO pointConfigByDeviceBO = new PointConfigByDeviceBO();
         ProfileBindDO bindDO = profileBindManager.getOne(new LambdaQueryWrapper<ProfileBindDO>().eq(ProfileBindDO::getDeviceId, deviceId));
         List<Long> configCount = new ArrayList<>();
-        List<Long> unConfigCount =new ArrayList<>();
+        List<Long> unConfigCount = new ArrayList<>();
         if (ObjectUtil.isNotEmpty(bindDO)) {
             List<PointDO> list = pointManager.list(new LambdaQueryWrapper<PointDO>().eq(PointDO::getProfileId, bindDO.getProfileId()));
             if (ObjectUtil.isNotEmpty(list)) {
@@ -272,8 +270,7 @@ public class PointServiceImpl implements PointService {
                     attrList.retainAll(profileList);
                     configCount.addAll(attrList);
                     unConfigCount.addAll(profileList);
-                }
-                else {
+                } else {
                     unConfigCount.addAll(profileList);
                 }
             }

@@ -14,43 +14,39 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.data.service.impl;
+package io.github.pnoker.center.data.biz.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.RabbitMQConnectionService;
+import io.github.pnoker.center.data.biz.RabbitMQQueueService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * <p>
- * RabbitMQConnection Service Impl
+ * RabbitMQQueue Service Impl
  * </p>
  *
  * @author wangshuai
  * @since 2024.3.26
  */
-
 @Service
-public class RabbitMQConnectionServiceImpl implements RabbitMQConnectionService {
+public class RabbitMQQueueServiceImpl implements RabbitMQQueueService {
     @Override
-    public RabbitMQDataVo queryConn(String cluster) {
+    public RabbitMQDataVo queryQue(String cluster) {
         try {
             // 构建原始 PromQL 查询字符串
-            String promQLQuery = "sum(rabbitmq_connections * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
+            String promQLQuery = "sum(rabbitmq_queues * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
             return queryPromethues(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,10 +55,10 @@ public class RabbitMQConnectionServiceImpl implements RabbitMQConnectionService 
     }
 
     @Override
-    public RabbitMQDataVo queryToConn(String cluster) {
+    public RabbitMQDataVo readyToCons(String cluster) {
         try {
             // 构建原始 PromQL 查询字符串
-            String promQLQuery = "rabbitmq_connections * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}";
+            String promQLQuery = "sum(rabbitmq_queue_messages_ready * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}) by(rabbitmq_node)";
             return queryPromethues(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,10 +67,10 @@ public class RabbitMQConnectionServiceImpl implements RabbitMQConnectionService 
     }
 
     @Override
-    public RabbitMQDataVo queryConnOpen(String cluster) {
+    public RabbitMQDataVo pendToCons(String cluster) {
         try {
             // 构建原始 PromQL 查询字符串
-            String promQLQuery = "sum(rate(rabbitmq_connections_opened_total[60s]) * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
+            String promQLQuery = "sum(rabbitmq_queue_messages_unacked * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}) by(rabbitmq_node)";
             return queryPromethues(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,10 +79,46 @@ public class RabbitMQConnectionServiceImpl implements RabbitMQConnectionService 
     }
 
     @Override
-    public RabbitMQDataVo queryConnClose(String cluster) {
+    public RabbitMQDataVo queryToQue(String cluster) {
         try {
             // 构建原始 PromQL 查询字符串
-            String promQLQuery = "sum(rate(rabbitmq_connections_closed_total[60s]) * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
+            String promQLQuery = "rabbitmq_queues * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}";
+            return queryPromethues(promQLQuery, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public RabbitMQDataVo queryQueDec(String cluster) {
+        try {
+            // 构建原始 PromQL 查询字符串
+            String promQLQuery = "sum(rate(rabbitmq_queues_declared_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}) by(rabbitmq_node)";
+            return queryPromethues(promQLQuery, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public RabbitMQDataVo queryQueCre(String cluster) {
+        try {
+            // 构建原始 PromQL 查询字符串
+            String promQLQuery = "sum(rate(rabbitmq_queues_created_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}) by(rabbitmq_node)";
+            return queryPromethues(promQLQuery, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public RabbitMQDataVo queryQueDel(String cluster) {
+        try {
+            // 构建原始 PromQL 查询字符串
+            String promQLQuery = "sum(rate(rabbitmq_queues_deleted_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}) by(rabbitmq_node)";
             return queryPromethues(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -126,7 +158,7 @@ public class RabbitMQConnectionServiceImpl implements RabbitMQConnectionService 
     }
 
     // 发送 HTTP GET 请求并返回响应内容
-    private static String sendGetRequest(String queryUrl) throws IOException {
+    private String sendGetRequest(String queryUrl) throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(queryUrl)
@@ -155,4 +187,5 @@ public class RabbitMQConnectionServiceImpl implements RabbitMQConnectionService 
         }
         return timestamps;
     }
+
 }
