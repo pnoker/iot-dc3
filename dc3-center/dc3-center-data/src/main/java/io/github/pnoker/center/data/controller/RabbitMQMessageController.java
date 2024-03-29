@@ -18,7 +18,7 @@ package io.github.pnoker.center.data.controller;
 
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.MessageService;
+import io.github.pnoker.center.data.service.RabbitMQMessageService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
@@ -29,18 +29,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-
+/**
+ * RabbitMQ消息 Controller
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Slf4j
 @RestController
-@RequestMapping(DataConstant.RABBITMQ_MESSAGES_URL_PREFIX)
+@RequestMapping(DataConstant.RABBITMQ_MESSAGE_URL_PREFIX)
 public class RabbitMQMessageController implements BaseController {
     @Resource
-    private MessageService messageService;
+    private RabbitMQMessageService rabbitMQMessageService;
 
-    @GetMapping("/InMess")
+    @GetMapping("/message_in")
     public R<RabbitMQDataVo> queryInMess(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQInMess(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQInMess(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -51,10 +56,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/ReMess")
+    @GetMapping("/message_ready")
     public R<RabbitMQDataVo> queryReMess(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQReMess(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQReMess(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -65,10 +70,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/UnackMess")
+    @GetMapping("/message_unack")
     public R<RabbitMQDataVo> queryUnackMess(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQUnackMess(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQUnackMess(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -79,10 +84,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/OutMess")
+    @GetMapping("/message_out")
     public R<RabbitMQDataVo> queryOutMess(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQOutMess(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQOutMess(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -93,10 +98,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/MessPub")
+    @GetMapping("/message_published")
     public R<RabbitMQDataVo> queryMessPub(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQMessPub(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQMessPub(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -107,10 +112,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/ConfPub")
+    @GetMapping("/message_confirm")
     public R<RabbitMQDataVo> queryConfPub(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQConfPub(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQConfPub(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -121,10 +126,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/RoutQue")
+    @GetMapping("/message_queue")
     public R<RabbitMQDataVo> queryRoutQue(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQRoutQue(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQRoutQue(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -135,11 +140,11 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/UnConfPub")
+    @GetMapping("/message_unconfirm")
     public R<RabbitMQDataVo> queryUnConfPub(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQUnConfPub(cluster);
-            if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQUnConfPub(cluster);
+            if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
         } catch (Exception e) {
@@ -149,11 +154,11 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/UnRoutDrop")
+    @GetMapping("/message_drop")
     public R<RabbitMQDataVo> queryUnRoutDrop(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQUnRoutDrop(cluster);
-            if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQUnRoutDrop(cluster);
+            if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
         } catch (Exception e) {
@@ -163,11 +168,11 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/UnRoutPub")
+    @GetMapping("/message_unroutable")
     public R<RabbitMQDataVo> queryUnRoutPub(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQUnRoutPub(cluster);
-            if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQUnRoutPub(cluster);
+            if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
         } catch (Exception e) {
@@ -177,10 +182,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/MessDel")
+    @GetMapping("/message_deliver")
     public R<RabbitMQDataVo> queryMessDel(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQMessDel(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQMessDel(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -191,10 +196,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/MessReDel")
+    @GetMapping("/message_redeliver")
     public R<RabbitMQDataVo> queryMessReDel(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQMessReDel(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQMessReDel(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -205,10 +210,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/MessDelAck")
+    @GetMapping("/message_manual")
     public R<RabbitMQDataVo> queryMessDelAck(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQMessDelAck(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQMessDelAck(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -219,10 +224,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/MessDelAuto")
+    @GetMapping("/message_auto")
     public R<RabbitMQDataVo> queryMessDelAuto(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQMessDelAuto(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQMessDelAuto(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -233,10 +238,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/MessAck")
+    @GetMapping("/message_ack")
     public R<RabbitMQDataVo> queryMessAck(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQMessAck(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQMessAck(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getValues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -247,10 +252,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/PoAutoAck")
+    @GetMapping("/poll_auto_ack")
     public R<RabbitMQDataVo> queryPoAutoAck(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQPoAutoAck(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQPoAutoAck(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -261,10 +266,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/PoNoResult")
+    @GetMapping("/poll_no_result")
     public R<RabbitMQDataVo> queryPoNoResult(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQPoNoResult(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQPoNoResult(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -275,10 +280,10 @@ public class RabbitMQMessageController implements BaseController {
         return R.fail();
     }
 
-    @GetMapping("/PoWithAck")
+    @GetMapping("/poll_manual_ack")
     public R<RabbitMQDataVo> queryPoWithAck(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = messageService.queryMQPoWithAck(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQMessageService.queryMQPoWithAck(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }

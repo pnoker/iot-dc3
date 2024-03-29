@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.controller;
 
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-import io.github.pnoker.center.data.service.QueueService;
+import io.github.pnoker.center.data.service.RabbitMQQueueService;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
@@ -27,18 +27,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-
+/**
+ * RabbitMQ队列 Controller
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Slf4j
 @RestController
-@RequestMapping(DataConstant.RABBITMQ_QUEUES_URL_PREFIX)
+@RequestMapping(DataConstant.RABBITMQ_QUEUE_URL_PREFIX)
 public class RabbitMQQueueController {
     @Resource
-    private QueueService queueService;
+    private RabbitMQQueueService rabbitMQQueueService;
 
-    @GetMapping("/Ques")
+    @GetMapping("/queues")
     public R<RabbitMQDataVo> queryQues(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = queueService.queryQue(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQQueueService.queryQue(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -49,10 +54,10 @@ public class RabbitMQQueueController {
         return R.fail();
     }
 
-    @GetMapping("/RToC")
+    @GetMapping("/queues_ready")
     public R<RabbitMQDataVo> queryRToC(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = queueService.readyToCons(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQQueueService.readyToCons(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -63,10 +68,10 @@ public class RabbitMQQueueController {
         return R.fail();
     }
 
-    @GetMapping("/PToC")
+    @GetMapping("/queues_pend")
     public R<RabbitMQDataVo> queryPToC(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = queueService.pendToCons(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQQueueService.pendToCons(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -77,10 +82,10 @@ public class RabbitMQQueueController {
         return R.fail();
     }
 
-    @GetMapping("/ToQue")
+    @GetMapping("/queues_total")
     public R<RabbitMQDataVo> queryToQue(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = queueService.queryToQue(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQQueueService.queryToQue(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -91,10 +96,10 @@ public class RabbitMQQueueController {
         return R.fail();
     }
 
-    @GetMapping("/QueDec")
+    @GetMapping("/queues_declared")
     public R<RabbitMQDataVo> queryQueDec(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = queueService.queryQueDec(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQQueueService.queryQueDec(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -105,10 +110,10 @@ public class RabbitMQQueueController {
         return R.fail();
     }
 
-    @GetMapping("/QueCre")
+    @GetMapping("/queues_create")
     public R<RabbitMQDataVo> queryQueCre(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = queueService.queryQueCre(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQQueueService.queryQueCre(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }
@@ -119,10 +124,10 @@ public class RabbitMQQueueController {
         return R.fail();
     }
 
-    @GetMapping("/QueDel")
+    @GetMapping("/queues_deleted")
     public R<RabbitMQDataVo> queryQueDel(@RequestParam String cluster) {
         try {
-            RabbitMQDataVo rabbbit = queueService.queryQueDel(cluster);
+            RabbitMQDataVo rabbbit = rabbitMQQueueService.queryQueDel(cluster);
             if (!rabbbit.getTimes().isEmpty() && !rabbbit.getIvalues().isEmpty()) {
                 return R.ok(rabbbit);
             }

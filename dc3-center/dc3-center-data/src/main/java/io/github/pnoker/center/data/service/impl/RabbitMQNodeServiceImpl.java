@@ -20,7 +20,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
 import io.github.pnoker.center.data.entity.vo.RabbitMQNodeVo;
-import io.github.pnoker.center.data.service.NodeService;
+import io.github.pnoker.center.data.service.RabbitMQNodeService;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -36,10 +39,16 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
-
+/**
+ * <p>
+ * RabbitMQNode Service Impl
+ * </p>
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Service
-public class NodeServiceImpl implements NodeService {
+public class RabbitMQNodeServiceImpl implements RabbitMQNodeService {
     @Override
     public RabbitMQDataVo queryNode(String cluster) {
         try {
@@ -130,17 +139,16 @@ public class NodeServiceImpl implements NodeService {
 
     // 发送 HTTP GET 请求并返回响应内容
     private static String sendGetRequest(String queryUrl) throws IOException {
-        StringBuilder response = new StringBuilder();
-        URL url = new URL(queryUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                response.append(line);
-            }
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(queryUrl)
+                .get()
+                .build();
+        Response response = client.newCall(request).execute();
+        if (!response.isSuccessful() || response.body() == null) {
+            throw new IOException("Request failed or empty response");
         }
-        return response.toString();
+        return response.body().string();
     }
 
     private List<Long> TimeUnix() {

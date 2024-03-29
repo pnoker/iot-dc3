@@ -16,10 +16,14 @@
 
 package io.github.pnoker.center.data.service;
 
-
 import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
-
-public interface MessageService {
+/**
+ * RabbitMQMessage Interface
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
+public interface RabbitMQMessageService {
     RabbitMQDataVo queryMQInMess(String cluster);
 
     RabbitMQDataVo queryMQReMess(String cluster);

@@ -18,7 +18,10 @@ package io.github.pnoker.center.data.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.pnoker.center.data.service.ClusterService;
+import io.github.pnoker.center.data.service.RabbitMQClusterService;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -29,9 +32,16 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * <p>
+ * RabbitMQCluster Service Impl
+ * </p>
+ *
+ * @author wangshuai
+ * @since 2024.3.26
+ */
 @Service
-public class ClusterServiceImpl implements ClusterService {
+public class RabbitMQClusterServiceImpl implements RabbitMQClusterService {
     @Override
     public List<String> queryCluster() {
         try {
@@ -60,16 +70,15 @@ public class ClusterServiceImpl implements ClusterService {
     }
 
     private static String sendGetRequest(String queryUrl) throws IOException {
-        StringBuilder response = new StringBuilder();
-        URL url = new URL(queryUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                response.append(line);
-            }
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(queryUrl)
+                .get()
+                .build();
+        Response response = client.newCall(request).execute();
+        if (!response.isSuccessful() || response.body() == null) {
+            throw new IOException("Request failed or empty response");
         }
-        return response.toString();
+        return response.body().string();
     }
 }
