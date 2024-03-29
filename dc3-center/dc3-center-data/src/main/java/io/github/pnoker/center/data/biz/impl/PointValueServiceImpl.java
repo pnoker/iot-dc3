@@ -56,9 +56,9 @@ public class PointValueServiceImpl implements PointValueService {
     @GrpcClient(ManagerConstant.SERVICE_NAME)
     private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
-    @Resource(name = "redisRepositoryServiceImpl")
+    @Resource(name = "redisRepositoryService")
     private RepositoryService redisRepositoryService;
-    @Resource(name = "mongoRepositoryServiceImpl")
+    @Resource(name = "mongoRepositoryService")
     private RepositoryService mongoRepositoryService;
 
     @Resource
