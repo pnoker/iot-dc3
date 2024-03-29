@@ -20,7 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.data.biz.DeviceEventService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
-import io.github.pnoker.common.redis.RedisService;
+import io.github.pnoker.common.redis.service.RedisService;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

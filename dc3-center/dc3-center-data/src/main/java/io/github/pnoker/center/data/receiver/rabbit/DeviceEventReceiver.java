@@ -22,7 +22,7 @@ import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.DeviceEventService;
 import io.github.pnoker.center.data.biz.EventService;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
-import io.github.pnoker.common.redis.RedisService;
+import io.github.pnoker.common.redis.service.RedisService;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
