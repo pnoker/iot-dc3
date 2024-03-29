@@ -126,4 +126,28 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * @return
      */
     List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds);
+
+    /**
+     * 驱动下位号数量
+     *
+     * @param driverId
+     * @return
+     */
+    PointDataVolumeRunDO selectPointDataByDriverId(Long driverId);
+
+    /**
+     * 驱动下位号数量
+     *
+     * @param driverId
+     * @return
+     */
+    Long selectPointByDriverId(Long driverId);
+
+    /**
+     * 统计7天驱动下位号数据量
+     *
+     * @param driverId
+     * @return
+     */
+    PointDataStatisticsByDriverIdBO selectPointDataStatisticsByDriverId(Long driverId);
 }
