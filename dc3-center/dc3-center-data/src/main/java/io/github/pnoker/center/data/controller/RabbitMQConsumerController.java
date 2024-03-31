@@ -16,8 +16,8 @@
 
 package io.github.pnoker.center.data.controller;
 
-import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
 import io.github.pnoker.center.data.biz.RabbitMQConsumerService;
+import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;

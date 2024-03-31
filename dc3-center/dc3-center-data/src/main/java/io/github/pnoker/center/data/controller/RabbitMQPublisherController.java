@@ -16,8 +16,8 @@
 
 package io.github.pnoker.center.data.controller;
 
-import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
 import io.github.pnoker.center.data.biz.RabbitMQPublisherService;
+import io.github.pnoker.center.data.entity.vo.RabbitMQDataVo;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
