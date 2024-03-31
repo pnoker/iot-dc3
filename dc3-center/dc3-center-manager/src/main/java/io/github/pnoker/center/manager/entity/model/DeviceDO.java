@@ -18,7 +18,6 @@ package io.github.pnoker.center.manager.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,7 +43,6 @@ public class DeviceDO implements Serializable {
     /**
      * 主键ID
      */
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
@@ -63,7 +61,6 @@ public class DeviceDO implements Serializable {
     /**
      * 驱动ID
      */
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @TableField("driver_id")
     private Long driverId;
 
