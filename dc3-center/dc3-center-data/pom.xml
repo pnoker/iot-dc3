@@ -32,12 +32,6 @@
 
     <dependencies>
 
-        <!-- Ok Http -->
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-        </dependency>
-
         <!-- DC3 Api 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
