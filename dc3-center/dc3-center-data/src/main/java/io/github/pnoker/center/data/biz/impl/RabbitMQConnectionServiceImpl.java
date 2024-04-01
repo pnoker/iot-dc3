@@ -125,8 +125,8 @@ public class RabbitMQConnectionServiceImpl implements RabbitMQConnectionService 
     // 发送 HTTP GET 请求并返回响应内容
     private static String sendGetRequest(String queryUrl) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
-                .callTimeout(10, TimeUnit.SECONDS) // 设置调用超时时间为10秒
-                .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间为10秒
+                .callTimeout(60, TimeUnit.SECONDS) // 设置调用超时时间为60秒
+                .connectTimeout(60, TimeUnit.SECONDS) // 设置连接超时时间为60秒
                 .readTimeout(60, TimeUnit.SECONDS) // 设置读取超时时间为60秒
                 .build();
         Request request = new Request.Builder()
