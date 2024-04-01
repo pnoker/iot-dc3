@@ -20,9 +20,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.DeviceEventService;
-import io.github.pnoker.center.data.biz.EventService;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
-import io.github.pnoker.common.redis.service.RedisService;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -32,7 +30,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 接收驱动发送过来的设备事件
@@ -43,13 +40,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Slf4j
 @Component
 public class DeviceEventReceiver {
-
-    @Resource
-    private RedisService redisService;
-    @Resource
-    private EventService eventService;
-    @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
 
     @Resource
     private DeviceEventService deviceEventService;
