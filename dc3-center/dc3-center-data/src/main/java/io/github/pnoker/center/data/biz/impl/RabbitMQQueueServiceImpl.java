@@ -47,7 +47,7 @@ public class RabbitMQQueueServiceImpl implements RabbitMQQueueService {
         try {
             // 构建原始 PromQL 查询字符串
             String promQLQuery = "sum(rabbitmq_queues * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
-            return queryPromethues(promQLQuery, false);
+            return queryPrometheus(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,7 +59,7 @@ public class RabbitMQQueueServiceImpl implements RabbitMQQueueService {
         try {
             // 构建原始 PromQL 查询字符串
             String promQLQuery = "sum(rabbitmq_queue_messages_ready * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}) by(rabbitmq_node)";
-            return queryPromethues(promQLQuery, false);
+            return queryPrometheus(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,7 +71,7 @@ public class RabbitMQQueueServiceImpl implements RabbitMQQueueService {
         try {
             // 构建原始 PromQL 查询字符串
             String promQLQuery = "sum(rabbitmq_queue_messages_unacked * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}) by(rabbitmq_node)";
-            return queryPromethues(promQLQuery, false);
+            return queryPrometheus(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,7 +83,7 @@ public class RabbitMQQueueServiceImpl implements RabbitMQQueueService {
         try {
             // 构建原始 PromQL 查询字符串
             String promQLQuery = "rabbitmq_queues * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}";
-            return queryPromethues(promQLQuery, false);
+            return queryPrometheus(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -95,7 +95,7 @@ public class RabbitMQQueueServiceImpl implements RabbitMQQueueService {
         try {
             // 构建原始 PromQL 查询字符串
             String promQLQuery = "sum(rate(rabbitmq_queues_declared_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}) by(rabbitmq_node)";
-            return queryPromethues(promQLQuery, false);
+            return queryPrometheus(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -107,7 +107,7 @@ public class RabbitMQQueueServiceImpl implements RabbitMQQueueService {
         try {
             // 构建原始 PromQL 查询字符串
             String promQLQuery = "sum(rate(rabbitmq_queues_created_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}) by(rabbitmq_node)";
-            return queryPromethues(promQLQuery, false);
+            return queryPrometheus(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,15 +119,15 @@ public class RabbitMQQueueServiceImpl implements RabbitMQQueueService {
         try {
             // 构建原始 PromQL 查询字符串
             String promQLQuery = "sum(rate(rabbitmq_queues_deleted_total[60s]) * on(instance) group_left(rabbitmq_cluster, rabbitmq_node) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''}) by(rabbitmq_node)";
-            return queryPromethues(promQLQuery, false);
+            return queryPrometheus(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    //处理Promethues接口调用，接收数据
-    private RabbitMQDataVo queryPromethues(String promQLQuery, boolean iord) throws Exception {
+    //处理Prometheus接口调用，接收数据
+    private RabbitMQDataVo queryPrometheus(String promQLQuery, boolean iord) throws Exception {
         // 将原始查询字符串转换为 URL 编码格式
         String encodedQuery = URLEncoder.encode(promQLQuery, "UTF-8");
         // 获取当前时间并转换为 UTC 时间
