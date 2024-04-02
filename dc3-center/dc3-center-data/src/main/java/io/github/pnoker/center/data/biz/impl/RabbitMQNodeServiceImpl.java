@@ -25,7 +25,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
-import java.util.concurrent.TimeUnit;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.Instant;
@@ -35,6 +35,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -115,7 +116,7 @@ public class RabbitMQNodeServiceImpl implements RabbitMQNodeService {
         long time2 = now.toEpochSecond(ZoneOffset.UTC);
         // 构建查询 URL
         String queryUrl = "http://10.6.0.107:9090/api/v1/query_range?query=" + encodedQuery;
-        String jsonResponse = sendGetRequest(queryUrl+"&start="+time1+"&end="+time2+"&step=15");
+        String jsonResponse = sendGetRequest(queryUrl + "&start=" + time1 + "&end=" + time2 + "&step=15");
         // 解析 JSON 响应
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootNode = objectMapper.readTree(jsonResponse);
