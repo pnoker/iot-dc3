@@ -49,7 +49,7 @@ public class RabbitMQConsumerServiceImpl implements RabbitMQConsumerService {
             // 构建原始 PromQL 查询字符串
             String promQLQuery = "sum(rabbitmq_consumers * on(instance) group_left(rabbitmq_cluster) rabbitmq_identity_info{rabbitmq_cluster='" + cluster + "', namespace=''})";
 
-            return queryPromethues(promQLQuery, false);
+            return queryPrometheus(promQLQuery, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,8 +57,8 @@ public class RabbitMQConsumerServiceImpl implements RabbitMQConsumerService {
     }
 
 
-    //处理Promethues接口调用，接收数据
-    private RabbitMQDataVo queryPromethues(String promQLQuery, boolean iord) throws Exception {
+    //处理Prometheus接口调用，接收数据
+    private RabbitMQDataVo queryPrometheus(String promQLQuery, boolean iord) throws Exception {
         // 将原始查询字符串转换为 URL 编码格式
         String encodedQuery = URLEncoder.encode(promQLQuery, "UTF-8");
         // 获取当前时间并转换为 UTC 时间
