@@ -23,11 +23,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
-import java.util.concurrent.TimeUnit;
+
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -68,8 +69,8 @@ public class RabbitMQClusterServiceImpl implements RabbitMQClusterService {
 
     private static String sendGetRequest(String queryUrl) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
-                .callTimeout(10, TimeUnit.SECONDS) // 设置调用超时时间为10秒
-                .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间为10秒
+                .callTimeout(60, TimeUnit.SECONDS) // 设置调用超时时间为60秒
+                .connectTimeout(60, TimeUnit.SECONDS) // 设置连接超时时间为60秒
                 .readTimeout(60, TimeUnit.SECONDS) // 设置读取超时时间为60秒
                 .build();
         Request request = new Request.Builder()
