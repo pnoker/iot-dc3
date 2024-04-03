@@ -81,6 +81,7 @@
         <dc3.common.mongo.version>2024.1.0</dc3.common.mongo.version>
         <dc3.common.mqtt.version>2024.1.0</dc3.common.mqtt.version>
         <dc3.common.mysql.version>2024.1.0</dc3.common.mysql.version>
+        <dc3.common.prometheus.version>2024.1.0</dc3.common.prometheus.version>
         <dc3.common.public.version>2024.1.0</dc3.common.public.version>
         <dc3.common.quartz.version>2024.1.0</dc3.common.quartz.version>
         <dc3.common.rabbitmq.version>2024.1.0</dc3.common.rabbitmq.version>
@@ -220,6 +221,11 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-mysql</artifactId>
                 <version>${dc3.common.mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-prometheus</artifactId>
+                <version>${dc3.common.prometheus.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
