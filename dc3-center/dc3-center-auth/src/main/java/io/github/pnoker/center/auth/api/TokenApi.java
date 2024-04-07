@@ -21,7 +21,7 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.GrpcLoginQuery;
 import io.github.pnoker.api.center.auth.GrpcRTokenDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
-import io.github.pnoker.api.common.GrpcRDTO;
+import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.center.auth.biz.TokenService;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.enums.ResponseEnum;
@@ -46,10 +46,10 @@ public class TokenApi extends TokenApiGrpc.TokenApiImplBase {
     private TokenService tokenService;
 
     @Override
-    public void checkTokenValid(GrpcLoginQuery request, StreamObserver<GrpcRTokenDTO> responseObserver) {
+    public void checkValid(GrpcLoginQuery request, StreamObserver<GrpcRTokenDTO> responseObserver) {
         GrpcRTokenDTO.Builder builder = GrpcRTokenDTO.newBuilder();
-        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
-        TokenValid select = tokenService.checkTokenValid(request.getName(), request.getSalt(), request.getToken(), request.getTenant());
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        TokenValid select = tokenService.checkValid(request.getName(), request.getSalt(), request.getToken(), request.getTenant());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());

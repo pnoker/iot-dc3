@@ -20,9 +20,9 @@ package io.github.pnoker.center.manager.api;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.GrpcBaseDTO;
-import io.github.pnoker.api.common.GrpcPageDTO;
-import io.github.pnoker.api.common.GrpcRDTO;
+import io.github.pnoker.api.common.GrpcBase;
+import io.github.pnoker.api.common.GrpcPage;
+import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.service.PointService;
@@ -55,9 +55,9 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
     private PointService pointService;
 
     @Override
-    public void list(GrpcPagePointQueryDTO request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
+    public void list(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
         GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
-        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         PointQuery pageQuery = buildPageQuery(request);
 
@@ -72,7 +72,7 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
             GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
-            GrpcPageDTO.Builder pageBuilder = GrpcPageDTO.newBuilder();
+            GrpcPage.Builder pageBuilder = GrpcPage.newBuilder();
             pageBuilder.setCurrent(pointPage.getCurrent());
             pageBuilder.setSize(pointPage.getSize());
             pageBuilder.setPages(pointPage.getPages());
@@ -95,21 +95,20 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
      * @param request PagePointQueryDTO
      * @return PointPageQuery
      */
-    private PointQuery buildPageQuery(GrpcPagePointQueryDTO request) {
+    private PointQuery buildPageQuery(GrpcPagePointQuery request) {
         PointQuery pageQuery = new PointQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());
         pageQuery.setPage(pages);
 
-        GrpcPointDTO point = request.getPoint();
         pageQuery.setDeviceId(request.getDeviceId() > DefaultConstant.DEFAULT_INT ? request.getDeviceId() : null);
-        pageQuery.setPointName(point.getPointName());
-        pageQuery.setProfileId(point.getProfileId() > DefaultConstant.DEFAULT_INT ? point.getProfileId() : null);
-        pageQuery.setPointTypeFlag(PointTypeFlagEnum.ofIndex((byte) point.getPointTypeFlag()));
-        pageQuery.setRwFlag(RwFlagEnum.ofIndex((byte) point.getRwFlag()));
-        pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) point.getEnableFlag()));
-        pageQuery.setTenantId(point.getTenantId());
+        pageQuery.setPointName(request.getPointName());
+        pageQuery.setProfileId(request.getProfileId() > DefaultConstant.DEFAULT_INT ? request.getProfileId() : null);
+        pageQuery.setPointTypeFlag(PointTypeFlagEnum.ofIndex((byte) request.getPointTypeFlag()));
+        pageQuery.setRwFlag(RwFlagEnum.ofIndex((byte) request.getRwFlag()));
+        pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) request.getEnableFlag()));
+        pageQuery.setTenantId(request.getTenantId());
 
         return pageQuery;
     }
@@ -122,7 +121,7 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
      */
     private GrpcPointDTO buildDTOByDO(PointBO entityDO) {
         GrpcPointDTO.Builder builder = GrpcPointDTO.newBuilder();
-        GrpcBaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+        GrpcBase baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
         builder.setPointName(entityDO.getPointName());
         builder.setPointCode(entityDO.getPointCode());

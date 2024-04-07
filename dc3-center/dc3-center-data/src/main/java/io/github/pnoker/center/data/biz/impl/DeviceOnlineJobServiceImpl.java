@@ -19,7 +19,7 @@ package io.github.pnoker.center.data.biz.impl;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.GrpcPageDTO;
+import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.DeviceOnlineJobService;
 import io.github.pnoker.center.data.dal.DeviceStatusHistoryManager;
 import io.github.pnoker.center.data.entity.model.DeviceStatusHistoryDO;
@@ -56,16 +56,30 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
         deviceQuery.setPage(new Pages());
         deviceQuery.getPage().setCurrent(1);
         deviceQuery.getPage().setSize(99999);
-        GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
+        GrpcPage.Builder page = GrpcPage.newBuilder()
                 .setSize(deviceQuery.getPage().getSize())
                 .setCurrent(deviceQuery.getPage().getCurrent());
-        DeviceDTO.Builder builder = buildDTOByQuery(deviceQuery);
-        GrpcPageDeviceQueryDTO.Builder query = GrpcPageDeviceQueryDTO.newBuilder()
-                .setPage(page)
-                .setDevice(builder);
+        GrpcPageDeviceQuery.Builder query = GrpcPageDeviceQuery.newBuilder()
+                .setPage(page);
+        if (CharSequenceUtil.isNotEmpty(deviceQuery.getDeviceName())) {
+            query.setDeviceName(deviceQuery.getDeviceName());
+        }
+        if (ObjectUtil.isNotEmpty(deviceQuery.getDriverId())) {
+            query.setDriverId(deviceQuery.getDriverId());
+        } else {
+            query.setDriverId(DefaultConstant.DEFAULT_INT);
+        }
+        if (ObjectUtil.isNotNull(deviceQuery.getEnableFlag())) {
+            query.setEnableFlag(deviceQuery.getEnableFlag().getIndex());
+        } else {
+            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
+        }
+        if (ObjectUtil.isNotEmpty(deviceQuery.getTenantId())) {
+            query.setTenantId(deviceQuery.getTenantId());
+        }
         GrpcRPageDeviceDTO list = deviceApiBlockingStub.list(query.build());
         GrpcPageDeviceDTO data = list.getData();
-        List<DeviceDTO> dataList = data.getDataList();
+        List<GrpcDeviceDTO> dataList = data.getDataList();
         if (ObjectUtils.isNotEmpty(dataList)) {
             List<DeviceStatusHistoryDO> deviceStatusHistoryDOS = new ArrayList<>();
             dataList.forEach(driverDO -> {
@@ -79,30 +93,9 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
                 deviceStatusHistoryDO.setStatus(status);
                 deviceStatusHistoryDOS.add(deviceStatusHistoryDO);
             });
-            if (deviceStatusHistoryDOS != null && deviceStatusHistoryDOS.size() > 0) {
+            if (!deviceStatusHistoryDOS.isEmpty()) {
                 deviceStatusHistoryService.saveBatch(deviceStatusHistoryDOS);
             }
         }
-    }
-
-    private static DeviceDTO.Builder buildDTOByQuery(DeviceQuery pageQuery) {
-        DeviceDTO.Builder builder = DeviceDTO.newBuilder();
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {
-            builder.setDeviceName(pageQuery.getDeviceName());
-        }
-        if (ObjectUtil.isNotEmpty(pageQuery.getDriverId())) {
-            builder.setDriverId(pageQuery.getDriverId());
-        } else {
-            builder.setDriverId(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            builder.setEnableFlag(pageQuery.getEnableFlag().getIndex());
-        } else {
-            builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
-            builder.setTenantId(pageQuery.getTenantId());
-        }
-        return builder;
     }
 }

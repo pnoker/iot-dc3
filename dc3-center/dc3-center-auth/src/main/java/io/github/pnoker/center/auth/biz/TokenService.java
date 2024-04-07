@@ -54,7 +54,7 @@ public interface TokenService {
      * @param tenantCode 租户编号
      * @return TokenValid
      */
-    TokenValid checkTokenValid(String loginName, String salt, String token, String tenantCode);
+    TokenValid checkValid(String loginName, String salt, String token, String tenantCode);
 
     /**
      * 注销令牌

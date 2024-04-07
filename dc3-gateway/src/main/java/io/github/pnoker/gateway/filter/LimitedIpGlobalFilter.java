@@ -49,7 +49,7 @@ public class LimitedIpGlobalFilter implements GlobalFilter, Ordered {
         /*ServerHttpRequest request = exchange.getRequest();
         String remoteIp = GatewayUtil.getRemoteIp(request);
         try {
-            GrpcRLimitedIpDTO rLimitedIpDTO = limitedIpApiBlockingStub.checkLimitedIpValid(GrpcIpQuery.newBuilder().setIp(remoteIp).build());
+            GrpcRLimitedIpDTO rLimitedIpDTO = limitedIpApiBlockingStub.checkValid(GrpcIpQuery.newBuilder().setIp(remoteIp).build());
             if (rLimitedIpDTO.getResult().getOk()) {
                 log.error("Forbidden Ip: {}", remoteIp);
                 exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);

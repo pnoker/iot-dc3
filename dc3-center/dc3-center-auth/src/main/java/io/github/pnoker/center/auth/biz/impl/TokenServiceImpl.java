@@ -129,7 +129,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public TokenValid checkTokenValid(String loginName, String salt, String token, String tenantCode) {
+    public TokenValid checkValid(String loginName, String salt, String token, String tenantCode) {
         TenantBO tenantBO = tenantService.selectByCode(tenantCode);
         if (ObjectUtil.isNull(tenantBO)) {
             throw new NotFoundException("租户、用户信息不匹配");

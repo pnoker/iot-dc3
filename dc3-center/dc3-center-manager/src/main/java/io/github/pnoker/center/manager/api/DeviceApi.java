@@ -21,9 +21,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.GrpcBaseDTO;
-import io.github.pnoker.api.common.GrpcPageDTO;
-import io.github.pnoker.api.common.GrpcRDTO;
+import io.github.pnoker.api.common.GrpcBase;
+import io.github.pnoker.api.common.GrpcPage;
+import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.center.manager.service.DeviceService;
@@ -56,9 +56,9 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
     private DeviceService deviceService;
 
     @Override
-    public void list(GrpcPageDeviceQueryDTO request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
+    public void list(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
         GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
-        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         DeviceQuery pageQuery = buildPageQuery(request);
 
@@ -73,13 +73,13 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
             GrpcPageDeviceDTO.Builder pageDeviceBuilder = GrpcPageDeviceDTO.newBuilder();
-            GrpcPageDTO.Builder pageBuilder = GrpcPageDTO.newBuilder();
+            GrpcPage.Builder pageBuilder = GrpcPage.newBuilder();
             pageBuilder.setCurrent(devicePage.getCurrent());
             pageBuilder.setSize(devicePage.getSize());
             pageBuilder.setPages(devicePage.getPages());
             pageBuilder.setTotal(devicePage.getTotal());
             pageDeviceBuilder.setPage(pageBuilder);
-            List<DeviceDTO> collect = devicePage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<GrpcDeviceDTO> collect = devicePage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
             pageDeviceBuilder.addAllData(collect);
 
             builder.setData(pageDeviceBuilder);
@@ -91,9 +91,9 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void getDeviceOnlineByDriverId(GrpcBYOnlineDriver driver, StreamObserver<GrpcBYOnlineDriverDTO> responseObserver) {
-        GrpcBYOnlineDriverDTO.Builder builder = GrpcBYOnlineDriverDTO.newBuilder();
-        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
+    public void selectByDriverId(GrpcDriverQuery driver, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
+        GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
         List<DeviceBO> deviceBOS = deviceService.selectByDriverId(driver.getDriverId());
         if (CollUtil.isEmpty(deviceBOS)) {
             rBuilder.setOk(false);
@@ -103,7 +103,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
-            List<DeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).collect(Collectors.toList());
             builder.addAllData(deviceDTOS);
         }
         builder.setResult(rBuilder);
@@ -112,9 +112,9 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void selectByProfileId(GrpcByProfileQueryDTO request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
+    public void selectByProfileId(GrpcProfileQuery request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
-        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         List<DeviceBO> deviceBOS = deviceService.selectByProfileId(request.getProfileId());
         if (CollUtil.isEmpty(deviceBOS)) {
@@ -126,7 +126,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            List<DeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).collect(Collectors.toList());
 
             builder.addAllData(deviceDTOS);
         }
@@ -137,9 +137,9 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void selectByDeviceId(GrpcByDeviceDTO request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
+    public void selectByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
         GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
-        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
         Set<Long> ids = new HashSet<>();
         ids.add(request.getDeviceId());
         List<DeviceBO> deviceBOS = deviceService.selectByIds(ids);
@@ -152,7 +152,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            DeviceDTO deviceDTO = buildDTOByDO(deviceBOS.get(0));
+            GrpcDeviceDTO deviceDTO = buildDTOByDO(deviceBOS.get(0));
 
             builder.setData(deviceDTO);
         }
@@ -168,19 +168,18 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
      * @param request PageDeviceQueryDTO
      * @return DevicePageQuery
      */
-    private DeviceQuery buildPageQuery(GrpcPageDeviceQueryDTO request) {
+    private DeviceQuery buildPageQuery(GrpcPageDeviceQuery request) {
         DeviceQuery pageQuery = new DeviceQuery();
         Pages pages = new Pages();
         pages.setCurrent(request.getPage().getCurrent());
         pages.setSize(request.getPage().getSize());
         pageQuery.setPage(pages);
 
-        DeviceDTO device = request.getDevice();
         pageQuery.setProfileId(request.getProfileId() > DefaultConstant.DEFAULT_INT ? request.getProfileId() : null);
-        pageQuery.setDeviceName(device.getDeviceName());
-        pageQuery.setDriverId(device.getDriverId() > DefaultConstant.DEFAULT_INT ? device.getDriverId() : null);
-        pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) device.getEnableFlag()));
-        pageQuery.setTenantId(device.getTenantId());
+        pageQuery.setDeviceName(request.getDeviceName());
+        pageQuery.setDriverId(request.getDriverId() > DefaultConstant.DEFAULT_INT ? request.getDriverId() : null);
+        pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) request.getEnableFlag()));
+        pageQuery.setTenantId(request.getTenantId());
 
         return pageQuery;
     }
@@ -191,9 +190,9 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
      * @param entityDO Device
      * @return DeviceDTO
      */
-    private DeviceDTO buildDTOByDO(DeviceBO entityDO) {
-        DeviceDTO.Builder builder = DeviceDTO.newBuilder();
-        GrpcBaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+    private GrpcDeviceDTO buildDTOByDO(DeviceBO entityDO) {
+        GrpcDeviceDTO.Builder builder = GrpcDeviceDTO.newBuilder();
+        GrpcBase baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
         builder.setBase(baseDTO);
         builder.setDeviceName(entityDO.getDeviceName());
         builder.setDeviceCode(entityDO.getDeviceCode());

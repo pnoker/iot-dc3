@@ -20,7 +20,7 @@ package io.github.pnoker.center.auth.api;
 import io.github.pnoker.api.center.auth.GrpcIpQuery;
 import io.github.pnoker.api.center.auth.GrpcRLimitedIpDTO;
 import io.github.pnoker.api.center.auth.LimitedIpApiGrpc;
-import io.github.pnoker.api.common.GrpcRDTO;
+import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.center.auth.service.LimitedIpService;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
@@ -43,10 +43,10 @@ public class LimitedIpApi extends LimitedIpApiGrpc.LimitedIpApiImplBase {
     private LimitedIpService limitedIpService;
 
     @Override
-    public void checkLimitedIpValid(GrpcIpQuery request, StreamObserver<GrpcRLimitedIpDTO> responseObserver) {
+    public void checkValid(GrpcIpQuery request, StreamObserver<GrpcRLimitedIpDTO> responseObserver) {
         GrpcRLimitedIpDTO.Builder builder = GrpcRLimitedIpDTO.newBuilder();
-        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
-        Boolean ipValid = limitedIpService.checkLimitedIpValid(request.getIp());
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+        Boolean ipValid = limitedIpService.checkValid(request.getIp());
         if (!Boolean.TRUE.equals(ipValid)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.IP_INVALID.getCode());
