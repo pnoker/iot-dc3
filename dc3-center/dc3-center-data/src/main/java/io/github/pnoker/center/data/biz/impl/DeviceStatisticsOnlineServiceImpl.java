@@ -20,7 +20,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.GrpcPageDTO;
+import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.DeviceStatisticsOnlineService;
 import io.github.pnoker.center.data.dal.DeviceRunHistoryManager;
 import io.github.pnoker.center.data.dal.DeviceRunManager;
@@ -71,17 +71,31 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
         deviceQuery.setPage(new Pages());
         deviceQuery.getPage().setCurrent(1);
         deviceQuery.getPage().setSize(99999);
-        GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
+        GrpcPage.Builder page = GrpcPage.newBuilder()
                 .setSize(deviceQuery.getPage().getSize())
                 .setCurrent(deviceQuery.getPage().getCurrent());
-        DeviceDTO.Builder builder = buildDTOByQuery(deviceQuery);
-        GrpcPageDeviceQueryDTO.Builder query = GrpcPageDeviceQueryDTO.newBuilder()
-                .setPage(page)
-                .setDevice(builder);
+        GrpcPageDeviceQuery.Builder query = GrpcPageDeviceQuery.newBuilder()
+                .setPage(page);
+        if (CharSequenceUtil.isNotEmpty(deviceQuery.getDeviceName())) {
+            query.setDeviceName(deviceQuery.getDeviceName());
+        }
+        if (ObjectUtil.isNotEmpty(deviceQuery.getDriverId())) {
+            query.setDriverId(deviceQuery.getDriverId());
+        } else {
+            query.setDriverId(DefaultConstant.DEFAULT_INT);
+        }
+        if (ObjectUtil.isNotNull(deviceQuery.getEnableFlag())) {
+            query.setEnableFlag(deviceQuery.getEnableFlag().getIndex());
+        } else {
+            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
+        }
+        if (ObjectUtil.isNotEmpty(deviceQuery.getTenantId())) {
+            query.setTenantId(deviceQuery.getTenantId());
+        }
         GrpcRPageDeviceDTO list = deviceApiBlockingStub.list(query.build());
         GrpcPageDeviceDTO data = list.getData();
-        List<DeviceDTO> dataList = data.getDataList();
-        if (dataList != null && dataList.size() > 0) {
+        List<GrpcDeviceDTO> dataList = data.getDataList();
+        if (!dataList.isEmpty()) {
             dataList.forEach(
                     driverDO -> {
                         //查出状态表最近两条数据
@@ -121,58 +135,34 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
         }
         // 查出所有driverids  去重
         List<DeviceRunHistoryDO> deviceRunHistoryDOS = deviceRunHistoryService.list(new LambdaQueryWrapper<>());
-        Set<Long> deviceIds = deviceRunHistoryDOS.stream().map(e -> e.getDeviceId()).collect(Collectors.toSet());
+        Set<Long> deviceIds = deviceRunHistoryDOS.stream().map(DeviceRunHistoryDO::getDeviceId).collect(Collectors.toSet());
         LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
-        if (deviceIds != null) {
-            deviceIds.forEach(
-                    id -> {
-                        //查出每天统计表在线时长是否有数据
-                        DeviceRunDO runDO = deviceRunManager.getOne(new LambdaQueryWrapper<DeviceRunDO>().eq(DeviceRunDO::getDeviceId, id)
-                                .eq(DeviceRunDO::getStatus, DriverStatusEnum.ONLINE.getCode())
-                                .between(DeviceRunDO::getCreateTime, startOfDay, endOfDay));
-                        DeviceRunDO deviceRunDO = deviceRunHistoryService.getDurationDay(id, DriverStatusEnum.ONLINE.getCode(), startOfDay, endOfDay);
-                        if (runDO != null && deviceRunDO != null) {
-                            deviceRunDO.setId(runDO.getId());
-                            deviceRunManager.updateById(deviceRunDO);
-                        } else if (ObjectUtils.isEmpty(runDO) && deviceRunDO != null) {
-                            deviceRunManager.save(deviceRunDO);
-                        }
-                        //查出每天统计表离线时长是否有数据
-                        DeviceRunDO runOffDO = deviceRunManager.getOne(new LambdaQueryWrapper<DeviceRunDO>().eq(DeviceRunDO::getDeviceId, id)
-                                .eq(DeviceRunDO::getStatus, DriverStatusEnum.OFFLINE.getCode())
-                                .between(DeviceRunDO::getCreateTime, startOfDay, endOfDay));
-                        DeviceRunDO deviceOffRunDO = deviceRunHistoryService.getDurationDay(id, DriverStatusEnum.OFFLINE.getCode(), startOfDay, endOfDay);
-                        if (runOffDO != null && deviceOffRunDO != null) {
-                            deviceOffRunDO.setId(runOffDO.getId());
-                            deviceRunManager.updateById(deviceOffRunDO);
-                        } else if (ObjectUtils.isEmpty(runOffDO) && deviceOffRunDO != null) {
-                            deviceRunManager.save(deviceOffRunDO);
-                        }
+        deviceIds.forEach(
+                id -> {
+                    //查出每天统计表在线时长是否有数据
+                    DeviceRunDO runDO = deviceRunManager.getOne(new LambdaQueryWrapper<DeviceRunDO>().eq(DeviceRunDO::getDeviceId, id)
+                            .eq(DeviceRunDO::getStatus, DriverStatusEnum.ONLINE.getCode())
+                            .between(DeviceRunDO::getCreateTime, startOfDay, endOfDay));
+                    DeviceRunDO deviceRunDO = deviceRunHistoryService.getDurationDay(id, DriverStatusEnum.ONLINE.getCode(), startOfDay, endOfDay);
+                    if (runDO != null && deviceRunDO != null) {
+                        deviceRunDO.setId(runDO.getId());
+                        deviceRunManager.updateById(deviceRunDO);
+                    } else if (ObjectUtils.isEmpty(runDO) && deviceRunDO != null) {
+                        deviceRunManager.save(deviceRunDO);
                     }
-            );
-        }
-
-    }
-
-    private static DeviceDTO.Builder buildDTOByQuery(DeviceQuery pageQuery) {
-        DeviceDTO.Builder builder = DeviceDTO.newBuilder();
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {
-            builder.setDeviceName(pageQuery.getDeviceName());
-        }
-        if (ObjectUtil.isNotEmpty(pageQuery.getDriverId())) {
-            builder.setDriverId(pageQuery.getDriverId());
-        } else {
-            builder.setDriverId(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            builder.setEnableFlag(pageQuery.getEnableFlag().getIndex());
-        } else {
-            builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
-            builder.setTenantId(pageQuery.getTenantId());
-        }
-        return builder;
+                    //查出每天统计表离线时长是否有数据
+                    DeviceRunDO runOffDO = deviceRunManager.getOne(new LambdaQueryWrapper<DeviceRunDO>().eq(DeviceRunDO::getDeviceId, id)
+                            .eq(DeviceRunDO::getStatus, DriverStatusEnum.OFFLINE.getCode())
+                            .between(DeviceRunDO::getCreateTime, startOfDay, endOfDay));
+                    DeviceRunDO deviceOffRunDO = deviceRunHistoryService.getDurationDay(id, DriverStatusEnum.OFFLINE.getCode(), startOfDay, endOfDay);
+                    if (runOffDO != null && deviceOffRunDO != null) {
+                        deviceOffRunDO.setId(runOffDO.getId());
+                        deviceRunManager.updateById(deviceOffRunDO);
+                    } else if (ObjectUtils.isEmpty(runOffDO) && deviceOffRunDO != null) {
+                        deviceRunManager.save(deviceOffRunDO);
+                    }
+                }
+        );
     }
 }

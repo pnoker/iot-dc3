@@ -19,10 +19,9 @@ package io.github.pnoker.center.data.biz.impl;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.GrpcPageDTO;
+import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.DeviceStatusService;
 import io.github.pnoker.center.data.entity.bo.DeviceRunBO;
-import io.github.pnoker.center.data.entity.builder.DeviceDurationBuilder;
 import io.github.pnoker.center.data.entity.model.DeviceRunDO;
 import io.github.pnoker.center.data.entity.query.DeviceQuery;
 import io.github.pnoker.center.data.service.DeviceRunService;
@@ -57,20 +56,31 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     private RedisService redisService;
 
     @Resource
-    private DeviceDurationBuilder deviceDurationBuilder;
-
-    @Resource
     private DeviceRunService deviceRunService;
 
     @Override
     public Map<Long, String> device(DeviceQuery pageQuery) {
-        GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
+        GrpcPage.Builder page = GrpcPage.newBuilder()
                 .setSize(pageQuery.getPage().getSize())
                 .setCurrent(pageQuery.getPage().getCurrent());
-        DeviceDTO.Builder builder = buildDTOByQuery(pageQuery);
-        GrpcPageDeviceQueryDTO.Builder query = GrpcPageDeviceQueryDTO.newBuilder()
-                .setPage(page)
-                .setDevice(builder);
+        GrpcPageDeviceQuery.Builder query = GrpcPageDeviceQuery.newBuilder()
+                .setPage(page);
+        if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {
+            query.setDeviceName(pageQuery.getDeviceName());
+        }
+        if (ObjectUtil.isNotEmpty(pageQuery.getDriverId())) {
+            query.setDriverId(pageQuery.getDriverId());
+        } else {
+            query.setDriverId(DefaultConstant.DEFAULT_INT);
+        }
+        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
+            query.setEnableFlag(pageQuery.getEnableFlag().getIndex());
+        } else {
+            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
+        }
+        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
+            query.setTenantId(pageQuery.getTenantId());
+        }
         if (ObjectUtil.isNotEmpty(pageQuery.getProfileId())) {
             query.setProfileId(pageQuery.getProfileId());
         }
@@ -80,13 +90,13 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
             return new HashMap<>();
         }
 
-        List<DeviceDTO> devices = rPageDeviceDTO.getData().getDataList();
+        List<GrpcDeviceDTO> devices = rPageDeviceDTO.getData().getDataList();
         return getStatusMap(devices);
     }
 
     @Override
     public Map<Long, String> deviceByProfileId(Long profileId) {
-        GrpcByProfileQueryDTO query = GrpcByProfileQueryDTO.newBuilder()
+        GrpcProfileQuery query = GrpcProfileQuery.newBuilder()
                 .setProfileId(profileId)
                 .build();
         GrpcRDeviceListDTO rDeviceListDTO = deviceApiBlockingStub.selectByProfileId(query);
@@ -94,14 +104,14 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
             return new HashMap<>();
         }
 
-        List<DeviceDTO> devices = rDeviceListDTO.getDataList();
+        List<GrpcDeviceDTO> devices = rDeviceListDTO.getDataList();
         return getStatusMap(devices);
     }
 
     @Override
     public DeviceRunBO selectOnlineByDeviceId(Long deviceId) {
         List<DeviceRunDO> deviceRunDOS = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
-        GrpcByDeviceDTO.Builder builder = GrpcByDeviceDTO.newBuilder();
+        GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDeviceDTO.getResult().getOk()) {
@@ -126,7 +136,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     @Override
     public DeviceRunBO selectOfflineByDeviceId(Long deviceId) {
         List<DeviceRunDO> deviceRunDOS = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
-        GrpcByDeviceDTO.Builder builder = GrpcByDeviceDTO.newBuilder();
+        GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDeviceDTO.getResult().getOk()) {
@@ -149,39 +159,12 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     }
 
     /**
-     * Query to DTO
-     *
-     * @param pageQuery DevicePageQuery
-     * @return DeviceDTO Builder
-     */
-    private static DeviceDTO.Builder buildDTOByQuery(DeviceQuery pageQuery) {
-        DeviceDTO.Builder builder = DeviceDTO.newBuilder();
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {
-            builder.setDeviceName(pageQuery.getDeviceName());
-        }
-        if (ObjectUtil.isNotEmpty(pageQuery.getDriverId())) {
-            builder.setDriverId(pageQuery.getDriverId());
-        } else {
-            builder.setDriverId(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            builder.setEnableFlag(pageQuery.getEnableFlag().getIndex());
-        } else {
-            builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
-            builder.setTenantId(pageQuery.getTenantId());
-        }
-        return builder;
-    }
-
-    /**
      * Get status map
      *
      * @param devices DeviceDTO Array
      * @return Status Map
      */
-    private Map<Long, String> getStatusMap(List<DeviceDTO> devices) {
+    private Map<Long, String> getStatusMap(List<GrpcDeviceDTO> devices) {
         Map<Long, String> statusMap = new HashMap<>(16);
         Set<Long> deviceIds = devices.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
         deviceIds.forEach(id -> {

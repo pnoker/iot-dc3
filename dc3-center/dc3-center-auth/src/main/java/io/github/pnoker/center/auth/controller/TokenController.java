@@ -80,8 +80,8 @@ public class TokenController implements BaseController {
      * @return 是否有效，并返回过期时间
      */
     @PostMapping("/check")
-    public R<Boolean> checkTokenValid(@Validated @RequestBody TokenQuery entityVO) {
-        TokenValid tokenValid = tokenService.checkTokenValid(entityVO.getName(), entityVO.getSalt(), entityVO.getToken(), entityVO.getTenant());
+    public R<Boolean> checkValid(@Validated @RequestBody TokenQuery entityVO) {
+        TokenValid tokenValid = tokenService.checkValid(entityVO.getName(), entityVO.getSalt(), entityVO.getToken(), entityVO.getTenant());
 
         boolean valid = tokenValid.isValid();
         String message = "The token has expired";

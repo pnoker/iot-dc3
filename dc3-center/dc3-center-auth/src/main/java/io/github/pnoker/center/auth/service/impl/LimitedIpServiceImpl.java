@@ -111,7 +111,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
     }
 
     @Override
-    public Boolean checkLimitedIpValid(String ip) {
+    public Boolean checkValid(String ip) {
         LimitedIpBO limitedIpBO = selectByIp(ip);
         return ObjectUtil.isNotNull(limitedIpBO);
     }

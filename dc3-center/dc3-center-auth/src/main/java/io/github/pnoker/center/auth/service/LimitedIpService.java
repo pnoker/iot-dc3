@@ -41,5 +41,5 @@ public interface LimitedIpService extends BaseService<LimitedIpBO, LimitedIpQuer
      * @param ip IP
      * @return boolean
      */
-    Boolean checkLimitedIpValid(String ip);
+    Boolean checkValid(String ip);
 }

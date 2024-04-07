@@ -22,8 +22,8 @@ import io.github.pnoker.api.center.auth.GrpcCodeQuery;
 import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
 import io.github.pnoker.api.center.auth.GrpcTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
-import io.github.pnoker.api.common.GrpcBaseDTO;
-import io.github.pnoker.api.common.GrpcRDTO;
+import io.github.pnoker.api.common.GrpcBase;
+import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.service.TenantService;
 import io.github.pnoker.common.enums.ResponseEnum;
@@ -50,7 +50,7 @@ public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
     @Override
     public void selectByCode(GrpcCodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {
         GrpcRTenantDTO.Builder builder = GrpcRTenantDTO.newBuilder();
-        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
         TenantBO select = tenantService.selectByCode(request.getCode());
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
@@ -78,7 +78,7 @@ public class TenantApi extends TenantApiGrpc.TenantApiImplBase {
      */
     private GrpcTenantDTO buildGrpcDTOByBO(TenantBO entityBO) {
         GrpcTenantDTO.Builder builder = GrpcTenantDTO.newBuilder();
-        GrpcBaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityBO);
+        GrpcBase baseDTO = BuilderUtil.buildBaseDTOByDO(entityBO);
         builder.setBase(baseDTO);
         builder.setTenantName(entityBO.getTenantName());
         builder.setTenantCode(entityBO.getTenantCode());

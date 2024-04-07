@@ -19,7 +19,7 @@ package io.github.pnoker.center.data.biz.impl;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.GrpcPageDTO;
+import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.DriverOnlineJobService;
 import io.github.pnoker.center.data.dal.DriverStatusHistoryManager;
 import io.github.pnoker.center.data.entity.model.DriverStatusHistoryDO;
@@ -56,13 +56,33 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
         driverQuery.setPage(new Pages());
         driverQuery.getPage().setCurrent(1);
         driverQuery.getPage().setSize(99999);
-        GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
+        GrpcPage.Builder page = GrpcPage.newBuilder()
                 .setSize(driverQuery.getPage().getSize())
                 .setCurrent(driverQuery.getPage().getCurrent());
-        GrpcDriverDTO.Builder builder = buildDTOByQuery(driverQuery);
-        GrpcPageDriverQueryDTO.Builder query = GrpcPageDriverQueryDTO.newBuilder()
-                .setPage(page)
-                .setDriver(builder);
+        GrpcPageDriverQuery.Builder query = GrpcPageDriverQuery.newBuilder()
+                .setPage(page);
+        if (CharSequenceUtil.isNotEmpty(driverQuery.getDriverName())) {
+            query.setDriverName(driverQuery.getDriverName());
+        }
+        if (CharSequenceUtil.isNotEmpty(driverQuery.getServiceName())) {
+            query.setServiceName(driverQuery.getServiceName());
+        }
+        if (CharSequenceUtil.isNotEmpty(driverQuery.getServiceHost())) {
+            query.setServiceHost(driverQuery.getServiceHost());
+        }
+        if (ObjectUtil.isNotNull(driverQuery.getDriverTypeFlag())) {
+            query.setDriverTypeFlag(driverQuery.getDriverTypeFlag().getIndex());
+        } else {
+            query.setDriverTypeFlag(DefaultConstant.DEFAULT_INT);
+        }
+        if (ObjectUtil.isNotNull(driverQuery.getEnableFlag())) {
+            query.setEnableFlag(driverQuery.getEnableFlag().getIndex());
+        } else {
+            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
+        }
+        if (ObjectUtil.isNotEmpty(driverQuery.getTenantId())) {
+            query.setTenantId(driverQuery.getTenantId());
+        }
         GrpcRPageDriverDTO list = driverApiBlockingStub.list(query.build());
         GrpcPageDriverDTO data = list.getData();
         List<GrpcDriverDTO> dataList = data.getDataList();
@@ -82,33 +102,5 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
                 driverStatusHistoryService.saveBatch(driverStatusHistoryDOS);
             }
         }
-    }
-
-    private static GrpcDriverDTO.Builder buildDTOByQuery(DriverQuery pageQuery) {
-        GrpcDriverDTO.Builder builder = GrpcDriverDTO.newBuilder();
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverName())) {
-            builder.setDriverName(pageQuery.getDriverName());
-        }
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceName())) {
-            builder.setServiceName(pageQuery.getServiceName());
-        }
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceHost())) {
-            builder.setServiceHost(pageQuery.getServiceHost());
-        }
-        if (ObjectUtil.isNotNull(pageQuery.getDriverTypeFlag())) {
-            builder.setDriverTypeFlag(pageQuery.getDriverTypeFlag().getIndex());
-        } else {
-            builder.setDriverTypeFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            builder.setEnableFlag(pageQuery.getEnableFlag().getIndex());
-        } else {
-            builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
-            builder.setTenantId(pageQuery.getTenantId());
-        }
-
-        return builder;
     }
 }

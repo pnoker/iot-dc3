@@ -22,8 +22,8 @@ import io.github.pnoker.api.center.auth.GrpcNameQuery;
 import io.github.pnoker.api.center.auth.GrpcRUserLoginDTO;
 import io.github.pnoker.api.center.auth.GrpcUserLoginDTO;
 import io.github.pnoker.api.center.auth.UserLoginApiGrpc;
-import io.github.pnoker.api.common.GrpcBaseDTO;
-import io.github.pnoker.api.common.GrpcRDTO;
+import io.github.pnoker.api.common.GrpcBase;
+import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.common.enums.ResponseEnum;
@@ -50,7 +50,7 @@ public class UserLoginApi extends UserLoginApiGrpc.UserLoginApiImplBase {
     @Override
     public void selectByName(GrpcNameQuery request, StreamObserver<GrpcRUserLoginDTO> responseObserver) {
         GrpcRUserLoginDTO.Builder builder = GrpcRUserLoginDTO.newBuilder();
-        GrpcRDTO.Builder rBuilder = GrpcRDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
         UserLoginBO select = userLoginService.selectByLoginName(request.getName(), false);
         if (ObjectUtil.isNull(select)) {
             rBuilder.setOk(false);
@@ -78,7 +78,7 @@ public class UserLoginApi extends UserLoginApiGrpc.UserLoginApiImplBase {
      */
     private GrpcUserLoginDTO buildGrpcDTOByBO(UserLoginBO entityBO) {
         GrpcUserLoginDTO.Builder builder = GrpcUserLoginDTO.newBuilder();
-        GrpcBaseDTO baseDTO = BuilderUtil.buildBaseDTOByDO(entityBO);
+        GrpcBase baseDTO = BuilderUtil.buildBaseDTOByDO(entityBO);
         builder.setBase(baseDTO);
         builder.setLoginName(entityBO.getLoginName());
         builder.setUserId(entityBO.getUserId());

@@ -66,7 +66,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
             GrpcRUserLoginDTO rUserLoginDTO = getLoginDTO(request);
 
             // Check Token Valid
-            checkTokenValid(request, rTenantDTO, rUserLoginDTO);
+            checkValid(request, rTenantDTO, rUserLoginDTO);
 
             // Header
             ServerHttpRequest build = request.mutate().headers(headers -> {
@@ -138,7 +138,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
         return entityBO;
     }
 
-    private void checkTokenValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO) {
+    private void checkValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO) {
         String token = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
         RequestHeader.TokenHeader entityBO = JsonUtil.parseObject(DecodeUtil.decode(token), RequestHeader.TokenHeader.class);
         if (ObjectUtil.isEmpty(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
@@ -146,7 +146,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
         }
 
         GrpcLoginQuery login = GrpcLoginQuery.newBuilder().setTenant(rTenantDTO.getData().getTenantCode()).setName(rUserLoginDTO.getData().getLoginName()).setSalt(entityBO.getSalt()).setToken(entityBO.getToken()).build();
-        GrpcRTokenDTO entityDTO = tokenApiBlockingStub.checkTokenValid(login);
+        GrpcRTokenDTO entityDTO = tokenApiBlockingStub.checkValid(login);
         if (!entityDTO.getResult().getOk()) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }

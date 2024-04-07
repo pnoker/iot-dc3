@@ -180,9 +180,9 @@ public class LimitedIpController implements BaseController {
      * @return 当前IP是否在限制IP中
      */
     @GetMapping("/check/{ip}")
-    public R<Boolean> checkLimitedIpValid(@NotNull @PathVariable(value = "ip") String ip) {
+    public R<Boolean> checkValid(@NotNull @PathVariable(value = "ip") String ip) {
         try {
-            return Boolean.TRUE.equals(limitedIpService.checkLimitedIpValid(ip)) ? R.ok() : R.fail();
+            return Boolean.TRUE.equals(limitedIpService.checkValid(ip)) ? R.ok() : R.fail();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());

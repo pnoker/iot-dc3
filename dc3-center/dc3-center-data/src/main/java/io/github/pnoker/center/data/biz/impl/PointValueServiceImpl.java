@@ -21,11 +21,11 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.GrpcPagePointQueryDTO;
+import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
 import io.github.pnoker.api.center.manager.GrpcPointDTO;
 import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
-import io.github.pnoker.api.common.GrpcPageDTO;
+import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -118,13 +118,23 @@ public class PointValueServiceImpl implements PointValueService {
         Page<PointValueBO> entityPageBO = new Page<>();
         entityPageBO.setCurrent(entityQuery.getPage().getCurrent()).setSize(entityQuery.getPage().getSize());
 
-        GrpcPageDTO.Builder entityPageGrpcDTO = GrpcPageDTO.newBuilder()
+        GrpcPage.Builder entityPageGrpcDTO = GrpcPage.newBuilder()
                 .setSize(entityQuery.getPage().getSize())
                 .setCurrent(entityQuery.getPage().getCurrent());
-        GrpcPointDTO entityGrpcDTO = buildDTOByQuery(entityQuery);
-        GrpcPagePointQueryDTO.Builder entityQueryGrpcDTO = GrpcPagePointQueryDTO.newBuilder()
-                .setPage(entityPageGrpcDTO)
-                .setPoint(entityGrpcDTO);
+        GrpcPagePointQuery.Builder entityQueryGrpcDTO = GrpcPagePointQuery.newBuilder()
+                .setPage(entityPageGrpcDTO);
+        if (CharSequenceUtil.isNotEmpty(entityQuery.getPointName())) {
+            entityQueryGrpcDTO.setPointName(entityQuery.getPointName());
+        }
+        entityQueryGrpcDTO.setPointTypeFlag(DefaultConstant.DEFAULT_INT);
+        entityQueryGrpcDTO.setRwFlag(DefaultConstant.DEFAULT_INT);
+        entityQueryGrpcDTO.setProfileId(DefaultConstant.DEFAULT_INT);
+        if (ObjectUtil.isNotNull(entityQuery.getEnableFlag())) {
+            entityQueryGrpcDTO.setEnableFlag(entityQuery.getEnableFlag().getIndex());
+        } else {
+            entityQueryGrpcDTO.setEnableFlag(DefaultConstant.DEFAULT_INT);
+        }
+        entityQueryGrpcDTO.setTenantId(entityQuery.getTenantId());
         if (ObjectUtil.isNotEmpty(entityQuery.getDeviceId())) {
             entityQueryGrpcDTO.setDeviceId(entityQuery.getDeviceId());
         }
@@ -158,30 +168,6 @@ public class PointValueServiceImpl implements PointValueService {
 
         RepositoryService repositoryService = getFirstRepositoryService();
         return repositoryService.selectPagePointValue(entityQuery);
-    }
-
-    /**
-     * Query to DTO
-     *
-     * @param pageQuery PointValuePageQuery
-     * @return PointDTO
-     */
-    private static GrpcPointDTO buildDTOByQuery(PointValueQuery pageQuery) {
-        GrpcPointDTO.Builder builder = GrpcPointDTO.newBuilder();
-
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getPointName())) {
-            builder.setPointName(pageQuery.getPointName());
-        }
-        builder.setPointTypeFlag(DefaultConstant.DEFAULT_INT);
-        builder.setRwFlag(DefaultConstant.DEFAULT_INT);
-        builder.setProfileId(DefaultConstant.DEFAULT_INT);
-        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            builder.setEnableFlag(pageQuery.getEnableFlag().getIndex());
-        } else {
-            builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
-        }
-        builder.setTenantId(pageQuery.getTenantId());
-        return builder.build();
     }
 
     /**

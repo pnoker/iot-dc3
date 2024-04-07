@@ -19,7 +19,7 @@ package io.github.pnoker.center.data.biz.impl;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.GrpcPageDTO;
+import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.DriverStatusService;
 import io.github.pnoker.center.data.entity.bo.DriverRunBO;
 import io.github.pnoker.center.data.entity.builder.DriverDurationBuilder;
@@ -67,13 +67,33 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
     @Override
     public Map<Long, String> driver(DriverQuery pageQuery) {
-        GrpcPageDTO.Builder page = GrpcPageDTO.newBuilder()
+        GrpcPage.Builder page = GrpcPage.newBuilder()
                 .setSize(pageQuery.getPage().getSize())
                 .setCurrent(pageQuery.getPage().getCurrent());
-        GrpcDriverDTO.Builder builder = buildDTOByQuery(pageQuery);
-        GrpcPageDriverQueryDTO.Builder query = GrpcPageDriverQueryDTO.newBuilder()
-                .setPage(page)
-                .setDriver(builder);
+        GrpcPageDriverQuery.Builder query = GrpcPageDriverQuery.newBuilder()
+                .setPage(page);
+        if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverName())) {
+            query.setDriverName(pageQuery.getDriverName());
+        }
+        if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceName())) {
+            query.setServiceName(pageQuery.getServiceName());
+        }
+        if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceHost())) {
+            query.setServiceHost(pageQuery.getServiceHost());
+        }
+        if (ObjectUtil.isNotNull(pageQuery.getDriverTypeFlag())) {
+            query.setDriverTypeFlag(pageQuery.getDriverTypeFlag().getIndex());
+        } else {
+            query.setDriverTypeFlag(DefaultConstant.DEFAULT_INT);
+        }
+        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
+            query.setEnableFlag(pageQuery.getEnableFlag().getIndex());
+        } else {
+            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
+        }
+        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
+            query.setTenantId(pageQuery.getTenantId());
+        }
         GrpcRPageDriverDTO rPageDriverDTO = driverApiBlockingStub.list(query.build());
 
         if (!rPageDriverDTO.getResult().getOk()) {
@@ -87,7 +107,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public DriverRunBO selectOnlineByDriverId(Long driverId) {
         List<DriverRunDO> driverRunDOS = driverRunService.get7daysDuration(driverId, DriverStatusEnum.ONLINE.getCode());
-        GrpcByDriverQueryDTO.Builder builder = GrpcByDriverQueryDTO.newBuilder();
+        GrpcDriverQuery.Builder builder = GrpcDriverQuery.newBuilder();
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
@@ -112,7 +132,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public DriverRunBO selectOfflineByDriverId(Long driverId) {
         List<DriverRunDO> driverRunDOS = driverRunService.get7daysDuration(driverId, DriverStatusEnum.OFFLINE.getCode());
-        GrpcByDriverQueryDTO.Builder builder = GrpcByDriverQueryDTO.newBuilder();
+        GrpcDriverQuery.Builder builder = GrpcDriverQuery.newBuilder();
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
@@ -158,14 +178,14 @@ public class DriverStatusServiceImpl implements DriverStatusService {
      */
     @Nullable
     private List<String> getList(Long driverId) {
-        GrpcBYOnlineDriver query = GrpcBYOnlineDriver.newBuilder()
+        GrpcDriverQuery query = GrpcDriverQuery.newBuilder()
                 .setDriverId(driverId)
                 .build();
-        GrpcBYOnlineDriverDTO onlineByDriverId = deviceApiBlockingStub.getDeviceOnlineByDriverId(query);
+        GrpcRDeviceListDTO onlineByDriverId = deviceApiBlockingStub.selectByDriverId(query);
         if (!onlineByDriverId.getResult().getOk()) {
             return null;
         }
-        List<DeviceDTO> devices = onlineByDriverId.getDataList();
+        List<GrpcDeviceDTO> devices = onlineByDriverId.getDataList();
         Set<Long> deviceIds = devices.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
         List<String> list = new ArrayList<>();
         deviceIds.forEach(id -> {
@@ -175,40 +195,6 @@ public class DriverStatusServiceImpl implements DriverStatusService {
             list.add(status);
         });
         return list;
-    }
-
-    /**
-     * Query to DTO
-     *
-     * @param pageQuery DriverPageQuery
-     * @return DriverDTO Builder
-     */
-    private static GrpcDriverDTO.Builder buildDTOByQuery(DriverQuery pageQuery) {
-        GrpcDriverDTO.Builder builder = GrpcDriverDTO.newBuilder();
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverName())) {
-            builder.setDriverName(pageQuery.getDriverName());
-        }
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceName())) {
-            builder.setServiceName(pageQuery.getServiceName());
-        }
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceHost())) {
-            builder.setServiceHost(pageQuery.getServiceHost());
-        }
-        if (ObjectUtil.isNotNull(pageQuery.getDriverTypeFlag())) {
-            builder.setDriverTypeFlag(pageQuery.getDriverTypeFlag().getIndex());
-        } else {
-            builder.setDriverTypeFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
-            builder.setEnableFlag(pageQuery.getEnableFlag().getIndex());
-        } else {
-            builder.setEnableFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
-            builder.setTenantId(pageQuery.getTenantId());
-        }
-
-        return builder;
     }
 
     /**

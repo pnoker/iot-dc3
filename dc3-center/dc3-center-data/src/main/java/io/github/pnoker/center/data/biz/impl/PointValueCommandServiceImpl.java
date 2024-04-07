@@ -17,7 +17,7 @@
 package io.github.pnoker.center.data.biz.impl;
 
 import io.github.pnoker.api.center.manager.DriverApiGrpc;
-import io.github.pnoker.api.center.manager.GrpcByDeviceQueryDTO;
+import io.github.pnoker.api.center.manager.GrpcDeviceQuery;
 import io.github.pnoker.api.center.manager.GrpcRDriverDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.center.data.biz.PointValueCommandService;
@@ -53,7 +53,7 @@ public class PointValueCommandServiceImpl implements PointValueCommandService {
 
     @Override
     public void read(PointValueReadVO entityVO) {
-        GrpcByDeviceQueryDTO.Builder builder = GrpcByDeviceQueryDTO.newBuilder();
+        GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
         builder.setDeviceId(entityVO.getDeviceId());
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
@@ -67,7 +67,7 @@ public class PointValueCommandServiceImpl implements PointValueCommandService {
 
     @Override
     public void write(PointValueWriteVO entityVO) {
-        GrpcByDeviceQueryDTO.Builder builder = GrpcByDeviceQueryDTO.newBuilder();
+        GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
         builder.setDeviceId(entityVO.getDeviceId());
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
