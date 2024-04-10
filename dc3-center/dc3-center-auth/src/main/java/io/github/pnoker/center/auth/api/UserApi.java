@@ -27,7 +27,7 @@ import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.center.auth.entity.bo.UserBO;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.utils.BuilderUtil;
+import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +79,7 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
      */
     private GrpcUserDTO buildGrpcDTOByBO(UserBO entityBO) {
         GrpcUserDTO.Builder builder = GrpcUserDTO.newBuilder();
-        GrpcBase baseDTO = BuilderUtil.buildBaseDTOByDO(entityBO);
+        GrpcBase baseDTO = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
         builder.setBase(baseDTO);
         builder.setNickName(entityBO.getNickName());
         builder.setUserName(entityBO.getUserName());

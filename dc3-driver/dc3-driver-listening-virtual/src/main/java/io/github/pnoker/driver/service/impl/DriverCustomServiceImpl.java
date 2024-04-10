@@ -108,7 +108,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         - io.github.pnoker.driver.service.netty.tcp.NettyTcpServerHandler.channelRead
         - io.github.pnoker.driver.service.netty.udp.NettyUdpServerHandler.channelRead0
          */
-        return DefaultConstant.DEFAULT_VALUE;
+        return DefaultConstant.DEFAULT_STRING_VALUE;
     }
 
     @Override

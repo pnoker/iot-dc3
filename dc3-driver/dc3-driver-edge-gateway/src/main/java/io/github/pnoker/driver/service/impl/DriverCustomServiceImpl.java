@@ -85,7 +85,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         因为 MQTT 的数据来源是被动接收的，所以无需实现该 Read 方法
         接收数据处理函数在 io.github.pnoker.driver.mqtt.handler.MqttReceiveHandler.handlerValue
         */
-        return DefaultConstant.DEFAULT_VALUE;
+        return DefaultConstant.DEFAULT_STRING_VALUE;
     }
 
     @Override

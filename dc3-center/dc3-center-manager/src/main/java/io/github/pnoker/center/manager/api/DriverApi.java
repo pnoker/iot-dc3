@@ -30,7 +30,9 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.utils.BuilderUtil;
+import io.github.pnoker.common.optional.LongOptional;
+import io.github.pnoker.common.optional.StringOptional;
+import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -59,7 +61,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
         GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DriverQuery pageQuery = buildPageQuery(request);
+        DriverQuery pageQuery = buildQueryByGrpcQuery(request);
 
         Page<DriverBO> driverPage = driverService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(driverPage)) {
@@ -141,45 +143,52 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
     }
 
     /**
-     * DTO to Query
+     * Grpc Query to Query
      *
-     * @param request PageDriverQueryDTO
-     * @return DriverPageQuery
+     * @param entityQuery GrpcPageDriverQuery
+     * @return DriverQuery
      */
-    private DriverQuery buildPageQuery(GrpcPageDriverQuery request) {
-        DriverQuery pageQuery = new DriverQuery();
-        Pages pages = new Pages();
-        pages.setCurrent(request.getPage().getCurrent());
-        pages.setSize(request.getPage().getSize());
-        pageQuery.setPage(pages);
+    private DriverQuery buildQueryByGrpcQuery(GrpcPageDriverQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery)) {
+            return null;
+        }
 
-        pageQuery.setDriverName(request.getDriverName());
-        pageQuery.setServiceName(request.getServiceName());
-        pageQuery.setServiceHost(request.getServiceHost());
-        pageQuery.setDriverTypeFlag(DriverTypeFlagEnum.ofIndex((byte) request.getDriverTypeFlag()));
-        pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) request.getEnableFlag()));
-        pageQuery.setTenantId(request.getTenantId());
+        DriverQuery query = new DriverQuery();
+        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityQuery.getPage());
+        query.setPage(pages);
 
-        return pageQuery;
+        StringOptional.of(entityQuery.getDriverName()).ifPresent(query::setDriverName);
+        StringOptional.of(entityQuery.getServiceName()).ifPresent(query::setServiceName);
+        StringOptional.of(entityQuery.getServiceHost()).ifPresent(query::setServiceHost);
+        query.setDriverTypeFlag(DriverTypeFlagEnum.ofIndex((byte) entityQuery.getDriverTypeFlag()));
+        query.setEnableFlag(EnableFlagEnum.ofIndex((byte) entityQuery.getEnableFlag()));
+        LongOptional.of(entityQuery.getTenantId()).ifPresent(query::setTenantId);
+
+        return query;
     }
 
     /**
-     * DO to DTO
+     * BO to Grpc DTO
      *
-     * @param entityDO Driver
-     * @return DriverDTO
+     * @param entityBO DriverBO
+     * @return GrpcDriverDTO
      */
-    private GrpcDriverDTO buildDTOByDO(DriverBO entityDO) {
+    private GrpcDriverDTO buildDTOByDO(DriverBO entityBO) {
+        if (ObjectUtil.isNull(entityBO)) {
+            return null;
+        }
+
         GrpcDriverDTO.Builder builder = GrpcDriverDTO.newBuilder();
-        GrpcBase baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+        GrpcBase baseDTO = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
         builder.setBase(baseDTO);
-        builder.setDriverName(entityDO.getDriverName());
-        builder.setDriverCode(entityDO.getDriverCode());
-        builder.setServiceName(entityDO.getServiceName());
-        builder.setDriverTypeFlag(entityDO.getDriverTypeFlag().getIndex());
-        builder.setServiceHost(entityDO.getServiceHost());
-        builder.setEnableFlag(entityDO.getEnableFlag().getIndex());
-        builder.setTenantId(entityDO.getTenantId());
+
+        builder.setDriverName(entityBO.getDriverName());
+        builder.setDriverCode(entityBO.getDriverCode());
+        builder.setServiceName(entityBO.getServiceName());
+        builder.setDriverTypeFlag(entityBO.getDriverTypeFlag().getIndex());
+        builder.setServiceHost(entityBO.getServiceHost());
+        builder.setEnableFlag(entityBO.getEnableFlag().getIndex());
+        builder.setTenantId(entityBO.getTenantId());
         return builder.build();
     }
 }
