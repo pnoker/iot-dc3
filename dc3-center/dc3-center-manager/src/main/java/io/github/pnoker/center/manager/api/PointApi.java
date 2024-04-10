@@ -26,13 +26,14 @@ import io.github.pnoker.api.common.GrpcR;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.service.PointService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.enums.RwFlagEnum;
-import io.github.pnoker.common.utils.BuilderUtil;
+import io.github.pnoker.common.optional.LongOptional;
+import io.github.pnoker.common.optional.StringOptional;
+import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -59,7 +60,7 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
         GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        PointQuery pageQuery = buildPageQuery(request);
+        PointQuery pageQuery = buildQueryByGrpcQuery(request);
 
         Page<PointBO> pointPage = pointService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(pointPage)) {
@@ -78,7 +79,7 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
             pageBuilder.setPages(pointPage.getPages());
             pageBuilder.setTotal(pointPage.getTotal());
             pagePointBuilder.setPage(pageBuilder);
-            List<GrpcPointDTO> collect = pointPage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<GrpcPointDTO> collect = pointPage.getRecords().stream().map(this::buildGrpcDTOByBO).collect(Collectors.toList());
             pagePointBuilder.addAllData(collect);
 
             builder.setData(pagePointBuilder);
@@ -90,51 +91,58 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
     }
 
     /**
-     * DTO to Query
+     * Grpc Query to Query
      *
-     * @param request PagePointQueryDTO
-     * @return PointPageQuery
+     * @param entityQuery GrpcPagePointQuery
+     * @return PointQuery
      */
-    private PointQuery buildPageQuery(GrpcPagePointQuery request) {
-        PointQuery pageQuery = new PointQuery();
-        Pages pages = new Pages();
-        pages.setCurrent(request.getPage().getCurrent());
-        pages.setSize(request.getPage().getSize());
-        pageQuery.setPage(pages);
+    private PointQuery buildQueryByGrpcQuery(GrpcPagePointQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery)) {
+            return null;
+        }
 
-        pageQuery.setDeviceId(request.getDeviceId() > DefaultConstant.DEFAULT_INT ? request.getDeviceId() : null);
-        pageQuery.setPointName(request.getPointName());
-        pageQuery.setProfileId(request.getProfileId() > DefaultConstant.DEFAULT_INT ? request.getProfileId() : null);
-        pageQuery.setPointTypeFlag(PointTypeFlagEnum.ofIndex((byte) request.getPointTypeFlag()));
-        pageQuery.setRwFlag(RwFlagEnum.ofIndex((byte) request.getRwFlag()));
-        pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) request.getEnableFlag()));
-        pageQuery.setTenantId(request.getTenantId());
+        PointQuery query = new PointQuery();
+        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityQuery.getPage());
+        query.setPage(pages);
 
-        return pageQuery;
+        LongOptional.of(entityQuery.getDeviceId()).ifPresent(query::setDeviceId);
+        StringOptional.of(entityQuery.getPointName()).ifPresent(query::setPointName);
+        LongOptional.of(entityQuery.getProfileId()).ifPresent(query::setProfileId);
+        query.setPointTypeFlag(PointTypeFlagEnum.ofIndex((byte) entityQuery.getPointTypeFlag()));
+        query.setRwFlag(RwFlagEnum.ofIndex((byte) entityQuery.getRwFlag()));
+        query.setEnableFlag(EnableFlagEnum.ofIndex((byte) entityQuery.getEnableFlag()));
+        LongOptional.of(entityQuery.getTenantId()).ifPresent(query::setTenantId);
+
+        return query;
     }
 
     /**
-     * DO to DTO
+     * BO to Grpc DTO
      *
-     * @param entityDO Point
-     * @return PointDTO
+     * @param entityBO PointBO
+     * @return GrpcPointDTO
      */
-    private GrpcPointDTO buildDTOByDO(PointBO entityDO) {
+    private GrpcPointDTO buildGrpcDTOByBO(PointBO entityBO) {
+        if (ObjectUtil.isNull(entityBO)) {
+            return null;
+        }
+
         GrpcPointDTO.Builder builder = GrpcPointDTO.newBuilder();
-        GrpcBase baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+        GrpcBase baseDTO = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
         builder.setBase(baseDTO);
-        builder.setPointName(entityDO.getPointName());
-        builder.setPointCode(entityDO.getPointCode());
-        builder.setPointTypeFlag(entityDO.getPointTypeFlag().getIndex());
-        builder.setRwFlag(entityDO.getRwFlag().getIndex());
-        builder.setBaseValue(entityDO.getBaseValue().doubleValue());
-        builder.setMultiple(entityDO.getMultiple().doubleValue());
-        builder.setValueDecimal(entityDO.getValueDecimal());
-        builder.setUnit(entityDO.getUnit());
-        builder.setProfileId(entityDO.getProfileId());
-        builder.setGroupId(entityDO.getGroupId());
-        builder.setEnableFlag(entityDO.getEnableFlag().getIndex());
-        builder.setTenantId(entityDO.getTenantId());
+
+        builder.setPointName(entityBO.getPointName());
+        builder.setPointCode(entityBO.getPointCode());
+        builder.setPointTypeFlag(entityBO.getPointTypeFlag().getIndex());
+        builder.setRwFlag(entityBO.getRwFlag().getIndex());
+        builder.setBaseValue(entityBO.getBaseValue().doubleValue());
+        builder.setMultiple(entityBO.getMultiple().doubleValue());
+        builder.setValueDecimal(entityBO.getValueDecimal());
+        builder.setUnit(entityBO.getUnit());
+        builder.setProfileId(entityBO.getProfileId());
+        builder.setGroupId(entityBO.getGroupId());
+        builder.setEnableFlag(entityBO.getEnableFlag().getIndex());
+        builder.setTenantId(entityBO.getTenantId());
         return builder.build();
     }
 

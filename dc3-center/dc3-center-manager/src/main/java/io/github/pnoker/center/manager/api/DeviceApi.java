@@ -31,7 +31,7 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
-import io.github.pnoker.common.utils.BuilderUtil;
+import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -60,7 +60,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DeviceQuery pageQuery = buildPageQuery(request);
+        DeviceQuery pageQuery = buildQueryByGrpcQuery(request);
 
         Page<DeviceBO> devicePage = deviceService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(devicePage)) {
@@ -163,43 +163,50 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     /**
-     * DTO to Query
+     * Grpc Query to Query
      *
-     * @param request PageDeviceQueryDTO
-     * @return DevicePageQuery
+     * @param entityQuery GrpcPageDeviceQuery
+     * @return DeviceQuery
      */
-    private DeviceQuery buildPageQuery(GrpcPageDeviceQuery request) {
-        DeviceQuery pageQuery = new DeviceQuery();
-        Pages pages = new Pages();
-        pages.setCurrent(request.getPage().getCurrent());
-        pages.setSize(request.getPage().getSize());
-        pageQuery.setPage(pages);
+    private DeviceQuery buildQueryByGrpcQuery(GrpcPageDeviceQuery entityQuery) {
+        if (ObjectUtil.isNull(entityQuery)) {
+            return null;
+        }
 
-        pageQuery.setProfileId(request.getProfileId() > DefaultConstant.DEFAULT_INT ? request.getProfileId() : null);
-        pageQuery.setDeviceName(request.getDeviceName());
-        pageQuery.setDriverId(request.getDriverId() > DefaultConstant.DEFAULT_INT ? request.getDriverId() : null);
-        pageQuery.setEnableFlag(EnableFlagEnum.ofIndex((byte) request.getEnableFlag()));
-        pageQuery.setTenantId(request.getTenantId());
+        DeviceQuery query = new DeviceQuery();
+        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityQuery.getPage());
+        query.setPage(pages);
 
-        return pageQuery;
+        query.setProfileId(entityQuery.getProfileId() > DefaultConstant.DEFAULT_INT ? entityQuery.getProfileId() : null);
+        query.setDeviceName(entityQuery.getDeviceName());
+        query.setDriverId(entityQuery.getDriverId() > DefaultConstant.DEFAULT_INT ? entityQuery.getDriverId() : null);
+        query.setEnableFlag(EnableFlagEnum.ofIndex((byte) entityQuery.getEnableFlag()));
+        query.setTenantId(entityQuery.getTenantId());
+
+        return query;
     }
 
     /**
-     * DO to DTO
+     * BO to Grpc DTO
      *
-     * @param entityDO Device
-     * @return DeviceDTO
+     * @param entityBO DeviceBO
+     * @return GrpcDeviceDTO
      */
-    private GrpcDeviceDTO buildDTOByDO(DeviceBO entityDO) {
+    private GrpcDeviceDTO buildDTOByDO(DeviceBO entityBO) {
+        if (ObjectUtil.isNull(entityBO)) {
+            return null;
+        }
+
         GrpcDeviceDTO.Builder builder = GrpcDeviceDTO.newBuilder();
-        GrpcBase baseDTO = BuilderUtil.buildBaseDTOByDO(entityDO);
+        GrpcBase baseDTO = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
         builder.setBase(baseDTO);
-        builder.setDeviceName(entityDO.getDeviceName());
-        builder.setDeviceCode(entityDO.getDeviceCode());
-        builder.setDriverId(entityDO.getDriverId());
-        builder.setGroupId(entityDO.getGroupId());
-        builder.setEnableFlag(entityDO.getEnableFlag().getIndex());
-        builder.setTenantId(entityDO.getTenantId());
+
+        builder.setDeviceName(entityBO.getDeviceName());
+        builder.setDeviceCode(entityBO.getDeviceCode());
+        builder.setDriverId(entityBO.getDriverId());
+        builder.setGroupId(entityBO.getGroupId());
+        builder.setEnableFlag(entityBO.getEnableFlag().getIndex());
+        builder.setTenantId(entityBO.getTenantId());
         return builder.build();
     }
 
