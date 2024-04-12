@@ -79,6 +79,14 @@
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-repository</artifactId>
         </dependency>
+     <!--   <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-tdengine</artifactId>
+        </dependency>-->
+<!--        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-influx</artifactId>
+        </dependency>-->
     </dependencies>
 
 </project>
