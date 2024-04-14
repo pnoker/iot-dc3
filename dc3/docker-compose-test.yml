@@ -14,8 +14,6 @@
 # limitations under the License.
 #
 
-version: '3'
-
 services:
   gateway:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2024.1.1.dev
