@@ -45,7 +45,7 @@ services:
     container_name: dc3-mongo
     hostname: dc3-mongo
     volumes:
-      - mongo_db:/data/db
+      - mongo_data:/data/db
       - mongo_config:/data/configdb
     logging:
       driver: json-file
@@ -99,9 +99,9 @@ services:
           - dc3-rabbitmq
 
 volumes:
-  mysql_lib:
   mysql_data:
-  mongo_db:
+  mysql_lib:
+  mongo_data:
   mongo_config:
   redis:
   rabbitmq:

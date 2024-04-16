@@ -42,7 +42,7 @@ public class OPCItemIO extends BaseCOMObject {
         Integer maxAges[] = new Integer[requests.length];
         for (int i = 0; i < requests.length; i++) {
             itemIDs[i] = new JIString(requests[i].getItemID(), JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR);
-            maxAges[i] = new Integer(requests[i].getMaxAge());
+            maxAges[i] = requests[i].getMaxAge();
         }
 
         callObject.addInParamAsInt(requests.length, JIFlags.FLAG_NULL);
