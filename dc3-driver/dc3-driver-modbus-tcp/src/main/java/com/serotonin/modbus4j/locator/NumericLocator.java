@@ -167,16 +167,16 @@ public class NumericLocator extends BaseLocator<Number> {
 
         // 2 bytes
         if (dataType == DataType.TWO_BYTE_INT_UNSIGNED)
-            return new Integer(((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff));
+            return ((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff);
 
         if (dataType == DataType.TWO_BYTE_INT_SIGNED)
-            return new Short((short) (((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff)));
+            return (short) (((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff));
 
         if (dataType == DataType.TWO_BYTE_INT_UNSIGNED_SWAPPED)
-            return new Integer(((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff));
+            return ((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff);
 
         if (dataType == DataType.TWO_BYTE_INT_SIGNED_SWAPPED)
-            return new Short((short) (((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff)));
+            return (short) (((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff));
 
         if (dataType == DataType.TWO_BYTE_BCD) {
             StringBuilder sb = new StringBuilder();
@@ -187,34 +187,34 @@ public class NumericLocator extends BaseLocator<Number> {
 
         // 1 byte
         if (dataType == DataType.ONE_BYTE_INT_UNSIGNED_LOWER)
-            return new Integer(data[offset + 1] & 0xff);
+            return data[offset + 1] & 0xff;
         if (dataType == DataType.ONE_BYTE_INT_UNSIGNED_UPPER)
-            return new Integer(data[offset] & 0xff);
+            return data[offset] & 0xff;
 
         // 4 bytes
         if (dataType == DataType.FOUR_BYTE_INT_UNSIGNED)
-            return new Long(((long) ((data[offset] & 0xff)) << 24) | ((long) ((data[offset + 1] & 0xff)) << 16)
-                    | ((long) ((data[offset + 2] & 0xff)) << 8) | ((data[offset + 3] & 0xff)));
+            return (long) ((data[offset] & 0xff)) << 24 | ((long) ((data[offset + 1] & 0xff)) << 16)
+                    | ((long) ((data[offset + 2] & 0xff)) << 8) | ((data[offset + 3] & 0xff));
 
         if (dataType == DataType.FOUR_BYTE_INT_SIGNED)
-            return new Integer(((data[offset] & 0xff) << 24) | ((data[offset + 1] & 0xff) << 16)
-                    | ((data[offset + 2] & 0xff) << 8) | (data[offset + 3] & 0xff));
+            return ((data[offset] & 0xff) << 24) | ((data[offset + 1] & 0xff) << 16)
+                    | ((data[offset + 2] & 0xff) << 8) | (data[offset + 3] & 0xff);
 
         if (dataType == DataType.FOUR_BYTE_INT_UNSIGNED_SWAPPED)
-            return new Long(((long) ((data[offset + 2] & 0xff)) << 24) | ((long) ((data[offset + 3] & 0xff)) << 16)
-                    | ((long) ((data[offset] & 0xff)) << 8) | ((data[offset + 1] & 0xff)));
+            return ((long) ((data[offset + 2] & 0xff)) << 24) | ((long) ((data[offset + 3] & 0xff)) << 16)
+                    | ((long) ((data[offset] & 0xff)) << 8) | ((data[offset + 1] & 0xff));
 
         if (dataType == DataType.FOUR_BYTE_INT_SIGNED_SWAPPED)
-            return new Integer(((data[offset + 2] & 0xff) << 24) | ((data[offset + 3] & 0xff) << 16)
-                    | ((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff));
+            return ((data[offset + 2] & 0xff) << 24) | ((data[offset + 3] & 0xff) << 16)
+                    | ((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff);
 
         if (dataType == DataType.FOUR_BYTE_INT_UNSIGNED_SWAPPED_SWAPPED)
-            return new Long(((long) ((data[offset + 3] & 0xff)) << 24) | (((data[offset + 2] & 0xff) << 16))
-                    | ((long) ((data[offset + 1] & 0xff)) << 8) | (data[offset] & 0xff));
+            return ((long) ((data[offset + 3] & 0xff)) << 24) | (((data[offset + 2] & 0xff) << 16))
+                    | ((long) ((data[offset + 1] & 0xff)) << 8) | (data[offset] & 0xff);
 
         if (dataType == DataType.FOUR_BYTE_INT_SIGNED_SWAPPED_SWAPPED)
-            return new Integer(((data[offset + 3] & 0xff) << 24) | ((data[offset + 2] & 0xff) << 16)
-                    | ((data[offset + 1] & 0xff) << 8) | ((data[offset] & 0xff)));
+            return ((data[offset + 3] & 0xff) << 24) | ((data[offset + 2] & 0xff) << 16)
+                    | ((data[offset + 1] & 0xff) << 8) | ((data[offset] & 0xff));
 
         if (dataType == DataType.FOUR_BYTE_FLOAT)
             return Float.intBitsToFloat(((data[offset] & 0xff) << 24) | ((data[offset + 1] & 0xff) << 16)
@@ -276,10 +276,10 @@ public class NumericLocator extends BaseLocator<Number> {
         }
 
         if (dataType == DataType.EIGHT_BYTE_INT_SIGNED)
-            return new Long(((long) ((data[offset] & 0xff)) << 56) | ((long) ((data[offset + 1] & 0xff)) << 48)
+            return ((long) ((data[offset] & 0xff)) << 56) | ((long) ((data[offset + 1] & 0xff)) << 48)
                     | ((long) ((data[offset + 2] & 0xff)) << 40) | ((long) ((data[offset + 3] & 0xff)) << 32)
                     | ((long) ((data[offset + 4] & 0xff)) << 24) | ((long) ((data[offset + 5] & 0xff)) << 16)
-                    | ((long) ((data[offset + 6] & 0xff)) << 8) | ((data[offset + 7] & 0xff)));
+                    | ((long) ((data[offset + 6] & 0xff)) << 8) | ((data[offset + 7] & 0xff));
 
         if (dataType == DataType.EIGHT_BYTE_INT_UNSIGNED_SWAPPED) {
             byte[] b9 = new byte[9];
@@ -295,10 +295,10 @@ public class NumericLocator extends BaseLocator<Number> {
         }
 
         if (dataType == DataType.EIGHT_BYTE_INT_SIGNED_SWAPPED)
-            return new Long(((long) ((data[offset + 6] & 0xff)) << 56) | ((long) ((data[offset + 7] & 0xff)) << 48)
+            return ((long) ((data[offset + 6] & 0xff)) << 56) | ((long) ((data[offset + 7] & 0xff)) << 48)
                     | ((long) ((data[offset + 4] & 0xff)) << 40) | ((long) ((data[offset + 5] & 0xff)) << 32)
                     | ((long) ((data[offset + 2] & 0xff)) << 24) | ((long) ((data[offset + 3] & 0xff)) << 16)
-                    | ((long) ((data[offset] & 0xff)) << 8) | ((data[offset + 1] & 0xff)));
+                    | ((long) ((data[offset] & 0xff)) << 8) | ((data[offset + 1] & 0xff));
 
         if (dataType == DataType.EIGHT_BYTE_FLOAT)
             return Double.longBitsToDouble(((long) ((data[offset] & 0xff)) << 56)

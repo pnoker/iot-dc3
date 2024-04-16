@@ -114,13 +114,13 @@ public class BinaryLocator extends BaseLocator<Boolean> {
     public Boolean bytesToValueRealOffset(byte[] data, int offset) {
         // If this is a coil or input, convert to boolean.
         if (range == RegisterRange.COIL_STATUS || range == RegisterRange.INPUT_STATUS)
-            return new Boolean((((data[offset / 8] & 0xff) >> (offset % 8)) & 0x1) == 1);
+            return (((data[offset / 8] & 0xff) >> (offset % 8)) & 0x1) == 1;
 
         // For the rest of the types, we double the normalized offset to account for short to byte.
         offset *= 2;
 
         // We could still be asking for a binary if it's a bit in a register.
-        return new Boolean((((data[offset + 1 - bit / 8] & 0xff) >> (bit % 8)) & 0x1) == 1);
+        return (((data[offset + 1 - bit / 8] & 0xff) >> (bit % 8)) & 0x1) == 1;
     }
 
 

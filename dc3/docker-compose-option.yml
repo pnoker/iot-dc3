@@ -183,7 +183,7 @@ services:
           - dc3-grafana
 
   portainer:
-    image: portainer/portainer:1.24.2
+    image: portainer/portainer/portainer-ce:2.20.1
     command: -H unix:///var/run/docker.sock
     restart: always
     ports:
