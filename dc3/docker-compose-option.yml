@@ -125,7 +125,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-tdengine:2024.1.1.dev
     restart: always
     ports:
-      - '36030:6030'
+      - '36041:6041'
     container_name: dc3-tdengine
     hostname: dc3-tdengine
     volumes:
@@ -183,7 +183,7 @@ services:
           - dc3-grafana
 
   portainer:
-    image: portainer/portainer/portainer-ce:2.20.1
+    image: portainer/portainer-ce:2.20.1
     command: -H unix:///var/run/docker.sock
     restart: always
     ports:
