@@ -22,4 +22,6 @@ import java.util.List;
 
 public interface DeviceRunService {
     List<DeviceRunDO> get7daysDuration(Long deviceId, String code);
+
+    Long selectSumDuration(Long deviceId, String code);
 }

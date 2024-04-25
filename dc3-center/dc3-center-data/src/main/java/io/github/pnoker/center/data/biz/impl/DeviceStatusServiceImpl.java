@@ -111,6 +111,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     @Override
     public DeviceRunBO selectOnlineByDeviceId(Long deviceId) {
         List<DeviceRunDO> deviceRunDOS = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
+        Long totalDuration=deviceRunService.selectSumDuration(deviceId,DriverStatusEnum.ONLINE.getCode());
         GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
@@ -121,6 +122,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
+        deviceRunBO.setTotalDuration(totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
         if (ObjectUtil.isEmpty(deviceRunDOS)) {
             deviceRunBO.setDuration(list);
@@ -136,6 +138,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     @Override
     public DeviceRunBO selectOfflineByDeviceId(Long deviceId) {
         List<DeviceRunDO> deviceRunDOS = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
+        Long totalDuration=deviceRunService.selectSumDuration(deviceId,DriverStatusEnum.OFFLINE.getCode());
         GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
@@ -146,6 +149,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
+        deviceRunBO.setTotalDuration(totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
         if (ObjectUtil.isEmpty(deviceRunDOS)) {
             deviceRunBO.setDuration(list);

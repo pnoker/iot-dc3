@@ -22,4 +22,6 @@ import java.util.List;
 
 public interface DriverRunService {
     List<DriverRunDO> get7daysDuration(Long driverId, String code);
+
+    Long selectSumDuration(Long driverId, String code);
 }

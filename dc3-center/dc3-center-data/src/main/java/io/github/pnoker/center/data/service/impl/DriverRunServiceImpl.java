@@ -33,4 +33,9 @@ public class DriverRunServiceImpl implements DriverRunService {
     public List<DriverRunDO> get7daysDuration(Long driverId, String code) {
         return driverRunMapper.get7daysDuration(driverId, code);
     }
+
+    @Override
+    public Long selectSumDuration(Long driverId, String code) {
+        return driverRunMapper.selectSumDuration(driverId,code);
+    }
 }

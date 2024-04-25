@@ -32,5 +32,7 @@ import java.util.List;
  */
 public interface DeviceRunMapper extends BaseMapper<DeviceRunDO> {
 
-    List<DeviceRunDO> get7daysDuration(@Param("driverId") Long driverId, @Param("status") String status);
+    List<DeviceRunDO> get7daysDuration(@Param("deviceId") Long deviceId, @Param("status") String status);
+
+    Long selectSumDuration(@Param("deviceId") Long deviceId,@Param("status")  String status);
 }

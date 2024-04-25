@@ -107,6 +107,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public DriverRunBO selectOnlineByDriverId(Long driverId) {
         List<DriverRunDO> driverRunDOS = driverRunService.get7daysDuration(driverId, DriverStatusEnum.ONLINE.getCode());
+        Long totalDuration=driverRunService.selectSumDuration(driverId,DriverStatusEnum.ONLINE.getCode());
         GrpcDriverQuery.Builder builder = GrpcDriverQuery.newBuilder();
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
@@ -118,6 +119,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         ArrayList<Long> list = new ArrayList<>(zeroList);
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         driverRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
+        driverRunBO.setTotalDuration(totalDuration);
         if (ObjectUtil.isEmpty(driverRunDOS)) {
             driverRunBO.setDuration(list);
             return driverRunBO;
@@ -132,6 +134,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public DriverRunBO selectOfflineByDriverId(Long driverId) {
         List<DriverRunDO> driverRunDOS = driverRunService.get7daysDuration(driverId, DriverStatusEnum.OFFLINE.getCode());
+        Long totalDuration=driverRunService.selectSumDuration(driverId,DriverStatusEnum.OFFLINE.getCode());
         GrpcDriverQuery.Builder builder = GrpcDriverQuery.newBuilder();
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
@@ -141,6 +144,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         DriverRunBO driverRunBO = new DriverRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
+        driverRunBO.setTotalDuration(totalDuration);
         driverRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         if (ObjectUtil.isEmpty(driverRunDOS)) {

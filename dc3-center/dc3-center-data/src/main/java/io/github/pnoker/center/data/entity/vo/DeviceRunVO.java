@@ -41,5 +41,7 @@ public class DeviceRunVO {
     @Schema(description = "设备在线时长 /分钟")
     private List<Long> duration;
 
+    @Schema(description = "设备在线总时长/分钟")
+    private Long totalDuration;
 
 }
