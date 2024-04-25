@@ -7,6 +7,7 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "type": "module",
   "scripts": {
     "serve": "vite --host --mode dev",
     "pre": "vite --host --mode pre",

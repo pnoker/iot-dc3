@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, reactive, ref, shallowRef } from 'vue'
+import { defineComponent, onMounted, reactive, ref } from 'vue'
 
 import * as echarts from 'echarts'
 
@@ -292,7 +292,6 @@ export default defineComponent({
             chart.setOption(option)
         })
 
-        const map = shallowRef(null)
         return {
             countDataChartRef,
             reactiveData,
