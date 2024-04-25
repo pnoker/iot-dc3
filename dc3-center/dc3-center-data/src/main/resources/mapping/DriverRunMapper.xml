@@ -25,4 +25,10 @@
           and driver_id = #{driverId}
           and status = #{status};
     </select>
+    <select id="selectSumDuration" resultType="java.lang.Long">
+        select SUM(duration)
+        from dc3_driver_run
+        where driver_id = #{driverId}
+          and status = #{status}
+    </select>
 </mapper>

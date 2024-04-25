@@ -22,7 +22,13 @@
         SELECT duration, create_time
         FROM dc3_device_run
         WHERE create_time >= DATE_SUB(CURRENT_DATE, INTERVAL 6 DAY)
-          and device_id = #{driverId}
+          and device_id = #{deviceId}
           and status = #{status};
+    </select>
+    <select id="selectSumDuration" resultType="java.lang.Long">
+        select SUM(duration)
+        from dc3_device_run
+        where device_id = #{deviceId}
+          and status = #{status}
     </select>
 </mapper>

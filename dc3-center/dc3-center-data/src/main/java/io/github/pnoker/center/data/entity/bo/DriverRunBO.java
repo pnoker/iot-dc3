@@ -41,4 +41,9 @@ public class DriverRunBO {
      * 驱动在线时长 /分钟
      */
     private List<Long> duration;
+
+    /**
+     * 驱动在线总时长 分钟
+     */
+    private Long totalDuration;
 }

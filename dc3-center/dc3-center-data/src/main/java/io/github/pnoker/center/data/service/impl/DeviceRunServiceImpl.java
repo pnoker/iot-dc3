@@ -33,4 +33,9 @@ public class DeviceRunServiceImpl implements DeviceRunService {
     public List<DeviceRunDO> get7daysDuration(Long deviceId, String code) {
         return deviceRunMapper.get7daysDuration(deviceId, code);
     }
+
+    @Override
+    public Long selectSumDuration(Long deviceId, String code) {
+        return deviceRunMapper.selectSumDuration(deviceId, code);
+    }
 }
