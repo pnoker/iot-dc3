@@ -16,10 +16,9 @@
 
 import request from '@/config/axios'
 
-export const getFlowsList = (flowsQuery : any) =>
+export const getFlowsList = (flowsQuery: any) =>
     request<R>({
-        url: "api/v3/manager/ruleengine/flowsList",
+        url: 'api/v3/manager/ruleengine/flowsList',
         method: 'post',
-        data:flowsQuery
+        data: flowsQuery,
     })
-

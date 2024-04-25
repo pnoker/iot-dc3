@@ -15,7 +15,7 @@
  */
 
 import { CircleCheck, CircleClose, Coin, Edit, List, Promotion, Sunset, SwitchButton } from '@element-plus/icons-vue'
-import { computed, defineComponent } from 'vue'
+import { defineComponent } from 'vue'
 
 import router from '@/config/router'
 

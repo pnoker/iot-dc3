@@ -15,71 +15,71 @@
  */
 
 .things-dialog {
-  .things-dialog-form-item {
-    display: flex;
+    .things-dialog-form-item {
+        display: flex;
 
-    .el-form-item__label {
-      width: 100px;
-      height: 32px;
-      display: block;
-      text-align: justify;
+        .el-form-item__label {
+            width: 100px;
+            height: 32px;
+            display: block;
+            text-align: justify;
+        }
+
+        .el-form-item__label::after {
+            display: inline-block;
+            width: 100%;
+            content: '';
+        }
     }
 
-    .el-form-item__label::after {
-      display: inline-block;
-      width: 100%;
-      content: '';
-    }
-  }
+    .things-dialog-upload {
+        margin-top: 20px;
 
-  .things-dialog-upload {
-    margin-top: 20px;
+        .el-upload__icon {
+            font-size: 71px;
+            color: var(--el-text-color-placeholder);
+            margin-bottom: 16px;
+            line-height: 35px;
+        }
 
-    .el-upload__icon {
-      font-size: 71px;
-      color: var(--el-text-color-placeholder);
-      margin-bottom: 16px;
-      line-height: 35px;
-    }
-
-    .el-upload__text {
-      color: var(--el-text-color-regular);
-      font-size: 14px;
-      text-align: center;
-    }
-  }
-
-  .things-dialog-form-alert {
-    margin-bottom: 10px;
-  }
-
-  .things-dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .el-dialog__title {
-    font-size: 16px;
-    font-weight: bold;
-  }
-
-  .el-dialog__body {
-    padding: 30px 30px 15px 30px;
-
-    pre {
-      margin: auto;
-    }
-  }
-
-  .el-form-item__content {
-    width: 100%;
-
-    .el-select {
-      width: 100%;
+        .el-upload__text {
+            color: var(--el-text-color-regular);
+            font-size: 14px;
+            text-align: center;
+        }
     }
 
-    .el-textarea__inner {
-      height: 100px;
+    .things-dialog-form-alert {
+        margin-bottom: 10px;
     }
-  }
+
+    .things-dialog-footer {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .el-dialog__title {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .el-dialog__body {
+        padding: 30px 30px 15px 30px;
+
+        pre {
+            margin: auto;
+        }
+    }
+
+    .el-form-item__content {
+        width: 100%;
+
+        .el-select {
+            width: 100%;
+        }
+
+        .el-textarea__inner {
+            height: 100px;
+        }
+    }
 }

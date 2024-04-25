@@ -11,12 +11,14 @@
     "serve": "vite --host --mode dev",
     "pre": "vite --host --mode pre",
     "build": "vite build --mode pro",
-    "build:dev": "vue-tsc && vite build --mode dev",
-    "build:mock": "vue-tsc && vite build --mode mock",
-    "build:test": "vue-tsc && vite build --mode test",
-    "build:pre": "vue-tsc && vite build --mode pre",
+    "build:dev": "vite build --mode dev",
+    "build:mock": "vite build --mode mock",
+    "build:test": "vite build --mode test",
+    "build:pre": "vite build --mode pre",
     "preview": "vite preview",
-    "lint": "vue-cli-service lint"
+    "check": "vue-tsc --build --force",
+    "format": "prettier --write src/",
+    "lint": "eslint . --ext .vue,.ts --fix --ignore-path .gitignore"
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^1.0.1",

@@ -24,6 +24,10 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
+# Lock files
 yarn.lock
+pnpm-lock.yaml
+
 components.d.ts
 auto-imports.d.ts
+/.history/
