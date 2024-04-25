@@ -32,9 +32,9 @@ docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3:2024.1.1.dev .
 
 cd dc3/docker
 docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2024.1.1.dev -f Dockerfile.gateway .
-docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-auth:2024.1.1.dev -f Dockerfile.auth .
-docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-data:2024.1.1.dev -f Dockerfile.data .
-docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-manager:2024.1.1.dev -f Dockerfile.manager .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2024.1.1.dev -f Dockerfile.auth .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2024.1.1.dev -f Dockerfile.data .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2024.1.1.dev -f Dockerfile.manager .
 
 cd ../
 docker-compose -f docker-compose-test.yml up -d auth manager data gateway virtual
