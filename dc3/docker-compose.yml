@@ -64,6 +64,29 @@ services:
         aliases:
           - dc3-center-auth
 
+  ekuiper:
+    build:
+      context: ../dc3-center/dc3-center-ekuiper/
+      dockerfile: ./Dockerfile
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-ekuiper:2024.1.1.dev
+    restart: always
+    ports:
+      - '8600:8600'
+      - '9600:9600'
+    container_name: dc3-center-ekuiper
+    hostname: dc3-center-ekuiper
+    volumes:
+      - logs:/dc3-center/dc3-center-ekuiper/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-center-ekuiper
+
   manager:
     build:
       context: ../dc3-center/dc3-center-manager/

@@ -79,6 +79,19 @@ spring:
                 key-resolver: '#{@hostKeyResolver}'
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
+        # ekuiper
+        - id: ekuiper_route
+          uri: http://dc3-center-ekuiper:8600
+          predicates:
+            - Path=/api/v3/ekuiper/**
+          filters:
+            - StripPrefix=2
+            - Authentic
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@hostKeyResolver}'
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
 
 grpc:
   client:
