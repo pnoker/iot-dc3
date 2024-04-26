@@ -14,14 +14,12 @@
 # limitations under the License.
 #
 
-version: '3'
-
 services:
   web:
     build:
       context: ../
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/iot-dc3-web:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-web:2024.1.1.dev
     restart: always
     ports:
       - 8080:80
@@ -29,14 +27,14 @@ services:
     environment:
       - APP_API_HOST=dc3-gateway
       - APP_API_PORT=8000
-    container_name: iot-dc3-web
-    hostname: iot-dc3-web
+    container_name: dc3-web
+    hostname: dc3-web
     volumes:
       - nginx:/var/log/nginx
     networks:
       dc3net:
         aliases:
-          - iot-dc3-web
+          - dc3-web
 
 volumes:
   nginx:
