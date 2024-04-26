@@ -312,7 +312,7 @@ public class PointServiceImpl implements PointService {
             deviceDataVolumeRunBO.setPointName(pointDO.getPointName());
             List<PointDataVolumeRunDO> pointDataVolumeRunDOS = pointDataVolumeRunManager.list(wrapper);
             if (ObjectUtil.isNotEmpty(pointDataVolumeRunDOS)) {
-                for (int i = 0; i < 7; i++) {
+                for (int i = 0; i < pointDataVolumeRunDOS.size(); i++) {
                     zeroList.set(i, pointDataVolumeRunDOS.get(i).getTotal());
                 }
             }
@@ -366,7 +366,7 @@ public class PointServiceImpl implements PointService {
             result.setTotal(zeroList);
             return result;
         }
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < pointDataVolumeRunDOS.size(); i++) {
             zeroList.set(i, pointDataVolumeRunDOS.get(i).getTotal());
         }
         result.setTotal(zeroList);
