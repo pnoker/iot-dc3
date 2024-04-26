@@ -35,6 +35,7 @@ docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2024.1.1.dev -f
 docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2024.1.1.dev -f Dockerfile.auth .
 docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2024.1.1.dev -f Dockerfile.data .
 docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2024.1.1.dev -f Dockerfile.manager .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-ekuiper:2024.1.1.dev -f Dockerfile.ekuiper .
 
 cd ../
-docker-compose -f docker-compose-test.yml up -d auth manager data gateway virtual
+docker-compose -f docker-compose-test.yml up -d auth manager data gateway ekuiper virtual

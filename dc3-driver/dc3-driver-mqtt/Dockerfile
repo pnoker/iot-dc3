@@ -16,7 +16,8 @@
 
 # runtime
 FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jre:17 AS runtime
-LABEL dc3.author=pnokers dc3.author.email=pnokers.icloud.com
+LABEL dc3.author pnokers
+LABEL dc3.author.email pnokers.icloud.com
 
 # default env
 ENV PARAMS   ''
