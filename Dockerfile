@@ -15,15 +15,14 @@
 #
 
 # builder
-FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-jdk-8.13.14 AS builder
-MAINTAINER pnoker <pnokers.icloud.com>
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:17 AS builder
+LABEL dc3.author=pnokers dc3.author.email=pnokers.icloud.com
 
 ARG PROFILE=dev
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 WORKDIR /build
-COPY . /build
 
 COPY ./ ./
 

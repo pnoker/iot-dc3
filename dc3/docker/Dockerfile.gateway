@@ -14,15 +14,18 @@
 # limitations under the License.
 #
 
+# builder
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3:2024.1.1.dev AS builder
+LABEL dc3.author=pnokers dc3.author.email=pnokers.icloud.com
+
 # runtime
 FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jre:17 AS runtime
 LABEL dc3.author=pnokers dc3.author.email=pnokers.icloud.com
 
 # default env
-ENV PARAMS   ''
-ENV NODE_ENV dev
-ENV TCP_PORT 9001
-ENV UDP_PORT 9002
+ENV PARAMS      ''
+ENV NODE_ENV    dev
+ENV SERVER_PORT 8000
 
 # default jvm & gc env
 ENV JAVA_OPS -server \
@@ -33,17 +36,16 @@ ENV JAVA_OPS -server \
              -XX:MetaspaceSize=200m \
              -XX:MaxMetaspaceSize=200m \
              -XX:+UseParallelGC
-ENV GC_LOG   -Xlog:gc*:file=dc3/logs/driver/dtu-yeecom/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=20M
+ENV GC_LOG   -Xlog:gc*:file=dc3/logs/gateway/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=20M
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-WORKDIR /dc3-driver/dc3-driver-dtu-yeecom
+WORKDIR /dc3-gateway
 
-ADD ./target/dc3-driver-dtu-yeecom.jar ./
+COPY --from=builder /build/dc3-gateway/target/dc3-gateway.jar ./
 
-EXPOSE ${TCP_PORT}
-EXPOSE ${UDP_PORT}
-VOLUME /dc3-driver/dc3-driver-dtu-yeecom/dc3/logs
+EXPOSE ${SERVER_PORT}
+VOLUME /dc3-gateway/dc3/logs
 
-CMD mkdir -p /dc3-driver/dc3-driver-dtu-yeecom/dc3/logs/driver/dtu-yeecom/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-driver-dtu-yeecom.jar ${PARAMS}
+CMD mkdir -p /dc3-gateway/dc3/logs/gateway/gc \
+    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-gateway.jar ${PARAMS}
