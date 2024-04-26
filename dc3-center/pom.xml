@@ -62,6 +62,7 @@
         <module>dc3-center-auth</module>
         <module>dc3-center-manager</module>
         <module>dc3-center-data</module>
+        <module>dc3-center-ekuiper</module>
     </modules>
 
     <dependencies>

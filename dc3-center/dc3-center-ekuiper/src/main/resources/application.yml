@@ -1,0 +1,22 @@
+server:
+    port: ${SERVER_PORT:8600}
+    servlet:
+        context-path: /ekuiper
+undertow:
+    accesslog:
+        dir: dc3/logs/center/ekuiper/undertow
+driver:
+    custom:
+        url: http://10.6.0.107:9081
+        STREAM_URL: ${driver.custom.url}/streams
+        TABLE_URL: ${driver.custom.url}/tables
+        CONFKEY_URL: ${driver.custom.url}/metadata
+        RULE_URL: ${driver.custom.url}/rules
+spring:
+    datasource:
+        dynamic:
+            datasource:
+                master:
+                    url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:33306}/${MYSQL_DB:dc3_data}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+                    username: ${MYSQL_USERNAME:root}
+                    password: ${MYSQL_PASSWORD:dc3}
