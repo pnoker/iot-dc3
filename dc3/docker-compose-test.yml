@@ -111,6 +111,8 @@ services:
     ports:
       - '8600:8600'
       - '9600:9600'
+    environment:
+      - NODE_ENV=test
     container_name: dc3-center-ekuiper
     hostname: dc3-center-ekuiper
     volumes:
