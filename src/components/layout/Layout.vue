@@ -72,7 +72,7 @@
 <script setup lang="ts">
 import router from '@/config/router'
 import menu from '@/config/router/views'
-import { warning } from '@/utils/MessageUtils'
+import { warning } from '@/utils/MessageUtil'
 import { HomeFilled } from '@element-plus/icons-vue'
 import { computed } from 'vue'
 import { useStore } from 'vuex'

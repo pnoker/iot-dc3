@@ -21,12 +21,12 @@ import 'nprogress/nprogress.css'
 import commonRouters from './common'
 import operateRouters from './operate'
 import viewsRouters from './views'
-import { getStorage } from '@/utils/StorageUtils'
+import { getStorage } from '@/utils/StorageUtil'
 import { isNull } from '@/utils/utils'
 import CommonConstant from '@/config/constant/common'
 import { checkTokenValid } from '@/api/token'
 import { Login } from '@/config/types'
-import { logout } from '@/utils/CommonUtils'
+import { logout } from '@/utils/CommonUtil'
 
 NProgress.configure({
     easing: 'ease',

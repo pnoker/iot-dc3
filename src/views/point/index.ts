@@ -27,7 +27,7 @@ import pointAddForm from './add/PointAddForm.vue'
 import pointCard from './card/PointCard.vue'
 import blankCard from '@/components/card/blank/BlankCard.vue'
 import { isNull } from '@/utils/utils'
-import { failMessage } from '@/utils/NotificationUtils'
+import { failMessage } from '@/utils/NotificationUtil'
 
 export default defineComponent({
     components: {

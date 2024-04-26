@@ -19,8 +19,8 @@ import { defineComponent } from 'vue'
 
 import router from '@/config/router'
 
-import { copy, timestamp } from '@/utils/CommonUtils'
-import { successMessage } from '@/utils/NotificationUtils'
+import { copy, timestamp } from '@/utils/CommonUtil'
+import { successMessage } from '@/utils/NotificationUtil'
 
 export default defineComponent({
     name: 'DeviceCard',

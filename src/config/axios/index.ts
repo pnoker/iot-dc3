@@ -17,8 +17,8 @@
 import axios, { AxiosInstance } from 'axios'
 
 import CommonConstant from '@/config/constant/common'
-import { failMessage, warnMessage } from '@/utils/NotificationUtils'
-import { getStorage } from '@/utils/StorageUtils'
+import { failMessage, warnMessage } from '@/utils/NotificationUtil'
+import { getStorage } from '@/utils/StorageUtil'
 import { isNull } from '@/utils/utils'
 import { encode } from 'js-base64'
 import JSONBigInt from 'json-bigint'

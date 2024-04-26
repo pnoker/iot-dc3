@@ -19,7 +19,7 @@ import { FormInstance, FormRules } from 'element-plus'
 
 import { Dictionary, Order } from '@/config/types'
 
-import { successMessage } from '@/utils/NotificationUtils'
+import { successMessage } from '@/utils/NotificationUtil'
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary'
 
 export default defineComponent({

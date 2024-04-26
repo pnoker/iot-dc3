@@ -21,7 +21,7 @@ import { cancelToken, generateSalt, generateToken } from '@/api/token'
 
 import CommonConstant from '@/config/constant/common'
 import { Login } from '@/config/types'
-import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtils'
+import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtil'
 import { isNull } from '@/utils/utils'
 import { Md5 } from 'ts-md5'
 

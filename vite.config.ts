@@ -57,7 +57,10 @@ export default (configEnv: ConfigEnv) => {
         compact: true,
         manualChunks: {
             vue: ['vue', 'vue-router', 'vuex'],
+            lodash: ['lodash-es'],
             echarts: ['echarts'],
+            element: ['element-plus', '@element-plus/icons-vue'],
+            antv: ['@antv/g2plot', '@amap/amap-jsapi-loader'],
         },
     }
 
@@ -90,6 +93,12 @@ export default (configEnv: ConfigEnv) => {
                 resolvers: [ElementPlusResolver()],
             }),
         ],
-        css: { preprocessorOptions: { css: { charset: false } } },
+        css: {
+            preprocessorOptions: {
+                css: {
+                    charset: false,
+                },
+            },
+        },
     })
 }

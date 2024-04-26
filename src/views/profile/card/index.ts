@@ -19,8 +19,8 @@ import { CircleCheck, CircleClose, CollectionTag, Edit, IceCreamSquare, Right, S
 
 import router from '@/config/router'
 
-import { successMessage } from '@/utils/NotificationUtils'
-import { copy, timestamp } from '@/utils/CommonUtils'
+import { successMessage } from '@/utils/NotificationUtil'
+import { copy, timestamp } from '@/utils/CommonUtil'
 
 export default defineComponent({
     name: 'ProfileCard',

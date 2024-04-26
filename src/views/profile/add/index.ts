@@ -17,7 +17,7 @@
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 
-import { successMessage } from '@/utils/NotificationUtils'
+import { successMessage } from '@/utils/NotificationUtil'
 
 export default defineComponent({
     name: 'ProfileAddForm',

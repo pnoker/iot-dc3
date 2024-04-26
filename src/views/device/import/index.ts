@@ -22,7 +22,7 @@ import { defineComponent, reactive, ref, unref } from 'vue'
 import { Dictionary, Order } from '@/config/types'
 
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary'
-import { successMessage } from '@/utils/NotificationUtils'
+import { successMessage } from '@/utils/NotificationUtil'
 
 export default defineComponent({
     name: 'DeviceImportForm',
