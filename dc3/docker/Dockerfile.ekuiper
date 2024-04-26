@@ -14,14 +14,22 @@
 # limitations under the License.
 #
 
+# builder
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3:2024.1.1.dev AS builder
+LABEL dc3.author pnokers
+LABEL dc3.author.email pnokers.icloud.com
+
 # runtime
 FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jre:17 AS runtime
 LABEL dc3.author pnokers
 LABEL dc3.author.email pnokers.icloud.com
 
 # default env
-ENV PARAMS   ''
-ENV NODE_ENV dev
+ENV PARAMS        ''
+ENV NODE_ENV      dev
+ENV SERVER_PORT   8600
+ENV GRPC_PORT     9600
+
 
 # default jvm & gc env
 ENV JAVA_OPS -server \
@@ -32,15 +40,17 @@ ENV JAVA_OPS -server \
              -XX:MetaspaceSize=200m \
              -XX:MaxMetaspaceSize=200m \
              -XX:+UseParallelGC
-ENV GC_LOG   -Xlog:gc*:file=dc3/logs/driver/modbus-tcp/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=20M
+ENV GC_LOG   -Xlog:gc*:file=dc3/logs/center/ekuiper/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=20M
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-WORKDIR /dc3-driver/dc3-driver-modbus-tcp
+WORKDIR /dc3-center/dc3-center-ekuiper
 
-ADD ./target/dc3-driver-modbus-tcp.jar ./
+COPY --from=builder /build/dc3-center/dc3-center-ekuiper/target/dc3-center-ekuiper.jar ./
 
-VOLUME /dc3-driver/dc3-driver-modbus-tcp/dc3/logs
+EXPOSE ${SERVER_PORT}
+EXPOSE ${GRPC_PORT}
+VOLUME /dc3-center/dc3-center-ekuiper/dc3/logs
 
-CMD mkdir -p /dc3-driver/dc3-driver-modbus-tcp/dc3/logs/driver/modbus-tcp/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-driver-modbus-tcp.jar ${PARAMS}
+CMD mkdir -p /dc3-center/dc3-center-ekuiper/dc3/logs/center/ekuiper/gc \
+    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-center-ekuiper.jar ${PARAMS}

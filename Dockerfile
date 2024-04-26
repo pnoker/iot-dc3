@@ -16,7 +16,8 @@
 
 # builder
 FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:17 AS builder
-LABEL dc3.author=pnokers dc3.author.email=pnokers.icloud.com
+LABEL dc3.author pnokers
+LABEL dc3.author.email pnokers.icloud.com
 
 ARG PROFILE=dev
 
