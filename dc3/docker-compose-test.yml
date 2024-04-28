@@ -165,6 +165,25 @@ services:
         aliases:
           - dc3-driver-modbus-tcp
 
+  mqtt:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2024.1.1.dev
+    restart: always
+    environment:
+      - NODE_ENV=dev
+    container_name: dc3-driver-mqtt
+    hostname: dc3-driver-mqtt
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mqtt
+
 volumes:
   logs:
 
