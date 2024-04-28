@@ -15,7 +15,8 @@
 #
 
 # builder
-FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:2024.1.1.dev AS builder
+# docker buildx build --platform linux/arm64,linux/amd64 -t registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:2024.1.1.dev -f dc3/docker/Dockerfile.dc3 . --push
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:17 AS builder
 LABEL dc3.author pnokers
 LABEL dc3.author.email pnokers.icloud.com
 
@@ -28,3 +29,12 @@ WORKDIR /build
 COPY ./ ./
 
 RUN mvn -U -e -B clean package -DskipTests -P $PROFILE
+
+# runtime
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:17 AS runtime
+LABEL dc3.author pnokers
+LABEL dc3.author.email pnokers.icloud.com
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+COPY --from=builder "/root/.m2/repository/" "/root/.m2/repository/"
