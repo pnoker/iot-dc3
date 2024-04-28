@@ -150,7 +150,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2024.1.1.dev
     restart: always
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
@@ -169,7 +169,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2024.1.1.dev
     restart: always
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
