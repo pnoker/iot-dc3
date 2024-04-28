@@ -40,4 +40,4 @@ docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2024.1.1
 docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2024.1.1.dev -f Dockerfile.modbus-tcp .
 
 cd ../
-docker-compose -f docker-compose-test.yml up -d auth manager data gateway ekuiper virtual
+docker-compose -f docker-compose-test.yml up -d auth manager data gateway ekuiper virtual modbus-tcp
