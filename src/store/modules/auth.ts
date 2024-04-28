@@ -23,7 +23,7 @@ import CommonConstant from '@/config/constant/common'
 import { Login } from '@/config/types'
 import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtil'
 import { isNull } from '@/utils/utils'
-import { Md5 } from 'ts-md5'
+import { md5 } from 'js-md5'
 
 const auth = {
     namespaced: true,
@@ -71,7 +71,7 @@ const auth = {
                         tenant: form.tenant,
                         name: form.name,
                         salt: salt,
-                        password: Md5.hashStr(Md5.hashStr(form.password) + salt),
+                        password: md5.hex(md5.hex(form.password) + salt),
                     }
 
                     generateToken(login)
