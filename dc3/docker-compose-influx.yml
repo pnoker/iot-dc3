@@ -20,13 +20,6 @@ services:
     restart: always
     ports:
       - '38086:8086'
-    environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=dc3
-      - DOCKER_INFLUXDB_INIT_PASSWORD=dc3dc3dc3
-      - DOCKER_INFLUXDB_INIT_ORG=dc3
-      - DOCKER_INFLUXDB_INIT_BUCKET=dc3
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=token_dc3dc3dc3
     container_name: dc3-influx
     hostname: dc3-influx
     volumes:
