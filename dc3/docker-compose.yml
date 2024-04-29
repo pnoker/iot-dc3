@@ -22,8 +22,8 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-web:2024.1.1.dev
     restart: always
     ports:
-      - 8080:80
-      - 443:443
+      - '8080:80'
+      - '443:443'
     environment:
       - APP_API_HOST=dc3-gateway
       - APP_API_PORT=8000
@@ -31,6 +31,11 @@ services:
     hostname: dc3-web
     volumes:
       - nginx:/var/log/nginx
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
     networks:
       dc3net:
         aliases:
@@ -41,5 +46,5 @@ volumes:
 
 networks:
   dc3net:
-    driver: 'bridge'
+    driver: bridge
 ...

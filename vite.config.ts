@@ -25,7 +25,7 @@ import Components from 'unplugin-vue-components/vite'
 import { ConfigEnv, defineConfig } from 'vite'
 
 export default (configEnv: ConfigEnv) => {
-    process.env.NODE_ENV = configEnv.mode || 'dev'
+    process.env.NODE_ENV = configEnv.mode == 'production' ? 'pro' : configEnv.mode || 'dev'
 
     const envDir = './src/config/env'
     const files = [`${envDir}/.env`, `${envDir}/.env.${process.env.NODE_ENV}`]
