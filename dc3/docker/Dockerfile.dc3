@@ -37,4 +37,4 @@ LABEL dc3.author.email pnokers.icloud.com
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-COPY --from=builder "/root/.m2/repository/" "/root/.m2/repository/"
+COPY --from=builder /root/.m2/repository/ /root/.m2/repository/
