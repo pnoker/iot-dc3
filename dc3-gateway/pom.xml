@@ -119,27 +119,6 @@
             <artifactId>dc3-common-public</artifactId>
         </dependency>
 
-        <!--
-        兼容性操作
-        注意：当升级到springboot3时需要替换为jakarta.validation
-         -->
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>6.2.5.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator-cdi</artifactId>
-            <version>6.2.5.Final</version>
-        </dependency>
-
     </dependencies>
 
     <repositories>
