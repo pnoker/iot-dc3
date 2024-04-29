@@ -177,9 +177,9 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityQuery.getPage());
         query.setPage(pages);
 
-        query.setProfileId(entityQuery.getProfileId() > DefaultConstant.DEFAULT_INT ? entityQuery.getProfileId() : null);
+        query.setProfileId(entityQuery.getProfileId() > DefaultConstant.DEFAULT_NULL_INT_VALUE ? entityQuery.getProfileId() : null);
         query.setDeviceName(entityQuery.getDeviceName());
-        query.setDriverId(entityQuery.getDriverId() > DefaultConstant.DEFAULT_INT ? entityQuery.getDriverId() : null);
+        query.setDriverId(entityQuery.getDriverId() > DefaultConstant.DEFAULT_NULL_INT_VALUE ? entityQuery.getDriverId() : null);
         query.setEnableFlag(EnableFlagEnum.ofIndex((byte) entityQuery.getEnableFlag()));
         query.setTenantId(entityQuery.getTenantId());
 

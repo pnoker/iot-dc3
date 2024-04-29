@@ -82,12 +82,12 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
         if (ObjectUtil.isNotEmpty(deviceQuery.getDriverId())) {
             query.setDriverId(deviceQuery.getDriverId());
         } else {
-            query.setDriverId(DefaultConstant.DEFAULT_INT);
+            query.setDriverId(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         if (ObjectUtil.isNotNull(deviceQuery.getEnableFlag())) {
             query.setEnableFlag(deviceQuery.getEnableFlag().getIndex());
         } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
+            query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         if (ObjectUtil.isNotEmpty(deviceQuery.getTenantId())) {
             query.setTenantId(deviceQuery.getTenantId());

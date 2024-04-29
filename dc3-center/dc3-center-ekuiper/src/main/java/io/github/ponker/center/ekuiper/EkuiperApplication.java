@@ -1,4 +1,5 @@
 package io.github.ponker.center.ekuiper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -6,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author : Zhen
- *
  */
 @SpringBootApplication
 public class EkuiperApplication {

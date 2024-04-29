@@ -13,5 +13,5 @@ public interface ConfigService {
     Mono<String> callApiDelConf(HttpMethod method, String url);
 
 
-    Mono<String> callApiConfig (HttpMethod method, String url, Object data, String name);
+    Mono<String> callApiConfig(HttpMethod method, String url, Object data, String name);
 }

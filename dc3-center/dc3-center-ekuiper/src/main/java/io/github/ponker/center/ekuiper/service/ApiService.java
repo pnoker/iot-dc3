@@ -17,7 +17,7 @@ public interface ApiService {
     Mono<String> callApi(HttpMethod method, String url);
 
 
-    Mono<String> callApiWithData(Object data, HttpMethod method, String url) ;
+    Mono<String> callApiWithData(Object data, HttpMethod method, String url);
 
 
     Mono<Page<RecordDto>> callApiWithPage(HttpMethod method, String url, Integer current, Integer size);

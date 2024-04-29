@@ -1,8 +1,9 @@
 package io.github.ponker.center.ekuiper.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import javax.validation.constraints.NotBlank;
+
 import java.util.Map;
 
 /**
@@ -26,7 +27,7 @@ public class RestSinkDto {
 
     private String bodyType;
 
-    private Map<String,String> headers;
+    private Map<String, String> headers;
 
     private String responseType;
 

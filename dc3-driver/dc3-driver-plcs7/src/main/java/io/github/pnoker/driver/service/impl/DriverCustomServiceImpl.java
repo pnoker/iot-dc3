@@ -121,7 +121,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
             return String.valueOf(serializer.dispense(plcs7PointVariable));
         } catch (Exception e) {
             log.error("Plc S7 Read Error: {}", e.getMessage());
-            return DefaultConstant.DEFAULT_STRING_VALUE;
+            return DefaultConstant.DEFAULT_NULL_STRING_VALUE;
         } finally {
             myS7Connector.lock.writeLock().unlock();
         }

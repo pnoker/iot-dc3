@@ -279,7 +279,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                 writeResult = item.write(new JIVariant(booleanValue, false));
                 break;
             case STRING:
-                writeResult = item.write(new JIVariant(value, false));
+                writeResult = item.write(new JIVariant(value.getValue(), false));
                 break;
             default:
                 break;

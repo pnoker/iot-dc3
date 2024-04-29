@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
  */
 public interface SinkTemplateService {
 
-    Mono<String> callApiSinktem (HttpMethod method, String url, Object data, String name);
+    Mono<String> callApiSinktem(HttpMethod method, String url, Object data, String name);
 
     Mono<String> callConfigAndSink(HttpMethod method, String url);
 

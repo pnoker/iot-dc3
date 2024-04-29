@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -118,9 +119,9 @@ public class ConfigServiceImpl implements ConfigService {
                 });
     }
 
-    private void handleMqttRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody)  {
+    private void handleMqttRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
-            MqttConfigDto mqttConfigDto  = new MqttConfigDto();
+            MqttConfigDto mqttConfigDto = new MqttConfigDto();
             JsonNode mqttJsonNode = generateJsonNode(mqttConfigDto);
 
             if (containsAllFields(dataJsonNode, mqttJsonNode)) {
@@ -136,7 +137,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private void handleHttpPushRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleHttpPushRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             HttppushConfigDto httppushConfigDto = new HttppushConfigDto();
             JsonNode httppushJsonNode = generateJsonNode(httppushConfigDto);
@@ -153,7 +154,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private void handleSqlRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleSqlRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             //SqlConfigDto sqlConfigDto = new SqlConfigDto();
             JsonNode sqlJsonNode = generateJsonNode(SqlConfigDto);
@@ -171,7 +172,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private void handleHttpPullRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleHttpPullRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             HttppullConfigDto httppullConfigDto = new HttppullConfigDto();
             JsonNode httppulJsonNode = generateJsonNode(httppullConfigDto);
@@ -188,7 +189,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private void handleRedisRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleRedisRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             RedisConfigDto redisConfigDto = new RedisConfigDto();
             JsonNode redisJsonNode = generateJsonNode(redisConfigDto);

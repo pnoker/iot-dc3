@@ -84,12 +84,12 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         if (ObjectUtil.isNotNull(pageQuery.getDriverTypeFlag())) {
             query.setDriverTypeFlag(pageQuery.getDriverTypeFlag().getIndex());
         } else {
-            query.setDriverTypeFlag(DefaultConstant.DEFAULT_INT);
+            query.setDriverTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
             query.setEnableFlag(pageQuery.getEnableFlag().getIndex());
         } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
+            query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
             query.setTenantId(pageQuery.getTenantId());
@@ -107,7 +107,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public DriverRunBO selectOnlineByDriverId(Long driverId) {
         List<DriverRunDO> driverRunDOS = driverRunService.get7daysDuration(driverId, DriverStatusEnum.ONLINE.getCode());
-        Long totalDuration=driverRunService.selectSumDuration(driverId,DriverStatusEnum.ONLINE.getCode());
+        Long totalDuration = driverRunService.selectSumDuration(driverId, DriverStatusEnum.ONLINE.getCode());
         GrpcDriverQuery.Builder builder = GrpcDriverQuery.newBuilder();
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
@@ -134,7 +134,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public DriverRunBO selectOfflineByDriverId(Long driverId) {
         List<DriverRunDO> driverRunDOS = driverRunService.get7daysDuration(driverId, DriverStatusEnum.OFFLINE.getCode());
-        Long totalDuration=driverRunService.selectSumDuration(driverId,DriverStatusEnum.OFFLINE.getCode());
+        Long totalDuration = driverRunService.selectSumDuration(driverId, DriverStatusEnum.OFFLINE.getCode());
         GrpcDriverQuery.Builder builder = GrpcDriverQuery.newBuilder();
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());

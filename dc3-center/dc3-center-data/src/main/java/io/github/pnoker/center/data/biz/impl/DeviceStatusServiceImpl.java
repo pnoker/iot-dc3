@@ -71,12 +71,12 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         if (ObjectUtil.isNotEmpty(pageQuery.getDriverId())) {
             query.setDriverId(pageQuery.getDriverId());
         } else {
-            query.setDriverId(DefaultConstant.DEFAULT_INT);
+            query.setDriverId(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
             query.setEnableFlag(pageQuery.getEnableFlag().getIndex());
         } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
+            query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
             query.setTenantId(pageQuery.getTenantId());
@@ -111,7 +111,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     @Override
     public DeviceRunBO selectOnlineByDeviceId(Long deviceId) {
         List<DeviceRunDO> deviceRunDOS = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
-        Long totalDuration=deviceRunService.selectSumDuration(deviceId,DriverStatusEnum.ONLINE.getCode());
+        Long totalDuration = deviceRunService.selectSumDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
         GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
@@ -138,7 +138,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     @Override
     public DeviceRunBO selectOfflineByDeviceId(Long deviceId) {
         List<DeviceRunDO> deviceRunDOS = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
-        Long totalDuration=deviceRunService.selectSumDuration(deviceId,DriverStatusEnum.OFFLINE.getCode());
+        Long totalDuration = deviceRunService.selectSumDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
         GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());

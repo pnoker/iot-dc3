@@ -15,12 +15,14 @@
  */
 
 package io.github.ponker.center.ekuiper.entity;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.ponker.center.ekuiper.constant.CommonConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**

@@ -1,9 +1,8 @@
 package io.github.ponker.center.ekuiper.entity.vo;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotBlank;
 
 /**
  * @author : Zhen

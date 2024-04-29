@@ -15,7 +15,6 @@ package io.github.ponker.center.ekuiper.utils;/*
  */
 
 
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;

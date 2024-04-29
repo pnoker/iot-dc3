@@ -126,13 +126,13 @@ public class PointValueServiceImpl implements PointValueService {
         if (CharSequenceUtil.isNotEmpty(entityQuery.getPointName())) {
             entityQueryGrpcDTO.setPointName(entityQuery.getPointName());
         }
-        entityQueryGrpcDTO.setPointTypeFlag(DefaultConstant.DEFAULT_INT);
-        entityQueryGrpcDTO.setRwFlag(DefaultConstant.DEFAULT_INT);
-        entityQueryGrpcDTO.setProfileId(DefaultConstant.DEFAULT_INT);
+        entityQueryGrpcDTO.setPointTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
+        entityQueryGrpcDTO.setRwFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
+        entityQueryGrpcDTO.setProfileId(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         if (ObjectUtil.isNotNull(entityQuery.getEnableFlag())) {
             entityQueryGrpcDTO.setEnableFlag(entityQuery.getEnableFlag().getIndex());
         } else {
-            entityQueryGrpcDTO.setEnableFlag(DefaultConstant.DEFAULT_INT);
+            entityQueryGrpcDTO.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         entityQueryGrpcDTO.setTenantId(entityQuery.getTenantId());
         if (ObjectUtil.isNotEmpty(entityQuery.getDeviceId())) {

@@ -26,19 +26,19 @@ public interface RuleService {
 
     Mono<String> addActions(Object data);
 
-    Mono<List<Map<String, Map<String, Object>>>> listActions() ;
+    Mono<List<Map<String, Map<String, Object>>>> listActions();
 
     Mono<String> deleteActions(String actionType);
 
-    Mono<String> deleteActions(String actionType,Integer index);
+    Mono<String> deleteActions(String actionType, Integer index);
 
     Mono<String> deleteActions(Integer index);
 
-    Mono<String> editActions(Object data,String type);
+    Mono<String> editActions(Object data, String type);
 
     Mono<String> editActions(Object data, Integer index);
 
-    Mono<String> editActions(Object data,String type, Integer index);
+    Mono<String> editActions(Object data, String type, Integer index);
 
 
     Mono<String> deleteAllActions();

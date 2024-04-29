@@ -18,6 +18,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -156,7 +157,7 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
                 });
     }
 
-    private void handleMqttRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody)  {
+    private void handleMqttRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             MqttSinkDto mqttSinkDto = new MqttSinkDto();
             JsonNode mqttJsonNode = generateJsonNode(mqttSinkDto);
@@ -174,7 +175,7 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
         }
     }
 
-    private void handleRestRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleRestRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             RestSinkDto restSinkDto = new RestSinkDto();
             JsonNode httppushJsonNode = generateJsonNode(restSinkDto);
@@ -191,7 +192,7 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
         }
     }
 
-    private void handleSqlRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleSqlRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             SqlSinkDto sqlSinkDto = new SqlSinkDto();
             JsonNode sqlJsonNode = generateJsonNode(sqlSinkDto);
@@ -209,7 +210,7 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
         }
     }
 
-    private void handleRedisRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleRedisRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             RedisSinkDto redisSinkDto = new RedisSinkDto();
             JsonNode redisJsonNode = generateJsonNode(redisSinkDto);

@@ -1,4 +1,5 @@
 package io.github.ponker.center.ekuiper.service.impl;
+
 import io.github.ponker.center.ekuiper.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
