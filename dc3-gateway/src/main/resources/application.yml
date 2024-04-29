@@ -32,8 +32,9 @@ spring:
   web:
     resources:
       add-mappings: false
-  redis:
-    database: 0
+  data:
+    redis:
+      database: 0
   cloud:
     gateway:
       loadbalancer:

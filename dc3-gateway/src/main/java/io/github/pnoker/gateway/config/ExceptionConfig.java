@@ -58,7 +58,7 @@ public class ExceptionConfig implements ErrorWebExceptionHandler {
 
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         if (throwable instanceof ResponseStatusException) {
-            response.setStatusCode(((ResponseStatusException) throwable).getStatus());
+            response.setStatusCode(((ResponseStatusException) throwable).getStatusCode());
         }
 
         return response.writeWith(Mono.fromSupplier(() -> {

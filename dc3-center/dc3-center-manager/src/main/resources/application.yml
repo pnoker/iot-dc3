@@ -32,8 +32,9 @@ spring:
   profiles:
     active:
       - ${NODE_ENV:dev}
-  redis:
-    database: 2
+  data:
+    redis:
+      database: 2
 
 logging:
   file:
