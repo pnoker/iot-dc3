@@ -14,15 +14,29 @@
 # limitations under the License.
 #
 
-FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-nginx:1.26
+# builder
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-node:20.12 AS builder
 LABEL dc3.author pnokers
 LABEL dc3.author.email pnokers.icloud.com
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
-COPY ./dc3/nginx/ /etc/nginx/
-COPY ./dist/ /usr/share/nginx/html/
-COPY ./dc3/dependencies/conf.crt/ /etc/letsencrypt/live/
+WORKDIR /build
+
+COPY ./ ./
+
+RUN yarn && yarn build
+
+# runtime
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-nginx:1.26 AS runtime
+LABEL dc3.author pnokers
+LABEL dc3.author.email pnokers.icloud.com
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+COPY --from=builder /build/dc3/nginx/ /etc/nginx/
+COPY --from=builder /build/dist/ /usr/share/nginx/html/
+COPY --from=builder /build/dc3/dependencies/conf.crt/ /etc/letsencrypt/live/
 
 EXPOSE 80 443
 VOLUME /var/log/nginx
