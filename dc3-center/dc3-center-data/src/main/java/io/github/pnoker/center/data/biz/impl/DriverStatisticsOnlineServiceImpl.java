@@ -87,12 +87,12 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
         if (ObjectUtil.isNotNull(driverQuery.getDriverTypeFlag())) {
             query.setDriverTypeFlag(driverQuery.getDriverTypeFlag().getIndex());
         } else {
-            query.setDriverTypeFlag(DefaultConstant.DEFAULT_INT);
+            query.setDriverTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         if (ObjectUtil.isNotNull(driverQuery.getEnableFlag())) {
             query.setEnableFlag(driverQuery.getEnableFlag().getIndex());
         } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
+            query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         if (ObjectUtil.isNotEmpty(driverQuery.getTenantId())) {
             query.setTenantId(driverQuery.getTenantId());

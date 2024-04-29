@@ -92,7 +92,7 @@ public class Lwm2mServer {
         } catch (RuntimeException | InterruptedException e) {
             log.error("read exception :{},{},{}", clientEndpoint, path, e.getMessage());
         }
-        return DefaultConstant.DEFAULT_STRING_VALUE;
+        return DefaultConstant.DEFAULT_NULL_STRING_VALUE;
     }
 
 

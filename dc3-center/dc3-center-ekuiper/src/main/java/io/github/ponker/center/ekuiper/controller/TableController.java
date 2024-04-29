@@ -1,4 +1,5 @@
 package io.github.ponker.center.ekuiper.controller;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.ponker.center.ekuiper.constant.ServiceConstant;
 import io.github.ponker.center.ekuiper.entity.R;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
 import javax.annotation.Resource;
 
 /**
@@ -34,10 +36,10 @@ public class TableController {
     private UrlService urlService;
 
     /**
-     *创建表
+     * 创建表
      */
     @PostMapping("/create")
-    public Mono<R<String>> createTable(@Validated @RequestBody StreamFormDto form)  {
+    public Mono<R<String>> createTable(@Validated @RequestBody StreamFormDto form) {
         Mono<String> stringMono = apiService.callApiWithData(form, HttpMethod.POST, urlService.getTableUrl());
         return stringMono.flatMap(s -> {
             try {
@@ -51,15 +53,15 @@ public class TableController {
 
 
     /**
-     *列出所有表
+     * 列出所有表
      */
     @GetMapping("/list")
-    public Mono<R<Page<RecordDto>>> listTable(@RequestParam(required = false,defaultValue = "1") Integer pageNum,
-                                              @RequestParam(required = false,defaultValue = "10") Integer pageSize) {
+    public Mono<R<Page<RecordDto>>> listTable(@RequestParam(required = false, defaultValue = "1") Integer pageNum,
+                                              @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         Mono<Page<RecordDto>> pageMono = apiService.callApiWithPage(HttpMethod.GET, urlService.getTableUrl(), pageNum, pageSize);
         return pageMono.flatMap(s -> {
             try {
-                return Mono.just(R.ok(s,"successful"));
+                return Mono.just(R.ok(s, "successful"));
             } catch (Exception e) {
                 log.error("Failed to call list Table API", e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -68,7 +70,7 @@ public class TableController {
     }
 
     /**
-     *删除表
+     * 删除表
      */
     @DeleteMapping("/delete")
     public Mono<R<String>> deleteTable(@RequestParam(name = "id") String id) {
@@ -85,7 +87,7 @@ public class TableController {
     }
 
     /**
-     *描述表
+     * 描述表
      */
     @GetMapping("/detail")
     public Mono<R<DetailTableVO>> detailTable(@RequestParam(name = "id") String id) {
@@ -93,7 +95,7 @@ public class TableController {
         Mono<DetailTableVO> detailTableMono = streamTableService.callApiTable(HttpMethod.GET, url);
         return detailTableMono.flatMap(s -> {
             try {
-                return Mono.just(R.ok(s,"successful"));
+                return Mono.just(R.ok(s, "successful"));
             } catch (Exception e) {
                 log.error("Failed to call detail Table API", e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -102,10 +104,10 @@ public class TableController {
     }
 
     /**
-     *更新表
+     * 更新表
      */
     @PutMapping("/update")
-    public Mono<R<String>> updateTable(@Validated @RequestBody StreamFormDto form, @RequestParam(name = "id") String id)  {
+    public Mono<R<String>> updateTable(@Validated @RequestBody StreamFormDto form, @RequestParam(name = "id") String id) {
         String url = urlService.getTableUrl() + "/" + id;
         Mono<String> stringMono = apiService.callApiWithData(form, HttpMethod.PUT, url);
         return stringMono.flatMap(s -> {

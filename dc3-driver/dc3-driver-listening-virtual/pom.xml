@@ -31,7 +31,7 @@
 
     <dependencies>
 
-        <!--Netty-->
+        <!--Netty -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>

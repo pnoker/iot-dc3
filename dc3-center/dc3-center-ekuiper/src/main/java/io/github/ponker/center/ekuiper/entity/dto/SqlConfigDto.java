@@ -1,12 +1,12 @@
 package io.github.ponker.center.ekuiper.entity.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import javax.validation.constraints.NotBlank;
 
 /**
  * @author : Zhen
  * @date : 2024/2/23
- *         对象聚合
+ * 对象聚合
  */
 @Data
 public class SqlConfigDto {

@@ -1,9 +1,9 @@
 package io.github.ponker.center.ekuiper.entity.dto;
 
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import java.util.Map;
 
 /**
@@ -32,7 +32,7 @@ public class HttppullConfigDto {
     @NotBlank
     private String responseType;
 
-    private Map<String,String> headers;
+    private Map<String, String> headers;
 
     private String body;
 }

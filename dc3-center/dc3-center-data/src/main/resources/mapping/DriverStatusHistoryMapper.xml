@@ -28,6 +28,7 @@
         from dc3_driver_status_history
         where driver_id = #{id}
           and deleted = 0
-        order by create_time desc limit 2;
+        order by create_time desc
+        limit 2;
     </select>
 </mapper>

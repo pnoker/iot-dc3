@@ -2,7 +2,7 @@ package io.github.ponker.center.ekuiper.constant;
 
 /**
  * @author : Zhen
- *
+ * <p>
  * 规则引擎相关
  */
 public interface EkuiperConstant {
@@ -10,7 +10,7 @@ public interface EkuiperConstant {
     /**
      * 规则引擎url相关
      */
-    interface EKUIPERURL{
+    interface EKUIPERURL {
 
         String STREAM_URL = "http://localhost:9081/streams";
         String TABLE_URL = "http://localhost:9081/tables";
@@ -19,7 +19,7 @@ public interface EkuiperConstant {
     }
 
 
-    interface ConKeyType{
+    interface ConKeyType {
 
         String MQTT = "mqtt";
         String REDIS = "redis";

@@ -1,4 +1,5 @@
 package io.github.ponker.center.ekuiper.service.impl;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
@@ -23,6 +24,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+
 import java.util.*;
 
 
@@ -61,7 +63,7 @@ public class RuleServiceImpl implements RuleService {
     @Override
     public Mono<String> callRuleApiWithData(Object data, HttpMethod method, String url) throws Exception {
         WebClient.RequestBodySpec request = webClient.method(method).uri(url);
-        if(Objects.nonNull(data)){
+        if (Objects.nonNull(data)) {
             try {
 
                 String jsonBody = objectMapper.writeValueAsString(data);
@@ -199,7 +201,7 @@ public class RuleServiceImpl implements RuleService {
     }
 
     @Override
-    public Mono<String> editActions(Object data,String type) {
+    public Mono<String> editActions(Object data, String type) {
         // 解析传入的数据为Map对象
         Map<String, Map<String, Object>> newData = (Map<String, Map<String, Object>>) data;
 
@@ -218,7 +220,6 @@ public class RuleServiceImpl implements RuleService {
         // 如果actions列表中没有指定类型的结构，则返回错误信息
         return Mono.error(new RuntimeException("No configuration found for type: " + type));
     }
-
 
 
     @Override
@@ -246,6 +247,7 @@ public class RuleServiceImpl implements RuleService {
     }
 
     private List<Map<String, Map<String, Object>>> actions = new ArrayList<>();
+
     @Override
     public Mono<String> editActions(Object data, Integer index) {
         // 解析传入的数据为Map<String, Map<String, Object>>对象
@@ -317,6 +319,7 @@ public class RuleServiceImpl implements RuleService {
         node2.fieldNames().forEachRemaining(keys2::add);
         return keys1.equals(keys2);
     }
+
     private List<RuleDataVO> getDataList2(String response) {
         List<RuleDataVO> ruleDataVOList = new ArrayList<>();
         try {
@@ -392,6 +395,7 @@ public class RuleServiceImpl implements RuleService {
             }
         }
     }
+
     private boolean isValidSinkType(String actionName, JsonNode actionNode) throws JsonProcessingException {
 
         switch (actionName) {

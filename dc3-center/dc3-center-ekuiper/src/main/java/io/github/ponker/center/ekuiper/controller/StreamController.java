@@ -1,4 +1,5 @@
 package io.github.ponker.center.ekuiper.controller;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.ponker.center.ekuiper.constant.ServiceConstant;
 import io.github.ponker.center.ekuiper.entity.R;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
 import javax.annotation.Resource;
 
 /**
@@ -53,8 +55,8 @@ public class StreamController {
      * 显示所有流
      */
     @GetMapping("/list")
-    public Mono<R<Page<RecordDto>>> listStream(@RequestParam(required = false,defaultValue = "1") Integer pageNum,
-                                               @RequestParam(required = false,defaultValue = "10") Integer pageSize) {
+    public Mono<R<Page<RecordDto>>> listStream(@RequestParam(required = false, defaultValue = "1") Integer pageNum,
+                                               @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         Mono<Page<RecordDto>> pageMono = apiService.callApiWithPage(HttpMethod.GET, urlService.getStreamUrl(), pageNum, pageSize);
         return pageMono.flatMap(s -> {
             try {
@@ -84,7 +86,7 @@ public class StreamController {
     }
 
     /**
-     *描述流
+     * 描述流
      */
     @GetMapping("/detail")
     public Mono<R<DetailStreamVO>> detailStream(@RequestParam(name = "id") String id) {
@@ -92,7 +94,7 @@ public class StreamController {
         Mono<DetailStreamVO> detailStreamMono = streamTableService.callApiStream(HttpMethod.GET, url);
         return detailStreamMono.flatMap(s -> {
             try {
-                return Mono.just(R.ok(s,"successful"));
+                return Mono.just(R.ok(s, "successful"));
             } catch (Exception e) {
                 log.error("Failed to call detail Stream API", e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -104,7 +106,7 @@ public class StreamController {
      * 更新流
      */
     @PutMapping("/update")
-    public Mono<R<String>> updateStream(@Validated @RequestBody StreamFormDto form, @RequestParam(name = "id") String id)  {
+    public Mono<R<String>> updateStream(@Validated @RequestBody StreamFormDto form, @RequestParam(name = "id") String id) {
         String url = urlService.getStreamUrl() + "/" + id;
         Mono<String> stringMono = apiService.callApiWithData(form, HttpMethod.PUT, url);
         return stringMono.flatMap(s -> {

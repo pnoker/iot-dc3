@@ -36,6 +36,6 @@ public class DriverRunServiceImpl implements DriverRunService {
 
     @Override
     public Long selectSumDuration(Long driverId, String code) {
-        return driverRunMapper.selectSumDuration(driverId,code);
+        return driverRunMapper.selectSumDuration(driverId, code);
     }
 }

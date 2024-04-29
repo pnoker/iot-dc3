@@ -210,8 +210,7 @@ public class PointServiceImpl implements PointService {
             List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
             deviceByPointBO.setDevices(deviceDOS);
             deviceByPointBO.setCount(deviceDOS.stream().count());
-        }
-        else {
+        } else {
             deviceByPointBO.setCount(0L);
         }
         return deviceByPointBO;
@@ -221,7 +220,7 @@ public class PointServiceImpl implements PointService {
     public List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds) {
         List<PointDataVolumeRunBO> list = new ArrayList<>();
         LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(7);
-        if (ObjectUtil.isEmpty(deviceIds)){
+        if (ObjectUtil.isEmpty(deviceIds)) {
             return list;
         }
         List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
@@ -299,7 +298,7 @@ public class PointServiceImpl implements PointService {
     public List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds) {
         List<DeviceDataVolumeRunBO> list = new ArrayList<>();
         LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(7);
-        if (ObjectUtil.isEmpty(pointIds)){
+        if (ObjectUtil.isEmpty(pointIds)) {
             return list;
         }
         List<PointDO> pointDOS = pointManager.list(new LambdaQueryWrapper<PointDO>().in(PointDO::getId, pointIds));

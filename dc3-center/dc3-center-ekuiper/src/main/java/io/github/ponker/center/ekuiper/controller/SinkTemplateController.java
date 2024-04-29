@@ -10,10 +10,11 @@ import io.github.ponker.center.ekuiper.service.SinkTemplateService;
 import io.github.ponker.center.ekuiper.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
 import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.util.Map;
 
 /**
@@ -41,10 +42,10 @@ public class SinkTemplateController {
     private UrlService urlService;
 
     /**
-     *注册、更新SinkTemplate
+     * 注册、更新SinkTemplate
      */
     @PutMapping("/create")
-    public Mono<R<String>> createSink(@Valid @RequestBody Object form, @RequestParam(name = "name") String name, @RequestParam(name = "confKey") String confKey) {
+    public Mono<R<String>> createSink(@Validated @RequestBody Object form, @RequestParam(name = "name") String name, @RequestParam(name = "confKey") String confKey) {
         String url = urlService.getConfigUrl() + "/sinks/" + name + "/confKeys/" + confKey;
         Mono<String> stringMono = sinkTemplateService.callApiSinktem(HttpMethod.PUT, url, form, name);
         return stringMono.flatMap(s -> {
@@ -58,7 +59,7 @@ public class SinkTemplateController {
     }
 
     /**
-     *列出{name}类型的全部SinkTemplate
+     * 列出{name}类型的全部SinkTemplate
      */
     @GetMapping("/list")
     public Mono<R<Map<String, Map<String, Object>>>> listSink(@RequestParam(name = "name") String name) {
@@ -66,9 +67,10 @@ public class SinkTemplateController {
         Mono<String> stringMono = apiService.callApi(HttpMethod.GET, url);
         return stringMono.flatMap(jsonString -> {
             try {
-                TypeReference<Map<String, Map<String, Object>>> typeRef = new TypeReference<Map<String, Map<String, Object>>>(){};
+                TypeReference<Map<String, Map<String, Object>>> typeRef = new TypeReference<Map<String, Map<String, Object>>>() {
+                };
                 Map<String, Map<String, Object>> configurations = objectMapper.readValue(jsonString, typeRef);
-                return Mono.just(R.ok(configurations,"successful"));
+                return Mono.just(R.ok(configurations, "successful"));
             } catch (Exception e) {
                 log.error("Failed to call listSink API", e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -77,7 +79,7 @@ public class SinkTemplateController {
     }
 
     /**
-     *删除SinkTemplate
+     * 删除SinkTemplate
      */
     @DeleteMapping("/delete")
     public Mono<R<String>> deleteSink(@RequestParam(name = "name") String name, @RequestParam(name = "confKey") String confKey) {
@@ -94,12 +96,12 @@ public class SinkTemplateController {
     }
 
     /**
-     *测试SinkTemplate连接
+     * 测试SinkTemplate连接
      */
     @PostMapping("/connection")
-    public Mono<R<String>> connectSink(@Valid @RequestBody Object form, @RequestParam(name = "name") String name){
-        String url = urlService.getConfigUrl() + "/sinks/connection/" + name ;
-        Mono<String> stringMono = sinkTemplateService.callApiSinktem(HttpMethod.POST,url,form,name);
+    public Mono<R<String>> connectSink(@Validated @RequestBody Object form, @RequestParam(name = "name") String name) {
+        String url = urlService.getConfigUrl() + "/sinks/connection/" + name;
+        Mono<String> stringMono = sinkTemplateService.callApiSinktem(HttpMethod.POST, url, form, name);
         return stringMono.flatMap(s -> {
             try {
                 return Mono.just(R.ok(s));
