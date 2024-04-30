@@ -116,13 +116,13 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDeviceDTO.getResult().getOk()) {
-            throw new RuntimeException("Grpc Failed");
+            throw new RuntimeException("设备号不存在");
         }
         DeviceRunBO deviceRunBO = new DeviceRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
-        deviceRunBO.setTotalDuration(totalDuration);
+        deviceRunBO.setTotalDuration(totalDuration==null?0L:totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
         if (ObjectUtil.isEmpty(deviceRunDOS)) {
             deviceRunBO.setDuration(list);
@@ -143,13 +143,13 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDeviceDTO.getResult().getOk()) {
-            throw new RuntimeException("Grpc Failed");
+            throw new RuntimeException("设备号不存在");
         }
         DeviceRunBO deviceRunBO = new DeviceRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
-        deviceRunBO.setTotalDuration(totalDuration);
+        deviceRunBO.setTotalDuration(totalDuration==null?0L:totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
         if (ObjectUtil.isEmpty(deviceRunDOS)) {
             deviceRunBO.setDuration(list);
