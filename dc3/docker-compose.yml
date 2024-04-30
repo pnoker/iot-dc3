@@ -19,7 +19,7 @@ services:
     build:
       context: ../
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-web:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-web:2024.2.0.dev
     restart: always
     ports:
       - '8080:80'
