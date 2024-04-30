@@ -326,7 +326,11 @@ public class PointServiceImpl implements PointService {
         QueryWrapper<PointDataVolumeRunDO> wrapper = new QueryWrapper<>();
         wrapper.select("sum(total) as total");
         wrapper.lambda().eq(PointDataVolumeRunDO::getDriverId, driverId);
-        return pointDataVolumeRunManager.getOne(wrapper);
+        PointDataVolumeRunDO one = pointDataVolumeRunManager.getOne(wrapper);
+        if (ObjectUtil.isNull(one)){
+            return new PointDataVolumeRunDO();
+        }
+        return one;
     }
 
     @Override
