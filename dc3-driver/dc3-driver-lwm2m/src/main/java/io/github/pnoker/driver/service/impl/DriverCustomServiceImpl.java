@@ -22,10 +22,10 @@ import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.driver.server.Lwm2mServer;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Map;
 
 import static io.github.pnoker.common.utils.DriverUtil.attribute;
@@ -45,9 +45,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         !!!
-        你可以在此处执行一些特定的初始化逻辑，驱动在启动的时候会自动执行该方法。
+        你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
         */
         lwm2mServer.startServer();
     }
@@ -55,14 +55,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void schedule() {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         !!!
-        上传设备状态，可自行灵活拓展，不一定非要在schedule()接口中实现，你可以：
+        上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
         - 在read中实现设备状态的判断；
         - 在自定义定时任务中实现设备状态的判断；
         - 通过某种判断机制实现设备状态的判断。
 
-        最后通过 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理，其中设备状态（StatusEnum）：
+        最后通过 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理, 其中设备状态（StatusEnum）: 
         - ONLINE:在线
         - OFFLINE:离线
         - MAINTAIN:维护
@@ -82,7 +82,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public String read(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, PointDTO point) {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
 
         可以主动读取,也可以订阅资源
          */
@@ -103,7 +103,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, AttributeConfigDTO value) {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
         if (StringUtils.nonEmptyString(attribute(pointInfo, "execDown"))) {
             //执行函数

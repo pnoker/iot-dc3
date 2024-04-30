@@ -22,6 +22,7 @@ import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -35,6 +36,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Schema(title = "MenuQuery", description = "菜单-查询")
 public class MenuQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")
@@ -61,7 +64,7 @@ public class MenuQuery implements Serializable {
     private String menuName;
 
     /**
-     * 菜单编号，一般为URL的MD5编码
+     * 菜单编号, 一般为URL的MD5编码
      */
     @Schema(description = "菜单编号")
     private String menuCode;

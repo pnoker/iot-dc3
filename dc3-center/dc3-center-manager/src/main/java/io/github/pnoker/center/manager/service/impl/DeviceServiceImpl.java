@@ -39,6 +39,7 @@ import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import io.github.pnoker.common.utils.PoiUtil;
+import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -51,7 +52,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -253,7 +253,7 @@ public class DeviceServiceImpl implements DeviceService {
         for (int i = 4; i <= mainSheet.getLastRowNum(); i++) {
             // 导入设备
             DeviceBO importDeviceBO = importDevice(entityBO, mainSheet, i);
-            log.info("正在导入设备：{}, index: {}", importDeviceBO.getDeviceName(), 1);
+            log.info("正在导入设备: {}, index: {}", importDeviceBO.getDeviceName(), 1);
 
             // 导入驱动属性配置
             importDriverAttributeConfig(importDeviceBO, driverAttributeBOS, mainSheet, i);
@@ -282,7 +282,7 @@ public class DeviceServiceImpl implements DeviceService {
 
         // 设置说明
         Row remarkRow = mainSheet.createRow(0);
-        PoiUtil.createCell(remarkRow, 0, "说明：请从第5行开始添加待导入的设备数据");
+        PoiUtil.createCell(remarkRow, 0, "说明: 请从第5行开始添加待导入的设备数据");
         PoiUtil.mergedRegion(mainSheet, 0, 0, 0, 2 + driverAttributeBOS.size() + pointAttributeBOS.size() * pointBOS.size() - 1);
 
         // 设置设备列
@@ -328,7 +328,7 @@ public class DeviceServiceImpl implements DeviceService {
         try {
             save(importDeviceBO);
         } catch (Exception e) {
-            log.error("导入设备: {}, 错误：{}", deviceBO, rowIndex);
+            log.error("导入设备: {}, 错误: {}", deviceBO, rowIndex);
             throw new ServiceException(e.getMessage());
         }
         return importDeviceBO;

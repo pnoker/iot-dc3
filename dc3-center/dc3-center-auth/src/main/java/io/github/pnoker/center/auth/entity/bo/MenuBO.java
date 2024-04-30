@@ -54,7 +54,7 @@ public class MenuBO extends BaseBO {
     private String menuName;
 
     /**
-     * 菜单编号，一般为URL的MD5编码
+     * 菜单编号, 一般为URL的MD5编码
      */
     private String menuCode;
 

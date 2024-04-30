@@ -20,6 +20,7 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.driver.context.DriverContext;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
@@ -37,7 +38,6 @@ import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 

@@ -23,6 +23,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -41,6 +42,8 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(title = "AlarmMessageProfile", description = "报警信息模板")
 public class AlarmMessageProfileQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")

@@ -25,10 +25,10 @@ import io.github.pnoker.center.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.center.auth.entity.model.TenantDO;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 

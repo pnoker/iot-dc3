@@ -17,17 +17,17 @@
 package io.github.pnoker.center.manager.job;
 
 import io.github.pnoker.center.manager.biz.PointStatisticsService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**
- * 通用：每小时执行任务
+ * 通用: 每小时执行任务
  *
  * @author pnoker
  * @since 2022.1.0
@@ -48,7 +48,7 @@ public class HourlyJob extends QuartzJobBean {
      */
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        // 暂时调整为30秒，仅供测试
+        // 暂时调整为30秒, 仅供测试
         pointStatisticsService.statisticsPointHistory(LocalDateTime.now());
         log.info("hourlyJobHandler: {}", LocalDateTime.now());
     }

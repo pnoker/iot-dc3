@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.data.biz.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
@@ -30,11 +31,10 @@ import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.redis.service.RedisService;
+import jakarta.annotation.Resource;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,7 +86,7 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
         GrpcRPageDriverDTO list = driverApiBlockingStub.list(query.build());
         GrpcPageDriverDTO data = list.getData();
         List<GrpcDriverDTO> dataList = data.getDataList();
-        if (ObjectUtils.isNotEmpty(dataList)) {
+        if (CollUtil.isNotEmpty(dataList)) {
             List<DriverStatusHistoryDO> driverStatusHistoryDOS = new ArrayList<>();
             dataList.forEach(driverDO -> {
                 String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverDO.getBase().getId();

@@ -99,3 +99,7 @@ grpc:
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
+
+logging:
+  level:
+    io.github.pnoker: DEBUG

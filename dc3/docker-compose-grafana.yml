@@ -27,7 +27,7 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:
@@ -48,7 +48,7 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:

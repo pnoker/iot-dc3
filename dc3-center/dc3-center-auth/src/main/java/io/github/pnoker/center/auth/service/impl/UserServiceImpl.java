@@ -32,11 +32,10 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
 
 /**
  * 用户服务接口实现类
@@ -59,7 +58,7 @@ public class UserServiceImpl implements UserService {
     public void save(UserBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
-        // 判断手机号是否存在，如果有手机号不为空，检查该手机号是否被占用
+        // 判断手机号是否存在, 如果有手机号不为空, 检查该手机号是否被占用
         if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
             UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
             if (ObjectUtil.isNotNull(selectByPhone)) {
@@ -67,7 +66,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // 判断邮箱是否存在，如果有邮箱不为空，检查该邮箱是否被占用
+        // 判断邮箱是否存在, 如果有邮箱不为空, 检查该邮箱是否被占用
         if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
             UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
             if (ObjectUtil.isNotNull(selectByEmail)) {

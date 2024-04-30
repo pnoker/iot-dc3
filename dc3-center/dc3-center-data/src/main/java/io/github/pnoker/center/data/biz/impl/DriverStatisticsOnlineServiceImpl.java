@@ -34,11 +34,10 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import jakarta.annotation.Resource;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -153,7 +152,7 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
                         if (runDO != null && driverRunDO != null) {
                             driverRunDO.setId(runDO.getId());
                             driverRunManager.updateById(driverRunDO);
-                        } else if (ObjectUtils.isEmpty(runDO) && driverRunDO != null) {
+                        } else if (ObjectUtil.isEmpty(runDO) && driverRunDO != null) {
                             driverRunManager.save(driverRunDO);
                         }
                         //查出每天统计表离线时长是否有数据
@@ -164,7 +163,7 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
                         if (runOffDO != null && driverOffRunDO != null) {
                             driverOffRunDO.setId(runOffDO.getId());
                             driverRunManager.updateById(driverOffRunDO);
-                        } else if (ObjectUtils.isEmpty(runOffDO) && driverOffRunDO != null) {
+                        } else if (ObjectUtil.isEmpty(runOffDO) && driverOffRunDO != null) {
                             driverRunManager.save(driverOffRunDO);
                         }
                     }

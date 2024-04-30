@@ -192,25 +192,25 @@ public interface CommonConstant {
          */
         interface Event {
             /**
-             * 驱动注册握手事件，该事件用于校验当前 dc3-center-manager 是否可用
+             * 驱动注册握手事件, 该事件用于校验当前 dc3-center-manager 是否可用
              */
             String DRIVER_HANDSHAKE = "driver_handshake";
             String DRIVER_HANDSHAKE_BACK = "driver_handshake_back";
 
             /**
-             * 驱动注册事件，该事件用于向 dc3-center-manager 注册驱动配置信息
+             * 驱动注册事件, 该事件用于向 dc3-center-manager 注册驱动配置信息
              */
             String DRIVER_REGISTER = "driver_register";
             String DRIVER_REGISTER_BACK = "driver_register_back";
 
             /**
-             * 同步驱动元数据时间，该事件用于向 dc3-center-manager 发送驱动元数据同步请求
+             * 同步驱动元数据时间, 该事件用于向 dc3-center-manager 发送驱动元数据同步请求
              */
             String DRIVER_METADATA_SYNC = "driver_metadata_sync";
             String DRIVER_METADATA_SYNC_BACK = "driver_metadata_sync_back";
 
             /**
-             * 驱动心跳事件，该事件用于向 dc3-center-manager 发送驱动的当前状态
+             * 驱动心跳事件, 该事件用于向 dc3-center-manager 发送驱动的当前状态
              */
             String DRIVER_HEARTBEAT = "driver_heartbeat";
 

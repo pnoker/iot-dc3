@@ -21,9 +21,9 @@ import io.github.pnoker.center.data.entity.model.DeviceRunDO;
 import io.github.pnoker.center.data.entity.model.DeviceRunHistoryDO;
 import io.github.pnoker.center.data.mapper.DeviceRunHistoryMapper;
 import io.github.pnoker.center.data.service.DeviceRunHistoryService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 @Service

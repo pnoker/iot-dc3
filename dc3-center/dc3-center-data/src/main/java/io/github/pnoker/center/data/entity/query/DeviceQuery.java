@@ -21,6 +21,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -36,6 +37,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Schema(title = "DeviceQuery", description = "设备-查询")
 public class DeviceQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")

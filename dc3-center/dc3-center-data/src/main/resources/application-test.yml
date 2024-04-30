@@ -62,3 +62,7 @@ driver:
     default-send-topic:
       qos: 1
       name: device
+
+logging:
+  level:
+    io.github.pnoker: DEBUG

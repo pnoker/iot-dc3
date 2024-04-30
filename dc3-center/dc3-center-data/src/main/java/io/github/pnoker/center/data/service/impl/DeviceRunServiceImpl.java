@@ -19,9 +19,9 @@ package io.github.pnoker.center.data.service.impl;
 import io.github.pnoker.center.data.entity.model.DeviceRunDO;
 import io.github.pnoker.center.data.mapper.DeviceRunMapper;
 import io.github.pnoker.center.data.service.DeviceRunService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 @Service

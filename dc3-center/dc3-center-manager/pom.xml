@@ -21,13 +21,13 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>2024.1.0</version>
+        <version>2024.2.0</version>
     </parent>
 
     <artifactId>dc3-center-manager</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 全部设备集合管理服务，包括设备组注册、权限管理、设备管理等功能。</description>
+    <description>IOT DC3 平台 全部设备集合管理服务, 包括设备组注册、权限管理、设备管理等功能。</description>
 
     <dependencies>
 

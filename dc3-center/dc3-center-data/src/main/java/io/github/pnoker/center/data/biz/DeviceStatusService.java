@@ -30,7 +30,7 @@ import java.util.Map;
 public interface DeviceStatusService {
 
     /**
-     * 分页查询 Device 服务状态，同设备分页查询配套使用
+     * 分页查询 Device 服务状态, 同设备分页查询配套使用
      *
      * @param deviceQuery 设备和分页参数
      * @return Map String:String

@@ -62,9 +62,9 @@ public class AlarmNotifyProfileVO extends BaseVO {
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
-     * 报警通知间隔，毫秒
+     * 报警通知间隔, 毫秒
      */
-    @Schema(description = "报警通知间隔，毫秒")
+    @Schema(description = "报警通知间隔, 毫秒")
     private Long alarmNotifyInterval;
 
     /**

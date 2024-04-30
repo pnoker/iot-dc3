@@ -22,6 +22,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_user")
 public class UserDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -47,37 +49,37 @@ public class UserDO implements Serializable {
     private Long id;
 
     /**
-     * 用户昵称，加密存储
+     * 用户昵称, 加密存储
      */
     @TableField("nick_name")
     private String nickName;
 
     /**
-     * 用户名，加密存储
+     * 用户名, 加密存储
      */
     @TableField("user_name")
     private String userName;
 
     /**
-     * 手机号，加密存储
+     * 手机号, 加密存储
      */
     @TableField("phone")
     private String phone;
 
     /**
-     * 邮箱，加密存储
+     * 邮箱, 加密存储
      */
     @TableField("email")
     private String email;
 
     /**
-     * 社交相关拓展信息，加密存储
+     * 社交相关拓展信息, 加密存储
      */
     @TableField(value = "social_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt socialExt;
 
     /**
-     * 身份相关拓展信息，加密存储
+     * 身份相关拓展信息, 加密存储
      */
     @TableField(value = "identity_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt identityExt;

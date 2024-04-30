@@ -17,11 +17,10 @@
 package io.github.pnoker.center.data.init;
 
 import io.github.pnoker.center.data.biz.ScheduleService;
+import jakarta.annotation.Resource;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * @author pnoker

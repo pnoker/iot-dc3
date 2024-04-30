@@ -55,7 +55,7 @@ public class AlarmNotifyProfileBO extends BaseBO {
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
-     * 报警通知间隔，毫秒
+     * 报警通知间隔, 毫秒
      */
     private Long alarmNotifyInterval;
 

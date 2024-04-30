@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -36,6 +37,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_user_login")
 public class UserLoginDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -45,7 +47,7 @@ public class UserLoginDO implements Serializable {
     private Long id;
 
     /**
-     * 登录名称，加密存储
+     * 登录名称, 加密存储
      */
     @TableField("login_name")
     private String loginName;

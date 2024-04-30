@@ -33,6 +33,7 @@ import io.github.pnoker.driver.api.S7Serializer;
 import io.github.pnoker.driver.api.factory.S7ConnectorFactory;
 import io.github.pnoker.driver.api.factory.S7SerializerFactory;
 import io.github.pnoker.driver.bean.PlcS7PointVariable;
+import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,7 +41,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -80,9 +80,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         !!!
-        你可以在此处执行一些特定的初始化逻辑，驱动在启动的时候会自动执行该方法。
+        你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
         */
         s7ConnectorMap = new ConcurrentHashMap<>(16);
     }
@@ -90,14 +90,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void schedule() {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         !!!
-        上传设备状态，可自行灵活拓展，不一定非要在schedule()接口中实现，你可以：
+        上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
         - 在read中实现设备状态的判断；
         - 在自定义定时任务中实现设备状态的判断；
         - 通过某种判断机制实现设备状态的判断。
 
-        最后通过 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理，其中设备状态（StatusEnum）：
+        最后通过 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理, 其中设备状态（StatusEnum）: 
         - ONLINE:在线
         - OFFLINE:离线
         - MAINTAIN:维护
@@ -109,7 +109,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public String read(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, PointDTO point) {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
         log.debug("Plc S7 Read, device: {}, point: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(point));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
@@ -130,7 +130,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, AttributeConfigDTO value) {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
         log.debug("Plc S7 Write, device: {}, value: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(value));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverInfo);
@@ -151,7 +151,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     /**
      * 获取 plcs7 serializer
-     * 先从缓存中取，没有就新建
+     * 先从缓存中取, 没有就新建
      *
      * @param deviceId   设备ID
      * @param driverInfo DeviceInfo Map

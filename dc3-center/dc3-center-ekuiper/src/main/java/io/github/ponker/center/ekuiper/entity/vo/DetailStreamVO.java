@@ -71,11 +71,11 @@ public class DetailStreamVO {
             this.format = format;
             this.confKey = confKey;
             this.type = type;
-            // 如果提供了 shared 属性，使用提供的值，否则默认为 false
+            // 如果提供了 shared 属性, 使用提供的值, 否则默认为 false
             this.shared = shared != null ? shared : false;
         }
 
-        // 添加 getter 和 setter 方法，以便在接收 JSON 数据时进行处理
+        // 添加 getter 和 setter 方法, 以便在接收 JSON 数据时进行处理
         public Boolean getShared() {
             return shared != null ? shared : false;
         }

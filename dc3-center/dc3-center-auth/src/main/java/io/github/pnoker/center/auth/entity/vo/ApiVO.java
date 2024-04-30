@@ -64,7 +64,7 @@ public class ApiVO extends BaseVO {
     private String apiName;
 
     /**
-     * Api接口编号，一般为URL的MD5编码
+     * Api接口编号, 一般为URL的MD5编码
      */
     @Schema(description = "Api接口编号")
     private String apiCode;

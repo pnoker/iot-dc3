@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * OpenAPI Config
  * <p>
- * 请勿移动到 common web，否则无法生效
+ * 请勿移动到 common web, 否则无法生效
  *
  * @author pnoker
  * @since 2022.1.0

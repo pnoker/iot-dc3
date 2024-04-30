@@ -20,6 +20,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -35,6 +36,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Schema(title = "DeviceEvent", description = "设备事件-查询")
 public class DeviceEventQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")

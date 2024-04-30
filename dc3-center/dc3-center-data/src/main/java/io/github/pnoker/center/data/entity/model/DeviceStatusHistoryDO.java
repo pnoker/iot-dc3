@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -36,6 +37,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_device_status_history")
 public class DeviceStatusHistoryDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -63,9 +65,9 @@ public class DeviceStatusHistoryDO implements Serializable {
     private String deviceName;
 
     /**
-     * CREATE：注册成功；
-     * ONLINE：在线
-     * ；OFFLINE：离线；
+     * CREATE: 注册成功；
+     * ONLINE: 在线
+     * ；OFFLINE: 离线；
      */
     @TableField("status")
     private String status;

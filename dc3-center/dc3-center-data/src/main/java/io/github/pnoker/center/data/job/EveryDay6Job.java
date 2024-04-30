@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 /**
- * 通用：每天早上6点执行任务
+ * 通用: 每天早上6点执行任务
  *
  * @author pnoker
  * @since 2022.1.0

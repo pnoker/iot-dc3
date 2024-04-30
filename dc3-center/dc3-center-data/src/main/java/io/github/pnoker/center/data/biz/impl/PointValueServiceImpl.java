@@ -36,12 +36,12 @@ import io.github.pnoker.common.exception.RepositoryException;
 import io.github.pnoker.common.redis.service.RedisRepositoryService;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
+import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;

@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 /**
- * 通用：每小时执行任务
+ * 通用: 每小时执行任务
  *
  * @author pnoker
  * @since 2022.1.0
@@ -44,7 +44,7 @@ public class HourlyJob extends QuartzJobBean {
      */
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        // 暂时调整为30秒，仅供测试
+        // 暂时调整为30秒, 仅供测试
         log.info("hourlyJobHandler: {}", LocalDateTime.now());
     }
 }

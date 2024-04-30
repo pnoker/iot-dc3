@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -36,6 +37,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_driver_attribute_config")
 public class DriverAttributeConfigDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

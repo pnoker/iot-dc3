@@ -84,7 +84,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
             return response.writeWith(Mono.just(dataBuffer));
         }*/
 
-        // 20240327 先去掉登录限制，新增一个默认的登录信息逻辑
+        // 20240327 先去掉登录限制, 新增一个默认的登录信息逻辑
         ServerHttpRequest build = request.mutate().headers(headers -> {
             RequestHeader.UserHeader entityBO = new RequestHeader.UserHeader();
             entityBO.setUserId(1L);

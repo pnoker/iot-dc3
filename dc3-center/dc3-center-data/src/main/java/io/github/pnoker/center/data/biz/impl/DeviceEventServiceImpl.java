@@ -22,10 +22,9 @@ import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
 import io.github.pnoker.common.redis.service.RedisService;
 import io.github.pnoker.common.utils.JsonUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * DeviceService Impl

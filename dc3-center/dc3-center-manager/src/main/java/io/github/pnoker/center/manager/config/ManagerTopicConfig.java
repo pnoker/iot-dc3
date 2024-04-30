@@ -19,6 +19,7 @@ package io.github.pnoker.center.manager.config;
 import io.github.pnoker.common.config.ExchangeConfig;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -28,7 +29,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public class ManagerTopicConfig {
     @Bean
     Queue driverRegisterQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        // 30秒：30 * 1000 = 30000L
+        // 30秒: 30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
         return new Queue(RabbitConstant.QUEUE_REGISTER_UP, false, false, false, arguments);
     }

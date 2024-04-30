@@ -22,6 +22,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -37,6 +38,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Schema(title = "DriverQuery", description = "驱动-查询")
 public class DriverQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")

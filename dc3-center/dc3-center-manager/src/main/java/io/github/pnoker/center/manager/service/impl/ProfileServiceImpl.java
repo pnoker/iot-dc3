@@ -43,10 +43,10 @@ import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import io.github.pnoker.common.utils.UserHeaderUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -97,7 +97,7 @@ public class ProfileServiceImpl implements ProfileService {
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("模板删除失败，该模板下存在位号");
+            throw new AssociatedException("模板删除失败, 该模板下存在位号");
         }
 
         if (!profileManager.removeById(id)) {

@@ -9,13 +9,13 @@ import io.github.ponker.center.ekuiper.entity.vo.RuleStatusVO;
 import io.github.ponker.center.ekuiper.service.ApiService;
 import io.github.ponker.center.ekuiper.service.RuleService;
 import io.github.ponker.center.ekuiper.service.UrlService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 

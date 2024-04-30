@@ -20,13 +20,12 @@ import io.github.pnoker.center.data.biz.ScheduleService;
 import io.github.pnoker.center.data.job.*;
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.quartz.QuartzService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DateBuilder;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * @author pnoker

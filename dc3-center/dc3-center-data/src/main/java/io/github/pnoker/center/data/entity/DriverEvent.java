@@ -23,6 +23,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -35,6 +36,8 @@ import java.time.LocalDateTime;
 @Document
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DriverEvent implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

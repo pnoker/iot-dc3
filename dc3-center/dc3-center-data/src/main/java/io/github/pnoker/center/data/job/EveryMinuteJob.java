@@ -25,9 +25,9 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 /**
- * 通用：每分钟执行任务
+ * 通用: 每分钟执行任务
  * <p>
- * 改任务主要用于判断驱动和设备的在线情况，如果设备的在线超时时长在一分钟内，则改任务不使用于设备的状态判断，需要更小调度周期
+ * 改任务主要用于判断驱动和设备的在线情况, 如果设备的在线超时时长在一分钟内, 则改任务不使用于设备的状态判断, 需要更小调度周期
  *
  * @author pnoker
  * @since 2022.1.0

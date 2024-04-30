@@ -24,6 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,6 +41,8 @@ import java.util.List;
 @AllArgsConstructor
 @Schema(title = "PointValueRead", description = "位号值")
 public class PointValueVO implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

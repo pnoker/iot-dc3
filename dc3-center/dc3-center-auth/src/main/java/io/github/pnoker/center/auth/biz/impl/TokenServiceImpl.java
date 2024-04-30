@@ -41,10 +41,10 @@ import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -159,7 +159,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     /**
-     * 检测用户登录限制，返回该用户是否受限
+     * 检测用户登录限制, 返回该用户是否受限
      *
      * @param loginName  登录名称
      * @param tenantCode 租户编号

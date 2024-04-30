@@ -32,10 +32,9 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * <p>
@@ -73,7 +72,7 @@ public class MenuServiceImpl implements MenuService {
         LambdaQueryChainWrapper<MenuDO> wrapper = menuManager.lambdaQuery().eq(MenuDO::getParentMenuId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("菜单删除失败，该菜单下存在子菜单");
+            throw new AssociatedException("菜单删除失败, 该菜单下存在子菜单");
         }
 
         if (!menuManager.removeById(id)) {

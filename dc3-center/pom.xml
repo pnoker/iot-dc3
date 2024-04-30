@@ -21,18 +21,18 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>2024.1.0</version>
+        <version>2024.2.0</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-center</artifactId>
-    <version>2024.1.0</version>
+    <version>2024.2.0</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2016-2022</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IOT DC3 平台 综合管理中心集合，包含：服务注册与发现中心、服务监控中心、物联数据采集中心、授权与权限管理中心。
+        IOT DC3 平台 综合管理中心集合, 包含: 服务注册与发现中心、服务监控中心、物联数据采集中心、授权与权限管理中心。
     </description>
 
     <developers>

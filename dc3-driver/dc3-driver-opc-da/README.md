@@ -10,7 +10,7 @@
 - [x] 跨平台
 - [x] 支持 OpcDa 2.0
 - [ ] 支持 OpcDa 3.0
-- [x] 支持数据类型： int \ long \ string \ double \ float \ boolean
+- [x] 支持数据类型:  int \ long \ string \ double \ float \ boolean
 
 ## 测试工具
 
@@ -22,15 +22,15 @@
 
 ### OpcDa Server 连接配置
 
-- Host ：OpcDa 服务所在主机IP
-- CLSID ：OpcDa 服务CLSID，可以通过OpcClient工具查看
-- User ：OpcDa 服务所在主机用户名
-- Password ：OpcDa 服务所在主机用户的远程登录密码
+- Host : OpcDa 服务所在主机IP
+- CLSID : OpcDa 服务CLSID, 可以通过OpcClient工具查看
+- User : OpcDa 服务所在主机用户名
+- Password : OpcDa 服务所在主机用户的远程登录密码
 
 ### OpcDa Point 配置
 
-- groupBO ：item groupBO
-- tag ：item name
+- groupBO : item groupBO
+- tag : item name
 
 ### 定时采集配置
 
