@@ -32,10 +32,9 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * <p>
@@ -74,7 +73,7 @@ public class RoleServiceImpl implements RoleService {
         LambdaQueryChainWrapper<RoleDO> wrapper = roleManager.lambdaQuery().eq(RoleDO::getParentRoleId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("角色删除失败，该角色下存在子角色");
+            throw new AssociatedException("角色删除失败, 该角色下存在子角色");
         }
 
         if (!roleManager.removeById(id)) {

@@ -9,13 +9,12 @@ import io.github.ponker.center.ekuiper.entity.vo.DetailTableVO;
 import io.github.ponker.center.ekuiper.service.ApiService;
 import io.github.ponker.center.ekuiper.service.StreamTableService;
 import io.github.ponker.center.ekuiper.service.UrlService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-
-import javax.annotation.Resource;
 
 /**
  * @author : Zhen

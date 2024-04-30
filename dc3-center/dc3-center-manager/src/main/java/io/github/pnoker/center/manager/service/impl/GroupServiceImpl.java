@@ -32,10 +32,9 @@ import io.github.pnoker.common.entity.bo.GroupBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * <p>
@@ -73,7 +72,7 @@ public class GroupServiceImpl implements GroupService {
         LambdaQueryChainWrapper<GroupDO> wrapper = groupManager.lambdaQuery().eq(GroupDO::getParentGroupId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("分组删除失败，该分组下存在子分组");
+            throw new AssociatedException("分组删除失败, 该分组下存在子分组");
         }
 
         if (!groupManager.removeById(id)) {

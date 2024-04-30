@@ -32,12 +32,12 @@ import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.redis.service.RedisService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 

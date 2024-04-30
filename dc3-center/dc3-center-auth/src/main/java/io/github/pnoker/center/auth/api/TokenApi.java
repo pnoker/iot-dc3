@@ -27,10 +27,9 @@ import io.github.pnoker.center.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.utils.TimeUtil;
 import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-
-import javax.annotation.Resource;
 
 /**
  * Token Api

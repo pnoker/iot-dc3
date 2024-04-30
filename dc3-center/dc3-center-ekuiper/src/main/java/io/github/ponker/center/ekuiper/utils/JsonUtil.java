@@ -45,7 +45,7 @@ public final class JsonUtil {
 
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象
+     * 反序列化, 将 Json 字符串解析为 Java 对象
      *
      * @param text      Json String
      * @param valueType Java 对象
@@ -60,7 +60,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象
+     * 反序列化, 将 Json 字符串解析为 Java 对象
      *
      * @param bytes     Json Byte Array
      * @param valueType Java 对象
@@ -75,7 +75,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象
+     * 反序列化, 将 Json 字符串解析为 Java 对象
      *
      * @param jsonParser Json Parser
      * @param valueType  Java 对象
@@ -90,7 +90,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象
+     * 反序列化, 将 Json 字符串解析为 Java 对象
      *
      * @param dataInput Json DataInput
      * @param valueType Java 对象
@@ -105,7 +105,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象
+     * 反序列化, 将 Json 字符串解析为 Java 对象
      *
      * @param inputStream Json InputStream
      * @param valueType   Java 对象
@@ -120,7 +120,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象
+     * 反序列化, 将 Json 字符串解析为 Java 对象
      *
      * @param reader    Json Reader
      * @param valueType Java 对象
@@ -135,7 +135,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象
+     * 反序列化, 将 Json 字符串解析为 Java 对象
      *
      * @param file      Json File
      * @param valueType Java 对象
@@ -150,10 +150,10 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将Json 字符串转化为指定对象,并将指定对象中的泛型转为指定的T类型
+     * 反序列化, 将Json 字符串转化为指定对象,并将指定对象中的泛型转为指定的T类型
      *
      * @param text          Json String
-     * @param typeReference TypeReference，T 为指定要转化为的数据类型
+     * @param typeReference TypeReference, T 为指定要转化为的数据类型
      * @return Java 对象
      */
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
@@ -165,7 +165,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象集合
+     * 反序列化, 将 Json 字符串解析为 Java 对象集合
      *
      * @param text      Json String
      * @param valueType Java 对象
@@ -181,7 +181,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象集合
+     * 反序列化, 将 Json 字符串解析为 Java 对象集合
      *
      * @param bytes     Json Byte Array
      * @param valueType Java 对象
@@ -197,7 +197,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象集合
+     * 反序列化, 将 Json 字符串解析为 Java 对象集合
      *
      * @param jsonParser Json JsonParser
      * @param valueType  Java 对象
@@ -213,7 +213,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象集合
+     * 反序列化, 将 Json 字符串解析为 Java 对象集合
      *
      * @param dataInput Json DataInput
      * @param valueType Java 对象
@@ -229,7 +229,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象集合
+     * 反序列化, 将 Json 字符串解析为 Java 对象集合
      *
      * @param inputStream Json InputStream
      * @param valueType   Java 对象
@@ -245,7 +245,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象集合
+     * 反序列化, 将 Json 字符串解析为 Java 对象集合
      *
      * @param reader    Json Reader
      * @param valueType Java 对象
@@ -261,7 +261,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化，将 Json 字符串解析为 Java 对象集合
+     * 反序列化, 将 Json 字符串解析为 Java 对象集合
      *
      * @param file      Json File
      * @param valueType Java 对象
@@ -277,7 +277,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 序列化，将一个 Java 对象或 Java 对象集合转化为 Json 字符串
+     * 序列化, 将一个 Java 对象或 Java 对象集合转化为 Json 字符串
      *
      * @param type Java 对象引用
      * @return Json 字符串
@@ -291,7 +291,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 序列化，将一个 Java 对象转化为 Json 字符串，并定制 Json 展示内容
+     * 序列化, 将一个 Java 对象转化为 Json 字符串, 并定制 Json 展示内容
      *
      * @param type              Java 对象引用
      * @param serializationView 定制现实内容的 Java 对象
@@ -306,7 +306,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 美化序列化，将一个 Java 对象或 Java 对象集合转化为 Json 字符串
+     * 美化序列化, 将一个 Java 对象或 Java 对象集合转化为 Json 字符串
      *
      * @param type Java 对象引用
      * @return Json 字符串
@@ -320,7 +320,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 美化序列化，将一个Java 对象转化为 Json 字符串，并定制 Json 展示内容
+     * 美化序列化, 将一个Java 对象转化为 Json 字符串, 并定制 Json 展示内容
      *
      * @param type              Java 对象引用
      * @param serializationView 定制现实内容的Java 对象
@@ -335,7 +335,7 @@ public final class JsonUtil {
     }
 
     /**
-     * 序列化，将一个 Java 对象或 Java 对象集合转化为 Json Byte Array
+     * 序列化, 将一个 Java 对象或 Java 对象集合转化为 Json Byte Array
      *
      * @param type Java 对象引用
      * @return Json 字符串

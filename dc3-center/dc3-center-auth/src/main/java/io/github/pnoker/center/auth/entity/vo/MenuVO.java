@@ -73,7 +73,7 @@ public class MenuVO extends BaseVO {
     private String menuName;
 
     /**
-     * 菜单编号，一般为URL的MD5编码
+     * 菜单编号, 一般为URL的MD5编码
      */
     @Schema(description = "菜单编号")
     private String menuCode;

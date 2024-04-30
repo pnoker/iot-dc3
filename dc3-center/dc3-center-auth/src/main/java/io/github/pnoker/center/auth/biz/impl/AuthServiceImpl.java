@@ -28,10 +28,10 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.AuthUser;
 import io.github.pnoker.common.utils.AuthUtil;
 import io.github.pnoker.common.utils.DecodeUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -86,12 +86,12 @@ public class AuthServiceImpl implements AuthService {
 
         UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
         if (ObjectUtil.isNull(userPasswordBO)) {
-            throw new NotFoundException("密码不存在，请先设置密码");
+            throw new NotFoundException("密码不存在, 请先设置密码");
         }
 
         String saltValue = AuthUtil.getPasswordSalt(tenantBO.getId(), login.getName());
         if (CharSequenceUtil.isEmpty(saltValue)) {
-            throw new NotFoundException("密码盐不存在，请重新登录");
+            throw new NotFoundException("密码盐不存在, 请重新登录");
         }
 
         String decodedPassword = DecodeUtil.md5(userPasswordBO.getLoginPassword() + saltValue);

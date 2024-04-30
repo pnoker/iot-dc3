@@ -22,6 +22,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_alarm_message_profile")
 public class AlarmMessageProfileDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

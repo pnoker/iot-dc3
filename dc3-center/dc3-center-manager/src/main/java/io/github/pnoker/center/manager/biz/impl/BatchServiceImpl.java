@@ -25,10 +25,10 @@ import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.dto.*;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -132,7 +132,7 @@ public class BatchServiceImpl implements BatchService {
      *
      * @param deviceIds          设备ID集
      * @param driverAttributeMap 驱动属性Map
-     * @return map(deviceId[driverAttribute.name[attributeInfo]]) 设备ID，属性名称，属性配置
+     * @return map(deviceId[driverAttribute.name[attributeInfo]]) 设备ID, 属性名称, 属性配置
      */
     public Map<Long, Map<String, AttributeConfigDTO>> getDriverInfoMap(Set<Long> deviceIds, Map<Long, DriverAttributeDTO> driverAttributeMap) {
         Map<Long, Map<String, AttributeConfigDTO>> driverInfoMap = new ConcurrentHashMap<>(16);

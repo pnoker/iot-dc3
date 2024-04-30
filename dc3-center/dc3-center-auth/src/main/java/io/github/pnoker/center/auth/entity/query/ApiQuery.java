@@ -22,6 +22,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -35,6 +36,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Schema(title = "ApiQuery", description = "接口-查询")
 public class ApiQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")
@@ -61,7 +64,7 @@ public class ApiQuery implements Serializable {
     private String apiName;
 
     /**
-     * Api接口编号，一般为URL的MD5编码
+     * Api接口编号, 一般为URL的MD5编码
      */
     @Schema(description = "Api接口编号")
     private String apiCode;

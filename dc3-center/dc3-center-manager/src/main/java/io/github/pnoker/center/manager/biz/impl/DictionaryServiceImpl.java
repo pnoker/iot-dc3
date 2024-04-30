@@ -31,10 +31,9 @@ import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import io.github.pnoker.common.entity.common.Pages;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * @author pnoker

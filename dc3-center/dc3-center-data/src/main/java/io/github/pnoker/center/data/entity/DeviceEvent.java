@@ -24,6 +24,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 @Document
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeviceEvent implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

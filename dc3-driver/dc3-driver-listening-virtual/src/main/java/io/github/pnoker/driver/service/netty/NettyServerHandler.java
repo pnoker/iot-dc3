@@ -30,10 +30,10 @@ import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +68,7 @@ public class NettyServerHandler {
         Long deviceId = getDeviceIdByName(deviceName);
         String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
 
-        //TODO 简单的例子，用于存储channel，然后配合write接口实现向下发送数据
+        //TODO 简单的例子, 用于存储channel, 然后配合write接口实现向下发送数据
         NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
 
         List<PointValueDTO> pointValues = new ArrayList<>(16);

@@ -17,12 +17,11 @@
 package io.github.pnoker.gateway.filter.factory;
 
 import io.github.pnoker.gateway.filter.AuthenticGatewayFilter;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 
 /**

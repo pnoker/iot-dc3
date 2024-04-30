@@ -16,10 +16,10 @@
 
 package com.serotonin.modbus4j.locator;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.code.RegisterRange;
 import com.serotonin.modbus4j.exception.IllegalDataTypeException;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -86,8 +86,7 @@ public class NumericLocator extends BaseLocator<Number> {
 
         if (range == RegisterRange.COIL_STATUS || range == RegisterRange.INPUT_STATUS)
             throw new IllegalDataTypeException("Only binary values can be read from Coil and Input ranges");
-
-        if (!ArrayUtils.contains(DATA_TYPES, dataType))
+        if (!ArrayUtil.contains(DATA_TYPES, dataType))
             throw new IllegalDataTypeException("Invalid data type");
     }
 

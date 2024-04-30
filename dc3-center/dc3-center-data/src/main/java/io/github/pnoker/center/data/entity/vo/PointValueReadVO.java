@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -37,6 +38,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Schema(title = "PointValueRead", description = "位号读")
 public class PointValueReadVO implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "设备ID")

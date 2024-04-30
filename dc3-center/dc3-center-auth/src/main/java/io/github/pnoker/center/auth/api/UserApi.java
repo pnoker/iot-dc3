@@ -30,10 +30,9 @@ import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-
-import javax.annotation.Resource;
 
 /**
  * User Api

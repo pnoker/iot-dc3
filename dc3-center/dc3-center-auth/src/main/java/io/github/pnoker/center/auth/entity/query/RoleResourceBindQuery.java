@@ -20,6 +20,7 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -33,6 +34,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Schema(title = "RoleResourceBindQuery", description = "角色资源绑定-查询")
 public class RoleResourceBindQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "分页")

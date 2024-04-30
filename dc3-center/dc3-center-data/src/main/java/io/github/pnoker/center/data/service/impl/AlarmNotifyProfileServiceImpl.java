@@ -32,10 +32,9 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * <p>
@@ -73,7 +72,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         LambdaQueryChainWrapper<AlarmNotifyProfileDO> wrapper = alarmNotifyProfileManager.lambdaQuery().eq(AlarmNotifyProfileDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("报警通知模板删除失败，该报警通知模板下存在子报警通知模板");
+            throw new AssociatedException("报警通知模板删除失败, 该报警通知模板下存在子报警通知模板");
         }
 
         if (!alarmNotifyProfileManager.removeById(id)) {

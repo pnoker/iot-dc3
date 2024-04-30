@@ -135,7 +135,7 @@ public class RuleServiceImpl implements RuleService {
             Iterator<Map<String, Map<String, Object>>> iterator = actions.iterator();
             while (iterator.hasNext()) {
                 Map<String, Map<String, Object>> action = iterator.next();
-                // 如果 action 包含指定的 actionType，则删除
+                // 如果 action 包含指定的 actionType, 则删除
                 if (action.containsKey(actionType)) {
                     iterator.remove();
                 }
@@ -143,7 +143,7 @@ public class RuleServiceImpl implements RuleService {
             // 操作完成后返回 "successful"
             return Mono.just("successful");
         } catch (Exception e) {
-            // 如果发生异常，则返回 Mono.error
+            // 如果发生异常, 则返回 Mono.error
             return Mono.error(e);
         }
     }
@@ -158,7 +158,7 @@ public class RuleServiceImpl implements RuleService {
                 Map<String, Map<String, Object>> action = iterator.next();
                 // 检查当前 action 是否包含指定的 actionType
                 if (action.containsKey(actionType)) {
-                    // 如果索引等于指定的 index，则删除
+                    // 如果索引等于指定的 index, 则删除
                     if (currentIndex == index) {
                         iterator.remove();
                         return Mono.just("删除成功");
@@ -166,10 +166,10 @@ public class RuleServiceImpl implements RuleService {
                     currentIndex++; // 增加索引
                 }
             }
-            // 如果没有找到匹配的数据，则返回错误信息
-            return Mono.error(new RuntimeException("找不到类型为：" + actionType + "，索引为：" + index + " 的数据"));
+            // 如果没有找到匹配的数据, 则返回错误信息
+            return Mono.error(new RuntimeException("找不到类型为: " + actionType + ", 索引为: " + index + " 的数据"));
         } catch (Exception e) {
-            // 如果发生异常，则返回 Mono.error
+            // 如果发生异常, 则返回 Mono.error
             return Mono.error(e);
         }
     }
@@ -184,7 +184,7 @@ public class RuleServiceImpl implements RuleService {
                 Map<String, Map<String, Object>> action = iterator.next();
                 // 如果当前 action 不为空
                 if (!action.isEmpty()) {
-                    // 如果索引等于指定的 index，则删除
+                    // 如果索引等于指定的 index, 则删除
                     if (currentIndex == index) {
                         iterator.remove();
                         return Mono.just("删除成功");
@@ -192,10 +192,10 @@ public class RuleServiceImpl implements RuleService {
                     currentIndex++; // 增加索引
                 }
             }
-            // 如果没有找到匹配的数据，则返回错误信息
+            // 如果没有找到匹配的数据, 则返回错误信息
             return Mono.error(new RuntimeException("索引超出范围"));
         } catch (Exception e) {
-            // 如果发生异常，则返回 Mono.error
+            // 如果发生异常, 则返回 Mono.error
             return Mono.error(e);
         }
     }
@@ -210,14 +210,14 @@ public class RuleServiceImpl implements RuleService {
             // 获取指定类型的结构
             Map<String, Object> targetConfig = actionMap.get(type);
 
-            // 如果存在指定类型的结构，则更新配置
+            // 如果存在指定类型的结构, 则更新配置
             if (targetConfig != null) {
                 updateConfig(targetConfig, newData.get(type));
                 return Mono.just(type + "编辑成功");
             }
         }
 
-        // 如果actions列表中没有指定类型的结构，则返回错误信息
+        // 如果actions列表中没有指定类型的结构, 则返回错误信息
         return Mono.error(new RuntimeException("No configuration found for type: " + type));
     }
 
@@ -233,7 +233,7 @@ public class RuleServiceImpl implements RuleService {
         for (Map<String, Map<String, Object>> actionMap : actions) {
             // 检查当前 Map 对象是否包含指定类型的结构
             if (actionMap.containsKey(type)) {
-                // 如果是 MQTT 类型，并且索引等于指定的 mqttIndex，则更新配置并返回成功消息
+                // 如果是 MQTT 类型, 并且索引等于指定的 mqttIndex, 则更新配置并返回成功消息
                 if (currentIndex == index) {
                     updateConfig(actionMap.get(type), newData.get(type));
                     return Mono.just(type + "[" + index + "]" + "编辑成功");
@@ -242,8 +242,8 @@ public class RuleServiceImpl implements RuleService {
             }
         }
 
-        // 如果 actions 列表中没有指定类型和索引的结构，则返回错误信息
-        return Mono.error(new RuntimeException("找不到类型为：" + type + "，索引为：" + index + " 的配置"));
+        // 如果 actions 列表中没有指定类型和索引的结构, 则返回错误信息
+        return Mono.error(new RuntimeException("找不到类型为: " + type + ", 索引为: " + index + " 的配置"));
     }
 
     private List<Map<String, Map<String, Object>>> actions = new ArrayList<>();
@@ -273,7 +273,7 @@ public class RuleServiceImpl implements RuleService {
                 }
             }
 
-            // 如果 actions 列表中没有与 newData 匹配的结构，则返回错误信息
+            // 如果 actions 列表中没有与 newData 匹配的结构, 则返回错误信息
             return Mono.error(new RuntimeException("找不到要编辑的数据"));
         } else {
             return Mono.error(new RuntimeException("索引越界"));
@@ -285,13 +285,13 @@ public class RuleServiceImpl implements RuleService {
         for (Map.Entry<String, Object> entry : newConfig.entrySet()) {
             // 检查新传入的字段是否有更新
             if (originalConfig.containsKey(entry.getKey())) {
-                // 如果新传入的字段在原始配置中存在，则更新原始配置中的对应字段
+                // 如果新传入的字段在原始配置中存在, 则更新原始配置中的对应字段
                 originalConfig.put(entry.getKey(), entry.getValue());
             }
         }
     }
 
-    // 辅助方法：将Map<String, Map<String, Object>>类型转换为Map<String, Object>类型
+    // 辅助方法: 将Map<String, Map<String, Object>>类型转换为Map<String, Object>类型
     private Map<String, Object> convertToMap(Map<String, Map<String, Object>> map) {
         Map<String, Object> result = new HashMap<>();
         for (Map.Entry<String, Map<String, Object>> entry : map.entrySet()) {
@@ -325,7 +325,7 @@ public class RuleServiceImpl implements RuleService {
         try {
             // 解析成 JSON 数组
             JSONArray jsonArray = JSONArray.parseArray(response);
-            // 遍历 JSON 数组中的每个元素，将其转换为 Data 对象，并添加到 dataList 中
+            // 遍历 JSON 数组中的每个元素, 将其转换为 Data 对象, 并添加到 dataList 中
             for (int i = 0; i < jsonArray.size(); i++) {
                 // 获取 JSON 对象
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -333,7 +333,7 @@ public class RuleServiceImpl implements RuleService {
                 String id = jsonObject.getString("id");
                 String name = jsonObject.getString("name");
                 String status = jsonObject.getString("status");
-                // 创建 Data 对象，并添加到 dataList 中
+                // 创建 Data 对象, 并添加到 dataList 中
                 RuleDataVO data = new RuleDataVO(id, name, status);
                 ruleDataVOList.add(data);
             }
@@ -364,7 +364,7 @@ public class RuleServiceImpl implements RuleService {
         }
         for (JsonNode action : actionsNode) {
             String actionName = action.fieldNames().next();
-            log.info("发现action：" + actionName);
+            log.info("发现action: " + actionName);
 
             JsonNode actionNode = action.get(actionName);
             if (!isValidSinkType(actionName, actionNode)) {
@@ -386,7 +386,7 @@ public class RuleServiceImpl implements RuleService {
         }
         for (JsonNode action : actionsNode) {
             String actionName = action.fieldNames().next();
-            log.info("发现action：" + actionName);
+            log.info("发现action: " + actionName);
 
             JsonNode actionNode = action.get(actionName);
             if (!isValidSinkType(actionName, actionNode)) {

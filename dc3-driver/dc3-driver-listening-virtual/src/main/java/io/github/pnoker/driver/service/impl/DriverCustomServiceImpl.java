@@ -29,11 +29,11 @@ import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.github.pnoker.driver.service.netty.udp.NettyUdpServer;
 import io.netty.channel.Channel;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -65,9 +65,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         !!!
-        你可以在此处执行一些特定的初始化逻辑，驱动在启动的时候会自动执行该方法。
+        你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
         */
         threadPoolExecutor.execute(() -> {
             log.debug("Virtual Listening Driver Starting(TCP::{}) incoming data listener", tcpPort);
@@ -82,14 +82,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void schedule() {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         !!!
-        上传设备状态，可自行灵活拓展，不一定非要在schedule()接口中实现，你可以：
+        上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
         - 在read中实现设备状态的判断；
         - 在自定义定时任务中实现设备状态的判断；
         - 通过某种判断机制实现设备状态的判断。
 
-        最后通过 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理，其中设备状态（StatusEnum）：
+        最后通过 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理, 其中设备状态（StatusEnum）: 
         - ONLINE:在线
         - OFFLINE:离线
         - MAINTAIN:维护
@@ -101,9 +101,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public String read(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, PointDTO point) {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
 
-        因为 Listening Virtual 的数据来源是被动接收的，所以无需实现该 Read 方法
+        因为 Listening Virtual 的数据来源是被动接收的, 所以无需实现该 Read 方法
         接收数据处理函数在
         - io.github.pnoker.driver.service.netty.tcp.NettyTcpServerHandler.channelRead
         - io.github.pnoker.driver.service.netty.udp.NettyUdpServerHandler.channelRead0
@@ -114,7 +114,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, AttributeConfigDTO value) {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);

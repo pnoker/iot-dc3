@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-driver</artifactId>
-        <version>2024.1.0</version>
+        <version>2024.2.0</version>
     </parent>
 
     <artifactId>dc3-driver-plcs7</artifactId>

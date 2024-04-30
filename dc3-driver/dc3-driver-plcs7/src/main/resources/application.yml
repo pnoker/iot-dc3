@@ -44,7 +44,7 @@ driver:
       attribute-name: dbNum
       attribute-type-flag: INT
       default-value: 0
-      remark: 数据块号，从 0 开始计数
+      remark: 数据块号, 从 0 开始计数
     - display-name: 字偏移
       attribute-name: byteOffset
       attribute-type-flag: INT

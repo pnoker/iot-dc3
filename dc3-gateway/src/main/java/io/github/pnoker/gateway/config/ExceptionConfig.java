@@ -18,6 +18,7 @@ package io.github.pnoker.gateway.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.common.entity.R;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.annotation.Order;
@@ -31,10 +32,8 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.handler.ResponseStatusExceptionHandler;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-
 /**
- * 网关异常通用处理器，只作用在webflux 环境下 , 优先级低于 {@link ResponseStatusExceptionHandler} 执行
+ * 网关异常通用处理器, 只作用在webflux 环境下 , 优先级低于 {@link ResponseStatusExceptionHandler} 执行
  *
  * @author pnoker
  * @since 2022.1.0

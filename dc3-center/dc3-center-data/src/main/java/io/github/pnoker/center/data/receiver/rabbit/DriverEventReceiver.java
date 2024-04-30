@@ -22,18 +22,18 @@ import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.DriverEventService;
 import io.github.pnoker.common.entity.dto.DriverEventDTO;
 import io.github.pnoker.common.utils.JsonUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 
 /**
  * 接收驱动发送过来的驱动事件数据
- * 其中包括：驱动心跳事件、在线、离线、故障等其他事件
+ * 其中包括: 驱动心跳事件、在线、离线、故障等其他事件
  *
  * @author pnoker
  * @since 2022.1.0

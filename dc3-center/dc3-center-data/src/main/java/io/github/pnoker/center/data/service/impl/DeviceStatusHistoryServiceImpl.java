@@ -19,9 +19,9 @@ package io.github.pnoker.center.data.service.impl;
 import io.github.pnoker.center.data.entity.model.DeviceStatusHistoryDO;
 import io.github.pnoker.center.data.mapper.DeviceStatusHistoryMapper;
 import io.github.pnoker.center.data.service.DeviceStatusHistoryService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 @Service

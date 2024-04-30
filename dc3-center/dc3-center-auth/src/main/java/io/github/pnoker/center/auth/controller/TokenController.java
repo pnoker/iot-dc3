@@ -25,14 +25,13 @@ import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.TimeUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
 
 /**
  * 令牌 Controller
@@ -77,7 +76,7 @@ public class TokenController implements BaseController {
      * 检测用户 Token 令牌是否有效
      *
      * @param entityVO 校验令牌请求体 {@link TokenQuery}
-     * @return 是否有效，并返回过期时间
+     * @return 是否有效, 并返回过期时间
      */
     @PostMapping("/check")
     public R<Boolean> checkValid(@Validated @RequestBody TokenQuery entityVO) {

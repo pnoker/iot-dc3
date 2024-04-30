@@ -24,6 +24,7 @@ import io.github.pnoker.center.data.entity.DriverEvent;
 import io.github.pnoker.center.data.entity.query.DeviceEventQuery;
 import io.github.pnoker.center.data.entity.query.DriverEventQuery;
 import io.github.pnoker.common.entity.common.Pages;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -31,7 +32,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
