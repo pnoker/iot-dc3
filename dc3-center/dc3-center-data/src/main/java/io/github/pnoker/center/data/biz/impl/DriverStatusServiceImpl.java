@@ -112,14 +112,14 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
-            throw new RuntimeException("Grpc Failed");
+            throw new RuntimeException("驱动不存在");
         }
         DriverRunBO driverRunBO = new DriverRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         driverRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
-        driverRunBO.setTotalDuration(totalDuration);
+        driverRunBO.setTotalDuration(totalDuration==null?0L:totalDuration);
         if (ObjectUtil.isEmpty(driverRunDOS)) {
             driverRunBO.setDuration(list);
             return driverRunBO;
@@ -139,12 +139,12 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
-            throw new RuntimeException("Grpc Failed");
+            throw new RuntimeException("驱动id不存在");
         }
         DriverRunBO driverRunBO = new DriverRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
-        driverRunBO.setTotalDuration(totalDuration);
+        driverRunBO.setTotalDuration(totalDuration==null?0L:totalDuration);
         driverRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         if (ObjectUtil.isEmpty(driverRunDOS)) {
@@ -161,7 +161,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public String getDeviceOnlineByDriverId(Long driverId) {
         List<String> list = getList(driverId);
-        if (list == null) return null;
+        if (list == null) return String.valueOf(0L);
         long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.ONLINE.getCode())).count();
         return String.valueOf(count);
     }
@@ -169,7 +169,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Override
     public String getDeviceOfflineByDriverId(Long driverId) {
         List<String> list = getList(driverId);
-        if (list == null) return null;
+        if (list == null) return String.valueOf(0L);
         long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.OFFLINE.getCode())).count();
         return String.valueOf(count);
     }

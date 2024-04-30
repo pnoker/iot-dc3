@@ -143,7 +143,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         Set<Long> ids = new HashSet<>();
         ids.add(request.getDeviceId());
         List<DeviceBO> deviceBOS = deviceService.selectByIds(ids);
-        if (ObjectUtil.isNull(deviceBOS)) {
+        if (ObjectUtil.isEmpty(deviceBOS)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
