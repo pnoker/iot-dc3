@@ -51,11 +51,13 @@ import java.util.List;
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_CONFIG_URL_PREFIX)
 public class PointAttributeConfigController implements BaseController {
 
-    @Resource
-    private PointAttributeConfigBuilder pointAttributeConfigBuilder;
+    private final PointAttributeConfigBuilder pointAttributeConfigBuilder;
+    private final PointAttributeConfigService pointAttributeConfigService;
 
-    @Resource
-    private PointAttributeConfigService pointAttributeConfigService;
+    public PointAttributeConfigController(PointAttributeConfigBuilder pointAttributeConfigBuilder, PointAttributeConfigService pointAttributeConfigService) {
+        this.pointAttributeConfigBuilder = pointAttributeConfigBuilder;
+        this.pointAttributeConfigService = pointAttributeConfigService;
+    }
 
     /**
      * 新增 PointInfo

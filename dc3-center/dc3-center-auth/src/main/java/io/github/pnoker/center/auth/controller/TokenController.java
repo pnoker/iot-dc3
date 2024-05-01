@@ -45,8 +45,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(AuthConstant.TOKEN_URL_PREFIX)
 public class TokenController implements BaseController {
 
-    @Resource
-    private TokenService tokenService;
+    private final TokenService tokenService;
+
+    public TokenController(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
 
     /**
      * 生成用户随机盐值

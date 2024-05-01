@@ -49,11 +49,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(ManagerConstant.LABEL_URL_PREFIX)
 public class LabelController implements BaseController {
 
-    @Resource
-    private LabelForManagerBuilder labelForManagerBuilder;
+    private final LabelForManagerBuilder labelForManagerBuilder;
+    private final LabelService labelService;
 
-    @Resource
-    private LabelService labelService;
+    public LabelController(LabelForManagerBuilder labelForManagerBuilder, LabelService labelService) {
+        this.labelForManagerBuilder = labelForManagerBuilder;
+        this.labelService = labelService;
+    }
 
     /**
      * 新增

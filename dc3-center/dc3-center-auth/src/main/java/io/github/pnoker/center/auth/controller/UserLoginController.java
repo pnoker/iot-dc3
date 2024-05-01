@@ -32,7 +32,6 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -50,13 +49,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(AuthConstant.USER_URL_PREFIX)
 public class UserLoginController implements BaseController {
 
-    @Resource
-    private UserLoginBuilder userLoginBuilder;
+    private final UserLoginBuilder userLoginBuilder;
+    private final UserLoginService userLoginService;
+    private final UserPasswordService userPasswordService;
 
-    @Resource
-    private UserLoginService userLoginService;
-    @Resource
-    private UserPasswordService userPasswordService;
+    public UserLoginController(UserLoginBuilder userLoginBuilder, UserLoginService userLoginService, UserPasswordService userPasswordService) {
+        this.userLoginBuilder = userLoginBuilder;
+        this.userLoginService = userLoginService;
+        this.userPasswordService = userPasswordService;
+    }
 
     /**
      * 新增用户

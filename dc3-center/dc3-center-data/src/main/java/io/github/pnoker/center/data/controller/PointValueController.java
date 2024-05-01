@@ -19,18 +19,21 @@ package io.github.pnoker.center.data.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.biz.PointValueService;
+import io.github.pnoker.center.data.entity.builder.PointValueBuilder;
+import io.github.pnoker.center.data.entity.vo.PointValueVO;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * PointValue Controller
@@ -41,57 +44,82 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @Tag(name = "接口-位号数据")
-@RequestMapping(DataConstant.VALUE_URL_PREFIX)
+@RequestMapping(DataConstant.POINT_VALUE_URL_PREFIX)
 public class PointValueController implements BaseController {
 
-    @Resource
-    private PointValueService pointValueService;
+    private final PointValueBuilder pointValueBuilder;
+    private final PointValueService pointValueService;
+
+    public PointValueController(PointValueBuilder pointValueBuilder, PointValueService pointValueService) {
+        this.pointValueBuilder = pointValueBuilder;
+        this.pointValueService = pointValueService;
+    }
 
     /**
-     * 查询最新 PointValue 集合
+     * 分页查询 最新 PointValue
      *
      * @param pointValueQuery 位号值和分页参数
      * @return 带分页的 {@link PointValueBO}
      */
     @PostMapping("/latest")
-    public R<Page<PointValueBO>> latest(@RequestBody PointValueQuery pointValueQuery) {
+    @Operation(summary = "分页查询-最新位号值")
+    public R<Page<PointValueVO>> latest(@RequestBody PointValueQuery pointValueQuery) {
         try {
             if (ObjectUtil.isEmpty(pointValueQuery)) {
                 pointValueQuery = new PointValueQuery();
             }
             pointValueQuery.setTenantId(getTenantId());
-            Page<PointValueBO> page = pointValueService.latest(pointValueQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            Page<PointValueBO> entityPageBO = pointValueService.latest(pointValueQuery);
+            Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
-        return R.fail();
     }
 
     /**
-     * 分页查询 PointValue
+     * 分页查询 历史 PointValue
      *
      * @param entityQuery 位号值和分页参数
      * @return 带分页的 {@link PointValueBO}
      */
     @PostMapping("/list")
-    public R<Page<PointValueBO>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
+    @Operation(summary = "分页查询-历史位号值")
+    public R<Page<PointValueVO>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         try {
             if (ObjectUtil.isEmpty(entityQuery)) {
                 entityQuery = new PointValueQuery();
             }
             Page<PointValueBO> entityPageBO = pointValueService.page(entityQuery);
-            if (ObjectUtil.isNotNull(entityPageBO)) {
-                return R.ok(entityPageBO);
-            }
+            Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
+            return R.ok(entityPageVO);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
         }
-        return R.fail();
+    }
+
+    /**
+     * 查询位号 PointValue 历史
+     *
+     * @param deviceId 设备ID
+     * @param pointId  位号ID
+     * @return 带分页的 {@link PointValueBO}
+     */
+    @GetMapping("/history/device_id/{deviceId}/point_id/{pointId}")
+    @Operation(summary = "查询位号值历史数据")
+    public R<List<String>> history(
+            @Schema(description = "设备ID") @NotNull @PathVariable(name = "deviceId") Long deviceId,
+            @Schema(description = "位号ID") @NotNull @PathVariable(name = "pointId") Long pointId,
+            @Schema(description = "历史数据量，最多500条") @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
+        try {
+            List<String> history = pointValueService.history(deviceId, pointId, count);
+            return R.ok(history);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return R.fail(e.getMessage());
+        }
     }
 
 }

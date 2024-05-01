@@ -56,15 +56,15 @@ import java.util.stream.Collectors;
 @RequestMapping(ManagerConstant.POINT_URL_PREFIX)
 public class PointController implements BaseController {
 
-    @Resource
-    private PointBuilder pointBuilder;
+    private final PointBuilder pointBuilder;
+    private final PointService pointService;
+    private final DeviceBuilder deviceBuilder;
 
-    @Resource
-    private PointService pointService;
-
-    @Resource
-    private DeviceBuilder deviceBuilder;
-
+    public PointController(PointBuilder pointBuilder, PointService pointService, DeviceBuilder deviceBuilder) {
+        this.pointBuilder = pointBuilder;
+        this.pointService = pointService;
+        this.deviceBuilder = deviceBuilder;
+    }
 
     /**
      * 新增 Point

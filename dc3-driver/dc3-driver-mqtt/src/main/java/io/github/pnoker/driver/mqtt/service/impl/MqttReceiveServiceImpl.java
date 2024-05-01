@@ -43,7 +43,7 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     @Override
     public void receiveValue(MqttMessage mqttMessage) {
         // do something to process your mqtt messages
-        log.info(JsonUtil.toPrettyJsonString(mqttMessage));
+        log.info(JsonUtil.toJsonString(mqttMessage));
         PointValueDTO pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValueDTO.class);
         pointValue.setOriginTime(LocalDateTime.now());
         driverSenderService.pointValueSender(pointValue);
@@ -52,13 +52,13 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     @Override
     public void receiveValues(List<MqttMessage> mqttMessageList) {
         // do something to process your mqtt messages
-        log.info(JsonUtil.toPrettyJsonString(mqttMessageList));
+        log.info(JsonUtil.toJsonString(mqttMessageList));
         List<PointValueDTO> pointValues = mqttMessageList.stream()
                 .map(mqttMessage -> {
                     PointValueDTO pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValueDTO.class);
                     pointValue.setOriginTime(LocalDateTime.now());
                     return pointValue;
-                }).collect(Collectors.toList());
+                }).toList();
         driverSenderService.pointValueSender(pointValues);
     }
 }

@@ -271,10 +271,10 @@ public class PointServiceImpl implements PointService {
         if (ObjectUtil.isNotEmpty(bindDO)) {
             List<PointDO> list = pointManager.list(new LambdaQueryWrapper<PointDO>().eq(PointDO::getProfileId, bindDO.getProfileId()));
             if (ObjectUtil.isNotEmpty(list)) {
-                List<Long> profileList = list.stream().map(e -> e.getId()).collect(Collectors.toList());
+                List<Long> profileList = list.stream().map(e -> e.getId()).toList();
                 List<PointAttributeConfigDO> list2 = pointAttributeConfigManager.list(new LambdaQueryWrapper<PointAttributeConfigDO>().eq(PointAttributeConfigDO::getDeviceId, deviceId));
                 if (ObjectUtil.isNotEmpty(list2)) {
-                    List<Long> attrList = list2.stream().map(e -> e.getPointId()).collect(Collectors.toList());
+                    List<Long> attrList = list2.stream().map(e -> e.getPointId()).toList();
                     //取交集
                     attrList.retainAll(profileList);
                     configCount.addAll(attrList);

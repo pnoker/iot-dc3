@@ -49,7 +49,7 @@ public class DeviceEventReceiver {
     public void deviceEventReceive(Channel channel, Message message, DeviceEventDTO entityDTO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Receive device event: {}", JsonUtil.toPrettyJsonString(entityDTO));
+            log.debug("Receive device event: {}", JsonUtil.toJsonString(entityDTO));
             if (ObjectUtil.isNull(entityDTO)
                     || ObjectUtil.isNull(entityDTO.getType())
                     || CharSequenceUtil.isEmpty(entityDTO.getContent())) {

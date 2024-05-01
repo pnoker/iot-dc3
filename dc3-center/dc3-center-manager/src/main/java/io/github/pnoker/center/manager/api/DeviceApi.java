@@ -79,7 +79,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             pageBuilder.setPages(devicePage.getPages());
             pageBuilder.setTotal(devicePage.getTotal());
             pageDeviceBuilder.setPage(pageBuilder);
-            List<GrpcDeviceDTO> collect = devicePage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<GrpcDeviceDTO> collect = devicePage.getRecords().stream().map(this::buildDTOByDO).toList();
             pageDeviceBuilder.addAllData(collect);
 
             builder.setData(pageDeviceBuilder);
@@ -103,7 +103,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
-            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).toList();
             builder.addAllData(deviceDTOS);
         }
         builder.setResult(rBuilder);
@@ -126,7 +126,7 @@ public class DeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(this::buildDTOByDO).toList();
 
             builder.addAllData(deviceDTOS);
         }

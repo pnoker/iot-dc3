@@ -42,7 +42,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author linys
@@ -116,9 +115,9 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         List<RoleResourceBindDO> entityDOS = roleResourceBindManager.list(wrapper);
         if (CollUtil.isNotEmpty(entityDOS)) {
             List<ResourceDO> resourceDOS = resourceManager.listByIds(entityDOS.stream()
-                    .map(RoleResourceBindDO::getResourceId).collect(Collectors.toList()));
-            List<ResourceDO> collect = resourceDOS.stream().filter(e -> EnableFlagEnum.ENABLE.equals(e.getEnableFlag()))
-                    .collect(Collectors.toList());
+                    .map(RoleResourceBindDO::getResourceId).toList());
+            List<ResourceDO> collect = resourceDOS.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
+                    .toList();
             return resourceBuilder.buildBOListByDOList(collect);
         }
 

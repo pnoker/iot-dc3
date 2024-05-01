@@ -23,7 +23,6 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,11 +39,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @Tag(name = "接口-位号数据指令")
-@RequestMapping(DataConstant.VALUE_COMMAND_URL_PREFIX)
+@RequestMapping(DataConstant.POINT_VALUE_COMMAND_URL_PREFIX)
 public class PointValueCommandController implements BaseController {
 
-    @Resource
-    private PointValueCommandService pointValueCommandService;
+    private final PointValueCommandService pointValueCommandService;
+
+    public PointValueCommandController(PointValueCommandService pointValueCommandService) {
+        this.pointValueCommandService = pointValueCommandService;
+    }
 
     /**
      * 读指令

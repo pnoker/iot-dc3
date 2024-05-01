@@ -80,7 +80,7 @@ public class DriverApi extends DriverApiGrpc.DriverApiImplBase {
             pageBuilder.setPages(driverPage.getPages());
             pageBuilder.setTotal(driverPage.getTotal());
             pageDriverBuilder.setPage(pageBuilder);
-            List<GrpcDriverDTO> collect = driverPage.getRecords().stream().map(this::buildDTOByDO).collect(Collectors.toList());
+            List<GrpcDriverDTO> collect = driverPage.getRecords().stream().map(this::buildDTOByDO).toList();
             pageDriverBuilder.addAllData(collect);
 
             builder.setData(pageDriverBuilder);

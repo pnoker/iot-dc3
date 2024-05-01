@@ -54,11 +54,13 @@ import java.util.stream.Collectors;
 @RequestMapping(ManagerConstant.DRIVER_URL_PREFIX)
 public class DriverController implements BaseController {
 
-    @Resource
-    private DriverBuilder driverBuilder;
+    private final DriverBuilder driverBuilder;
+    private final DriverService driverService;
 
-    @Resource
-    private DriverService driverService;
+    public DriverController(DriverBuilder driverBuilder, DriverService driverService) {
+        this.driverBuilder = driverBuilder;
+        this.driverService = driverService;
+    }
 
     /**
      * 新增 Driver

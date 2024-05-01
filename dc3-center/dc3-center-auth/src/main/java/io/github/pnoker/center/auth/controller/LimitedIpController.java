@@ -49,11 +49,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = AuthConstant.LIMITED_IP_URL_PREFIX)
 public class LimitedIpController implements BaseController {
 
-    @Resource
-    private LimitedIpBuilder limitedIpBuilder;
+    private final LimitedIpBuilder limitedIpBuilder;
+    private final LimitedIpService limitedIpService;
 
-    @Resource
-    private LimitedIpService limitedIpService;
+    public LimitedIpController(LimitedIpBuilder limitedIpBuilder, LimitedIpService limitedIpService) {
+        this.limitedIpBuilder = limitedIpBuilder;
+        this.limitedIpService = limitedIpService;
+    }
 
     /**
      * 新增 LimitedIp

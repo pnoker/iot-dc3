@@ -56,7 +56,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             driverDictionary.setLabel(entityDO.getTenantName());
             driverDictionary.setValue(entityDO.getId());
             return driverDictionary;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class DictionaryServiceImpl implements DictionaryService {
             driverDictionary.setLabel(entityDO.getIp());
             driverDictionary.setValue(entityDO.getId());
             return driverDictionary;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
 }

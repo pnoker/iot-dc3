@@ -69,7 +69,7 @@ public class PointValueReceiver {
                 return;
             }
             PointValueJob.valueCount.getAndIncrement();
-            log.debug("Point value, From: {}, Received: {}", message.getMessageProperties().getReceivedRoutingKey(), pointValueBO);
+            log.debug("Receive point value from: {}, {}", message.getMessageProperties().getReceivedRoutingKey(), JsonUtil.toJsonString(pointValueBO));
 
             // Judge whether to process data in batch according to the data transmission speed
             if (PointValueJob.valueSpeed.get() < batchSpeed) {
@@ -84,9 +84,9 @@ public class PointValueReceiver {
                 PointValueJob.valueLock.writeLock().unlock();
             }
 
-            // Forward data to MQTT
+            // Forward point value to MQTT
             String topic = mqttProperties.getDefaultSendTopic().getName() + "/" + pointValueBO.getDeviceId();
-            log.debug("Forward dat to device: {}:{}", pointValueBO.getDeviceId(), topic);
+            log.debug("Forwar device[{}] point value to mqtt topic: {}", pointValueBO.getDeviceId(), topic);
             mqttSendService.sendToMqtt(topic, JsonUtil.toJsonString(pointValueBO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
