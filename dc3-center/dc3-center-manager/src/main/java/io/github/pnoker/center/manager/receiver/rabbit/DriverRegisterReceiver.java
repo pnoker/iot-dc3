@@ -52,7 +52,7 @@ public class DriverRegisterReceiver {
                 log.error("跳过: 接收到的驱动注册信息无效");
                 return;
             }
-            log.debug("接收到驱动注册信息: {}", JsonUtil.toPrettyJsonString(entityDTO));
+            log.debug("接收到驱动注册信息: {}", JsonUtil.toJsonString(entityDTO));
             driverSyncService.up(entityDTO);
         } catch (IOException e) {
             log.error(e.getMessage(), e);

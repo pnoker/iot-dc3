@@ -118,9 +118,9 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         List<RoleUserBindDO> roleUserBindBOS = roleUserBindManager.list(wrapper);
         if (CollUtil.isNotEmpty(roleUserBindBOS)) {
             List<RoleDO> roleBOS = roleManager.listByIds(roleUserBindBOS.stream().map(RoleUserBindDO::getRoleId)
-                    .collect(Collectors.toList()));
-            List<RoleDO> collect = roleBOS.stream().filter(e -> EnableFlagEnum.ENABLE.equals(e.getEnableFlag()) && tenantId.equals(e.getTenantId()))
-                    .collect(Collectors.toList());
+                    .toList());
+            List<RoleDO> collect = roleBOS.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()) && tenantId.equals(e.getTenantId()))
+                    .toList();
             return roleBuilder.buildBOListByDOList(collect);
         }
 

@@ -45,11 +45,13 @@ import java.util.List;
 @RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
 public class DictionaryController implements BaseController {
 
-    @Resource
-    private DictionaryForAuthBuilder dictionaryForAuthBuilder;
+    private final DictionaryForAuthBuilder dictionaryForAuthBuilder;
+    private final DictionaryService dictionaryService;
 
-    @Resource
-    private DictionaryService dictionaryService;
+    public DictionaryController(DictionaryForAuthBuilder dictionaryForAuthBuilder, DictionaryService dictionaryService) {
+        this.dictionaryForAuthBuilder = dictionaryForAuthBuilder;
+        this.dictionaryService = dictionaryService;
+    }
 
     /**
      * 查询租户字典列表

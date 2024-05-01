@@ -58,11 +58,13 @@ import java.util.stream.Collectors;
 @RequestMapping(ManagerConstant.DEVICE_URL_PREFIX)
 public class DeviceController implements BaseController {
 
-    @Resource
-    private DeviceBuilder deviceBuilder;
+    private final DeviceBuilder deviceBuilder;
+    private final DeviceService deviceService;
 
-    @Resource
-    private DeviceService deviceService;
+    public DeviceController(DeviceBuilder deviceBuilder, DeviceService deviceService) {
+        this.deviceBuilder = deviceBuilder;
+        this.deviceService = deviceService;
+    }
 
     /**
      * 新增设备

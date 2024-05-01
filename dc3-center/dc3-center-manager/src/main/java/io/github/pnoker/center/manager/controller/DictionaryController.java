@@ -48,11 +48,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(ManagerConstant.DICTIONARY_URL_PREFIX)
 public class DictionaryController implements BaseController {
 
-    @Resource
-    private DictionaryForManagerBuilder dictionaryForManagerBuilder;
+    private final DictionaryForManagerBuilder dictionaryForManagerBuilder;
+    private final DictionaryService dictionaryService;
 
-    @Resource
-    private DictionaryService dictionaryService;
+    public DictionaryController(DictionaryForManagerBuilder dictionaryForManagerBuilder, DictionaryService dictionaryService) {
+        this.dictionaryForManagerBuilder = dictionaryForManagerBuilder;
+        this.dictionaryService = dictionaryService;
+    }
 
     /**
      * 查询驱动 Dictionary

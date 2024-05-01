@@ -53,11 +53,13 @@ import java.util.List;
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_URL_PREFIX)
 public class PointAttributeController implements BaseController {
 
-    @Resource
-    private PointAttributeBuilder pointAttributeBuilder;
+    private final PointAttributeBuilder pointAttributeBuilder;
+    private final PointAttributeService pointAttributeService;
 
-    @Resource
-    private PointAttributeService pointAttributeService;
+    public PointAttributeController(PointAttributeBuilder pointAttributeBuilder, PointAttributeService pointAttributeService) {
+        this.pointAttributeBuilder = pointAttributeBuilder;
+        this.pointAttributeService = pointAttributeService;
+    }
 
     /**
      * 新增 PointAttribute

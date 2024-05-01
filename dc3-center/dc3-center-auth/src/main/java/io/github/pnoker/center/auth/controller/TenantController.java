@@ -49,11 +49,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(AuthConstant.TENANT_URL_PREFIX)
 public class TenantController implements BaseController {
 
-    @Resource
-    private TenantBuilder tenantBuilder;
+    private final TenantBuilder tenantBuilder;
+    private final TenantService tenantService;
 
-    @Resource
-    private TenantService tenantService;
+    public TenantController(TenantBuilder tenantBuilder, TenantService tenantService) {
+        this.tenantBuilder = tenantBuilder;
+        this.tenantService = tenantService;
+    }
 
     /**
      * 新增租户

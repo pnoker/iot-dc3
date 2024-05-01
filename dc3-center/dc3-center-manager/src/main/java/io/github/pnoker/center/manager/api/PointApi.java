@@ -79,7 +79,7 @@ public class PointApi extends PointApiGrpc.PointApiImplBase {
             pageBuilder.setPages(pointPage.getPages());
             pageBuilder.setTotal(pointPage.getTotal());
             pagePointBuilder.setPage(pageBuilder);
-            List<GrpcPointDTO> collect = pointPage.getRecords().stream().map(this::buildGrpcDTOByBO).collect(Collectors.toList());
+            List<GrpcPointDTO> collect = pointPage.getRecords().stream().map(this::buildGrpcDTOByBO).toList();
             pagePointBuilder.addAllData(collect);
 
             builder.setData(pagePointBuilder);

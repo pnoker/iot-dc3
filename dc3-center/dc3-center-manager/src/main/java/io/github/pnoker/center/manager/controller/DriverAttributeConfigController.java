@@ -51,11 +51,13 @@ import java.util.List;
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX)
 public class DriverAttributeConfigController implements BaseController {
 
-    @Resource
-    private DriverAttributeConfigBuilder driverAttributeConfigBuilder;
+    private final DriverAttributeConfigBuilder driverAttributeConfigBuilder;
+    private final DriverAttributeConfigService driverAttributeConfigService;
 
-    @Resource
-    private DriverAttributeConfigService driverAttributeConfigService;
+    public DriverAttributeConfigController(DriverAttributeConfigBuilder driverAttributeConfigBuilder, DriverAttributeConfigService driverAttributeConfigService) {
+        this.driverAttributeConfigBuilder = driverAttributeConfigBuilder;
+        this.driverAttributeConfigService = driverAttributeConfigService;
+    }
 
     /**
      * 新增 DriverInfo

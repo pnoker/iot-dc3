@@ -50,7 +50,7 @@ public class DriverEventReceiver {
     public void driverEventReceive(Channel channel, Message message, DriverEventDTO entityDTO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Receive driver event: {}", JsonUtil.toPrettyJsonString(entityDTO));
+            log.debug("Receive driver event: {}", JsonUtil.toJsonString(entityDTO));
             if (ObjectUtil.isNull(entityDTO)
                     || ObjectUtil.isNull(entityDTO.getType())
                     || CharSequenceUtil.isEmpty(entityDTO.getContent())) {

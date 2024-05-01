@@ -25,7 +25,6 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,8 +43,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(DataConstant.DRIVER_EVENT_URL_PREFIX)
 public class DriverEventController implements BaseController {
 
-    @Resource
-    private EventService eventService;
+    private final EventService eventService;
+
+    public DriverEventController(EventService eventService) {
+        this.eventService = eventService;
+    }
 
     /**
      * 分页查询 DriverEvent

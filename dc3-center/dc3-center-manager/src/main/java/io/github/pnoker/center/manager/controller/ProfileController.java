@@ -54,11 +54,13 @@ import java.util.stream.Collectors;
 @RequestMapping(ManagerConstant.PROFILE_URL_PREFIX)
 public class ProfileController implements BaseController {
 
-    @Resource
-    private ProfileBuilder profileBuilder;
+    private final ProfileBuilder profileBuilder;
+    private final ProfileService profileService;
 
-    @Resource
-    private ProfileService profileService;
+    public ProfileController(ProfileBuilder profileBuilder, ProfileService profileService) {
+        this.profileBuilder = profileBuilder;
+        this.profileService = profileService;
+    }
 
     /**
      * 新增 Profile

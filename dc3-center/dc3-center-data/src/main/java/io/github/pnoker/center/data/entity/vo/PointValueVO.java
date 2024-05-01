@@ -39,7 +39,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "PointValueRead", description = "位号值")
+@Schema(title = "PointValueVO", description = "位号值")
 public class PointValueVO implements Serializable {
 
     @Serial
@@ -48,7 +48,7 @@ public class PointValueVO implements Serializable {
     /**
      * ID
      */
-    private Long id;
+    private String id;
 
     /**
      * 设备ID
@@ -69,8 +69,6 @@ public class PointValueVO implements Serializable {
      * 处理值
      */
     private String value;
-
-    private List<String> history;
 
     /**
      * 原始时间

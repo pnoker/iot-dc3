@@ -49,11 +49,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(ManagerConstant.GROUP_URL_PREFIX)
 public class GroupController implements BaseController {
 
-    @Resource
-    private GroupForManagerBuilder groupForManagerBuilder;
+    private final GroupForManagerBuilder groupForManagerBuilder;
+    private final GroupService groupService;
 
-    @Resource
-    private GroupService groupService;
+    public GroupController(GroupForManagerBuilder groupForManagerBuilder, GroupService groupService) {
+        this.groupForManagerBuilder = groupForManagerBuilder;
+        this.groupService = groupService;
+    }
 
     /**
      * 新增

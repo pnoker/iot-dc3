@@ -144,7 +144,7 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
-        List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).collect(Collectors.toList());
+        List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).toList();
 
         List<PointValueBO> pointValueBOS = redisRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
         if (CollUtil.isEmpty(pointValueBOS)) {
