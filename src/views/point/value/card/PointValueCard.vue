@@ -28,7 +28,7 @@
                     <div class="things-card-header-icon">
                         <img :src="icon" :alt="data.pointName" />
                     </div>
-                    <div class="things-card-header-name nowrap-name" @click="copyId(data.pointId, '位号值ID')">
+                    <div class="things-card-header-name nowrap-name" @click="copy(data.pointId, '位号值ID')">
                         {{ point.pointName }}
                     </div>
                     <div class="things-card-header-status" title="读写标识">
@@ -39,27 +39,43 @@
                 </div>
                 <div class="things-card__body">
                     <div class="things-card-body-content">
-                        <ul class="things-card-body-content-value">
-                            <li class="nowrap-item value" title="处理值，点击复制" @click="copyValue(data)">{{ data.value }} {{ unit }}</li>
-                            <li class="nowrap-item" title="计算值">
-                                {{ data.calculateValue || '-' }}
-                            </li>
-                            <li class="nowrap-item">
-                                <el-icon><Sunrise /></el-icon> 原始值: {{ data.rawValue }}
-                            </li>
-                            <li class="nowrap-item value-point" v-if="embedded == ''">
-                                <el-icon> <Management /> </el-icon> 所属设备: {{ device.deviceName }}
-                            </li>
-                            <li class="nowrap-item">
-                                <el-icon><Timer /></el-icon> 数据延时: {{ data.interval }} ms
-                            </li>
-                            <li class="nowrap-item">
-                                <el-icon><Edit /></el-icon> 采集日期: {{ timestamp(data.originTime) }}
-                            </li>
-                            <li class="nowrap-item">
-                                <el-icon><Sunset /></el-icon> 保存日期: {{ timestamp(data.createTime) }}
-                            </li>
-                        </ul>
+                        <div class="things-card-body-content-column">
+                            <div class="things-card-body-content-value">
+                                <span class="nowrap-item value" title="处理值，点击复制" @click="copyValue(data)">{{ data.value }} {{ unit }}</span>
+                            </div>
+                            <ul>
+                                <li class="nowrap-item">
+                                    <el-icon>
+                                        <Sunrise />
+                                    </el-icon>
+                                    原始值: {{ data.rawValue }}
+                                </li>
+                                <li class="nowrap-item value-point" v-if="embedded == ''">
+                                    <el-icon>
+                                        <Management />
+                                    </el-icon>
+                                    所属设备: {{ device.deviceName }}
+                                </li>
+                                <li class="nowrap-item">
+                                    <el-icon>
+                                        <Timer />
+                                    </el-icon>
+                                    数据延时: {{ data.interval }} ms
+                                </li>
+                                <li class="nowrap-item">
+                                    <el-icon>
+                                        <Edit />
+                                    </el-icon>
+                                    采集日期: {{ timestamp(data.originTime) }}
+                                </li>
+                                <li class="nowrap-item">
+                                    <el-icon>
+                                        <Sunset />
+                                    </el-icon>
+                                    保存日期: {{ timestamp(data.createTime) }}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="things-card-body-content-time" v-if="embedded != ''">
                         <div :id="data.pointId"></div>
@@ -81,7 +97,112 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue'
+
+import { TinyArea } from '@antv/g2plot'
+
+import { copy, timestamp } from '@/utils/CommonUtil'
+import { getPointValueHistory } from '@/api/point'
+
+const props = defineProps({
+    embedded: {
+        type: String,
+        default: () => {
+            return ''
+        },
+    },
+    data: {
+        type: Object,
+        default: () => {
+            return {}
+        },
+    },
+    device: {
+        type: Object,
+        default: () => {
+            return {}
+        },
+    },
+    point: {
+        type: Object,
+        default: () => {
+            return {}
+        },
+    },
+    unit: {
+        type: String,
+        default: '',
+    },
+    icon: {
+        type: String,
+        default: 'images/common/point.png',
+    },
+})
+
+const copyValue = (data) => {
+    const content = {
+        deviceId: data.deviceId,
+        pointId: data.pointId,
+        value: data.value,
+    }
+    copy(JSON.stringify(content, null, 2), '位号值')
+}
+
+onMounted(() => {
+    if (props.embedded == '') {
+        return
+    }
+
+    window.dispatchEvent(new Event('resize'))
+
+    getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
+        .then((res) => {
+            let historyData = []
+            const pointValueType = props.point.pointTypeFlag.toLowerCase()
+            if (pointValueType === 'string') {
+                historyData = []
+            } else if (pointValueType === 'boolean') {
+                historyData = res.data.reverse().map((value: string) => (value === 'true' ? 1 : 0))
+            } else {
+                historyData = res.data.reverse().map((value: string) => +value)
+            }
+
+            const tinyArea = new TinyArea(props.data.pointId, {
+                height: 60,
+                data: historyData,
+                autoFit: true,
+                smooth: true,
+                annotations: [
+                    {
+                        type: 'line',
+                        start: ['min', 'mean'],
+                        end: ['max', 'mean'],
+                        text: {
+                            content: 'AVG',
+                            offsetY: -5,
+                            style: {
+                                textAlign: 'left',
+                                fontSize: 10,
+                                fill: 'rgba(44, 53, 66, 0.45)',
+                                textBaseline: 'bottom',
+                            },
+                        },
+                        style: {
+                            stroke: 'rgba(0, 0, 0, 0.25)',
+                        },
+                    },
+                ],
+            })
+
+            tinyArea.render()
+        })
+        .catch(() => {
+            // nothing to do
+        })
+})
+</script>
 
 <style lang="scss">
 @import '@/components/card/styles/things-card';

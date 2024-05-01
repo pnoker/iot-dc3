@@ -14,16 +14,42 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios'
+/**
+ * 登录信息
+ */
+export interface Login {
+    tenant?: string
+    name?: string
+    salt?: string
+    password?: string
+    token?: string
+}
 
-export const getStatisticsData = () =>
-    request<R>({
-        url: 'api/v3/manager/statistics',
-        method: 'get',
-    })
+/**
+ * 属性
+ */
+export interface Attribute {
+    id: string
+    name: string
+    displayName: string
+}
 
-export const getWeatherDeviceList = () =>
-    request<R>({
-        url: 'api/v3/manager/weatherDeviceList',
-        method: 'get',
-    })
+/**
+ * 字典
+ */
+export interface Dictionary {
+    type: string
+    label: string
+    value: string
+    disabled: boolean
+    expand: boolean
+    children: Array<Dictionary>
+}
+
+/**
+ * 排序
+ */
+export interface Order {
+    column: string
+    asc: boolean
+}

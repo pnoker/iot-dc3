@@ -38,7 +38,7 @@ const props = defineProps({
 
 <style lang="scss">
 .title-card {
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
 
     .title-card__header {

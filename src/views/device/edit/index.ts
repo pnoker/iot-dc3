@@ -26,7 +26,7 @@ import { getDeviceById, updateDevice } from '@/api/device'
 import { getDriverAttributeByDriverId, getPointAttributeByDriverId } from '@/api/attribute'
 import { addDriverInfo, getDriverInfoByDeviceId, updateDriverInfo, addPointInfo, getPointInfoByDeviceId, updatePointInfo } from '@/api/info'
 
-import { Dictionary, Order } from '@/config/types'
+import { Dictionary, Order } from '@/config/entity'
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue'

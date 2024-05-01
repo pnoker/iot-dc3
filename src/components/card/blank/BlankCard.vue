@@ -16,7 +16,7 @@
 
 <template>
     <div class="blank-card">
-        <el-card class="blank-card__body" :shadow="!props.embedded ? 'hover' : 'never'">
+        <el-card class="blank-card__body" shadow="hover">
             <div class="blank-card__container">
                 <slot />
             </div>
@@ -24,18 +24,11 @@
     </div>
 </template>
 
-<script setup lang="ts">
-const props = defineProps({
-    embedded: {
-        type: Boolean,
-        default: false,
-    },
-})
-</script>
+<script setup lang="ts"></script>
 
 <style lang="scss">
 .blank-card {
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
 
     ul {

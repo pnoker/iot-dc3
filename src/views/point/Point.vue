@@ -32,7 +32,7 @@
             @current-change="currentChange"
         ></point-tool>
 
-        <blank-card :embedded="embedded != ''">
+        <blank-card>
             <el-row>
                 <el-col v-for="data in 12" :key="data" :xs="24" :sm="12" :md="12" :lg="8" :xl="6">
                     <skeleton-card :loading="reactiveData.loading"></skeleton-card>

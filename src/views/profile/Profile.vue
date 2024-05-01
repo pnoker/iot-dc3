@@ -28,7 +28,7 @@
             @current-change="currentChange"
         ></profile-tool>
 
-        <blank-card :embedded="embedded != ''">
+        <blank-card>
             <el-row>
                 <el-col v-for="data in 12" :key="data" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
                     <skeleton-card :loading="reactiveData.loading"></skeleton-card>

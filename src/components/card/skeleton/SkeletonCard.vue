@@ -72,7 +72,7 @@ const props = defineProps({
 
 <style lang="scss">
 .skeleton-card {
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
 
     margin-left: 3px;
@@ -96,7 +96,7 @@ const props = defineProps({
             width: 55px;
             height: 48px;
             margin-right: 12px;
-            border-radius: 5px;
+            border-radius: 4px;
             overflow: hidden;
 
             img {

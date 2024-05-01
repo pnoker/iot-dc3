@@ -69,40 +69,131 @@
                 <el-tab-pane label="设备数据" name="pointValue">
                     <point-value ref="pointValueViewRef" :embedded="'device'" :device-id="reactiveData.id"></point-value>
                 </el-tab-pane>
-                <!-- <el-tab-pane label="设备模型" name="deviceModel">
-                    <el-empty description="暂无设备模型数据！"></el-empty>
-                </el-tab-pane>
-                <el-tab-pane label="设备指令" name="deviceCommand">
-                    <el-empty description="暂无设备指令数据！"></el-empty>
-                </el-tab-pane>
-                <el-tab-pane label="设备事件" name="deviceEvent">
-                    <el-timeline>
-                        <el-timeline-item timestamp="2021/7/30" placement="top">
-                            <el-card>
-                                <h4>设备数据上报</h4>
-                                <p>该设备于 2021/7/30 20:46 开始上报数据</p>
-                            </el-card>
-                        </el-timeline-item>
-                        <el-timeline-item timestamp="2021/7/30" placement="top">
-                            <el-card>
-                                <h4>设备上线</h4>
-                                <p>该设备于 2021/7/30 20:46 上线</p>
-                            </el-card>
-                        </el-timeline-item>
-                        <el-timeline-item timestamp="2021/7/30" placement="top">
-                            <el-card>
-                                <h4>设备注册</h4>
-                                <p>该设备于 2021/7/30 20:46 注册成功</p>
-                            </el-card>
-                        </el-timeline-item>
-                    </el-timeline>
-                </el-tab-pane> -->
             </el-tabs>
         </base-card>
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script setup lang="ts">
+import { computed, onMounted, reactive, ref } from 'vue'
+import { CollectionTag, Edit, List, Management, Promotion, Sunset } from '@element-plus/icons-vue'
+
+import { useRoute } from 'vue-router'
+import router from '@/config/router'
+
+import { getDriverById } from '@/api/driver'
+import { getProfileByDeviceId, getProfileByIds } from '@/api/profile'
+import { getDeviceById } from '@/api/device'
+
+import baseCard from '@/components/card/base/BaseCard.vue'
+import detailCard from '@/components/card/detail/DetailCard.vue'
+import profile from '@/views/profile/Profile.vue'
+import point from '@/views/point/Point.vue'
+import pointValue from '@/views/point/value/PointValue.vue'
+
+import { timestamp } from '@/utils/CommonUtil'
+
+const route = useRoute()
+
+const profileViewRef: any = ref<InstanceType<typeof profile>>()
+const pointViewRef: any = ref<InstanceType<typeof point>>()
+const pointValueViewRef: any = ref<InstanceType<typeof pointValue>>()
+
+// 定义响应式数据
+const reactiveData = reactive({
+    id: route.query.id as string,
+    active: route.query.active,
+    profileLoading: true,
+    pointLoading: true,
+    pointValueLoading: true,
+    data: {} as any,
+    driver: {} as any,
+    profileTable: {},
+    pointTable: {},
+    deviceTable: {},
+    unitTable: {},
+    listProfileData: [] as any[],
+    listPointData: [] as any[],
+    listPointValueData: [] as any[],
+    listPointValueHistoryData: {},
+    pointValueDetailData: {},
+})
+
+const profileLength = computed(() => {
+    return profileViewRef.value?.reactiveData.page.total || 0
+})
+
+const pointLength = computed(() => {
+    return pointViewRef.value?.reactiveData.page.total || 0
+})
+
+const device = () => {
+    getDeviceById(reactiveData.id)
+        .then((res) => {
+            reactiveData.data = res.data
+            reactiveData.deviceTable[reactiveData.data.id] = reactiveData.data.deviceName
+
+            getDriverById(reactiveData.data.driverId)
+                .then((res) => {
+                    reactiveData.driver = res.data
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        })
+        .catch(() => {
+            // nothing to do
+        })
+}
+
+const profiles = () => {
+    getProfileByDeviceId(reactiveData.id)
+        .then((res) => {
+            reactiveData.listProfileData = res.data
+
+            // profile
+            const profileIds = Array.from(new Set(reactiveData.listProfileData.map((pointValue) => pointValue.id)))
+            getProfileByIds(profileIds)
+                .then((res) => {
+                    reactiveData.profileTable = res.data
+                })
+                .catch(() => {
+                    // nothing to do
+                })
+        })
+        .catch(() => {
+            // nothing to do
+        })
+        .finally(() => {
+            reactiveData.profileLoading = false
+        })
+}
+
+const changeActive = (tab) => {
+    const query = route.query
+    router.push({ query: { ...query, active: tab.props.name } }).catch(() => {
+        // nothing to do
+    })
+
+    switch (tab.props.name) {
+        case 'profile':
+            break
+        case 'point':
+            pointViewRef.value?.refresh()
+            break
+        case 'pointValue':
+            pointValueViewRef.value?.refresh()
+            break
+        default:
+            break
+    }
+}
+
+onMounted(() => {
+    device()
+    profiles()
+})
+</script>
 
 <style lang="scss">
 @import '@/components/card/styles/things-card.scss';

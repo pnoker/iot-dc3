@@ -15,7 +15,7 @@
  */
 
 import request from '@/config/axios'
-import { Login } from '@/config/types'
+import { Login } from '@/config/entity'
 
 /**
  * 获取 Salt

@@ -20,7 +20,7 @@ import { ElLoading } from 'element-plus'
 import { cancelToken, generateSalt, generateToken } from '@/api/token'
 
 import CommonConstant from '@/config/constant/common'
-import { Login } from '@/config/types'
+import { Login } from '@/config/entity'
 import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtil'
 import { isNull } from '@/utils/utils'
 import { md5 } from 'js-md5'

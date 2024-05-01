@@ -16,7 +16,7 @@
 
 <template>
     <div class="tool-card">
-        <el-card :shadow="embedded == '' ? 'hover' : 'never'">
+        <el-card shadow="hover">
             <el-form class="tool-card__body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
                 <div class="tool-card-body-form">
                     <el-form-item prop="pointName" label="位号名称">

@@ -25,7 +25,7 @@ import { getStorage } from '@/utils/StorageUtil'
 import { isNull } from '@/utils/utils'
 import CommonConstant from '@/config/constant/common'
 import { checkTokenValid } from '@/api/token'
-import { Login } from '@/config/types'
+import { Login } from '@/config/entity'
 import { logout } from '@/utils/CommonUtil'
 
 NProgress.configure({

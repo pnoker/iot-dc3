@@ -156,6 +156,21 @@ export const getPointValueList = (pointValue: any) =>
     })
 
 /**
+ * 查询位号值历史
+ * @param deviceId 设备ID
+ * @param pointId 位号ID
+ * @param count 数量
+ */
+export const getPointValueHistory = (deviceId: number, pointId: number, count: number = 100) =>
+    request<R>({
+        url: `api/v3/data/point_value/history/device_id/${deviceId}/point_id/${pointId}`,
+        method: 'get',
+        params: {
+            count,
+        },
+    })
+
+/**
  * 读位号值
  *
  * @param pointValueReadVO PointValueReadVO

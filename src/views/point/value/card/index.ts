@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, onMounted } from 'vue'
+import { defineComponent, onMounted, reactive } from 'vue'
 import { CircleClose, Edit, Management, Sunrise, Sunset, Timer, ZoomIn } from '@element-plus/icons-vue'
 
 import { TinyArea } from '@antv/g2plot'

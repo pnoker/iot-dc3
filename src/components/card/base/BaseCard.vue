@@ -28,7 +28,7 @@
 
 <style lang="scss">
 .base-card {
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
 
     ul {
@@ -45,12 +45,22 @@
         box-sizing: border-box;
     }
 
-    .el-card__body {
-        padding: 10px 5px 0px 5px;
-    }
-
     .el-tabs__nav {
         margin: 0 5px 0 5px;
+    }
+
+    .base-card__container {
+        .el-tabs__header {
+            margin-bottom: 0;
+
+            .el-tabs__nav-wrap:after {
+                height: 1px;
+            }
+        }
+
+        .el-tab-pane {
+            background: #f6f7f9;
+        }
     }
 }
 </style>

@@ -16,7 +16,7 @@
 
 <template>
     <div class="things-card" @click="select">
-        <el-card :shadow="data.active ? 'always' : 'hover'" :class="{ active: data.active }">
+        <el-card shadow="hover">
             <div class="things-card-content">
                 <div
                     class="things-card__header"

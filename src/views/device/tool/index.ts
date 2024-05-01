@@ -19,7 +19,7 @@ import { FormInstance, FormRules } from 'element-plus'
 import { defineComponent, reactive, ref, unref } from 'vue'
 
 import { getDriverDictionary } from '@/api/dictionary'
-import { Dictionary, Order } from '@/config/types'
+import { Dictionary, Order } from '@/config/entity'
 
 export default defineComponent({
     name: 'DeviceTool',

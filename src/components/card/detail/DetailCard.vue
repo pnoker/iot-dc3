@@ -28,12 +28,8 @@
 
 <style lang="scss">
 .detail-card {
-    border-radius: 5px;
+    border-radius: 4px;
     box-sizing: border-box;
-
-    margin-left: 3px;
-    margin-right: 3px;
-    margin-bottom: 6px;
 
     ul {
         list-style: none;
