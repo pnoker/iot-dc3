@@ -19,7 +19,7 @@ services:
     build:
       context: ../dc3-gateway/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2024.2.0.dev
     restart: always
     ports:
       - '8000:8000'
@@ -43,7 +43,7 @@ services:
     build:
       context: ../dc3-center/dc3-center-auth/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2024.2.0.dev
     restart: always
     ports:
       - '8300:8300'
@@ -68,7 +68,7 @@ services:
     build:
       context: ../dc3-center/dc3-center-manager/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2024.2.0.dev
     restart: always
     ports:
       - '7400:7400'
@@ -94,7 +94,7 @@ services:
     build:
       context: ../dc3-center/dc3-center-data/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2024.2.0.dev
     restart: always
     ports:
       - '7500:7500'
@@ -120,7 +120,7 @@ services:
     build:
       context: ../dc3-center/dc3-center-ekuiper/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-ekuiper:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-ekuiper:2024.2.0.dev
     restart: always
     ports:
       - '8600:8600'
@@ -145,7 +145,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-virtual/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2024.2.0.dev
     restart: always
     environment:
       - NODE_ENV=dev
@@ -167,7 +167,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-plcs7/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:2024.2.0.dev
     restart: always
     environment:
       - NODE_ENV=dev
@@ -189,7 +189,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-opc-da/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:2024.2.0.dev
     restart: always
     environment:
       - NODE_ENV=dev
@@ -211,7 +211,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-opc-ua/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:2024.2.0.dev
     restart: always
     environment:
       - NODE_ENV=dev
@@ -233,7 +233,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-listening-virtual/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:2024.2.0.dev
     restart: always
     ports:
       - '6270:6270'
@@ -258,7 +258,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-dtu-yeecom/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-dtu-yeecom:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-dtu-yeecom:2024.2.0.dev
     restart: always
     ports:
       - '9001:9001'
@@ -283,7 +283,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-lwm2m/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-lwm2m:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-lwm2m:2024.2.0.dev
     restart: always
     ports:
       - '5683:5683'
@@ -308,7 +308,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-mqtt/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2024.2.0.dev
     restart: always
     environment:
       - NODE_ENV=dev
@@ -330,7 +330,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-edge-gateway/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-edge-gateway:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-edge-gateway:2024.2.0.dev
     restart: always
     environment:
       - NODE_ENV=dev
@@ -352,7 +352,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-modbus-tcp/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2024.2.0.dev
     restart: always
     environment:
       - NODE_ENV=dev
@@ -374,7 +374,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-weather-amap/
       dockerfile: ./Dockerfile
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-weather-amap:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-weather-amap:2024.2.0.dev
     restart: always
     environment:
       - NODE_ENV=dev
