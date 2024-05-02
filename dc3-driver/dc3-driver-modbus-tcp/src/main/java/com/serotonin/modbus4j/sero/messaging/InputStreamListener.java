@@ -71,7 +71,7 @@ public class InputStreamListener implements Runnable {
      */
     public void setReadDelay(int readDelay) {
         if (readDelay < 1)
-            throw new IllegalArgumentException("readDelay cannot be less than one");
+            throw new IllegalArgumentException("readDelay can't be less than one");
         this.readDelay = readDelay;
     }
 

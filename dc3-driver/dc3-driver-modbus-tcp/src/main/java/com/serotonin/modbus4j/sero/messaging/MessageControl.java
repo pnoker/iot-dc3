@@ -69,7 +69,7 @@ public class MessageControl implements DataConsumer {
     public void start(Transport transport, MessageParser messageParser, RequestHandler handler,
                       WaitingRoomKeyFactory waitingRoomKeyFactory) throws IOException {
         if (transport == null) {
-            throw new IllegalArgumentException("transport cannot be null");
+            throw new IllegalArgumentException("transport can't be null");
         }
         this.transport = transport;
         this.messageParser = messageParser;

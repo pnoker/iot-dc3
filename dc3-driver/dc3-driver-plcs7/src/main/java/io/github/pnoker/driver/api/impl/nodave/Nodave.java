@@ -257,9 +257,9 @@ public final class Nodave {
             case Nodave.RESULT_EMPTY_RESULT_ERROR:
                 return "this result contains no data";
             case Nodave.RESULT_EMPTY_RESULT_SET_ERROR:
-                return "cannot work with an undefined result set";
+                return "can't work with an undefined result set";
             case Nodave.RESULT_CANNOT_EVALUATE_PDU:
-                return "cannot evaluate the received PDU";
+                return "can't evaluate the received PDU";
             case Nodave.RESULT_WRITE_DATA_SIZE_MISMATCH:
                 return "Write data size error";
             case Nodave.RESULT_NO_PERIPHERAL_AT_ADDRESS:

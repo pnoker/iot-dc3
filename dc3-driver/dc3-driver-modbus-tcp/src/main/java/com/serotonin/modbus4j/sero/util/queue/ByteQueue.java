@@ -745,7 +745,7 @@ public class ByteQueue implements Cloneable {
      */
     public int indexOf(byte[] b, int start) {
         if (b == null || b.length == 0)
-            throw new IllegalArgumentException("cannot search for empty values");
+            throw new IllegalArgumentException("can't search for empty values");
 
         while ((start = indexOf(b[0], start)) != -1 && start < size - b.length + 1) {
             boolean found = true;

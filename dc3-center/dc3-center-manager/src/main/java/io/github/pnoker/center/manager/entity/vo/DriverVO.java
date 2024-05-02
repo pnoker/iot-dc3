@@ -49,7 +49,7 @@ public class DriverVO extends BaseVO {
      * 驱动名称
      */
     @Schema(description = "驱动名称")
-    @NotBlank(message = "驱动名称不能为空",
+    @NotBlank(message = "Driver name can't be empty",
             groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "驱动名称格式无效",
