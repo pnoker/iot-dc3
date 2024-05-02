@@ -46,7 +46,7 @@ public class RtuMaster extends SerialMaster {
      * <p>
      * Default to validating the slave id in responses
      *
-     * @param wrapper a {@link SerialPortWrapper} object.
+     * @param wrapper a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
      */
     public RtuMaster(SerialPortWrapper wrapper) {
         super(wrapper, true);
@@ -55,13 +55,16 @@ public class RtuMaster extends SerialMaster {
     /**
      * <p>Constructor for RtuMaster.</p>
      *
-     * @param wrapper          a {@link SerialPortWrapper} object.
+     * @param wrapper          a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
      * @param validateResponse - confirm that requested slave id is the same in the response
      */
     public RtuMaster(SerialPortWrapper wrapper, boolean validateResponse) {
         super(wrapper, validateResponse);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void init() throws ModbusInitException {
         try {
@@ -72,6 +75,9 @@ public class RtuMaster extends SerialMaster {
         initialized = true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void openConnection(MessageControl toClose) throws Exception {
         super.openConnection(toClose);
@@ -84,6 +90,9 @@ public class RtuMaster extends SerialMaster {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         closeMessageControl(conn);
@@ -91,6 +100,9 @@ public class RtuMaster extends SerialMaster {
         initialized = false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
         // Wrap the modbus request in an rtu request.
@@ -105,7 +117,7 @@ public class RtuMaster extends SerialMaster {
             return rtuResponse.getModbusResponse();
         } catch (Exception e) {
             try {
-                LOG.debug("Connection may have been reset. Attempting to re-open.");
+                LOG.debug("Connection may have been reset. Attempting to re-open.", e);
                 openConnection(conn);
                 rtuResponse = (RtuMessageResponse) conn.send(rtuRequest);
                 if (rtuResponse == null)
@@ -113,7 +125,7 @@ public class RtuMaster extends SerialMaster {
                 return rtuResponse.getModbusResponse();
             } catch (Exception e2) {
                 closeConnection(conn);
-                LOG.debug("Failed to re-connect", e);
+                LOG.debug("Failed to re-connect", e2);
                 throw new ModbusTransportException(e2, request.getSlaveId());
             }
         }
@@ -127,7 +139,7 @@ public class RtuMaster extends SerialMaster {
      * For baud less than 19200
      * Message Spacing: 3.5 * char time
      *
-     * @param wrapper a {@link SerialPortWrapper} object.
+     * @param wrapper a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
      * @return a long.
      */
     public static long computeMessageFrameSpacing(SerialPortWrapper wrapper) {
@@ -148,7 +160,7 @@ public class RtuMaster extends SerialMaster {
      * For baud less than 19200
      * Char Spacing: 1.5 * char time
      *
-     * @param wrapper a {@link SerialPortWrapper} object.
+     * @param wrapper a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
      * @return a long.
      */
     public static long computeCharacterSpacing(SerialPortWrapper wrapper) {
@@ -175,7 +187,7 @@ public class RtuMaster extends SerialMaster {
      * Char Spacing: 1.5 * char time
      * Message Spacing: 3.5 * char time
      *
-     * @param wrapper a {@link SerialPortWrapper} object.
+     * @param wrapper a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
      * @return time in nanoseconds
      */
     public static float computeCharacterTime(SerialPortWrapper wrapper) {

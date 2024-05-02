@@ -60,14 +60,17 @@ public class MessageControl implements DataConsumer {
     /**
      * <p>start.</p>
      *
-     * @param transport             a {@link Transport} object.
-     * @param messageParser         a {@link MessageParser} object.
-     * @param handler               a {@link RequestHandler} object.
-     * @param waitingRoomKeyFactory a {@link WaitingRoomKeyFactory} object.
-     * @throws IOException if any.
+     * @param transport             a {@link com.serotonin.modbus4j.sero.messaging.Transport} object.
+     * @param messageParser         a {@link com.serotonin.modbus4j.sero.messaging.MessageParser} object.
+     * @param handler               a {@link com.serotonin.modbus4j.sero.messaging.RequestHandler} object.
+     * @param waitingRoomKeyFactory a {@link com.serotonin.modbus4j.sero.messaging.WaitingRoomKeyFactory} object.
+     * @throws java.io.IOException if any.
      */
     public void start(Transport transport, MessageParser messageParser, RequestHandler handler,
                       WaitingRoomKeyFactory waitingRoomKeyFactory) throws IOException {
+        if (transport == null) {
+            throw new IllegalArgumentException("transport cannot be null");
+        }
         this.transport = transport;
         this.messageParser = messageParser;
         this.requestHandler = handler;
@@ -80,13 +83,15 @@ public class MessageControl implements DataConsumer {
      * <p>close.</p>
      */
     public void close() {
-        transport.removeConsumer();
+        if (transport != null) {
+            transport.removeConsumer();
+        }
     }
 
     /**
      * <p>Setter for the field <code>exceptionHandler</code>.</p>
      *
-     * @param exceptionHandler a {@link MessagingExceptionHandler} object.
+     * @param exceptionHandler a {@link com.serotonin.modbus4j.sero.messaging.MessagingExceptionHandler} object.
      */
     public void setExceptionHandler(MessagingExceptionHandler exceptionHandler) {
         if (exceptionHandler == null)
@@ -152,7 +157,7 @@ public class MessageControl implements DataConsumer {
     /**
      * <p>Getter for the field <code>ioLog</code>.</p>
      *
-     * @return a {@link BaseIOLog} object.
+     * @return a {@link com.serotonin.modbus4j.sero.log.BaseIOLog} object.
      */
     public BaseIOLog getIoLog() {
         return ioLog;
@@ -161,7 +166,7 @@ public class MessageControl implements DataConsumer {
     /**
      * <p>Setter for the field <code>ioLog</code>.</p>
      *
-     * @param ioLog a {@link BaseIOLog} object.
+     * @param ioLog a {@link com.serotonin.modbus4j.sero.log.BaseIOLog} object.
      */
     public void setIoLog(BaseIOLog ioLog) {
         this.ioLog = ioLog;
@@ -170,7 +175,7 @@ public class MessageControl implements DataConsumer {
     /**
      * <p>Getter for the field <code>timeSource</code>.</p>
      *
-     * @return a {@link TimeSource} object.
+     * @return a {@link com.serotonin.modbus4j.sero.timer.TimeSource} object.
      */
     public TimeSource getTimeSource() {
         return timeSource;
@@ -179,7 +184,7 @@ public class MessageControl implements DataConsumer {
     /**
      * <p>Setter for the field <code>timeSource</code>.</p>
      *
-     * @param timeSource a {@link TimeSource} object.
+     * @param timeSource a {@link com.serotonin.modbus4j.sero.timer.TimeSource} object.
      */
     public void setTimeSource(TimeSource timeSource) {
         this.timeSource = timeSource;
@@ -188,9 +193,9 @@ public class MessageControl implements DataConsumer {
     /**
      * <p>send.</p>
      *
-     * @param request a {@link OutgoingRequestMessage} object.
-     * @return a {@link IncomingResponseMessage} object.
-     * @throws IOException if any.
+     * @param request a {@link com.serotonin.modbus4j.sero.messaging.OutgoingRequestMessage} object.
+     * @return a {@link com.serotonin.modbus4j.sero.messaging.IncomingResponseMessage} object.
+     * @throws java.io.IOException if any.
      */
     public IncomingResponseMessage send(OutgoingRequestMessage request) throws IOException {
         return send(request, timeout, retries);
@@ -199,11 +204,11 @@ public class MessageControl implements DataConsumer {
     /**
      * <p>send.</p>
      *
-     * @param request a {@link OutgoingRequestMessage} object.
+     * @param request a {@link com.serotonin.modbus4j.sero.messaging.OutgoingRequestMessage} object.
      * @param timeout a int.
      * @param retries a int.
-     * @return a {@link IncomingResponseMessage} object.
-     * @throws IOException if any.
+     * @return a {@link com.serotonin.modbus4j.sero.messaging.IncomingResponseMessage} object.
+     * @throws java.io.IOException if any.
      */
     public IncomingResponseMessage send(OutgoingRequestMessage request, int timeout, int retries) throws IOException {
         byte[] data = request.getMessageData();
@@ -246,8 +251,8 @@ public class MessageControl implements DataConsumer {
     /**
      * <p>send.</p>
      *
-     * @param response a {@link OutgoingResponseMessage} object.
-     * @throws IOException if any.
+     * @param response a {@link com.serotonin.modbus4j.sero.messaging.OutgoingResponseMessage} object.
+     * @throws java.io.IOException if any.
      */
     public void send(OutgoingResponseMessage response) throws IOException {
         write(response.getMessageData());
@@ -318,7 +323,9 @@ public class MessageControl implements DataConsumer {
         }
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     public void handleIOException(IOException e) {
         exceptionHandler.receivedException(e);
     }
