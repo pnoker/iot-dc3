@@ -25,7 +25,7 @@ import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.entity.dto.PointValueDTO;
 import io.github.pnoker.common.utils.AttributeUtil;
-import io.github.pnoker.common.utils.ConvertUtil;
+import io.github.pnoker.common.utils.ValueUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -52,7 +52,7 @@ public class NettyServerHandler {
     private DriverContext driverContext;
 
     public Long getDeviceIdByName(String name) {
-        List<DeviceDTO> values = new ArrayList<>(driverContext.getDriverMetadataDTO().getDeviceMap().values());
+        List<DeviceDTO> values = new ArrayList<>(driverContext.getDriverMetadata().getDeviceMap().values());
         for (int i = 0; i < values.size(); i++) {
             DeviceDTO device = values.get(i);
             if (device.getDeviceName().equals(name)) {
@@ -74,7 +74,7 @@ public class NettyServerHandler {
         NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
 
         List<PointValueDTO> pointValues = new ArrayList<>(16);
-        Map<Long, Map<String, AttributeConfigDTO>> pointConfigMap = driverContext.getDriverMetadataDTO().getPointConfigMap().get(deviceId);
+        Map<Long, Map<String, AttributeConfigDTO>> pointConfigMap = driverContext.getDriverMetadata().getPointConfigMap().get(deviceId);
         for (Long pointId : pointConfigMap.keySet()) {
             PointDTO point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
             Map<String, AttributeConfigDTO> infoMap = pointConfigMap.get(pointId);
@@ -89,32 +89,32 @@ public class NettyServerHandler {
                     case "海拔":
                         float altitude = byteBuf.getFloat(start);
                         pointValue = new PointValueDTO(deviceId, pointId, String.valueOf(altitude),
-                                ConvertUtil.convertValue(point, String.valueOf(altitude)));
+                                ValueUtil.getFinalValue(point, String.valueOf(altitude)));
                         break;
                     case "速度":
                         double speed = byteBuf.getDouble(start);
                         pointValue = new PointValueDTO(deviceId, pointId, String.valueOf(speed),
-                                ConvertUtil.convertValue(point, String.valueOf(speed)));
+                                ValueUtil.getFinalValue(point, String.valueOf(speed)));
                         break;
                     case "液位":
                         long level = byteBuf.getLong(start);
                         pointValue = new PointValueDTO(deviceId, pointId, String.valueOf(level),
-                                ConvertUtil.convertValue(point, String.valueOf(level)));
+                                ValueUtil.getFinalValue(point, String.valueOf(level)));
                         break;
                     case "方向":
                         int direction = byteBuf.getInt(start);
                         pointValue = new PointValueDTO(deviceId, pointId, String.valueOf(direction),
-                                ConvertUtil.convertValue(point, String.valueOf(direction)));
+                                ValueUtil.getFinalValue(point, String.valueOf(direction)));
                         break;
                     case "锁定":
                         boolean lock = byteBuf.getBoolean(start);
                         pointValue = new PointValueDTO(deviceId, pointId, String.valueOf(lock),
-                                ConvertUtil.convertValue(point, String.valueOf(lock)));
+                                ValueUtil.getFinalValue(point, String.valueOf(lock)));
                         break;
                     case "经纬":
                         String lalo = byteBuf.toString(start, end, CharsetUtil.CHARSET_ISO_8859_1).trim();
                         pointValue = new PointValueDTO(deviceId, pointId, lalo,
-                                ConvertUtil.convertValue(point, lalo));
+                                ValueUtil.getFinalValue(point, lalo));
                         break;
                     default:
                         break;

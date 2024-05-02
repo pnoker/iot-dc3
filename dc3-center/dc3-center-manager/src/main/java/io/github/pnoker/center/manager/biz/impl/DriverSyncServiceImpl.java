@@ -176,7 +176,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
             if (!newDriverAttributeMap.containsKey(name)) {
                 try {
                     driverAttributeConfigService.selectByAttributeId(oldDriverAttributeMap.get(name).getId());
-                    throw new ServiceException("The driver attribute(" + name + ") used by driver attribute config and cannot be deleted");
+                    throw new ServiceException("The driver attribute(" + name + ") used by driver attribute config and can't be deleted");
                 } catch (NotFoundException notFoundException) {
                     log.debug("Driver attribute is redundant, deleting: {}", oldDriverAttributeMap.get(name));
                     driverAttributeService.remove(oldDriverAttributeMap.get(name).getId());
@@ -225,7 +225,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
             if (!newPointAttributeMap.containsKey(name)) {
                 try {
                     pointAttributeConfigService.selectByAttributeId(oldPointAttributeMap.get(name).getId());
-                    throw new ServiceException("The point attribute(" + name + ") used by point attribute config and cannot be deleted");
+                    throw new ServiceException("The point attribute(" + name + ") used by point attribute config and can't be deleted");
                 } catch (NotFoundException notFoundException1) {
                     log.debug("Point attribute is redundant, deleting: {}", oldPointAttributeMap.get(name));
                     pointAttributeService.remove(oldPointAttributeMap.get(name).getId());
