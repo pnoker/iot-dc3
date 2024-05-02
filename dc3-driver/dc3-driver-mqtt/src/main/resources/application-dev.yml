@@ -19,7 +19,7 @@ driver:
   schedule:
     # 定时读数据
     read:
-      corn: '0/5 * * * * ?'
+      cron: '0/5 * * * * ?'
   mqtt:
     url: ${MQTT_BROKER_URL:tcp://dc3-rabbitmq:2883}
     auth-type: USERNAME

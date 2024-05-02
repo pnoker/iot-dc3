@@ -40,7 +40,6 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Device Api

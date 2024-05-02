@@ -119,7 +119,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         ArrayList<Long> list = new ArrayList<>(zeroList);
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         driverRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
-        driverRunBO.setTotalDuration(totalDuration==null?0L:totalDuration);
+        driverRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         if (ObjectUtil.isEmpty(driverRunDOS)) {
             driverRunBO.setDuration(list);
             return driverRunBO;
@@ -144,7 +144,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         DriverRunBO driverRunBO = new DriverRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
-        driverRunBO.setTotalDuration(totalDuration==null?0L:totalDuration);
+        driverRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         driverRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         if (ObjectUtil.isEmpty(driverRunDOS)) {

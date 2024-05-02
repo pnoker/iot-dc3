@@ -26,6 +26,7 @@ import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.utils.AttributeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.driver.entity.WeatherInfo;
 import jakarta.annotation.Resource;
@@ -41,7 +42,6 @@ import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static io.github.pnoker.common.utils.DriverUtil.attribute;
 
 /**
  * @author pnoker
@@ -87,19 +87,19 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, PointDTO point) {
+    public String read(Map<String, AttributeConfigDTO> driverConfig, Map<String, AttributeConfigDTO> pointConfig, DeviceDTO device, PointDTO point) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
-        String city = attribute(pointInfo, "city");
-        String type = attribute(pointInfo, "type");
+        String city = AttributeUtil.getAttributeValue(pointConfig.get("city"), String.class);
+        String type = AttributeUtil.getAttributeValue(pointConfig.get("type"), String.class);
 
         String response = getRequest(city);
         return getValue(type, response);
     }
 
     @Override
-    public Boolean write(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, AttributeConfigDTO value) {
+    public Boolean write(Map<String, AttributeConfigDTO> driverConfig, Map<String, AttributeConfigDTO> pointConfig, DeviceDTO device, AttributeConfigDTO value) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */

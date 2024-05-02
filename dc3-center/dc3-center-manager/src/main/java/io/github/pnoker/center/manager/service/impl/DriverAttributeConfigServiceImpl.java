@@ -40,7 +40,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * DriverInfoService Impl
+ * DriverConfigService Impl
  *
  * @author pnoker
  * @since 2022.1.0

@@ -26,7 +26,7 @@
 ### OpcDa Point 配置
 
 - slaveId: 从站编号, 例如: 1、2、3...
-- functionCode: 功能编码, 分别是: 
+- functionCode: 功能编码, 分别是:
     - 1（Coil Status 0X）
     - 2（Input Status 1X）
     - 3（Holding Register 4X）
@@ -37,10 +37,10 @@
 
 ```yaml
 schedule:
-    # 定时读数据
-    read:
-      enable: true
-      corn: '0/30 * * * * ?'
+  # 定时读数据
+  read:
+    enable: true
+    cron: '0/30 * * * * ?'
 ```
 
 ## 接口测试

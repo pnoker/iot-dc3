@@ -17,8 +17,8 @@
 package io.github.pnoker.driver.mqtt.service.impl;
 
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.MqttMessage;
 import io.github.pnoker.common.entity.dto.PointValueDTO;
+import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author pnoker

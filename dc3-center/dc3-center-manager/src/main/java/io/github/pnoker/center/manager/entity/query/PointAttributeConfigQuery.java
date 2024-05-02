@@ -25,7 +25,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * PointInfo Query
+ * PointConfig Query
  *
  * @author pnoker
  * @since 2022.1.0
