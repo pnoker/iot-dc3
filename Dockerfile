@@ -25,7 +25,8 @@ WORKDIR /build
 
 COPY ./ ./
 
-RUN yarn && yarn build
+RUN yarn
+RUN yarn build
 
 # runtime
 FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-nginx:1.26 AS runtime
