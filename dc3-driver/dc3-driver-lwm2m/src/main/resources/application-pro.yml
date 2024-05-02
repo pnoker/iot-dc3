@@ -19,7 +19,7 @@ driver:
   schedule:
     # 定时读数据
     read:
-      corn: '0 0/15 * * * ?'
+      cron: '0 0/15 * * * ?'
 
 spring:
   rabbitmq:

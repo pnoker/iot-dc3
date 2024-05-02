@@ -44,7 +44,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * PointInfoService Impl
+ * PointConfigService Impl
  *
  * @author pnoker
  * @since 2022.1.0

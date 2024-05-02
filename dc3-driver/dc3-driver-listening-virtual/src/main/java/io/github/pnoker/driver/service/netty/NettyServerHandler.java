@@ -24,8 +24,8 @@ import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.entity.dto.PointValueDTO;
+import io.github.pnoker.common.utils.AttributeUtil;
 import io.github.pnoker.common.utils.ConvertUtil;
-import io.github.pnoker.common.utils.DriverUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -62,22 +62,26 @@ public class NettyServerHandler {
         return null;
     }
 
+    /**
+     * 例子，仅供参考，请结合自己的实际数据格式进行解析
+     */
     public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
         log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         String deviceName = byteBuf.toString(0, 22, CharsetUtil.CHARSET_ISO_8859_1);
         Long deviceId = getDeviceIdByName(deviceName);
         String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
 
-        //TODO 简单的例子, 用于存储channel, 然后配合write接口实现向下发送数据
         NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
 
         List<PointValueDTO> pointValues = new ArrayList<>(16);
-        Map<Long, Map<String, AttributeConfigDTO>> pointInfoMap = driverContext.getDriverMetadataDTO().getPointInfoMap().get(deviceId);
-        for (Long pointId : pointInfoMap.keySet()) {
+        Map<Long, Map<String, AttributeConfigDTO>> pointConfigMap = driverContext.getDriverMetadataDTO().getPointConfigMap().get(deviceId);
+        for (Long pointId : pointConfigMap.keySet()) {
             PointDTO point = driverContext.getPointByDeviceIdAndPointId(deviceId, pointId);
-            Map<String, AttributeConfigDTO> infoMap = pointInfoMap.get(pointId);
-            int start = DriverUtil.value(infoMap.get("start").getType().getCode(), infoMap.get("start").getValue());
-            int end = DriverUtil.value(infoMap.get("end").getType().getCode(), infoMap.get("end").getValue());
+            Map<String, AttributeConfigDTO> infoMap = pointConfigMap.get(pointId);
+            AttributeConfigDTO startAttribute = infoMap.get("start");
+            AttributeConfigDTO endAttribute = infoMap.get("end");
+            int start = AttributeUtil.getAttributeValue(startAttribute, Integer.class);
+            int end = AttributeUtil.getAttributeValue(endAttribute, Integer.class);
 
             if (infoMap.get("key").getValue().equals(hexKey)) {
                 PointValueDTO pointValue = null;

@@ -327,7 +327,7 @@ public class PointServiceImpl implements PointService {
         wrapper.select("sum(total) as total");
         wrapper.lambda().eq(PointDataVolumeRunDO::getDriverId, driverId);
         PointDataVolumeRunDO one = pointDataVolumeRunManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)){
+        if (ObjectUtil.isNull(one)) {
             return new PointDataVolumeRunDO();
         }
         return one;
@@ -436,7 +436,7 @@ public class PointServiceImpl implements PointService {
      *
      * @param deviceId 设备ID
      * @param pointId  位号ID
-     * @return PointInfo Array
+     * @return PointConfig Array
      */
     private List<PointAttributeConfigDO> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()

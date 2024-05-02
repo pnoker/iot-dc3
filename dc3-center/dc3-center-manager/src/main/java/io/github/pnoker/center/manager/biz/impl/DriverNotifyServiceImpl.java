@@ -107,7 +107,7 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
             );
             notifyDriver(entityDO, entityDTO);
         } catch (Exception e) {
-            log.error("Notify driver {} driverInfo: {}", command, e.getMessage());
+            log.error("Notify driver {} driverConfig: {}", command, e.getMessage());
         }
     }
 
@@ -122,7 +122,7 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
             );
             notifyDriver(entityDO, entityDTO);
         } catch (Exception e) {
-            log.error("Notify driver {} pointInfo: {}", command, e.getMessage());
+            log.error("Notify driver {} pointConfig: {}", command, e.getMessage());
         }
     }
 

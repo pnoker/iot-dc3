@@ -22,7 +22,7 @@ import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.job.PointValueJob;
 import io.github.pnoker.center.data.mqtt.service.MqttSendService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.entity.property.MqttProperties;
+import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

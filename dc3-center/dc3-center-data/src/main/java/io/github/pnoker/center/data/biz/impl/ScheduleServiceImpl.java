@@ -47,13 +47,13 @@ public class ScheduleServiceImpl implements ScheduleService {
             quartzService.createJobWithInterval(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-point-value-schedule-job", interval, DateBuilder.IntervalUnit.SECOND, PointValueJob.class);
 
             // 自定义调度
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-every-minute-job", "0 0/1 * * * ?", EveryMinuteJob.class);
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-every-day-6-job", "0 0 6 * * ?", EveryDay6Job.class);
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-hourly-job", "0 0 0/1 * * ?", HourlyJob.class);
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "driver-online-job", "0 0 0/1 * * ?", DriverOnlineJob.class);
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "driver-statistics-online-job", "0 0 0/1 * * ?", DriverStatisticsOnlineJob.class);
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "device-online-job", "0 0 0/1 * * ?", DeviceOnlineJob.class);
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "device-statistics-online-job", "0 0 0/1 * * ?", DeviceStatisticsOnlineJob.class);
+            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-every-minute-job", "0 0/1 * * * ?", EveryMinuteJob.class);
+            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-every-day-6-job", "0 0 6 * * ?", EveryDay6Job.class);
+            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-hourly-job", "0 0 0/1 * * ?", HourlyJob.class);
+            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "driver-online-job", "0 0 0/1 * * ?", DriverOnlineJob.class);
+            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "driver-statistics-online-job", "0 0 0/1 * * ?", DriverStatisticsOnlineJob.class);
+            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "device-online-job", "0 0 0/1 * * ?", DeviceOnlineJob.class);
+            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "device-statistics-online-job", "0 0 0/1 * * ?", DeviceStatisticsOnlineJob.class);
 
 
             quartzService.startScheduler();

@@ -31,7 +31,6 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -60,7 +59,7 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 新增 PointInfo
+     * 新增 PointConfig
      *
      * @param entityVO {@link PointAttributeConfigVO}
      * @return R of String
@@ -80,7 +79,7 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除 PointInfo
+     * 根据 ID 删除 PointConfig
      *
      * @param id ID
      * @return R of String
@@ -97,7 +96,7 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 更新 PointInfo
+     * 更新 PointConfig
      *
      * @param entityVO {@link PointAttributeConfigVO}
      * @return R of String
@@ -115,7 +114,7 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询 PointInfo
+     * 根据 ID 查询 PointConfig
      *
      * @param id 位号信息ID
      * @return PointAttributeConfigVO {@link PointAttributeConfigVO}
@@ -133,12 +132,12 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 属性ID、设备ID 和 位号ID 查询 PointInfo
+     * 根据 属性ID、设备ID 和 位号ID 查询 PointConfig
      *
      * @param attributeId Attribute ID
      * @param deviceId    设备ID
      * @param pointId     位号ID
-     * @return PointInfo
+     * @return PointConfig
      */
     @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}/point_id/{pointId}")
     public R<PointAttributeConfigVO> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") Long attributeId,
@@ -155,11 +154,11 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 设备ID 和 位号ID 查询 PointInfo
+     * 根据 设备ID 和 位号ID 查询 PointConfig
      *
      * @param deviceId 设备ID
      * @param pointId  位号ID
-     * @return PointInfo
+     * @return PointConfig
      */
     @GetMapping("/device_id/{deviceId}/point_id/{pointId}")
     public R<List<PointAttributeConfigVO>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
@@ -175,10 +174,10 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 设备ID 查询 PointInfo
+     * 根据 设备ID 查询 PointConfig
      *
      * @param deviceId 设备ID
-     * @return PointInfo
+     * @return PointConfig
      */
     @GetMapping("/device_id/{deviceId}")
     public R<List<PointAttributeConfigVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
@@ -192,10 +191,10 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 分页查询 PointInfo
+     * 分页查询 PointConfig
      *
-     * @param entityQuery PointInfo Dto
-     * @return Page Of PointInfo
+     * @param entityQuery PointConfig Dto
+     * @return Page Of PointConfig
      */
     @PostMapping("/list")
     public R<Page<PointAttributeConfigVO>> list(@RequestBody(required = false) PointAttributeConfigQuery entityQuery) {

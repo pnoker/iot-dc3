@@ -23,7 +23,7 @@ import io.github.pnoker.common.base.service.BaseService;
 import java.util.List;
 
 /**
- * DriverInfo Interface
+ * DriverConfig Interface
  *
  * @author pnoker
  * @since 2022.1.0
@@ -34,7 +34,7 @@ public interface DriverAttributeConfigService extends BaseService<DriverAttribut
      * 根据 设备ID 查询
      *
      * @param deviceId 设备ID
-     * @return DriverInfo Array
+     * @return DriverConfig Array
      */
     List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId);
 
@@ -42,7 +42,7 @@ public interface DriverAttributeConfigService extends BaseService<DriverAttribut
      * 根据 驱动属性配置ID 查询
      *
      * @param attributeId 驱动属性ID
-     * @return DriverInfo Array
+     * @return DriverConfig Array
      */
     List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId);
 
@@ -51,7 +51,7 @@ public interface DriverAttributeConfigService extends BaseService<DriverAttribut
      *
      * @param deviceId    设备ID
      * @param attributeId 驱动属性ID
-     * @return DriverInfo
+     * @return DriverConfig
      */
     DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId);
 

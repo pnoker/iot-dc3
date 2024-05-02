@@ -31,7 +31,6 @@ import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -60,7 +59,7 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 新增 DriverInfo
+     * 新增 DriverConfig
      *
      * @param entityVO {@link DriverAttributeConfigVO}
      * @return R of String
@@ -80,7 +79,7 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除 DriverInfo
+     * 根据 ID 删除 DriverConfig
      *
      * @param id ID
      * @return R of String
@@ -97,7 +96,7 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 更新 DriverInfo
+     * 更新 DriverConfig
      *
      * @param entityVO {@link DriverAttributeConfigVO}
      * @return R of String
@@ -115,7 +114,7 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询 DriverInfo
+     * 根据 ID 查询 DriverConfig
      *
      * @param id ID
      * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
@@ -133,11 +132,11 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 属性ID 和 设备ID 查询 DriverInfo
+     * 根据 属性ID 和 设备ID 查询 DriverConfig
      *
      * @param attributeId Attribute ID
      * @param deviceId    设备ID
-     * @return DriverInfo
+     * @return DriverConfig
      */
     @GetMapping("/device_id/{deviceId}/attribute_id/{attributeId}")
     public R<DriverAttributeConfigVO> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
@@ -153,10 +152,10 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 设备ID 查询 DriverInfo
+     * 根据 设备ID 查询 DriverConfig
      *
      * @param deviceId 设备ID
-     * @return DriverInfo Array
+     * @return DriverConfig Array
      */
     @GetMapping("/device_id/{deviceId}")
     public R<List<DriverAttributeConfigVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
@@ -171,10 +170,10 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 分页查询 DriverInfo
+     * 分页查询 DriverConfig
      *
-     * @param entityQuery DriverInfo Dto
-     * @return Page Of DriverInfo
+     * @param entityQuery DriverConfig Dto
+     * @return Page Of DriverConfig
      */
     @PostMapping("/list")
     public R<Page<DriverAttributeConfigVO>> list(@RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {

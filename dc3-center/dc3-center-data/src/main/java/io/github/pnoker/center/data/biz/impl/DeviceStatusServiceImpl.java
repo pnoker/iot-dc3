@@ -122,7 +122,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
-        deviceRunBO.setTotalDuration(totalDuration==null?0L:totalDuration);
+        deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
         if (ObjectUtil.isEmpty(deviceRunDOS)) {
             deviceRunBO.setDuration(list);
@@ -149,7 +149,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
-        deviceRunBO.setTotalDuration(totalDuration==null?0L:totalDuration);
+        deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
         if (ObjectUtil.isEmpty(deviceRunDOS)) {
             deviceRunBO.setDuration(list);

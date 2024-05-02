@@ -248,13 +248,13 @@ public interface CommonConstant {
             String UPDATE = "update_point";
         }
 
-        interface DriverInfo {
+        interface DriverConfig {
             String ADD = "add_driver_info";
             String DELETE = "delete_driver_info";
             String UPDATE = "update_driver_info";
         }
 
-        interface PointInfo {
+        interface PointConfig {
             String ADD = "add_point_info";
             String DELETE = "delete_point_info";
             String UPDATE = "update_point_info";

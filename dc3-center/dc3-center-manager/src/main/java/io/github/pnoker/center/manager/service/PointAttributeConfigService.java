@@ -23,7 +23,7 @@ import io.github.pnoker.common.base.service.BaseService;
 import java.util.List;
 
 /**
- * PointInfo Interface
+ * PointConfig Interface
  *
  * @author pnoker
  * @since 2022.1.0
@@ -34,7 +34,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      * 根据 设备ID 查询
      *
      * @param deviceId 设备ID
-     * @return PointInfo Array
+     * @return PointConfig Array
      */
     List<PointAttributeConfigBO> selectByDeviceId(Long deviceId);
 
@@ -42,7 +42,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      * 根据 属性ID 查询
      *
      * @param attributeId 属性ID
-     * @return PointInfo Array
+     * @return PointConfig Array
      */
     List<PointAttributeConfigBO> selectByAttributeId(Long attributeId);
 
@@ -51,7 +51,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      *
      * @param deviceId 设备ID
      * @param pointId  位号ID
-     * @return PointInfo Array
+     * @return PointConfig Array
      */
     List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
 
@@ -61,7 +61,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      * @param attributeId 属性ID
      * @param deviceId    设备ID
      * @param pointId     位号ID
-     * @return PointInfo
+     * @return PointConfig
      */
     PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId);
 }
