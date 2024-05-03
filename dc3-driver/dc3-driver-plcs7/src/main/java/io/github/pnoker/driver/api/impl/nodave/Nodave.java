@@ -70,7 +70,7 @@ public final class Nodave {
     public final static int RESULT_ITEM_NOT_AVAILABLE = 10;
     /* means a a piece of data is not available in the CPU, e.g. */
     /* when trying to read a non existing DB */
-    /* CPU tells it does not support to read a bit block with a */
+    /* CPU tells it doesn't support to read a bit block with a */
     /* length other than 1 bit. */
     public final static int RESULT_ITEM_NOT_AVAILABLE200 = 3;
     /* means a a piece of data is not available in the CPU, e.g. */
@@ -243,7 +243,7 @@ public final class Nodave {
             case RESULT_OK:
                 return "ok";
             case RESULT_MULTIPLE_BITS_NOT_SUPPORTED:
-                return "the CPU does not support reading a bit block of length<>1";
+                return "the CPU doesn't support reading a bit block of length<>1";
             case RESULT_ITEM_NOT_AVAILABLE:
                 return "the desired item is not available in the PLC";
             case RESULT_ITEM_NOT_AVAILABLE200:
@@ -289,7 +289,7 @@ public final class Nodave {
             case 0x8107:
                 return "data type not consistent.";
             case 0x810A:
-                return "object does not exist.";
+                return "object doesn't exist.";
             case 0x8500:
                 return "incorrect PDU size.";
             case 0x8702:
@@ -309,9 +309,9 @@ public final class Nodave {
             case 0xd207:
                 return "block exists in EPROM.";
             case 0xd209:
-                return "block does not exist.";
+                return "block doesn't exist.";
             case 0xd20e:
-                return "no block does not exist.";
+                return "no block doesn't exist.";
             case 0xd210:
                 return "block number too big.";
             case 0xd240:

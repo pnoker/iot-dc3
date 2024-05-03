@@ -187,7 +187,7 @@ public class Lwm2mServer {
             @Override
             public void onResponse(SingleObservation singleObservation, Registration registration, ObserveResponse observeResponse) {
                 /**
-                 * 可以通过MQ发送到其他服务去消费或者入库
+                 * 可以根据MQ发送到其他服务去消费或者入库
                  */
                 log.debug("obs res:{}{},{}", registration.getEndpoint(), singleObservation.getPath(), observeResponse.getContent());
             }

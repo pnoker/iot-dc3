@@ -127,8 +127,8 @@ public class ConfigServiceImpl implements ConfigService {
             if (containsAllFields(dataJsonNode, mqttJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from mqttConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from mqttConfigForm");
+                log.info("The data doesn't contain all fields from mqttConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from mqttConfigForm");
             }
 
         } catch (Exception e) {
@@ -144,8 +144,8 @@ public class ConfigServiceImpl implements ConfigService {
             if (containsAllFields(dataJsonNode, httppushJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from httpPushConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from httpPushConfigForm");
+                log.info("The data doesn't contain all fields from httpPushConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from httpPushConfigForm");
             }
 
         } catch (Exception e) {
@@ -162,8 +162,8 @@ public class ConfigServiceImpl implements ConfigService {
             if (containsAllFields(dataJsonNode, sqlJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from sqlConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from sqlConfigForm");
+                log.info("The data doesn't contain all fields from sqlConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from sqlConfigForm");
             }
 
         } catch (Exception e) {
@@ -179,8 +179,8 @@ public class ConfigServiceImpl implements ConfigService {
             if (containsAllFields(dataJsonNode, httppulJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from httpPullConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from httpPullConfigForm");
+                log.info("The data doesn't contain all fields from httpPullConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from httpPullConfigForm");
             }
 
         } catch (Exception e) {
@@ -196,8 +196,8 @@ public class ConfigServiceImpl implements ConfigService {
             if (containsAllFields(dataJsonNode, redisJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from redisConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from redisConfigForm");
+                log.info("The data doesn't contain all fields from redisConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from redisConfigForm");
             }
 
         } catch (Exception e) {

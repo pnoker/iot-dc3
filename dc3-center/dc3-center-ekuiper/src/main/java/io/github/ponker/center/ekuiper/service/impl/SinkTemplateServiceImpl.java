@@ -165,8 +165,8 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
             if (containsAllFields(dataJsonNode, mqttJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from mqttSink");
-                throw new IllegalArgumentException("The data does not contain all fields from mqttSink");
+                log.info("The data doesn't contain all fields from mqttSink");
+                throw new IllegalArgumentException("The data doesn't contain all fields from mqttSink");
             }
 
         } catch (Exception e) {
@@ -182,8 +182,8 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
             if (containsAllFields(dataJsonNode, httppushJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from httpPushConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from httpPushConfigForm");
+                log.info("The data doesn't contain all fields from httpPushConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from httpPushConfigForm");
             }
 
         } catch (Exception e) {
@@ -200,8 +200,8 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
             if (containsAllFields(dataJsonNode, sqlJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from sqlConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from sqlConfigForm");
+                log.info("The data doesn't contain all fields from sqlConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from sqlConfigForm");
             }
 
         } catch (Exception e) {
@@ -217,8 +217,8 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
             if (containsAllFields(dataJsonNode, redisJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from redisConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from redisConfigForm");
+                log.info("The data doesn't contain all fields from redisConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from redisConfigForm");
             }
 
         } catch (Exception e) {

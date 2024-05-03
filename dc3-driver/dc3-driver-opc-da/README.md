@@ -23,7 +23,7 @@
 ### OpcDa Server 连接配置
 
 - Host : OpcDa 服务所在主机IP
-- CLSID : OpcDa 服务CLSID, 可以通过OpcClient工具查看
+- CLSID : OpcDa 服务CLSID, 可以根据OpcClient工具查看
 - User : OpcDa 服务所在主机用户名
 - Password : OpcDa 服务所在主机用户的远程登录密码
 
