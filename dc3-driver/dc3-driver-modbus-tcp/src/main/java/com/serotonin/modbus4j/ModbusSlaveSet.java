@@ -109,7 +109,7 @@ abstract public class ModbusSlaveSet extends Modbus {
     }
 
     /**
-     * Starts the slave. If an exception is not thrown, this method does not return, but uses the thread to execute the
+     * Starts the slave. If an exception is not thrown, this method doesn't return, but uses the thread to execute the
      * listening.
      *
      * @throws ModbusInitException if necessary

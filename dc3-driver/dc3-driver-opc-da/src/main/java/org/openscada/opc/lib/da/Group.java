@@ -251,7 +251,7 @@ public class Group {
     protected void checkItems(final Item[] items) {
         for (Item item : items) {
             if (item.getGroup() != this) {
-                throw new IllegalArgumentException("Item does not belong to this group");
+                throw new IllegalArgumentException("Item doesn't belong to this group");
             }
         }
     }
