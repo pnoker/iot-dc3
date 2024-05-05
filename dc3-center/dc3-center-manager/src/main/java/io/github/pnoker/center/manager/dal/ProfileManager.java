@@ -21,7 +21,7 @@ import io.github.pnoker.center.manager.entity.model.ProfileDO;
 
 /**
  * <p>
- * 设备模板表 服务类
+ * 设备模版表 服务类
  * </p>
  *
  * @author pnoker

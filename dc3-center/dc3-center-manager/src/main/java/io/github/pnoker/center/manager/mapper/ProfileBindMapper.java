@@ -21,7 +21,7 @@ import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 
 /**
  * <p>
- * 模板-设备关联表 Mapper 接口
+ * 模版-设备关联表 Mapper 接口
  * </p>
  *
  * @author pnoker

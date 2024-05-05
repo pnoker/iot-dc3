@@ -28,3 +28,10 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:dc3}
     password: ${RABBITMQ_PASSWORD:dc3}
+
+grpc:
+  client:
+    dc3-center-manager:
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext

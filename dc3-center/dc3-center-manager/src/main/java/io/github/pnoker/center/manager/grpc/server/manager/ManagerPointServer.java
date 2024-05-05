@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.grpc.api.point;
+package io.github.pnoker.center.manager.grpc.server.manager;
+
 
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.api.center.manager.GrpcPagePointDTO;
+import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
+import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
+import io.github.pnoker.api.center.manager.PointApiGrpc;
+import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.api.common.driver.GrpcPointQuery;
-import io.github.pnoker.api.common.driver.GrpcRPointDTO;
-import io.github.pnoker.api.common.driver.PointApiGrpc;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
+import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.grpc.builder.GrpcPointBuilder;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.enums.ResponseEnum;
@@ -30,30 +35,35 @@ import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+import java.util.List;
+
 /**
- * Device Api
+ * Point Api
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @GrpcService
-public class DriverOfPointApi extends PointApiGrpc.PointApiImplBase {
+public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
 
+    private final GrpcPointBuilder grpcPointBuilder;
     private final PointService pointService;
 
-    public DriverOfPointApi(PointService pointService) {
+    public ManagerPointServer(GrpcPointBuilder grpcPointBuilder, PointService pointService) {
+        this.grpcPointBuilder = grpcPointBuilder;
         this.pointService = pointService;
     }
 
     @Override
-    public void selectById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
-        GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
+    public void list(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
+        GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        // TODO 添加位号是否属于设备，设备是否属于驱动的校验
-        PointBO pointBO = pointService.selectById(request.getPointId());
-        if (ObjectUtil.isNull(pointBO)) {
+        PointQuery pageQuery = grpcPointBuilder.buildQueryByGrpcQuery(request);
+
+        Page<PointBO> pointPage = pointService.selectByPage(pageQuery);
+        if (ObjectUtil.isNull(pointPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -62,13 +72,22 @@ public class DriverOfPointApi extends PointApiGrpc.PointApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcPointDTO pointDTO = GrpcPointBuilder.buildGrpcDTOByBO(pointBO);
+            GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
+            GrpcPage.Builder pageBuilder = GrpcPage.newBuilder();
+            pageBuilder.setCurrent(pointPage.getCurrent());
+            pageBuilder.setSize(pointPage.getSize());
+            pageBuilder.setPages(pointPage.getPages());
+            pageBuilder.setTotal(pointPage.getTotal());
+            pagePointBuilder.setPage(pageBuilder);
+            List<GrpcPointDTO> collect = pointPage.getRecords().stream().map(grpcPointBuilder::buildGrpcDTOByBO).toList();
+            pagePointBuilder.addAllData(collect);
 
-            builder.setData(pointDTO);
+            builder.setData(pagePointBuilder);
         }
 
         builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
+
 }

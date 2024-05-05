@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.grpc.api.manager;
+package io.github.pnoker.center.manager.grpc.server.manager;
 
 
 import cn.hutool.core.collection.CollUtil;
@@ -43,11 +43,13 @@ import java.util.List;
  */
 @Slf4j
 @GrpcService
-public class ManagerOfDeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
+public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
+    private final GrpcDeviceBuilder grpcDeviceBuilder;
     private final DeviceService deviceService;
 
-    public ManagerOfDeviceApi(DeviceService deviceService) {
+    public ManagerDeviceServer(GrpcDeviceBuilder grpcDeviceBuilder, DeviceService deviceService) {
+        this.grpcDeviceBuilder = grpcDeviceBuilder;
         this.deviceService = deviceService;
     }
 
@@ -56,7 +58,7 @@ public class ManagerOfDeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DeviceQuery pageQuery = GrpcDeviceBuilder.buildQueryByGrpcQuery(request);
+        DeviceQuery pageQuery = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
 
         Page<DeviceBO> devicePage = deviceService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(devicePage)) {
@@ -75,7 +77,7 @@ public class ManagerOfDeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             pageBuilder.setPages(devicePage.getPages());
             pageBuilder.setTotal(devicePage.getTotal());
             pageDeviceBuilder.setPage(pageBuilder);
-            List<GrpcDeviceDTO> collect = devicePage.getRecords().stream().map(GrpcDeviceBuilder::buildGrpcDTOByBO).toList();
+            List<GrpcDeviceDTO> collect = devicePage.getRecords().stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
             pageDeviceBuilder.addAllData(collect);
 
             builder.setData(pageDeviceBuilder);
@@ -101,7 +103,7 @@ public class ManagerOfDeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(GrpcDeviceBuilder::buildGrpcDTOByBO).toList();
+            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
 
             builder.addAllData(deviceDTOS);
         }
@@ -126,7 +128,7 @@ public class ManagerOfDeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(GrpcDeviceBuilder::buildGrpcDTOByBO).toList();
+            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
 
             builder.addAllData(deviceDTOS);
         }
@@ -151,7 +153,7 @@ public class ManagerOfDeviceApi extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcDeviceDTO deviceDTO = GrpcDeviceBuilder.buildGrpcDTOByBO(deviceBO);
+            GrpcDeviceDTO deviceDTO = grpcDeviceBuilder.buildGrpcDTOByBO(deviceBO);
 
             builder.setData(deviceDTO);
         }

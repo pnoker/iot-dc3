@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * PointAttribute BO
+ * 位号属性BO
  *
  * @author pnoker
  * @since 2022.1.0

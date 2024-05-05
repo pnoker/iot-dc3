@@ -18,9 +18,10 @@ package io.github.pnoker.center.data.entity.builder;
 
 import io.github.pnoker.center.data.entity.bo.DeviceRunBO;
 import io.github.pnoker.center.data.entity.vo.DeviceRunVO;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DeviceDurationBuilder {
 
     DeviceRunVO buildVOByBOList(DeviceRunBO duration);

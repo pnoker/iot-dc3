@@ -56,7 +56,7 @@ public class ApiVO extends BaseVO {
      * Api接口名称
      */
     @Schema(description = "Api接口名称")
-    @NotBlank(message = "Api name can't be empty",
+    @NotBlank(message = "Api接口名称不能为空",
             groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
             message = "无效接口名称",

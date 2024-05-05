@@ -79,9 +79,9 @@ public class PointQuery implements Serializable {
     private RwFlagEnum rwFlag;
 
     /**
-     * 模板ID
+     * 模版ID
      */
-    @Schema(description = "模板ID")
+    @Schema(description = "模版ID")
     private Long profileId;
 
     /**

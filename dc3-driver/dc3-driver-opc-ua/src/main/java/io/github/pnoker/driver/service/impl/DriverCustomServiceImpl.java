@@ -20,7 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.driver.context.DriverContext;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
+import io.github.pnoker.common.entity.bo.AttributeBO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
@@ -67,7 +67,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     public void initial() {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        !!!
         你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
         */
         connectMap = new ConcurrentHashMap<>(16);
@@ -77,7 +76,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     public void schedule() {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        !!!
         上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
         - 在read中实现设备状态的判断；
         - 在自定义定时任务中实现设备状态的判断；
@@ -93,7 +91,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeConfigDTO> driverConfig, Map<String, AttributeConfigDTO> pointConfig, DeviceDTO device, PointDTO point) {
+    public String read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
@@ -103,7 +101,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeConfigDTO> driverConfig, Map<String, AttributeConfigDTO> pointConfig, DeviceDTO device, AttributeConfigDTO value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, AttributeBO value) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
@@ -118,7 +116,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverConfig 驱动信息
      * @return OpcUaClient
      */
-    private OpcUaClient getConnector(Long deviceId, Map<String, AttributeConfigDTO> driverConfig) {
+    private OpcUaClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("Opc Ua Server Connection Info {}", JsonUtil.toJsonString(driverConfig));
         OpcUaClient opcUaClient = connectMap.get(deviceId);
         if (ObjectUtil.isNull(opcUaClient)) {
@@ -151,7 +149,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointConfig 位号信息
      * @return OpcUa Node
      */
-    private NodeId getNode(Map<String, AttributeConfigDTO> pointConfig) {
+    private NodeId getNode(Map<String, AttributeBO> pointConfig) {
         int namespace = AttributeUtil.getAttributeValue(pointConfig.get("namespace"), Integer.class);
         String tag = AttributeUtil.getAttributeValue(pointConfig.get("tag"), String.class);
         return new NodeId(namespace, tag);
@@ -164,7 +162,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointConfig 位号信息
      * @return Node Value
      */
-    private String readValue(OpcUaClient client, Map<String, AttributeConfigDTO> pointConfig) {
+    private String readValue(OpcUaClient client, Map<String, AttributeBO> pointConfig) {
         try {
             NodeId nodeId = getNode(pointConfig);
             client.connect().get();
@@ -187,7 +185,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointConfig 位号信息
      * @param value       写入值
      */
-    private boolean writeValue(OpcUaClient client, Map<String, AttributeConfigDTO> pointConfig, AttributeConfigDTO value) {
+    private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, AttributeBO value) {
         try {
             NodeId nodeId = getNode(pointConfig);
 
@@ -213,7 +211,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws ExecutionException   ExecutionException
      * @throws InterruptedException InterruptedException
      */
-    private boolean writeNode(OpcUaClient client, NodeId nodeId, AttributeConfigDTO value) throws ExecutionException, InterruptedException {
+    private boolean writeNode(OpcUaClient client, NodeId nodeId, AttributeBO value) throws ExecutionException, InterruptedException {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(value.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
             throw new UnSupportException("Unsupported type of " + value.getType());

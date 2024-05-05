@@ -32,7 +32,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -108,5 +107,5 @@ public class DeviceVO extends BaseVO {
     @Schema(description = "模版ID集")
     @NotNull(message = "模版ID集不能为空",
             groups = {Upload.class})
-    private Set<Long> profileIds = new HashSet<>(4);
+    private Set<Long> profileIds;
 }

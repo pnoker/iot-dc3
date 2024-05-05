@@ -21,7 +21,7 @@ import io.github.pnoker.center.manager.entity.model.PointAttributeDO;
 
 /**
  * <p>
- * 模板配置信息表 服务类
+ * 模版配置信息表 服务类
  * </p>
  *
  * @author pnoker

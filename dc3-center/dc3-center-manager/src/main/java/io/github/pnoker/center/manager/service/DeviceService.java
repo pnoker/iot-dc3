@@ -54,7 +54,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
     /**
      * 根据 驱动ID 查询该驱动下的全部设备
      *
-     * @param driverId Driver ID
+     * @param driverId 驱动ID
      * @return {@link DeviceBO} Array
      */
     List<DeviceBO> selectByDriverId(Long driverId);

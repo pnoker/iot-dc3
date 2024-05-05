@@ -21,6 +21,7 @@ import io.github.pnoker.center.data.entity.model.LabelBindDO;
 import io.github.pnoker.common.entity.bo.LabelBindBO;
 import io.github.pnoker.common.entity.builder.LabelBindBuilder;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -35,7 +36,7 @@ import java.util.Optional;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface LabelBindForDataBuilder extends LabelBindBuilder {
 
     /**

@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DriverAttribute BO
+ * 驱动属性BO
  *
  * @author pnoker
  * @since 2022.1.0

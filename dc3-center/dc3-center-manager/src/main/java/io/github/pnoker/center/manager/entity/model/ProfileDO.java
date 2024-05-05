@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 设备模板表
+ * 设备模版表
  * </p>
  *
  * @author pnoker
@@ -49,25 +49,25 @@ public class ProfileDO implements Serializable {
     private Long id;
 
     /**
-     * 模板名称
+     * 模版名称
      */
     @TableField("profile_name")
     private String profileName;
 
     /**
-     * 模板编号
+     * 模版编号
      */
     @TableField("profile_code")
     private String profileCode;
 
     /**
-     * 模板共享类型标识
+     * 模版共享类型标识
      */
     @TableField("profile_share_flag")
     private Byte profileShareFlag;
 
     /**
-     * 模板类型标识
+     * 模版类型标识
      */
     @TableField("profile_type_flag")
     private Byte profileTypeFlag;
@@ -79,7 +79,7 @@ public class ProfileDO implements Serializable {
     private Long groupId;
 
     /**
-     * 模板拓展信息
+     * 模版拓展信息
      */
     @TableField(value = "profile_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt profileExt;

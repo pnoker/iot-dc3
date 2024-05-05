@@ -61,7 +61,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
         ProfileBindDO entityDO = profileBindBuilder.buildDOByBO(entityBO);
         if (!profileBindManager.save(entityDO)) {
-            throw new AddException("模板绑定创建失败");
+            throw new AddException("模版绑定创建失败");
         }
     }
 
@@ -70,7 +70,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         getDOById(id, true);
 
         if (!profileBindManager.removeById(id)) {
-            throw new DeleteException("模板绑定删除失败");
+            throw new DeleteException("模版绑定删除失败");
         }
     }
 
@@ -98,7 +98,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         ProfileBindDO entityDO = profileBindBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
         if (!profileBindManager.updateById(entityDO)) {
-            throw new UpdateException("模板绑定更新失败");
+            throw new UpdateException("模版绑定更新失败");
         }
     }
 
@@ -171,7 +171,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("模板绑定重复");
+            throw new DuplicateException("模版绑定重复");
         }
         return duplicate;
     }
@@ -186,7 +186,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     private ProfileBindDO getDOById(Long id, boolean throwException) {
         ProfileBindDO entityDO = profileBindManager.getById(id);
         if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("模板绑定不存在");
+            throw new NotFoundException("模版绑定不存在");
         }
         return entityDO;
     }

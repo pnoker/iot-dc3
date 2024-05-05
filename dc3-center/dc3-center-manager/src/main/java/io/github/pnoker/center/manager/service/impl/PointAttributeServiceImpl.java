@@ -103,7 +103,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    public List<PointAttributeBO> selectByDriverId(Long driverId, boolean throwException) {
+    public List<PointAttributeBO> selectByDriverId(Long driverId) {
         LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery()
                 .eq(PointAttributeDO::getDriverId, driverId);
         List<PointAttributeDO> entityDO = wrapper.list();

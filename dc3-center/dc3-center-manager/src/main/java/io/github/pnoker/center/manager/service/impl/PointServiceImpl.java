@@ -38,6 +38,7 @@ import io.github.pnoker.center.manager.mapper.DriverMapper;
 import io.github.pnoker.center.manager.mapper.PointMapper;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.center.manager.service.ProfileBindService;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
@@ -384,7 +385,7 @@ public class PointServiceImpl implements PointService {
         wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getPointCode()), "dp.point_code", entityQuery.getPointTypeFlag());
         wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getPointTypeFlag()), "dp.point_type_flag", entityQuery.getPointTypeFlag());
         wrapper.eq(ObjectUtil.isNotNull(entityQuery.getRwFlag()), "dp.rw_flag", entityQuery.getRwFlag());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getProfileId()), "dp.profile_id", entityQuery.getProfileId());
+        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getProfileId()) && entityQuery.getProfileId() > DefaultConstant.DEFAULT_ZERO_VALUE, "dp.profile_id", entityQuery.getProfileId());
         wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
         wrapper.eq("dp.tenant_id", entityQuery.getTenantId());
         return wrapper.lambda();

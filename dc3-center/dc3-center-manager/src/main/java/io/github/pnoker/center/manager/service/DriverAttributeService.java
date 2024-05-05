@@ -23,7 +23,7 @@ import io.github.pnoker.common.base.service.BaseService;
 import java.util.List;
 
 /**
- * DriverAttribute Interface
+ * 驱动属性Interface
  *
  * @author pnoker
  * @since 2022.1.0
@@ -35,7 +35,7 @@ public interface DriverAttributeService extends BaseService<DriverAttributeBO, D
      * 根据 驱动ID 查询
      *
      * @param driverId 驱动ID
-     * @return DriverAttribute Array
+     * @return 驱动属性Array
      */
     List<DriverAttributeBO> selectByDriverId(Long driverId);
 

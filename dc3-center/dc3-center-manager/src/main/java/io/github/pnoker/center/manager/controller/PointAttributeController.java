@@ -137,12 +137,12 @@ public class PointAttributeController implements BaseController {
      * 根据 驱动ID 查询 PointAttribute
      *
      * @param id 位号属性ID
-     * @return PointAttribute Array
+     * @return 位号属性Array
      */
     @GetMapping("/driver_id/{id}")
     public R<List<PointAttributeVO>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            List<PointAttributeBO> entityBOS = pointAttributeService.selectByDriverId(id, true);
+            List<PointAttributeBO> entityBOS = pointAttributeService.selectByDriverId(id);
             List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOS);
             return R.ok(entityVO);
         } catch (NotFoundException ne) {

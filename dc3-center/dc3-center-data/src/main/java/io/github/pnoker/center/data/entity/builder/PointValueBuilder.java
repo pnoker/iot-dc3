@@ -19,6 +19,7 @@ package io.github.pnoker.center.data.entity.builder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.vo.PointValueVO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -30,7 +31,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface PointValueBuilder {
 
 

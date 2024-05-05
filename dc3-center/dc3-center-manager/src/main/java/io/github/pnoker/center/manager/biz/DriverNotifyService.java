@@ -28,7 +28,7 @@ import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 public interface DriverNotifyService {
 
     /**
-     * 通知驱动 新增模板(ADD) / 删除模板(DELETE) / 更新模板(UPDATE)
+     * 通知驱动 新增模版(ADD) / 删除模版(DELETE) / 更新模版(UPDATE)
      *
      * @param command   Operation Type
      * @param profileBO Profile

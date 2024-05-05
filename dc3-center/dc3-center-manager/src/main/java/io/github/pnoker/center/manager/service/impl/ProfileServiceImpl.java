@@ -84,7 +84,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         ProfileDO entityDO = profileBuilder.buildDOByBO(entityBO);
         if (!profileManager.save(entityDO)) {
-            throw new AddException("模板创建失败");
+            throw new AddException("模版创建失败");
         }
     }
 
@@ -93,11 +93,11 @@ public class ProfileServiceImpl implements ProfileService {
     public void remove(Long id) {
         ProfileDO entityDO = getDOById(id, true);
 
-        // 删除模板之前需要检查该模板是否存在关联
+        // 删除模版之前需要检查该模版是否存在关联
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("模板删除失败, 该模板下存在位号");
+            throw new AssociatedException("模版删除失败, 该模版下存在位号");
         }
 
         if (!profileManager.removeById(id)) {
@@ -117,7 +117,7 @@ public class ProfileServiceImpl implements ProfileService {
         ProfileDO entityDO = profileBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
         if (!profileManager.updateById(entityDO)) {
-            throw new UpdateException("模板更新失败");
+            throw new UpdateException("模版更新失败");
         }
 
         entityDO = profileManager.getById(entityDO.getId());
@@ -200,7 +200,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("模板重复");
+            throw new DuplicateException("模版重复");
         }
         return duplicate;
     }

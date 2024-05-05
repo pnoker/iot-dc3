@@ -199,7 +199,7 @@ public class DriverSyncServiceImpl implements DriverSyncService {
 
         Map<String, PointAttributeBO> oldPointAttributeMap = new HashMap<>(8);
         try {
-            List<PointAttributeBO> byDriverId = pointAttributeService.selectByDriverId(entityDO.getId(), true);
+            List<PointAttributeBO> byDriverId = pointAttributeService.selectByDriverId(entityDO.getId());
             byDriverId.forEach(pointAttribute -> oldPointAttributeMap.put(pointAttribute.getAttributeName(), pointAttribute));
         } catch (NotFoundException ignored) {
             // nothing to do
