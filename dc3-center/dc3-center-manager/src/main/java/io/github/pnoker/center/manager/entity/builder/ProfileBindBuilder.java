@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.ProfileBindBO;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.vo.ProfileBindVO;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -31,7 +32,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface ProfileBindBuilder {
 
     /**

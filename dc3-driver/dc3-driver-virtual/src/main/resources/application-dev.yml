@@ -32,6 +32,14 @@ spring:
     username: ${RABBITMQ_USERNAME:dc3}
     password: ${RABBITMQ_PASSWORD:dc3}
 
+grpc:
+  client:
+    dc3-center-manager:
+      address: 'static://dc3-center-manager:9400'
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
+
 logging:
   level:
     io.github.pnoker: DEBUG

@@ -18,9 +18,10 @@ package io.github.pnoker.center.data.entity.builder;
 
 import io.github.pnoker.center.data.entity.bo.DriverRunBO;
 import io.github.pnoker.center.data.entity.vo.DriverRunVO;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DriverDurationBuilder {
 
     DriverRunVO buildVOByBOList(DriverRunBO duration);

@@ -81,17 +81,17 @@ public class PointBO extends BaseBO {
     private String unit;
 
     /**
-     * 模板ID
+     * 模版ID
      */
     private Long profileId;
 
     /**
-     * 报警通知模板ID
+     * 报警通知模版ID
      */
     private Long alarmNotifyProfileId;
 
     /**
-     * 报警信息模板ID
+     * 报警信息模版ID
      */
     private Long alarmMessageProfileId;
 

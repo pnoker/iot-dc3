@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 模板-设备关联表
+ * 模版-设备关联表
  * </p>
  *
  * @author pnoker

@@ -34,7 +34,7 @@ import java.util.Set;
 public interface PointService extends BaseService<PointBO, PointQuery> {
 
     /**
-     * 根据 模板ID 查询位号
+     * 根据 模版ID 查询位号
      *
      * @param profileId 位号ID
      * @return Point Array

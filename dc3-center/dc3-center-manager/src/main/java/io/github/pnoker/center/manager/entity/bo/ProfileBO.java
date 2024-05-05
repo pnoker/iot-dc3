@@ -39,22 +39,22 @@ import lombok.Setter;
 public class ProfileBO extends BaseBO {
 
     /**
-     * 模板名称
+     * 模版名称
      */
     private String profileName;
 
     /**
-     * 模板编号
+     * 模版编号
      */
     private String profileCode;
 
     /**
-     * 模板共享类型标识
+     * 模版共享类型标识
      */
     private ProfileShareFlagEnum profileShareFlag;
 
     /**
-     * 模板类型标识
+     * 模版类型标识
      */
     private ProfileTypeFlagEnum profileTypeFlag;
 
@@ -64,7 +64,7 @@ public class ProfileBO extends BaseBO {
     private Long groupId;
 
     /**
-     * 模板拓展信息
+     * 模版拓展信息
      */
     private ProfileExt profileExt;
 

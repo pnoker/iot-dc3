@@ -144,12 +144,12 @@ public class DeviceServiceImpl implements DeviceService {
         Set<Long> newProfileIds = ObjectUtil.isNotNull(entityBO.getProfileIds()) ? entityBO.getProfileIds() : new HashSet<>(4);
         Set<Long> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityBO.getId());
 
-        // 新增的模板
+        // 新增的模版
         Set<Long> add = new HashSet<>(newProfileIds);
         add.removeAll(oldProfileIds);
         addProfileBind(entityDO, add);
 
-        // 删除的模板
+        // 删除的模版
         Set<Long> delete = new HashSet<>(oldProfileIds);
         delete.removeAll(newProfileIds);
         delete.forEach(profileId -> profileBindService.removeByDeviceIdAndProfileId(entityBO.getId(), profileId));
@@ -232,7 +232,9 @@ public class DeviceServiceImpl implements DeviceService {
             entityQuery.setPage(new Pages());
         }
         Page<DeviceDO> entityPageDO = deviceMapper.selectPageWithProfile(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery), entityQuery.getProfileId());
-        return deviceBuilder.buildBOPageByDOPage(entityPageDO);
+        Page<DeviceBO> entityPageBO = deviceBuilder.buildBOPageByDOPage(entityPageDO);
+        entityPageBO.getRecords().forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
+        return entityPageBO;
     }
 
     @Override
@@ -240,7 +242,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Transactional
     public void importDevice(DeviceBO entityBO, MultipartFile multipartFile) {
         List<DriverAttributeBO> driverAttributeBOS = driverAttributeService.selectByDriverId(entityBO.getDriverId());
-        List<PointAttributeBO> pointAttributeBOS = pointAttributeService.selectByDriverId(entityBO.getDriverId(), false);
+        List<PointAttributeBO> pointAttributeBOS = pointAttributeService.selectByDriverId(entityBO.getDriverId());
         List<PointBO> pointBOS = pointService.selectByProfileIds(entityBO.getProfileIds());
 
         Workbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
@@ -267,7 +269,7 @@ public class DeviceServiceImpl implements DeviceService {
     @SneakyThrows
     public Path generateImportTemplate(DeviceBO entityBO) {
         List<DriverAttributeBO> driverAttributeBOS = driverAttributeService.selectByDriverId(entityBO.getDriverId());
-        List<PointAttributeBO> pointAttributeBOS = pointAttributeService.selectByDriverId(entityBO.getDriverId(), false);
+        List<PointAttributeBO> pointAttributeBOS = pointAttributeService.selectByDriverId(entityBO.getDriverId());
         List<PointBO> pointBOS = pointService.selectByProfileIds(entityBO.getProfileIds());
 
         Workbook workbook = new XSSFWorkbook();
@@ -298,7 +300,7 @@ public class DeviceServiceImpl implements DeviceService {
         // 设置位号属性配置列
         configPointCell(driverAttributeBOS, pointAttributeBOS, pointBOS, mainSheet, titleRow, attributeRow, cellStyle);
 
-        // 生成设备导入模板
+        // 生成设备导入模版
         return generateTemplate(workbook);
     }
 
@@ -399,8 +401,8 @@ public class DeviceServiceImpl implements DeviceService {
     /**
      * 判断配置数据是否一致
      *
-     * @param driverAttributeBOS DriverAttribute Array
-     * @param pointAttributeBOS  PointAttribute Array
+     * @param driverAttributeBOS 驱动属性Array
+     * @param pointAttributeBOS  位号属性Array
      * @param pointBOS           Point Array
      * @param workbook           Workbook
      */
@@ -427,7 +429,7 @@ public class DeviceServiceImpl implements DeviceService {
     /**
      * 设置驱动属性配置列
      *
-     * @param driverAttributeBOS DriverAttribute Array
+     * @param driverAttributeBOS 驱动属性Array
      * @param mainSheet          Main Sheet
      * @param titleRow           Title Row
      * @param attributeRow       Attribute Row
@@ -448,8 +450,8 @@ public class DeviceServiceImpl implements DeviceService {
     /**
      * 设置配置工作表
      *
-     * @param driverAttributeBOS DriverAttribute Array
-     * @param pointAttributeBOS  PointAttribute Array
+     * @param driverAttributeBOS 驱动属性Array
+     * @param pointAttributeBOS  位号属性Array
      * @param pointBOS           Point Array
      * @param workbook           Workbook
      */
@@ -466,8 +468,8 @@ public class DeviceServiceImpl implements DeviceService {
     /**
      * 设置位号属性配置列
      *
-     * @param driverAttributeBOS DriverAttribute Array
-     * @param pointAttributeBOS  PointAttribute Array
+     * @param driverAttributeBOS 驱动属性Array
+     * @param pointAttributeBOS  位号属性Array
      * @param pointBOS           Point  Array
      * @param mainSheet          Main Sheet
      * @param titleRow           Title Row
@@ -492,7 +494,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * 生成设备导入模板
+     * 生成设备导入模版
      *
      * @param workbook Workbook
      * @return Path

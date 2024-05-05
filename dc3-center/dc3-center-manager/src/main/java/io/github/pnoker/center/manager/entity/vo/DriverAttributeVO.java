@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DriverAttribute VO
+ * 驱动属性VO
  *
  * @author pnoker
  * @since 2022.1.0

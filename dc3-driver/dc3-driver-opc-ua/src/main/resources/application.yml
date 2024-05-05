@@ -18,7 +18,7 @@ driver:
   tenant: default
   name: OpcUa驱动
   code: OpcUaDriver
-  type: DRIVER
+  type: DRIVER_CLIENT
   remark: @project.description@
   schedule:
     # 定时读数据

@@ -112,7 +112,7 @@ public class PointValueController implements BaseController {
     public R<List<String>> history(
             @Schema(description = "设备ID") @NotNull @PathVariable(name = "deviceId") Long deviceId,
             @Schema(description = "位号ID") @NotNull @PathVariable(name = "pointId") Long pointId,
-            @Schema(description = "历史数据量，最多500条") @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
+            @Schema(description = "历史数据量, 最多500条") @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         try {
             List<String> history = pointValueService.history(deviceId, pointId, count);
             return R.ok(history);

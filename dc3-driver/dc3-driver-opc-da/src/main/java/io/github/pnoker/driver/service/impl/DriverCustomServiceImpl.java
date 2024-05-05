@@ -20,7 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.driver.context.DriverContext;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
+import io.github.pnoker.common.entity.bo.AttributeBO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
@@ -70,7 +70,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     public void initial() {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        !!!
         你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
         */
         connectMap = new ConcurrentHashMap<>(16);
@@ -80,7 +79,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     public void schedule() {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        !!!
         上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
         - 在read中实现设备状态的判断；
         - 在自定义定时任务中实现设备状态的判断；
@@ -96,7 +94,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeConfigDTO> driverConfig, Map<String, AttributeConfigDTO> pointConfig, DeviceDTO device, PointDTO point) {
+    public String read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
@@ -105,7 +103,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeConfigDTO> driverConfig, Map<String, AttributeConfigDTO> pointConfig, DeviceDTO device, AttributeConfigDTO value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, AttributeBO value) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
@@ -120,7 +118,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverConfig 驱动信息
      * @return Server
      */
-    private Server getConnector(Long deviceId, Map<String, AttributeConfigDTO> driverConfig) {
+    private Server getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("Opc Da Server Connection Info {}", JsonUtil.toJsonString(driverConfig));
         Server server = connectMap.get(deviceId);
         if (ObjectUtil.isNull(server)) {
@@ -154,7 +152,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @throws DuplicateGroupException DuplicateGroupException
      * @throws AddFailedException      AddFailedException
      */
-    public Item getItem(Server server, Map<String, AttributeConfigDTO> pointConfig) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException, AddFailedException {
+    public Item getItem(Server server, Map<String, AttributeBO> pointConfig) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException, AddFailedException {
         Group group;
         String groupName = AttributeUtil.getAttributeValue(pointConfig.get("group"), String.class);
         try {
@@ -172,7 +170,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointConfig 位号信息
      * @return Item Value
      */
-    private String readValue(Server server, Map<String, AttributeConfigDTO> pointConfig) {
+    private String readValue(Server server, Map<String, AttributeBO> pointConfig) {
         try {
             Item item = getItem(server, pointConfig);
             return readItem(item);
@@ -227,7 +225,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param value       写入值
      * @return 是否写入
      */
-    private boolean writeValue(Server server, Map<String, AttributeConfigDTO> pointConfig, AttributeConfigDTO value) {
+    private boolean writeValue(Server server, Map<String, AttributeBO> pointConfig, AttributeBO value) {
         try {
             Item item = getItem(server, pointConfig);
             return writeItem(item, value);
@@ -246,7 +244,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param value 写入值
      * @throws JIException OpcDa JIException
      */
-    private boolean writeItem(Item item, AttributeConfigDTO value) throws JIException {
+    private boolean writeItem(Item item, AttributeBO value) throws JIException {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(value.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
             throw new UnSupportException("Unsupported type of " + value.getType());

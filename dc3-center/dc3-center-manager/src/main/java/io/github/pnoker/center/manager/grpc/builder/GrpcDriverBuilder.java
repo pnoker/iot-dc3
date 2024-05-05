@@ -16,36 +16,35 @@
 
 package io.github.pnoker.center.manager.grpc.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.GrpcPageDriverQuery;
 import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.ext.DriverExt;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.optional.EnableOptional;
-import io.github.pnoker.common.optional.IntegerOptional;
-import io.github.pnoker.common.optional.LongOptional;
-import io.github.pnoker.common.optional.StringOptional;
+import io.github.pnoker.common.optional.JsonOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.Optional;
 
 /**
- * Point Builder
+ * GrpcDriver Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public class GrpcDriverBuilder {
-
-    private GrpcDriverBuilder() {
-        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+public interface GrpcDriverBuilder {
 
     /**
      * Grpc Query to Query
@@ -53,25 +52,18 @@ public class GrpcDriverBuilder {
      * @param entityQuery GrpcPageDriverQuery
      * @return DriverQuery
      */
-    public static DriverQuery buildQueryByGrpcQuery(GrpcPageDriverQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery)) {
-            return null;
-        }
+    @Mapping(target = "page", ignore = true)
+    @Mapping(target = "driverTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    DriverQuery buildQueryByGrpcQuery(GrpcPageDriverQuery entityQuery);
 
-        DriverQuery query = new DriverQuery();
-        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityQuery.getPage());
-        query.setPage(pages);
+    @AfterMapping
+    default void afterProcess(GrpcPageDriverQuery entityGrpc, @MappingTarget DriverQuery.DriverQueryBuilder entityQuery) {
+        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
+        entityQuery.page(pages);
 
-        LongOptional.ofNullable(entityQuery.getTenantId()).ifPresent(query::setTenantId);
-        StringOptional.ofNullable(entityQuery.getDriverName()).ifPresent(query::setDriverName);
-        StringOptional.ofNullable(entityQuery.getDriverCode()).ifPresent(query::setDriverCode);
-        StringOptional.ofNullable(entityQuery.getServiceName()).ifPresent(query::setServiceName);
-        StringOptional.ofNullable(entityQuery.getServiceHost()).ifPresent(query::setServiceHost);
-        query.setDriverTypeFlag(DriverTypeFlagEnum.ofIndex((byte) entityQuery.getDriverTypeFlag()));
-        EnableOptional.ofNullable(entityQuery.getEnableFlag()).ifPresent(query::setEnableFlag);
-        IntegerOptional.ofNullable(entityQuery.getVersion()).ifPresent(query::setVersion);
-
-        return query;
+        Optional.ofNullable(DriverTypeFlagEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag())).ifPresent(entityQuery::driverTypeFlag);
+        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
     }
 
     /**
@@ -80,26 +72,38 @@ public class GrpcDriverBuilder {
      * @param entityBO DriverBO
      * @return GrpcDriverDTO
      */
-    public static GrpcDriverDTO buildGrpcDTOByBO(DriverBO entityBO) {
-        if (ObjectUtil.isNull(entityBO)) {
-            return null;
-        }
+    @Mapping(target = "driverExt", ignore = true)
+    @Mapping(target = "driverTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    GrpcDriverDTO buildGrpcDTOByBO(DriverBO entityBO);
 
-        GrpcDriverDTO.Builder builder = GrpcDriverDTO.newBuilder();
-        GrpcBase baseDTO = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
-        builder.setBase(baseDTO)
-                .setDriverName(entityBO.getDriverName())
-                .setDriverCode(entityBO.getDriverCode())
-                .setServiceName(entityBO.getServiceName())
-                .setServiceHost(entityBO.getServiceHost())
-                .setDriverExt(JsonUtil.toJsonString(entityBO.getDriverExt()))
-                .setSignature(entityBO.getSignature())
-                .setVersion(entityBO.getVersion())
-                .setTenantId(entityBO.getTenantId());
+    @AfterMapping
+    default void afterProcess(DriverBO entityBO, @MappingTarget GrpcDriverDTO.Builder entityGrpc) {
+        GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
+        entityGrpc.setBase(grpcBase);
 
-        Optional.ofNullable(entityBO.getDriverTypeFlag()).ifPresentOrElse(value -> builder.setDriverTypeFlag(value.getIndex()), () -> builder.setDriverTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE));
-        Optional.ofNullable(entityBO.getEnableFlag()).ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()), () -> builder.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE));
+        Optional.ofNullable(entityBO.getDriverExt()).ifPresent(value -> entityGrpc.setDriverExt(JsonUtil.toJsonString(value)));
+        Optional.ofNullable(entityBO.getDriverTypeFlag()).ifPresentOrElse(value -> entityGrpc.setDriverTypeFlag(value.getIndex()), () -> entityGrpc.setDriverTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE));
+        Optional.ofNullable(entityBO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE));
+    }
 
-        return builder.build();
+    /**
+     * Grpc DTO to BO
+     *
+     * @param entityGrpc GrpcDriverDTO
+     * @return DriverBO
+     */
+    @Mapping(target = "driverExt", ignore = true)
+    @Mapping(target = "driverTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    DriverBO buildBOByGrpcDTO(GrpcDriverDTO entityGrpc);
+
+    @AfterMapping
+    default void afterProcess(GrpcDriverDTO entityGrpc, @MappingTarget DriverBO entityBO) {
+        GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
+
+        JsonOptional.ofNullable(entityGrpc.getDriverExt()).ifPresent(value -> entityBO.setDriverExt(JsonUtil.parseObject(value, DriverExt.class)));
+        Optional.ofNullable(DriverTypeFlagEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag())).ifPresent(entityBO::setDriverTypeFlag);
+        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
     }
 }

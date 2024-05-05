@@ -41,7 +41,7 @@ public class TokenQuery {
      * 租户
      */
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
-            message = "无效租户编号")
+            message = "无效的租户编号")
     @Schema(description = "租户")
     private String tenant;
     /**

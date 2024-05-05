@@ -18,7 +18,7 @@ driver:
   tenant: default
   name: Lwm2m协议驱动
   code: Lwm2mDriver
-  type: DRIVER
+  type: DRIVER_SERVER
   remark: @project.description@
   custom:
     coap:

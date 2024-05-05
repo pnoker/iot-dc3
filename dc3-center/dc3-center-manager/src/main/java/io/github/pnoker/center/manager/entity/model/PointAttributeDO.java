@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 模板配置信息表
+ * 模版配置信息表
  * </p>
  *
  * @author pnoker

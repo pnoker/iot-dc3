@@ -156,7 +156,7 @@ public class DriverAttributeController implements BaseController {
     /**
      * 分页查询 DriverAttribute
      *
-     * @param entityQuery DriverAttribute Dto
+     * @param entityQuery 驱动属性Dto
      * @return Page Of DriverAttribute
      */
     @PostMapping("/list")

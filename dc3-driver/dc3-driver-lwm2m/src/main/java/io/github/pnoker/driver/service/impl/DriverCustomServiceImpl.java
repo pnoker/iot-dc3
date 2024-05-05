@@ -18,7 +18,7 @@ package io.github.pnoker.driver.service.impl;
 
 import com.mchange.v2.lang.StringUtils;
 import io.github.pnoker.common.driver.service.DriverCustomService;
-import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
+import io.github.pnoker.common.entity.bo.AttributeBO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.utils.AttributeUtil;
@@ -45,7 +45,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     public void initial() {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        !!!
         你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
         */
         lwm2mServer.startServer();
@@ -55,7 +54,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     public void schedule() {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        !!!
         上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
         - 在read中实现设备状态的判断；
         - 在自定义定时任务中实现设备状态的判断；
@@ -79,13 +77,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return
      */
     @Override
-    public String read(Map<String, AttributeConfigDTO> driverConfig, Map<String, AttributeConfigDTO> pointConfig, DeviceDTO device, PointDTO point) {
+    public String read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
 
         可以主动读取,也可以订阅资源
          */
-        AttributeConfigDTO messageUpAttribute = pointConfig.get("messageUp");
+        AttributeBO messageUpAttribute = pointConfig.get("messageUp");
         return lwm2mServer.readValueByPath(String.valueOf(device.getId()), AttributeUtil.getAttributeValue(messageUpAttribute, String.class));
     }
 
@@ -101,17 +99,17 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return
      */
     @Override
-    public Boolean write(Map<String, AttributeConfigDTO> driverConfig, Map<String, AttributeConfigDTO> pointConfig, DeviceDTO device, AttributeConfigDTO value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, AttributeBO value) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
-        AttributeConfigDTO execDownAttribute = pointConfig.get("execDown");
+        AttributeBO execDownAttribute = pointConfig.get("execDown");
         String execDownValue = AttributeUtil.getAttributeValue(execDownAttribute, String.class);
         if (StringUtils.nonEmptyString(execDownValue)) {
             //执行函数
             return lwm2mServer.execute(String.valueOf(device.getId()), execDownValue, value.getValue());
         }
-        AttributeConfigDTO messageDownAttribute = pointConfig.get("messageDown");
+        AttributeBO messageDownAttribute = pointConfig.get("messageDown");
         String messageDownValue = AttributeUtil.getAttributeValue(messageDownAttribute, String.class);
         return lwm2mServer.writeValueByPath(String.valueOf(device.getId()), messageDownValue, value.getValue(), false);
     }

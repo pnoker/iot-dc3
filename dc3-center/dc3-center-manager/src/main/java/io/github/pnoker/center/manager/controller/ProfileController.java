@@ -42,14 +42,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 模板 Controller
+ * 模版 Controller
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-模板")
+@Tag(name = "接口-模版")
 @RequestMapping(ManagerConstant.PROFILE_URL_PREFIX)
 public class ProfileController implements BaseController {
 
@@ -68,7 +68,7 @@ public class ProfileController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    @Operation(summary = "新增-模板")
+    @Operation(summary = "新增-模版")
     public R<String> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
         try {
             ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
@@ -137,7 +137,7 @@ public class ProfileController implements BaseController {
     /**
      * 根据 ID 集合查询 Profile
      *
-     * @param profileIds 模板ID集
+     * @param profileIds 模版ID集
      * @return Map(ID, ProfileVO)
      */
     @PostMapping("/ids")

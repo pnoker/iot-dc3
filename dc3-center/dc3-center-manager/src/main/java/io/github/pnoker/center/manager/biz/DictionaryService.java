@@ -37,7 +37,7 @@ public interface DictionaryService {
     Page<DictionaryBO> driverDictionary(DictionaryQuery entityQuery);
 
     /**
-     * 获取模板字典带分页的列表
+     * 获取模版字典带分页的列表
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return DictionaryBO Page
@@ -45,7 +45,7 @@ public interface DictionaryService {
     Page<DictionaryBO> profileDictionary(DictionaryQuery entityQuery);
 
     /**
-     * 获取模板下位号字典带分页的列表
+     * 获取模版下位号字典带分页的列表
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return DictionaryBO Page

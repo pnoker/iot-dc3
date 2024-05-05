@@ -30,7 +30,7 @@ import com.serotonin.modbus4j.msg.WriteCoilResponse;
 import io.github.pnoker.common.driver.context.DriverContext;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
+import io.github.pnoker.common.entity.bo.AttributeBO;
 import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
@@ -75,7 +75,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     public void initial() {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        !!!
         你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
         */
         connectMap = new ConcurrentHashMap<>(16);
@@ -85,7 +84,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     public void schedule() {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        !!!
         上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
         - 在read中实现设备状态的判断；
         - 在自定义定时任务中实现设备状态的判断；
@@ -101,7 +99,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeConfigDTO> driverConfig, Map<String, AttributeConfigDTO> pointConfig, DeviceDTO device, PointDTO point) {
+    public String read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         */
@@ -110,7 +108,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeConfigDTO> driverConfig, Map<String, AttributeConfigDTO> pointConfig, DeviceDTO device, AttributeConfigDTO value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, AttributeBO value) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         */
@@ -125,13 +123,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param driverConfig 驱动信息
      * @return ModbusMaster
      */
-    private ModbusMaster getConnector(Long deviceId, Map<String, AttributeConfigDTO> driverConfig) {
+    private ModbusMaster getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("Modbus Tcp Connection Info: {}", JsonUtil.toJsonString(driverConfig));
         ModbusMaster modbusMaster = connectMap.get(deviceId);
         if (ObjectUtil.isNull(modbusMaster)) {
             IpParameters params = new IpParameters();
-            AttributeConfigDTO hostAttribute = driverConfig.get("host");
-            AttributeConfigDTO portAttribute = driverConfig.get("port");
+            AttributeBO hostAttribute = driverConfig.get("host");
+            AttributeBO portAttribute = driverConfig.get("port");
             params.setHost(AttributeUtil.getAttributeValue(hostAttribute, String.class));
             params.setPort(AttributeUtil.getAttributeValue(portAttribute, Integer.class));
             modbusMaster = modbusFactory.createTcpMaster(params, true);
@@ -155,7 +153,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param type         Value Type
      * @return R of String Value
      */
-    private String readValue(ModbusMaster modbusMaster, Map<String, AttributeConfigDTO> pointConfig, String type) {
+    private String readValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, String type) {
         int slaveId = AttributeUtil.getAttributeValue(pointConfig.get("slaveId"), Integer.class);
         int functionCode = AttributeUtil.getAttributeValue(pointConfig.get("functionCode"), Integer.class);
         int offset = AttributeUtil.getAttributeValue(pointConfig.get("offset"), Integer.class);
@@ -206,7 +204,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param value        Value
      * @return Write Result
      */
-    private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeConfigDTO> pointConfig, AttributeConfigDTO value) {
+    private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, AttributeBO value) {
         int slaveId = AttributeUtil.getAttributeValue(pointConfig.get("slaveId"), Integer.class);
         int functionCode = AttributeUtil.getAttributeValue(pointConfig.get("functionCode"), Integer.class);
         int offset = AttributeUtil.getAttributeValue(pointConfig.get("offset"), Integer.class);
@@ -260,7 +258,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param value        写入值
      * @return WriteCoilResponse
      */
-    private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, AttributeConfigDTO value) {
+    private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, AttributeBO value) {
         try {
             WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, AttributeUtil.getAttributeValue(value, Boolean.class));
             return (WriteCoilResponse) modbusMaster.send(coilRequest);
@@ -278,7 +276,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param value        写入值
      * @param <T>          类型
      */
-    private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, AttributeConfigDTO value) {
+    private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, AttributeBO value) {
         try {
             modbusMaster.setValue(locator, AttributeUtil.getAttributeValue(value, Float.class));
         } catch (ModbusTransportException | ErrorResponseException e) {

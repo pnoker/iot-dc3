@@ -157,7 +157,7 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 根据 模板 ID 查询 Point
+     * 根据 模版 ID 查询 Point
      *
      * @param profileId 位号ID
      * @return Point Array

@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.center.auth.entity.model.RoleResourceBindDO;
 import io.github.pnoker.center.auth.entity.vo.RoleResourceBindVO;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -31,7 +32,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface RoleResourceBindBuilder {
 
     /**

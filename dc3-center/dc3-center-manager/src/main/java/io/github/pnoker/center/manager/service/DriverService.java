@@ -59,7 +59,7 @@ public interface DriverService extends BaseService<DriverBO, DriverQuery> {
     /**
      * 根据 驱动ID集 查询 驱动集
      *
-     * @param ids Driver ID Array
+     * @param ids 驱动ID Array
      * @return Driver Array
      */
     List<DriverBO> selectByIds(Set<Long> ids);

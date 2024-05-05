@@ -26,7 +26,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * PointAttribute Query
+ * 位号属性Query
  *
  * @author pnoker
  * @since 2022.1.0

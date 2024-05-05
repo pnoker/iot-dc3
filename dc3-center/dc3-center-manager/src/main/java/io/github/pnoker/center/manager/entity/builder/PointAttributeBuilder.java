@@ -27,6 +27,7 @@ import io.github.pnoker.common.entity.ext.PointAttributeExt;
 import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -36,12 +37,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * PointAttribute Builder
+ * 位号属性Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface PointAttributeBuilder {
 
     /**

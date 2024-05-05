@@ -98,19 +98,19 @@ public class PointDO implements Serializable {
     private String unit;
 
     /**
-     * 模板ID
+     * 模版ID
      */
     @TableField("profile_id")
     private Long profileId;
 
     /**
-     * 报警通知模板ID
+     * 报警通知模版ID
      */
     @TableField("alarm_notify_profile_id")
     private Long alarmNotifyProfileId;
 
     /**
-     * 报警信息模板ID
+     * 报警信息模版ID
      */
     @TableField("alarm_message_profile_id")
     private Long alarmMessageProfileId;
