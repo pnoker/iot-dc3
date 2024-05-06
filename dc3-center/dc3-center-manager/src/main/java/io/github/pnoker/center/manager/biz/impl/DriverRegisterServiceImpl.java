@@ -79,7 +79,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     public DriverBO registerDriver(GrpcDriverRegisterDTO entityGrpc) {
         GrpcRTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(entityGrpc.getTenant()).build());
         if (!rTenantDTO.getResult().getOk()) {
-            throw new ServiceException("租户({})信息无效: {}", entityGrpc.getTenant(), rTenantDTO.getResult().getMessage());
+            throw new ServiceException("租户[{}]信息无效: {}", entityGrpc.getTenant(), rTenantDTO.getResult().getMessage());
         }
 
         DriverBO driverBO = grpcDriverBuilder.buildBOByGrpcDTO(entityGrpc.getDriver());

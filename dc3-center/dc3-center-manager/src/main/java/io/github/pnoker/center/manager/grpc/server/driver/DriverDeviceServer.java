@@ -42,9 +42,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Device Api
@@ -103,7 +100,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             pageBuilder.setTotal(devicePage.getTotal());
             pageDeviceBuilder.setPage(pageBuilder);
 
-            List<GrpcRDeviceAttachDTO> collect = devicePage.getRecords().stream().map(entityBO -> getDeviceAttrichDTO(entityBO).build()).toList();
+            List<GrpcRDeviceAttachDTO> collect = devicePage.getRecords().stream().map(entityBO -> getDeviceAttachDTO(entityBO).build()).toList();
             pageDeviceBuilder.addAllData(collect);
 
             builder.setData(pageDeviceBuilder);
@@ -129,7 +126,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcRDeviceAttachDTO.Builder dBuilder = getDeviceAttrichDTO(entityBO);
+            GrpcRDeviceAttachDTO.Builder dBuilder = getDeviceAttachDTO(entityBO);
 
             builder.setData(dBuilder);
         }
@@ -139,7 +136,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         responseObserver.onCompleted();
     }
 
-    private GrpcRDeviceAttachDTO.Builder getDeviceAttrichDTO(DeviceBO entityBO) {
+    private GrpcRDeviceAttachDTO.Builder getDeviceAttachDTO(DeviceBO entityBO) {
         GrpcRDeviceAttachDTO.Builder dBuilder = GrpcRDeviceAttachDTO.newBuilder();
         GrpcDeviceDTO deviceDTO = grpcDeviceBuilder.buildGrpcDTOByBO(entityBO);
         dBuilder.setDevice(deviceDTO);
@@ -149,14 +146,14 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         CollectionOptional.ofNullable(pointBOS).ifPresent(list -> dBuilder.addAllPointIds(list.stream().map(PointBO::getId).toList()));
 
         List<DriverAttributeConfigBO> driverAttributeConfigBOS = driverAttributeConfigService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(driverAttributeConfigBOS).ifPresent(list -> dBuilder.putAllDriverConfigMap(list.stream()
+        CollectionOptional.ofNullable(driverAttributeConfigBOS).ifPresent(list -> dBuilder.addAllDriverConfigs(list.stream()
                 .map(grpcDriverAttributeConfigBuilder::buildGrpcDTOByBO)
-                .collect(Collectors.toMap(entity -> Objects.requireNonNull(entity).getDriverAttributeId(), Function.identity()))));
+                .toList()));
 
         List<PointAttributeConfigBO> pointAttributeConfigBOS = pointAttributeConfigService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(pointAttributeConfigBOS).ifPresent(list -> dBuilder.putAllPointConfigMap(list.stream()
+        CollectionOptional.ofNullable(pointAttributeConfigBOS).ifPresent(list -> dBuilder.addAllPointConfigs(list.stream()
                 .map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO)
-                .collect(Collectors.toMap(entity -> Objects.requireNonNull(entity).getPointAttributeId(), Function.identity()))));
+                .toList()));
         return dBuilder;
     }
 }
