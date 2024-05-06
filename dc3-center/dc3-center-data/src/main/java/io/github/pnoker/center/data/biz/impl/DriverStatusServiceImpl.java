@@ -206,7 +206,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     /**
      * Get status map
      *
-     * @param drivers DriverDTO Array
+     * @param drivers GrpcDriverDTO Array
      * @return Status Map
      */
     private Map<Long, String> getStatusMap(List<GrpcDriverDTO> drivers) {

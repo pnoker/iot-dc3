@@ -166,7 +166,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     /**
      * Get status map
      *
-     * @param devices DeviceDTO Array
+     * @param devices GrpcDeviceDTO Array
      * @return Status Map
      */
     private Map<Long, String> getStatusMap(List<GrpcDeviceDTO> devices) {

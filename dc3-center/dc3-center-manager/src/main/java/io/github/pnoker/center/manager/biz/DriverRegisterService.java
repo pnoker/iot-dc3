@@ -41,7 +41,7 @@ public interface DriverRegisterService {
     /**
      * 注册驱动属性
      *
-     * @param entityGrpc DriverRegisterDTO
+     * @param entityGrpc GrpcDriverRegisterDTO
      * @param entityBO   DriverBO
      */
     List<DriverAttributeBO> registerDriverAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
@@ -49,7 +49,7 @@ public interface DriverRegisterService {
     /**
      * 注册位号属性
      *
-     * @param entityGrpc DriverRegisterDTO
+     * @param entityGrpc GrpcDriverRegisterDTO
      * @param entityBO   DriverBO
      */
     List<PointAttributeBO> registerPointAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);

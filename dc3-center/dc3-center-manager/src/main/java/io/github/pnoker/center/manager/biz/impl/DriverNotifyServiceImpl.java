@@ -130,7 +130,7 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
      * notify driver
      *
      * @param entityDO  Driver
-     * @param entityDTO DriverMetadataDTO
+     * @param entityDTO DriverTransferMetadataDTO
      */
     private void notifyDriver(DriverBO entityDO, DriverTransferMetadataDTO entityDTO) {
         log.info("Notify driver[{}]: {}", entityDO.getServiceName(), entityDTO);

@@ -23,7 +23,6 @@ import io.github.pnoker.center.manager.entity.bo.DeviceByPointBO;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.vo.DeviceByPointVO;
 import io.github.pnoker.center.manager.entity.vo.DeviceVO;
-import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.ext.DeviceExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -152,22 +151,6 @@ public interface DeviceBuilder {
      * @return EntityVO Array
      */
     List<DeviceVO> buildVOListByBOList(List<DeviceBO> entityBOList);
-
-    /**
-     * BO to DTO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDTO
-     */
-    DeviceDTO buildDTOByBO(DeviceBO entityBO);
-
-    /**
-     * BOList to DTOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDTO Array
-     */
-    List<DeviceDTO> buildDTOListByBOList(List<DeviceBO> entityBOList);
 
     /**
      * DOPage to BOPage
