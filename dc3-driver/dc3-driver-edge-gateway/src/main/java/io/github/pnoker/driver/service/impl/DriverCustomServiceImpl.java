@@ -17,14 +17,14 @@
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.driver.context.DriverContext;
+import io.github.pnoker.common.driver.entity.bean.RWPointValue;
 import io.github.pnoker.common.driver.entity.dto.DeviceDTO;
 import io.github.pnoker.common.driver.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.bo.AttributeBO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
-import io.github.pnoker.common.utils.AttributeUtil;
 import io.github.pnoker.driver.service.MqttSendService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
-    private DriverContext driverContext;
+    private DeviceMetadata deviceMetadata;
     @Resource
     private DriverSenderService driverSenderService;
     @Resource
@@ -72,7 +72,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         - MAINTAIN:维护
         - FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+        deviceMetadata.getAllDevice().forEach(device -> driverSenderService.deviceStatusSender(device.getId(), DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
     @Override
@@ -87,16 +87,16 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, AttributeBO values) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point, RWPointValue values) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
         AttributeBO commandTopicAttribute = pointConfig.get("commandTopic");
-        String commandTopic = AttributeUtil.getAttributeValue(commandTopicAttribute, String.class);
+        String commandTopic = commandTopicAttribute.getAttributeValue(String.class);
         String value = values.getValue();
         try {
             AttributeBO commandQosAttribute = pointConfig.get("commandQos");
-            int commandQos = AttributeUtil.getAttributeValue(commandQosAttribute, Integer.class);
+            int commandQos = commandQosAttribute.getAttributeValue(Integer.class);
             mqttSendService.sendToMqtt(commandTopic, commandQos, value);
         } catch (Exception e) {
             mqttSendService.sendToMqtt(commandTopic, value);

@@ -16,7 +16,7 @@
 
 package io.github.pnoker.driver.service.netty;
 
-import io.github.pnoker.common.driver.context.DriverContext;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -36,7 +36,7 @@ public class NettyServerHandler {
     @Resource
     private DriverSenderService driverSenderService;
     @Resource
-    private DriverContext driverContext;
+    private DeviceMetadata deviceMetadata;
 
     public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
         log.info("1.{}->\n{}", context.channel().remoteAddress(), ByteBufUtil.prettyHexDump(byteBuf));

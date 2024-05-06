@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.data.biz.impl;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
@@ -99,7 +100,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         GrpcRPageDriverDTO rPageDriverDTO = driverApiBlockingStub.list(query.build());
 
         if (!rPageDriverDTO.getResult().getOk()) {
-            return new HashMap<>();
+            return MapUtil.empty();
         }
 
         List<GrpcDriverDTO> drivers = rPageDriverDTO.getData().getDataList();

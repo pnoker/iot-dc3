@@ -35,10 +35,10 @@
 
 ```yaml
 schedule:
-    # 定时读数据
-    read:
-      enable: true
-      cron: '0/30 * * * * ?'
+  # 定时读数据
+  read:
+    enable: true
+    cron: '0/30 * * * * ?'
 ```
 
 ## 接口测试

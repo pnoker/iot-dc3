@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.data.biz.impl;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
@@ -88,7 +89,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.list(query.build());
 
         if (!rPageDeviceDTO.getResult().getOk()) {
-            return new HashMap<>();
+            return MapUtil.empty();
         }
 
         List<GrpcDeviceDTO> devices = rPageDeviceDTO.getData().getDataList();
@@ -102,7 +103,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
                 .build();
         GrpcRDeviceListDTO rDeviceListDTO = deviceApiBlockingStub.selectByProfileId(query);
         if (!rDeviceListDTO.getResult().getOk()) {
-            return new HashMap<>();
+            return MapUtil.empty();
         }
 
         List<GrpcDeviceDTO> devices = rDeviceListDTO.getDataList();

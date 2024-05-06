@@ -55,7 +55,7 @@ public interface DriverNotifyService {
      * 通知驱动 新增驱动配置(ADD) / 删除驱动配置(DELETE) / 更新驱动配置(UPDATE)
      *
      * @param command                 Operation Type
-     * @param driverAttributeConfigBO Driver Attribute Config
+     * @param driverAttributeConfigBO 驱动属性配置
      */
     void notifyDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfigBO driverAttributeConfigBO);
 

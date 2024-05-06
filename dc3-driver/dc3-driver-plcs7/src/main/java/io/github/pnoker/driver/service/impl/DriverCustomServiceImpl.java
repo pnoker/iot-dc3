@@ -18,9 +18,10 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.driver.context.DriverContext;
+import io.github.pnoker.common.driver.entity.bean.RWPointValue;
 import io.github.pnoker.common.driver.entity.dto.DeviceDTO;
 import io.github.pnoker.common.driver.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.bo.AttributeBO;
@@ -28,7 +29,6 @@ import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.UnSupportException;
-import io.github.pnoker.common.utils.AttributeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.driver.api.S7Connector;
 import io.github.pnoker.driver.api.S7Serializer;
@@ -58,7 +58,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
-    private DriverContext driverContext;
+    private DeviceMetadata deviceMetadata;
     @Resource
     private DriverSenderService driverSenderService;
 
@@ -101,7 +101,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         - MAINTAIN:维护
         - FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+        deviceMetadata.getAllDevice().forEach(device -> driverSenderService.deviceStatusSender(device.getId(), DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
     @Override
@@ -126,7 +126,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, AttributeBO value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point, RWPointValue value) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
@@ -163,8 +163,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
             log.debug("Plc S7 Connection Info {}", JsonUtil.toJsonString(driverConfig));
             try {
                 S7Connector s7Connector = S7ConnectorFactory.buildTCPConnector()
-                        .withHost(AttributeUtil.getAttributeValue(driverConfig.get("host"), String.class))
-                        .withPort(AttributeUtil.getAttributeValue(driverConfig.get("port"), Integer.class))
+                        .withHost(driverConfig.get("host").getAttributeValue(String.class))
+                        .withPort(driverConfig.get("port").getAttributeValue(Integer.class))
                         .build();
                 myS7Connector.setLock(new ReentrantReadWriteLock());
                 myS7Connector.setConnector(s7Connector);
@@ -185,10 +185,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private PlcS7PointVariable getPointVariable(Map<String, AttributeBO> pointConfig, String type) {
         log.debug("Plc S7 Point Attribute Config {}", JsonUtil.toJsonString(pointConfig));
         return new PlcS7PointVariable(
-                AttributeUtil.getAttributeValue(pointConfig.get("dbNum"), Integer.class),
-                AttributeUtil.getAttributeValue(pointConfig.get("byteOffset"), Integer.class),
-                AttributeUtil.getAttributeValue(pointConfig.get("bitOffset"), Integer.class),
-                AttributeUtil.getAttributeValue(pointConfig.get("blockSize"), Integer.class),
+                pointConfig.get("dbNum").getAttributeValue(Integer.class),
+                pointConfig.get("byteOffset").getAttributeValue(Integer.class),
+                pointConfig.get("bitOffset").getAttributeValue(Integer.class),
+                pointConfig.get("blockSize").getAttributeValue(Integer.class),
                 type);
     }
 
@@ -209,23 +209,23 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
         switch (valueType) {
             case INT:
-                int intValue = AttributeUtil.getAttributeValue(attributeConfig, Integer.class);
+                int intValue = attributeConfig.getAttributeValue(Integer.class);
                 serializer.store(intValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             case LONG:
-                long longValue = AttributeUtil.getAttributeValue(attributeConfig, Long.class);
+                long longValue = attributeConfig.getAttributeValue(Long.class);
                 serializer.store(longValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             case FLOAT:
-                float floatValue = AttributeUtil.getAttributeValue(attributeConfig, Float.class);
+                float floatValue = attributeConfig.getAttributeValue(Float.class);
                 serializer.store(floatValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             case DOUBLE:
-                double doubleValue = AttributeUtil.getAttributeValue(attributeConfig, Double.class);
+                double doubleValue = attributeConfig.getAttributeValue(Double.class);
                 serializer.store(doubleValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             case BOOLEAN:
-                boolean booleanValue = AttributeUtil.getAttributeValue(attributeConfig, Boolean.class);
+                boolean booleanValue = attributeConfig.getAttributeValue(Boolean.class);
                 serializer.store(booleanValue, plcS7PointVariable.getDbNum(), plcS7PointVariable.getByteOffset());
                 break;
             case STRING:
