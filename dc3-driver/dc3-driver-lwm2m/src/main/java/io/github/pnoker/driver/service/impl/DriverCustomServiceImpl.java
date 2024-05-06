@@ -17,10 +17,10 @@
 package io.github.pnoker.driver.service.impl;
 
 import com.mchange.v2.lang.StringUtils;
+import io.github.pnoker.common.driver.entity.dto.DeviceDTO;
+import io.github.pnoker.common.driver.entity.dto.PointDTO;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.entity.bo.AttributeBO;
-import io.github.pnoker.common.entity.dto.DeviceDTO;
-import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.utils.AttributeUtil;
 import io.github.pnoker.driver.server.Lwm2mServer;
 import jakarta.annotation.Resource;
