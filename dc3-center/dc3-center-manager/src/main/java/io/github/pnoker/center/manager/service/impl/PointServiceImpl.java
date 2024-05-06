@@ -358,7 +358,7 @@ public class PointServiceImpl implements PointService {
         result.setDriverName(driverDO.getDriverName());
         List<Long> zero = Collections.nCopies(7, 0L);
         ArrayList<Long> zeroList = new ArrayList<>(zero);
-        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(7);
+        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(6);
         QueryWrapper<PointDataVolumeRunDO> wrapper = new QueryWrapper<>();
         wrapper.select("sum(total) as total");
         List<PointDataVolumeRunDO> pointDataVolumeRunDOS = pointDataVolumeRunManager.list(wrapper.lambda()
