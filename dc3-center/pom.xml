@@ -39,8 +39,12 @@
         <developer>
             <id>pnoker</id>
             <name>pnoker</name>
-            <email>pnokers@icloud.com</email>
+            <email>pnokers@gmail.com</email>
+            <roles>
+                <role>PMC</role>
+            </roles>
             <organization>pnoker.github.io</organization>
+            <url>https://github.com/pnoker/iot-dc3</url>
         </developer>
     </developers>
 
