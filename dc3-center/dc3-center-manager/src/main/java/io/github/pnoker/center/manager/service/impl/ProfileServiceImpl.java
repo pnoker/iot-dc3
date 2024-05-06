@@ -24,7 +24,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.dal.PointManager;
 import io.github.pnoker.center.manager.dal.ProfileBindManager;
 import io.github.pnoker.center.manager.dal.ProfileManager;
@@ -38,7 +37,6 @@ import io.github.pnoker.center.manager.mapper.ProfileMapper;
 import io.github.pnoker.center.manager.service.ProfileService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
@@ -75,9 +73,6 @@ public class ProfileServiceImpl implements ProfileService {
     @Resource
     private ProfileMapper profileMapper;
 
-    @Resource
-    private DriverNotifyService driverNotifyService;
-
     @Override
     public void save(ProfileBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -103,9 +98,6 @@ public class ProfileServiceImpl implements ProfileService {
         if (!profileManager.removeById(id)) {
             throw new DeleteException("The profile delete failed");
         }
-
-        ProfileBO entityBO = profileBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyProfile(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     @Override
@@ -119,10 +111,6 @@ public class ProfileServiceImpl implements ProfileService {
         if (!profileManager.updateById(entityDO)) {
             throw new UpdateException("模版更新失败");
         }
-
-        entityDO = profileManager.getById(entityDO.getId());
-        entityBO = profileBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyProfile(MetadataCommandTypeEnum.UPDATE, entityBO);
     }
 
     @Override

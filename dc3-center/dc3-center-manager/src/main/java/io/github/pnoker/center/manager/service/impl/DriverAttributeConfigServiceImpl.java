@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.dal.DriverAttributeConfigManager;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.builder.DriverAttributeConfigBuilder;
@@ -30,7 +29,6 @@ import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
@@ -55,9 +53,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     @Resource
     private DriverAttributeConfigManager driverAttributeConfigManager;
 
-    @Resource
-    private DriverNotifyService driverNotifyService;
-
     @Override
     public void save(DriverAttributeConfigBO entityBO) {
         checkDuplicate(entityBO, false, true);
@@ -66,11 +61,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         if (!driverAttributeConfigManager.save(entityDO)) {
             throw new AddException("驱动属性配置创建失败");
         }
-
-        // 通知驱动新增
-        entityDO = driverAttributeConfigManager.getById(entityDO.getId());
-        entityBO = driverAttributeConfigBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyDriverAttributeConfig(MetadataCommandTypeEnum.ADD, entityBO);
     }
 
     @Override
@@ -80,9 +70,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         if (!driverAttributeConfigManager.removeById(id)) {
             throw new DeleteException("驱动属性配置删除失败");
         }
-
-        DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyDriverAttributeConfig(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     @Override
@@ -96,10 +83,6 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         if (!driverAttributeConfigManager.updateById(entityDO)) {
             throw new UpdateException("驱动属性配置更新失败");
         }
-
-        entityDO = driverAttributeConfigManager.getById(entityDO.getId());
-        entityBO = driverAttributeConfigBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyDriverAttributeConfig(MetadataCommandTypeEnum.UPDATE, entityBO);
     }
 
     @Override

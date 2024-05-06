@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
@@ -32,7 +31,6 @@ import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
@@ -61,8 +59,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Resource
     private PointService pointService;
-    @Resource
-    private DriverNotifyService driverNotifyService;
 
     @Override
     public void save(PointAttributeConfigBO entityBO) {
@@ -72,11 +68,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         if (!pointAttributeConfigManager.save(entityDO)) {
             throw new AddException("位号属性配置创建失败");
         }
-
-        // 通知驱动新增
-        entityDO = pointAttributeConfigManager.getById(entityDO.getId());
-        entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.ADD, entityBO);
     }
 
     @Override
@@ -86,9 +77,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         if (!pointAttributeConfigManager.removeById(id)) {
             throw new DeleteException("位号属性配置删除失败");
         }
-
-        PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.DELETE, entityBO);
     }
 
     @Override
@@ -102,10 +90,6 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         if (!pointAttributeConfigManager.updateById(entityDO)) {
             throw new UpdateException("位号属性配置更新失败");
         }
-
-        entityDO = pointAttributeConfigManager.getById(entityDO.getId());
-        entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.UPDATE, entityBO);
     }
 
     @Override
