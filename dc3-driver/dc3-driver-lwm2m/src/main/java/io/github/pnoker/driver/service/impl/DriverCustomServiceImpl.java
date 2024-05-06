@@ -17,17 +17,21 @@
 package io.github.pnoker.driver.service.impl;
 
 import com.mchange.v2.lang.StringUtils;
+import io.github.pnoker.common.driver.entity.bean.RWPointValue;
 import io.github.pnoker.common.driver.entity.dto.DeviceDTO;
 import io.github.pnoker.common.driver.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
+import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.bo.AttributeBO;
-import io.github.pnoker.common.utils.AttributeUtil;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.driver.server.Lwm2mServer;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -38,8 +42,12 @@ import java.util.Map;
 public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
-    private Lwm2mServer lwm2mServer;
+    private DeviceMetadata deviceMetadata;
 
+    @Resource
+    private Lwm2mServer lwm2mServer;
+    @Resource
+    private DriverSenderService driverSenderService;
 
     @Override
     public void initial() {
@@ -65,17 +73,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         - MAINTAIN:维护
         - FAULT:故障
          */
+        deviceMetadata.getAllDevice().forEach(device -> driverSenderService.deviceStatusSender(device.getId(), DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
-    /**
-     * 读取值 or 订阅
-     *
-     * @param driverConfig Driver Attribute Config
-     * @param pointConfig  Point Attribute Config
-     * @param device       Device
-     * @param point        Point
-     * @return
-     */
     @Override
     public String read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point) {
         /*
@@ -84,33 +84,22 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         可以主动读取,也可以订阅资源
          */
         AttributeBO messageUpAttribute = pointConfig.get("messageUp");
-        return lwm2mServer.readValueByPath(String.valueOf(device.getId()), AttributeUtil.getAttributeValue(messageUpAttribute, String.class));
+        return lwm2mServer.readValueByPath(String.valueOf(device.getId()), messageUpAttribute.getAttributeValue(String.class));
     }
 
-    /**
-     * 写入值 or 执行函数
-     * <p>
-     * 注意配置只写位号时,只可以配消息下行或命令下行其中一个
-     *
-     * @param driverConfig Driver Attribute Config
-     * @param pointConfig  Point Attribute Config
-     * @param device       Device
-     * @param value        Value Attribute Config
-     * @return
-     */
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, AttributeBO value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point, RWPointValue value) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
         AttributeBO execDownAttribute = pointConfig.get("execDown");
-        String execDownValue = AttributeUtil.getAttributeValue(execDownAttribute, String.class);
+        String execDownValue = execDownAttribute.getAttributeValue(String.class);
         if (StringUtils.nonEmptyString(execDownValue)) {
             //执行函数
             return lwm2mServer.execute(String.valueOf(device.getId()), execDownValue, value.getValue());
         }
         AttributeBO messageDownAttribute = pointConfig.get("messageDown");
-        String messageDownValue = AttributeUtil.getAttributeValue(messageDownAttribute, String.class);
+        String messageDownValue = messageDownAttribute.getAttributeValue(String.class);
         return lwm2mServer.writeValueByPath(String.valueOf(device.getId()), messageDownValue, value.getValue(), false);
     }
 }

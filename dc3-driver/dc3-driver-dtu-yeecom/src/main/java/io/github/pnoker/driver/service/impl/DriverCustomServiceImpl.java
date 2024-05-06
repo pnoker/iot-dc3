@@ -18,9 +18,11 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.driver.context.DriverContext;
+import io.github.pnoker.common.driver.entity.bean.RWPointValue;
 import io.github.pnoker.common.driver.entity.dto.DeviceDTO;
 import io.github.pnoker.common.driver.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.bo.AttributeBO;
@@ -52,7 +54,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private Integer udpPort;
 
     @Resource
-    private DriverContext driverContext;
+    private DeviceMetadata deviceMetadata;
+    @Resource
+    DriverMetadata driverMetadata;
     @Resource
     private DriverSenderService driverSenderService;
     @Resource
@@ -93,7 +97,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         - MAINTAIN:维护
         - FAULT:故障
          */
-        driverContext.getDriverMetadata().getDeviceMap().keySet().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+        deviceMetadata.getAllDevice().forEach(device -> driverSenderService.deviceStatusSender(device.getId(), DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
     @Override
@@ -110,7 +114,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, AttributeBO value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point, RWPointValue value) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */

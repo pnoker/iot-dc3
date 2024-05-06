@@ -17,7 +17,7 @@
 package io.github.pnoker.driver.server;
 
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.driver.context.DriverContext;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import jakarta.annotation.Resource;
@@ -59,7 +59,7 @@ public class Lwm2mServer {
     private LeshanServer server;
 
     @Resource
-    private DriverContext driverContext;
+    private DeviceMetadata deviceMetadata;
     @Resource
     private DriverSenderService driverSenderService;
 
