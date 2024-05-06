@@ -95,7 +95,7 @@ public class GlobalExceptionAdvice {
         HashMap<String, String> map = new HashMap<>(16);
         List<FieldError> errorList = exception.getBindingResult().getFieldErrors();
         errorList.forEach(error -> {
-            log.warn("Method Argument Not Valid Exception Handler: {}({})", error.getField(), error.getDefaultMessage());
+            log.warn("Method Argument Not Valid Exception Handler: {}[{}]", error.getField(), error.getDefaultMessage());
             map.put(error.getField(), error.getDefaultMessage());
         });
         return R.fail(JsonUtil.toJsonString(map));
