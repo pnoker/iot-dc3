@@ -17,7 +17,9 @@
 package io.github.pnoker.center.manager.biz.impl;
 
 import io.github.pnoker.center.manager.biz.DriverNotifyService;
-import io.github.pnoker.center.manager.entity.bo.*;
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
+import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.entity.dto.DriverTransferMetadataDTO;
@@ -48,19 +50,17 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public void notifyProfile(MetadataCommandTypeEnum command, ProfileBO profileBO) {
+    public void notifyDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO) {
         try {
-            List<DriverBO> entityDOS = driverService.selectByProfileId(profileBO.getId());
-            entityDOS.forEach(driver -> {
-                DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
-                        MetadataTypeEnum.PROFILE,
-                        command,
-                        JsonUtil.toJsonString(profileBO)
-                );
-                notifyDriver(driver, entityDTO);
-            });
+            DriverBO entityDO = driverService.selectById(deviceBO.getDriverId());
+            DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
+                    MetadataTypeEnum.DEVICE,
+                    command,
+                    JsonUtil.toJsonString(deviceBO)
+            );
+            notifyDriver(entityDO, entityDTO);
         } catch (Exception e) {
-            log.warn("Notify driver {} profile error: {}", command, e.getMessage());
+            log.error("Notify driver {} device: {}", command, e.getMessage());
         }
     }
 
@@ -78,51 +78,6 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
             });
         } catch (Exception e) {
             log.error("Notify driver {} point: {}", command, e.getMessage());
-        }
-    }
-
-    @Override
-    public void notifyDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO) {
-        try {
-            DriverBO entityDO = driverService.selectById(deviceBO.getDriverId());
-            DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
-                    MetadataTypeEnum.DEVICE,
-                    command,
-                    JsonUtil.toJsonString(deviceBO)
-            );
-            notifyDriver(entityDO, entityDTO);
-        } catch (Exception e) {
-            log.error("Notify driver {} device: {}", command, e.getMessage());
-        }
-    }
-
-    @Override
-    public void notifyDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfigBO driverAttributeConfigBO) {
-        try {
-            DriverBO entityDO = driverService.selectByDeviceId(driverAttributeConfigBO.getDeviceId());
-            DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
-                    MetadataTypeEnum.DRIVER_ATTRIBUTE_CONFIG,
-                    command,
-                    JsonUtil.toJsonString(driverAttributeConfigBO)
-            );
-            notifyDriver(entityDO, entityDTO);
-        } catch (Exception e) {
-            log.error("Notify driver {} driverConfig: {}", command, e.getMessage());
-        }
-    }
-
-    @Override
-    public void notifyPointAttributeConfig(MetadataCommandTypeEnum command, PointAttributeConfigBO pointAttributeConfigBO) {
-        try {
-            DriverBO entityDO = driverService.selectByDeviceId(pointAttributeConfigBO.getDeviceId());
-            DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
-                    MetadataTypeEnum.POINT_ATTRIBUTE_CONFIG,
-                    command,
-                    JsonUtil.toJsonString(pointAttributeConfigBO)
-            );
-            notifyDriver(entityDO, entityDTO);
-        } catch (Exception e) {
-            log.error("Notify driver {} pointConfig: {}", command, e.getMessage());
         }
     }
 

@@ -28,22 +28,6 @@ import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 public interface DriverNotifyService {
 
     /**
-     * 通知驱动 新增模版(ADD) / 删除模版(DELETE) / 更新模版(UPDATE)
-     *
-     * @param command   Operation Type
-     * @param profileBO Profile
-     */
-    void notifyProfile(MetadataCommandTypeEnum command, ProfileBO profileBO);
-
-    /**
-     * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 更新位号(UPDATE)
-     *
-     * @param command Operation Type
-     * @param pointBO Point
-     */
-    void notifyPoint(MetadataCommandTypeEnum command, PointBO pointBO);
-
-    /**
      * 通知驱动 新增设备(ADD) / 删除设备(DELETE) / 更新设备(UPDATE)
      *
      * @param command  Operation Type
@@ -52,19 +36,11 @@ public interface DriverNotifyService {
     void notifyDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO);
 
     /**
-     * 通知驱动 新增驱动配置(ADD) / 删除驱动配置(DELETE) / 更新驱动配置(UPDATE)
+     * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 更新位号(UPDATE)
      *
-     * @param command                 Operation Type
-     * @param driverAttributeConfigBO 驱动属性配置
+     * @param command Operation Type
+     * @param pointBO Point
      */
-    void notifyDriverAttributeConfig(MetadataCommandTypeEnum command, DriverAttributeConfigBO driverAttributeConfigBO);
-
-    /**
-     * 通知驱动 新增位号配置(ADD) / 删除位号配置(DELETE) / 更新位号配置(UPDATE)
-     *
-     * @param command                Operation Type
-     * @param pointAttributeConfigBO PointConfig
-     */
-    void notifyPointAttributeConfig(MetadataCommandTypeEnum command, PointAttributeConfigBO pointAttributeConfigBO);
+    void notifyPoint(MetadataCommandTypeEnum command, PointBO pointBO);
 
 }
