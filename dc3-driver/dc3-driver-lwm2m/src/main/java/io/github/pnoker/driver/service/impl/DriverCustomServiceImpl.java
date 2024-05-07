@@ -17,13 +17,14 @@
 package io.github.pnoker.driver.service.impl;
 
 import com.mchange.v2.lang.StringUtils;
-import io.github.pnoker.common.driver.entity.bean.RWPointValue;
-import io.github.pnoker.common.driver.entity.dto.DeviceDTO;
-import io.github.pnoker.common.driver.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.entity.bean.RValue;
+import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.bo.AttributeBO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.driver.server.Lwm2mServer;
 import jakarta.annotation.Resource;
@@ -77,29 +78,27 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point) {
+    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
 
         可以主动读取,也可以订阅资源
          */
-        AttributeBO messageUpAttribute = pointConfig.get("messageUp");
-        return lwm2mServer.readValueByPath(String.valueOf(device.getId()), messageUpAttribute.getAttributeValue(String.class));
+        String value = lwm2mServer.readValueByPath(String.valueOf(device.getId()), pointConfig.get("messageUp").getValue(String.class));
+        return new RValue(device, point, value);
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point, RWPointValue value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
-        AttributeBO execDownAttribute = pointConfig.get("execDown");
-        String execDownValue = execDownAttribute.getAttributeValue(String.class);
+        String execDownValue = pointConfig.get("execDown").getValue(String.class);
         if (StringUtils.nonEmptyString(execDownValue)) {
             //执行函数
-            return lwm2mServer.execute(String.valueOf(device.getId()), execDownValue, value.getValue());
+            return lwm2mServer.execute(String.valueOf(device.getId()), execDownValue, wValue.getValue());
         }
-        AttributeBO messageDownAttribute = pointConfig.get("messageDown");
-        String messageDownValue = messageDownAttribute.getAttributeValue(String.class);
-        return lwm2mServer.writeValueByPath(String.valueOf(device.getId()), messageDownValue, value.getValue(), false);
+        String messageDownValue = pointConfig.get("messageDown").getValue(String.class);
+        return lwm2mServer.writeValueByPath(String.valueOf(device.getId()), messageDownValue, wValue.getValue(), false);
     }
 }

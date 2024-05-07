@@ -25,7 +25,7 @@ public final class S7Exception extends RuntimeException {
     /**
      * The Constant serialVersionUID.
      */
-    private static final long serialVersionUID = -4761415733559374116L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Instantiates a new s7 exception.

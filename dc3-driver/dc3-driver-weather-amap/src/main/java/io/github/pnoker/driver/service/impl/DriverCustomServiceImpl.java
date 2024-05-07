@@ -18,20 +18,20 @@ package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.common.driver.entity.bean.RWPointValue;
-import io.github.pnoker.common.driver.entity.dto.DeviceDTO;
-import io.github.pnoker.common.driver.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.entity.bean.RValue;
+import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.bo.AttributeBO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.driver.entity.WeatherInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -55,7 +55,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private DeviceMetadata deviceMetadata;
     @Resource
     private DriverSenderService driverSenderService;
-    @Value("${driver.custom.key}")
+    @org.springframework.beans.factory.annotation.Value("${driver.custom.key}")
     private String key;
 
     @Override
@@ -85,19 +85,18 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point) {
+    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
-        String city = pointConfig.get("city").getAttributeValue(String.class);
-        String type = pointConfig.get("type").getAttributeValue(String.class);
+        String city = pointConfig.get("city").getValue(String.class);
+        String type = pointConfig.get("type").getValue(String.class);
 
-        String response = getRequest(city);
-        return getValue(type, response);
+        return new RValue(device, point, getValue(type, getRequest(city)));
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point, RWPointValue value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */

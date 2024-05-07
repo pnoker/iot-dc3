@@ -17,13 +17,14 @@
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.driver.entity.bean.RWPointValue;
-import io.github.pnoker.common.driver.entity.dto.DeviceDTO;
-import io.github.pnoker.common.driver.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.entity.bean.RValue;
+import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.driver.service.MqttSendService;
 import jakarta.annotation.Resource;
@@ -77,25 +78,25 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point) {
+    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
 
         因为 MQTT 的数据来源是被动接收的, 所以无需实现该 Read 方法
         接收数据处理函数在 io.github.pnoker.common.mqtt.handler.MqttReceiveHandler.handlerValue
          */
-        return DefaultConstant.DEFAULT_NULL_STRING_VALUE;
+        return null;
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point, RWPointValue values) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue values) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
-        String commandTopic = pointConfig.get("commandTopic").getAttributeValue(String.class);
+        String commandTopic = pointConfig.get("commandTopic").getValue(String.class);
         String value = values.getValue();
         try {
-            int commandQos = pointConfig.get("commandQos").getAttributeValue(Integer.class);
+            int commandQos = pointConfig.get("commandQos").getValue(Integer.class);
             mqttSendService.sendToMqtt(commandTopic, commandQos, value);
         } catch (Exception e) {
             mqttSendService.sendToMqtt(commandTopic, value);

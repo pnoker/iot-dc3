@@ -24,7 +24,7 @@ public class AddFailedException extends Exception {
     /**
      *
      */
-    private static final long serialVersionUID = 5299486640366935298L;
+    private static final long serialVersionUID = 1L;
 
     private Map<String, Integer> _errors = new HashMap<String, Integer>();
 

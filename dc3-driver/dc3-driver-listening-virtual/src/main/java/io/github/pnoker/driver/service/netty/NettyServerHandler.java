@@ -16,15 +16,16 @@
 
 package io.github.pnoker.driver.service.netty;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
-import io.github.pnoker.common.driver.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.entity.bean.RValue;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.bo.AttributeBO;
-import io.github.pnoker.common.utils.ValueUtil;
 import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -58,62 +59,38 @@ public class NettyServerHandler {
     public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
         log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         String deviceName = byteBuf.toString(0, 22, CharsetUtil.CHARSET_ISO_8859_1);
-        Long deviceId = Long.valueOf(deviceName);
-        String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
+        long deviceId = Long.parseLong(deviceName);
+        DeviceBO device = deviceMetadata.getDevice(deviceId);
 
+        String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
         NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
 
-        List<PointValue> pointValues = new ArrayList<>(16);
         Map<Long, Map<String, AttributeBO>> pointConfigMap = deviceMetadata.getPointAttributeConfig(deviceId);
-        for (Long pointId : pointConfigMap.keySet()) {
-            PointDTO point = pointMetadata.getPoint(pointId);
-            Map<String, AttributeBO> infoMap = pointConfigMap.get(pointId);
-            AttributeBO startAttribute = infoMap.get("start");
-            AttributeBO endAttribute = infoMap.get("end");
-            int start = startAttribute.getAttributeValue(Integer.class);
-            int end = endAttribute.getAttributeValue(Integer.class);
+
+        List<PointValue> pointValues = new ArrayList<>(16);
+        for (Map.Entry<Long, Map<String, AttributeBO>> entry : pointConfigMap.entrySet()) {
+            PointBO point = pointMetadata.getPoint(entry.getKey());
+            Map<String, AttributeBO> infoMap = pointConfigMap.get(entry.getKey());
+            int start = infoMap.get("start").getValue(Integer.class);
+            int end = infoMap.get("end").getValue(Integer.class);
 
             if (infoMap.get("key").getValue().equals(hexKey)) {
-                PointValue pointValue = null;
-                switch (point.getPointName()) {
-                    case "海拔":
-                        float altitude = byteBuf.getFloat(start);
-                        pointValue = new PointValue(deviceId, pointId, String.valueOf(altitude),
-                                ValueUtil.getValue(point, String.valueOf(altitude)));
-                        break;
-                    case "速度":
-                        double speed = byteBuf.getDouble(start);
-                        pointValue = new PointValue(deviceId, pointId, String.valueOf(speed),
-                                ValueUtil.getValue(point, String.valueOf(speed)));
-                        break;
-                    case "液位":
-                        long level = byteBuf.getLong(start);
-                        pointValue = new PointValue(deviceId, pointId, String.valueOf(level),
-                                ValueUtil.getValue(point, String.valueOf(level)));
-                        break;
-                    case "方向":
-                        int direction = byteBuf.getInt(start);
-                        pointValue = new PointValue(deviceId, pointId, String.valueOf(direction),
-                                ValueUtil.getValue(point, String.valueOf(direction)));
-                        break;
-                    case "锁定":
-                        boolean lock = byteBuf.getBoolean(start);
-                        pointValue = new PointValue(deviceId, pointId, String.valueOf(lock),
-                                ValueUtil.getValue(point, String.valueOf(lock)));
-                        break;
-                    case "经纬":
-                        String lalo = byteBuf.toString(start, end, CharsetUtil.CHARSET_ISO_8859_1).trim();
-                        pointValue = new PointValue(deviceId, pointId, lalo,
-                                ValueUtil.getValue(point, lalo));
-                        break;
-                    default:
-                        break;
-                }
-                if (ObjectUtil.isNotNull(pointValue)) {
-                    pointValues.add(pointValue);
+                String value = switch (point.getPointName()) {
+                    case "海拔" -> String.valueOf(byteBuf.getFloat(start));
+                    case "速度" -> String.valueOf(byteBuf.getDouble(start));
+                    case "液位" -> String.valueOf(byteBuf.getLong(start));
+                    case "方向" -> String.valueOf(byteBuf.getInt(start));
+                    case "锁定" -> String.valueOf(byteBuf.getBoolean(start));
+                    case "经纬" -> byteBuf.toString(start, end, CharsetUtil.CHARSET_ISO_8859_1).trim();
+                    default -> "";
+                };
+
+                if (CharSequenceUtil.isNotEmpty(value)) {
+                    pointValues.add(new PointValue(new RValue(device, point, value)));
                 }
             }
         }
+
         driverSenderService.pointValueSender(pointValues);
     }
 }
