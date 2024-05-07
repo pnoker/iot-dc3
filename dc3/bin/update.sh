@@ -19,12 +19,18 @@
 set -e
 
 cd ../../
+git fetch --all
+git reset --hard origin/pre_main
 git pull
 
 cd dc3-api
+git fetch --all
+git reset --hard origin/pre_main
 git pull
 
 cd ../dc3-common
+git fetch --all
+git reset --hard origin/pre_main
 git pull
 
 cd ../
