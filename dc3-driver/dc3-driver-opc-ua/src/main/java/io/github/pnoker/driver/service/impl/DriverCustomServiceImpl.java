@@ -17,13 +17,14 @@
 package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.common.driver.entity.bean.RWPointValue;
-import io.github.pnoker.common.driver.entity.dto.DeviceDTO;
-import io.github.pnoker.common.driver.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.entity.bean.RValue;
+import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.bo.AttributeBO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.exception.ConnectorException;
@@ -91,22 +92,21 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point) {
+    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
-        OpcUaClient client = getConnector(device.getId(), driverConfig);
-        return readValue(client, pointConfig);
+        return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
 
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point, RWPointValue value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
         OpcUaClient client = getConnector(device.getId(), driverConfig);
-        return writeValue(client, pointConfig, value);
+        return writeValue(client, pointConfig, wValue);
     }
 
     /**
@@ -120,9 +120,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         log.debug("Opc Ua Server Connection Info {}", JsonUtil.toJsonString(driverConfig));
         OpcUaClient opcUaClient = connectMap.get(deviceId);
         if (ObjectUtil.isNull(opcUaClient)) {
-            String host = driverConfig.get("host").getAttributeValue(String.class);
-            int port = driverConfig.get("port").getAttributeValue(Integer.class);
-            String path = driverConfig.get("path").getAttributeValue(String.class);
+            String host = driverConfig.get("host").getValue(String.class);
+            int port = driverConfig.get("port").getValue(Integer.class);
+            String path = driverConfig.get("path").getValue(String.class);
             String url = String.format("opc.tcp://%s:%s%s", host, port, path);
             try {
                 opcUaClient = OpcUaClient.create(
@@ -150,8 +150,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return OpcUa Node
      */
     private NodeId getNode(Map<String, AttributeBO> pointConfig) {
-        int namespace = pointConfig.get("namespace").getAttributeValue(Integer.class);
-        String tag = pointConfig.get("tag").getAttributeValue(String.class);
+        int namespace = pointConfig.get("namespace").getValue(Integer.class);
+        String tag = pointConfig.get("tag").getValue(String.class);
         return new NodeId(namespace, tag);
     }
 
@@ -183,14 +183,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * 写入 OpcUa 值
      *
      * @param pointConfig 位号信息
-     * @param value       写入值
+     * @param wValue      写入值
      */
-    private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, RWPointValue value) {
+    private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WValue wValue) {
         try {
             NodeId nodeId = getNode(pointConfig);
 
             client.connect().get();
-            return writeNode(client, nodeId, value);
+            return writeNode(client, nodeId, wValue);
         } catch (InterruptedException e) {
             log.error("Write opc ua value error: {}", e.getMessage(), e);
             Thread.currentThread().interrupt();
@@ -206,41 +206,41 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      *
      * @param client OpcUaClient
      * @param nodeId OpcUa Node
-     * @param value  写入值
+     * @param wValue 写入值
      * @return 是否写入
      * @throws ExecutionException   ExecutionException
      * @throws InterruptedException InterruptedException
      */
-    private boolean writeNode(OpcUaClient client, NodeId nodeId, RWPointValue value) throws ExecutionException, InterruptedException {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(value.getType().getCode());
+    private boolean writeNode(OpcUaClient client, NodeId nodeId, WValue wValue) throws ExecutionException, InterruptedException {
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
-            throw new UnSupportException("Unsupported type of " + value.getType());
+            throw new UnSupportException("Unsupported type of " + wValue.getType());
         }
 
         CompletableFuture<StatusCode> status = new CompletableFuture<>();
         switch (valueType) {
             case INT:
-                int intValue = value.getValue(Integer.class);
+                int intValue = wValue.getValue(Integer.class);
                 status = client.writeValue(nodeId, new DataValue(new Variant(intValue)));
                 break;
             case LONG:
-                long longValue = value.getValue(Long.class);
+                long longValue = wValue.getValue(Long.class);
                 status = client.writeValue(nodeId, new DataValue(new Variant(longValue)));
                 break;
             case FLOAT:
-                float floatValue = value.getValue(Float.class);
+                float floatValue = wValue.getValue(Float.class);
                 status = client.writeValue(nodeId, new DataValue(new Variant(floatValue)));
                 break;
             case DOUBLE:
-                double doubleValue = value.getValue(Double.class);
+                double doubleValue = wValue.getValue(Double.class);
                 status = client.writeValue(nodeId, new DataValue(new Variant(doubleValue)));
                 break;
             case BOOLEAN:
-                boolean booleanValue = value.getValue(Boolean.class);
+                boolean booleanValue = wValue.getValue(Boolean.class);
                 status = client.writeValue(nodeId, new DataValue(new Variant(booleanValue)));
                 break;
             case STRING:
-                status = client.writeValue(nodeId, new DataValue(new Variant(value.getValue())));
+                status = client.writeValue(nodeId, new DataValue(new Variant(wValue.getValue())));
                 break;
             default:
                 break;

@@ -17,13 +17,14 @@
 package io.github.pnoker.driver.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.common.driver.entity.bean.RWPointValue;
-import io.github.pnoker.common.driver.entity.dto.DeviceDTO;
-import io.github.pnoker.common.driver.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.entity.bean.RValue;
+import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.exception.ConnectorException;
@@ -94,21 +95,20 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public String read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point) {
+    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
-        Server server = getConnector(device.getId(), driverConfig);
-        return readValue(server, pointConfig);
+        return  new RValue(device,point,readValue(getConnector(device.getId(), driverConfig), pointConfig));
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceDTO device, PointDTO point, RWPointValue value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
         Server server = getConnector(device.getId(), driverConfig);
-        return writeValue(server, pointConfig, value);
+        return writeValue(server, pointConfig, wValue);
     }
 
     /**
@@ -122,10 +122,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         log.debug("Opc Da Server Connection Info {}", JsonUtil.toJsonString(driverConfig));
         Server server = connectMap.get(deviceId);
         if (ObjectUtil.isNull(server)) {
-            String host = driverConfig.get("host").getAttributeValue(String.class);
-            String clsId = driverConfig.get("clsId").getAttributeValue(String.class);
-            String user = driverConfig.get("username").getAttributeValue(String.class);
-            String password = driverConfig.get("password").getAttributeValue(String.class);
+            String host = driverConfig.get("host").getValue(String.class);
+            String clsId = driverConfig.get("clsId").getValue(String.class);
+            String user = driverConfig.get("username").getValue(String.class);
+            String password = driverConfig.get("password").getValue(String.class);
             ConnectionInformation connectionInformation = new ConnectionInformation(host, clsId, user, password);
             server = new Server(connectionInformation, Executors.newSingleThreadScheduledExecutor());
             try {
@@ -154,13 +154,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      */
     public Item getItem(Server server, Map<String, AttributeBO> pointConfig) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException, AddFailedException {
         Group group;
-        String groupName = pointConfig.get("group").getAttributeValue(String.class);
+        String groupName = pointConfig.get("group").getValue(String.class);
         try {
             group = server.findGroup(groupName);
         } catch (UnknownGroupException e) {
             group = server.addGroup(groupName);
         }
-        return group.addItem(pointConfig.get("tag").getAttributeValue(String.class));
+        return group.addItem(pointConfig.get("tag").getValue(String.class));
     }
 
     /**
@@ -222,13 +222,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      *
      * @param server      OpcDa Server
      * @param pointConfig 位号信息
-     * @param value       写入值
+     * @param wValue       写入值
      * @return 是否写入
      */
-    private boolean writeValue(Server server, Map<String, AttributeBO> pointConfig, RWPointValue value) {
+    private boolean writeValue(Server server, Map<String, AttributeBO> pointConfig, WValue wValue) {
         try {
             Item item = getItem(server, pointConfig);
-            return writeItem(item, value);
+            return writeItem(item, wValue);
         } catch (NotConnectedException | AddFailedException | DuplicateGroupException | UnknownHostException |
                  JIException e) {
             server.dispose();
@@ -241,43 +241,43 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * Write Opc Da Item
      *
      * @param item  OpcDa Item
-     * @param value 写入值
+     * @param wValue 写入值
      * @throws JIException OpcDa JIException
      */
-    private boolean writeItem(Item item, RWPointValue value) throws JIException {
-        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(value.getType().getCode());
+    private boolean writeItem(Item item, WValue wValue) throws JIException {
+        PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());
         if (ObjectUtil.isNull(valueType)) {
-            throw new UnSupportException("Unsupported type of " + value.getType());
+            throw new UnSupportException("Unsupported type of " + wValue.getType());
         }
 
         int writeResult = 0;
         switch (valueType) {
             case SHORT:
-                short shortValue = value.getValue(Short.class);
+                short shortValue = wValue.getValue(Short.class);
                 writeResult = item.write(new JIVariant(shortValue, false));
                 break;
             case INT:
-                int intValue = value.getValue(Integer.class);
+                int intValue = wValue.getValue(Integer.class);
                 writeResult = item.write(new JIVariant(intValue, false));
                 break;
             case LONG:
-                long longValue = value.getValue(Long.class);
+                long longValue = wValue.getValue(Long.class);
                 writeResult = item.write(new JIVariant(longValue, false));
                 break;
             case FLOAT:
-                float floatValue = value.getValue(Float.class);
+                float floatValue = wValue.getValue(Float.class);
                 writeResult = item.write(new JIVariant(floatValue, false));
                 break;
             case DOUBLE:
-                double doubleValue = value.getValue(Double.class);
+                double doubleValue = wValue.getValue(Double.class);
                 writeResult = item.write(new JIVariant(doubleValue, false));
                 break;
             case BOOLEAN:
-                boolean booleanValue = value.getValue(Boolean.class);
+                boolean booleanValue = wValue.getValue(Boolean.class);
                 writeResult = item.write(new JIVariant(booleanValue, false));
                 break;
             case STRING:
-                writeResult = item.write(new JIVariant(value.getValue(), false));
+                writeResult = item.write(new JIVariant(wValue.getValue(), false));
                 break;
             default:
                 break;

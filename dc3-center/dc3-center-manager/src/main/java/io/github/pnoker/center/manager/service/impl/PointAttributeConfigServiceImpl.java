@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -37,6 +38,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -120,6 +122,10 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     public List<PointAttributeConfigBO> selectByDeviceId(Long deviceId) {
         List<PointBO> pointBOS = pointService.selectByDeviceId(deviceId);
         Set<Long> pointIds = pointBOS.stream().map(PointBO::getId).collect(Collectors.toSet());
+        if (CollUtil.isEmpty(pointIds)) {
+            return Collections.emptyList();
+        }
+
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
                 .eq(PointAttributeConfigDO::getDeviceId, deviceId)
                 .in(PointAttributeConfigDO::getPointId, pointIds);
