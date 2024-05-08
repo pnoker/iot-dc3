@@ -27,13 +27,10 @@ ENV COAPS_PORT 5684
 
 # default jvm & gc env
 ENV JAVA_OPS -server \
-             -Xms128m \
+             -Xms256m \
              -Xmx1024m \
              -Djava.security.egd=file:/dev/./urandom \
-             -XX:CompressedClassSpaceSize=128m \
-             -XX:MetaspaceSize=200m \
-             -XX:MaxMetaspaceSize=200m \
-             -XX:+UseParallelGC
+             -XX:+UseG1GC
 ENV GC_LOG   -Xlog:gc*:file=dc3/logs/driver/lwm2m/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
