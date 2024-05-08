@@ -48,6 +48,6 @@ docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2024.2.0.de
 
 cd ../
 docker-compose -f docker-compose-test.yml up -d auth manager data gateway ekuiper
+echo 'Waiting for 30 second'
 sleep 30s
-echo 'Wait for 30 second'
 docker-compose -f docker-compose-test.yml up -d virtual modbus-tcp mqtt
