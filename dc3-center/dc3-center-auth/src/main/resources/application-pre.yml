@@ -17,12 +17,9 @@
 # Pre-release environment, customizable configuration
 spring:
   datasource:
-    dynamic:
-      datasource:
-        master:
-          url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:3306}/${MYSQL_DB:dc3_auth}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
-          username: ${MYSQL_USERNAME:root}
-          password: ${MYSQL_PASSWORD:dc3}
+    url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:3306}/${MYSQL_DB:dc3_auth}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:dc3}
   data:
     redis:
       host: ${REDIS_HOST:dc3-redis}

@@ -16,7 +16,8 @@
 
 package io.github.pnoker.center.manager.biz;
 
-import io.github.pnoker.center.manager.entity.bo.*;
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 
 /**
