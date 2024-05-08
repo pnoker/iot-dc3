@@ -33,14 +33,6 @@ spring:
   data:
     redis:
       database: 0
-  cloud:
-    gateway:
-      loadbalancer:
-        use404: true
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
 
 logging:
   file:

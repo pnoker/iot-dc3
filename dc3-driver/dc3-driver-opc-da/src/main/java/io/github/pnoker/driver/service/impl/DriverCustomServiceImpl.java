@@ -19,12 +19,12 @@ package io.github.pnoker.driver.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.common.driver.entity.bean.RValue;
 import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.exception.ConnectorException;
@@ -99,7 +99,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
-        return  new RValue(device,point,readValue(getConnector(device.getId(), driverConfig), pointConfig));
+        return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
     }
 
     @Override
@@ -222,7 +222,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      *
      * @param server      OpcDa Server
      * @param pointConfig 位号信息
-     * @param wValue       写入值
+     * @param wValue      写入值
      * @return 是否写入
      */
     private boolean writeValue(Server server, Map<String, AttributeBO> pointConfig, WValue wValue) {
@@ -240,7 +240,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * Write Opc Da Item
      *
-     * @param item  OpcDa Item
+     * @param item   OpcDa Item
      * @param wValue 写入值
      * @throws JIException OpcDa JIException
      */
