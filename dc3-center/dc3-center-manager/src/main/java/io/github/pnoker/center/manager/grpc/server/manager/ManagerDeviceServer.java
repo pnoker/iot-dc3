@@ -93,8 +93,8 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<DeviceBO> deviceBOS = deviceService.selectByDriverId(driver.getDriverId());
-        if (CollUtil.isEmpty(deviceBOS)) {
+        List<DeviceBO> deviceBOList = deviceService.selectByDriverId(driver.getDriverId());
+        if (CollUtil.isEmpty(deviceBOList)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -103,7 +103,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
+            List<GrpcDeviceDTO> deviceDTOS = deviceBOList.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
 
             builder.addAllData(deviceDTOS);
         }
@@ -118,8 +118,8 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<DeviceBO> deviceBOS = deviceService.selectByProfileId(request.getProfileId());
-        if (CollUtil.isEmpty(deviceBOS)) {
+        List<DeviceBO> deviceBOList = deviceService.selectByProfileId(request.getProfileId());
+        if (CollUtil.isEmpty(deviceBOList)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -128,7 +128,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            List<GrpcDeviceDTO> deviceDTOS = deviceBOS.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
+            List<GrpcDeviceDTO> deviceDTOS = deviceBOList.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
 
             builder.addAllData(deviceDTOS);
         }

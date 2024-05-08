@@ -58,7 +58,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     List<PointBO> selectByProfileIds(Set<Long> profileIds);
 
     /**
-     * 根据 设备ID集 查询设备
+     * 根据 设备ID集合 查询设备
      *
      * @param ids 位号ID集
      * @return Point Array
