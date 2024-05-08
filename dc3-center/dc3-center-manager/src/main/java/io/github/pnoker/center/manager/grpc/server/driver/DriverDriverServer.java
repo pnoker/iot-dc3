@@ -24,12 +24,14 @@ import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
 import io.github.pnoker.center.manager.biz.DriverRegisterService;
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.grpc.builder.GrpcDriverAttributeBuilder;
 import io.github.pnoker.center.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.center.manager.grpc.builder.GrpcPointAttributeBuilder;
+import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
@@ -54,8 +56,11 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
     private GrpcDriverAttributeBuilder grpcDriverAttributeBuilder;
     @Resource
     private GrpcPointAttributeBuilder grpcPointAttributeBuilder;
+
     @Resource
     private DriverRegisterService driverRegisterService;
+    @Resource
+    private DeviceService deviceService;
 
     @Override
     public void driverRegister(GrpcDriverRegisterDTO request, StreamObserver<GrpcRDriverRegisterDTO> responseObserver) {
@@ -67,6 +72,11 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
             DriverBO driverBO = driverRegisterService.registerDriver(request);
             GrpcDriverDTO grpcDriverDTO = grpcDriverBuilder.buildGrpcDTOByBO(driverBO);
             builder.setDriver(grpcDriverDTO);
+
+            // 查询设备
+            List<DeviceBO> deviceBOList = deviceService.selectByDriverId(driverBO.getId());
+            List<Long> idList = deviceBOList.stream().map(DeviceBO::getId).toList();
+            builder.addAllDeviceIds(idList);
 
             // 注册驱动属性
             List<DriverAttributeBO> driverAttributeBOList = driverRegisterService.registerDriverAttribute(request, driverBO);

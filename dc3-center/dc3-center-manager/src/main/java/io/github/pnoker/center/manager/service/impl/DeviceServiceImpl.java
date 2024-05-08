@@ -205,9 +205,9 @@ public class DeviceServiceImpl implements DeviceService {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDriverId, driverId);
         List<DeviceDO> entityDOS = deviceManager.list(wrapper);
-        List<DeviceBO> deviceBOS = deviceBuilder.buildBOListByDOList(entityDOS);
-        deviceBOS.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
-        return deviceBOS;
+        List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOS);
+        deviceBOList.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
+        return deviceBOList;
     }
 
     @Override
@@ -221,9 +221,9 @@ public class DeviceServiceImpl implements DeviceService {
             return Collections.emptyList();
         }
         List<DeviceDO> entityDOS = deviceManager.listByIds(ids);
-        List<DeviceBO> deviceBOS = deviceBuilder.buildBOListByDOList(entityDOS);
-        deviceBOS.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
-        return deviceBOS;
+        List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOS);
+        deviceBOList.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
+        return deviceBOList;
     }
 
     @Override

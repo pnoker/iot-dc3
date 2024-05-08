@@ -68,7 +68,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
     List<DeviceBO> selectByProfileId(Long profileId);
 
     /**
-     * 根据 设备ID集 查询设备
+     * 根据 设备ID集合 查询设备
      *
      * @param ids 设备ID集
      * @return {@link DeviceBO} Array
