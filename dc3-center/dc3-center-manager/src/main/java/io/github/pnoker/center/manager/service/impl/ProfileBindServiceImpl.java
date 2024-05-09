@@ -122,16 +122,16 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     public Set<Long> selectDeviceIdsByProfileId(Long profileId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
                 .eq(ProfileBindDO::getProfileId, profileId);
-        List<ProfileBindDO> entityDOS = wrapper.list();
-        return entityDOS.stream().map(ProfileBindDO::getDeviceId).collect(Collectors.toSet());
+        List<ProfileBindDO> entityDOList = wrapper.list();
+        return entityDOList.stream().map(ProfileBindDO::getDeviceId).collect(Collectors.toSet());
     }
 
     @Override
     public Set<Long> selectProfileIdsByDeviceId(Long deviceId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
                 .eq(ProfileBindDO::getDeviceId, deviceId);
-        List<ProfileBindDO> entityDOS = wrapper.list();
-        return entityDOS.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
+        List<ProfileBindDO> entityDOList = wrapper.list();
+        return entityDOList.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
     }
 
     @Override

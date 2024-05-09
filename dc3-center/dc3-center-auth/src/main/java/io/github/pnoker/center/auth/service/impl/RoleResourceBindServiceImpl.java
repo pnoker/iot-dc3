@@ -112,9 +112,9 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     public List<ResourceBO> listResourceByRoleId(Long roleId) {
         LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
         wrapper.eq(RoleResourceBindDO::getRoleId, roleId);
-        List<RoleResourceBindDO> entityDOS = roleResourceBindManager.list(wrapper);
-        if (CollUtil.isNotEmpty(entityDOS)) {
-            List<ResourceDO> resourceDOS = resourceManager.listByIds(entityDOS.stream()
+        List<RoleResourceBindDO> entityDOList = roleResourceBindManager.list(wrapper);
+        if (CollUtil.isNotEmpty(entityDOList)) {
+            List<ResourceDO> resourceDOS = resourceManager.listByIds(entityDOList.stream()
                     .map(RoleResourceBindDO::getResourceId).toList());
             List<ResourceDO> collect = resourceDOS.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
                     .toList();

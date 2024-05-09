@@ -45,7 +45,7 @@ public interface ProfileService extends BaseService<ProfileBO, ProfileQuery> {
      * 根据 设备ID 查询模版
      *
      * @param deviceId 设备ID
-     * @return ProfileBO Array
+     * @return ProfileBO 集合
      */
     List<ProfileBO> selectByDeviceId(Long deviceId);
 
@@ -53,7 +53,7 @@ public interface ProfileService extends BaseService<ProfileBO, ProfileQuery> {
      * 根据 模版ID集 查询模版
      *
      * @param ids 模版ID集
-     * @return ProfileBO Array
+     * @return ProfileBO 集合
      */
     List<ProfileBO> selectByIds(Set<Long> ids);
 

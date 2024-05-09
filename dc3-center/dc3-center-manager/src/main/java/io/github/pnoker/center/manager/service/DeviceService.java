@@ -55,15 +55,23 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * 根据 驱动ID 查询该驱动下的全部设备
      *
      * @param driverId 驱动ID
-     * @return {@link DeviceBO} Array
+     * @return {@link DeviceBO} 集合
      */
     List<DeviceBO> selectByDriverId(Long driverId);
+
+    /**
+     * 根据 驱动ID 查询该驱动下的全部设备ID集合
+     *
+     * @param driverId 驱动ID
+     * @return {@link DeviceBO} 集合
+     */
+    List<Long> selectIdsByDriverId(Long driverId);
 
     /**
      * 根据 模板ID 查询该驱动下的全部设备
      *
      * @param profileId 模版ID
-     * @return {@link DeviceBO} Array
+     * @return {@link DeviceBO} 集合
      */
     List<DeviceBO> selectByProfileId(Long profileId);
 
@@ -71,7 +79,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * 根据 设备ID集合 查询设备
      *
      * @param ids 设备ID集
-     * @return {@link DeviceBO} Array
+     * @return {@link DeviceBO} 集合
      */
     List<DeviceBO> selectByIds(Set<Long> ids);
 

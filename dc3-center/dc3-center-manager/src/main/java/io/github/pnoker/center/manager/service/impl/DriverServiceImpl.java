@@ -118,8 +118,8 @@ public class DriverServiceImpl implements DriverService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<DriverDO> entityDOS = driverManager.listByIds(ids);
-        return driverBuilder.buildBOListByDOList(entityDOS);
+        List<DriverDO> entityDOList = driverManager.listByIds(ids);
+        return driverBuilder.buildBOListByDOList(entityDOList);
     }
 
     @Override
@@ -140,11 +140,11 @@ public class DriverServiceImpl implements DriverService {
         }
         List<DeviceDO> deviceDOS = deviceManager.listByIds(ids);
         Set<Long> driverIds = deviceDOS.stream().map(DeviceDO::getDriverId).collect(Collectors.toSet());
-        List<DriverBO> entityDOS = selectByIds(driverIds);
-        if (CollUtil.isEmpty(entityDOS)) {
+        List<DriverBO> entityDOList = selectByIds(driverIds);
+        if (CollUtil.isEmpty(entityDOList)) {
             return Collections.emptyList();
         }
-        return entityDOS;
+        return entityDOList;
     }
 
     @Override

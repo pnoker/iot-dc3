@@ -67,8 +67,8 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
     @Override
     public void notifyPoint(MetadataCommandTypeEnum command, PointBO pointBO) {
         try {
-            List<DriverBO> entityDOS = driverService.selectByProfileId(pointBO.getProfileId());
-            entityDOS.forEach(driver -> {
+            List<DriverBO> entityDOList = driverService.selectByProfileId(pointBO.getProfileId());
+            entityDOList.forEach(driver -> {
                 DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
                         MetadataTypeEnum.POINT,
                         command,
