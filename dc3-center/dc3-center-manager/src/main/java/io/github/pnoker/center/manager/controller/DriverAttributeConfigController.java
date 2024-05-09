@@ -155,7 +155,7 @@ public class DriverAttributeConfigController implements BaseController {
      * 根据 设备ID 查询 DriverConfig
      *
      * @param deviceId 设备ID
-     * @return DriverConfig Array
+     * @return DriverConfig 集合
      */
     @GetMapping("/device_id/{deviceId}")
     public R<List<DriverAttributeConfigVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {

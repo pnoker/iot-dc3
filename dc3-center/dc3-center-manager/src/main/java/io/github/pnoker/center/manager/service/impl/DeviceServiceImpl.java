@@ -204,10 +204,18 @@ public class DeviceServiceImpl implements DeviceService {
     public List<DeviceBO> selectByDriverId(Long driverId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDriverId, driverId);
-        List<DeviceDO> entityDOS = deviceManager.list(wrapper);
-        List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOS);
+        List<DeviceDO> entityDOList = deviceManager.list(wrapper);
+        List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOList);
         deviceBOList.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
         return deviceBOList;
+    }
+
+    @Override
+    public List<Long> selectIdsByDriverId(Long driverId) {
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+        wrapper.eq(DeviceDO::getDriverId, driverId).select(DeviceDO::getId);
+        List<DeviceDO> entityDOList = deviceManager.list(wrapper);
+        return entityDOList.stream().map(DeviceDO::getId).toList();
     }
 
     @Override
@@ -220,8 +228,8 @@ public class DeviceServiceImpl implements DeviceService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<DeviceDO> entityDOS = deviceManager.listByIds(ids);
-        List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOS);
+        List<DeviceDO> entityDOList = deviceManager.listByIds(ids);
+        List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOList);
         deviceBOList.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
         return deviceBOList;
     }
@@ -323,7 +331,7 @@ public class DeviceServiceImpl implements DeviceService {
      * @param deviceBO  Device
      * @param mainSheet Sheet
      * @param rowIndex  Row Index
-     * @return
+     * @return DeviceBO
      */
     private DeviceBO importDevice(DeviceBO deviceBO, Sheet mainSheet, int rowIndex) {
         DeviceBO importDeviceBO = getDevice(deviceBO, mainSheet, rowIndex);
@@ -403,7 +411,7 @@ public class DeviceServiceImpl implements DeviceService {
      *
      * @param driverAttributeBOS 驱动属性Array
      * @param pointAttributeBOS  位号属性Array
-     * @param pointBOS           Point Array
+     * @param pointBOS           Point 集合
      * @param workbook           Workbook
      */
     private boolean configIsEqual(List<DriverAttributeBO> driverAttributeBOS, List<PointAttributeBO> pointAttributeBOS, List<PointBO> pointBOS, Workbook workbook) {

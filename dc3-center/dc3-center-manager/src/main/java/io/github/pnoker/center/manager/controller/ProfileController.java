@@ -156,7 +156,7 @@ public class ProfileController implements BaseController {
      * 根据 设备ID 查询 Profile 集合
      *
      * @param deviceId 设备ID
-     * @return Profile Array
+     * @return Profile 集合
      */
     @GetMapping("/device_id/{deviceId}")
     public R<List<ProfileVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {

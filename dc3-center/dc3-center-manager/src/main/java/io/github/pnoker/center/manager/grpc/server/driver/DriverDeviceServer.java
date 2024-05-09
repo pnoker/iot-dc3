@@ -75,12 +75,11 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void list(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
+    public void selectByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
         GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         DeviceQuery pageQuery = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
-        pageQuery.setEnableFlag(EnableFlagEnum.ENABLE);
 
         Page<DeviceBO> devicePage = deviceService.selectByPage(pageQuery);
         if (ObjectUtil.isNull(devicePage)) {

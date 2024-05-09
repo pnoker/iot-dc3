@@ -24,7 +24,6 @@ import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
 import io.github.pnoker.center.manager.biz.DriverRegisterService;
-import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
@@ -74,8 +73,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
             builder.setDriver(grpcDriverDTO);
 
             // 查询设备
-            List<DeviceBO> deviceBOList = deviceService.selectByDriverId(driverBO.getId());
-            List<Long> idList = deviceBOList.stream().map(DeviceBO::getId).toList();
+            List<Long> idList = deviceService.selectIdsByDriverId(driverBO.getId());
             builder.addAllDeviceIds(idList);
 
             // 注册驱动属性

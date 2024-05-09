@@ -135,15 +135,15 @@ public class ProfileServiceImpl implements ProfileService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<ProfileDO> entityDOS = profileManager.listByIds(ids);
-        return profileBuilder.buildBOListByDOList(entityDOS);
+        List<ProfileDO> entityDOList = profileManager.listByIds(ids);
+        return profileBuilder.buildBOListByDOList(entityDOList);
     }
 
     @Override
     public List<ProfileBO> selectByDeviceId(Long deviceId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId);
-        List<ProfileBindDO> entityDOS = wrapper.list();
-        Set<Long> profileIds = entityDOS.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
+        List<ProfileBindDO> entityDOList = wrapper.list();
+        Set<Long> profileIds = entityDOList.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
         return selectByIds(profileIds);
     }
 

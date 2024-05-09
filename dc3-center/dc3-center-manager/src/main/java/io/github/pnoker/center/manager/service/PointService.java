@@ -37,7 +37,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * 根据 模版ID 查询位号
      *
      * @param profileId 位号ID
-     * @return Point Array
+     * @return Point 集合
      */
     List<PointBO> selectByProfileId(Long profileId);
 
@@ -45,7 +45,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * 根据 设备ID 查询位号
      *
      * @param deviceId 设备ID
-     * @return Point Array
+     * @return Point 集合
      */
     List<PointBO> selectByDeviceId(Long deviceId);
 
@@ -53,7 +53,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * 根据 模板ID 集查询位号
      *
      * @param profileIds 模版ID集
-     * @return Point Array
+     * @return Point 集合
      */
     List<PointBO> selectByProfileIds(Set<Long> profileIds);
 
@@ -61,7 +61,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
      * 根据 设备ID集合 查询设备
      *
      * @param ids 位号ID集
-     * @return Point Array
+     * @return Point 集合
      */
     List<PointBO> selectByIds(Set<Long> ids);
 

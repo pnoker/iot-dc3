@@ -48,9 +48,9 @@ public class DictionaryServiceImpl implements DictionaryService {
     public List<DictionaryBO> tenantDictionary() {
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
         wrapper.eq(TenantDO::getEnableFlag, EnableFlagEnum.ENABLE);
-        List<TenantDO> entityDOS = tenantManager.list(wrapper);
+        List<TenantDO> entityDOList = tenantManager.list(wrapper);
 
-        return entityDOS.stream().map(entityDO -> {
+        return entityDOList.stream().map(entityDO -> {
             DictionaryBO driverDictionary = new DictionaryBO();
             driverDictionary.setLabel(entityDO.getTenantName());
             driverDictionary.setValue(entityDO.getId());
@@ -63,9 +63,9 @@ public class DictionaryServiceImpl implements DictionaryService {
         LambdaQueryWrapper<LimitedIpDO> wrapper = Wrappers.<LimitedIpDO>query().lambda();
         wrapper.eq(LimitedIpDO::getTenantId, tenantId);
         wrapper.eq(LimitedIpDO::getEnableFlag, EnableFlagEnum.ENABLE);
-        List<LimitedIpDO> entityDOS = limitedIpManager.list(wrapper);
+        List<LimitedIpDO> entityDOList = limitedIpManager.list(wrapper);
 
-        return entityDOS.stream().map(entityDO -> {
+        return entityDOList.stream().map(entityDO -> {
             DictionaryBO driverDictionary = new DictionaryBO();
             driverDictionary.setLabel(entityDO.getIp());
             driverDictionary.setValue(entityDO.getId());

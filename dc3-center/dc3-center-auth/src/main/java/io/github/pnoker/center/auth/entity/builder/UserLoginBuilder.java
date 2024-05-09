@@ -50,8 +50,8 @@ public interface UserLoginBuilder {
     /**
      * VOList to BOList
      *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
+     * @param entityVOList EntityVO 集合
+     * @return EntityBO 集合
      */
     List<UserLoginBO> buildBOListByVOList(List<UserLoginVO> entityVOList);
 
@@ -75,8 +75,8 @@ public interface UserLoginBuilder {
     /**
      * BOList to DOList
      *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
+     * @param entityBOList EntityBO 集合
+     * @return EntityDO 集合
      */
     List<UserLoginDO> buildDOListByBOList(List<UserLoginBO> entityBOList);
 
@@ -99,8 +99,8 @@ public interface UserLoginBuilder {
     /**
      * DOList to BOList
      *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
+     * @param entityDOList EntityDO 集合
+     * @return EntityBO 集合
      */
     List<UserLoginBO> buildBOListByDOList(List<UserLoginDO> entityDOList);
 
@@ -115,7 +115,7 @@ public interface UserLoginBuilder {
     /**
      * BOList to VOList
      *
-     * @param entityBOList EntityBO Array
+     * @param entityBOList EntityBO 集合
      * @return EntityVO Array
      */
     List<UserLoginVO> buildVOListByBOList(List<UserLoginBO> entityBOList);

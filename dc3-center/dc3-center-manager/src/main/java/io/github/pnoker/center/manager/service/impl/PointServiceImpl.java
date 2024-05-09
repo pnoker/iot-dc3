@@ -148,23 +148,23 @@ public class PointServiceImpl implements PointService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        List<PointDO> entityDOS = pointManager.listByIds(ids);
-        return pointBuilder.buildBOListByDOList(entityDOS);
+        List<PointDO> entityDOList = pointManager.listByIds(ids);
+        return pointBuilder.buildBOListByDOList(entityDOList);
     }
 
     @Override
     public List<PointBO> selectByDeviceId(Long deviceId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId);
-        List<ProfileBindDO> entityDOS = wrapper.list();
-        Set<Long> profileIds = entityDOS.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
+        List<ProfileBindDO> entityDOList = wrapper.list();
+        Set<Long> profileIds = entityDOList.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
         return selectByProfileIds(profileIds);
     }
 
     @Override
     public List<PointBO> selectByProfileId(Long profileId) {
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, profileId);
-        List<PointDO> entityDOS = wrapper.list();
-        return pointBuilder.buildBOListByDOList(entityDOS);
+        List<PointDO> entityDOList = wrapper.list();
+        return pointBuilder.buildBOListByDOList(entityDOList);
     }
 
     @Override
@@ -173,8 +173,8 @@ public class PointServiceImpl implements PointService {
             return Collections.emptyList();
         }
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().in(PointDO::getProfileId, profileIds);
-        List<PointDO> entityDOS = wrapper.list();
-        return pointBuilder.buildBOListByDOList(entityDOS);
+        List<PointDO> entityDOList = wrapper.list();
+        return pointBuilder.buildBOListByDOList(entityDOList);
     }
 
     @Override

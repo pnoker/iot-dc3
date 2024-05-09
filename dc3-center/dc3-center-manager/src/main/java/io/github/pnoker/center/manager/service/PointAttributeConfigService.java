@@ -34,7 +34,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      * 根据 设备ID 查询
      *
      * @param deviceId 设备ID
-     * @return PointConfig Array
+     * @return PointConfig 集合
      */
     List<PointAttributeConfigBO> selectByDeviceId(Long deviceId);
 
@@ -42,7 +42,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      * 根据 属性ID 查询
      *
      * @param attributeId 属性ID
-     * @return PointConfig Array
+     * @return PointConfig 集合
      */
     List<PointAttributeConfigBO> selectByAttributeId(Long attributeId);
 
@@ -51,7 +51,7 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      *
      * @param deviceId 设备ID
      * @param pointId  位号ID
-     * @return PointConfig Array
+     * @return PointConfig 集合
      */
     List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
 

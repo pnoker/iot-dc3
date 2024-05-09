@@ -160,7 +160,7 @@ public class PointController implements BaseController {
      * 根据 模版 ID 查询 Point
      *
      * @param profileId 位号ID
-     * @return Point Array
+     * @return Point 集合
      */
     @GetMapping("/profile_id/{profileId}")
     public R<List<PointVO>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
