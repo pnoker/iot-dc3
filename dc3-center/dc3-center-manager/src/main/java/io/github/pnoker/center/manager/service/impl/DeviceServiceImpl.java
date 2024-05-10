@@ -152,7 +152,7 @@ public class DeviceServiceImpl implements DeviceService {
         // 删除的模版
         Set<Long> delete = new HashSet<>(oldProfileIds);
         delete.removeAll(newProfileIds);
-        delete.forEach(profileId -> profileBindService.removeByDeviceIdAndProfileId(entityBO.getId(), profileId));
+//        delete.forEach(profileId -> profileBindService.removeByDeviceIdAndProfileId(entityBO.getId(), profileId));
 
         entityDO = deviceBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
