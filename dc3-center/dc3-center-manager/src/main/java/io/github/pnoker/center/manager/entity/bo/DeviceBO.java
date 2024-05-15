@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Device BO
@@ -88,5 +88,5 @@ public class DeviceBO extends BaseBO {
     /**
      * 模版ID集
      */
-    private Set<Long> profileIds;
+    private List<Long> profileIds;
 }

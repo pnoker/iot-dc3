@@ -55,7 +55,9 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
 
     @Override
     public void save(DriverAttributeConfigBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("驱动属性配置创建失败: 驱动属性配置重复");
+        }
 
         DriverAttributeConfigDO entityDO = driverAttributeConfigBuilder.buildDOByBO(entityBO);
         if (!driverAttributeConfigManager.save(entityDO)) {
@@ -65,7 +67,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
 
     @Override
     public void remove(Long id) {
-        DriverAttributeConfigDO entityDO = getDOById(id, true);
+        getDOById(id, true);
 
         if (!driverAttributeConfigManager.removeById(id)) {
             throw new DeleteException("驱动属性配置删除失败");
@@ -76,7 +78,9 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     public void update(DriverAttributeConfigBO entityBO) {
         getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("驱动属性配置更新失败: 驱动属性配置重复");
+        }
 
         DriverAttributeConfigDO entityDO = driverAttributeConfigBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
@@ -137,12 +141,11 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     /**
      * 重复性校验
      *
-     * @param entityBO       {@link DriverAttributeConfigBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
+     * @param entityBO {@link DriverAttributeConfigBO}
+     * @param isUpdate 是否为更新操作
      * @return 是否重复
      */
-    private boolean checkDuplicate(DriverAttributeConfigBO entityBO, boolean isUpdate, boolean throwException) {
+    private boolean checkDuplicate(DriverAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
         wrapper.eq(DriverAttributeConfigDO::getDriverAttributeId, entityBO.getDriverAttributeId());
         wrapper.eq(DriverAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
@@ -152,11 +155,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         if (ObjectUtil.isNull(one)) {
             return false;
         }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("驱动属性配置重复");
-        }
-        return duplicate;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
     /**

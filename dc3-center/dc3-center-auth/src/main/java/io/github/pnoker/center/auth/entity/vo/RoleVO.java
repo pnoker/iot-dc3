@@ -23,7 +23,6 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -43,13 +42,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "Role", description = "角色")
 public class RoleVO extends BaseVO {
 
     /**
      * 角色父级ID
      */
-    @Schema(description = "角色父级ID")
     @NotNull(message = "Role parent id can't be empty",
             groups = {Add.class, Update.class})
     private Long parentRoleId;
@@ -57,7 +54,6 @@ public class RoleVO extends BaseVO {
     /**
      * 角色名称
      */
-    @Schema(description = "角色名称")
     @NotBlank(message = "Role name can't be empty",
             groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
@@ -68,18 +64,15 @@ public class RoleVO extends BaseVO {
     /**
      * 角色编号
      */
-    @Schema(description = "角色编号")
     private String roleCode;
 
     /**
      * 角色拓展信息
      */
-    @Schema(description = "角色拓展信息")
     private RoleExt roleExt;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

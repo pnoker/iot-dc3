@@ -134,7 +134,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public List<DriverBO> selectByProfileId(Long profileId) {
-        Set<Long> ids = profileBindService.selectDeviceIdsByProfileId(profileId);
+        List<Long> ids = profileBindService.selectDeviceIdsByProfileId(profileId);
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ExpireFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,42 +38,35 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "DriverToken", description = "驱动令牌")
 public class DriverTokenVO extends BaseVO {
 
     /**
      * 驱动编号
      */
-    @Schema(description = "驱动编号")
     private String driverCode;
 
     /**
      * 驱动AppID
      */
-    @Schema(description = "驱动AppID")
     private String driverAppId;
 
     /**
      * 驱动AppKey
      */
-    @Schema(description = "驱动AppKey")
     private String driverAppKey;
 
     /**
      * 失效标识
      */
-    @Schema(description = "失效标识")
     private ExpireFlagEnum expireFlag;
 
     /**
      * 失效时间
      */
-    @Schema(description = "失效时间")
     private LocalDateTime expireTime;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

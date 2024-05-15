@@ -34,7 +34,6 @@ import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.optional.CollectionOptional;
 import io.grpc.stub.StreamObserver;

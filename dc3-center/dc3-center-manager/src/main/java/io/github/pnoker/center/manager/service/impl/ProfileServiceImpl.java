@@ -75,7 +75,9 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void save(ProfileBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("模版创建失败: 模版重复");
+        }
 
         ProfileDO entityDO = profileBuilder.buildDOByBO(entityBO);
         if (!profileManager.save(entityDO)) {
@@ -86,17 +88,17 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void remove(Long id) {
-        ProfileDO entityDO = getDOById(id, true);
+        getDOById(id, true);
 
         // 删除模版之前需要检查该模版是否存在关联
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("模版删除失败, 该模版下存在位号");
+            throw new AssociatedException("模版删除失败: 该模版下存在位号");
         }
 
         if (!profileManager.removeById(id)) {
-            throw new DeleteException("The profile delete failed");
+            throw new DeleteException("模版删除失败");
         }
     }
 
@@ -104,7 +106,9 @@ public class ProfileServiceImpl implements ProfileService {
     public void update(ProfileBO entityBO) {
         getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("模版更新失败: 模版重复");
+        }
 
         ProfileDO entityDO = profileBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
@@ -170,12 +174,11 @@ public class ProfileServiceImpl implements ProfileService {
     /**
      * 重复性校验
      *
-     * @param entityBO       {@link ProfileBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
+     * @param entityBO {@link ProfileBO}
+     * @param isUpdate 是否为更新操作
      * @return 是否重复
      */
-    private boolean checkDuplicate(ProfileBO entityBO, boolean isUpdate, boolean throwException) {
+    private boolean checkDuplicate(ProfileBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
         wrapper.eq(ProfileDO::getProfileName, entityBO.getProfileName());
         wrapper.eq(ProfileDO::getProfileCode, entityBO.getProfileCode());
@@ -186,11 +189,7 @@ public class ProfileServiceImpl implements ProfileService {
         if (ObjectUtil.isNull(one)) {
             return false;
         }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("模版重复");
-        }
-        return duplicate;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
     /**

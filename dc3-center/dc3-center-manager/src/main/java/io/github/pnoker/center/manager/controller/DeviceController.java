@@ -30,8 +30,6 @@ import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.utils.ResponseUtil;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +40,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -53,7 +50,6 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-设备")
 @RequestMapping(ManagerConstant.DEVICE_URL_PREFIX)
 public class DeviceController implements BaseController {
 
@@ -72,7 +68,6 @@ public class DeviceController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    @Operation(summary = "新增-设备")
     public R<String> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
@@ -145,7 +140,7 @@ public class DeviceController implements BaseController {
      * @return Map(ID, DeviceVO)
      */
     @PostMapping("/ids")
-    public R<Map<Long, DeviceVO>> selectByIds(@RequestBody Set<Long> deviceIds) {
+    public R<Map<Long, DeviceVO>> selectByIds(@RequestBody List<Long> deviceIds) {
         try {
             List<DeviceBO> entityBOS = deviceService.selectByIds(deviceIds);
             Map<Long, DeviceVO> deviceMap = entityBOS.stream().collect(Collectors.toMap(DeviceBO::getId, entityBO -> deviceBuilder.buildVOByBO(entityBO)));

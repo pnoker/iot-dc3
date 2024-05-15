@@ -73,7 +73,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
                 .eq(AlarmMessageProfileDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("分组删除失败, 该分组下存在子分组");
+            throw new AssociatedException("分组删除失败: 该分组下存在子分组");
         }
 
         if (!alarmMessageProfileManager.removeById(id)) {

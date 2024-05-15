@@ -18,7 +18,6 @@ package io.github.pnoker.center.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -35,19 +34,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "LimitedIpQuery", description = "禁止IP-查询")
 public class LimitedIpQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -55,12 +51,10 @@ public class LimitedIpQuery implements Serializable {
     /**
      * 禁止IP
      */
-    @Schema(description = "禁止IP")
     private String ip;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

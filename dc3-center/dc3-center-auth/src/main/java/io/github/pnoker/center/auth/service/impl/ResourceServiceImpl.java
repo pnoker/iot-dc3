@@ -51,11 +51,13 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public void save(ResourceBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("资源创建失败: 资源重复");
+        }
 
         ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
         if (!resourceManager.save(entityDO)) {
-            throw new AddException("The resource add failed");
+            throw new AddException("资源创建失败");
         }
     }
 
@@ -64,7 +66,7 @@ public class ResourceServiceImpl implements ResourceService {
         getDOById(id, true);
 
         if (!resourceManager.removeById(id)) {
-            throw new DeleteException("The resource delete failed");
+            throw new DeleteException("资源删除失败");
         }
     }
 
@@ -72,12 +74,14 @@ public class ResourceServiceImpl implements ResourceService {
     public void update(ResourceBO entityBO) {
         getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("资源更新失败: 资源重复");
+        }
 
         ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!resourceManager.updateById(entityDO)) {
-            throw new UpdateException("The resource update failed");
+            throw new UpdateException("资源更新失败");
         }
     }
 
@@ -109,12 +113,11 @@ public class ResourceServiceImpl implements ResourceService {
     /**
      * 重复性校验
      *
-     * @param entityBO       {@link ResourceBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
+     * @param entityBO {@link ResourceBO}
+     * @param isUpdate 是否为更新操作
      * @return 是否重复
      */
-    private boolean checkDuplicate(ResourceBO entityBO, boolean isUpdate, boolean throwException) {
+    private boolean checkDuplicate(ResourceBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
         wrapper.eq(ResourceDO::getParentResourceId, entityBO.getParentResourceId());
         wrapper.eq(ResourceDO::getResourceName, entityBO.getResourceName());
@@ -128,11 +131,7 @@ public class ResourceServiceImpl implements ResourceService {
         if (ObjectUtil.isNull(one)) {
             return false;
         }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("资源重复");
-        }
-        return duplicate;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
     /**

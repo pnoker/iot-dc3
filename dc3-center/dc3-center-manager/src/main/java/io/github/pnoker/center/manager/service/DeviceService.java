@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Device Interface
@@ -81,7 +80,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * @param ids 设备ID集
      * @return {@link DeviceBO} 集合
      */
-    List<DeviceBO> selectByIds(Set<Long> ids);
+    List<DeviceBO> selectByIds(List<Long> ids);
 
     /**
      * 导入设备

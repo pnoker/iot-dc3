@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -34,19 +33,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "DeviceEvent", description = "设备事件-查询")
 public class DeviceEventQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -54,12 +50,10 @@ public class DeviceEventQuery implements Serializable {
     /**
      * 设备ID
      */
-    @Schema(description = "位号ID")
     private Long deviceId;
 
     /**
      * 位号ID
      */
-    @Schema(description = "位号ID")
     private Long pointId;
 }

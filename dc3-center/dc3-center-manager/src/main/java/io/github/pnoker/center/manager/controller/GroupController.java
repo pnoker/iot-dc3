@@ -29,8 +29,6 @@ import io.github.pnoker.common.entity.vo.GroupVO;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -44,7 +42,6 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-分组")
 @RequestMapping(ManagerConstant.GROUP_URL_PREFIX)
 public class GroupController implements BaseController {
 
@@ -63,7 +60,6 @@ public class GroupController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    @Operation(summary = "新增-分组")
     public R<String> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
         try {
             GroupBO entityBO = groupForManagerBuilder.buildBOByVO(entityVO);

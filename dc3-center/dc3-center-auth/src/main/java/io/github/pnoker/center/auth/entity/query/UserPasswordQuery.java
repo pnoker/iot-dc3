@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -34,13 +33,11 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "UserPasswordQuery", description = "用户密码-查询")
 public class UserPasswordQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     // 查询字段
@@ -48,6 +45,5 @@ public class UserPasswordQuery implements Serializable {
     /**
      * 登录密码
      */
-    @Schema(description = "登录密码")
     private String loginPassword;
 }

@@ -20,7 +20,7 @@ import io.github.pnoker.center.manager.entity.bo.ProfileBindBO;
 import io.github.pnoker.center.manager.entity.query.ProfileBindQuery;
 import io.github.pnoker.common.base.service.BaseService;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * ProfileBind Interface
@@ -62,7 +62,7 @@ public interface ProfileBindService extends BaseService<ProfileBindBO, ProfileBi
      * @param profileId 位号ID
      * @return 设备ID集
      */
-    Set<Long> selectDeviceIdsByProfileId(Long profileId);
+    List<Long> selectDeviceIdsByProfileId(Long profileId);
 
     /**
      * 根据 设备ID 查询关联的 模版ID 集合
@@ -70,6 +70,6 @@ public interface ProfileBindService extends BaseService<ProfileBindBO, ProfileBi
      * @param deviceId 设备ID
      * @return 模版ID集
      */
-    Set<Long> selectProfileIdsByDeviceId(Long deviceId);
+    List<Long> selectProfileIdsByDeviceId(Long deviceId);
 
 }

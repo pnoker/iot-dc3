@@ -23,7 +23,6 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -42,13 +41,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "Tenant", description = "租户")
 public class TenantVO extends BaseVO {
 
     /**
      * 租户名称
      */
-    @Schema(description = "租户名称")
     @NotBlank(message = "Tenant name can't be empty",
             groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
@@ -59,7 +56,6 @@ public class TenantVO extends BaseVO {
     /**
      * 租户编号
      */
-    @Schema(description = "租户编号")
     @NotBlank(message = "Tenant code can't be empty",
             groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
@@ -70,12 +66,10 @@ public class TenantVO extends BaseVO {
     /**
      * 租户拓展信息
      */
-    @Schema(description = "租户拓展信息")
     private TenantExt tenantExt;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

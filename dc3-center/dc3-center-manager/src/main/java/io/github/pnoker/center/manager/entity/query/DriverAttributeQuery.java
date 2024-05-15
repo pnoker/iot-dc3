@@ -19,7 +19,6 @@ package io.github.pnoker.center.manager.entity.query;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -36,19 +35,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "DriverAttributeQuery", description = "驱动属性-查询")
 public class DriverAttributeQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -56,36 +52,30 @@ public class DriverAttributeQuery implements Serializable {
     /**
      * 显示名称
      */
-    @Schema(description = "显示名称")
     private String displayName;
 
     /**
      * 属性名称
      */
-    @Schema(description = "属性名称")
     private String attributeName;
 
     /**
      * 属性类型标识
      */
-    @Schema(description = "属性类型标识")
     private AttributeTypeFlagEnum attributeTypeFlag;
 
     /**
      * 驱动ID
      */
-    @Schema(description = "驱动ID")
     private Long driverId;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
      * 版本
      */
-    @Schema(description = "版本")
     private Integer version;
 }

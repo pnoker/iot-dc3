@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -34,19 +33,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "LabelBindQuery", description = "标签绑定-查询")
 public class LabelBindQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -54,12 +50,10 @@ public class LabelBindQuery implements Serializable {
     /**
      * 标签ID
      */
-    @Schema(description = "标签ID")
     private Long labelId;
 
     /**
      * 实体ID
      */
-    @Schema(description = "实体ID")
     private Long entityId;
 }

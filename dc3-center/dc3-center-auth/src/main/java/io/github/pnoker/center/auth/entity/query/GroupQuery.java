@@ -19,7 +19,6 @@ package io.github.pnoker.center.auth.entity.query;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.GroupTypeFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -36,19 +35,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "GroupQuery", description = "分组-查询")
 public class GroupQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -56,30 +52,25 @@ public class GroupQuery implements Serializable {
     /**
      * 分组名称
      */
-    @Schema(description = "分组名称")
     private String groupName;
 
     /**
      * 父分组ID
      */
-    @Schema(description = "分组父级ID")
     private String parentGroupId;
 
     /**
      * 分组排序位置
      */
-    @Schema(description = "分组排序")
     private Integer position;
 
     /**
      * 分组标识
      */
-    @Schema(description = "分组标识")
     private GroupTypeFlagEnum groupTypeFlag;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

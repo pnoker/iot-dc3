@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -40,19 +39,16 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "AlarmRule", description = "报警规则")
 public class AlarmRuleQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -60,30 +56,25 @@ public class AlarmRuleQuery implements Serializable {
     /**
      * 报警规则名称
      */
-    @Schema(description = "报警规则名称")
     private String alarmRuleName;
 
     /**
      * 报警规则编号
      */
-    @Schema(description = "报警规则编号")
     private String alarmRuleCode;
 
     /**
      * 位号ID
      */
-    @Schema(description = "位号ID")
     private Long pointId;
 
     /**
      * 报警类型标识
      */
-    @Schema(description = "报警类型标识")
     private AlarmTypeFlagEnum alarmTypeFlag;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

@@ -18,7 +18,6 @@ package io.github.pnoker.center.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -35,13 +34,11 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "TenantQuery", description = "租户-查询")
 public class TenantQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     // 查询字段
@@ -49,18 +46,15 @@ public class TenantQuery implements Serializable {
     /**
      * 租户名称
      */
-    @Schema(description = "租户名称")
     private String tenantName;
 
     /**
      * 租户编号
      */
-    @Schema(description = "租户编号")
     private String tenantCode;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }
