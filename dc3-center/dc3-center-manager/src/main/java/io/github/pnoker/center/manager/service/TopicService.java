@@ -8,6 +8,7 @@ import io.github.pnoker.center.manager.entity.vo.TopicVO;
 import java.util.List;
 
 
+
 public interface TopicService extends IService<DeviceDO> {
 
     Page<List<TopicVO>> query(TopicQuery topicQuery);
