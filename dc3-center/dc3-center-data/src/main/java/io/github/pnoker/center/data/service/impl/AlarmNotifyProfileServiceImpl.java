@@ -72,7 +72,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         LambdaQueryChainWrapper<AlarmNotifyProfileDO> wrapper = alarmNotifyProfileManager.lambdaQuery().eq(AlarmNotifyProfileDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("报警通知模板删除失败, 该报警通知模板下存在子报警通知模板");
+            throw new AssociatedException("报警通知模板删除失败: 该报警通知模板下存在子报警通知模板");
         }
 
         if (!alarmNotifyProfileManager.removeById(id)) {

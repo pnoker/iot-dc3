@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,13 +37,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "RoleResourceBind", description = "角色资源绑定")
 public class RoleResourceBindVO extends BaseVO {
 
     /**
      * 角色ID
      */
-    @Schema(description = "角色ID")
     @NotNull(message = "Role id can't be empty",
             groups = {Add.class, Update.class})
     private Long roleId;
@@ -52,7 +49,6 @@ public class RoleResourceBindVO extends BaseVO {
     /**
      * 权限资源ID
      */
-    @Schema(description = "权限资源ID")
     @NotNull(message = "Resource id can't be empty",
             groups = {Add.class, Update.class})
     private Long resourceId;

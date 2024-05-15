@@ -64,7 +64,9 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Override
     public void save(PointAttributeConfigBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("位号属性配置创建失败: 位号属性配置重复");
+        }
 
         PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
         if (!pointAttributeConfigManager.save(entityDO)) {
@@ -74,7 +76,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Override
     public void remove(Long id) {
-        PointAttributeConfigDO entityDO = getDOById(id, true);
+        getDOById(id, true);
 
         if (!pointAttributeConfigManager.removeById(id)) {
             throw new DeleteException("位号属性配置删除失败");
@@ -85,7 +87,9 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     public void update(PointAttributeConfigBO entityBO) {
         getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("位号属性配置更新失败: 位号属性配置重复");
+        }
 
         PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
@@ -163,12 +167,11 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     /**
      * 重复性校验
      *
-     * @param entityBO       {@link PointAttributeConfigBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
+     * @param entityBO {@link PointAttributeConfigBO}
+     * @param isUpdate 是否为更新操作
      * @return 是否重复
      */
-    private boolean checkDuplicate(PointAttributeConfigBO entityBO, boolean isUpdate, boolean throwException) {
+    private boolean checkDuplicate(PointAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
         wrapper.eq(PointAttributeConfigDO::getPointAttributeId, entityBO.getPointAttributeId());
         wrapper.eq(PointAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
@@ -179,11 +182,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         if (ObjectUtil.isNull(one)) {
             return false;
         }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("位号属性配置重复");
-        }
-        return duplicate;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
     /**

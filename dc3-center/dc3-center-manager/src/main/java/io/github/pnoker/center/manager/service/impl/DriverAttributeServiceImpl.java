@@ -56,7 +56,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     @Override
     public void save(DriverAttributeBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("驱动属性创建失败: 驱动属性重复");
+        }
 
         DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(entityBO);
         if (!driverAttributeManager.save(entityDO)) {
@@ -77,7 +79,9 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public void update(DriverAttributeBO entityBO) {
         getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("驱动属性更新失败: 驱动属性重复");
+        }
 
         DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
@@ -132,12 +136,11 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     /**
      * 重复性校验
      *
-     * @param entityBO       {@link DriverAttributeBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
+     * @param entityBO {@link DriverAttributeBO}
+     * @param isUpdate 是否为更新操作
      * @return 是否重复
      */
-    private boolean checkDuplicate(DriverAttributeBO entityBO, boolean isUpdate, boolean throwException) {
+    private boolean checkDuplicate(DriverAttributeBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
         wrapper.eq(DriverAttributeDO::getAttributeName, entityBO.getAttributeName());
         wrapper.eq(DriverAttributeDO::getDriverId, entityBO.getDriverId());
@@ -147,11 +150,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         if (ObjectUtil.isNull(one)) {
             return false;
         }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("驱动属性重复");
-        }
-        return duplicate;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
     /**

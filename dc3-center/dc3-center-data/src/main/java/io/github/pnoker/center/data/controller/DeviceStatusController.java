@@ -24,7 +24,6 @@ import io.github.pnoker.center.data.entity.vo.DeviceRunVO;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +38,6 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-设备状态")
 @RequestMapping(DataConstant.DEVICE_STATUS_URL_PREFIX)
 public class DeviceStatusController implements BaseController {
 

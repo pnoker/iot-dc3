@@ -63,11 +63,13 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
     @Override
     public void save(RoleResourceBindBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("角色资源绑定创建失败: 角色资源绑定重复");
+        }
 
         RoleResourceBindDO entityDO = roleResourceBindBuilder.buildDOByBO(entityBO);
         if (!roleResourceBindManager.save(entityDO)) {
-            throw new AddException("The tenant bind add failed");
+            throw new AddException("角色资源绑定创建失败");
         }
     }
 
@@ -76,7 +78,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         getDOById(id, true);
 
         if (!roleResourceBindManager.removeById(id)) {
-            throw new DeleteException("The role resource bind delete failed");
+            throw new DeleteException("角色资源绑定删除失败");
         }
     }
 
@@ -84,12 +86,14 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     public void update(RoleResourceBindBO entityBO) {
         getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("角色资源绑定更新失败: 角色资源绑定重复");
+        }
 
         RoleResourceBindDO entityDO = roleResourceBindBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!roleResourceBindManager.updateById(entityDO)) {
-            throw new UpdateException("The role resource bind update failed");
+            throw new UpdateException("角色资源绑定更新失败");
         }
     }
 
@@ -135,12 +139,11 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     /**
      * 重复性校验
      *
-     * @param entityBO       {@link RoleResourceBindBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
+     * @param entityBO {@link RoleResourceBindBO}
+     * @param isUpdate 是否为更新操作
      * @return 是否重复
      */
-    private boolean checkDuplicate(RoleResourceBindBO entityBO, boolean isUpdate, boolean throwException) {
+    private boolean checkDuplicate(RoleResourceBindBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
         wrapper.eq(RoleResourceBindDO::getRoleId, entityBO.getRoleId());
         wrapper.eq(RoleResourceBindDO::getResourceId, entityBO.getResourceId());
@@ -150,11 +153,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         if (ObjectUtil.isNull(one)) {
             return false;
         }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("角色资源绑定重复");
-        }
-        return duplicate;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
     /**

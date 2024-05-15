@@ -72,7 +72,7 @@ public class MenuServiceImpl implements MenuService {
         LambdaQueryChainWrapper<MenuDO> wrapper = menuManager.lambdaQuery().eq(MenuDO::getParentMenuId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("菜单删除失败, 该菜单下存在子菜单");
+            throw new AssociatedException("菜单删除失败: 该菜单下存在子菜单");
         }
 
         if (!menuManager.removeById(id)) {

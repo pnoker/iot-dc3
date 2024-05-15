@@ -72,7 +72,7 @@ public class GroupServiceImpl implements GroupService {
         LambdaQueryChainWrapper<GroupDO> wrapper = groupManager.lambdaQuery().eq(GroupDO::getParentGroupId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("分组删除失败, 该分组下存在子分组");
+            throw new AssociatedException("分组删除失败: 该分组下存在子分组");
         }
 
         if (!groupManager.removeById(id)) {

@@ -31,8 +31,6 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -51,7 +49,6 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-位号")
 @RequestMapping(ManagerConstant.POINT_URL_PREFIX)
 public class PointController implements BaseController {
 
@@ -72,7 +69,6 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    @Operation(summary = "新增-位号")
     public R<PointBO> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
         try {
             PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
@@ -244,7 +240,6 @@ public class PointController implements BaseController {
      * @return {@link R}<{@link Set}<{@link Long}>>
      */
     @GetMapping("/selectPointStatisticsWithDevice/{pointId}")
-    @Operation(summary = "查询-位号被多少设备引用")
     public R<DeviceByPointVO> selectPointStatisticsWithDevice(@NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
             DeviceByPointBO deviceByPointBO = pointService.selectPointStatisticsWithDevice(pointId);
@@ -266,7 +261,6 @@ public class PointController implements BaseController {
      * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
      */
     @PostMapping("/selectPointStatisticsByDeviceId/{pointId}")
-    @Operation(summary = "查询-位号在不同设备下的数据量")
     public R<List<PointDataVolumeRunVO>> selectPointStatisticsByDeviceId(@NotNull @PathVariable(value = "pointId") Long pointId, @NotNull @RequestBody Set<Long> deviceIds) {
         try {
             List<PointDataVolumeRunBO> list = pointService.selectPointStatisticsByDeviceId(pointId, deviceIds);
@@ -286,7 +280,6 @@ public class PointController implements BaseController {
      * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
      */
     @GetMapping("/selectPointStatisticsByPointId/{pointId}")
-    @Operation(summary = "查询-当前位号数据总量")
     public R<Long> selectPointStatisticsByPointId(@NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
             PointDataVolumeRunDO pointDataVolumeRunDO = pointService.selectPointStatisticsByPointId(pointId);
@@ -304,7 +297,6 @@ public class PointController implements BaseController {
      * @return
      */
     @GetMapping("/selectPointByDeviceId/{deviceId}")
-    @Operation(summary = "查询-设备下位号数量")
     public R<Long> selectPointByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             Long count = pointService.selectPointByDeviceId(deviceId);
@@ -322,7 +314,6 @@ public class PointController implements BaseController {
      * @return
      */
     @GetMapping("/selectPointConfigByDeviceId/{deviceId}")
-    @Operation(summary = "查询-设备下已配置位号数量 下拉框")
     public R<PointConfigByDeviceVO> selectPointConfigByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             PointConfigByDeviceBO pointConfigByDeviceBO = pointService.selectPointConfigByDeviceId(deviceId);
@@ -343,7 +334,6 @@ public class PointController implements BaseController {
      * @return
      */
     @PostMapping("/selectDeviceStatisticsByPointId/{deviceId}")
-    @Operation(summary = "查询-设备在不同位号下的数据量")
     public R<List<DeviceDataVolumeRunVO>> selectDeviceStatisticsByPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @RequestBody Set<Long> pointIds) {
         try {
             List<DeviceDataVolumeRunBO> list = pointService.selectDeviceStatisticsByPointId(deviceId, pointIds);
@@ -362,7 +352,6 @@ public class PointController implements BaseController {
      * @return
      */
     @GetMapping("/selectPointDataByDriverId/{driverId}")
-    @Operation(summary = "查询-驱动下位号数据量")
     public R<Long> selectPointDataByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             PointDataVolumeRunDO pointDataVolumeRunDO = pointService.selectPointDataByDriverId(driverId);
@@ -380,7 +369,6 @@ public class PointController implements BaseController {
      * @return
      */
     @GetMapping("/selectPointByDriverId/{driverId}")
-    @Operation(summary = "查询-驱动下位号数量")
     public R<Long> selectPointByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             Long result = pointService.selectPointByDriverId(driverId);
@@ -392,7 +380,6 @@ public class PointController implements BaseController {
     }
 
     @GetMapping("/selectPointDataStatisticsByDriverId/{driverId}")
-    @Operation(summary = "查询-统计7天驱动下位号数据量")
     public R<PointDataStatisticsByDriverIdVO> selectPointDataStatisticsByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOS = pointService.selectPointDataStatisticsByDriverId(driverId);

@@ -30,8 +30,6 @@ import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -48,7 +46,6 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-驱动属性")
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_URL_PREFIX)
 public class DriverAttributeController implements BaseController {
 
@@ -67,7 +64,6 @@ public class DriverAttributeController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    @Operation(summary = "新增-驱动属性")
     public R<String> add(@Validated(Add.class) @RequestBody DriverAttributeVO entityVO) {
         try {
             DriverAttributeBO entityBO = driverAttributeBuilder.buildBOByVO(entityVO);

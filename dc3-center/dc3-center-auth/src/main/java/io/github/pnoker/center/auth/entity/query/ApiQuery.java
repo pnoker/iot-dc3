@@ -19,7 +19,6 @@ package io.github.pnoker.center.auth.entity.query;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.ApiTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -34,19 +33,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "ApiQuery", description = "接口-查询")
 public class ApiQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -54,24 +50,20 @@ public class ApiQuery implements Serializable {
     /**
      * Api接口类型标识
      */
-    @Schema(description = "Api接口类型标识")
     private ApiTypeFlagEnum apiTypeFlag;
 
     /**
      * Api接口名称
      */
-    @Schema(description = "Api接口名称")
     private String apiName;
 
     /**
      * Api接口编号, 一般为URL的MD5编码
      */
-    @Schema(description = "Api接口编号")
     private String apiCode;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

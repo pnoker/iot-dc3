@@ -18,7 +18,6 @@ package io.github.pnoker.center.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -35,13 +34,11 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "UserLoginQuery", description = "用户登录-查询")
 public class UserLoginQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     // 查询字段
@@ -49,24 +46,20 @@ public class UserLoginQuery implements Serializable {
     /**
      * 登录名称
      */
-    @Schema(description = "登录名称")
     private String loginName;
 
     /**
      * 用户ID
      */
-    @Schema(description = "用户ID")
     private Long userId;
 
     /**
      * 用户密码ID
      */
-    @Schema(description = "用户密码ID")
     private Long userPasswordId;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

@@ -19,7 +19,6 @@ package io.github.pnoker.center.auth.entity.query;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.MenuTypeFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -34,19 +33,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "MenuQuery", description = "菜单-查询")
 public class MenuQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -54,25 +50,21 @@ public class MenuQuery implements Serializable {
     /**
      * 菜单类型标识
      */
-    @Schema(description = "菜单类型标识")
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
      * 菜单名称
      */
-    @Schema(description = "菜单名称")
     private String menuName;
 
     /**
      * 菜单编号, 一般为URL的MD5编码
      */
-    @Schema(description = "菜单编号")
     private String menuCode;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
 }

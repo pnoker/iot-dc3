@@ -56,11 +56,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * DeviceService Impl
@@ -111,7 +107,7 @@ public class DeviceServiceImpl implements DeviceService {
         // 通知驱动新增
         DeviceBO deviceBO = selectById(entityDO.getId());
         List<ProfileBO> profileBOS = profileService.selectByDeviceId(entityDO.getId());
-        deviceBO.setProfileIds(profileBOS.stream().map(ProfileBO::getId).collect(Collectors.toSet()));
+        deviceBO.setProfileIds(profileBOS.stream().map(ProfileBO::getId).toList());
         driverNotifyService.notifyDevice(MetadataCommandTypeEnum.ADD, deviceBO);
     }
 
@@ -141,13 +137,12 @@ public class DeviceServiceImpl implements DeviceService {
 
         checkDuplicate(entityBO, true, true);
 
-        Set<Long> newProfileIds = ObjectUtil.isNotNull(entityBO.getProfileIds()) ? entityBO.getProfileIds() : new HashSet<>(4);
-        Set<Long> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityBO.getId());
+        List<Long> newProfileIds = Optional.ofNullable(entityBO.getProfileIds()).orElse(Collections.emptyList());
+        List<Long> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityBO.getId());
 
         // 新增的模版
-        Set<Long> add = new HashSet<>(newProfileIds);
-        add.removeAll(oldProfileIds);
-        addProfileBind(entityDO, add);
+        newProfileIds.removeAll(oldProfileIds);
+        addProfileBind(entityDO, newProfileIds);
 
         // 删除的模版
         Set<Long> delete = new HashSet<>(oldProfileIds);
@@ -214,8 +209,7 @@ public class DeviceServiceImpl implements DeviceService {
     public List<Long> selectIdsByDriverId(Long driverId) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDriverId, driverId).select(DeviceDO::getId);
-        List<DeviceDO> entityDOList = deviceManager.list(wrapper);
-        return entityDOList.stream().map(DeviceDO::getId).toList();
+        return deviceManager.list(wrapper).stream().map(DeviceDO::getId).toList();
     }
 
     @Override
@@ -224,7 +218,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public List<DeviceBO> selectByIds(Set<Long> ids) {
+    public List<DeviceBO> selectByIds(List<Long> ids) {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyList();
         }
@@ -521,7 +515,7 @@ public class DeviceServiceImpl implements DeviceService {
         return path;
     }
 
-    private void addProfileBind(DeviceDO entityDO, Set<Long> profileIds) {
+    private void addProfileBind(DeviceDO entityDO, List<Long> profileIds) {
         if (CollUtil.isEmpty(profileIds)) {
             return;
         }

@@ -26,9 +26,6 @@ import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +40,6 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-位号数据")
 @RequestMapping(DataConstant.POINT_VALUE_URL_PREFIX)
 public class PointValueController implements BaseController {
 
@@ -62,7 +58,6 @@ public class PointValueController implements BaseController {
      * @return 带分页的 {@link PointValueBO}
      */
     @PostMapping("/latest")
-    @Operation(summary = "分页查询-最新位号值")
     public R<Page<PointValueVO>> latest(@RequestBody PointValueQuery pointValueQuery) {
         try {
             if (ObjectUtil.isEmpty(pointValueQuery)) {
@@ -85,7 +80,6 @@ public class PointValueController implements BaseController {
      * @return 带分页的 {@link PointValueBO}
      */
     @PostMapping("/list")
-    @Operation(summary = "分页查询-历史位号值")
     public R<Page<PointValueVO>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         try {
             if (ObjectUtil.isEmpty(entityQuery)) {
@@ -108,11 +102,10 @@ public class PointValueController implements BaseController {
      * @return 带分页的 {@link PointValueBO}
      */
     @GetMapping("/history/device_id/{deviceId}/point_id/{pointId}")
-    @Operation(summary = "查询位号值历史数据")
     public R<List<String>> history(
-            @Schema(description = "设备ID") @NotNull @PathVariable(name = "deviceId") Long deviceId,
-            @Schema(description = "位号ID") @NotNull @PathVariable(name = "pointId") Long pointId,
-            @Schema(description = "历史数据量, 最多500条") @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
+            @NotNull @PathVariable(name = "deviceId") Long deviceId,
+            @NotNull @PathVariable(name = "pointId") Long pointId,
+            @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         try {
             List<String> history = pointValueService.history(deviceId, pointId, count);
             return R.ok(history);

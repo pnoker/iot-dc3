@@ -19,7 +19,6 @@ package io.github.pnoker.center.auth.entity.query;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ExpireFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.io.Serial;
@@ -36,19 +35,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "DriverTokenQuery", description = "驱动令牌-查询")
 public class DriverTokenQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -56,24 +52,20 @@ public class DriverTokenQuery implements Serializable {
     /**
      * 驱动编号
      */
-    @Schema(description = "驱动编号")
     private String driverCode;
 
     /**
      * 驱动AppID
      */
-    @Schema(description = "驱动AppID")
     private String driverAppId;
 
     /**
      * 失效标识
      */
-    @Schema(description = "失效标识")
     private ExpireFlagEnum expireFlag;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

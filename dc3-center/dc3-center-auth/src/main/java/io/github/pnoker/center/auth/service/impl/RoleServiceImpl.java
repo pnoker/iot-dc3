@@ -73,7 +73,7 @@ public class RoleServiceImpl implements RoleService {
         LambdaQueryChainWrapper<RoleDO> wrapper = roleManager.lambdaQuery().eq(RoleDO::getParentRoleId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("角色删除失败, 该角色下存在子角色");
+            throw new AssociatedException("角色删除失败: 该角色下存在子角色");
         }
 
         if (!roleManager.removeById(id)) {
