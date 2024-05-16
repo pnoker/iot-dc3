@@ -75,6 +75,20 @@ public interface GrpcDriverBuilder {
     @Mapping(target = "driverExt", ignore = true)
     @Mapping(target = "driverTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "driverNameBytes", ignore = true)
+    @Mapping(target = "driverCodeBytes", ignore = true)
+    @Mapping(target = "serviceNameBytes", ignore = true)
+    @Mapping(target = "serviceHostBytes", ignore = true)
+    @Mapping(target = "driverExtBytes", ignore = true)
+    @Mapping(target = "signatureBytes", ignore = true)
+    @Mapping(target = "mergeFrom", ignore = true)
+    @Mapping(target = "clearField", ignore = true)
+    @Mapping(target = "clearOneof", ignore = true)
+    @Mapping(target = "base", ignore = true)
+    @Mapping(target = "mergeBase", ignore = true)
+    @Mapping(target = "unknownFields", ignore = true)
+    @Mapping(target = "mergeUnknownFields", ignore = true)
+    @Mapping(target = "allFields", ignore = true)
     GrpcDriverDTO buildGrpcDTOByBO(DriverBO entityBO);
 
     @AfterMapping
