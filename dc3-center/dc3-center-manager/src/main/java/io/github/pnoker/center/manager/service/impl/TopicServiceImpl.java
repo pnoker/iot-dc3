@@ -52,16 +52,15 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO>
         String dName = topicQuery.getDeviceName();
         List<DeviceDO> deviceList = lambdaQuery()
                 .eq(deviceIdL != null, DeviceDO::getId, deviceIdL)
-                .eq(dName != null, DeviceDO::getDeviceName, dName)
+                .eq(!dName.isEmpty(), DeviceDO::getDeviceName, dName)
                 .eq(DeviceDO::getEnableFlag, 1)
-                .eq(DeviceDO::getDeleted, 0)
                 .list();
+
         for (DeviceDO device : deviceList) {
             String deviceName = device.getDeviceName();
             Long deviceId = device.getId();
             ProfileBindDO profileBind = Db.lambdaQuery(ProfileBindDO.class)
                     .eq(ProfileBindDO::getDeviceId, deviceId)
-                    .eq(ProfileBindDO::getDeleted, 0)
                     .one();
             if (profileBind != null) {
                 Long profileBindId = profileBind.getProfileId();
