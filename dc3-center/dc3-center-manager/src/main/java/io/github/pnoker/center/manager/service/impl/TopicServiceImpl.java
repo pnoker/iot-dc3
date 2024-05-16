@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.pnoker.center.manager.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,9 +27,9 @@ import io.github.pnoker.center.manager.entity.vo.TopicVO;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.TopicService;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
-
 
 
 @Service
@@ -23,8 +39,8 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO>
 
     @Override
     public Page<List<TopicVO>> query(TopicQuery topicQuery) {
-        int page =(int)topicQuery.getPage().getCurrent();
-        int size = (int)topicQuery.getPage().getSize();
+        int page = (int) topicQuery.getPage().getCurrent();
+        int size = (int) topicQuery.getPage().getSize();
         Page<List<TopicVO>> resultPage = new Page<>(page, size);
         List<TopicVO> topicVOList = new ArrayList<>();
         String topic = topicQuery.getTopic();
@@ -35,28 +51,28 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO>
         }
         String dName = topicQuery.getDeviceName();
         List<DeviceDO> deviceList = lambdaQuery()
-                .eq(deviceIdL != null,DeviceDO::getId,deviceIdL)
-                .eq(dName != null,DeviceDO::getDeviceName,dName)
-                .eq(DeviceDO::getEnableFlag,1)
-                .eq(DeviceDO::getDeleted,0)
+                .eq(deviceIdL != null, DeviceDO::getId, deviceIdL)
+                .eq(dName != null, DeviceDO::getDeviceName, dName)
+                .eq(DeviceDO::getEnableFlag, 1)
+                .eq(DeviceDO::getDeleted, 0)
                 .list();
-        for(DeviceDO device:deviceList){
+        for (DeviceDO device : deviceList) {
             String deviceName = device.getDeviceName();
             Long deviceId = device.getId();
-            ProfileBindDO profileBind= Db.lambdaQuery(ProfileBindDO.class)
+            ProfileBindDO profileBind = Db.lambdaQuery(ProfileBindDO.class)
                     .eq(ProfileBindDO::getDeviceId, deviceId)
-                    .eq(ProfileBindDO::getDeleted,0)
+                    .eq(ProfileBindDO::getDeleted, 0)
                     .one();
-            if(profileBind != null){
+            if (profileBind != null) {
                 Long profileBindId = profileBind.getProfileId();
                 List<PointDO> points = Db.lambdaQuery(PointDO.class)
-                        .eq(PointDO::getProfileId,profileBindId)
-                        .eq(PointDO::getEnableFlag,1)
-                        .eq(PointDO::getDeleted,0)
+                        .eq(PointDO::getProfileId, profileBindId)
+                        .eq(PointDO::getEnableFlag, 1)
+                        .eq(PointDO::getDeleted, 0)
                         .list();
                 for (PointDO point : points) {
                     TopicVO topicVO = new TopicVO();
-                    topicVO.setTopic("dc3/dc3-center-data/device/"+deviceId);
+                    topicVO.setTopic("dc3/dc3-center-data/device/" + deviceId);
                     topicVO.setDeviceName(deviceName);
                     topicVO.setPointName(point.getPointName());
                     topicVOList.add(topicVO);

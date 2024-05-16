@@ -69,6 +69,12 @@ public interface GrpcDeviceBuilder {
      * @return DeviceQuery
      */
     @Mapping(target = "page", ignore = true)
+    @Mapping(target = "deviceName", ignore = true)
+    @Mapping(target = "deviceCode", ignore = true)
+    @Mapping(target = "groupId", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "profileId", ignore = true)
     DeviceQuery buildQueryByGrpcQuery(io.github.pnoker.api.common.driver.GrpcPageDeviceQuery entityQuery);
 
     @AfterMapping
@@ -84,7 +90,20 @@ public interface GrpcDeviceBuilder {
      * @return GrpcDeviceDTO
      */
     @Mapping(target = "deviceExt", ignore = true)
+    @Mapping(target = "profileIdsList", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "deviceNameBytes", ignore = true)
+    @Mapping(target = "deviceCodeBytes", ignore = true)
+    @Mapping(target = "deviceExtBytes", ignore = true)
+    @Mapping(target = "signatureBytes", ignore = true)
+    @Mapping(target = "mergeFrom", ignore = true)
+    @Mapping(target = "clearField", ignore = true)
+    @Mapping(target = "clearOneof", ignore = true)
+    @Mapping(target = "base", ignore = true)
+    @Mapping(target = "mergeBase", ignore = true)
+    @Mapping(target = "unknownFields", ignore = true)
+    @Mapping(target = "mergeUnknownFields", ignore = true)
+    @Mapping(target = "allFields", ignore = true)
     GrpcDeviceDTO buildGrpcDTOByBO(DeviceBO entityBO);
 
     @AfterMapping
