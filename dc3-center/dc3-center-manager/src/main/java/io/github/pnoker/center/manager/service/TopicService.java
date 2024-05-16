@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.query.TopicQuery;
 import io.github.pnoker.center.manager.entity.vo.TopicVO;
-import java.util.List;
 
+import java.util.List;
 
 
 public interface TopicService extends IService<DeviceDO> {

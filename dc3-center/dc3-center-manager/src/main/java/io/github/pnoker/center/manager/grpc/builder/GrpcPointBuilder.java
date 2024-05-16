@@ -68,6 +68,11 @@ public interface GrpcPointBuilder {
     }
 
     @Mapping(target = "page", ignore = true)
+    @Mapping(target = "pointName", ignore = true)
+    @Mapping(target = "pointCode", ignore = true)
+    @Mapping(target = "groupId", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "profileId", ignore = true)
     @Mapping(target = "pointTypeFlag", ignore = true)
     @Mapping(target = "rwFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
@@ -89,6 +94,19 @@ public interface GrpcPointBuilder {
     @Mapping(target = "pointTypeFlag", ignore = true)
     @Mapping(target = "rwFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "pointNameBytes", ignore = true)
+    @Mapping(target = "pointCodeBytes", ignore = true)
+    @Mapping(target = "unitBytes", ignore = true)
+    @Mapping(target = "pointExtBytes", ignore = true)
+    @Mapping(target = "signatureBytes", ignore = true)
+    @Mapping(target = "mergeFrom", ignore = true)
+    @Mapping(target = "clearField", ignore = true)
+    @Mapping(target = "clearOneof", ignore = true)
+    @Mapping(target = "base", ignore = true)
+    @Mapping(target = "mergeBase", ignore = true)
+    @Mapping(target = "unknownFields", ignore = true)
+    @Mapping(target = "mergeUnknownFields", ignore = true)
+    @Mapping(target = "allFields", ignore = true)
     GrpcPointDTO buildGrpcDTOByBO(PointBO entityBO);
 
     @AfterMapping
