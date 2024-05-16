@@ -29,7 +29,6 @@ public class TopicQuery implements Serializable {
 
     private String topic;
 
-    // 查询字段
 
     /**
      * 设备名称
