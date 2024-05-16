@@ -25,7 +25,7 @@ public class TopicController implements BaseController{
         this.topicService = topicService;
     }
 
-    @GetMapping("/list")
+    @PostMapping("/list")
     public R<Page<List<TopicVO>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
         try {
             Page<List<TopicVO>> topicVOList = topicService.query(topicQuery);
