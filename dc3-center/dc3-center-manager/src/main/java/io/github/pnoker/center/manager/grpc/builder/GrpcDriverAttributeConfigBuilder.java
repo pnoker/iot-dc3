@@ -45,6 +45,16 @@ public interface GrpcDriverAttributeConfigBuilder {
      * @return GrpcDriverAttributeConfigDTO
      */
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "configValueBytes", ignore = true)
+    @Mapping(target = "signatureBytes", ignore = true)
+    @Mapping(target = "mergeFrom", ignore = true)
+    @Mapping(target = "clearField", ignore = true)
+    @Mapping(target = "clearOneof", ignore = true)
+    @Mapping(target = "base", ignore = true)
+    @Mapping(target = "mergeBase", ignore = true)
+    @Mapping(target = "unknownFields", ignore = true)
+    @Mapping(target = "mergeUnknownFields", ignore = true)
+    @Mapping(target = "allFields", ignore = true)
     GrpcDriverAttributeConfigDTO buildGrpcDTOByBO(DriverAttributeConfigBO entityBO);
 
     @AfterMapping

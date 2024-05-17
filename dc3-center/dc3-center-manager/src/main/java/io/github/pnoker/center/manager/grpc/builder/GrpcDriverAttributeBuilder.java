@@ -80,6 +80,19 @@ public interface GrpcDriverAttributeBuilder {
     @Mapping(target = "attributeExt", ignore = true)
     @Mapping(target = "attributeTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "displayNameBytes", ignore = true)
+    @Mapping(target = "attributeNameBytes", ignore = true)
+    @Mapping(target = "defaultValueBytes", ignore = true)
+    @Mapping(target = "attributeExtBytes", ignore = true)
+    @Mapping(target = "signatureBytes", ignore = true)
+    @Mapping(target = "mergeFrom", ignore = true)
+    @Mapping(target = "clearField", ignore = true)
+    @Mapping(target = "clearOneof", ignore = true)
+    @Mapping(target = "base", ignore = true)
+    @Mapping(target = "mergeBase", ignore = true)
+    @Mapping(target = "unknownFields", ignore = true)
+    @Mapping(target = "mergeUnknownFields", ignore = true)
+    @Mapping(target = "allFields", ignore = true)
     GrpcDriverAttributeDTO buildGrpcDTOByBO(DriverAttributeBO entityBO);
 
     @AfterMapping
