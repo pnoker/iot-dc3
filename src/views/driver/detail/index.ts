@@ -54,7 +54,7 @@ export default defineComponent({
         Sunset,
         Management,
         Connection,
-        Monitor,
+        Monitor
     },
     setup() {
         const route = useRoute()
@@ -65,7 +65,7 @@ export default defineComponent({
         const reactiveData = reactive({
             id: route.query.id as string,
             active: route.query.active,
-            data: {} as any,
+            data: {} as any
         })
 
         const deviceLength = computed(() => {
@@ -109,7 +109,7 @@ export default defineComponent({
             reactiveData,
             deviceLength,
             changeActive,
-            timestamp,
+            timestamp
         }
-    },
+    }
 })

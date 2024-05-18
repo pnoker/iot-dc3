@@ -28,23 +28,23 @@ export default defineComponent({
         Edit,
         Sunset,
         IceCreamSquare,
-        CollectionTag,
+        CollectionTag
     },
     props: {
         embedded: {
             type: Boolean,
-            default: () => false,
+            default: () => false
         },
         data: {
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         icon: {
             type: String,
-            default: () => 'images/common/profile.png',
-        },
+            default: () => 'images/common/profile.png'
+        }
     },
     emits: ['disable-thing', 'enable-thing', 'delete-thing'],
     setup(props, { emit }) {
@@ -53,7 +53,7 @@ export default defineComponent({
             SwitchButton,
             CircleCheck,
             Right,
-            CircleClose,
+            CircleClose
         }
 
         const disableThing = () => {
@@ -94,7 +94,7 @@ export default defineComponent({
             detail,
             copyId: copy,
             timestamp,
-            ...Icon,
+            ...Icon
         }
-    },
+    }
 })

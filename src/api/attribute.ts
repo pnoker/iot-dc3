@@ -25,7 +25,7 @@ import request from '@/config/axios'
 export const getDriverAttributeByDriverId = (id: string) =>
     request<R>({
         url: `api/v3/manager/driver_attribute/driver_id/${id}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -36,5 +36,5 @@ export const getDriverAttributeByDriverId = (id: string) =>
 export const getPointAttributeByDriverId = (id: string) =>
     request<R>({
         url: `api/v3/manager/point_attribute/driver_id/${id}`,
-        method: 'get',
+        method: 'get'
     })

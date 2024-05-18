@@ -29,37 +29,37 @@ export default defineComponent({
         List,
         Coin,
         Edit,
-        Sunset,
+        Sunset
     },
     props: {
         embedded: {
             type: Boolean,
             default: () => {
                 return false
-            },
+            }
         },
         status: {
             type: String,
             default: () => {
                 return ''
-            },
+            }
         },
         data: {
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         driver: {
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         icon: {
             type: String,
-            default: 'images/common/device.png',
-        },
+            default: 'images/common/device.png'
+        }
     },
     emits: ['disable-thing', 'enable-thing', 'delete-thing'],
     setup(props, { emit }) {
@@ -67,7 +67,7 @@ export default defineComponent({
         const Icon = {
             SwitchButton,
             CircleCheck,
-            CircleClose,
+            CircleClose
         }
 
         const disableThing = () => {
@@ -108,7 +108,7 @@ export default defineComponent({
             detail,
             copyId: copy,
             timestamp,
-            ...Icon,
+            ...Icon
         }
-    },
+    }
 })

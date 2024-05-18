@@ -30,12 +30,12 @@ import { logout } from '@/utils/CommonUtil'
 
 NProgress.configure({
     easing: 'ease',
-    showSpinner: false,
+    showSpinner: false
 })
 
 const router = createRouter({
     history: createWebHashHistory(import.meta.env.BASE_URL),
-    routes: [...commonRouters, viewsRouters, ...operateRouters],
+    routes: [...commonRouters, viewsRouters, ...operateRouters]
 })
 
 router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
@@ -57,7 +57,7 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
     const login: Login = {
         tenant: tenant,
         name: user,
-        ...token,
+        ...token
     }
 
     checkTokenValid(login)

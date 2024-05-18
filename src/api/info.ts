@@ -26,7 +26,7 @@ export const addDriverInfo = (driverInfo: any) =>
     request<R>({
         url: `api/v3/manager/driver_attribute_config/add`,
         method: 'post',
-        data: driverInfo,
+        data: driverInfo
     })
 
 /**
@@ -39,7 +39,7 @@ export const updateDriverInfo = (driverInfo: any) =>
     request<R>({
         url: `api/v3/manager/driver_attribute_config/update`,
         method: 'post',
-        data: driverInfo,
+        data: driverInfo
     })
 
 /**
@@ -52,7 +52,7 @@ export const updateDriverInfo = (driverInfo: any) =>
 export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attributeId: string) =>
     request<R>({
         url: `api/v3/manager/driver_attribute_config/device_id/${deviceId}/attribute_id/${attributeId}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -64,7 +64,7 @@ export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attribut
 export const getDriverInfoByDeviceId = (deviceId: string) =>
     request<R>({
         url: `api/v3/manager/driver_attribute_config/device_id/${deviceId}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -77,7 +77,7 @@ export const addPointInfo = (pointInfo: any) =>
     request<R>({
         url: `api/v3/manager/point_attribute_config/add`,
         method: 'post',
-        data: pointInfo,
+        data: pointInfo
     })
 
 /**
@@ -90,7 +90,7 @@ export const updatePointInfo = (pointInfo: any) =>
     request<R>({
         url: `api/v3/manager/point_attribute_config/update`,
         method: 'post',
-        data: pointInfo,
+        data: pointInfo
     })
 
 /**
@@ -103,7 +103,7 @@ export const updatePointInfo = (pointInfo: any) =>
 export const getPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: string) =>
     request<R>({
         url: `api/v3/manager/point_attribute_config/device_id/${deviceId}/point_id/${pointId}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -115,5 +115,5 @@ export const getPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: stri
 export const getPointInfoByDeviceId = (deviceId: string) =>
     request<R>({
         url: `api/v3/manager/point_attribute_config/device_id/${deviceId}`,
-        method: 'get',
+        method: 'get'
     })

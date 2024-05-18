@@ -27,7 +27,7 @@ export const generateSalt = (login: Login) =>
     request<R>({
         url: `api/v3/auth/token/salt`,
         method: 'post',
-        data: login,
+        data: login
     })
 
 /**
@@ -40,7 +40,7 @@ export const generateToken = (login: Login) =>
     request<R>({
         url: `api/v3/auth/token/generate`,
         method: 'post',
-        data: login,
+        data: login
     })
 
 /**
@@ -53,7 +53,7 @@ export const cancelToken = (login: Login) =>
     request<R>({
         url: `api/v3/auth/token/cancel`,
         method: 'post',
-        data: login,
+        data: login
     })
 
 /**
@@ -66,5 +66,5 @@ export const checkTokenValid = (login: Login) =>
     request<R>({
         url: `api/v3/auth/token/check`,
         method: 'post',
-        data: login,
+        data: login
     })

@@ -61,43 +61,43 @@ class ShaderProgram {
                 },
                 onResize: () => {
                     // nothing to do
-                },
+                }
             },
-            options,
+            options
         )
         const uniforms = Object.assign(
             {
                 time: {
                     type: 'float',
-                    value: 0,
+                    value: 0
                 },
                 hasTexture: {
                     type: 'int',
-                    value: 0,
+                    value: 0
                 },
                 resolution: {
                     type: 'vec2',
-                    value: [0, 0],
+                    value: [0, 0]
                 },
                 projection: {
                     type: 'mat4',
-                    value: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-                },
+                    value: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+                }
             },
-            options.uniforms,
+            options.uniforms
         )
         const buffers = Object.assign(
             {
                 position: {
                     size: 3,
-                    data: [],
+                    data: []
                 },
                 color: {
                     size: 4,
-                    data: [],
-                },
+                    data: []
+                }
             },
-            options.buffers,
+            options.buffers
         )
         const camera = Object.assign(
             {
@@ -106,13 +106,13 @@ class ShaderProgram {
                 far: 10000,
                 aspect: 1,
                 z: 100,
-                perspective: true,
+                perspective: true
             },
-            options.camera,
+            options.camera
         )
         const canvas = document.createElement('canvas')
         const gl = canvas.getContext('webgl', {
-            antialias: options.antialias,
+            antialias: options.antialias
         })
         if (!gl) return false
         this.count = 0
@@ -138,7 +138,7 @@ class ShaderProgram {
         this.update = this.update.bind(this)
         this.time = {
             start: performance.now(),
-            old: performance.now(),
+            old: performance.now()
         }
         this.update()
     }
@@ -217,7 +217,7 @@ class ShaderProgram {
                     uniforms[name].value = value
                     this.setUniform(name, value)
                 },
-                get: () => uniforms[name].value,
+                get: () => uniforms[name].value
             })
         })
     }
@@ -282,7 +282,7 @@ class ShaderProgram {
                     this.setBuffer(name, data)
                     if (name === 'position') this.count = buffers.position.data.length / 3
                 },
-                get: () => buffers[name].data,
+                get: () => buffers[name].data
             })
         })
     }
@@ -357,7 +357,7 @@ export default {
             uniforms: {
                 size: { type: 'float', value: pointSize },
                 field: { type: 'vec3', value: [0, 0, 0] },
-                speed: { type: 'float', value: 5 },
+                speed: { type: 'float', value: 5 }
             },
             vertex: `
                             #define M_PI 3.1415926535897932384626433832795
@@ -404,9 +404,9 @@ export default {
                 this.buffers.position = position
                 this.buffers.color = color
                 this.uniforms.size = (h / 400) * pointSize * dpi
-            },
+            }
         })
-    },
+    }
 }
 </script>
 

@@ -27,20 +27,20 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/home/dashboard',
                 meta: {
                     icon: 'el-icon-s-home',
-                    title: '看板',
+                    title: '看板'
                 },
-                component: () => import('@/views/dashboard/Dashboard.vue'),
+                component: () => import('@/views/dashboard/Dashboard.vue')
             },
             {
                 name: 'application',
                 path: '/home/application',
                 meta: {
                     icon: 'el-icon-s-home',
-                    title: '应用',
+                    title: '应用'
                 },
-                component: () => import('@/views/application/Application.vue'),
-            },
-        ],
+                component: () => import('@/views/application/Application.vue')
+            }
+        ]
     },
     {
         path: '/driver',
@@ -51,11 +51,11 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/driver/detail',
                 meta: {
                     icon: 'el-icon-s-promotion',
-                    title: '驱动信息',
+                    title: '驱动信息'
                 },
-                component: () => import('@/views/driver/detail/DriverDetail.vue'),
-            },
-        ],
+                component: () => import('@/views/driver/detail/DriverDetail.vue')
+            }
+        ]
     },
     {
         path: '/device',
@@ -66,20 +66,20 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/device/detail',
                 meta: {
                     icon: 'el-icon-s-finance',
-                    title: '设备信息',
+                    title: '设备信息'
                 },
-                component: () => import('@/views/device/detail/DeviceDetail.vue'),
+                component: () => import('@/views/device/detail/DeviceDetail.vue')
             },
             {
                 name: 'deviceEdit',
                 path: '/device/edit',
                 meta: {
                     icon: 'el-icon-s-finance',
-                    title: '设备编辑',
+                    title: '设备编辑'
                 },
-                component: () => import('@/views/device/edit/DeviceEdit.vue'),
-            },
-        ],
+                component: () => import('@/views/device/edit/DeviceEdit.vue')
+            }
+        ]
     },
     {
         path: '/profile',
@@ -90,20 +90,20 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/profile/detail',
                 meta: {
                     icon: 'el-icon-s-order',
-                    title: '模板信息',
+                    title: '模板信息'
                 },
-                component: () => import('@/views/profile/detail/ProfileDetail.vue'),
+                component: () => import('@/views/profile/detail/ProfileDetail.vue')
             },
             {
                 name: 'profileEdit',
                 path: '/profile/edit',
                 meta: {
                     icon: 'el-icon-s-order',
-                    title: '模板编辑',
+                    title: '模板编辑'
                 },
-                component: () => import('@/views/profile/edit/ProfileEdit.vue'),
-            },
-        ],
+                component: () => import('@/views/profile/edit/ProfileEdit.vue')
+            }
+        ]
     },
     {
         path: '/point',
@@ -114,21 +114,21 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/point/detail',
                 meta: {
                     icon: 'el-icon-s-order',
-                    title: '位号信息',
+                    title: '位号信息'
                 },
-                component: () => import('@/views/point/detail/PointDetail.vue'),
+                component: () => import('@/views/point/detail/PointDetail.vue')
             },
             {
                 name: 'pointEdit',
                 path: '/point/edit',
                 meta: {
                     icon: 'el-icon-s-order',
-                    title: '位号编辑',
+                    title: '位号编辑'
                 },
-                component: () => import('@/views/point/edit/PointEdit.vue'),
-            },
-        ],
-    },
+                component: () => import('@/views/point/edit/PointEdit.vue')
+            }
+        ]
+    }
 ]
 
 export default routes

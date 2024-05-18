@@ -22,7 +22,7 @@ import { Attribute } from '@/config/entity'
 export default defineComponent({
     name: 'PointInfoCard',
     components: {
-        Goblet,
+        Goblet
     },
     props: {
         data: {
@@ -33,20 +33,20 @@ export default defineComponent({
                     defaultValue: '',
                     remark: '',
                     createTime: '',
-                    operateTime: '',
+                    operateTime: ''
                 }
-            },
+            }
         },
         attributes: {
             type: Array<Attribute>,
             default: () => {
                 return []
-            },
+            }
         },
         icon: {
             type: String,
-            default: 'images/common/point-info-disable.png',
-        },
+            default: 'images/common/point-info-disable.png'
+        }
     },
     emits: ['select'],
     setup(props, { emit }) {
@@ -76,7 +76,7 @@ export default defineComponent({
         return {
             isConfig,
             isSelect,
-            select,
+            select
         }
-    },
+    }
 })

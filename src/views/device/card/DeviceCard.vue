@@ -22,7 +22,7 @@
                     class="things-card__header"
                     :class="{
                         'header-enable': 'ENABLE' === data.enableFlag,
-                        'header-disable': 'ENABLE' !== data.enableFlag,
+                        'header-disable': 'ENABLE' !== data.enableFlag
                     }"
                 >
                     <div class="things-card-header-icon">

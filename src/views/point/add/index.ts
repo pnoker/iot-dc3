@@ -25,8 +25,8 @@ export default defineComponent({
             type: String,
             default: () => {
                 return ''
-            },
-        },
+            }
+        }
     },
     emits: ['add-thing'],
     setup(props, { emit }) {
@@ -42,9 +42,9 @@ export default defineComponent({
                 multiple: 1,
                 valueDecimal: 3,
                 unit: '',
-                profileId: props.profileId,
+                profileId: props.profileId
             } as any,
-            formVisible: false,
+            formVisible: false
         })
 
         // 定义表单校验规则
@@ -53,59 +53,59 @@ export default defineComponent({
                 {
                     required: true,
                     message: '请输入位号名称',
-                    trigger: 'blur',
+                    trigger: 'blur'
                 },
                 {
                     min: 2,
                     max: 32,
                     message: '请输入 2~32 位字长的位号名称',
-                    trigger: 'blur',
+                    trigger: 'blur'
                 },
                 {
                     pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-                    message: '请输入正确格式的位号名称',
-                },
+                    message: '请输入正确格式的位号名称'
+                }
             ],
             pointTypeFlag: [
                 {
                     required: true,
                     message: '请选择位号数据类型',
-                    trigger: 'change',
-                },
+                    trigger: 'change'
+                }
             ],
             rwFlag: [
                 {
                     required: true,
                     message: '请选择位号读写标识',
-                    trigger: 'change',
-                },
+                    trigger: 'change'
+                }
             ],
             baseValue: [
                 {
                     pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
-                    message: '请输入 正确格式的基础值',
-                },
+                    message: '请输入 正确格式的基础值'
+                }
             ],
             multiple: [
                 {
                     pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
-                    message: '请输入 正确格式的比例系数',
-                },
+                    message: '请输入 正确格式的比例系数'
+                }
             ],
             valueDecimal: [
                 {
                     required: true,
                     message: '请输入 数据格式',
-                    trigger: 'blur',
-                },
+                    trigger: 'blur'
+                }
             ],
             remark: [
                 {
                     max: 300,
                     message: '最多输入300个字符',
-                    trigger: 'blur',
-                },
-            ],
+                    trigger: 'blur'
+                }
+            ]
         })
 
         const show = () => {
@@ -138,7 +138,7 @@ export default defineComponent({
             show,
             cancel,
             reset,
-            addThing,
+            addThing
         }
-    },
+    }
 })

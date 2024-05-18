@@ -80,8 +80,8 @@ const reactiveData = reactive({
     formData: {
         tenant: tenant,
         name: name,
-        password: 'dc3dc3dc3',
-    },
+        password: 'dc3dc3dc3'
+    }
 })
 
 // 定义表单校验规则
@@ -90,8 +90,8 @@ const formRule = reactive<FormRules>({
     name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
     password: [
         { required: true, message: '请输入密码', trigger: 'blur' },
-        { min: 6, message: '密码长度最少为6位', trigger: 'blur' },
-    ],
+        { min: 6, message: '密码长度最少为6位', trigger: 'blur' }
+    ]
 })
 
 // 显示、隐藏密码

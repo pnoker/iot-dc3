@@ -129,14 +129,14 @@ defineProps({
         type: String,
         default: () => {
             return ''
-        },
+        }
     },
     page: {
         type: Object,
         default: () => {
             return {}
-        },
-    },
+        }
+    }
 })
 
 const emit = defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change'])
@@ -153,7 +153,7 @@ const reactiveData = reactive({
         total: 0,
         size: 5,
         current: 1,
-        orders: [] as Order[],
+        orders: [] as Order[]
     },
     pointQuery: '',
     pointDictionary: [] as Dictionary[],
@@ -161,8 +161,8 @@ const reactiveData = reactive({
         total: 0,
         size: 5,
         current: 1,
-        orders: [] as Order[],
-    },
+        orders: [] as Order[]
+    }
 })
 
 // 定义表单校验规则
@@ -171,7 +171,7 @@ const formRule = reactive<FormRules>({})
 const deviceDictionary = (query?: string) => {
     getDeviceDictionary({
         page: reactiveData.devicePage,
-        label: query ? query : reactiveData.deviceQuery,
+        label: query ? query : reactiveData.deviceQuery
     })
         .then((res) => {
             const data = res.data
@@ -192,7 +192,7 @@ const pointDictionary = (query?: string) => {
     getPointDictionary({
         page: reactiveData.pointPage,
         label: query ? query : reactiveData.pointQuery,
-        parentId: reactiveData.formData.deviceId,
+        parentId: reactiveData.formData.deviceId
     })
         .then((res) => {
             const data = res.data

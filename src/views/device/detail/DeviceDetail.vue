@@ -116,7 +116,7 @@ const reactiveData = reactive({
     listPointData: [] as any[],
     listPointValueData: [] as any[],
     listPointValueHistoryData: {},
-    pointValueDetailData: {},
+    pointValueDetailData: {}
 })
 
 const profileLength = computed(() => {

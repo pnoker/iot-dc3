@@ -35,39 +35,39 @@ export default defineComponent({
         pointTool,
         pointAddForm,
         pointCard,
-        blankCard,
+        blankCard
     },
     props: {
         embedded: {
             type: String,
             default: () => {
                 return ''
-            },
+            }
         },
         pre: {
             type: Boolean,
             default: () => {
                 return false
-            },
+            }
         },
         next: {
             type: Boolean,
             default: () => {
                 return false
-            },
+            }
         },
         profileId: {
             type: String,
             default: () => {
                 return ''
-            },
+            }
         },
         deviceId: {
             type: String,
             default: () => {
                 return ''
-            },
-        },
+            }
+        }
     },
     emits: ['pre-handle', 'next-handle'],
     setup(props, { emit }) {
@@ -84,8 +84,8 @@ export default defineComponent({
                 total: 0,
                 size: 12,
                 current: 1,
-                orders: [] as Order[],
-            },
+                orders: [] as Order[]
+            }
         })
 
         const hasData = computed(() => {
@@ -96,19 +96,19 @@ export default defineComponent({
             if (!isNull(props.profileId)) {
                 reactiveData.query = {
                     ...reactiveData.query,
-                    profileId: props.profileId,
+                    profileId: props.profileId
                 }
             }
             if (!isNull(props.deviceId)) {
                 reactiveData.query = {
                     ...reactiveData.query,
-                    deviceId: props.deviceId,
+                    deviceId: props.deviceId
                 }
             }
 
             getPointList({
                 page: reactiveData.page,
-                ...reactiveData.query,
+                ...reactiveData.query
             })
                 .then((res) => {
                     const data = res.data
@@ -137,13 +137,13 @@ export default defineComponent({
             if (!isNull(props.profileId)) {
                 params = {
                     ...params,
-                    profileId: props.profileId,
+                    profileId: props.profileId
                 }
             }
             if (!isNull(props.deviceId)) {
                 params = {
                     ...params,
-                    deviceId: props.deviceId,
+                    deviceId: props.deviceId
                 }
             }
 
@@ -266,7 +266,7 @@ export default defineComponent({
             sizeChange,
             currentChange,
             preHandle,
-            nextHandle,
+            nextHandle
         }
-    },
+    }
 })

@@ -27,12 +27,12 @@ export default defineComponent({
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         add: {
             type: Boolean,
-            default: () => false,
-        },
+            default: () => false
+        }
     },
     emits: ['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change'],
     setup(props, { emit }) {
@@ -43,12 +43,12 @@ export default defineComponent({
 
         // 定义响应式数据
         const reactiveData = reactive({
-            formData: {} as any,
+            formData: {} as any
         })
 
         // 定义表单校验规则
         const formRule = reactive<FormRules>({
-            port: [{ type: 'number', message: '端口必须为数字值' }],
+            port: [{ type: 'number', message: '端口必须为数字值' }]
         })
 
         // 图标
@@ -57,7 +57,7 @@ export default defineComponent({
             Search,
             RefreshRight,
             Refresh,
-            Sort,
+            Sort
         }
 
         const search = () => {
@@ -102,7 +102,7 @@ export default defineComponent({
             sort,
             sizeChange,
             currentChange,
-            ...Icon,
+            ...Icon
         }
-    },
+    }
 })

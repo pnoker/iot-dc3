@@ -28,26 +28,26 @@ export default defineComponent({
             type: String,
             default: () => {
                 return ''
-            },
+            }
         },
         page: {
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         pre: {
             type: Boolean,
             default: () => {
                 return false
-            },
+            }
         },
         next: {
             type: Boolean,
             default: () => {
                 return false
-            },
-        },
+            }
+        }
     },
     emits: ['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change', 'pre-handle', 'next-handle'],
     setup(props, { emit }) {
@@ -62,7 +62,7 @@ export default defineComponent({
             Refresh,
             Sort,
             Back,
-            Check,
+            Check
         }
 
         // 定义响应式数据
@@ -74,19 +74,19 @@ export default defineComponent({
                 total: 0,
                 size: 5,
                 current: 1,
-                orders: [] as Order[],
-            },
+                orders: [] as Order[]
+            }
         })
 
         // 定义表单校验规则
         const formRule = reactive<FormRules>({
-            port: [{ type: 'number', message: '端口必须为数字值' }],
+            port: [{ type: 'number', message: '端口必须为数字值' }]
         })
 
         const profileDictionary = () => {
             getProfileDictionary({
                 page: reactiveData.profilePage,
-                label: reactiveData.profileQuery,
+                label: reactiveData.profileQuery
             })
                 .then((res) => {
                     const data = res.data
@@ -163,7 +163,7 @@ export default defineComponent({
             currentChange,
             preHandle,
             nextHandle,
-            ...Icon,
+            ...Icon
         }
-    },
+    }
 })

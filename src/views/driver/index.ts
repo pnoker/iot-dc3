@@ -31,7 +31,7 @@ export default defineComponent({
         blankCard,
         skeletonCard,
         driverTool,
-        driverCard,
+        driverCard
     },
     setup() {
         // 定义响应式数据
@@ -40,15 +40,15 @@ export default defineComponent({
             statusTable: {},
             listData: [] as any[],
             query: {
-                type: 'driver',
+                type: 'driver'
             },
             order: false,
             page: {
                 total: 0,
                 size: 12,
                 current: 1,
-                orders: [] as Order[],
-            },
+                orders: [] as Order[]
+            }
         })
 
         const hasData = computed(() => {
@@ -58,7 +58,7 @@ export default defineComponent({
         const list = () => {
             getDriverList({
                 page: reactiveData.page,
-                ...reactiveData.query,
+                ...reactiveData.query
             })
                 .then((res) => {
                     const data = res.data
@@ -74,7 +74,7 @@ export default defineComponent({
 
             getDriverStatus({
                 page: reactiveData.page,
-                ...reactiveData.query,
+                ...reactiveData.query
             })
                 .then((res) => {
                     reactiveData.statusTable = res.data
@@ -128,7 +128,7 @@ export default defineComponent({
             refresh,
             sort,
             sizeChange,
-            currentChange,
+            currentChange
         }
-    },
+    }
 })

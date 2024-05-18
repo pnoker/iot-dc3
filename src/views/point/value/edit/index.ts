@@ -26,8 +26,8 @@ export default defineComponent({
             type: Object,
             default: () => {
                 return {}
-            },
-        },
+            }
+        }
     },
     emits: ['update-thing'],
     setup(props, { emit }) {
@@ -36,7 +36,7 @@ export default defineComponent({
 
         // 定义响应式数据
         const reactiveData = reactive({
-            formVisible: false,
+            formVisible: false
         })
 
         // 定义表单校验规则
@@ -45,16 +45,16 @@ export default defineComponent({
                 {
                     required: true,
                     message: '请输入位号值',
-                    trigger: 'blur',
-                },
+                    trigger: 'blur'
+                }
             ],
             remark: [
                 {
                     max: 300,
                     message: '最多输入300个字符',
-                    trigger: 'blur',
-                },
-            ],
+                    trigger: 'blur'
+                }
+            ]
         })
 
         const show = () => {
@@ -87,7 +87,7 @@ export default defineComponent({
             show,
             cancel,
             reset,
-            updateThing,
+            updateThing
         }
-    },
+    }
 })

@@ -89,7 +89,7 @@ export const setStorage = (key: string, value: any, isSession?: boolean) => {
         dataType: typeof value,
         content: value,
         type: isSession,
-        datetime: new Date().getTime(),
+        datetime: new Date().getTime()
     }
     if (isSession) window.sessionStorage.setItem(key, encode(JSON.stringify(obj)))
     else window.localStorage.setItem(key, encode(JSON.stringify(obj)))
@@ -117,14 +117,14 @@ export const getAllStorage = (isSession?: boolean) => {
         for (let i = 0; i <= window.sessionStorage.length; i++) {
             list.push({
                 name: window.sessionStorage.key(i),
-                content: getStorage(window.sessionStorage.key(i) || ''),
+                content: getStorage(window.sessionStorage.key(i) || '')
             })
         }
     } else {
         for (let i = 0; i <= window.localStorage.length; i++) {
             list.push({
                 name: window.localStorage.key(i),
-                content: getStorage(window.localStorage.key(i) || ''),
+                content: getStorage(window.localStorage.key(i) || '')
             })
         }
     }

@@ -21,38 +21,38 @@ const routes: Array<RouteRecordRaw> = [
         name: 'login',
         path: '/login',
         meta: {
-            title: 'IoT DC3 Web',
+            title: 'IoT DC3 Web'
         },
-        component: () => import('@/views/login/Login.vue'),
+        component: () => import('@/views/login/Login.vue')
     },
     {
         name: '403',
         path: '/403',
         meta: {
-            title: '403',
+            title: '403'
         },
-        component: () => import('@/components/error/403.vue'),
+        component: () => import('@/components/error/403.vue')
     },
     {
         name: '404',
         path: '/404',
         meta: {
-            title: '404',
+            title: '404'
         },
-        component: () => import('@/components/error/404.vue'),
+        component: () => import('@/components/error/404.vue')
     },
     {
         name: '500',
         path: '/500',
         meta: {
-            title: '500',
+            title: '500'
         },
-        component: () => import('@/components/error/500.vue'),
+        component: () => import('@/components/error/500.vue')
     },
     {
         path: '/:catchAll(.*)',
-        redirect: '/404',
-    },
+        redirect: '/404'
+    }
 ]
 
 export default routes

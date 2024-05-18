@@ -26,47 +26,47 @@ const routes: RouteRecordRaw = {
             name: 'home',
             path: '/home',
             meta: {
-                title: '首页',
+                title: '首页'
             },
-            component: () => import('@/views/home/Home.vue'),
+            component: () => import('@/views/home/Home.vue')
         },
         {
             name: 'driver',
             path: '/driver',
             meta: {
                 icon: 'Promotion',
-                title: '驱动',
+                title: '驱动'
             },
-            component: () => import('@/views/driver/Driver.vue'),
+            component: () => import('@/views/driver/Driver.vue')
         },
         {
             name: 'profile',
             path: '/profile',
             meta: {
                 icon: 'List',
-                title: '模板',
+                title: '模板'
             },
-            component: () => import('@/views/profile/Profile.vue'),
+            component: () => import('@/views/profile/Profile.vue')
         },
         {
             name: 'device',
             path: '/device',
             meta: {
                 icon: 'Management',
-                title: '设备',
+                title: '设备'
             },
-            component: () => import('@/views/device/Device.vue'),
+            component: () => import('@/views/device/Device.vue')
         },
         {
             name: 'pointValue',
             path: '/point_value',
             meta: {
                 icon: 'Histogram',
-                title: '数据',
+                title: '数据'
             },
-            component: () => import('@/views/point/value/PointValue.vue'),
-        },
-    ],
+            component: () => import('@/views/point/value/PointValue.vue')
+        }
+    ]
 }
 
 export default routes

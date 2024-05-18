@@ -36,8 +36,8 @@ const request: AxiosInstance = axios.create({
             } catch (err) {
                 return { data }
             }
-        },
-    ],
+        }
+    ]
 })
 
 request.interceptors.request.use(
@@ -66,7 +66,7 @@ request.interceptors.request.use(
     },
     (error: any) => {
         return Promise.reject(error)
-    },
+    }
 )
 
 request.interceptors.response.use(
@@ -88,7 +88,7 @@ request.interceptors.response.use(
     },
     (error: any) => {
         return Promise.reject(error)
-    },
+    }
 )
 
 export default request

@@ -39,7 +39,7 @@ export default defineComponent({
     name: 'DeviceEdit',
     components: {
         skeletonCard,
-        pointInfoCard,
+        pointInfoCard
     },
     setup() {
         const route = useRoute()
@@ -55,7 +55,7 @@ export default defineComponent({
             RefreshLeft,
             Right,
             Back,
-            Check,
+            Check
         }
 
         // 定义响应式数据
@@ -80,7 +80,7 @@ export default defineComponent({
                 total: 0,
                 size: 5,
                 current: 1,
-                orders: [] as Order[],
+                orders: [] as Order[]
             },
             profileQuery: '',
             profileDictionary: [] as Dictionary[],
@@ -88,8 +88,8 @@ export default defineComponent({
                 total: 0,
                 size: 5,
                 current: 1,
-                orders: [] as Order[],
-            },
+                orders: [] as Order[]
+            }
         })
 
         // 定义表单校验规则
@@ -98,47 +98,47 @@ export default defineComponent({
                 {
                     required: true,
                     message: '请输入设备名称',
-                    trigger: 'blur',
+                    trigger: 'blur'
                 },
                 {
                     min: 2,
                     max: 32,
                     message: '请输入 2~32 位字长的设备名称',
-                    trigger: 'blur',
+                    trigger: 'blur'
                 },
                 {
                     pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-                    message: '请输入正确格式的设备名称',
-                },
+                    message: '请输入正确格式的设备名称'
+                }
             ],
             driverId: [
                 {
                     required: true,
                     message: '请选择所属驱动',
-                    trigger: 'change',
-                },
+                    trigger: 'change'
+                }
             ],
             profileIds: [
                 {
                     required: true,
                     message: '请选择关联模板',
-                    trigger: 'change',
-                },
+                    trigger: 'change'
+                }
             ],
             enableFlag: [
                 {
                     required: true,
                     message: '请选择使能',
-                    trigger: 'change',
-                },
+                    trigger: 'change'
+                }
             ],
             remark: [
                 {
                     max: 300,
                     message: '最多输入300个字符',
-                    trigger: 'blur',
-                },
-            ],
+                    trigger: 'blur'
+                }
+            ]
         })
 
         const hasPointFormData = computed(() => {
@@ -148,7 +148,7 @@ export default defineComponent({
         const driverDictionary = () => {
             getDriverDictionary({
                 page: reactiveData.driverPage,
-                label: reactiveData.driverQuery,
+                label: reactiveData.driverQuery
             })
                 .then((res) => {
                     const data = res.data
@@ -175,7 +175,7 @@ export default defineComponent({
         const profileDictionary = () => {
             getProfileDictionary({
                 page: reactiveData.profilePage,
-                label: reactiveData.profileQuery,
+                label: reactiveData.profileQuery
             })
                 .then((res) => {
                     const data = res.data
@@ -209,7 +209,7 @@ export default defineComponent({
                         const driver = res.data
                         reactiveData.driverDictionary.push({
                             label: driver.driverName,
-                            value: driver.id,
+                            value: driver.id
                         } as Dictionary)
                     })
 
@@ -219,7 +219,7 @@ export default defineComponent({
                             const profile = profiles[key]
                             reactiveData.profileDictionary.push({
                                 label: profile.profileName,
-                                value: profile.id,
+                                value: profile.id
                             } as Dictionary)
                         }
                     })
@@ -248,7 +248,7 @@ export default defineComponent({
                     reactiveData.driverAttributes.forEach((attribute) => {
                         driverFormData[attribute.attributeName] = {
                             id: null,
-                            configValue: '',
+                            configValue: ''
                         }
                     })
                     reactiveData.driverFormData = JSON.parse(JSON.stringify(driverFormData))
@@ -285,7 +285,7 @@ export default defineComponent({
                     res.data.forEach((info: { driverAttributeId: string | number; id: any; configValue: any }) => {
                         formData[reactiveData.driverAttributeTable[info.driverAttributeId]] = {
                             id: info.id,
-                            configValue: info.configValue,
+                            configValue: info.configValue
                         }
                     })
 
@@ -304,13 +304,13 @@ export default defineComponent({
                         const pointInfo = {
                             id: point.id,
                             pointName: point.pointName,
-                            shadow: 'hover',
+                            shadow: 'hover'
                         }
 
                         reactiveData.pointAttributes.forEach((attribute) => {
                             pointInfo[attribute.attributeName] = {
                                 id: null,
-                                configValue: '',
+                                configValue: ''
                             }
                         })
                         return pointInfo
@@ -323,7 +323,7 @@ export default defineComponent({
                                     if (pointInfo.id === info.pointId) {
                                         pointInfo[reactiveData.pointAttributeTable[info.pointAttributeId]] = {
                                             id: info.id,
-                                            configValue: info.configValue,
+                                            configValue: info.configValue
                                         }
                                     }
                                     return pointInfo
@@ -364,7 +364,7 @@ export default defineComponent({
                             id: reactiveData.driverFormData[attribute.attributeName].id,
                             driverAttributeId: attribute.id,
                             deviceId: reactiveData.id,
-                            configValue: reactiveData.driverFormData[attribute.attributeName].configValue,
+                            configValue: reactiveData.driverFormData[attribute.attributeName].configValue
                         }
 
                         driverInfo.id
@@ -382,7 +382,7 @@ export default defineComponent({
                         function loadFormData(res: { id: any; driverAttributeId?: any; deviceId?: string; configValue: any }) {
                             driverFormData[attribute.attributeName] = {
                                 id: res.id,
-                                configValue: res.configValue,
+                                configValue: res.configValue
                             }
                             reactiveData.oldDriverFormData = JSON.parse(JSON.stringify(driverFormData))
                         }
@@ -401,7 +401,7 @@ export default defineComponent({
                             pointAttributeId: attribute.id,
                             deviceId: reactiveData.id,
                             pointId: reactiveData.pointFormData.id,
-                            configValue: reactiveData.pointFormData[attribute.attributeName].configValue,
+                            configValue: reactiveData.pointFormData[attribute.attributeName].configValue
                         }
 
                         pointInfo.id
@@ -421,7 +421,7 @@ export default defineComponent({
                                 if (pointInfo.id === reactiveData.pointFormData.id) {
                                     pointInfo[attribute.attributeName] = {
                                         id: res.id,
-                                        configValue: res.configValue,
+                                        configValue: res.configValue
                                     }
                                     reactiveData.oldPointFormData = JSON.parse(JSON.stringify(pointInfo))
                                 }
@@ -438,7 +438,7 @@ export default defineComponent({
                 if (!row[attribute.attributeName]) {
                     row[attribute.attributeName] = {
                         id: null,
-                        configValue: '',
+                        configValue: ''
                     }
                 }
             })
@@ -529,7 +529,7 @@ export default defineComponent({
             driverInfoReset,
             pointInfoReset,
             changeActive,
-            ...Icon,
+            ...Icon
         }
-    },
+    }
 })

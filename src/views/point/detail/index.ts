@@ -41,7 +41,7 @@ export default defineComponent({
         CollectionTag,
         Edit,
         Sunset,
-        Management,
+        Management
     },
     setup() {
         const route = useRoute()
@@ -54,7 +54,7 @@ export default defineComponent({
             profileTable: {},
             statusTable: {},
             data: {} as any,
-            listDeviceData: [] as any[],
+            listDeviceData: [] as any[]
         })
 
         const driver = () => {
@@ -88,8 +88,8 @@ export default defineComponent({
                             reactiveData.listDeviceData.reduce((pre, cur) => {
                                 pre.push(...cur.profileIds)
                                 return pre
-                            }, []),
-                        ),
+                            }, [])
+                        )
                     )
                     getProfileByIds(profileIds)
                         .then((res) => {
@@ -132,7 +132,7 @@ export default defineComponent({
             device,
             deviceName,
             changeActive,
-            timestamp,
+            timestamp
         }
-    },
+    }
 })

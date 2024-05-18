@@ -39,7 +39,7 @@ export default defineComponent({
                 total: 0,
                 size: 5,
                 current: 1,
-                orders: [] as Order[],
+                orders: [] as Order[]
             },
             profileQuery: '',
             profileDictionary: [] as Dictionary[],
@@ -47,8 +47,8 @@ export default defineComponent({
                 total: 0,
                 size: 5,
                 current: 1,
-                orders: [] as Order[],
-            },
+                orders: [] as Order[]
+            }
         })
 
         // 定义表单校验规则
@@ -57,39 +57,39 @@ export default defineComponent({
                 {
                     required: true,
                     message: '请输入设备名称',
-                    trigger: 'blur',
+                    trigger: 'blur'
                 },
                 {
                     min: 2,
                     max: 32,
                     message: '请输入 2~32 位字长的设备名称',
-                    trigger: 'blur',
+                    trigger: 'blur'
                 },
                 {
                     pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-                    message: '请输入正确格式的设备名称',
-                },
+                    message: '请输入正确格式的设备名称'
+                }
             ],
             driverId: [
                 {
                     required: true,
                     message: '请选择所属驱动',
-                    trigger: 'change',
-                },
+                    trigger: 'change'
+                }
             ],
             remark: [
                 {
                     max: 300,
                     message: '最多输入300个字符',
-                    trigger: 'blur',
-                },
-            ],
+                    trigger: 'blur'
+                }
+            ]
         })
 
         const driverDictionary = () => {
             getDriverDictionary({
                 page: reactiveData.driverPage,
-                label: reactiveData.driverQuery,
+                label: reactiveData.driverQuery
             })
                 .then((res) => {
                     const data = res.data
@@ -116,7 +116,7 @@ export default defineComponent({
         const profileDictionary = () => {
             getProfileDictionary({
                 page: reactiveData.profilePage,
-                label: reactiveData.profileQuery,
+                label: reactiveData.profileQuery
             })
                 .then((res) => {
                     const data = res.data
@@ -176,7 +176,7 @@ export default defineComponent({
             show,
             cancel,
             reset,
-            addThing,
+            addThing
         }
-    },
+    }
 })

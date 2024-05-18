@@ -28,14 +28,14 @@ export default defineComponent({
             type: String,
             default: () => {
                 return ''
-            },
+            }
         },
         page: {
             type: Object,
             default: () => {
                 return {}
-            },
-        },
+            }
+        }
     },
     emits: ['search', 'reset', 'show-add', 'show-import', 'refresh', 'sort', 'size-change', 'current-change'],
     setup(props, { emit }) {
@@ -51,8 +51,8 @@ export default defineComponent({
                 total: 0,
                 size: 5,
                 current: 1,
-                orders: [] as Order[],
-            },
+                orders: [] as Order[]
+            }
         })
 
         // 定义表单校验规则
@@ -65,13 +65,13 @@ export default defineComponent({
             Search,
             RefreshRight,
             Refresh,
-            Sort,
+            Sort
         }
 
         const driverDictionary = (query?: string) => {
             getDriverDictionary({
                 page: reactiveData.driverPage,
-                label: query ? query : reactiveData.driverQuery,
+                label: query ? query : reactiveData.driverQuery
             })
                 .then((res) => {
                     const data = res.data
@@ -149,7 +149,7 @@ export default defineComponent({
             sort,
             sizeChange,
             currentChange,
-            ...Icon,
+            ...Icon
         }
-    },
+    }
 })

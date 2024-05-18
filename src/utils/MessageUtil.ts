@@ -21,7 +21,7 @@ export const info = (message: string, grouping = true, showClose = true) => {
         type: 'info',
         grouping: grouping,
         showClose: showClose,
-        message: message,
+        message: message
     })
 }
 
@@ -30,7 +30,7 @@ export const success = (message: string, grouping = true, showClose = true) => {
         type: 'success',
         grouping: grouping,
         showClose: showClose,
-        message: message,
+        message: message
     })
 }
 
@@ -39,7 +39,7 @@ export const error = (message: string, grouping = true, showClose = true) => {
         type: 'error',
         grouping: grouping,
         showClose: showClose,
-        message: message,
+        message: message
     })
 }
 
@@ -48,6 +48,6 @@ export const warning = (message: string, grouping = true, showClose = true) => {
         type: 'warning',
         grouping: grouping,
         showClose: showClose,
-        message: message,
+        message: message
     })
 }

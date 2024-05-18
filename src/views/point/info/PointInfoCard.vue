@@ -22,7 +22,7 @@
                     class="things-card__header"
                     :class="{
                         'header-enable': isConfig,
-                        'header-disable': !isConfig,
+                        'header-disable': !isConfig
                     }"
                 >
                     <div class="things-card-header-icon">

@@ -31,5 +31,5 @@ export const log = {
     error(message: string) {
         const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS')
         console.log(now, '%cERROR%c  ---  :', 'color:#F00', message)
-    },
+    }
 }

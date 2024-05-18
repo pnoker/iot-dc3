@@ -22,7 +22,7 @@
                     class="things-card__header"
                     :class="{
                         'header-enable': data.interval < 200,
-                        'header-disable': data.interval >= 200,
+                        'header-disable': data.interval >= 200
                     }"
                 >
                     <div class="things-card-header-icon">
@@ -111,41 +111,41 @@ const props = defineProps({
         type: String,
         default: () => {
             return ''
-        },
+        }
     },
     data: {
         type: Object,
         default: () => {
             return {}
-        },
+        }
     },
     device: {
         type: Object,
         default: () => {
             return {}
-        },
+        }
     },
     point: {
         type: Object,
         default: () => {
             return {}
-        },
+        }
     },
     unit: {
         type: String,
-        default: '',
+        default: ''
     },
     icon: {
         type: String,
-        default: 'images/common/point.png',
-    },
+        default: 'images/common/point.png'
+    }
 })
 
 const copyValue = (data) => {
     const content = {
         deviceId: data.deviceId,
         pointId: data.pointId,
-        value: data.value,
+        value: data.value
     }
     copy(JSON.stringify(content, null, 2), '位号值')
 }
@@ -186,14 +186,14 @@ onMounted(() => {
                                 textAlign: 'left',
                                 fontSize: 10,
                                 fill: 'rgba(44, 53, 66, 0.45)',
-                                textBaseline: 'bottom',
-                            },
+                                textBaseline: 'bottom'
+                            }
                         },
                         style: {
-                            stroke: 'rgba(0, 0, 0, 0.25)',
-                        },
-                    },
-                ],
+                            stroke: 'rgba(0, 0, 0, 0.25)'
+                        }
+                    }
+                ]
             })
 
             tinyArea.render()

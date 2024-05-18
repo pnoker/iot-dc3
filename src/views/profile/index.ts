@@ -34,21 +34,21 @@ export default defineComponent({
         skeletonCard,
         profileTool,
         profileAddForm,
-        profileCard,
+        profileCard
     },
     props: {
         embedded: {
             type: String,
             default: () => {
                 return ''
-            },
+            }
         },
         deviceId: {
             type: String,
             default: () => {
                 return ''
-            },
-        },
+            }
+        }
     },
     setup(props) {
         const profileAddFormRef: any = ref<InstanceType<typeof profileAddForm>>()
@@ -64,8 +64,8 @@ export default defineComponent({
                 total: 0,
                 size: 12,
                 current: 1,
-                orders: [] as Order[],
-            },
+                orders: [] as Order[]
+            }
         })
 
         const hasData = computed(() => {
@@ -76,13 +76,13 @@ export default defineComponent({
             if (!isNull(props.deviceId)) {
                 reactiveData.query = {
                     ...reactiveData.query,
-                    deviceId: props.deviceId,
+                    deviceId: props.deviceId
                 }
             }
 
             getProfileList({
                 page: reactiveData.page,
-                ...reactiveData.query,
+                ...reactiveData.query
             })
                 .then((res) => {
                     const data = res.data
@@ -101,7 +101,7 @@ export default defineComponent({
             if (!isNull(props.deviceId)) {
                 params = {
                     ...params,
-                    deviceId: props.deviceId,
+                    deviceId: props.deviceId
                 }
             }
 
@@ -198,7 +198,7 @@ export default defineComponent({
             refresh,
             sort,
             sizeChange,
-            currentChange,
+            currentChange
         }
-    },
+    }
 })

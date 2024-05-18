@@ -78,7 +78,7 @@ export const getObjType = (obj: any) => {
         '[object RegExp]': 'regExp',
         '[object Undefined]': 'undefined',
         '[object Null]': 'null',
-        '[object Object]': 'object',
+        '[object Object]': 'object'
     }
     if (obj instanceof Element) {
         return 'element'
@@ -297,7 +297,7 @@ export const calcDate = (date1, date2) => {
         days: days,
         hours: hours,
         minutes: minutes,
-        seconds: seconds,
+        seconds: seconds
     }
 }
 
@@ -317,7 +317,7 @@ export function dateFormat(date: any): string {
             'm+': date.getMinutes(), //minute
             's+': date.getSeconds(), //second
             'q+': Math.floor((date.getMonth() + 3) / 3), //quarter
-            S: date.getMilliseconds(), //millisecond
+            S: date.getMilliseconds() //millisecond
         }
         if (/(y+)/.test(format)) format = format.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
         for (const k in o) if (new RegExp('(' + k + ')').test(format)) format = format.replace(RegExp.$1, RegExp.$1.length === 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length))

@@ -32,32 +32,32 @@ export default defineComponent({
                 {
                     required: true,
                     message: '请输入模板名称',
-                    trigger: 'blur',
+                    trigger: 'blur'
                 },
                 {
                     min: 2,
                     max: 32,
                     message: '请输入 2~32 位字长的模板名称',
-                    trigger: 'blur',
+                    trigger: 'blur'
                 },
                 {
                     pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-                    message: '请输入正确格式的模板名称',
-                },
+                    message: '请输入正确格式的模板名称'
+                }
             ],
             remark: [
                 {
                     max: 300,
                     message: '最多输入300个字符',
-                    trigger: 'blur',
-                },
-            ],
+                    trigger: 'blur'
+                }
+            ]
         })
 
         // 定义响应式数据
         const reactiveData = reactive({
             formData: {} as any,
-            formVisible: false,
+            formVisible: false
         })
 
         const show = () => {
@@ -93,7 +93,7 @@ export default defineComponent({
             show,
             cancel,
             reset,
-            addThing,
+            addThing
         }
-    },
+    }
 })

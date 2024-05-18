@@ -19,26 +19,26 @@ import request from '@/config/axios'
 export const getDriverById = (id: string) =>
     request<R>({
         url: `api/v3/manager/driver/id/${id}`,
-        method: 'get',
+        method: 'get'
     })
 
 export const getDriverByIds = (driverIds: any) =>
     request<R>({
         url: `api/v3/manager/driver/ids`,
         method: 'post',
-        data: driverIds,
+        data: driverIds
     })
 
 export const getDriverList = (driver: any) =>
     request<R>({
         url: `api/v3/manager/driver/list`,
         method: 'post',
-        data: driver,
+        data: driver
     })
 
 export const getDriverStatus = (driver: any) =>
     request<R>({
         url: `api/v3/data/driver/status/driver`,
         method: 'post',
-        data: driver,
+        data: driver
     })

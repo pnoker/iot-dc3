@@ -38,27 +38,27 @@ export default defineComponent({
         deviceTool,
         deviceAddForm,
         deviceImportForm,
-        deviceCard,
+        deviceCard
     },
     props: {
         embedded: {
             type: String,
             default: () => {
                 return ''
-            },
+            }
         },
         driverId: {
             type: String,
             default: () => {
                 return ''
-            },
+            }
         },
         profileId: {
             type: String,
             default: () => {
                 return ''
-            },
-        },
+            }
+        }
     },
     setup(props) {
         const deviceAddFormRef: any = ref<InstanceType<typeof deviceAddForm>>()
@@ -77,8 +77,8 @@ export default defineComponent({
                 total: 0,
                 size: 12,
                 current: 1,
-                orders: [] as Order[],
-            },
+                orders: [] as Order[]
+            }
         })
 
         const hasData = computed(() => {
@@ -89,19 +89,19 @@ export default defineComponent({
             if (!isNull(props.driverId)) {
                 reactiveData.query = {
                     ...reactiveData.query,
-                    driverId: props.driverId,
+                    driverId: props.driverId
                 }
             }
             if (!isNull(props.profileId)) {
                 reactiveData.query = {
                     ...reactiveData.query,
-                    profileId: props.profileId,
+                    profileId: props.profileId
                 }
             }
 
             getDeviceList({
                 page: reactiveData.page,
-                ...reactiveData.query,
+                ...reactiveData.query
             })
                 .then((res) => {
                     const data = res.data
@@ -127,7 +127,7 @@ export default defineComponent({
 
             getDeviceStatus({
                 page: reactiveData.page,
-                ...reactiveData.query,
+                ...reactiveData.query
             })
                 .then((res) => {
                     reactiveData.statusTable = res.data
@@ -141,13 +141,13 @@ export default defineComponent({
             if (!isNull(props.driverId)) {
                 params = {
                     ...params,
-                    driverId: props.driverId,
+                    driverId: props.driverId
                 }
             }
             if (!isNull(props.profileId)) {
                 params = {
                     ...params,
-                    profileId: props.profileId,
+                    profileId: props.profileId
                 }
             }
 
@@ -298,7 +298,7 @@ export default defineComponent({
             refresh,
             sort,
             sizeChange,
-            currentChange,
+            currentChange
         }
-    },
+    }
 })

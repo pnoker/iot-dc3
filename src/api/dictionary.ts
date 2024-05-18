@@ -26,7 +26,7 @@ export const getDriverDictionary = (dictionary: any) =>
     request<R>({
         url: `api/v3/manager/dictionary/driver`,
         method: 'post',
-        data: dictionary,
+        data: dictionary
     })
 
 /**
@@ -39,7 +39,7 @@ export const getDeviceDictionary = (dictionary: any) =>
     request<R>({
         url: `api/v3/manager/dictionary/device`,
         method: 'post',
-        data: dictionary,
+        data: dictionary
     })
 
 /**
@@ -52,7 +52,7 @@ export const getProfileDictionary = (dictionary: any) =>
     request<R>({
         url: `api/v3/manager/dictionary/profile`,
         method: 'post',
-        data: dictionary,
+        data: dictionary
     })
 
 /**
@@ -65,5 +65,5 @@ export const getPointDictionary = (dictionary: any) =>
     request<R>({
         url: `api/v3/manager/dictionary/device_point`,
         method: 'post',
-        data: dictionary,
+        data: dictionary
     })

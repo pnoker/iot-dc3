@@ -26,7 +26,7 @@ export const addDevice = (device: any) =>
     request<R>({
         url: `api/v3/manager/device/add`,
         method: 'post',
-        data: device,
+        data: device
     })
 
 /**
@@ -38,7 +38,7 @@ export const addDevice = (device: any) =>
 export const deleteDevice = (id: string) =>
     request<R>({
         url: `api/v3/manager/device/delete/${id}`,
-        method: 'post',
+        method: 'post'
     })
 
 /**
@@ -51,7 +51,7 @@ export const updateDevice = (device: any) =>
     request<R>({
         url: `api/v3/manager/device/update`,
         method: 'post',
-        data: device,
+        data: device
     })
 
 /**
@@ -63,7 +63,7 @@ export const updateDevice = (device: any) =>
 export const getDeviceById = (id: string) =>
     request<R>({
         url: `api/v3/manager/device/id/${id}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -76,7 +76,7 @@ export const getDeviceByIds = (deviceIds: any) =>
     request<R>({
         url: `api/v3/manager/device/ids`,
         method: 'post',
-        data: deviceIds,
+        data: deviceIds
     })
 
 /**
@@ -88,7 +88,7 @@ export const getDeviceByIds = (deviceIds: any) =>
 export const getDeviceByDriverId = (driverId: string) =>
     request<R>({
         url: `api/v3/manager/device/driver_id/${driverId}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -100,7 +100,7 @@ export const getDeviceByDriverId = (driverId: string) =>
 export const getDeviceByProfileId = (profileId: string) =>
     request<R>({
         url: `api/v3/manager/device/profile_id/${profileId}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -113,7 +113,7 @@ export const getDeviceList = (device: any) =>
     request<R>({
         url: `api/v3/manager/device/list`,
         method: 'post',
-        data: device,
+        data: device
     })
 
 /**
@@ -126,7 +126,7 @@ export const getDeviceStatus = (device: any) =>
     request<R>({
         url: `api/v3/data/device/status/device`,
         method: 'post',
-        data: device,
+        data: device
     })
 
 /**
@@ -138,7 +138,7 @@ export const getDeviceStatus = (device: any) =>
 export const getDeviceStatusByDriverId = (driverId: string) =>
     request<R>({
         url: `api/v3/data/device/status/device/driver_id/${driverId}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -150,7 +150,7 @@ export const getDeviceStatusByDriverId = (driverId: string) =>
 export const getDeviceStatusByProfileId = (profileId: string) =>
     request<R>({
         url: `api/v3/data/device/status/device/profile_id/${profileId}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -164,7 +164,7 @@ export const importDeviceTemplate = (device: any) =>
         url: `api/v3/manager/device/import/template`,
         responseType: 'blob',
         method: 'post',
-        data: device,
+        data: device
     })
 
 /**
@@ -179,5 +179,5 @@ export const importDevice = (device: any) =>
         method: 'post',
         timeout: 0,
         headers: { 'Content-Type': 'multipart/form-data' },
-        data: device,
+        data: device
     })

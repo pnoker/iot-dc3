@@ -27,29 +27,29 @@ export default defineComponent({
         Edit,
         Sunset,
         Connection,
-        Monitor,
+        Monitor
     },
     props: {
         icon: {
             type: String,
-            default: 'images/common/driver.png',
+            default: 'images/common/driver.png'
         },
         statusTable: {
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         data: {
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         footer: {
             type: Boolean,
-            default: () => false,
-        },
+            default: () => false
+        }
     },
     emits: ['select-change'],
     setup(props, { emit }) {
@@ -57,7 +57,7 @@ export default defineComponent({
         const Icon = {
             SwitchButton,
             CircleCheck,
-            CircleClose,
+            CircleClose
         }
 
         // 驱动详情
@@ -86,7 +86,7 @@ export default defineComponent({
             select,
             copyId: copy,
             timestamp,
-            ...Icon,
+            ...Icon
         }
-    },
+    }
 })

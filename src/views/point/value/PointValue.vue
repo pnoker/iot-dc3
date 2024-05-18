@@ -66,14 +66,14 @@ const props = defineProps({
         type: String,
         default: () => {
             return ''
-        },
+        }
     },
     deviceId: {
         type: String,
         default: () => {
             return ''
-        },
-    },
+        }
+    }
 })
 
 const reactiveData = reactive({
@@ -86,8 +86,8 @@ const reactiveData = reactive({
     page: {
         total: 0,
         size: 12,
-        current: 1,
-    },
+        current: 1
+    }
 })
 
 const hasData = computed(() => {
@@ -98,14 +98,14 @@ const list = () => {
     if (!isNull(props.deviceId)) {
         reactiveData.query = {
             ...reactiveData.query,
-            deviceId: props.deviceId,
+            deviceId: props.deviceId
         }
     }
 
     if (props.embedded == 'device') {
         getPointValueLatest({
             page: reactiveData.page,
-            ...reactiveData.query,
+            ...reactiveData.query
         })
             .then((res) => {
                 loadPointValueList(res)
@@ -119,7 +119,7 @@ const list = () => {
     } else {
         getPointValueList({
             page: reactiveData.page,
-            ...reactiveData.query,
+            ...reactiveData.query
         })
             .then((res) => {
                 loadPointValueList(res)

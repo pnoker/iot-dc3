@@ -22,6 +22,6 @@ import interval from '@/store/modules/interval'
 export default createStore({
     modules: {
         auth,
-        interval,
-    },
+        interval
+    }
 })

@@ -41,6 +41,6 @@ export default (app: any) => {
                 }
                 hljs.highlightBlock(target)
             }
-        },
+        }
     })
 }

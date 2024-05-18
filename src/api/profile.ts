@@ -26,7 +26,7 @@ export const addProfile = (profile: any) =>
     request<R>({
         url: `api/v3/manager/profile/add`,
         method: 'post',
-        data: profile,
+        data: profile
     })
 
 /**
@@ -38,7 +38,7 @@ export const addProfile = (profile: any) =>
 export const deleteProfile = (id: string) =>
     request<R>({
         url: `api/v3/manager/profile/delete/${id}`,
-        method: 'post',
+        method: 'post'
     })
 
 /**
@@ -51,7 +51,7 @@ export const updateProfile = (profile: any) =>
     request<R>({
         url: `api/v3/manager/profile/update`,
         method: 'post',
-        data: profile,
+        data: profile
     })
 
 /**
@@ -63,7 +63,7 @@ export const updateProfile = (profile: any) =>
 export const getProfileById = (id: string) =>
     request<R>({
         url: `api/v3/manager/profile/id/${id}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -76,7 +76,7 @@ export const getProfileByIds = (profileIds: any) =>
     request<R>({
         url: `api/v3/manager/profile/ids`,
         method: 'post',
-        data: profileIds,
+        data: profileIds
     })
 
 /**
@@ -88,7 +88,7 @@ export const getProfileByIds = (profileIds: any) =>
 export const getProfileByDeviceId = (deviceId: string) =>
     request<R>({
         url: `api/v3/manager/profile/device_id/${deviceId}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -101,5 +101,5 @@ export const getProfileList = (profile: any) =>
     request<R>({
         url: `api/v3/manager/profile/list`,
         method: 'post',
-        data: profile,
+        data: profile
     })

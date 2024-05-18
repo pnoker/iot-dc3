@@ -29,47 +29,47 @@ export default defineComponent({
         Timer,
         Management,
         Sunrise,
-        ZoomIn,
+        ZoomIn
     },
     props: {
         embedded: {
             type: String,
             default: () => {
                 return ''
-            },
+            }
         },
         data: {
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         device: {
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         point: {
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         unit: {
             type: String,
-            default: '',
+            default: ''
         },
         historyData: {
             type: Array<number>,
             default: () => {
                 return []
-            },
+            }
         },
         icon: {
             type: String,
-            default: 'images/common/point.png',
-        },
+            default: 'images/common/point.png'
+        }
     },
     emits: ['show-edit', 'show-detail'],
     setup(props, { emit }) {
@@ -78,16 +78,16 @@ export default defineComponent({
             spRefLineStyles: {
                 stroke: '#54a5ff',
                 strokeOpacity: 0.5,
-                strokeDasharray: '2, 2',
+                strokeDasharray: '2, 2'
             },
             spCurveStyles: {
-                stroke: '#54a5ff',
-            },
+                stroke: '#54a5ff'
+            }
         })
 
         // 图标
         const Icon = {
-            CircleClose,
+            CircleClose
         }
 
         const showEdit = (pointValue) => {
@@ -98,7 +98,7 @@ export default defineComponent({
             const content = {
                 deviceId: data.deviceId,
                 pointId: data.pointId,
-                value: data.value,
+                value: data.value
             }
             copy(JSON.stringify(content, null, 2), '位号值')
         }
@@ -112,7 +112,7 @@ export default defineComponent({
                 height: 60,
                 data: props.historyData,
                 autoFit: true,
-                smooth: true,
+                smooth: true
             })
 
             tinyArea.render()
@@ -124,7 +124,7 @@ export default defineComponent({
             copyId: copy,
             copyValue,
             timestamp,
-            ...Icon,
+            ...Icon
         }
-    },
+    }
 })

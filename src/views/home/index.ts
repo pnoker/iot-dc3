@@ -31,7 +31,7 @@ export default defineComponent({
         ArrowRight,
         CaretBottom,
         CaretTop,
-        Warning,
+        Warning
     },
     setup() {
         const countDataChartRef = ref<HTMLElement>()
@@ -62,7 +62,7 @@ export default defineComponent({
                 '05:00',
                 '06:00',
                 '07:00',
-                '08:00',
+                '08:00'
             ],
             days: ['周一', '周二', '周三', '周四', '周五', '周六', '周天'],
             data: [
@@ -233,8 +233,8 @@ export default defineComponent({
                 [6, 20, 1],
                 [6, 21, 2],
                 [6, 22, 2],
-                [6, 23, 6],
-            ],
+                [6, 23, 6]
+            ]
         })
 
         onMounted(() => {
@@ -243,37 +243,37 @@ export default defineComponent({
             const option = {
                 legend: {
                     data: ['日/时数据量统计'],
-                    left: 'right',
+                    left: 'right'
                 },
                 tooltip: {
                     position: 'top',
                     formatter: (params) => {
                         return params.value[2] + ' commits in ' + reactiveData.hours[params.value[0]] + ' of ' + reactiveData.days[params.value[1]]
-                    },
+                    }
                 },
                 grid: {
                     left: 2,
                     bottom: 10,
                     right: 10,
-                    containLabel: true,
+                    containLabel: true
                 },
                 xAxis: {
                     type: 'category',
                     data: reactiveData.hours,
                     boundaryGap: false,
                     splitLine: {
-                        show: true,
+                        show: true
                     },
                     axisLine: {
-                        show: false,
-                    },
+                        show: false
+                    }
                 },
                 yAxis: {
                     type: 'category',
                     data: reactiveData.days,
                     axisLine: {
-                        show: false,
-                    },
+                        show: false
+                    }
                 },
                 series: [
                     {
@@ -285,16 +285,16 @@ export default defineComponent({
                         data: reactiveData.data,
                         animationDelay: (idx) => {
                             return idx * 5
-                        },
-                    },
-                ],
+                        }
+                    }
+                ]
             }
             chart.setOption(option)
         })
 
         return {
             countDataChartRef,
-            reactiveData,
+            reactiveData
         }
-    },
+    }
 })

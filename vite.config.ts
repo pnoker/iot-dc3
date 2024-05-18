@@ -39,7 +39,7 @@ export default (configEnv: ConfigEnv) => {
 
     const alias: Record<string, string> = {
         '@': resolve(__dirname, './src'),
-        vue$: 'vue/dist/vue.runtime.esm-bundler.js',
+        vue$: 'vue/dist/vue.runtime.esm-bundler.js'
     }
     const apiPrefix = process.env.APP_API_PREFIX as string
     const proxy = {
@@ -47,8 +47,8 @@ export default (configEnv: ConfigEnv) => {
             ws: false,
             changeOrigin: true,
             target: `${process.env.APP_API_PATH}:${process.env.APP_API_PORT}`,
-            rewrite: (path: string) => path.replace(new RegExp(`^${apiPrefix}`), apiPrefix),
-        },
+            rewrite: (path: string) => path.replace(new RegExp(`^${apiPrefix}`), apiPrefix)
+        }
     }
     const output = {
         entryFileNames: `assets/dc3.[name].[hash].js`,
@@ -60,8 +60,8 @@ export default (configEnv: ConfigEnv) => {
             lodash: ['lodash-es'],
             echarts: ['echarts'],
             element: ['element-plus', '@element-plus/icons-vue'],
-            antv: ['@antv/g2plot', '@amap/amap-jsapi-loader'],
-        },
+            antv: ['@antv/g2plot', '@amap/amap-jsapi-loader']
+        }
     }
 
     return defineConfig({
@@ -70,35 +70,35 @@ export default (configEnv: ConfigEnv) => {
         envDir,
         envPrefix: 'APP_',
         resolve: {
-            alias,
+            alias
         },
         server: {
             port: Number(process.env.APP_CLI_PORT),
-            proxy,
+            proxy
         },
         build: {
             outDir: 'dist',
             chunkSizeWarningLimit: 1500,
-            rollupOptions: { output },
+            rollupOptions: { output }
         },
         plugins: [
             vue(),
             legacy({
-                targets: ['Android > 39', 'Chrome >= 60', 'Safari >= 10.1', 'iOS >= 10.3', 'Firefox >= 54', 'Edge >= 15'],
+                targets: ['Android > 39', 'Chrome >= 60', 'Safari >= 10.1', 'iOS >= 10.3', 'Firefox >= 54', 'Edge >= 15']
             }),
             AutoImport({
-                resolvers: [ElementPlusResolver()],
+                resolvers: [ElementPlusResolver()]
             }),
             Components({
-                resolvers: [ElementPlusResolver()],
-            }),
+                resolvers: [ElementPlusResolver()]
+            })
         ],
         css: {
             preprocessorOptions: {
                 css: {
-                    charset: false,
-                },
-            },
-        },
+                    charset: false
+                }
+            }
+        }
     })
 }

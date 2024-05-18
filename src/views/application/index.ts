@@ -22,8 +22,8 @@ export default defineComponent({
     props: {
         url: {
             type: String,
-            default: 'http://zhb_nyx.gitee.io/data-view',
-        },
+            default: 'http://zhb_nyx.gitee.io/data-view'
+        }
     },
     setup() {
         const route = useRoute()
@@ -33,7 +33,7 @@ export default defineComponent({
         }
 
         return {
-            iframeUrl,
+            iframeUrl
         }
-    },
+    }
 })

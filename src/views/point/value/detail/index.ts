@@ -23,14 +23,14 @@ export default defineComponent({
             type: Object,
             default: () => {
                 return {}
-            },
-        },
+            }
+        }
     },
     setup() {
         const detailVisible = ref(false)
 
         return {
-            detailVisible,
+            detailVisible
         }
-    },
+    }
 })

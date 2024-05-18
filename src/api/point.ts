@@ -26,7 +26,7 @@ export const pointAddApi = (point: any) =>
     request<R>({
         url: `api/v3/manager/point/add`,
         method: 'post',
-        data: point,
+        data: point
     })
 
 /**
@@ -38,7 +38,7 @@ export const pointAddApi = (point: any) =>
 export const pointDeleteApi = (id: string) =>
     request<R>({
         url: `api/v3/manager/point/delete/${id}`,
-        method: 'post',
+        method: 'post'
     })
 
 /**
@@ -51,7 +51,7 @@ export const getPointUpdate = (point: any) =>
     request<R>({
         url: `api/v3/manager/point/update`,
         method: 'post',
-        data: point,
+        data: point
     })
 
 /**
@@ -63,7 +63,7 @@ export const getPointUpdate = (point: any) =>
 export const getPointById = (id: string) =>
     request<R>({
         url: `api/v3/manager/point/id/${id}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -76,7 +76,7 @@ export const getPointByIds = (pointIds: any) =>
     request<R>({
         url: `api/v3/manager/point/ids`,
         method: 'post',
-        data: pointIds,
+        data: pointIds
     })
 
 /**
@@ -89,7 +89,7 @@ export const getPointList = (point: any) =>
     request<R>({
         url: `api/v3/manager/point/list`,
         method: 'post',
-        data: point,
+        data: point
     })
 
 /**
@@ -102,7 +102,7 @@ export const getPointUnit = (pointIds: any) =>
     request<R>({
         url: `api/v3/manager/point/unit`,
         method: 'post',
-        data: pointIds,
+        data: pointIds
     })
 
 /**
@@ -114,7 +114,7 @@ export const getPointUnit = (pointIds: any) =>
 export const getPointByProfileId = (profileId: string) =>
     request<R>({
         url: `api/v3/manager/point/profile_id/${profileId}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -126,7 +126,7 @@ export const getPointByProfileId = (profileId: string) =>
 export const getPointByDeviceId = (deviceId: string) =>
     request<R>({
         url: `api/v3/manager/point/device_id/${deviceId}`,
-        method: 'get',
+        method: 'get'
     })
 
 /**
@@ -139,7 +139,7 @@ export const getPointValueLatest = (pointValue: any) =>
     request<R>({
         url: `api/v3/data/point_value/latest`,
         method: 'post',
-        data: pointValue,
+        data: pointValue
     })
 
 /**
@@ -152,7 +152,7 @@ export const getPointValueList = (pointValue: any) =>
     request<R>({
         url: `api/v3/data/point_value/list`,
         method: 'post',
-        data: pointValue,
+        data: pointValue
     })
 
 /**
@@ -166,8 +166,8 @@ export const getPointValueHistory = (deviceId: number, pointId: number, count: n
         url: `api/v3/data/point_value/history/device_id/${deviceId}/point_id/${pointId}`,
         method: 'get',
         params: {
-            count,
-        },
+            count
+        }
     })
 
 /**
@@ -180,7 +180,7 @@ export const readPointValue = (pointValueReadVO: any) =>
     request<R>({
         url: `api/v3/data/point_value_command/read`,
         method: 'post',
-        data: pointValueReadVO,
+        data: pointValueReadVO
     })
 
 /**
@@ -193,5 +193,5 @@ export const writePointValue = (pointValueWriteVO: any) =>
     request<R>({
         url: `api/v3/data/point_value_command/write`,
         method: 'post',
-        data: pointValueWriteVO,
+        data: pointValueWriteVO
     })

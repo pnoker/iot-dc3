@@ -16,7 +16,7 @@
 
 const interval = {
     state: {
-        pointValueInterval: null,
+        pointValueInterval: null
     },
     getters: {},
     mutations: {
@@ -25,13 +25,13 @@ const interval = {
                 clearInterval(state.pointValueInterval)
             }
             state.pointValueInterval = interval
-        },
+        }
     },
     actions: {
         ClearPointValueInterval({ commit }: any, interval: number) {
             commit('CLEAR_POINT_VALUE_INTERVAL', interval)
-        },
-    },
+        }
+    }
 }
 
 export default interval

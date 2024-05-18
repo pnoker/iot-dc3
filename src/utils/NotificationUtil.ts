@@ -32,7 +32,7 @@ export const successMessage = (message?: string, title: string = '成功') => {
         type: 'success',
         title: title,
         dangerouslyUseHTMLString: true,
-        message: message,
+        message: message
     })
 }
 
@@ -56,7 +56,7 @@ export const warnMessage = (message?: string, title = '警告', error?: any) => 
         type: 'warning',
         title: title,
         dangerouslyUseHTMLString: true,
-        message: message,
+        message: message
     })
 }
 
@@ -80,6 +80,6 @@ export const failMessage = (message?: string, title = '错误', error?: any) => 
         type: 'error',
         title: title,
         dangerouslyUseHTMLString: true,
-        message: message,
+        message: message
     })
 }

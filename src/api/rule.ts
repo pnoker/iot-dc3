@@ -20,5 +20,5 @@ export const getFlowsList = (flowsQuery: any) =>
     request<R>({
         url: 'api/v3/manager/ruleengine/flowsList',
         method: 'post',
-        data: flowsQuery,
+        data: flowsQuery
     })

@@ -46,7 +46,7 @@ export default defineComponent({
                 total: 0,
                 size: 5,
                 current: 1,
-                orders: [] as Order[],
+                orders: [] as Order[]
             },
             profileQuery: '',
             profileDictionary: [] as Dictionary[],
@@ -54,8 +54,8 @@ export default defineComponent({
                 total: 0,
                 size: 5,
                 current: 1,
-                orders: [] as Order[],
-            },
+                orders: [] as Order[]
+            }
         })
 
         // 定义表单校验规则
@@ -64,27 +64,27 @@ export default defineComponent({
                 {
                     required: true,
                     message: '请选择所属驱动',
-                    trigger: 'change',
-                },
+                    trigger: 'change'
+                }
             ],
             profileIds: [
                 {
                     required: true,
                     message: '请选择关联模板',
-                    trigger: 'change',
-                },
-            ],
+                    trigger: 'change'
+                }
+            ]
         })
 
         // 图标
         const Icon = {
-            UploadFilled,
+            UploadFilled
         }
 
         const driverDictionary = () => {
             getDriverDictionary({
                 page: reactiveData.driverPage,
-                label: reactiveData.driverQuery,
+                label: reactiveData.driverQuery
             })
                 .then((res) => {
                     const data = res.data
@@ -111,7 +111,7 @@ export default defineComponent({
         const profileDictionary = () => {
             getProfileDictionary({
                 page: reactiveData.profilePage,
-                label: reactiveData.profileQuery,
+                label: reactiveData.profileQuery
             })
                 .then((res) => {
                     const data = res.data
@@ -204,7 +204,7 @@ export default defineComponent({
             uploadRequest,
             importThing,
             handleExceed,
-            ...Icon,
+            ...Icon
         }
-    },
+    }
 })

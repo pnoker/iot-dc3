@@ -45,7 +45,7 @@ export default defineComponent({
         CollectionTag,
         Management,
         Edit,
-        Sunset,
+        Sunset
     },
     setup() {
         const route = useRoute()
@@ -64,7 +64,7 @@ export default defineComponent({
             statusTable: {} as any,
             data: {} as any,
             listDeviceData: [] as any[],
-            listPointData: [] as any[],
+            listPointData: [] as any[]
         })
 
         const pointLength = computed(() => {
@@ -105,7 +105,7 @@ export default defineComponent({
             pointLength,
             deviceLength,
             changeActive,
-            timestamp,
+            timestamp
         }
-    },
+    }
 })

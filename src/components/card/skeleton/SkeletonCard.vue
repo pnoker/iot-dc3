@@ -59,14 +59,14 @@ const props = defineProps({
         type: Boolean,
         default: () => {
             return false
-        },
+        }
     },
     footer: {
         type: Boolean,
         default: () => {
             return false
-        },
-    },
+        }
+    }
 })
 </script>
 

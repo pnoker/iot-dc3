@@ -43,16 +43,16 @@ export default {
     props: {
         name: {
             type: String,
-            default: '数据看板',
+            default: '数据看板'
         },
         icon: {
             type: String,
-            default: 'images/app/application.png',
+            default: 'images/app/application.png'
         },
         url: {
             type: String,
-            default: '',
-        },
+            default: ''
+        }
     },
     methods: {
         show() {
@@ -61,8 +61,8 @@ export default {
                     // nothing to do
                 })
             }
-        },
-    },
+        }
+    }
 }
 </script>
 

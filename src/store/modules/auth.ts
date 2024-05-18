@@ -29,7 +29,7 @@ const auth = {
     namespaced: true,
     state: {
         tenant: 'default',
-        name: 'pnoker',
+        name: 'pnoker'
     },
     getters: {
         getTenant: () => {
@@ -37,7 +37,7 @@ const auth = {
         },
         getName: () => {
             return getStorage(CommonConstant.X_AUTH_LOGIN)
-        },
+        }
     },
     mutations: {
         setToken: (state: any, login: any) => {
@@ -52,17 +52,17 @@ const auth = {
             removeStorage(CommonConstant.X_AUTH_TENANT)
             removeStorage(CommonConstant.X_AUTH_LOGIN)
             removeStorage(CommonConstant.X_AUTH_TOKEN)
-        },
+        }
     },
     actions: {
         login({ commit }: any, form: any) {
             const loading = ElLoading.service({
                 lock: true,
-                text: '登录中,请稍后...',
+                text: '登录中,请稍后...'
             })
             const login: Login = {
                 tenant: form.tenant,
-                name: form.name,
+                name: form.name
             }
             generateSalt(login)
                 .then((res) => {
@@ -71,7 +71,7 @@ const auth = {
                         tenant: form.tenant,
                         name: form.name,
                         salt: salt,
-                        password: md5.hex(md5.hex(form.password) + salt),
+                        password: md5.hex(md5.hex(form.password) + salt)
                     }
 
                     generateToken(login)
@@ -80,7 +80,7 @@ const auth = {
                                 tenant: login.tenant,
                                 name: login.name,
                                 salt: login.salt,
-                                token: res.data,
+                                token: res.data
                             })
                             router.push({ name: 'home' }).then(() => loading.close())
                         })
@@ -94,13 +94,13 @@ const auth = {
             if (!isNull(tenant) && !isNull(user)) {
                 const login = {
                     tenant: tenant,
-                    name: user,
+                    name: user
                 } as Login
                 cancelToken(login)
             }
             commit('removeToken')
-        },
-    },
+        }
+    }
 }
 
 export default auth

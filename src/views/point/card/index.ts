@@ -30,14 +30,14 @@ export default defineComponent({
         List,
         Location,
         Bottom,
-        Top,
+        Top
     },
     props: {
         embedded: {
             type: Boolean,
             default: () => {
                 return false
-            },
+            }
         },
         data: {
             type: Object,
@@ -47,20 +47,20 @@ export default defineComponent({
                     enable: '',
                     remark: '',
                     createTime: '',
-                    operateTime: '',
+                    operateTime: ''
                 }
-            },
+            }
         },
         profile: {
             type: Object,
             default: () => {
                 return {}
-            },
+            }
         },
         icon: {
             type: String,
-            default: 'images/common/point.png',
-        },
+            default: 'images/common/point.png'
+        }
     },
     emits: ['disable-thing', 'enable-thing', 'delete-thing'],
     setup(props, { emit }) {
@@ -68,7 +68,7 @@ export default defineComponent({
         const Icon = {
             SwitchButton,
             CircleCheck,
-            CircleClose,
+            CircleClose
         }
 
         const pointTypeFlag = computed(() => {
@@ -145,7 +145,7 @@ export default defineComponent({
             detail,
             copyId: copy,
             timestamp,
-            ...Icon,
+            ...Icon
         }
-    },
+    }
 })
