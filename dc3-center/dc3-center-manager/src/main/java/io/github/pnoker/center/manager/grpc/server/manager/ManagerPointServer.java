@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.grpc.server.manager;
 
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.GrpcPagePointDTO;
 import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
@@ -36,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Point Api
@@ -63,7 +63,7 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
         PointQuery pageQuery = grpcPointBuilder.buildQueryByGrpcQuery(request);
 
         Page<PointBO> pointPage = pointService.selectByPage(pageQuery);
-        if (ObjectUtil.isNull(pointPage)) {
+        if (Objects.isNull(pointPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());

@@ -23,7 +23,7 @@ import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.entity.dto.DriverTransferMetadataDTO;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
@@ -50,7 +50,7 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public void notifyDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO) {
+    public void notifyDevice(MetadataOperateTypeEnum command, DeviceBO deviceBO) {
         try {
             DriverBO entityDO = driverService.selectById(deviceBO.getDriverId());
             DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
@@ -65,7 +65,7 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
     }
 
     @Override
-    public void notifyPoint(MetadataCommandTypeEnum command, PointBO pointBO) {
+    public void notifyPoint(MetadataOperateTypeEnum command, PointBO pointBO) {
         try {
             List<DriverBO> entityDOList = driverService.selectByProfileId(pointBO.getProfileId());
             entityDOList.forEach(driver -> {

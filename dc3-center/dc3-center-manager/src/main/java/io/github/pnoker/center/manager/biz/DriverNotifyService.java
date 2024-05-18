@@ -18,7 +18,7 @@ package io.github.pnoker.center.manager.biz;
 
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 
 /**
  * Driver Notify Interface
@@ -34,7 +34,7 @@ public interface DriverNotifyService {
      * @param command  Operation Type
      * @param deviceBO Device
      */
-    void notifyDevice(MetadataCommandTypeEnum command, DeviceBO deviceBO);
+    void notifyDevice(MetadataOperateTypeEnum command, DeviceBO deviceBO);
 
     /**
      * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 更新位号(UPDATE)
@@ -42,6 +42,6 @@ public interface DriverNotifyService {
      * @param command Operation Type
      * @param pointBO Point
      */
-    void notifyPoint(MetadataCommandTypeEnum command, PointBO pointBO);
+    void notifyPoint(MetadataOperateTypeEnum command, PointBO pointBO);
 
 }

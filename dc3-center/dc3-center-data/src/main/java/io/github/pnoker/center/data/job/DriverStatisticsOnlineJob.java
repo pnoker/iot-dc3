@@ -18,7 +18,6 @@ package io.github.pnoker.center.data.job;
 
 
 import io.github.pnoker.center.data.biz.DriverStatisticsOnlineService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -30,9 +29,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class DriverStatisticsOnlineJob extends QuartzJobBean {
 
-    @Resource
-    private DriverStatisticsOnlineService driverStatisticsOnlineService;
+    private final DriverStatisticsOnlineService driverStatisticsOnlineService;
 
+    public DriverStatisticsOnlineJob(DriverStatisticsOnlineService driverStatisticsOnlineService) {
+        this.driverStatisticsOnlineService = driverStatisticsOnlineService;
+    }
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {

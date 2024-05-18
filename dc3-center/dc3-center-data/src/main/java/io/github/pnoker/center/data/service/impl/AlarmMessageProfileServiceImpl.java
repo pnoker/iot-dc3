@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -35,6 +34,8 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -102,7 +103,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
 
     @Override
     public Page<AlarmMessageProfileBO> selectByPage(AlarmMessageProfileQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<AlarmMessageProfileDO> entityPageDO = alarmMessageProfileManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -137,7 +138,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         wrapper.eq(AlarmMessageProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmMessageProfileDO one = alarmMessageProfileManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -156,7 +157,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
      */
     private AlarmMessageProfileDO getDOById(Long id, boolean throwException) {
         AlarmMessageProfileDO entityDO = alarmMessageProfileManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("报警信息模板不存在");
         }
         return entityDO;

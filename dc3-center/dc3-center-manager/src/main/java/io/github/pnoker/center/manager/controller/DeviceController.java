@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
@@ -40,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -160,7 +160,7 @@ public class DeviceController implements BaseController {
     @PostMapping("/list")
     public R<Page<DeviceVO>> list(@RequestBody(required = false) DeviceQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new DeviceQuery();
             }
             entityQuery.setTenantId(getTenantId());

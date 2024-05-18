@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,6 +34,8 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * 限制IP服务接口实现类
@@ -102,7 +103,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
 
     @Override
     public Page<LimitedIpBO> selectByPage(LimitedIpQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<LimitedIpDO> entityPageDO = limitedIpManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -112,7 +113,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
     @Override
     public Boolean checkValid(String ip) {
         LimitedIpBO limitedIpBO = selectByIp(ip);
-        return ObjectUtil.isNotNull(limitedIpBO);
+        return !Objects.isNull(limitedIpBO);
     }
 
     private LambdaQueryWrapper<LimitedIpDO> fuzzyQuery(LimitedIpQuery entityQuery) {
@@ -136,7 +137,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
         wrapper.eq(LimitedIpDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         LimitedIpDO one = limitedIpManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -155,7 +156,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
      */
     private LimitedIpDO getDOById(Long id, boolean throwException) {
         LimitedIpDO entityDO = limitedIpManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("受限IP不存在");
         }
         return entityDO;

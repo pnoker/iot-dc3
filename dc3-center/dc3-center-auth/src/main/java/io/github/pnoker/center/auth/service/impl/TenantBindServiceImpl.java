@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -33,6 +32,8 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * TenantBindService Impl
@@ -100,7 +101,7 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     @Override
     public Page<TenantBindBO> selectByPage(TenantBindQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<TenantBindDO> entityPageDO = tenantBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -109,8 +110,8 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     private LambdaQueryWrapper<TenantBindDO> fuzzyQuery(TenantBindQuery entityQuery) {
         LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getTenantId()), TenantBindDO::getTenantId, entityQuery.getTenantId());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getUserId()), TenantBindDO::getUserId, entityQuery.getUserId());
+        wrapper.eq(!Objects.isNull(entityQuery.getTenantId()), TenantBindDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(!Objects.isNull(entityQuery.getUserId()), TenantBindDO::getUserId, entityQuery.getUserId());
         return wrapper;
     }
 
@@ -128,7 +129,7 @@ public class TenantBindServiceImpl implements TenantBindService {
         wrapper.eq(TenantBindDO::getUserId, entityBO.getUserId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         TenantBindDO one = tenantBindManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -147,7 +148,7 @@ public class TenantBindServiceImpl implements TenantBindService {
      */
     private TenantBindDO getDOById(Long id, boolean throwException) {
         TenantBindDO entityDO = tenantBindManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("租户绑定不存在");
         }
         return entityDO;

@@ -18,7 +18,6 @@ package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
@@ -84,17 +83,17 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceHost())) {
             query.setServiceHost(pageQuery.getServiceHost());
         }
-        if (ObjectUtil.isNotNull(pageQuery.getDriverTypeFlag())) {
+        if (!Objects.isNull(pageQuery.getDriverTypeFlag())) {
             query.setDriverTypeFlag(pageQuery.getDriverTypeFlag().getIndex());
         } else {
             query.setDriverTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
-        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
+        if (!Objects.isNull(pageQuery.getEnableFlag())) {
             query.setEnableFlag(pageQuery.getEnableFlag().getIndex());
         } else {
             query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
-        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
+        if (!Objects.isNull(pageQuery.getTenantId())) {
             query.setTenantId(pageQuery.getTenantId());
         }
         GrpcRPageDriverDTO rPageDriverDTO = driverApiBlockingStub.list(query.build());
@@ -123,7 +122,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         driverRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
         driverRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
-        if (ObjectUtil.isEmpty(driverRunDOS)) {
+        if (Objects.isNull(driverRunDOS)) {
             driverRunBO.setDuration(list);
             return driverRunBO;
         }
@@ -150,7 +149,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         driverRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         driverRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
-        if (ObjectUtil.isEmpty(driverRunDOS)) {
+        if (Objects.isNull(driverRunDOS)) {
             driverRunBO.setDuration(list);
             return driverRunBO;
         }
@@ -198,7 +197,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         deviceIds.forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisService.getKey(key);
-            status = ObjectUtil.isNotNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
+            status = !Objects.isNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
             list.add(status);
         });
         return list;
@@ -216,7 +215,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         driverIds.forEach(id -> {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + id;
             String status = redisService.getKey(key);
-            status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
+            status = !Objects.isNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
             statusMap.put(id, status);
         });
         return statusMap;

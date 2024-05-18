@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.builder.TenantBuilder;
@@ -33,6 +32,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 /**
  * 用户 Controller
@@ -138,7 +139,7 @@ public class TenantController implements BaseController {
     public R<TenantBO> selectByCode(@NotNull @PathVariable(value = "code") String code) {
         try {
             TenantBO select = tenantService.selectByCode(code);
-            if (ObjectUtil.isNotNull(select)) {
+            if (!Objects.isNull(select)) {
                 return R.ok(select);
             }
         } catch (Exception e) {
@@ -157,7 +158,7 @@ public class TenantController implements BaseController {
     @PostMapping("/list")
     public R<Page<TenantVO>> list(@RequestBody(required = false) TenantQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new TenantQuery();
             }
             Page<TenantBO> entityPageBO = tenantService.selectByPage(entityQuery);

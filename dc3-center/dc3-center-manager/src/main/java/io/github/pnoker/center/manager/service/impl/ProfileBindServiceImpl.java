@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -36,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * ProfileBindService Impl
@@ -136,7 +136,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     public Page<ProfileBindBO> selectByPage(ProfileBindQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<ProfileBindDO> entityPageDO = profileBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -145,8 +145,8 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     private LambdaQueryWrapper<ProfileBindDO> fuzzyQuery(ProfileBindQuery entityQuery) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getProfileId()), ProfileBindDO::getProfileId, entityQuery.getProfileId());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDeviceId()), ProfileBindDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(!Objects.isNull(entityQuery.getProfileId()), ProfileBindDO::getProfileId, entityQuery.getProfileId());
+        wrapper.eq(!Objects.isNull(entityQuery.getDeviceId()), ProfileBindDO::getDeviceId, entityQuery.getDeviceId());
         wrapper.eq(ProfileBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -165,7 +165,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         wrapper.eq(ProfileBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileBindDO one = profileBindManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
@@ -180,7 +180,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     private ProfileBindDO getDOById(Long id, boolean throwException) {
         ProfileBindDO entityDO = profileBindManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("模版绑定不存在");
         }
         return entityDO;

@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.entity.model.PointAttributeDO;
@@ -33,6 +32,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -78,7 +78,7 @@ public interface PointAttributeBuilder {
         // Json Ext
         PointAttributeExt entityExt = entityBO.getAttributeExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -118,7 +118,7 @@ public interface PointAttributeBuilder {
     default void afterProcess(PointAttributeDO entityDO, @MappingTarget PointAttributeBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getAttributeExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             PointAttributeExt ext = new PointAttributeExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

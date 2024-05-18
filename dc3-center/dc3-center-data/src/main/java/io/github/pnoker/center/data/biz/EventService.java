@@ -59,7 +59,7 @@ public interface EventService {
     void addDeviceEvents(List<DeviceEvent> deviceEvents);
 
     /**
-     * 获取 DriverEvent 带分页、排序
+     * 获取 DriverEvent 带分页, 排序
      *
      * @param driverEventQuery 驱动事件和分页参数
      * @return Page Of DriverEvent
@@ -67,7 +67,7 @@ public interface EventService {
     Page<DriverEvent> driverEvent(DriverEventQuery driverEventQuery);
 
     /**
-     * 获取 DeviceEvent 带分页、排序
+     * 获取 DeviceEvent 带分页, 排序
      *
      * @param deviceEventQuery 设备事件和分页参数
      * @return Page Of DeviceEvent

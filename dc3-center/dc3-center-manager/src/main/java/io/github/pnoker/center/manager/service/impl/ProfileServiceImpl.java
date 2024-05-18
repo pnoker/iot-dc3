@@ -18,7 +18,6 @@ package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -47,6 +46,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -153,7 +153,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public Page<ProfileBO> selectByPage(ProfileQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<ProfileDO> entityPageDO = profileMapper.selectPageWithDevice(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery), entityQuery.getDeviceId());
@@ -165,8 +165,8 @@ public class ProfileServiceImpl implements ProfileService {
         wrapper.eq("dp.deleted", 0);
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getProfileName()), "dp.profile_name", entityQuery.getProfileName());
         wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getProfileCode()), "dp.profile_code", entityQuery.getProfileCode());
-        wrapper.eq(ObjectUtil.isNotNull(entityQuery.getProfileShareFlag()), "dp.profile_share_flag", entityQuery.getProfileShareFlag());
-        wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
+        wrapper.eq(!Objects.isNull(entityQuery.getProfileShareFlag()), "dp.profile_share_flag", entityQuery.getProfileShareFlag());
+        wrapper.eq(!Objects.isNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
         wrapper.eq("dp.tenant_id", entityQuery.getTenantId());
         return wrapper.lambda();
     }
@@ -186,7 +186,7 @@ public class ProfileServiceImpl implements ProfileService {
         wrapper.eq(ProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileDO one = profileManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
@@ -201,7 +201,7 @@ public class ProfileServiceImpl implements ProfileService {
      */
     private ProfileDO getDOById(Long id, boolean throwException) {
         ProfileDO entityDO = profileManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("模板不存在");
         }
         return entityDO;

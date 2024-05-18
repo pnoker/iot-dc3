@@ -16,7 +16,6 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.code.DataType;
@@ -32,7 +31,9 @@ import io.github.pnoker.common.driver.entity.bean.WValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.driver.metadata.DeviceMetadata;
+import io.github.pnoker.common.driver.event.device.DeviceMetadataEvent;
+import io.github.pnoker.common.driver.event.point.PointMetadataEvent;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
@@ -47,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -60,7 +62,8 @@ import java.util.concurrent.TimeUnit;
 public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
-    private DeviceMetadata deviceMetadata;
+    DriverMetadata driverMetadata;
+
     @Resource
     private DriverSenderService driverSenderService;
 
@@ -90,13 +93,33 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         - 在自定义定时任务中实现设备状态的判断；
         - 根据某种判断机制实现设备状态的判断。
 
-        最后根据 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理, 其中设备状态（StatusEnum）:
+        最后根据 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理, 其中设备状态(StatusEnum):
         - ONLINE:在线
         - OFFLINE:离线
         - MAINTAIN:维护
         - FAULT:故障
          */
-        deviceMetadata.getAllDevice().forEach(device -> driverSenderService.deviceStatusSender(device.getId(), DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+        driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
+    }
+
+    @Override
+    public void event(DeviceMetadataEvent event) {
+        /*
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
+        接收设备元数据的新增, 更新, 删除都会触发改事件
+        提供元数据操作类型: MetadataOperateTypeEnum(ADD，DELETE，UPDATE)
+        使用场景：更新驱动、设备等连接句柄
+         */
+    }
+
+    @Override
+    public void event(PointMetadataEvent event) {
+        /*
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
+        接收位号元数据的新增, 更新, 删除都会触发改事件
+        提供元数据操作类型: MetadataOperateTypeEnum(ADD，DELETE，UPDATE)
+        使用场景：更新驱动、设备等连接句柄
+         */
     }
 
     @Override
@@ -126,7 +149,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private ModbusMaster getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("Modbus Tcp Connection Info: {}", JsonUtil.toJsonString(driverConfig));
         ModbusMaster modbusMaster = connectMap.get(deviceId);
-        if (ObjectUtil.isNull(modbusMaster)) {
+        if (Objects.isNull(modbusMaster)) {
             IpParameters params = new IpParameters();
             params.setHost(driverConfig.get("host").getValue(String.class));
             params.setPort(driverConfig.get("port").getValue(Integer.class));
@@ -231,7 +254,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      */
     private int getValueType(String type) {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(type);
-        if (ObjectUtil.isNull(valueType)) {
+        if (Objects.isNull(valueType)) {
             throw new UnSupportException("Unsupported type of " + type);
         }
 

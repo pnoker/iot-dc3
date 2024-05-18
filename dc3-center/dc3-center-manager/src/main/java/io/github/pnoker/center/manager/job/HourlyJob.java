@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.job;
 
 import io.github.pnoker.center.manager.biz.PointStatisticsService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -35,8 +34,12 @@ import java.time.LocalDateTime;
 @Slf4j
 @Component
 public class HourlyJob extends QuartzJobBean {
-    @Resource
-    private PointStatisticsService pointStatisticsService;
+
+    private final PointStatisticsService pointStatisticsService;
+
+    public HourlyJob(PointStatisticsService pointStatisticsService) {
+        this.pointStatisticsService = pointStatisticsService;
+    }
 
     /**
      * 任务执行

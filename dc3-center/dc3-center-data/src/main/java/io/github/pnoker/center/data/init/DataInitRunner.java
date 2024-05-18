@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.init;
 
 import io.github.pnoker.center.data.biz.ScheduleService;
-import jakarta.annotation.Resource;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -29,8 +28,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataInitRunner implements ApplicationRunner {
 
-    @Resource
-    private ScheduleService scheduleService;
+    private final ScheduleService scheduleService;
+
+    public DataInitRunner(ScheduleService scheduleService) {
+        this.scheduleService = scheduleService;
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

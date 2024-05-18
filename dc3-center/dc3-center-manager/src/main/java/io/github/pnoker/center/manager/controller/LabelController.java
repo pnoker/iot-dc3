@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.builder.LabelForManagerBuilder;
 import io.github.pnoker.center.manager.entity.query.LabelQuery;
@@ -33,6 +32,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 /**
  * 标签 Controller
@@ -134,7 +135,7 @@ public class LabelController implements BaseController {
     @PostMapping("/list")
     public R<Page<LabelVO>> list(@RequestBody(required = false) LabelQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new LabelQuery();
             }
             entityQuery.setTenantId(getTenantId());

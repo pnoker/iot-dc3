@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -37,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * DriverAttributeService Impl
@@ -116,7 +116,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     @Override
     public Page<DriverAttributeBO> selectByPage(DriverAttributeQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<DriverAttributeDO> entityPageDO = driverAttributeManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -127,8 +127,8 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), DriverAttributeDO::getDisplayName, entityQuery.getDisplayName());
-        wrapper.eq(ObjectUtil.isNotNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
+        wrapper.eq(!Objects.isNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
+        wrapper.eq(!Objects.isNull(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
         wrapper.eq(DriverAttributeDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -147,7 +147,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         wrapper.eq(DriverAttributeDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeDO one = driverAttributeManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
@@ -162,7 +162,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      */
     private DriverAttributeDO getDOById(Long id, boolean throwException) {
         DriverAttributeDO entityDO = driverAttributeManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("驱动属性不存在");
         }
         return entityDO;

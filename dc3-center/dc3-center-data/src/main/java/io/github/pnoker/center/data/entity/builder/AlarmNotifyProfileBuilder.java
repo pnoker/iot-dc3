@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.bo.AlarmNotifyProfileBO;
 import io.github.pnoker.center.data.entity.model.AlarmNotifyProfileDO;
@@ -33,6 +32,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -78,7 +78,7 @@ public interface AlarmNotifyProfileBuilder {
         // Json Ext
         AlarmNotifyExt entityExt = entityBO.getAlarmNotifyExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -118,7 +118,7 @@ public interface AlarmNotifyProfileBuilder {
     default void afterProcess(AlarmNotifyProfileDO entityDO, @MappingTarget AlarmNotifyProfileBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getAlarmNotifyExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             AlarmNotifyExt ext = new AlarmNotifyExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

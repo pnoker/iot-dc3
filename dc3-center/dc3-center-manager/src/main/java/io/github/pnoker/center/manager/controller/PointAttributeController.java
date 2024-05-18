@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeBuilder;
@@ -37,6 +36,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 驱动属性配置信息 Controller
@@ -158,7 +158,7 @@ public class PointAttributeController implements BaseController {
     @PostMapping("/list")
     public R<Page<PointAttributeVO>> list(@RequestBody(required = false) PointAttributeQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointAttributeQuery();
             }
             entityQuery.setTenantId(getTenantId());

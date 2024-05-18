@@ -53,7 +53,7 @@ driver:
       attribute-name: type
       attribute-type-flag: STRING
       default-value: string
-      remark: 解析类型, short、int、long、float、double、boolean、string
+      remark: 解析类型, short, int, long, float, double, boolean, string
 
 spring:
   application:

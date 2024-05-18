@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -35,6 +34,8 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -105,7 +106,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Page<RoleBO> selectByPage(RoleQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<RoleDO> entityPageDO = roleManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -142,7 +143,7 @@ public class RoleServiceImpl implements RoleService {
         wrapper.eq(RoleDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RoleDO one = roleManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -161,7 +162,7 @@ public class RoleServiceImpl implements RoleService {
      */
     private RoleDO getDOById(Long id, boolean throwException) {
         RoleDO entityDO = roleManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("角色不存在");
         }
         return entityDO;

@@ -58,7 +58,7 @@ public class SinkTemplateController {
     private UrlService urlService;
 
     /**
-     * 注册、更新SinkTemplate
+     * 注册, 更新SinkTemplate
      */
     @PutMapping("/create")
     public Mono<R<String>> createSink(@Validated @RequestBody Object form, @RequestParam(name = "name") String name, @RequestParam(name = "confKey") String confKey) {

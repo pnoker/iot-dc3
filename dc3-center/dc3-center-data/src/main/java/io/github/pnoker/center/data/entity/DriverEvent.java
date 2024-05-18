@@ -54,7 +54,7 @@ public class DriverEvent implements Serializable {
     /**
      * Driver Event
      * <p>
-     * STATUS、ERROR
+     * STATUS, ERROR
      */
     private String type;
 

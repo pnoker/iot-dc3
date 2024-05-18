@@ -19,7 +19,6 @@ package io.github.pnoker.center.data.config;
 import io.github.pnoker.common.config.ExchangeConfig;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.driver.RabbitConstant;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -41,11 +40,13 @@ import java.util.Map;
 @ConditionalOnClass(ExchangeConfig.class)
 public class DataTopicConfig {
 
-    @Resource
-    private TopicExchange eventExchange;
+    private final TopicExchange eventExchange;
+    private final TopicExchange valueExchange;
 
-    @Resource
-    private TopicExchange valueExchange;
+    public DataTopicConfig(TopicExchange eventExchange, TopicExchange valueExchange) {
+        this.eventExchange = eventExchange;
+        this.valueExchange = valueExchange;
+    }
 
     @Bean
     Queue driverEventQueue() {

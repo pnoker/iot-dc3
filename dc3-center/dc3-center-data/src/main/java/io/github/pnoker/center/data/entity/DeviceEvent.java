@@ -60,7 +60,7 @@ public class DeviceEvent implements Serializable {
     /**
      * Device Event
      * <p>
-     * STATUS、LIMIT、ERROR
+     * STATUS, LIMIT, ERROR
      */
     private String type;
 

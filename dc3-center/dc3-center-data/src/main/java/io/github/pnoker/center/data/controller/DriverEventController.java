@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.biz.EventService;
 import io.github.pnoker.center.data.entity.DriverEvent;
@@ -29,6 +28,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Objects;
 
 /**
  * 驱动事件 Controller
@@ -56,11 +57,11 @@ public class DriverEventController implements BaseController {
     @PostMapping("/driver")
     public R<Page<DriverEvent>> driverEvent(@RequestBody(required = false) DriverEventQuery driverEventQuery) {
         try {
-            if (ObjectUtil.isEmpty(driverEventQuery)) {
+            if (Objects.isNull(driverEventQuery)) {
                 driverEventQuery = new DriverEventQuery();
             }
             Page<DriverEvent> page = eventService.driverEvent(driverEventQuery);
-            if (ObjectUtil.isNotNull(page)) {
+            if (!Objects.isNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

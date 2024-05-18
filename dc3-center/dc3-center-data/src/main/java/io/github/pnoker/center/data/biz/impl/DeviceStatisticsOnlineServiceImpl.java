@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.pnoker.api.center.manager.DeviceApiGrpc;
 import io.github.pnoker.api.center.manager.GrpcPageDeviceDTO;
@@ -46,6 +45,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -82,17 +82,17 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
         if (CharSequenceUtil.isNotEmpty(deviceQuery.getDeviceName())) {
             query.setDeviceName(deviceQuery.getDeviceName());
         }
-        if (ObjectUtil.isNotEmpty(deviceQuery.getDriverId())) {
+        if (!Objects.isNull(deviceQuery.getDriverId())) {
             query.setDriverId(deviceQuery.getDriverId());
         } else {
             query.setDriverId(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
-        if (ObjectUtil.isNotNull(deviceQuery.getEnableFlag())) {
+        if (!Objects.isNull(deviceQuery.getEnableFlag())) {
             query.setEnableFlag(deviceQuery.getEnableFlag().getIndex());
         } else {
             query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
-        if (ObjectUtil.isNotEmpty(deviceQuery.getTenantId())) {
+        if (!Objects.isNull(deviceQuery.getTenantId())) {
             query.setTenantId(deviceQuery.getTenantId());
         }
         GrpcRPageDeviceDTO list = deviceApiBlockingStub.list(query.build());
@@ -151,7 +151,7 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
                     if (runDO != null && deviceRunDO != null) {
                         deviceRunDO.setId(runDO.getId());
                         deviceRunManager.updateById(deviceRunDO);
-                    } else if (ObjectUtil.isEmpty(runDO) && deviceRunDO != null) {
+                    } else if (Objects.isNull(runDO) && deviceRunDO != null) {
                         deviceRunManager.save(deviceRunDO);
                     }
                     //查出每天统计表离线时长是否有数据
@@ -162,7 +162,7 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
                     if (runOffDO != null && deviceOffRunDO != null) {
                         deviceOffRunDO.setId(runOffDO.getId());
                         deviceRunManager.updateById(deviceOffRunDO);
-                    } else if (ObjectUtil.isEmpty(runOffDO) && deviceOffRunDO != null) {
+                    } else if (Objects.isNull(runOffDO) && deviceOffRunDO != null) {
                         deviceRunManager.save(deviceOffRunDO);
                     }
                 }

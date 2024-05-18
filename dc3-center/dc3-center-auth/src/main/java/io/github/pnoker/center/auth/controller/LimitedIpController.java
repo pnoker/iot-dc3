@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.LimitedIpBO;
 import io.github.pnoker.center.auth.entity.builder.LimitedIpBuilder;
@@ -33,6 +32,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 /**
  * 限制IP Controller
@@ -156,7 +157,7 @@ public class LimitedIpController implements BaseController {
     @PostMapping("/list")
     public R<Page<LimitedIpVO>> list(@RequestBody(required = false) LimitedIpQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new LimitedIpQuery();
             }
             entityQuery.setTenantId(getTenantId());

@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.entity.builder.UserLoginBuilder;
@@ -34,6 +33,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 /**
  * 用户 Controller
@@ -175,7 +176,7 @@ public class UserLoginController implements BaseController {
     @PostMapping("/list")
     public R<Page<UserLoginVO>> list(@RequestBody(required = false) UserLoginQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new UserLoginQuery();
             }
             Page<UserLoginBO> entityPageBO = userLoginService.selectByPage(entityQuery);

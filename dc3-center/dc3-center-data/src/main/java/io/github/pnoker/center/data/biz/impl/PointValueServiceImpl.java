@@ -19,7 +19,6 @@ package io.github.pnoker.center.data.biz.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
 import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
@@ -43,10 +42,7 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -69,7 +65,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public void save(PointValueBO pointValueBO) {
-        if (ObjectUtil.isNull(pointValueBO)) {
+        if (Objects.isNull(pointValueBO)) {
             return;
         }
 
@@ -95,7 +91,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public List<String> history(Long deviceId, Long pointId, int count) {
-        if (!ObjectUtil.isAllNotEmpty(deviceId, pointId)) {
+        if (Objects.isNull(deviceId) || Objects.isNull(pointId)) {
             return Collections.emptyList();
         }
         if (count < 1) {
@@ -111,7 +107,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public Page<PointValueBO> latest(PointValueQuery entityQuery) {
-        if (ObjectUtil.isEmpty(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 
@@ -129,13 +125,13 @@ public class PointValueServiceImpl implements PointValueService {
         entityQueryGrpcDTO.setPointTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         entityQueryGrpcDTO.setRwFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         entityQueryGrpcDTO.setProfileId(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        if (ObjectUtil.isNotNull(entityQuery.getEnableFlag())) {
+        if (!Objects.isNull(entityQuery.getEnableFlag())) {
             entityQueryGrpcDTO.setEnableFlag(entityQuery.getEnableFlag().getIndex());
         } else {
             entityQueryGrpcDTO.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         entityQueryGrpcDTO.setTenantId(entityQuery.getTenantId());
-        if (ObjectUtil.isNotEmpty(entityQuery.getDeviceId())) {
+        if (!Objects.isNull(entityQuery.getDeviceId())) {
             entityQueryGrpcDTO.setDeviceId(entityQuery.getDeviceId());
         }
         GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.list(entityQueryGrpcDTO.build());
@@ -162,7 +158,7 @@ public class PointValueServiceImpl implements PointValueService {
     @Override
     @SneakyThrows
     public Page<PointValueBO> page(PointValueQuery entityQuery) {
-        if (ObjectUtil.isEmpty(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 

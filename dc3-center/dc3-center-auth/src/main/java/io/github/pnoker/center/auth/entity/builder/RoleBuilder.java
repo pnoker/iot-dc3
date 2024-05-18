@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.RoleBO;
 import io.github.pnoker.center.auth.entity.model.RoleDO;
@@ -32,6 +31,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -76,7 +76,7 @@ public interface RoleBuilder {
         // Json Ext
         RoleExt entityExt = entityBO.getRoleExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -111,7 +111,7 @@ public interface RoleBuilder {
     default void afterProcess(RoleDO entityDO, @MappingTarget RoleBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getRoleExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             RoleExt ext = new RoleExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

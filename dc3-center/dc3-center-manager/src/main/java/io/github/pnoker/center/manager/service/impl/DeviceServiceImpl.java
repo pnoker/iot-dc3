@@ -18,7 +18,6 @@ package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -34,7 +33,7 @@ import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -108,7 +107,7 @@ public class DeviceServiceImpl implements DeviceService {
         DeviceBO deviceBO = selectById(entityDO.getId());
         List<ProfileBO> profileBOS = profileService.selectByDeviceId(entityDO.getId());
         deviceBO.setProfileIds(profileBOS.stream().map(ProfileBO::getId).toList());
-        driverNotifyService.notifyDevice(MetadataCommandTypeEnum.ADD, deviceBO);
+        driverNotifyService.notifyDevice(MetadataOperateTypeEnum.ADD, deviceBO);
     }
 
     @Override
@@ -127,7 +126,7 @@ public class DeviceServiceImpl implements DeviceService {
 
         // 通知驱动删除设备
         DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyDevice(MetadataCommandTypeEnum.DELETE, entityBO);
+        driverNotifyService.notifyDevice(MetadataOperateTypeEnum.DELETE, entityBO);
     }
 
 
@@ -159,7 +158,7 @@ public class DeviceServiceImpl implements DeviceService {
         select.setProfileIds(CollUtil.isEmpty(newProfileIds) ? oldProfileIds : newProfileIds);
         entityBO.setDeviceName(select.getDeviceName());
         // 通知驱动更新设备
-        driverNotifyService.notifyDevice(MetadataCommandTypeEnum.UPDATE, select);
+        driverNotifyService.notifyDevice(MetadataOperateTypeEnum.UPDATE, select);
     }
 
 
@@ -230,7 +229,7 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Override
     public Page<DeviceBO> selectByPage(DeviceQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<DeviceDO> entityPageDO = deviceMapper.selectPageWithProfile(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery), entityQuery.getProfileId());
@@ -309,11 +308,11 @@ public class DeviceServiceImpl implements DeviceService {
     private LambdaQueryWrapper<DeviceDO> fuzzyQuery(DeviceQuery entityQuery) {
         QueryWrapper<DeviceDO> wrapper = Wrappers.query();
         wrapper.eq("dd.deleted", 0);
-        if (ObjectUtil.isNotNull(entityQuery)) {
+        if (!Objects.isNull(entityQuery)) {
             wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceName()), "dd.device_name", entityQuery.getDeviceName());
             wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code", entityQuery.getDeviceCode());
-            wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
-            wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
+            wrapper.eq(!Objects.isNull(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
+            wrapper.eq(!Objects.isNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
             wrapper.eq("dd.tenant_id", entityQuery.getTenantId());
         }
         return wrapper.lambda();
@@ -409,7 +408,7 @@ public class DeviceServiceImpl implements DeviceService {
      * @param workbook           Workbook
      */
     private boolean configIsEqual(List<DriverAttributeBO> driverAttributeBOS, List<PointAttributeBO> pointAttributeBOS, List<PointBO> pointBOS, Workbook workbook) {
-        Sheet configSheet = workbook.getSheet("配置（忽略）");
+        Sheet configSheet = workbook.getSheet("配置(忽略)");
         String driverAttributesValueNew = JsonUtil.toJsonString(driverAttributeBOS);
         String driverAttributesValueOld = PoiUtil.getCellStringValue(configSheet, 0, 0);
         if (!driverAttributesValueNew.equals(driverAttributesValueOld)) {
@@ -458,7 +457,7 @@ public class DeviceServiceImpl implements DeviceService {
      * @param workbook           Workbook
      */
     private void configConfigSheet(List<DriverAttributeBO> driverAttributeBOS, List<PointAttributeBO> pointAttributeBOS, List<PointBO> pointBOS, Workbook workbook) {
-        Sheet configSheet = workbook.createSheet("配置（忽略）");
+        Sheet configSheet = workbook.createSheet("配置(忽略)");
         Row driverAttributesRow = configSheet.createRow(0);
         Row pointAttributesRow = configSheet.createRow(1);
         Row pointsRow = configSheet.createRow(2);
@@ -530,7 +529,7 @@ public class DeviceServiceImpl implements DeviceService {
 
                 List<PointBO> pointBOS = pointService.selectByProfileId(profileId);
                 // 通知驱动新增位号
-                pointBOS.forEach(point -> driverNotifyService.notifyPoint(MetadataCommandTypeEnum.ADD, point));
+                pointBOS.forEach(point -> driverNotifyService.notifyPoint(MetadataOperateTypeEnum.ADD, point));
             } catch (Exception ignored) {
                 // nothing to do
             }
@@ -553,7 +552,7 @@ public class DeviceServiceImpl implements DeviceService {
         wrapper.eq(DeviceDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO one = deviceManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -572,7 +571,7 @@ public class DeviceServiceImpl implements DeviceService {
      */
     private DeviceDO getDOById(Long id, boolean throwException) {
         DeviceDO entityDO = deviceManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("设备不存在");
         }
         return entityDO;
