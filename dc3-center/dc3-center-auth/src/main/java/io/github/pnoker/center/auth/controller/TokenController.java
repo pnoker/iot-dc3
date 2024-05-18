@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.biz.TokenService;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
 import io.github.pnoker.center.auth.entity.query.TokenQuery;
@@ -30,6 +29,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Objects;
 
 /**
  * 令牌 Controller
@@ -57,7 +58,7 @@ public class TokenController implements BaseController {
     @PostMapping("/salt")
     public R<String> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
         String salt = tokenService.generateSalt(entityVO.getName(), entityVO.getTenant());
-        return ObjectUtil.isNotNull(salt) ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
+        return !Objects.isNull(salt) ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
     }
 
     /**
@@ -69,7 +70,7 @@ public class TokenController implements BaseController {
     @PostMapping("/generate")
     public R<String> generateToken(@Validated @RequestBody TokenQuery entityVO) {
         String token = tokenService.generateToken(entityVO.getName(), entityVO.getSalt(), entityVO.getPassword(), entityVO.getTenant());
-        return ObjectUtil.isNotNull(token) ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
+        return !Objects.isNull(token) ? R.ok(token, "The token will expire in 12 hours.") : R.fail();
     }
 
     /**
@@ -84,10 +85,10 @@ public class TokenController implements BaseController {
 
         boolean valid = tokenValid.isValid();
         String message = "The token has expired";
-        if (valid && ObjectUtil.isNotNull(tokenValid.getExpireTime())) {
+        if (valid && !Objects.isNull(tokenValid.getExpireTime())) {
             String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
             message = "The token will expire in " + expireTime;
-        } else if (!valid && ObjectUtil.isNotNull(tokenValid.getExpireTime())) {
+        } else if (!valid && !Objects.isNull(tokenValid.getExpireTime())) {
             String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
             message = "The token has expired in " + expireTime;
         }

@@ -18,7 +18,6 @@ package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -42,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author linys
@@ -103,7 +103,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
     @Override
     public Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<RoleUserBindDO> entityPageDO = roleUserBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -128,7 +128,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
     private LambdaQueryWrapper<RoleUserBindDO> fuzzyQuery(RoleUserBindQuery entityQuery) {
         LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getUserId()), RoleUserBindDO::getUserId, entityQuery.getUserId());
+        wrapper.eq(!Objects.isNull(entityQuery.getUserId()), RoleUserBindDO::getUserId, entityQuery.getUserId());
         wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getRoleId()), RoleUserBindDO::getRoleId, entityQuery.getRoleId());
         wrapper.eq(RoleUserBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
@@ -149,7 +149,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         wrapper.eq(RoleUserBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RoleUserBindDO one = roleUserBindManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -168,7 +168,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
      */
     private RoleUserBindDO getDOById(Long id, boolean throwException) {
         RoleUserBindDO entityDO = roleUserBindManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("角色用户绑定不存在");
         }
         return entityDO;

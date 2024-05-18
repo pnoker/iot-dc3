@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.grpc.server.manager;
 
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcDriverDTO;
@@ -33,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Driver Api
@@ -60,7 +60,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         DriverQuery pageQuery = grpcDriverBuilder.buildQueryByGrpcQuery(request);
 
         Page<DriverBO> driverPage = driverService.selectByPage(pageQuery);
-        if (ObjectUtil.isNull(driverPage)) {
+        if (Objects.isNull(driverPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -93,7 +93,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         DriverBO entityDO = driverService.selectByDeviceId(request.getDeviceId());
-        if (ObjectUtil.isNull(entityDO)) {
+        if (Objects.isNull(entityDO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -118,7 +118,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         DriverBO driverBO = driverService.selectById(request.getDriverId());
-        if (ObjectUtil.isNull(driverBO)) {
+        if (Objects.isNull(driverBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());

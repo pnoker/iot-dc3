@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 import io.github.pnoker.center.manager.entity.builder.ProfileBuilder;
@@ -36,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -175,7 +175,7 @@ public class ProfileController implements BaseController {
     @PostMapping("/list")
     public R<Page<ProfileVO>> list(@RequestBody(required = false) ProfileQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new ProfileQuery();
             }
             entityQuery.setTenantId(getTenantId());

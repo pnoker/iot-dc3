@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.api;
 
 
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.GrpcIdQuery;
 import io.github.pnoker.api.center.auth.GrpcRUserDTO;
 import io.github.pnoker.api.center.auth.GrpcUserDTO;
@@ -33,6 +32,8 @@ import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+
+import java.util.Objects;
 
 /**
  * User Api
@@ -52,7 +53,7 @@ public class UserApi extends UserApiGrpc.UserApiImplBase {
         GrpcRUserDTO.Builder builder = GrpcRUserDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
         UserBO select = userService.selectById(request.getId());
-        if (ObjectUtil.isNull(select)) {
+        if (Objects.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());

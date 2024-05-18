@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.api;
 
 
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.GrpcLoginQuery;
 import io.github.pnoker.api.center.auth.GrpcRTokenDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
@@ -30,6 +29,8 @@ import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+
+import java.util.Objects;
 
 /**
  * Token Api
@@ -49,7 +50,7 @@ public class TokenApi extends TokenApiGrpc.TokenApiImplBase {
         GrpcRTokenDTO.Builder builder = GrpcRTokenDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
         TokenValid select = tokenService.checkValid(request.getName(), request.getSalt(), request.getToken(), request.getTenant());
-        if (ObjectUtil.isNull(select)) {
+        if (Objects.isNull(select)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());

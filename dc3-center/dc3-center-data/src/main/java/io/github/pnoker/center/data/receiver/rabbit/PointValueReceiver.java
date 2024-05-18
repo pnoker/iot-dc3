@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.receiver.rabbit;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.job.PointValueJob;
@@ -32,6 +31,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -51,37 +51,37 @@ public class PointValueReceiver {
 
     @Resource
     private MqttProperties mqttProperties;
-
-    @Resource
-    private PointValueService pointValueService;
     @Resource
     private MqttSendService mqttSendService;
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
+
+    @Resource
+    private PointValueService pointValueService;
 
     @RabbitHandler
     @RabbitListener(queues = "#{pointValueQueue.name}", containerFactory = "")
     public void pointValueReceive(Channel channel, Message message, PointValueBO pointValueBO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            if (ObjectUtil.isNull(pointValueBO) || ObjectUtil.isNull(pointValueBO.getDeviceId())) {
+            if (Objects.isNull(pointValueBO) || Objects.isNull(pointValueBO.getDeviceId())) {
                 log.error("Invalid point value: {}", pointValueBO);
                 return;
             }
-            PointValueJob.valueCount.getAndIncrement();
+            PointValueJob.VALUE_COUNT.getAndIncrement();
             log.debug("Receive point value from: {}, {}", message.getMessageProperties().getReceivedRoutingKey(), JsonUtil.toJsonString(pointValueBO));
 
             // Judge whether to process data in batch according to the data transmission speed
-            if (PointValueJob.valueSpeed.get() < batchSpeed) {
+            if (PointValueJob.VALUE_SPEED.get() < batchSpeed) {
                 threadPoolExecutor.execute(() ->
                         // Save point value to Redis & MongoDB
                         pointValueService.save(pointValueBO)
                 );
             } else {
                 // Save point value to schedule
-                PointValueJob.valueLock.writeLock().lock();
+                PointValueJob.VALUE_LOCK.writeLock().lock();
                 PointValueJob.addPointValues(pointValueBO);
-                PointValueJob.valueLock.writeLock().unlock();
+                PointValueJob.VALUE_LOCK.writeLock().unlock();
             }
 
             // Forward point value to MQTT

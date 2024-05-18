@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.bo.AlarmRuleBO;
 import io.github.pnoker.center.data.entity.model.AlarmRuleDO;
@@ -33,6 +32,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -78,7 +78,7 @@ public interface AlarmRuleBuilder {
         // Json Ext
         AlarmRuleExt entityExt = entityBO.getAlarmRuleExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -118,7 +118,7 @@ public interface AlarmRuleBuilder {
     default void afterProcess(AlarmRuleDO entityDO, @MappingTarget AlarmRuleBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getAlarmRuleExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             AlarmRuleExt ext = new AlarmRuleExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

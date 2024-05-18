@@ -76,7 +76,7 @@ public class WeatherInfo {
         private String adCode;
 
         /**
-         * 天气现象（汉字描述）
+         * 天气现象(汉字描述)
          */
         private String weather;
 

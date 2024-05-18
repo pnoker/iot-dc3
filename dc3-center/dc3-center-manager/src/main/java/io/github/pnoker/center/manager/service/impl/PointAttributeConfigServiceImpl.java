@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -40,6 +39,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -148,7 +148,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Override
     public Page<PointAttributeConfigBO> selectByPage(PointAttributeConfigQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<PointAttributeConfigDO> entityPageDO = pointAttributeConfigManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -157,9 +157,9 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, entityQuery.getPointAttributeId());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getPointId()), PointAttributeConfigDO::getPointId, entityQuery.getPointId());
+        wrapper.eq(!Objects.isNull(entityQuery.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, entityQuery.getPointAttributeId());
+        wrapper.eq(!Objects.isNull(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(!Objects.isNull(entityQuery.getPointId()), PointAttributeConfigDO::getPointId, entityQuery.getPointId());
         wrapper.eq(PointAttributeConfigDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -179,7 +179,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         wrapper.eq(PointAttributeConfigDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointAttributeConfigDO one = pointAttributeConfigManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
@@ -194,7 +194,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     private PointAttributeConfigDO getDOById(Long id, boolean throwException) {
         PointAttributeConfigDO entityDO = pointAttributeConfigManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("位号属性配置不存在");
         }
         return entityDO;

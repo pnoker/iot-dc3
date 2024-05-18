@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.entity.builder.PointValueBuilder;
@@ -31,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * PointValue Controller
@@ -60,7 +60,7 @@ public class PointValueController implements BaseController {
     @PostMapping("/latest")
     public R<Page<PointValueVO>> latest(@RequestBody PointValueQuery pointValueQuery) {
         try {
-            if (ObjectUtil.isEmpty(pointValueQuery)) {
+            if (Objects.isNull(pointValueQuery)) {
                 pointValueQuery = new PointValueQuery();
             }
             pointValueQuery.setTenantId(getTenantId());
@@ -82,7 +82,7 @@ public class PointValueController implements BaseController {
     @PostMapping("/list")
     public R<Page<PointValueVO>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointValueQuery();
             }
             Page<PointValueBO> entityPageBO = pointValueService.page(entityQuery);

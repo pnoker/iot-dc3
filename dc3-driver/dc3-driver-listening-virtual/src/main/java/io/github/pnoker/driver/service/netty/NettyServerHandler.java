@@ -60,7 +60,7 @@ public class NettyServerHandler {
         log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
         String deviceName = byteBuf.toString(0, 22, CharsetUtil.CHARSET_ISO_8859_1);
         long deviceId = Long.parseLong(deviceName);
-        DeviceBO device = deviceMetadata.getDevice(deviceId);
+        DeviceBO device = deviceMetadata.getCache(deviceId);
 
         String hexKey = ByteBufUtil.hexDump(byteBuf, 22, 1);
         NettyTcpServer.deviceChannelMap.put(deviceId, context.channel());
@@ -69,7 +69,7 @@ public class NettyServerHandler {
 
         List<PointValue> pointValues = new ArrayList<>(16);
         for (Map.Entry<Long, Map<String, AttributeBO>> entry : pointConfigMap.entrySet()) {
-            PointBO point = pointMetadata.getPoint(entry.getKey());
+            PointBO point = pointMetadata.getCache(entry.getKey());
             Map<String, AttributeBO> infoMap = pointConfigMap.get(entry.getKey());
             int start = infoMap.get("start").getValue(Integer.class);
             int end = infoMap.get("end").getValue(Integer.class);

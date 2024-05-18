@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -36,6 +35,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 /**
  * 用户密码服务接口实现类
@@ -96,7 +97,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     public Page<UserPasswordBO> selectByPage(UserPasswordQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<UserPasswordDO> entityPageDO = userPasswordManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -106,7 +107,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     @Override
     public void restPassword(Long id) {
         UserPasswordBO userPasswordBO = selectById(id);
-        if (ObjectUtil.isNotNull(userPasswordBO)) {
+        if (!Objects.isNull(userPasswordBO)) {
             userPasswordBO.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
             update(userPasswordBO);
         }
@@ -129,7 +130,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         wrapper.eq(UserPasswordDO::getLoginPassword, entityBO.getLoginPassword());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserPasswordDO one = userPasswordManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -148,7 +149,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
      */
     private UserPasswordDO getDOById(Long id, boolean throwException) {
         UserPasswordDO entityDO = userPasswordManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("用户密码不存在");
         }
         return entityDO;

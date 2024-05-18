@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import io.github.pnoker.center.auth.entity.model.ResourceDO;
@@ -34,6 +33,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -80,7 +80,7 @@ public interface ResourceBuilder {
         // Json Ext
         ResourceExt entityExt = entityBO.getResourceExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -125,7 +125,7 @@ public interface ResourceBuilder {
     default void afterProcess(ResourceDO entityDO, @MappingTarget ResourceBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getResourceExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             ResourceExt ext = new ResourceExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

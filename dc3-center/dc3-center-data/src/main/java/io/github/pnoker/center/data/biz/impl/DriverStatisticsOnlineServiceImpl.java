@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.pnoker.api.center.manager.DriverApiGrpc;
 import io.github.pnoker.api.center.manager.GrpcPageDriverDTO;
@@ -46,6 +45,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -87,17 +87,17 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
         if (CharSequenceUtil.isNotEmpty(driverQuery.getServiceHost())) {
             query.setServiceHost(driverQuery.getServiceHost());
         }
-        if (ObjectUtil.isNotNull(driverQuery.getDriverTypeFlag())) {
+        if (!Objects.isNull(driverQuery.getDriverTypeFlag())) {
             query.setDriverTypeFlag(driverQuery.getDriverTypeFlag().getIndex());
         } else {
             query.setDriverTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
-        if (ObjectUtil.isNotNull(driverQuery.getEnableFlag())) {
+        if (!Objects.isNull(driverQuery.getEnableFlag())) {
             query.setEnableFlag(driverQuery.getEnableFlag().getIndex());
         } else {
             query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
-        if (ObjectUtil.isNotEmpty(driverQuery.getTenantId())) {
+        if (!Objects.isNull(driverQuery.getTenantId())) {
             query.setTenantId(driverQuery.getTenantId());
         }
         GrpcRPageDriverDTO list = driverApiBlockingStub.list(query.build());
@@ -156,7 +156,7 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
                         if (runDO != null && driverRunDO != null) {
                             driverRunDO.setId(runDO.getId());
                             driverRunManager.updateById(driverRunDO);
-                        } else if (ObjectUtil.isEmpty(runDO) && driverRunDO != null) {
+                        } else if (Objects.isNull(runDO) && driverRunDO != null) {
                             driverRunManager.save(driverRunDO);
                         }
                         //查出每天统计表离线时长是否有数据
@@ -167,7 +167,7 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
                         if (runOffDO != null && driverOffRunDO != null) {
                             driverOffRunDO.setId(runOffDO.getId());
                             driverRunManager.updateById(driverOffRunDO);
-                        } else if (ObjectUtil.isEmpty(runOffDO) && driverOffRunDO != null) {
+                        } else if (Objects.isNull(runOffDO) && driverOffRunDO != null) {
                             driverRunManager.save(driverOffRunDO);
                         }
                     }

@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.builder.DriverAttributeBuilder;
@@ -37,6 +36,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 驱动连接配置信息 Controller
@@ -158,7 +158,7 @@ public class DriverAttributeController implements BaseController {
     @PostMapping("/list")
     public R<Page<DriverAttributeVO>> list(@RequestBody(required = false) DriverAttributeQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new DriverAttributeQuery();
             }
             entityQuery.setTenantId(getTenantId());

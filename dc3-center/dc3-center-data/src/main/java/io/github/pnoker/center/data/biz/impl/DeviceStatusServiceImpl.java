@@ -18,7 +18,6 @@ package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcPage;
@@ -70,20 +69,20 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {
             query.setDeviceName(pageQuery.getDeviceName());
         }
-        if (ObjectUtil.isNotEmpty(pageQuery.getDriverId())) {
+        if (!Objects.isNull(pageQuery.getDriverId())) {
             query.setDriverId(pageQuery.getDriverId());
         } else {
             query.setDriverId(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
-        if (ObjectUtil.isNotNull(pageQuery.getEnableFlag())) {
+        if (!Objects.isNull(pageQuery.getEnableFlag())) {
             query.setEnableFlag(pageQuery.getEnableFlag().getIndex());
         } else {
             query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
-        if (ObjectUtil.isNotEmpty(pageQuery.getTenantId())) {
+        if (!Objects.isNull(pageQuery.getTenantId())) {
             query.setTenantId(pageQuery.getTenantId());
         }
-        if (ObjectUtil.isNotEmpty(pageQuery.getProfileId())) {
+        if (!Objects.isNull(pageQuery.getProfileId())) {
             query.setProfileId(pageQuery.getProfileId());
         }
         GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.list(query.build());
@@ -126,7 +125,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
         deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
-        if (ObjectUtil.isEmpty(deviceRunDOS)) {
+        if (Objects.isNull(deviceRunDOS)) {
             deviceRunBO.setDuration(list);
             return deviceRunBO;
         }
@@ -153,7 +152,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
-        if (ObjectUtil.isEmpty(deviceRunDOS)) {
+        if (Objects.isNull(deviceRunDOS)) {
             deviceRunBO.setDuration(list);
             return deviceRunBO;
         }
@@ -176,7 +175,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         deviceIds.forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisService.getKey(key);
-            status = ObjectUtil.isNotNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
+            status = !Objects.isNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
             statusMap.put(id, status);
         });
         return statusMap;

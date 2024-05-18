@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.grpc.server.driver;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcPage;
@@ -41,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Device Api
@@ -81,7 +81,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         DeviceQuery pageQuery = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
 
         Page<DeviceBO> devicePage = deviceService.selectByPage(pageQuery);
-        if (ObjectUtil.isNull(devicePage)) {
+        if (Objects.isNull(devicePage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -115,7 +115,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         DeviceBO entityBO = deviceService.selectById(request.getDeviceId());
-        if (ObjectUtil.isEmpty(entityBO)) {
+        if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());

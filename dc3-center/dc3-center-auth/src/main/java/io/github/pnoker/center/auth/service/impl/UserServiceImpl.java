@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -36,6 +35,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 /**
  * 用户服务接口实现类
@@ -61,7 +62,7 @@ public class UserServiceImpl implements UserService {
         // 判断手机号是否存在, 如果有手机号不为空, 检查该手机号是否被占用
         if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
             UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
-            if (ObjectUtil.isNotNull(selectByPhone)) {
+            if (!Objects.isNull(selectByPhone)) {
                 throw new DuplicateException("The user already exists with phone: {}", entityBO.getPhone());
             }
         }
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService {
         // 判断邮箱是否存在, 如果有邮箱不为空, 检查该邮箱是否被占用
         if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
             UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
-            if (ObjectUtil.isNotNull(selectByEmail)) {
+            if (!Objects.isNull(selectByEmail)) {
                 throw new DuplicateException("The user already exists with email: {}", entityBO.getEmail());
             }
         }
@@ -99,7 +100,7 @@ public class UserServiceImpl implements UserService {
         if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
             if (!entityBO.getPhone().equals(selectById.getPhone())) {
                 UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
-                if (ObjectUtil.isNotNull(selectByPhone)) {
+                if (!Objects.isNull(selectByPhone)) {
                     throw new DuplicateException("The user already exists with phone {}", entityBO.getPhone());
                 }
             }
@@ -109,7 +110,7 @@ public class UserServiceImpl implements UserService {
         if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
             if (!entityBO.getEmail().equals(selectById.getEmail())) {
                 UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
-                if (ObjectUtil.isNotNull(selectByEmail)) {
+                if (!Objects.isNull(selectByEmail)) {
                     throw new DuplicateException("The user already exists with email {}", entityBO.getEmail());
                 }
             }
@@ -165,7 +166,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserBO> selectByPage(UserQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<UserDO> page = userManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -186,7 +187,7 @@ public class UserServiceImpl implements UserService {
         wrapper.eq(key, value);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserDO userDO = userManager.getOne(wrapper);
-        if (ObjectUtil.isNull(userDO)) {
+        if (Objects.isNull(userDO)) {
             if (throwException) {
                 throw new NotFoundException();
             }
@@ -208,7 +209,7 @@ public class UserServiceImpl implements UserService {
         wrapper.eq(UserDO::getUserName, entityBO.getUserName());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserDO one = userManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -227,7 +228,7 @@ public class UserServiceImpl implements UserService {
      */
     private UserDO getDOById(Long id, boolean throwException) {
         UserDO entityDO = userManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("用户不存在");
         }
         return entityDO;

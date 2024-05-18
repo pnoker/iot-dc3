@@ -49,7 +49,7 @@ driver:
       attribute-name: functionCode
       attribute-type-flag: INT
       default-value: 1
-      remark: 功能码 [1、2、3、4]
+      remark: 功能码 [1, 2, 3, 4]
     - display-name: 偏移量
       attribute-name: offset
       attribute-type-flag: INT

@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.biz.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.data.biz.DeviceEventService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
@@ -25,6 +24,8 @@ import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * DeviceService Impl
@@ -43,7 +44,7 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     @Override
     public void heartbeatEvent(DeviceEventDTO entityDTO) {
         DeviceEventDTO.DeviceStatus deviceStatus = JsonUtil.parseObject(entityDTO.getContent(), DeviceEventDTO.DeviceStatus.class);
-        if (ObjectUtil.isNull(deviceStatus)) {
+        if (Objects.isNull(deviceStatus)) {
             return;
         }
         redisService.setKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceStatus.getDeviceId(), deviceStatus.getStatus(), deviceStatus.getTimeOut(), deviceStatus.getTimeUnit());

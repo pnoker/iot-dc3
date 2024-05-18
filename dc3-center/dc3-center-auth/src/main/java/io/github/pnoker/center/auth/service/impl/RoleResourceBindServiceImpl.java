@@ -18,7 +18,6 @@ package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -42,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author linys
@@ -105,7 +105,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
     @Override
     public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<RoleResourceBindDO> entityPageDO = roleResourceBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -150,7 +150,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         wrapper.eq(RoleResourceBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RoleResourceBindDO one = roleResourceBindManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
@@ -165,7 +165,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
      */
     private RoleResourceBindDO getDOById(Long id, boolean throwException) {
         RoleResourceBindDO entityDO = roleResourceBindManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("角色资源绑定不存在");
         }
         return entityDO;

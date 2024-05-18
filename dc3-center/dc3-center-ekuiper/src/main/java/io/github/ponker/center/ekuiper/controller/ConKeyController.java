@@ -59,7 +59,7 @@ public class ConKeyController {
     private SinkTemplateService sinkTemplateService;
 
     /**
-     * 注册、更新ConfKey
+     * 注册, 更新ConfKey
      */
     @PutMapping("/create")
     public Mono<R<String>> createConf(@Validated @RequestBody Object form, @RequestParam(name = "name") String name, @RequestParam(name = "confKey") String confKey) {

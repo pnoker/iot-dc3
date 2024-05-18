@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.MenuBO;
 import io.github.pnoker.center.auth.entity.model.MenuDO;
@@ -34,6 +33,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -80,7 +80,7 @@ public interface MenuBuilder {
         // Json Ext
         MenuExt entityExt = entityBO.getMenuExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -125,7 +125,7 @@ public interface MenuBuilder {
     default void afterProcess(MenuDO entityDO, @MappingTarget MenuBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getMenuExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             MenuExt ext = new MenuExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

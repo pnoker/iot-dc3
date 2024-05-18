@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -35,6 +34,8 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -101,7 +102,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
 
     @Override
     public Page<AlarmRuleBO> selectByPage(AlarmRuleQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<AlarmRuleDO> entityPageDO = alarmRuleManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -137,7 +138,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
         wrapper.eq(AlarmRuleDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmRuleDO one = alarmRuleManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -156,7 +157,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
      */
     private AlarmRuleDO getDOById(Long id, boolean throwException) {
         AlarmRuleDO entityDO = alarmRuleManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("报警规则不存在");
         }
         return entityDO;

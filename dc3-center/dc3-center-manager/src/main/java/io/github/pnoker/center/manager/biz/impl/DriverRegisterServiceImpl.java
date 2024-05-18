@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.biz.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.GrpcCodeQuery;
 import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
@@ -85,7 +84,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         DriverBO driverBO = grpcDriverBuilder.buildBOByGrpcDTO(entityGrpc.getDriver());
         Objects.requireNonNull(driverBO).setTenantId(rTenantDTO.getData().getBase().getId());
         DriverBO entityBO = driverService.selectByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
-        if (ObjectUtil.isNotNull(entityBO)) {
+        if (!Objects.isNull(entityBO)) {
             log.info("驱动已注册, 执行更新: {}", JsonUtil.toJsonString(driverBO));
             driverBO.setId(entityBO.getId());
             driverService.update(driverBO);

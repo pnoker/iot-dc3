@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.biz.DictionaryService;
 import io.github.pnoker.center.manager.entity.builder.DictionaryForManagerBuilder;
@@ -33,6 +32,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Objects;
 
 /**
  * 字典 Controller
@@ -62,7 +63,7 @@ public class DictionaryController implements BaseController {
     @PostMapping("/driver")
     public R<Page<DictionaryVO>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
@@ -84,7 +85,7 @@ public class DictionaryController implements BaseController {
     @PostMapping("/profile")
     public R<Page<DictionaryVO>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
@@ -106,7 +107,7 @@ public class DictionaryController implements BaseController {
     @PostMapping("/profile_point")
     public R<Page<DictionaryVO>> pointDictionaryForProfile(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
@@ -128,7 +129,7 @@ public class DictionaryController implements BaseController {
     @PostMapping("/device_point")
     public R<Page<DictionaryVO>> pointDictionaryForDevice(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
@@ -150,7 +151,7 @@ public class DictionaryController implements BaseController {
     @PostMapping("/device")
     public R<Page<DictionaryVO>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
@@ -172,7 +173,7 @@ public class DictionaryController implements BaseController {
     @PostMapping("/driver_device")
     public R<Page<DictionaryVO>> deviceDictionaryForDriver(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());

@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.ApiBO;
 import io.github.pnoker.center.auth.entity.model.ApiDO;
@@ -33,6 +32,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -78,7 +78,7 @@ public interface ApiBuilder {
         // Json Ext
         ApiExt entityExt = entityBO.getApiExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -119,7 +119,7 @@ public interface ApiBuilder {
     default void afterProcess(ApiDO entityDO, @MappingTarget ApiBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getApiExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             ApiExt ext = new ApiExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

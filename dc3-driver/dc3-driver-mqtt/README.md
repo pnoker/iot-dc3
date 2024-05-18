@@ -6,7 +6,7 @@
 - [x] 下发 Mqtt 数据
 - [ ] 定时下发 Mqtt 点位
 - [x] Qos
-- [x] 模糊匹配, *（星号）表示一个单词, #（井号）表示零个或者多个单词
+- [x] 模糊匹配, *(星号)表示一个单词, #(井号)表示零个或者多个单词
 - [ ] 上行数据, 动态添加主题
 - [x] 下行指令, 动态指定主题
 - [ ] Virtual Host
@@ -43,8 +43,8 @@
 - Default.Topic: 默认主题
 - Default.Qos: 默认主题 Qos
 - Default.Receive.Enable: 是否开启接收默认主题上行Mqtt数据
-- KeepAlive: 保活时间间隔（秒）
-- CompletionTimeout: 超时设置（秒）
+- KeepAlive: 保活时间间隔(秒)
+- CompletionTimeout: 超时设置(秒)
 
 ### Mqtt Point 配置
 

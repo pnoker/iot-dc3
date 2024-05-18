@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.model.TenantDO;
@@ -32,6 +31,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -75,7 +75,7 @@ public interface TenantBuilder {
         // Json Ext
         TenantExt entityExt = entityBO.getTenantExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -110,7 +110,7 @@ public interface TenantBuilder {
     default void afterProcess(TenantDO entityDO, @MappingTarget TenantBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getTenantExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (!Objects.isNull(entityExt)) {
             TenantExt ext = new TenantExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

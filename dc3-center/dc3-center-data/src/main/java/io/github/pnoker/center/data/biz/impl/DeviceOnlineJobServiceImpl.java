@@ -18,7 +18,6 @@ package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.manager.DeviceApiGrpc;
 import io.github.pnoker.api.center.manager.GrpcPageDeviceDTO;
 import io.github.pnoker.api.center.manager.GrpcPageDeviceQuery;
@@ -41,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
@@ -68,17 +68,17 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
         if (CharSequenceUtil.isNotEmpty(deviceQuery.getDeviceName())) {
             query.setDeviceName(deviceQuery.getDeviceName());
         }
-        if (ObjectUtil.isNotEmpty(deviceQuery.getDriverId())) {
+        if (!Objects.isNull(deviceQuery.getDriverId())) {
             query.setDriverId(deviceQuery.getDriverId());
         } else {
             query.setDriverId(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
-        if (ObjectUtil.isNotNull(deviceQuery.getEnableFlag())) {
+        if (!Objects.isNull(deviceQuery.getEnableFlag())) {
             query.setEnableFlag(deviceQuery.getEnableFlag().getIndex());
         } else {
             query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
-        if (ObjectUtil.isNotEmpty(deviceQuery.getTenantId())) {
+        if (!Objects.isNull(deviceQuery.getTenantId())) {
             query.setTenantId(deviceQuery.getTenantId());
         }
         GrpcRPageDeviceDTO list = deviceApiBlockingStub.list(query.build());
@@ -89,7 +89,7 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
             dataList.forEach(driverDO -> {
                 String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + driverDO.getBase().getId();
                 String status = redisService.getKey(key);
-                status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
+                status = !Objects.isNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
                 DeviceStatusHistoryDO deviceStatusHistoryDO = new DeviceStatusHistoryDO();
                 deviceStatusHistoryDO.setDriverId(driverDO.getDriverId());
                 deviceStatusHistoryDO.setDeviceId(driverDO.getBase().getId());

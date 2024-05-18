@@ -53,7 +53,7 @@ public interface PointValueService {
     List<String> history(Long deviceId, Long pointId, int count);
 
     /**
-     * 获取带分页、排序 最新 PointValue
+     * 获取带分页, 排序 最新 PointValue
      *
      * @param pointValueQuery Entry of Query
      * @return Entity of BO Page
@@ -61,7 +61,7 @@ public interface PointValueService {
     Page<PointValueBO> latest(PointValueQuery pointValueQuery);
 
     /**
-     * 获取带分页、排序 历史 PointValue
+     * 获取带分页, 排序 历史 PointValue
      *
      * @param pointValueQuery Entry of Query
      * @return Entity of BO Page

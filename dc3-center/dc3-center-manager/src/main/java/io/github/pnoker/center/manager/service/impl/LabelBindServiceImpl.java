@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -33,6 +32,8 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * LabelBindService Impl
@@ -90,7 +91,7 @@ public class LabelBindServiceImpl implements LabelBindService {
 
     @Override
     public Page<LabelBindBO> selectByPage(LabelBindQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<LabelBindDO> entityPageDO = labelBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -105,8 +106,8 @@ public class LabelBindServiceImpl implements LabelBindService {
      */
     private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery entityQuery) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
+        wrapper.eq(!Objects.isNull(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
+        wrapper.eq(!Objects.isNull(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
         wrapper.eq(LabelBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -127,7 +128,7 @@ public class LabelBindServiceImpl implements LabelBindService {
         wrapper.eq(LabelBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         LabelBindDO one = labelBindManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -146,7 +147,7 @@ public class LabelBindServiceImpl implements LabelBindService {
      */
     private LabelBindDO getDOById(Long id, boolean throwException) {
         LabelBindDO entityDO = labelBindManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("标签绑定不存在");
         }
         return entityDO;

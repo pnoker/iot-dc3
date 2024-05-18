@@ -18,7 +18,6 @@ package io.github.pnoker.center.auth.biz.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.biz.AuthService;
 import io.github.pnoker.center.auth.entity.bean.Login;
 import io.github.pnoker.center.auth.entity.bo.*;
@@ -34,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -68,24 +68,24 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserLoginBO authenticateUser(Login login) {
         TenantBO tenantBO = tenantService.selectByCode(login.getTenant());
-        if (ObjectUtil.isNull(tenantBO)) {
+        if (Objects.isNull(tenantBO)) {
             throw new NotFoundException("租户{}不存在", login.getTenant());
         }
 
         //todo checkUserLimit
 
         UserLoginBO userLogin = userLoginService.selectByLoginName(login.getName(), false);
-        if (ObjectUtil.isNull(userLogin)) {
+        if (Objects.isNull(userLogin)) {
             throw new NotFoundException("用户{}不存在", login.getName());
         }
 
         TenantBindBO tenantBindBO = tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
-        if (ObjectUtil.isNull(tenantBindBO)) {
-            throw new NotFoundException("租户、用户信息不匹配");
+        if (Objects.isNull(tenantBindBO)) {
+            throw new NotFoundException("租户, 用户信息不匹配");
         }
 
         UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
-        if (ObjectUtil.isNull(userPasswordBO)) {
+        if (Objects.isNull(userPasswordBO)) {
             throw new NotFoundException("密码不存在, 请先设置密码");
         }
 
@@ -110,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthUser login(Login login) {
         //1. authenticate user
         UserLoginBO userLogin = authenticateUser(login);
-        if (ObjectUtil.isNull(userLogin)) {
+        if (Objects.isNull(userLogin)) {
             throw new ServiceException("认证失败！请重试");
         }
 

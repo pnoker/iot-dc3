@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeConfigBuilder;
@@ -35,6 +34,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 位号属性配置信息 Controller
@@ -128,7 +128,7 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 属性ID、设备ID 和 位号ID 查询 PointConfig
+     * 根据 属性ID, 设备ID 和 位号ID 查询 PointConfig
      *
      * @param attributeId Attribute ID
      * @param deviceId    设备ID
@@ -195,7 +195,7 @@ public class PointAttributeConfigController implements BaseController {
     @PostMapping("/list")
     public R<Page<PointAttributeConfigVO>> list(@RequestBody(required = false) PointAttributeConfigQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointAttributeConfigQuery();
             }
             entityQuery.setTenantId(getTenantId());

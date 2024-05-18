@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.biz.EventService;
 import io.github.pnoker.center.data.entity.DeviceEvent;
@@ -29,6 +28,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Objects;
 
 /**
  * 设备事件 Controller
@@ -56,11 +57,11 @@ public class DeviceEventController implements BaseController {
     @PostMapping("/device")
     public R<Page<DeviceEvent>> deviceEvent(@RequestBody(required = false) DeviceEventQuery deviceEventQuery) {
         try {
-            if (ObjectUtil.isEmpty(deviceEventQuery)) {
+            if (Objects.isNull(deviceEventQuery)) {
                 deviceEventQuery = new DeviceEventQuery();
             }
             Page<DeviceEvent> page = eventService.deviceEvent(deviceEventQuery);
-            if (ObjectUtil.isNotNull(page)) {
+            if (!Objects.isNull(page)) {
                 return R.ok(page);
             }
         } catch (Exception e) {

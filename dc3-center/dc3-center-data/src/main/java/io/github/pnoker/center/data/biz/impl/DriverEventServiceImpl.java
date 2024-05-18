@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.biz.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.data.biz.DriverEventService;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.entity.dto.DriverEventDTO;
@@ -26,6 +25,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,7 +45,7 @@ public class DriverEventServiceImpl implements DriverEventService {
     @Override
     public void heartbeatEvent(DriverEventDTO entityDTO) {
         DriverEventDTO.DriverStatus driverStatus = JsonUtil.parseObject(entityDTO.getContent(), DriverEventDTO.DriverStatus.class);
-        if (ObjectUtil.isNull(driverStatus)) {
+        if (Objects.isNull(driverStatus)) {
             return;
         }
         redisService.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getDriverId(), driverStatus.getStatus(), 10, TimeUnit.SECONDS);

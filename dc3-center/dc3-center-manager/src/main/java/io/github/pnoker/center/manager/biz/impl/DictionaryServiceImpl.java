@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.biz.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.biz.DictionaryService;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
@@ -34,6 +33,8 @@ import io.github.pnoker.common.entity.common.Pages;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * @author pnoker
@@ -57,7 +58,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public Page<DictionaryBO> driverDictionary(DictionaryQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 
@@ -68,7 +69,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public Page<DictionaryBO> profileDictionary(DictionaryQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 
@@ -79,7 +80,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public Page<DictionaryBO> pointDictionaryForProfile(DictionaryQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 
@@ -90,7 +91,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public Page<DictionaryBO> pointDictionaryForDevice(DictionaryQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 
@@ -101,7 +102,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public Page<DictionaryBO> deviceDictionary(DictionaryQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 
@@ -112,7 +113,7 @@ public class DictionaryServiceImpl implements DictionaryService {
 
     @Override
     public Page<DictionaryBO> deviceDictionaryForDriver(DictionaryQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 

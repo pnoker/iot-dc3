@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
@@ -38,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -197,7 +197,7 @@ public class PointController implements BaseController {
     @PostMapping("/list")
     public R<Page<PointVO>> list(@RequestBody(required = false) PointQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointQuery();
             }
             entityQuery.setTenantId(getTenantId());
@@ -220,7 +220,7 @@ public class PointController implements BaseController {
     public R<Map<Long, String>> unit(@RequestBody Set<Long> pointIds) {
         try {
             Map<Long, String> units = pointService.unit(pointIds);
-            if (ObjectUtil.isNotNull(units)) {
+            if (!Objects.isNull(units)) {
                 Map<Long, String> unitCodeMap = units.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                 return R.ok(unitCodeMap);
             }
@@ -283,7 +283,7 @@ public class PointController implements BaseController {
     public R<Long> selectPointStatisticsByPointId(@NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
             PointDataVolumeRunDO pointDataVolumeRunDO = pointService.selectPointStatisticsByPointId(pointId);
-            return R.ok(ObjectUtil.isEmpty(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal());
+            return R.ok(Objects.isNull(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
@@ -355,7 +355,7 @@ public class PointController implements BaseController {
     public R<Long> selectPointDataByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             PointDataVolumeRunDO pointDataVolumeRunDO = pointService.selectPointDataByDriverId(driverId);
-            return R.ok(ObjectUtil.isEmpty(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal());
+            return R.ok(Objects.isNull(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());

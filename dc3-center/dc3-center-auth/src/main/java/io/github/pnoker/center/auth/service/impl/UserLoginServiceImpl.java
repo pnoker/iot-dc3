@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -36,6 +35,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 /**
  * 用户服务接口实现类
@@ -94,7 +95,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     public Page<UserLoginBO> selectByPage(UserLoginQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<UserLoginDO> entityPageBO = userLoginManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -115,7 +116,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         wrapper.eq(UserLoginDO::getEnableFlag, EnableFlagEnum.ENABLE);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserLoginDO userLogin = userLoginManager.getOne(wrapper);
-        if (ObjectUtil.isNull(userLogin)) {
+        if (Objects.isNull(userLogin)) {
             throw new NotFoundException();
         }
         return userLoginBuilder.buildBOByDO(userLogin);
@@ -124,7 +125,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     @Override
     public boolean checkLoginNameValid(String loginName) {
         UserLoginBO userLogin = selectByLoginName(loginName, false);
-        if (ObjectUtil.isNotNull(userLogin)) {
+        if (!Objects.isNull(userLogin)) {
             return EnableFlagEnum.ENABLE.equals(userLogin.getEnableFlag());
         }
 
@@ -151,7 +152,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         wrapper.eq(UserLoginDO::getUserId, entityBO.getUserId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserLoginDO one = userLoginManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -170,7 +171,7 @@ public class UserLoginServiceImpl implements UserLoginService {
      */
     private UserLoginDO getDOById(Long id, boolean throwException) {
         UserLoginDO entityDO = userLoginManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("用户登录不存在");
         }
         return entityDO;

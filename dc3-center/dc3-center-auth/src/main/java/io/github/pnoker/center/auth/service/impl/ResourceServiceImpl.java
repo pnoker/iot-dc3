@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -34,6 +33,8 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * @author linys
@@ -93,7 +94,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public Page<ResourceBO> selectByPage(ResourceQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<ResourceDO> entityPageDO = resourceManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -104,8 +105,8 @@ public class ResourceServiceImpl implements ResourceService {
         LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getResourceName()), ResourceDO::getResourceName, entityQuery.getResourceName());
         wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getResourceCode()), ResourceDO::getResourceCode, entityQuery.getResourceCode());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, entityQuery.getResourceTypeFlag());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag, entityQuery.getEnableFlag());
+        wrapper.eq(!Objects.isNull(entityQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, entityQuery.getResourceTypeFlag());
+        wrapper.eq(!Objects.isNull(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag, entityQuery.getEnableFlag());
         wrapper.eq(ResourceDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -128,7 +129,7 @@ public class ResourceServiceImpl implements ResourceService {
         wrapper.eq(ResourceDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ResourceDO one = resourceManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         return !isUpdate || !one.getId().equals(entityBO.getId());
@@ -143,7 +144,7 @@ public class ResourceServiceImpl implements ResourceService {
      */
     private ResourceDO getDOById(Long id, boolean throwException) {
         ResourceDO entityDO = resourceManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("资源不存在");
         }
         return entityDO;

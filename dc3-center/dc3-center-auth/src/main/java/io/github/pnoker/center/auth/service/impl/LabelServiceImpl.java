@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -36,6 +35,8 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * LabelService Impl
@@ -103,7 +104,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public Page<LabelBO> selectByPage(LabelQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<LabelDO> entityPageDO = labelManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -119,7 +120,7 @@ public class LabelServiceImpl implements LabelService {
     private LambdaQueryWrapper<LabelDO> fuzzyQuery(LabelQuery entityQuery) {
         LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getLabelName()), LabelDO::getLabelName, entityQuery.getLabelName());
-        wrapper.eq(ObjectUtil.isNotNull(entityQuery.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, entityQuery.getEntityTypeFlag());
+        wrapper.eq(!Objects.isNull(entityQuery.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, entityQuery.getEntityTypeFlag());
         wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getColor()), LabelDO::getColor, entityQuery.getColor());
         wrapper.eq(LabelDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
@@ -140,7 +141,7 @@ public class LabelServiceImpl implements LabelService {
         wrapper.eq(LabelDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         LabelDO one = labelManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
@@ -159,7 +160,7 @@ public class LabelServiceImpl implements LabelService {
      */
     private LabelDO getDOById(Long id, boolean throwException) {
         LabelDO entityDO = labelManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("标签不存在");
         }
         return entityDO;
