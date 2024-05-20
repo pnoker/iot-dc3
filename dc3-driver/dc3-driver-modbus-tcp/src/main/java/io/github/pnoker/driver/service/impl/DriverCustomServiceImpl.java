@@ -110,6 +110,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         提供元数据操作类型: MetadataOperateTypeEnum(ADD，DELETE，UPDATE)
         使用场景：更新驱动、设备等连接句柄
          */
+        //设备事件移除设备连接缓存，解决切换设备IP。
+        connectMap.remove(event.getDevice().getId());
     }
 
     @Override
