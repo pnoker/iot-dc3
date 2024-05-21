@@ -60,7 +60,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
         PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(entityBO);
         if (!pointAttributeManager.save(entityDO)) {
-            throw new AddException("位号属性创建失败");
+            throw new AddException("Failed to create point attribute");
         }
     }
 
@@ -69,7 +69,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         getDOById(id, true);
 
         if (!pointAttributeManager.removeById(id)) {
-            throw new DeleteException("位号属性删除失败");
+            throw new DeleteException("Failed to remove point attribute");
         }
     }
 
@@ -82,7 +82,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!pointAttributeManager.updateById(entityDO)) {
-            throw new UpdateException("位号属性更新失败");
+            throw new UpdateException("Failed to update point attribute");
         }
     }
 
@@ -149,7 +149,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("位号属性重复");
+            throw new DuplicateException("Point attribute has been duplicated");
         }
         return duplicate;
     }
@@ -164,7 +164,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     private PointAttributeDO getDOById(Long id, boolean throwException) {
         PointAttributeDO entityDO = pointAttributeManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("位号属性不存在");
+            throw new NotFoundException("Point attribute does not exist");
         }
         return entityDO;
     }

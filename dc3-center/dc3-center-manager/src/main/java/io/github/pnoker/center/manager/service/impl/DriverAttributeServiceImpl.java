@@ -57,12 +57,12 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     @Override
     public void save(DriverAttributeBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
-            throw new DuplicateException("驱动属性创建失败: 驱动属性重复");
+            throw new DuplicateException("Failed to create driver attribute: driver attribute has been duplicated");
         }
 
         DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(entityBO);
         if (!driverAttributeManager.save(entityDO)) {
-            throw new AddException("驱动属性创建失败");
+            throw new AddException("Failed to create driver attribute");
         }
     }
 
@@ -71,7 +71,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         getDOById(id, true);
 
         if (!driverAttributeManager.removeById(id)) {
-            throw new DeleteException("驱动属性删除失败");
+            throw new DeleteException("Failed to remove driver attribute");
         }
     }
 
@@ -80,13 +80,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         getDOById(entityBO.getId(), true);
 
         if (checkDuplicate(entityBO, true)) {
-            throw new DuplicateException("驱动属性更新失败: 驱动属性重复");
+            throw new DuplicateException("Failed to update driver attribute: driver attribute has been duplicated");
         }
 
         DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!driverAttributeManager.updateById(entityDO)) {
-            throw new UpdateException("驱动属性更新失败");
+            throw new UpdateException("Failed to update driver attribute");
         }
     }
 
@@ -163,7 +163,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     private DriverAttributeDO getDOById(Long id, boolean throwException) {
         DriverAttributeDO entityDO = driverAttributeManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("驱动属性不存在");
+            throw new NotFoundException("Driver attribute does not exist");
         }
         return entityDO;
     }

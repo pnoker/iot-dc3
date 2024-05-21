@@ -56,12 +56,12 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     @Override
     public void save(ProfileBindBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
-            throw new DuplicateException("模版绑定创建失败: 模版绑定重复");
+            throw new DuplicateException("Failed to create profile bind: profile bind has been duplicated");
         }
 
         ProfileBindDO entityDO = profileBindBuilder.buildDOByBO(entityBO);
         if (!profileBindManager.save(entityDO)) {
-            throw new AddException("模版绑定创建失败");
+            throw new AddException("Failed to create profile bind");
         }
     }
 
@@ -70,7 +70,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         getDOById(id, true);
 
         if (!profileBindManager.removeById(id)) {
-            throw new DeleteException("模版绑定删除失败");
+            throw new DeleteException("Failed to remove profile bind");
         }
     }
 
@@ -94,13 +94,13 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         getDOById(entityBO.getId(), true);
 
         if (checkDuplicate(entityBO, true)) {
-            throw new DuplicateException("模版绑定更新失败: 模版绑定重复");
+            throw new DuplicateException("Failed to update profile bind: profile bind has been duplicated");
         }
 
         ProfileBindDO entityDO = profileBindBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
         if (!profileBindManager.updateById(entityDO)) {
-            throw new UpdateException("模版绑定更新失败");
+            throw new UpdateException("Failed to update profile bind");
         }
     }
 
@@ -181,7 +181,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     private ProfileBindDO getDOById(Long id, boolean throwException) {
         ProfileBindDO entityDO = profileBindManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("模版绑定不存在");
+            throw new NotFoundException("Profile bind does not exist");
         }
         return entityDO;
     }

@@ -61,7 +61,7 @@ public class GroupServiceImpl implements GroupService {
 
         GroupDO entityDO = groupForManagerBuilder.buildDOByBO(entityBO);
         if (!groupManager.save(entityDO)) {
-            throw new AddException("分组创建失败");
+            throw new AddException("Failed to create group");
         }
     }
 
@@ -73,11 +73,11 @@ public class GroupServiceImpl implements GroupService {
         LambdaQueryChainWrapper<GroupDO> wrapper = groupManager.lambdaQuery().eq(GroupDO::getParentGroupId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("分组删除失败: 该分组下存在子分组");
+            throw new AssociatedException("Failed to remove group: there are subgroups under the group");
         }
 
         if (!groupManager.removeById(id)) {
-            throw new DeleteException("分组删除失败");
+            throw new DeleteException("Failed to remove group");
         }
     }
 
@@ -90,7 +90,7 @@ public class GroupServiceImpl implements GroupService {
         GroupDO entityDO = groupForManagerBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!groupManager.updateById(entityDO)) {
-            throw new UpdateException("分组更新失败");
+            throw new UpdateException("Failed to update group");
         }
     }
 
@@ -143,7 +143,7 @@ public class GroupServiceImpl implements GroupService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("分组重复");
+            throw new DuplicateException("Group has been duplicated");
         }
         return duplicate;
     }
@@ -158,7 +158,7 @@ public class GroupServiceImpl implements GroupService {
     private GroupDO getDOById(Long id, boolean throwException) {
         GroupDO entityDO = groupManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("分组不存在");
+            throw new NotFoundException("Group does not exist");
         }
         return entityDO;
     }

@@ -62,7 +62,7 @@ public class LabelServiceImpl implements LabelService {
 
         LabelDO entityDO = labelForManagerBuilder.buildDOByBO(entityBO);
         if (!labelManager.save(entityDO)) {
-            throw new AddException("The label add failed");
+            throw new AddException("Failed to create label");
         }
     }
 
@@ -79,7 +79,7 @@ public class LabelServiceImpl implements LabelService {
         }
 
         if (!labelManager.removeById(id)) {
-            throw new DeleteException("The label delete failed");
+            throw new DeleteException("Failed to remove label");
         }
     }
 
@@ -146,7 +146,7 @@ public class LabelServiceImpl implements LabelService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("标签重复");
+            throw new DuplicateException("Label has been duplicated");
         }
         return duplicate;
     }
@@ -161,7 +161,7 @@ public class LabelServiceImpl implements LabelService {
     private LabelDO getDOById(Long id, boolean throwException) {
         LabelDO entityDO = labelManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("标签不存在");
+            throw new NotFoundException("Label does not exist");
         }
         return entityDO;
     }

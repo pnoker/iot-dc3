@@ -69,14 +69,14 @@ public class AuthServiceImpl implements AuthService {
     public UserLoginBO authenticateUser(Login login) {
         TenantBO tenantBO = tenantService.selectByCode(login.getTenant());
         if (Objects.isNull(tenantBO)) {
-            throw new NotFoundException("租户{}不存在", login.getTenant());
+            throw new NotFoundException("Tenant[{}] does not exist", login.getTenant());
         }
 
         //todo checkUserLimit
 
         UserLoginBO userLogin = userLoginService.selectByLoginName(login.getName(), false);
         if (Objects.isNull(userLogin)) {
-            throw new NotFoundException("用户{}不存在", login.getName());
+            throw new NotFoundException("User[{}] does not exist", login.getName());
         }
 
         TenantBindBO tenantBindBO = tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
@@ -86,12 +86,12 @@ public class AuthServiceImpl implements AuthService {
 
         UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
         if (Objects.isNull(userPasswordBO)) {
-            throw new NotFoundException("密码不存在, 请先设置密码");
+            throw new NotFoundException("Password does not exist");
         }
 
         String saltValue = AuthUtil.getPasswordSalt(tenantBO.getId(), login.getName());
         if (CharSequenceUtil.isEmpty(saltValue)) {
-            throw new NotFoundException("密码盐不存在, 请重新登录");
+            throw new NotFoundException("Salt does not exist");
         }
 
         String decodedPassword = DecodeUtil.md5(userPasswordBO.getLoginPassword() + saltValue);

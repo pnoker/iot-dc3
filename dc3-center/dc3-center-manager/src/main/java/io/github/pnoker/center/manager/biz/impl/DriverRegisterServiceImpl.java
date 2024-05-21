@@ -78,18 +78,18 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     public DriverBO registerDriver(GrpcDriverRegisterDTO entityGrpc) {
         GrpcRTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(entityGrpc.getTenant()).build());
         if (!rTenantDTO.getResult().getOk()) {
-            throw new ServiceException("租户[{}]信息无效: {}", entityGrpc.getTenant(), rTenantDTO.getResult().getMessage());
+            throw new ServiceException("Tenant[{}] information is invalid: {}", entityGrpc.getTenant(), rTenantDTO.getResult().getMessage());
         }
 
         DriverBO driverBO = grpcDriverBuilder.buildBOByGrpcDTO(entityGrpc.getDriver());
         Objects.requireNonNull(driverBO).setTenantId(rTenantDTO.getData().getBase().getId());
         DriverBO entityBO = driverService.selectByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
         if (!Objects.isNull(entityBO)) {
-            log.info("驱动已注册, 执行更新: {}", JsonUtil.toJsonString(driverBO));
+            log.info("The driver has been registered, perform update: {}", JsonUtil.toJsonString(driverBO));
             driverBO.setId(entityBO.getId());
             driverService.update(driverBO);
         } else {
-            log.info("驱动未注册, 执行新增: {}", JsonUtil.toJsonString(driverBO));
+            log.info("The driver is not registered, perform new addition: {}", JsonUtil.toJsonString(driverBO));
             driverService.save(driverBO);
         }
 
@@ -109,11 +109,11 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             DriverAttributeBO attribute = newDriverAttributeMap.get(name);
             attribute.setDriverId(attribute.getId());
             if (oldDriverAttributeMap.containsKey(name)) {
-                log.debug("驱动属性已注册, 执行更新: {}", JsonUtil.toJsonString(attribute));
+                log.debug("The driver attributes have been registered, update is performed: {}", JsonUtil.toJsonString(attribute));
                 attribute.setId(oldDriverAttributeMap.get(name).getId());
                 driverAttributeService.update(attribute);
             } else {
-                log.debug("驱动属性未注册, 执行新增: {}", JsonUtil.toJsonString(attribute));
+                log.debug("The driver attributes are not registered, perform new addition: {}", JsonUtil.toJsonString(attribute));
                 driverAttributeService.save(attribute);
             }
         }
@@ -142,11 +142,11 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
             PointAttributeBO attribute = newPointAttributeMap.get(name);
             attribute.setDriverId(attribute.getId());
             if (oldPointAttributeMap.containsKey(name)) {
-                log.debug("位号属性已注册, 执行更新: {}", JsonUtil.toJsonString(attribute));
+                log.debug("The point attribute has been registered, update is performed: {}", JsonUtil.toJsonString(attribute));
                 attribute.setId(oldPointAttributeMap.get(name).getId());
                 pointAttributeService.update(attribute);
             } else {
-                log.debug("位号属性未注册, 执行更新: {}", JsonUtil.toJsonString(attribute));
+                log.debug("The point attribute is not registered, perform update: {}", JsonUtil.toJsonString(attribute));
                 pointAttributeService.save(attribute);
             }
         }

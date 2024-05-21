@@ -60,7 +60,7 @@ public class ApiServiceImpl implements ApiService {
 
         ApiDO entityDO = apiBuilder.buildDOByBO(entityBO);
         if (!apiManager.save(entityDO)) {
-            throw new AddException("接口创建失败");
+            throw new AddException("Failed to create api");
         }
     }
 
@@ -70,7 +70,7 @@ public class ApiServiceImpl implements ApiService {
         getDOById(id, true);
 
         if (!apiManager.removeById(id)) {
-            throw new DeleteException("接口删除失败");
+            throw new DeleteException("Failed to remove api");
         }
     }
 
@@ -84,7 +84,7 @@ public class ApiServiceImpl implements ApiService {
         ApiDO entityDO = apiBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!apiManager.updateById(entityDO)) {
-            throw new UpdateException("接口更新失败");
+            throw new UpdateException("Failed to update api");
         }
     }
 
@@ -139,7 +139,7 @@ public class ApiServiceImpl implements ApiService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("接口重复");
+            throw new DuplicateException("Api has been duplicated");
         }
         return duplicate;
     }
@@ -154,7 +154,7 @@ public class ApiServiceImpl implements ApiService {
     private ApiDO getDOById(Long id, boolean throwException) {
         ApiDO entityDO = apiManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("接口不存在");
+            throw new NotFoundException("Api does not exist");
         }
         return entityDO;
     }

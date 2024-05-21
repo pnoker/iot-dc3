@@ -53,12 +53,12 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public void save(ResourceBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
-            throw new DuplicateException("资源创建失败: 资源重复");
+            throw new DuplicateException("Failed to create resource: resource has been duplicated");
         }
 
         ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
         if (!resourceManager.save(entityDO)) {
-            throw new AddException("资源创建失败");
+            throw new AddException("Failed to create resource");
         }
     }
 
@@ -67,7 +67,7 @@ public class ResourceServiceImpl implements ResourceService {
         getDOById(id, true);
 
         if (!resourceManager.removeById(id)) {
-            throw new DeleteException("资源删除失败");
+            throw new DeleteException("Failed to remove resource");
         }
     }
 
@@ -76,13 +76,13 @@ public class ResourceServiceImpl implements ResourceService {
         getDOById(entityBO.getId(), true);
 
         if (checkDuplicate(entityBO, true)) {
-            throw new DuplicateException("资源更新失败: 资源重复");
+            throw new DuplicateException("Failed to update resource: resource has been duplicated");
         }
 
         ResourceDO entityDO = resourceBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!resourceManager.updateById(entityDO)) {
-            throw new UpdateException("资源更新失败");
+            throw new UpdateException("Failed to update resource");
         }
     }
 
@@ -145,7 +145,7 @@ public class ResourceServiceImpl implements ResourceService {
     private ResourceDO getDOById(Long id, boolean throwException) {
         ResourceDO entityDO = resourceManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("资源不存在");
+            throw new NotFoundException("Resource does not exist");
         }
         return entityDO;
     }

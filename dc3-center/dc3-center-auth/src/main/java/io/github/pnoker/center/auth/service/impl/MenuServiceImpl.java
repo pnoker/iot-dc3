@@ -61,7 +61,7 @@ public class MenuServiceImpl implements MenuService {
 
         MenuDO entityDO = menuBuilder.buildDOByBO(entityBO);
         if (!menuManager.save(entityDO)) {
-            throw new AddException("菜单创建失败");
+            throw new AddException("Failed to create menu");
         }
     }
 
@@ -73,11 +73,11 @@ public class MenuServiceImpl implements MenuService {
         LambdaQueryChainWrapper<MenuDO> wrapper = menuManager.lambdaQuery().eq(MenuDO::getParentMenuId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("菜单删除失败: 该菜单下存在子菜单");
+            throw new AssociatedException("Failed to remove menu: some sub menus exists in the menu");
         }
 
         if (!menuManager.removeById(id)) {
-            throw new DeleteException("菜单删除失败");
+            throw new DeleteException("Failed to remove menu");
         }
     }
 
@@ -90,7 +90,7 @@ public class MenuServiceImpl implements MenuService {
         MenuDO entityDO = menuBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!menuManager.updateById(entityDO)) {
-            throw new UpdateException("菜单更新失败");
+            throw new UpdateException("Failed to update menu");
         }
     }
 
@@ -144,7 +144,7 @@ public class MenuServiceImpl implements MenuService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("菜单重复");
+            throw new DuplicateException("Menu has been duplicated");
         }
         return duplicate;
     }
@@ -159,7 +159,7 @@ public class MenuServiceImpl implements MenuService {
     private MenuDO getDOById(Long id, boolean throwException) {
         MenuDO entityDO = menuManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("菜单不存在");
+            throw new NotFoundException("Menu does not exist");
         }
         return entityDO;
     }

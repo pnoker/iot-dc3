@@ -65,12 +65,12 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     @Override
     public void save(PointAttributeConfigBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
-            throw new DuplicateException("位号属性配置创建失败: 位号属性配置重复");
+            throw new DuplicateException("Failed to create point attribute config: point attribute config has been duplicated");
         }
 
         PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
         if (!pointAttributeConfigManager.save(entityDO)) {
-            throw new AddException("位号属性配置创建失败");
+            throw new AddException("Failed to create point attribute config");
         }
     }
 
@@ -79,7 +79,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         getDOById(id, true);
 
         if (!pointAttributeConfigManager.removeById(id)) {
-            throw new DeleteException("位号属性配置删除失败");
+            throw new DeleteException("Failed to remove point attribute config");
         }
     }
 
@@ -88,13 +88,13 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         getDOById(entityBO.getId(), true);
 
         if (checkDuplicate(entityBO, true)) {
-            throw new DuplicateException("位号属性配置更新失败: 位号属性配置重复");
+            throw new DuplicateException("Failed to update point attribute config: point attribute config has been duplicated");
         }
 
         PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
         if (!pointAttributeConfigManager.updateById(entityDO)) {
-            throw new UpdateException("位号属性配置更新失败");
+            throw new UpdateException("Failed to update point attribute config");
         }
     }
 
@@ -195,7 +195,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     private PointAttributeConfigDO getDOById(Long id, boolean throwException) {
         PointAttributeConfigDO entityDO = pointAttributeConfigManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("位号属性配置不存在");
+            throw new NotFoundException("Point attribute config does not exist");
         }
         return entityDO;
     }

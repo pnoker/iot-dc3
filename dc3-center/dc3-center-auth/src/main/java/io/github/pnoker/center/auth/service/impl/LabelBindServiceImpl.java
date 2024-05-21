@@ -57,7 +57,7 @@ public class LabelBindServiceImpl implements LabelBindService {
 
         LabelBindDO entityDO = labelBindForAuthBuilder.buildDOByBO(entityBO);
         if (!labelBindManager.save(entityDO)) {
-            throw new AddException("The label bind add failed");
+            throw new AddException("Failed to create label bind");
         }
     }
 
@@ -67,7 +67,7 @@ public class LabelBindServiceImpl implements LabelBindService {
         getDOById(id, true);
 
         if (!labelBindManager.removeById(id)) {
-            throw new DeleteException("The label bind delete failed");
+            throw new DeleteException("Failed to remove label bind");
         }
     }
 
@@ -136,7 +136,7 @@ public class LabelBindServiceImpl implements LabelBindService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("标签绑定重复");
+            throw new DuplicateException("Label bind has been duplicated");
         }
         return duplicate;
     }
@@ -151,7 +151,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     private LabelBindDO getDOById(Long id, boolean throwException) {
         LabelBindDO entityDO = labelBindManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("标签绑定不存在");
+            throw new NotFoundException("Label bind does not exist");
         }
         return entityDO;
     }

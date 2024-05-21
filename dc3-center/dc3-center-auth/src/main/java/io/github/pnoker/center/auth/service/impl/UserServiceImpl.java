@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
         UserDO entityDO = userBuilder.buildDOByBO(entityBO);
         if (!userManager.save(entityDO)) {
-            throw new AddException("The user add failed: {}", entityBO.toString());
+            throw new AddException("Failed to create user: {}", entityBO.toString());
         }
     }
 
@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
         getDOById(id, true);
 
         if (!userManager.removeById(id)) {
-            throw new DeleteException("The user delete failed");
+            throw new DeleteException("Failed to remove user");
         }
     }
 
@@ -214,7 +214,7 @@ public class UserServiceImpl implements UserService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("用户重复");
+            throw new DuplicateException("User has been duplicated");
         }
         return duplicate;
     }
@@ -229,7 +229,7 @@ public class UserServiceImpl implements UserService {
     private UserDO getDOById(Long id, boolean throwException) {
         UserDO entityDO = userManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("用户不存在");
+            throw new NotFoundException("User does not exist");
         }
         return entityDO;
     }

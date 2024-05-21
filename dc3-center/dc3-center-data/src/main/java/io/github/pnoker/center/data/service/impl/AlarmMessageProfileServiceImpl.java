@@ -61,7 +61,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
 
         AlarmMessageProfileDO entityDO = alarmMessageProfileBuilder.buildDOByBO(entityBO);
         if (!alarmMessageProfileManager.save(entityDO)) {
-            throw new AddException("分组创建失败");
+            throw new AddException("Failed to create group");
         }
     }
 
@@ -74,11 +74,11 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
                 .eq(AlarmMessageProfileDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("分组删除失败: 该分组下存在子分组");
+            throw new AssociatedException("Failed to remove group: there are subgroups under the group");
         }
 
         if (!alarmMessageProfileManager.removeById(id)) {
-            throw new DeleteException("分组删除失败");
+            throw new DeleteException("Failed to remove group");
         }
     }
 
@@ -91,7 +91,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         AlarmMessageProfileDO entityDO = alarmMessageProfileBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!alarmMessageProfileManager.updateById(entityDO)) {
-            throw new UpdateException("分组更新失败");
+            throw new UpdateException("Failed to update group");
         }
     }
 
@@ -143,7 +143,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("报警信息模板重复");
+            throw new DuplicateException("Alarm message profile has been duplicated");
         }
         return duplicate;
     }
@@ -158,7 +158,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
     private AlarmMessageProfileDO getDOById(Long id, boolean throwException) {
         AlarmMessageProfileDO entityDO = alarmMessageProfileManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("报警信息模板不存在");
+            throw new NotFoundException("Alarm message profile does not exist");
         }
         return entityDO;
     }

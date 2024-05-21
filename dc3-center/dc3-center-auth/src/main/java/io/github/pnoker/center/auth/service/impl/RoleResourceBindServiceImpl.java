@@ -64,12 +64,12 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     @Override
     public void save(RoleResourceBindBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
-            throw new DuplicateException("角色资源绑定创建失败: 角色资源绑定重复");
+            throw new DuplicateException("Failed to create role resource bind: role resource bind has been duplicated");
         }
 
         RoleResourceBindDO entityDO = roleResourceBindBuilder.buildDOByBO(entityBO);
         if (!roleResourceBindManager.save(entityDO)) {
-            throw new AddException("角色资源绑定创建失败");
+            throw new AddException("Failed to create role resource bind");
         }
     }
 
@@ -78,7 +78,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         getDOById(id, true);
 
         if (!roleResourceBindManager.removeById(id)) {
-            throw new DeleteException("角色资源绑定删除失败");
+            throw new DeleteException("Failed to remove role resource bind");
         }
     }
 
@@ -87,13 +87,13 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         getDOById(entityBO.getId(), true);
 
         if (checkDuplicate(entityBO, true)) {
-            throw new DuplicateException("角色资源绑定更新失败: 角色资源绑定重复");
+            throw new DuplicateException("Failed to update role resource bind: role resource bind has been duplicated");
         }
 
         RoleResourceBindDO entityDO = roleResourceBindBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!roleResourceBindManager.updateById(entityDO)) {
-            throw new UpdateException("角色资源绑定更新失败");
+            throw new UpdateException("Failed to update role resource bind");
         }
     }
 
@@ -166,7 +166,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     private RoleResourceBindDO getDOById(Long id, boolean throwException) {
         RoleResourceBindDO entityDO = roleResourceBindManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("角色资源绑定不存在");
+            throw new NotFoundException("Role resource bind does not exist");
         }
         return entityDO;
     }

@@ -61,7 +61,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 
         UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
         if (!userLoginManager.save(entityDO)) {
-            throw new AddException("The user add failed: {}", entityBO.toString());
+            throw new AddException("Failed to create user: {}", entityBO.toString());
         }
     }
 
@@ -70,7 +70,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         getDOById(id, true);
 
         if (!userLoginManager.removeById(id)) {
-            throw new DeleteException("The user login delete failed");
+            throw new DeleteException("Failed to remove user login");
         }
     }
 
@@ -157,7 +157,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("用户登录重复");
+            throw new DuplicateException("User login has been duplicated");
         }
         return duplicate;
     }
@@ -172,7 +172,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     private UserLoginDO getDOById(Long id, boolean throwException) {
         UserLoginDO entityDO = userLoginManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("用户登录不存在");
+            throw new NotFoundException("User login does not exist");
         }
         return entityDO;
     }
