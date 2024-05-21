@@ -40,7 +40,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import java.util.List;
 
 /**
- * Device Api
+ * 设备 Api
  *
  * @author pnoker
  * @since 2022.1.0

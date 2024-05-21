@@ -58,7 +58,7 @@ public class DeviceEvent implements Serializable {
     private Long pointId;
 
     /**
-     * Device Event
+     * 设备 Event
      * <p>
      * STATUS, LIMIT, ERROR
      */

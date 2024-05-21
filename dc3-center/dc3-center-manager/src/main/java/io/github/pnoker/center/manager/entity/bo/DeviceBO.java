@@ -27,7 +27,7 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * Device BO
+ * 设备 BO
  *
  * @author pnoker
  * @since 2022.1.0

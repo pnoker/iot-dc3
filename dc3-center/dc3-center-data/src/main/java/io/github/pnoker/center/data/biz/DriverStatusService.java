@@ -23,7 +23,7 @@ import io.github.pnoker.center.data.entity.query.DriverQuery;
 import java.util.Map;
 
 /**
- * Device Interface
+ * 设备 Interface
  *
  * @author pnoker
  * @since 2022.1.0

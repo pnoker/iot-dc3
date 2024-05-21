@@ -16,7 +16,7 @@
 
 package io.github.pnoker.center.manager.biz.impl;
 
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
+import io.github.pnoker.center.manager.biz.MetadataNotifyService;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
@@ -41,7 +41,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class DriverNotifyServiceImpl implements DriverNotifyService {
+public class MetadataNotifyServiceImpl implements MetadataNotifyService {
 
     @Resource
     private DriverService driverService;
@@ -50,34 +50,34 @@ public class DriverNotifyServiceImpl implements DriverNotifyService {
     private RabbitTemplate rabbitTemplate;
 
     @Override
-    public void notifyDevice(MetadataOperateTypeEnum command, DeviceBO deviceBO) {
+    public void notifyDevice(MetadataOperateTypeEnum operate, DeviceBO metadata) {
         try {
-            DriverBO entityDO = driverService.selectById(deviceBO.getDriverId());
+            DriverBO entityDO = driverService.selectById(metadata.getDriverId());
             DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
                     MetadataTypeEnum.DEVICE,
-                    command,
-                    JsonUtil.toJsonString(deviceBO)
+                    operate,
+                    JsonUtil.toJsonString(metadata)
             );
             notifyDriver(entityDO, entityDTO);
         } catch (Exception e) {
-            log.error("Notify driver {} device: {}", command, e.getMessage());
+            log.error("Notify driver {} device: {}", operate, e.getMessage());
         }
     }
 
     @Override
-    public void notifyPoint(MetadataOperateTypeEnum command, PointBO pointBO) {
+    public void notifyPoint(MetadataOperateTypeEnum operate, PointBO metadata) {
         try {
-            List<DriverBO> entityDOList = driverService.selectByProfileId(pointBO.getProfileId());
+            List<DriverBO> entityDOList = driverService.selectByProfileId(metadata.getProfileId());
             entityDOList.forEach(driver -> {
                 DriverTransferMetadataDTO entityDTO = new DriverTransferMetadataDTO(
                         MetadataTypeEnum.POINT,
-                        command,
-                        JsonUtil.toJsonString(pointBO)
+                        operate,
+                        JsonUtil.toJsonString(metadata)
                 );
                 notifyDriver(driver, entityDTO);
             });
         } catch (Exception e) {
-            log.error("Notify driver {} point: {}", command, e.getMessage());
+            log.error("Notify driver {} point: {}", operate, e.getMessage());
         }
     }
 

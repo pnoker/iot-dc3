@@ -20,14 +20,15 @@ import io.github.pnoker.common.driver.entity.bean.RValue;
 import io.github.pnoker.common.driver.entity.bean.WValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.MetadataEventBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.driver.event.device.DeviceMetadataEvent;
-import io.github.pnoker.common.driver.event.point.PointMetadataEvent;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -68,7 +69,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * Plc Connector Map
      * 仅供参考
      */
-    private Map<Long, MyS7Connector> s7ConnectorMap;
+    private Map<Long, MyS7Connector> connectMap;
 
     @Getter
     @Setter
@@ -85,7 +86,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
         */
-        s7ConnectorMap = new ConcurrentHashMap<>(16);
+        connectMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
@@ -107,23 +108,27 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public void event(DeviceMetadataEvent event) {
+    public void event(MetadataEventBO<? extends BaseBO> metadataEvent) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        接收设备元数据的新增, 更新, 删除都会触发改事件
-        提供元数据操作类型: MetadataOperateTypeEnum(ADD，DELETE，UPDATE)
-        使用场景：更新驱动、设备等连接句柄
+        接收驱动, 设备, 位号元数据新增, 更新, 删除都会触发改事件
+        提供元数据类型: MetadataTypeEnum(DRIVER, DEVICE, POINT)
+        提供元数据操作类型: MetadataOperateTypeEnum(ADD, DELETE, UPDATE)
          */
-    }
-
-    @Override
-    public void event(PointMetadataEvent event) {
-        /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        接收位号元数据的新增, 更新, 删除都会触发改事件
-        提供元数据操作类型: MetadataOperateTypeEnum(ADD，DELETE，UPDATE)
-        使用场景：更新驱动、设备等连接句柄
-         */
+        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+        switch (metadataType) {
+            case DRIVER -> {
+                // to do something for driver event
+            }
+            case DEVICE -> {
+                //设备事件移除设备连接缓存, 解决切换设备IP。
+                connectMap.remove(metadataEvent.getMetadata().getId());
+            }
+            case POINT -> {
+                // to do something for point event
+            }
+            default -> log.warn("There is no event of this metadata: {}", metadataEvent);
+        }
     }
 
     @Override
@@ -178,7 +183,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @return S7Serializer
      */
     private MyS7Connector getS7Connector(Long deviceId, Map<String, AttributeBO> driverConfig) {
-        MyS7Connector myS7Connector = s7ConnectorMap.get(deviceId);
+        MyS7Connector myS7Connector = connectMap.get(deviceId);
         if (Objects.isNull(myS7Connector)) {
             myS7Connector = new MyS7Connector();
 
@@ -193,7 +198,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
             } catch (Exception e) {
                 throw new ServiceException("new s7connector fail" + e.getMessage());
             }
-            s7ConnectorMap.put(deviceId, myS7Connector);
+            connectMap.put(deviceId, myS7Connector);
         }
         return myS7Connector;
     }

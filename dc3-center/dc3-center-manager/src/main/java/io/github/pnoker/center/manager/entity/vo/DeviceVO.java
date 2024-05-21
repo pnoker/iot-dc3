@@ -34,7 +34,7 @@ import lombok.Setter;
 import java.util.Set;
 
 /**
- * Device VO
+ * 设备 VO
  *
  * @author pnoker
  * @since 2022.1.0
