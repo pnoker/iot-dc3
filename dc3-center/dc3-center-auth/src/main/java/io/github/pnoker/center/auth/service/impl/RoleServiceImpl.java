@@ -61,7 +61,7 @@ public class RoleServiceImpl implements RoleService {
 
         RoleDO entityDO = roleBuilder.buildDOByBO(entityBO);
         if (!roleManager.save(entityDO)) {
-            throw new AddException("角色创建失败");
+            throw new AddException("Failed to create role");
         }
     }
 
@@ -74,11 +74,11 @@ public class RoleServiceImpl implements RoleService {
         LambdaQueryChainWrapper<RoleDO> wrapper = roleManager.lambdaQuery().eq(RoleDO::getParentRoleId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("角色删除失败: 该角色下存在子角色");
+            throw new AssociatedException("Failed to remove role: some sub roles exists in the role");
         }
 
         if (!roleManager.removeById(id)) {
-            throw new DeleteException("角色删除失败");
+            throw new DeleteException("Failed to remove role");
         }
     }
 
@@ -92,7 +92,7 @@ public class RoleServiceImpl implements RoleService {
         RoleDO entityDO = roleBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!roleManager.updateById(entityDO)) {
-            throw new UpdateException("角色更新失败");
+            throw new UpdateException("Failed to update role");
         }
     }
 
@@ -148,7 +148,7 @@ public class RoleServiceImpl implements RoleService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("角色重复");
+            throw new DuplicateException("Role has been duplicated");
         }
         return duplicate;
     }
@@ -163,7 +163,7 @@ public class RoleServiceImpl implements RoleService {
     private RoleDO getDOById(Long id, boolean throwException) {
         RoleDO entityDO = roleManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("角色不存在");
+            throw new NotFoundException("Role does not exist");
         }
         return entityDO;
     }

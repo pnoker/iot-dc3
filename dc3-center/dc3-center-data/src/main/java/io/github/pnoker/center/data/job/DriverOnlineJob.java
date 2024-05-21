@@ -50,6 +50,5 @@ public class DriverOnlineJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         driverOnlineJobService.driverOnline();
-        log.info("驱动状态统计---------");
     }
 }

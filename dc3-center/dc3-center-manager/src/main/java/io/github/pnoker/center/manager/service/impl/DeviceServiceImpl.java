@@ -98,7 +98,7 @@ public class DeviceServiceImpl implements DeviceService {
 
         DeviceDO entityDO = deviceBuilder.buildDOByBO(entityBO);
         if (!deviceManager.save(entityDO)) {
-            throw new AddException("设备创建失败");
+            throw new AddException("Failed to create device");
         }
 
         addProfileBind(entityDO, entityBO.getProfileIds());
@@ -117,11 +117,11 @@ public class DeviceServiceImpl implements DeviceService {
 
         // 删除设备之前需要检查该设备是否存在关联
         if (!profileBindService.removeByDeviceId(id)) {
-            throw new DeleteException("The profile bind delete failed");
+            throw new DeleteException("Failed to remove profile bind");
         }
 
         if (!deviceManager.removeById(id)) {
-            throw new DeleteException("The device delete failed");
+            throw new DeleteException("Failed to remove device");
         }
 
         // 通知驱动删除设备
@@ -256,7 +256,7 @@ public class DeviceServiceImpl implements DeviceService {
         for (int i = 4; i <= mainSheet.getLastRowNum(); i++) {
             // 导入设备
             DeviceBO importDeviceBO = importDevice(entityBO, mainSheet, i);
-            log.info("正在导入设备: {}, index: {}", importDeviceBO.getDeviceName(), 1);
+            log.info("Importing device: {}, index: {}", importDeviceBO.getDeviceName(), 1);
 
             // 导入驱动属性配置
             importDriverAttributeConfig(importDeviceBO, driverAttributeBOS, mainSheet, i);
@@ -557,7 +557,7 @@ public class DeviceServiceImpl implements DeviceService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("设备重复");
+            throw new DuplicateException("Device has been duplicated");
         }
         return duplicate;
     }
@@ -572,7 +572,7 @@ public class DeviceServiceImpl implements DeviceService {
     private DeviceDO getDOById(Long id, boolean throwException) {
         DeviceDO entityDO = deviceManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("设备不存在");
+            throw new NotFoundException("Device does not exist");
         }
         return entityDO;
     }

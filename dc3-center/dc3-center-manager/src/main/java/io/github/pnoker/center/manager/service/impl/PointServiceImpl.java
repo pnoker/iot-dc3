@@ -98,7 +98,7 @@ public class PointServiceImpl implements PointService {
 
         PointDO entityDO = pointBuilder.buildDOByBO(entityBO);
         if (!pointManager.save(entityDO)) {
-            throw new AddException("位号创建失败");
+            throw new AddException("Failed to create 位号");
         }
 
         // 通知驱动新增
@@ -112,7 +112,7 @@ public class PointServiceImpl implements PointService {
         PointDO entityDO = getDOById(id, true);
 
         if (!pointManager.removeById(id)) {
-            throw new DeleteException("位号删除失败");
+            throw new DeleteException("Failed to remove 位号");
         }
 
         PointBO entityBO = pointBuilder.buildBOByDO(entityDO);
@@ -128,7 +128,7 @@ public class PointServiceImpl implements PointService {
         PointDO entityDO = pointBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!pointManager.updateById(entityDO)) {
-            throw new UpdateException("位号更新失败");
+            throw new UpdateException("Failed to update 位号");
         }
 
         entityDO = pointManager.getById(entityDO.getId());
@@ -352,7 +352,7 @@ public class PointServiceImpl implements PointService {
         PointDataStatisticsByDriverIdBO result = new PointDataStatisticsByDriverIdBO();
         DriverDO driverDO = driverMapper.selectById(driverId);
         if (Objects.isNull(driverDO)) {
-            throw new NotFoundException("driver 驱动不存在");
+            throw new NotFoundException("Driver does not exist");
         }
         result.setDriverName(driverDO.getDriverName());
         List<Long> zero = Collections.nCopies(7, 0L);
@@ -411,7 +411,7 @@ public class PointServiceImpl implements PointService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("位号重复");
+            throw new DuplicateException("Point has been duplicated");
         }
         return duplicate;
     }
@@ -426,7 +426,7 @@ public class PointServiceImpl implements PointService {
     private PointDO getDOById(Long id, boolean throwException) {
         PointDO entityDO = pointManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("位号不存在");
+            throw new NotFoundException("Point does not exist");
         }
         return entityDO;
     }

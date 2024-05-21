@@ -72,7 +72,7 @@ public class DriverServiceImpl implements DriverService {
 
         DriverDO entityDO = driverBuilder.buildDOByBO(entityBO);
         if (!driverManager.save(entityDO)) {
-            throw new AddException("驱动创建失败");
+            throw new AddException("Failed to create driver");
         }
     }
 
@@ -81,7 +81,7 @@ public class DriverServiceImpl implements DriverService {
         getDOById(id, true);
 
         if (!driverManager.removeById(id)) {
-            throw new DeleteException("驱动删除失败");
+            throw new DeleteException("Failed to remove driver");
         }
     }
 
@@ -94,7 +94,7 @@ public class DriverServiceImpl implements DriverService {
         DriverDO entityDO = driverBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!driverManager.updateById(entityDO)) {
-            throw new UpdateException("驱动更新失败");
+            throw new UpdateException("Failed to update point attribute config");
         }
     }
 
@@ -185,7 +185,7 @@ public class DriverServiceImpl implements DriverService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("驱动重复");
+            throw new DuplicateException("Driver has been duplicated");
         }
         return duplicate;
     }
@@ -200,7 +200,7 @@ public class DriverServiceImpl implements DriverService {
     private DriverDO getDOById(Long id, boolean throwException) {
         DriverDO entityDO = driverManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("驱动不存在");
+            throw new NotFoundException("Driver does not exist");
         }
         return entityDO;
     }

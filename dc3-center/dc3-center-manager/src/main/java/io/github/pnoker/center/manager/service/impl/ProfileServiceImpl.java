@@ -76,12 +76,12 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void save(ProfileBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
-            throw new DuplicateException("模版创建失败: 模版重复");
+            throw new DuplicateException("Failed to create profile: profile has been duplicated");
         }
 
         ProfileDO entityDO = profileBuilder.buildDOByBO(entityBO);
         if (!profileManager.save(entityDO)) {
-            throw new AddException("模版创建失败");
+            throw new AddException("Failed to create profile");
         }
     }
 
@@ -94,11 +94,11 @@ public class ProfileServiceImpl implements ProfileService {
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("模版删除失败: 该模版下存在位号");
+            throw new AssociatedException("Failed to remove profile: some points exists in the template");
         }
 
         if (!profileManager.removeById(id)) {
-            throw new DeleteException("模版删除失败");
+            throw new DeleteException("Failed to remove profile");
         }
     }
 
@@ -107,13 +107,13 @@ public class ProfileServiceImpl implements ProfileService {
         getDOById(entityBO.getId(), true);
 
         if (checkDuplicate(entityBO, true)) {
-            throw new DuplicateException("模版更新失败: 模版重复");
+            throw new DuplicateException("Failed to update profile: profile has been duplicated");
         }
 
         ProfileDO entityDO = profileBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
         if (!profileManager.updateById(entityDO)) {
-            throw new UpdateException("模版更新失败");
+            throw new UpdateException("Failed to update profile");
         }
     }
 
@@ -202,7 +202,7 @@ public class ProfileServiceImpl implements ProfileService {
     private ProfileDO getDOById(Long id, boolean throwException) {
         ProfileDO entityDO = profileManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("模板不存在");
+            throw new NotFoundException("Profile does not exist");
         }
         return entityDO;
     }

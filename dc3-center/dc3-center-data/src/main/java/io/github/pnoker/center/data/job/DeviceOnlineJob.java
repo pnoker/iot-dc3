@@ -50,6 +50,5 @@ public class DeviceOnlineJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         deviceOnlineJobService.deviceOnline();
-        log.info("设备状态统计---------");
     }
 }

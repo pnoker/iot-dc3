@@ -114,7 +114,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
-            throw new RuntimeException("驱动不存在");
+            throw new RuntimeException("Driver does not exist");
         }
         DriverRunBO driverRunBO = new DriverRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
@@ -141,7 +141,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         builder.setDriverId(driverId);
         GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
         if (!rDriverDTO.getResult().getOk()) {
-            throw new RuntimeException("驱动id不存在");
+            throw new RuntimeException("Driver id does not exist");
         }
         DriverRunBO driverRunBO = new DriverRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);

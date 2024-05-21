@@ -68,7 +68,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
         getDOById(id, true);
 
         if (!limitedIpManager.removeById(id)) {
-            throw new DeleteException("The ip delete failed");
+            throw new DeleteException("Failed to remove ip");
         }
     }
 
@@ -81,7 +81,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
         LimitedIpDO entityDO = limitedIpBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (limitedIpManager.updateById(entityDO)) {
-            throw new UpdateException("限制IP更新失败");
+            throw new UpdateException("Failed to update limited ip");
         }
     }
 
@@ -142,7 +142,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("限制IP重复");
+            throw new DuplicateException("Limited ip has been duplicated");
         }
         return duplicate;
     }
@@ -157,7 +157,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
     private LimitedIpDO getDOById(Long id, boolean throwException) {
         LimitedIpDO entityDO = limitedIpManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("受限IP不存在");
+            throw new NotFoundException("Limited ip does not exist");
         }
         return entityDO;
     }

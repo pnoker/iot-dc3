@@ -117,7 +117,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDeviceDTO.getResult().getOk()) {
-            throw new RuntimeException("设备号不存在");
+            throw new RuntimeException("Device does not exist");
         }
         DeviceRunBO deviceRunBO = new DeviceRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
@@ -144,7 +144,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         builder.setDeviceId(deviceId);
         GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
         if (!rDeviceDTO.getResult().getOk()) {
-            throw new RuntimeException("设备号不存在");
+            throw new RuntimeException("Device does not exist");
         }
         DeviceRunBO deviceRunBO = new DeviceRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);

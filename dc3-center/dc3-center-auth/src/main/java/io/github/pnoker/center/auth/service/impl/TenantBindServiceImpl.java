@@ -57,7 +57,7 @@ public class TenantBindServiceImpl implements TenantBindService {
 
         TenantBindDO entityDO = tenantBindBuilder.buildDOByBO(entityBO);
         if (!tenantBindManager.save(entityDO)) {
-            throw new AddException("The tenant bind add failed");
+            throw new AddException("Failed to create tenant bind");
         }
     }
 
@@ -66,7 +66,7 @@ public class TenantBindServiceImpl implements TenantBindService {
         getDOById(id, true);
 
         if (!tenantBindManager.removeById(id)) {
-            throw new DeleteException("The tenant bind delete failed");
+            throw new DeleteException("Failed to remove tenant bind");
         }
     }
 
@@ -134,7 +134,7 @@ public class TenantBindServiceImpl implements TenantBindService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("租户绑定重复");
+            throw new DuplicateException("Tenant has been duplicated");
         }
         return duplicate;
     }
@@ -149,7 +149,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     private TenantBindDO getDOById(Long id, boolean throwException) {
         TenantBindDO entityDO = tenantBindManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("租户绑定不存在");
+            throw new NotFoundException("Tenant bind does not exist");
         }
         return entityDO;
     }

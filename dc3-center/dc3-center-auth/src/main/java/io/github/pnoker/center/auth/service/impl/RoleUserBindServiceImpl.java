@@ -69,7 +69,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
         RoleUserBindDO entityDO = roleUserBindBuilder.buildDOByBO(entityBO);
         if (!roleUserBindManager.save(entityDO)) {
-            throw new AddException("The role user bind add failed");
+            throw new AddException("Failed to create role user bind");
         }
     }
 
@@ -78,7 +78,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         getDOById(id, true);
 
         if (!roleUserBindManager.removeById(id)) {
-            throw new DeleteException("The role user bind delete failed");
+            throw new DeleteException("Failed to remove role user bind");
         }
     }
 
@@ -154,7 +154,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("角色用户绑定重复");
+            throw new DuplicateException("Role user bind has been duplicated");
         }
         return duplicate;
     }
@@ -169,7 +169,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     private RoleUserBindDO getDOById(Long id, boolean throwException) {
         RoleUserBindDO entityDO = roleUserBindManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("角色用户绑定不存在");
+            throw new NotFoundException("Role user bind does not exist");
         }
         return entityDO;
     }

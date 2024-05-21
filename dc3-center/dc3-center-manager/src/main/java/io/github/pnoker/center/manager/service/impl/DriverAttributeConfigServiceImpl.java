@@ -56,12 +56,12 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     @Override
     public void save(DriverAttributeConfigBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
-            throw new DuplicateException("驱动属性配置创建失败: 驱动属性配置重复");
+            throw new DuplicateException("Failed to create driver attribute config: driver attribute config has been duplicated");
         }
 
         DriverAttributeConfigDO entityDO = driverAttributeConfigBuilder.buildDOByBO(entityBO);
         if (!driverAttributeConfigManager.save(entityDO)) {
-            throw new AddException("驱动属性配置创建失败");
+            throw new AddException("Failed to create driver attribute config");
         }
     }
 
@@ -70,7 +70,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         getDOById(id, true);
 
         if (!driverAttributeConfigManager.removeById(id)) {
-            throw new DeleteException("驱动属性配置删除失败");
+            throw new DeleteException("Failed to remove driver attribute config");
         }
     }
 
@@ -79,13 +79,13 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         getDOById(entityBO.getId(), true);
 
         if (checkDuplicate(entityBO, true)) {
-            throw new DuplicateException("驱动属性配置更新失败: 驱动属性配置重复");
+            throw new DuplicateException("Failed to update driver attribute config: driver attribute config has been duplicated");
         }
 
         DriverAttributeConfigDO entityDO = driverAttributeConfigBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
         if (!driverAttributeConfigManager.updateById(entityDO)) {
-            throw new UpdateException("驱动属性配置更新失败");
+            throw new UpdateException("Failed to update driver attribute config");
         }
     }
 
@@ -168,7 +168,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     private DriverAttributeConfigDO getDOById(Long id, boolean throwException) {
         DriverAttributeConfigDO entityDO = driverAttributeConfigManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("驱动属性配置不存在");
+            throw new NotFoundException("Driver attribute does not exist");
         }
         return entityDO;
     }

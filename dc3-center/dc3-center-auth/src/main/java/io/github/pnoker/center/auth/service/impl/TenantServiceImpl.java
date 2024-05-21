@@ -59,7 +59,7 @@ public class TenantServiceImpl implements TenantService {
 
         TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
         if (!tenantManager.save(entityDO)) {
-            throw new AddException("The tenant {} add failed", entityBO.getTenantName());
+            throw new AddException("Failed to create tenant: {}", entityBO.getTenantName());
         }
     }
 
@@ -68,7 +68,7 @@ public class TenantServiceImpl implements TenantService {
         getDOById(id, true);
 
         if (!tenantManager.removeById(id)) {
-            throw new DeleteException("The tenant delete failed");
+            throw new DeleteException("Failed to remove tenant");
         }
     }
 
@@ -81,7 +81,7 @@ public class TenantServiceImpl implements TenantService {
         TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!tenantManager.updateById(entityDO)) {
-            throw new UpdateException("租户更新失败");
+            throw new UpdateException("Failed to update 租户");
         }
     }
 
@@ -135,7 +135,7 @@ public class TenantServiceImpl implements TenantService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("租户重复");
+            throw new DuplicateException("Tenant has been duplicated");
         }
         return duplicate;
     }

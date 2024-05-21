@@ -62,7 +62,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         UserPasswordDO entityDO = userPasswordBuilder.buildDOByBO(entityBO);
         entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
         if (!userPasswordManager.save(entityDO)) {
-            throw new AddException("The user password add failed: {}", entityBO.toString());
+            throw new AddException("Failed to create user password: {}", entityBO.toString());
         }
     }
 
@@ -71,7 +71,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         getDOById(id, true);
 
         if (!userPasswordManager.removeById(id)) {
-            throw new DeleteException("The user password delete failed");
+            throw new DeleteException("Failed to remove user password");
         }
     }
 
@@ -135,7 +135,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("用户密码重复");
+            throw new DuplicateException("User password has been duplicated");
         }
         return duplicate;
     }
@@ -150,7 +150,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     private UserPasswordDO getDOById(Long id, boolean throwException) {
         UserPasswordDO entityDO = userPasswordManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("用户密码不存在");
+            throw new NotFoundException("User password does not exist");
         }
         return entityDO;
     }

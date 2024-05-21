@@ -61,7 +61,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
 
         AlarmNotifyProfileDO entityDO = alarmNotifyProfileBuilder.buildDOByBO(entityBO);
         if (!alarmNotifyProfileManager.save(entityDO)) {
-            throw new AddException("报警通知模板创建失败");
+            throw new AddException("Failed to create alarm notify profile");
         }
     }
 
@@ -73,11 +73,11 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         LambdaQueryChainWrapper<AlarmNotifyProfileDO> wrapper = alarmNotifyProfileManager.lambdaQuery().eq(AlarmNotifyProfileDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("报警通知模板删除失败: 该报警通知模板下存在子报警通知模板");
+            throw new AssociatedException("Failed to remove alarm notify profile: some sub alarm notify profiles exists in the alarm notify profile");
         }
 
         if (!alarmNotifyProfileManager.removeById(id)) {
-            throw new DeleteException("报警通知模板删除失败");
+            throw new DeleteException("Failed to remove alarm notify profile");
         }
     }
 
@@ -90,7 +90,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         AlarmNotifyProfileDO entityDO = alarmNotifyProfileBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!alarmNotifyProfileManager.updateById(entityDO)) {
-            throw new UpdateException("报警通知模板更新失败");
+            throw new UpdateException("Failed to update alarm notify profile");
         }
     }
 
@@ -142,7 +142,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("报警通知模板重复");
+            throw new DuplicateException("Alarm notify profile has been duplicated");
         }
         return duplicate;
     }
@@ -157,7 +157,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
     private AlarmNotifyProfileDO getDOById(Long id, boolean throwException) {
         AlarmNotifyProfileDO entityDO = alarmNotifyProfileManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("报警通知模板不存在");
+            throw new NotFoundException("Alarm notify profile does not exist");
         }
         return entityDO;
     }
