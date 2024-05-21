@@ -21,27 +21,27 @@ import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 
 /**
- * Driver Notify Interface
+ * 元数据通知接口
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverNotifyService {
+public interface MetadataNotifyService {
 
     /**
      * 通知驱动 新增设备(ADD) / 删除设备(DELETE) / 更新设备(UPDATE)
      *
-     * @param command  Operation Type
-     * @param deviceBO Device
+     * @param operate  Operation Type
+     * @param metadata Device
      */
-    void notifyDevice(MetadataOperateTypeEnum command, DeviceBO deviceBO);
+    void notifyDevice(MetadataOperateTypeEnum operate, DeviceBO metadata);
 
     /**
      * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 更新位号(UPDATE)
      *
-     * @param command Operation Type
-     * @param pointBO Point
+     * @param operate  Operation Type
+     * @param metadata Point
      */
-    void notifyPoint(MetadataOperateTypeEnum command, PointBO pointBO);
+    void notifyPoint(MetadataOperateTypeEnum operate, PointBO metadata);
 
 }

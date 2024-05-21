@@ -23,17 +23,19 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.dal.DeviceManager;
 import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.query.DeviceQuery;
+import io.github.pnoker.center.manager.event.notify.MetadataEvent;
+import io.github.pnoker.center.manager.event.notify.MetadataEventPublisher;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -90,7 +92,7 @@ public class DeviceServiceImpl implements DeviceService {
     @Resource
     private ProfileBindService profileBindService;
     @Resource
-    private DriverNotifyService driverNotifyService;
+    private MetadataEventPublisher metadataEventPublisher;
 
     @Override
     public void save(DeviceBO entityBO) {
@@ -107,7 +109,8 @@ public class DeviceServiceImpl implements DeviceService {
         DeviceBO deviceBO = selectById(entityDO.getId());
         List<ProfileBO> profileBOS = profileService.selectByDeviceId(entityDO.getId());
         deviceBO.setProfileIds(profileBOS.stream().map(ProfileBO::getId).toList());
-        driverNotifyService.notifyDevice(MetadataOperateTypeEnum.ADD, deviceBO);
+        MetadataEvent<DeviceBO> metadataEvent = new MetadataEvent<>(this, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, deviceBO);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override
@@ -125,8 +128,9 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         // 通知驱动删除设备
-        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyDevice(MetadataOperateTypeEnum.DELETE, entityBO);
+        DeviceBO deviceBO = deviceBuilder.buildBOByDO(entityDO);
+        MetadataEvent<DeviceBO> metadataEvent = new MetadataEvent<>(this, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE, deviceBO);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
 
@@ -154,11 +158,12 @@ public class DeviceServiceImpl implements DeviceService {
             throw new UpdateException("The device update failed");
         }
 
-        DeviceBO select = selectById(entityBO.getId());
-        select.setProfileIds(CollUtil.isEmpty(newProfileIds) ? oldProfileIds : newProfileIds);
-        entityBO.setDeviceName(select.getDeviceName());
+        DeviceBO deviceBO = selectById(entityBO.getId());
+        deviceBO.setProfileIds(CollUtil.isEmpty(newProfileIds) ? oldProfileIds : newProfileIds);
+        entityBO.setDeviceName(deviceBO.getDeviceName());
         // 通知驱动更新设备
-        driverNotifyService.notifyDevice(MetadataOperateTypeEnum.UPDATE, select);
+        MetadataEvent<DeviceBO> metadataEvent = new MetadataEvent<>(this, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE, deviceBO);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
 
@@ -529,7 +534,10 @@ public class DeviceServiceImpl implements DeviceService {
 
                 List<PointBO> pointBOS = pointService.selectByProfileId(profileId);
                 // 通知驱动新增位号
-                pointBOS.forEach(point -> driverNotifyService.notifyPoint(MetadataOperateTypeEnum.ADD, point));
+                pointBOS.forEach(pointBO -> {
+                    MetadataEvent<PointBO> metadataEvent = new MetadataEvent<>(this, MetadataTypeEnum.POINT, MetadataOperateTypeEnum.ADD, pointBO);
+                    metadataEventPublisher.publishEvent(metadataEvent);
+                });
             } catch (Exception ignored) {
                 // nothing to do
             }

@@ -81,7 +81,7 @@ public class TenantServiceImpl implements TenantService {
         TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!tenantManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update 租户");
+            throw new UpdateException("Failed to update tenant");
         }
     }
 

@@ -23,7 +23,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.center.manager.dal.PointDataVolumeRunManager;
 import io.github.pnoker.center.manager.dal.PointManager;
@@ -32,6 +31,8 @@ import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.entity.model.*;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
+import io.github.pnoker.center.manager.event.notify.MetadataEvent;
+import io.github.pnoker.center.manager.event.notify.MetadataEventPublisher;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.mapper.DriverMapper;
 import io.github.pnoker.center.manager.mapper.PointMapper;
@@ -41,6 +42,7 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
@@ -75,7 +77,7 @@ public class PointServiceImpl implements PointService {
     private PointMapper pointMapper;
 
     @Resource
-    private DriverNotifyService driverNotifyService;
+    private MetadataEventPublisher metadataEventPublisher;
 
     @Resource
     private PointDataVolumeRunManager pointDataVolumeRunManager;
@@ -103,8 +105,9 @@ public class PointServiceImpl implements PointService {
 
         // 通知驱动新增
         entityDO = pointManager.getById(entityDO.getId());
-        entityBO = pointBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyPoint(MetadataOperateTypeEnum.ADD, entityBO);
+        PointBO pointBO = pointBuilder.buildBOByDO(entityDO);
+        MetadataEvent<PointBO> metadataEvent = new MetadataEvent<>(this, MetadataTypeEnum.POINT, MetadataOperateTypeEnum.ADD, pointBO);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override
@@ -115,8 +118,9 @@ public class PointServiceImpl implements PointService {
             throw new DeleteException("Failed to remove 位号");
         }
 
-        PointBO entityBO = pointBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyPoint(MetadataOperateTypeEnum.DELETE, entityBO);
+        PointBO pointBO = pointBuilder.buildBOByDO(entityDO);
+        MetadataEvent<PointBO> metadataEvent = new MetadataEvent<>(this, MetadataTypeEnum.POINT, MetadataOperateTypeEnum.DELETE, pointBO);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override
@@ -128,12 +132,13 @@ public class PointServiceImpl implements PointService {
         PointDO entityDO = pointBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!pointManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update 位号");
+            throw new UpdateException("Failed to update point");
         }
 
         entityDO = pointManager.getById(entityDO.getId());
-        entityBO = pointBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyPoint(MetadataOperateTypeEnum.UPDATE, entityBO);
+        PointBO pointBO = pointBuilder.buildBOByDO(entityDO);
+        MetadataEvent<PointBO> metadataEvent = new MetadataEvent<>(this, MetadataTypeEnum.POINT, MetadataOperateTypeEnum.UPDATE, pointBO);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override

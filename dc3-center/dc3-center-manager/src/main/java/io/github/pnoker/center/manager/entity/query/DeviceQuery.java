@@ -24,7 +24,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Device Query
+ * 设备 Query
  *
  * @author pnoker
  * @since 2022.1.0

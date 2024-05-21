@@ -25,7 +25,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Device Interface
+ * 设备 Interface
  *
  * @author pnoker
  * @since 2022.1.0

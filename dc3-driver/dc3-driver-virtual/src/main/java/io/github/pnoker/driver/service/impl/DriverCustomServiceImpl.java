@@ -21,13 +21,16 @@ import io.github.pnoker.common.driver.entity.bean.RValue;
 import io.github.pnoker.common.driver.entity.bean.WValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.MetadataEventBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.event.device.DeviceMetadataEvent;
 import io.github.pnoker.common.driver.event.point.PointMetadataEvent;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -76,23 +79,26 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public void event(DeviceMetadataEvent event) {
+    public void event(MetadataEventBO<? extends BaseBO> metadataEvent) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        接收设备元数据的新增, 更新, 删除都会触发改事件
-        提供元数据操作类型: MetadataOperateTypeEnum(ADD，DELETE，UPDATE)
-        使用场景：更新驱动、设备等连接句柄
+        接收驱动, 设备, 位号元数据新增, 更新, 删除都会触发改事件
+        提供元数据类型: MetadataTypeEnum(DRIVER, DEVICE, POINT)
+        提供元数据操作类型: MetadataOperateTypeEnum(ADD, DELETE, UPDATE)
          */
-    }
-
-    @Override
-    public void event(PointMetadataEvent event) {
-        /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        接收位号元数据的新增, 更新, 删除都会触发改事件
-        提供元数据操作类型: MetadataOperateTypeEnum(ADD，DELETE，UPDATE)
-        使用场景：更新驱动、设备等连接句柄
-         */
+        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+        switch (metadataType) {
+            case DRIVER -> {
+                // to do something for driver event
+            }
+            case DEVICE -> {
+                // to do something for device event
+            }
+            case POINT -> {
+                // to do something for point event
+            }
+            default -> log.warn("There is no event of this metadata: {}", metadataEvent);
+        }
     }
 
     @Override
