@@ -138,8 +138,8 @@ public class PointAttributeController implements BaseController {
     @GetMapping("/driver_id/{id}")
     public R<List<PointAttributeVO>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            List<PointAttributeBO> entityBOS = pointAttributeService.selectByDriverId(id);
-            List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOS);
+            List<PointAttributeBO> entityBOList = pointAttributeService.selectByDriverId(id);
+            List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVO);
         } catch (NotFoundException ne) {
             return R.ok(new ArrayList<>());

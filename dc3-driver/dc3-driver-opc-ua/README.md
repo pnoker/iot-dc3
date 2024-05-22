@@ -18,7 +18,7 @@
 
 ## 配置项
 
-> src/main/resourceBOS/application.yml
+> src/main/resource/application.yml
 
 ### OpcUa Server 连接配置
 

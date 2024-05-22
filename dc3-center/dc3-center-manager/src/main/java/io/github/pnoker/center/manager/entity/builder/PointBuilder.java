@@ -205,5 +205,5 @@ public interface PointBuilder {
 
     List<DeviceDataVolumeRunVO> buildVODeviceDataByBO(List<DeviceDataVolumeRunBO> list);
 
-    PointDataStatisticsByDriverIdVO buildVOPointDataDriverByBO(PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOS);
+    PointDataStatisticsByDriverIdVO buildVOPointDataDriverByBO(PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOList);
 }

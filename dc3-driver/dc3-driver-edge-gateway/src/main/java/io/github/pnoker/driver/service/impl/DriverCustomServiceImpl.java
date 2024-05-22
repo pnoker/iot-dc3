@@ -27,6 +27,7 @@ import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.driver.service.MqttSendService;
 import jakarta.annotation.Resource;
@@ -66,8 +67,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
-        - 在read中实现设备状态的判断；
-        - 在自定义定时任务中实现设备状态的判断；
+        - 在read中实现设备状态的判断;
+        - 在自定义定时任务中实现设备状态的判断;
         - 根据某种判断机制实现设备状态的判断。
 
         最后根据 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理, 其中设备状态(StatusEnum):
@@ -88,17 +89,15 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         提供元数据操作类型: MetadataOperateTypeEnum(ADD, DELETE, UPDATE)
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
-        switch (metadataType) {
-            case DRIVER -> {
-                // to do something for driver event
-            }
-            case DEVICE -> {
-                // to do something for device event
-            }
-            case POINT -> {
-                // to do something for point event
-            }
-            default -> log.warn("There is no event of this metadata: {}", metadataEvent);
+        MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
+        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+            // to do something for device event
+            DeviceBO metadata = (DeviceBO) metadataEvent.getMetadata();
+            log.info("Device metadata event: deviceId: {}, operate: {}, metadata: {}", metadata.getId(), operateType, metadata);
+        } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
+            // to do something for point event
+            PointBO metadata = (PointBO) metadataEvent.getMetadata();
+            log.info("Point metadata event: pointId: {}, operate: {}, metadata: {}", metadata.getId(), operateType, metadata);
         }
     }
 

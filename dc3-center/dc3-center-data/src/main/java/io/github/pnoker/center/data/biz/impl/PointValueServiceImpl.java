@@ -74,12 +74,12 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public void save(List<PointValueBO> pointValueBOS) {
-        if (CollUtil.isEmpty(pointValueBOS)) {
+    public void save(List<PointValueBO> pointValueBOList) {
+        if (CollUtil.isEmpty(pointValueBOList)) {
             return;
         }
 
-        final Map<Long, List<PointValueBO>> group = pointValueBOS.stream()
+        final Map<Long, List<PointValueBO>> group = pointValueBOList.stream()
                 .map(pointValue -> {
                     pointValue.setCreateTime(LocalDateTime.now());
                     return pointValue;
@@ -142,15 +142,15 @@ public class PointValueServiceImpl implements PointValueService {
         List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
         List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).toList();
 
-        List<PointValueBO> pointValueBOS = redisRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
-        if (CollUtil.isEmpty(pointValueBOS)) {
+        List<PointValueBO> pointValueBOList = redisRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
+        if (CollUtil.isEmpty(pointValueBOList)) {
             RepositoryService repositoryService = getFirstRepositoryService();
-            pointValueBOS = repositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
+            pointValueBOList = repositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
         }
         entityPageBO.setCurrent(rPagePointDTO.getData().getPage().getCurrent())
                 .setSize(rPagePointDTO.getData().getPage().getSize())
                 .setTotal(rPagePointDTO.getData().getPage().getTotal())
-                .setRecords(pointValueBOS);
+                .setRecords(pointValueBOList);
 
         return entityPageBO;
     }
@@ -187,18 +187,18 @@ public class PointValueServiceImpl implements PointValueService {
     /**
      * 保存 PointValues 到指定存储服务
      *
-     * @param deviceId      设备ID
-     * @param pointValueBOS PointValue Array
+     * @param deviceId                   设备ID
+     * @param pointValueBOListPointValue Array
      */
-    private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOS) {
+    private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOList) {
         try {
             // redis repository
-            redisRepositoryService.savePointValue(deviceId, pointValueBOS);
+            redisRepositoryService.savePointValue(deviceId, pointValueBOList);
 
             // other repository
             RepositoryService repositoryService = getFirstRepositoryService();
-            List<List<PointValueBO>> splitPointValueBOS = ListUtil.split(pointValueBOS, 100);
-            for (List<PointValueBO> splitPointValueBO : splitPointValueBOS) {
+            List<List<PointValueBO>> splitPointValueBOList = ListUtil.split(pointValueBOList, 100);
+            for (List<PointValueBO> splitPointValueBO : splitPointValueBOList) {
                 repositoryService.savePointValue(deviceId, splitPointValueBO);
             }
         } catch (Exception e) {

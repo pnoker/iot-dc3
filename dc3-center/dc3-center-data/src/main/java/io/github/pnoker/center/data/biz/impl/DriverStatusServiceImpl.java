@@ -108,7 +108,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
     @Override
     public DriverRunBO selectOnlineByDriverId(Long driverId) {
-        List<DriverRunDO> driverRunDOS = driverRunService.get7daysDuration(driverId, DriverStatusEnum.ONLINE.getCode());
+        List<DriverRunDO> driverRunDOList = driverRunService.get7daysDuration(driverId, DriverStatusEnum.ONLINE.getCode());
         Long totalDuration = driverRunService.selectSumDuration(driverId, DriverStatusEnum.ONLINE.getCode());
         GrpcDriverQuery.Builder builder = GrpcDriverQuery.newBuilder();
         builder.setDriverId(driverId);
@@ -122,12 +122,12 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         driverRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
         driverRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
-        if (Objects.isNull(driverRunDOS)) {
+        if (Objects.isNull(driverRunDOList)) {
             driverRunBO.setDuration(list);
             return driverRunBO;
         }
-        for (int i = 0; i < driverRunDOS.size(); i++) {
-            list.set(i, driverRunDOS.get(i).getDuration());
+        for (int i = 0; i < driverRunDOList.size(); i++) {
+            list.set(i, driverRunDOList.get(i).getDuration());
         }
         driverRunBO.setDuration(list);
         return driverRunBO;
@@ -135,7 +135,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
     @Override
     public DriverRunBO selectOfflineByDriverId(Long driverId) {
-        List<DriverRunDO> driverRunDOS = driverRunService.get7daysDuration(driverId, DriverStatusEnum.OFFLINE.getCode());
+        List<DriverRunDO> driverRunDOList = driverRunService.get7daysDuration(driverId, DriverStatusEnum.OFFLINE.getCode());
         Long totalDuration = driverRunService.selectSumDuration(driverId, DriverStatusEnum.OFFLINE.getCode());
         GrpcDriverQuery.Builder builder = GrpcDriverQuery.newBuilder();
         builder.setDriverId(driverId);
@@ -149,12 +149,12 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         driverRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         driverRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
-        if (Objects.isNull(driverRunDOS)) {
+        if (Objects.isNull(driverRunDOList)) {
             driverRunBO.setDuration(list);
             return driverRunBO;
         }
-        for (int i = 0; i < driverRunDOS.size(); i++) {
-            list.set(i, driverRunDOS.get(i).getDuration());
+        for (int i = 0; i < driverRunDOList.size(); i++) {
+            list.set(i, driverRunDOList.get(i).getDuration());
         }
         driverRunBO.setDuration(list);
         return driverRunBO;

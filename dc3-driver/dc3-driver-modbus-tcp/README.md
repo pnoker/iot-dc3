@@ -16,7 +16,7 @@
 
 ## 配置项
 
-> src/main/resourceBOS/application.yml
+> src/main/resource/application.yml
 
 ### OpcDa Server 连接配置
 

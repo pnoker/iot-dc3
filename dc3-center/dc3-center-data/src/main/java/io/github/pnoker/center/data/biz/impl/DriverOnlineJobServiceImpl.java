@@ -91,7 +91,7 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
         GrpcPageDriverDTO data = list.getData();
         List<GrpcDriverDTO> dataList = data.getDataList();
         if (CollUtil.isNotEmpty(dataList)) {
-            List<DriverStatusHistoryDO> driverStatusHistoryDOS = new ArrayList<>();
+            List<DriverStatusHistoryDO> driverStatusHistoryDOList = new ArrayList<>();
             dataList.forEach(driverDO -> {
                 String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverDO.getBase().getId();
                 String status = redisService.getKey(key);
@@ -100,10 +100,10 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
                 driverStatusHistoryDO.setDriverId(driverDO.getBase().getId());
                 driverStatusHistoryDO.setDriverName(driverDO.getDriverName());
                 driverStatusHistoryDO.setStatus(status);
-                driverStatusHistoryDOS.add(driverStatusHistoryDO);
+                driverStatusHistoryDOList.add(driverStatusHistoryDO);
             });
-            if (driverStatusHistoryDOS != null && driverStatusHistoryDOS.size() > 0) {
-                driverStatusHistoryService.saveBatch(driverStatusHistoryDOS);
+            if (driverStatusHistoryDOList != null && driverStatusHistoryDOList.size() > 0) {
+                driverStatusHistoryService.saveBatch(driverStatusHistoryDOList);
             }
         }
     }

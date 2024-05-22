@@ -139,8 +139,8 @@ public class ProfileController implements BaseController {
     @PostMapping("/ids")
     public R<Map<Long, ProfileVO>> selectByIds(@RequestBody Set<Long> profileIds) {
         try {
-            List<ProfileBO> entityBOS = profileService.selectByIds(profileIds);
-            Map<Long, ProfileVO> deviceMap = entityBOS.stream().collect(Collectors.toMap(ProfileBO::getId, entityBO -> profileBuilder.buildVOByBO(entityBO)));
+            List<ProfileBO> entityBOList = profileService.selectByIds(profileIds);
+            Map<Long, ProfileVO> deviceMap = entityBOList.stream().collect(Collectors.toMap(ProfileBO::getId, entityBO -> profileBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -157,9 +157,9 @@ public class ProfileController implements BaseController {
     @GetMapping("/device_id/{deviceId}")
     public R<List<ProfileVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<ProfileBO> entityBOS = profileService.selectByDeviceId(deviceId);
-            List<ProfileVO> entityVOS = profileBuilder.buildVOListByBOList(entityBOS);
-            return R.ok(entityVOS);
+            List<ProfileBO> entityBOList = profileService.selectByDeviceId(deviceId);
+            List<ProfileVO> entityVOList = profileBuilder.buildVOListByBOList(entityBOList);
+            return R.ok(entityVOList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());

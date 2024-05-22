@@ -124,8 +124,8 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Override
     public List<PointAttributeConfigBO> selectByDeviceId(Long deviceId) {
-        List<PointBO> pointBOS = pointService.selectByDeviceId(deviceId);
-        Set<Long> pointIds = pointBOS.stream().map(PointBO::getId).collect(Collectors.toSet());
+        List<PointBO> pointBOList = pointService.selectByDeviceId(deviceId);
+        Set<Long> pointIds = pointBOList.stream().map(PointBO::getId).collect(Collectors.toSet());
         if (CollUtil.isEmpty(pointIds)) {
             return Collections.emptyList();
         }

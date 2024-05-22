@@ -142,8 +142,8 @@ public class DeviceController implements BaseController {
     @PostMapping("/ids")
     public R<Map<Long, DeviceVO>> selectByIds(@RequestBody List<Long> deviceIds) {
         try {
-            List<DeviceBO> entityBOS = deviceService.selectByIds(deviceIds);
-            Map<Long, DeviceVO> deviceMap = entityBOS.stream().collect(Collectors.toMap(DeviceBO::getId, entityBO -> deviceBuilder.buildVOByBO(entityBO)));
+            List<DeviceBO> entityBOList = deviceService.selectByIds(deviceIds);
+            Map<Long, DeviceVO> deviceMap = entityBOList.stream().collect(Collectors.toMap(DeviceBO::getId, entityBO -> deviceBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

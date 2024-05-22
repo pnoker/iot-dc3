@@ -156,9 +156,9 @@ public class DriverAttributeConfigController implements BaseController {
     @GetMapping("/device_id/{deviceId}")
     public R<List<DriverAttributeConfigVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<DriverAttributeConfigBO> entityBOS = driverAttributeConfigService.selectByDeviceId(deviceId);
-            List<DriverAttributeConfigVO> entityVOS = driverAttributeConfigBuilder.buildVOListByBOList(entityBOS);
-            return R.ok(entityVOS);
+            List<DriverAttributeConfigBO> entityBOList = driverAttributeConfigService.selectByDeviceId(deviceId);
+            List<DriverAttributeConfigVO> entityVOList = driverAttributeConfigBuilder.buildVOListByBOList(entityBOList);
+            return R.ok(entityVOList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());

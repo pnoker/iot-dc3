@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.event.notify;
+package io.github.pnoker.center.manager.event.metadata;
 
 import io.github.pnoker.center.manager.biz.MetadataNotifyService;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -48,22 +49,14 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent<
     public void onApplicationEvent(@NotNull MetadataEvent metadataEvent) {
         log.info("Metadata event listener received: {}", JsonUtil.toJsonString(metadataEvent));
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
-        switch (metadataType) {
-            case DRIVER -> {
-                // to do something for driver event
-            }
-            case DEVICE -> {
-                MetadataOperateTypeEnum operate = metadataEvent.getOperateType();
-                DeviceBO metadata = (DeviceBO) metadataEvent.getMetadata();
-                metadataNotifyService.notifyDevice(operate, metadata);
-            }
-            case POINT -> {
-                MetadataOperateTypeEnum operate = metadataEvent.getOperateType();
-                PointBO metadata = (PointBO) metadataEvent.getMetadata();
-                metadataNotifyService.notifyPoint(operate, metadata);
-            }
-            default -> log.warn("There is no event of this metadata: {}", metadataEvent);
+        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+            MetadataOperateTypeEnum operate = metadataEvent.getOperateType();
+            DeviceBO metadata = (DeviceBO) metadataEvent.getMetadata();
+            metadataNotifyService.notifyDevice(operate, metadata);
+        } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
+            MetadataOperateTypeEnum operate = metadataEvent.getOperateType();
+            PointBO metadata = (PointBO) metadataEvent.getMetadata();
+            metadataNotifyService.notifyPoint(operate, metadata);
         }
-
     }
 }

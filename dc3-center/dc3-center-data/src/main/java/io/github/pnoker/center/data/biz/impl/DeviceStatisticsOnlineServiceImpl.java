@@ -102,17 +102,17 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
             dataList.forEach(
                     driverDO -> {
                         //查出状态表最近两条数据
-                        List<DeviceStatusHistoryDO> deviceStatusHistoryDOS = deviceStatusHistoryService.selectRecently2Data(driverDO.getBase().getId());
-                        if (deviceStatusHistoryDOS.size() > 1) {
-                            Duration duration = Duration.between(deviceStatusHistoryDOS.get(1).getCreateTime(), deviceStatusHistoryDOS.get(0).getCreateTime());
+                        List<DeviceStatusHistoryDO> deviceStatusHistoryDOList = deviceStatusHistoryService.selectRecently2Data(driverDO.getBase().getId());
+                        if (deviceStatusHistoryDOList.size() > 1) {
+                            Duration duration = Duration.between(deviceStatusHistoryDOList.get(1).getCreateTime(), deviceStatusHistoryDOList.get(0).getCreateTime());
                             DeviceRunHistoryDO deviceRunHistoryDO = new DeviceRunHistoryDO();
                             long minutes = duration.toMinutes();
                             deviceRunHistoryDO.setDuration(minutes);
                             deviceRunHistoryDO.setDeviceName(driverDO.getDeviceName());
                             deviceRunHistoryDO.setDriverId(driverDO.getDriverId());
                             deviceRunHistoryDO.setDeviceId(driverDO.getBase().getId());
-                            if (DriverStatusEnum.OFFLINE.getCode().equals(deviceStatusHistoryDOS.get(0).getStatus())) {
-                                if (DriverStatusEnum.OFFLINE.getCode().equals(deviceStatusHistoryDOS.get(1).getStatus())) {
+                            if (DriverStatusEnum.OFFLINE.getCode().equals(deviceStatusHistoryDOList.get(0).getStatus())) {
+                                if (DriverStatusEnum.OFFLINE.getCode().equals(deviceStatusHistoryDOList.get(1).getStatus())) {
                                     //都为离线  离线时长
                                     deviceRunHistoryDO.setStatus(DriverStatusEnum.OFFLINE.getCode());
                                     deviceRunHistoryManager.save(deviceRunHistoryDO);
@@ -121,8 +121,8 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
                                     deviceRunHistoryDO.setStatus(DriverStatusEnum.ONLINE.getCode());
                                     deviceRunHistoryManager.save(deviceRunHistoryDO);
                                 }
-                            } else if (DriverStatusEnum.ONLINE.getCode().equals(deviceStatusHistoryDOS.get(0).getStatus())) {
-                                if (DriverStatusEnum.ONLINE.getCode().equals(deviceStatusHistoryDOS.get(1).getStatus())) {
+                            } else if (DriverStatusEnum.ONLINE.getCode().equals(deviceStatusHistoryDOList.get(0).getStatus())) {
+                                if (DriverStatusEnum.ONLINE.getCode().equals(deviceStatusHistoryDOList.get(1).getStatus())) {
                                     //都为在线  在线时长
                                     deviceRunHistoryDO.setStatus(DriverStatusEnum.ONLINE.getCode());
                                     deviceRunHistoryManager.save(deviceRunHistoryDO);
@@ -137,8 +137,8 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
             );
         }
         // 查出所有driverids  去重
-        List<DeviceRunHistoryDO> deviceRunHistoryDOS = deviceRunHistoryService.list(new LambdaQueryWrapper<>());
-        Set<Long> deviceIds = deviceRunHistoryDOS.stream().map(DeviceRunHistoryDO::getDeviceId).collect(Collectors.toSet());
+        List<DeviceRunHistoryDO> deviceRunHistoryDOList = deviceRunHistoryService.list(new LambdaQueryWrapper<>());
+        Set<Long> deviceIds = deviceRunHistoryDOList.stream().map(DeviceRunHistoryDO::getDeviceId).collect(Collectors.toSet());
         LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
         deviceIds.forEach(

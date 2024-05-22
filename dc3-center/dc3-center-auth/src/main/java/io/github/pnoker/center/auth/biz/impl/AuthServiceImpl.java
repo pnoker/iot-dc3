@@ -122,18 +122,18 @@ public class AuthServiceImpl implements AuthService {
         authUser.setTenantId(tenantBO.getId());
 
         //2.1 roles
-        List<RoleBO> roleBOS = roleUserBindService.listRoleByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
-        if (CollUtil.isEmpty(roleBOS)) {
+        List<RoleBO> roleBOList = roleUserBindService.listRoleByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
+        if (CollUtil.isEmpty(roleBOList)) {
             throw new ServiceException("请先为用户{}分配角色", login.getName());
         }
-        Set<String> roleCodeSet = roleBOS.stream().map(RoleBO::getRoleCode).collect(Collectors.toSet());
+        Set<String> roleCodeSet = roleBOList.stream().map(RoleBO::getRoleCode).collect(Collectors.toSet());
         authUser.setRoleCodeSet(roleCodeSet);
 
         //2.2 resources
         Set<ResourceBO> resourceBOSet = new HashSet<>(4);
-        for (RoleBO roleBO : roleBOS) {
-            List<ResourceBO> resourceBOS = roleResourceBindService.listResourceByRoleId(roleBO.getId());
-            resourceBOSet.addAll(resourceBOS);
+        for (RoleBO roleBO : roleBOList) {
+            List<ResourceBO> resourceBOList = roleResourceBindService.listResourceByRoleId(roleBO.getId());
+            resourceBOSet.addAll(resourceBOList);
         }
         if (CollUtil.isEmpty(resourceBOSet)) {
             throw new ServiceException("请先为用户{}分配权限", login.getName());

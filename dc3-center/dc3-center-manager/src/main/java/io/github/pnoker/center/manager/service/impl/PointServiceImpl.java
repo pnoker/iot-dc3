@@ -31,8 +31,7 @@ import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.builder.PointBuilder;
 import io.github.pnoker.center.manager.entity.model.*;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
-import io.github.pnoker.center.manager.event.notify.MetadataEvent;
-import io.github.pnoker.center.manager.event.notify.MetadataEventPublisher;
+import io.github.pnoker.center.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.mapper.DriverMapper;
 import io.github.pnoker.center.manager.mapper.PointMapper;
@@ -41,6 +40,7 @@ import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
@@ -195,8 +195,8 @@ public class PointServiceImpl implements PointService {
         if (CollUtil.isEmpty(ids)) {
             return Collections.emptyMap();
         }
-        List<PointDO> pointDOS = pointManager.listByIds(ids);
-        return pointDOS.stream().collect(Collectors.toMap(PointDO::getId, PointDO::getUnit));
+        List<PointDO> pointDOList = pointManager.listByIds(ids);
+        return pointDOList.stream().collect(Collectors.toMap(PointDO::getId, PointDO::getUnit));
     }
 
     @Override
@@ -212,9 +212,9 @@ public class PointServiceImpl implements PointService {
         });
         DeviceByPointBO deviceByPointBO = new DeviceByPointBO();
         if (!Objects.isNull(deviceIds)) {
-            List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
-            deviceByPointBO.setDevices(deviceDOS);
-            deviceByPointBO.setCount(deviceDOS.stream().count());
+            List<DeviceDO> deviceDOList = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
+            deviceByPointBO.setDevices(deviceDOList);
+            deviceByPointBO.setCount(deviceDOList.stream().count());
         } else {
             deviceByPointBO.setCount(0L);
         }
@@ -228,18 +228,18 @@ public class PointServiceImpl implements PointService {
         if (Objects.isNull(deviceIds)) {
             return list;
         }
-        List<DeviceDO> deviceDOS = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
+        List<DeviceDO> deviceDOList = deviceMapper.selectList(new LambdaQueryWrapper<DeviceDO>().in(DeviceDO::getId, deviceIds));
         List<Long> zero = Collections.nCopies(7, 0L);
         ArrayList<Long> zeroList = new ArrayList<>(zero);
-        deviceDOS.forEach(deviceDO -> {
+        deviceDOList.forEach(deviceDO -> {
             LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
             wrapper.eq(PointDataVolumeRunDO::getPointId, pointId).eq(PointDataVolumeRunDO::getDeviceId, deviceDO.getId()).ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo);
             PointDataVolumeRunBO pointDataVolumeRunBO = new PointDataVolumeRunBO();
             pointDataVolumeRunBO.setDeviceName(deviceDO.getDeviceName());
-            List<PointDataVolumeRunDO> pointDataVolumeRunDOS = pointDataVolumeRunManager.list(wrapper);
-            if (!Objects.isNull(pointDataVolumeRunDOS)) {
+            List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(wrapper);
+            if (!Objects.isNull(pointDataVolumeRunDOList)) {
                 for (int i = 0; i < 7; i++) {
-                    zeroList.set(i, pointDataVolumeRunDOS.get(i).getTotal());
+                    zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
                 }
             }
             pointDataVolumeRunBO.setTotal(zeroList);
@@ -306,18 +306,18 @@ public class PointServiceImpl implements PointService {
         if (Objects.isNull(pointIds)) {
             return list;
         }
-        List<PointDO> pointDOS = pointManager.list(new LambdaQueryWrapper<PointDO>().in(PointDO::getId, pointIds));
+        List<PointDO> pointDOList = pointManager.list(new LambdaQueryWrapper<PointDO>().in(PointDO::getId, pointIds));
         List<Long> zero = Collections.nCopies(7, 0L);
         ArrayList<Long> zeroList = new ArrayList<>(zero);
-        pointDOS.forEach(pointDO -> {
+        pointDOList.forEach(pointDO -> {
             LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
             wrapper.eq(PointDataVolumeRunDO::getPointId, pointDO.getId()).eq(PointDataVolumeRunDO::getDeviceId, deviceId).ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo);
             DeviceDataVolumeRunBO deviceDataVolumeRunBO = new DeviceDataVolumeRunBO();
             deviceDataVolumeRunBO.setPointName(pointDO.getPointName());
-            List<PointDataVolumeRunDO> pointDataVolumeRunDOS = pointDataVolumeRunManager.list(wrapper);
-            if (!Objects.isNull(pointDataVolumeRunDOS)) {
-                for (int i = 0; i < pointDataVolumeRunDOS.size(); i++) {
-                    zeroList.set(i, pointDataVolumeRunDOS.get(i).getTotal());
+            List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(wrapper);
+            if (!Objects.isNull(pointDataVolumeRunDOList)) {
+                for (int i = 0; i < pointDataVolumeRunDOList.size(); i++) {
+                    zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
                 }
             }
             deviceDataVolumeRunBO.setTotal(zeroList);
@@ -344,9 +344,9 @@ public class PointServiceImpl implements PointService {
         queryWrapper.select(PointDataVolumeRunDO::getPointId);
         queryWrapper.eq(PointDataVolumeRunDO::getDriverId, driverId)
                 .groupBy(PointDataVolumeRunDO::getPointId);
-        List<PointDataVolumeRunDO> pointDataVolumeRunDOS = pointDataVolumeRunManager.list(queryWrapper);
-        if (!Objects.isNull(pointDataVolumeRunDOS)) {
-            return pointDataVolumeRunDOS.stream().count();
+        List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(queryWrapper);
+        if (!Objects.isNull(pointDataVolumeRunDOList)) {
+            return pointDataVolumeRunDOList.stream().count();
         } else {
             return 0L;
         }
@@ -365,17 +365,17 @@ public class PointServiceImpl implements PointService {
         LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(6);
         QueryWrapper<PointDataVolumeRunDO> wrapper = new QueryWrapper<>();
         wrapper.select("sum(total) as total");
-        List<PointDataVolumeRunDO> pointDataVolumeRunDOS = pointDataVolumeRunManager.list(wrapper.lambda()
+        List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(wrapper.lambda()
                 .eq(PointDataVolumeRunDO::getDriverId, driverId)
                 .ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo)
                 .groupBy(PointDataVolumeRunDO::getCreateTime)
                 .orderByDesc(PointDataVolumeRunDO::getCreateTime));
-        if (Objects.isNull(pointDataVolumeRunDOS)) {
+        if (Objects.isNull(pointDataVolumeRunDOList)) {
             result.setTotal(zeroList);
             return result;
         }
-        for (int i = 0; i < pointDataVolumeRunDOS.size(); i++) {
-            zeroList.set(i, pointDataVolumeRunDOS.get(i).getTotal());
+        for (int i = 0; i < pointDataVolumeRunDOList.size(); i++) {
+            zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
         }
         result.setTotal(zeroList);
         return result;

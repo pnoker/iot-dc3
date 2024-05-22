@@ -107,16 +107,16 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
             dataList.forEach(
                     driverDO -> {
                         //查出状态表最近两条数据
-                        List<DriverStatusHistoryDO> driverStatusHistoryDOS = driverStatusHistoryService.selectRecently2Data(driverDO.getBase().getId());
-                        if (driverStatusHistoryDOS.size() > 1) {
-                            Duration duration = Duration.between(driverStatusHistoryDOS.get(1).getCreateTime(), driverStatusHistoryDOS.get(0).getCreateTime());
+                        List<DriverStatusHistoryDO> driverStatusHistoryDOList = driverStatusHistoryService.selectRecently2Data(driverDO.getBase().getId());
+                        if (driverStatusHistoryDOList.size() > 1) {
+                            Duration duration = Duration.between(driverStatusHistoryDOList.get(1).getCreateTime(), driverStatusHistoryDOList.get(0).getCreateTime());
                             DriverRunHistoryDO driverRunHistoryDO = new DriverRunHistoryDO();
                             long minutes = duration.toMinutes();
                             driverRunHistoryDO.setDuration(minutes);
                             driverRunHistoryDO.setDriverName(driverDO.getDriverName());
                             driverRunHistoryDO.setDriverId(driverDO.getBase().getId());
-                            if (DriverStatusEnum.OFFLINE.getCode().equals(driverStatusHistoryDOS.get(0).getStatus())) {
-                                if (DriverStatusEnum.OFFLINE.getCode().equals(driverStatusHistoryDOS.get(1).getStatus())) {
+                            if (DriverStatusEnum.OFFLINE.getCode().equals(driverStatusHistoryDOList.get(0).getStatus())) {
+                                if (DriverStatusEnum.OFFLINE.getCode().equals(driverStatusHistoryDOList.get(1).getStatus())) {
                                     //都为离线  离线时长
                                     driverRunHistoryDO.setStatus(DriverStatusEnum.OFFLINE.getCode());
                                     driverRunHistoryManager.save(driverRunHistoryDO);
@@ -125,8 +125,8 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
                                     driverRunHistoryDO.setStatus(DriverStatusEnum.ONLINE.getCode());
                                     driverRunHistoryManager.save(driverRunHistoryDO);
                                 }
-                            } else if (DriverStatusEnum.ONLINE.getCode().equals(driverStatusHistoryDOS.get(0).getStatus())) {
-                                if (DriverStatusEnum.ONLINE.getCode().equals(driverStatusHistoryDOS.get(1).getStatus())) {
+                            } else if (DriverStatusEnum.ONLINE.getCode().equals(driverStatusHistoryDOList.get(0).getStatus())) {
+                                if (DriverStatusEnum.ONLINE.getCode().equals(driverStatusHistoryDOList.get(1).getStatus())) {
                                     //都为在线  在线时长
                                     driverRunHistoryDO.setStatus(DriverStatusEnum.ONLINE.getCode());
                                     driverRunHistoryManager.save(driverRunHistoryDO);
@@ -141,8 +141,8 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
             );
         }
         // 查出所有driverids  去重
-        List<DriverRunHistoryDO> driverRunHistoryDOS = driverRunHistoryService.list(new LambdaQueryWrapper<>());
-        Set<Long> driverIds = driverRunHistoryDOS.stream().map(e -> e.getDriverId()).collect(Collectors.toSet());
+        List<DriverRunHistoryDO> driverRunHistoryDOList = driverRunHistoryService.list(new LambdaQueryWrapper<>());
+        Set<Long> driverIds = driverRunHistoryDOList.stream().map(e -> e.getDriverId()).collect(Collectors.toSet());
         LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
         if (driverIds != null) {

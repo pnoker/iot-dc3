@@ -143,8 +143,8 @@ public class PointController implements BaseController {
     @PostMapping("/ids")
     public R<Map<Long, PointVO>> selectByIds(@RequestBody Set<Long> pointIds) {
         try {
-            List<PointBO> entityBOS = pointService.selectByIds(pointIds);
-            Map<Long, PointVO> deviceMap = entityBOS.stream().collect(Collectors.toMap(PointBO::getId, entityBO -> pointBuilder.buildVOByBO(entityBO)));
+            List<PointBO> entityBOList = pointService.selectByIds(pointIds);
+            Map<Long, PointVO> deviceMap = entityBOList.stream().collect(Collectors.toMap(PointBO::getId, entityBO -> pointBuilder.buildVOByBO(entityBO)));
             return R.ok(deviceMap);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -161,9 +161,9 @@ public class PointController implements BaseController {
     @GetMapping("/profile_id/{profileId}")
     public R<List<PointVO>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
         try {
-            List<PointBO> entityBOS = pointService.selectByProfileId(profileId);
-            List<PointVO> entityVOS = pointBuilder.buildVOListByBOList(entityBOS);
-            return R.ok(entityVOS);
+            List<PointBO> entityBOList = pointService.selectByProfileId(profileId);
+            List<PointVO> entityVOList = pointBuilder.buildVOListByBOList(entityBOList);
+            return R.ok(entityVOList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
@@ -179,9 +179,9 @@ public class PointController implements BaseController {
     @GetMapping("/device_id/{deviceId}")
     public R<List<PointVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<PointBO> entityBOS = pointService.selectByDeviceId(deviceId);
-            List<PointVO> entityVOS = pointBuilder.buildVOListByBOList(entityBOS);
-            return R.ok(entityVOS);
+            List<PointBO> entityBOList = pointService.selectByDeviceId(deviceId);
+            List<PointVO> entityVOList = pointBuilder.buildVOListByBOList(entityBOList);
+            return R.ok(entityVOList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
@@ -337,8 +337,8 @@ public class PointController implements BaseController {
     public R<List<DeviceDataVolumeRunVO>> selectDeviceStatisticsByPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @RequestBody Set<Long> pointIds) {
         try {
             List<DeviceDataVolumeRunBO> list = pointService.selectDeviceStatisticsByPointId(deviceId, pointIds);
-            List<DeviceDataVolumeRunVO> deviceDataVolumeRunVOS = pointBuilder.buildVODeviceDataByBO(list);
-            return R.ok(deviceDataVolumeRunVOS);
+            List<DeviceDataVolumeRunVO> deviceDataVolumeRunVOList = pointBuilder.buildVODeviceDataByBO(list);
+            return R.ok(deviceDataVolumeRunVOList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
@@ -382,9 +382,9 @@ public class PointController implements BaseController {
     @GetMapping("/selectPointDataStatisticsByDriverId/{driverId}")
     public R<PointDataStatisticsByDriverIdVO> selectPointDataStatisticsByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
-            PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOS = pointService.selectPointDataStatisticsByDriverId(driverId);
-            PointDataStatisticsByDriverIdVO pointDataStatisticsByDriverIdVOS = pointBuilder.buildVOPointDataDriverByBO(pointDataStatisticsByDriverIdBOS);
-            return R.ok(pointDataStatisticsByDriverIdVOS);
+            PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOList = pointService.selectPointDataStatisticsByDriverId(driverId);
+            PointDataStatisticsByDriverIdVO pointDataStatisticsByDriverIdVOList = pointBuilder.buildVOPointDataDriverByBO(pointDataStatisticsByDriverIdBOList);
+            return R.ok(pointDataStatisticsByDriverIdVOList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
