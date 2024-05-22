@@ -140,16 +140,16 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         dBuilder.setDevice(deviceDTO);
 
         // 附加字段
-        List<PointBO> pointBOS = pointService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(pointBOS).ifPresent(list -> dBuilder.addAllPointIds(list.stream().map(PointBO::getId).toList()));
+        List<PointBO> pointBOList = pointService.selectByDeviceId(entityBO.getId());
+        CollectionOptional.ofNullable(pointBOList).ifPresent(list -> dBuilder.addAllPointIds(list.stream().map(PointBO::getId).toList()));
 
-        List<DriverAttributeConfigBO> driverAttributeConfigBOS = driverAttributeConfigService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(driverAttributeConfigBOS).ifPresent(list -> dBuilder.addAllDriverConfigs(list.stream()
+        List<DriverAttributeConfigBO> driverAttributeConfigBOList = driverAttributeConfigService.selectByDeviceId(entityBO.getId());
+        CollectionOptional.ofNullable(driverAttributeConfigBOList).ifPresent(list -> dBuilder.addAllDriverConfigs(list.stream()
                 .map(grpcDriverAttributeConfigBuilder::buildGrpcDTOByBO)
                 .toList()));
 
-        List<PointAttributeConfigBO> pointAttributeConfigBOS = pointAttributeConfigService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(pointAttributeConfigBOS).ifPresent(list -> dBuilder.addAllPointConfigs(list.stream()
+        List<PointAttributeConfigBO> pointAttributeConfigBOList = pointAttributeConfigService.selectByDeviceId(entityBO.getId());
+        CollectionOptional.ofNullable(pointAttributeConfigBOList).ifPresent(list -> dBuilder.addAllPointConfigs(list.stream()
                 .map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO)
                 .toList()));
         return dBuilder;

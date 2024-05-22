@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.event.notify;
+package io.github.pnoker.center.manager.event.metadata;
 
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,10 +42,10 @@ public class MetadataEventPublisher {
     /**
      * 发布事件
      *
-     * @param event MetadataEvent
+     * @param metadataEvent MetadataEvent
      */
-    public void publishEvent(MetadataEvent<? extends BaseBO> event) {
-        log.info("Device metadata event publisher publishEvent: {}", JsonUtil.toJsonString(event));
-        applicationEventPublisher.publishEvent(event);
+    public void publishEvent(MetadataEvent<? extends BaseBO> metadataEvent) {
+        log.info("Metadata event publisher publishEvent: {}", JsonUtil.toJsonString(metadataEvent));
+        applicationEventPublisher.publishEvent(metadataEvent);
     }
 }

@@ -65,9 +65,9 @@ public class DeviceStatusHistoryDO implements Serializable {
     private String deviceName;
 
     /**
-     * CREATE: 注册成功；
+     * CREATE: 注册成功
      * ONLINE: 在线
-     * ；OFFLINE: 离线；
+     * OFFLINE: 离线
      */
     @TableField("status")
     private String status;

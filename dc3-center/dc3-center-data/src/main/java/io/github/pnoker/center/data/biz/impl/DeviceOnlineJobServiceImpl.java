@@ -85,7 +85,7 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
         GrpcPageDeviceDTO data = list.getData();
         List<GrpcDeviceDTO> dataList = data.getDataList();
         if (CollUtil.isNotEmpty(dataList)) {
-            List<DeviceStatusHistoryDO> deviceStatusHistoryDOS = new ArrayList<>();
+            List<DeviceStatusHistoryDO> deviceStatusHistoryDOList = new ArrayList<>();
             dataList.forEach(driverDO -> {
                 String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + driverDO.getBase().getId();
                 String status = redisService.getKey(key);
@@ -95,10 +95,10 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
                 deviceStatusHistoryDO.setDeviceId(driverDO.getBase().getId());
                 deviceStatusHistoryDO.setDeviceName(driverDO.getDeviceName());
                 deviceStatusHistoryDO.setStatus(status);
-                deviceStatusHistoryDOS.add(deviceStatusHistoryDO);
+                deviceStatusHistoryDOList.add(deviceStatusHistoryDO);
             });
-            if (!deviceStatusHistoryDOS.isEmpty()) {
-                deviceStatusHistoryService.saveBatch(deviceStatusHistoryDOS);
+            if (!deviceStatusHistoryDOList.isEmpty()) {
+                deviceStatusHistoryService.saveBatch(deviceStatusHistoryDOList);
             }
         }
     }

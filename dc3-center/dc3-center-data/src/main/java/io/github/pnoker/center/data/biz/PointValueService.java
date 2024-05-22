@@ -38,9 +38,9 @@ public interface PointValueService {
     /**
      * 批量新增 PointValue
      *
-     * @param pointValueBOS PointValue Array
+     * @param pointValueBOListPointValue Array
      */
-    void save(List<PointValueBO> pointValueBOS);
+    void save(List<PointValueBO> pointValueBOList);
 
     /**
      * 获取历史 PointValue

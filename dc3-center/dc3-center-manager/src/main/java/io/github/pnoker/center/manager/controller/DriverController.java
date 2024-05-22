@@ -139,8 +139,8 @@ public class DriverController implements BaseController {
     @PostMapping("/ids")
     public R<Map<Long, DriverVO>> selectByIds(@RequestBody Set<Long> driverIds) {
         try {
-            List<DriverBO> entityBOS = driverService.selectByIds(driverIds);
-            Map<Long, DriverVO> driverMap = entityBOS.stream().collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
+            List<DriverBO> entityBOList = driverService.selectByIds(driverIds);
+            Map<Long, DriverVO> driverMap = entityBOList.stream().collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
             return R.ok(driverMap);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

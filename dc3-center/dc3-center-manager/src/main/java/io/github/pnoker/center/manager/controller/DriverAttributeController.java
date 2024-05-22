@@ -138,8 +138,8 @@ public class DriverAttributeController implements BaseController {
     @GetMapping("/driver_id/{id}")
     public R<List<DriverAttributeVO>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            List<DriverAttributeBO> entityBOS = driverAttributeService.selectByDriverId(id);
-            List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOS);
+            List<DriverAttributeBO> entityBOList = driverAttributeService.selectByDriverId(id);
+            List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOList);
             return R.ok(entityVO);
         } catch (NotFoundException ne) {
             return R.ok(new ArrayList<>());

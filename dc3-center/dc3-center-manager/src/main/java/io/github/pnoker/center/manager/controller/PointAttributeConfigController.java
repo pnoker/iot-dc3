@@ -160,9 +160,9 @@ public class PointAttributeConfigController implements BaseController {
     public R<List<PointAttributeConfigVO>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
                                                                       @NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
-            List<PointAttributeConfigBO> entityBOS = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId, pointId);
-            List<PointAttributeConfigVO> entityVOS = pointAttributeConfigBuilder.buildVOListByBOList(entityBOS);
-            return R.ok(entityVOS);
+            List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId, pointId);
+            List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
+            return R.ok(entityVOList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
@@ -178,9 +178,9 @@ public class PointAttributeConfigController implements BaseController {
     @GetMapping("/device_id/{deviceId}")
     public R<List<PointAttributeConfigVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<PointAttributeConfigBO> entityBOS = pointAttributeConfigService.selectByDeviceId(deviceId);
-            List<PointAttributeConfigVO> entityVOS = pointAttributeConfigBuilder.buildVOListByBOList(entityBOS);
-            return R.ok(entityVOS);
+            List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceId(deviceId);
+            List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
+            return R.ok(entityVOList);
         } catch (Exception e) {
             return R.fail(e.getMessage());
         }

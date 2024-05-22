@@ -17,9 +17,9 @@
 
 > **什么是 Qos ？**
 >
-> **0**: 最多一次的传输, 仅发一次包, 是否收到完全不管, 适合那些不是很重要的数据；
+> **0**: 最多一次的传输, 仅发一次包, 是否收到完全不管, 适合那些不是很重要的数据;
 >
-> **1**: 至少一次的传输, (鸡肋), 当client没收到service的puback或者service没有收到client的puback, 那么就会一直发送publisher；
+> **1**: 至少一次的传输, (鸡肋), 当client没收到service的puback或者service没有收到client的puback, 那么就会一直发送publisher;
 >
 > **2**:  只有一次的传输, publisher和broker进行了缓存, 其中publisher缓存了message和msgID, 而broker缓存了msgID, 两方都做记录所以可以保证消息不重复。
 
@@ -30,7 +30,7 @@
 
 ## 配置项
 
-> src/main/resourceBOS/application.yml
+> src/main/resource/application.yml
 
 ### Mqtt 连接配置
 

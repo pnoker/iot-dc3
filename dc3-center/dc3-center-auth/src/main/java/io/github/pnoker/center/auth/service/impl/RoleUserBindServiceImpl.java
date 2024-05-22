@@ -114,11 +114,11 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     public List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId) {
         LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
         wrapper.eq(RoleUserBindDO::getUserId, userId);
-        List<RoleUserBindDO> roleUserBindBOS = roleUserBindManager.list(wrapper);
-        if (CollUtil.isNotEmpty(roleUserBindBOS)) {
-            List<RoleDO> roleBOS = roleManager.listByIds(roleUserBindBOS.stream().map(RoleUserBindDO::getRoleId)
+        List<RoleUserBindDO> roleUserBindBOList = roleUserBindManager.list(wrapper);
+        if (CollUtil.isNotEmpty(roleUserBindBOList)) {
+            List<RoleDO> roleBOList = roleManager.listByIds(roleUserBindBOList.stream().map(RoleUserBindDO::getRoleId)
                     .toList());
-            List<RoleDO> collect = roleBOS.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()) && tenantId.equals(e.getTenantId()))
+            List<RoleDO> collect = roleBOList.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()) && tenantId.equals(e.getTenantId()))
                     .toList();
             return roleBuilder.buildBOListByDOList(collect);
         }

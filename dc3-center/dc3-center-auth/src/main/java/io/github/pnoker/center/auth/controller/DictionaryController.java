@@ -57,9 +57,9 @@ public class DictionaryController implements BaseController {
     @GetMapping("/tenant")
     public R<List<DictionaryVO>> tenantDictionary() {
         try {
-            List<DictionaryBO> entityBOS = dictionaryService.tenantDictionary();
-            List<DictionaryVO> entityVOS = dictionaryForAuthBuilder.buildVOListByBOList(entityBOS);
-            return R.ok(entityVOS);
+            List<DictionaryBO> entityBOList = dictionaryService.tenantDictionary();
+            List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
+            return R.ok(entityVOList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());
@@ -74,9 +74,9 @@ public class DictionaryController implements BaseController {
     @GetMapping("/limited_ip")
     public R<List<DictionaryVO>> limitedIpDictionary() {
         try {
-            List<DictionaryBO> entityBOS = dictionaryService.limitedIpDictionary(getTenantId());
-            List<DictionaryVO> entityVOS = dictionaryForAuthBuilder.buildVOListByBOList(entityBOS);
-            return R.ok(entityVOS);
+            List<DictionaryBO> entityBOList = dictionaryService.limitedIpDictionary(getTenantId());
+            List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
+            return R.ok(entityVOList);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return R.fail(e.getMessage());

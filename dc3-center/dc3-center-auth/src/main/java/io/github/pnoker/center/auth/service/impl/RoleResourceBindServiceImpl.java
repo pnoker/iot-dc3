@@ -118,9 +118,9 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         wrapper.eq(RoleResourceBindDO::getRoleId, roleId);
         List<RoleResourceBindDO> entityDOList = roleResourceBindManager.list(wrapper);
         if (CollUtil.isNotEmpty(entityDOList)) {
-            List<ResourceDO> resourceDOS = resourceManager.listByIds(entityDOList.stream()
+            List<ResourceDO> resourceDOList = resourceManager.listByIds(entityDOList.stream()
                     .map(RoleResourceBindDO::getResourceId).toList());
-            List<ResourceDO> collect = resourceDOS.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
+            List<ResourceDO> collect = resourceDOList.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
                     .toList();
             return resourceBuilder.buildBOListByDOList(collect);
         }

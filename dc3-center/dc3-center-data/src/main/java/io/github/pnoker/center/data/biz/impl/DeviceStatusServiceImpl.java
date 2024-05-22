@@ -111,7 +111,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Override
     public DeviceRunBO selectOnlineByDeviceId(Long deviceId) {
-        List<DeviceRunDO> deviceRunDOS = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
+        List<DeviceRunDO> deviceRunDOList = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
         Long totalDuration = deviceRunService.selectSumDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
         GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
         builder.setDeviceId(deviceId);
@@ -125,12 +125,12 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
         deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
-        if (Objects.isNull(deviceRunDOS)) {
+        if (Objects.isNull(deviceRunDOList)) {
             deviceRunBO.setDuration(list);
             return deviceRunBO;
         }
-        for (int i = 0; i < deviceRunDOS.size(); i++) {
-            list.set(i, deviceRunDOS.get(i).getDuration());
+        for (int i = 0; i < deviceRunDOList.size(); i++) {
+            list.set(i, deviceRunDOList.get(i).getDuration());
         }
         deviceRunBO.setDuration(list);
         return deviceRunBO;
@@ -138,7 +138,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Override
     public DeviceRunBO selectOfflineByDeviceId(Long deviceId) {
-        List<DeviceRunDO> deviceRunDOS = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
+        List<DeviceRunDO> deviceRunDOList = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
         Long totalDuration = deviceRunService.selectSumDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
         GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
         builder.setDeviceId(deviceId);
@@ -152,12 +152,12 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
-        if (Objects.isNull(deviceRunDOS)) {
+        if (Objects.isNull(deviceRunDOList)) {
             deviceRunBO.setDuration(list);
             return deviceRunBO;
         }
-        for (int i = 0; i < deviceRunDOS.size(); i++) {
-            list.set(i, deviceRunDOS.get(i).getDuration());
+        for (int i = 0; i < deviceRunDOList.size(); i++) {
+            list.set(i, deviceRunDOList.get(i).getDuration());
         }
         deviceRunBO.setDuration(list);
         return deviceRunBO;
