@@ -33,6 +33,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -137,16 +138,16 @@ public class DriverAttributeController implements BaseController {
      * @return DriverAttribute
      */
     @GetMapping("/driver_id/{id}")
-    public Mono<R<List<DriverAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
+    public Flux<R<List<DriverAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
         try {
             List<DriverAttributeBO> entityBOList = driverAttributeService.selectByDriverId(id);
             List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVO));
+            return Flux.just(R.ok(entityVO));
         } catch (NotFoundException ne) {
-            return Mono.just(R.ok(Collections.emptyList()));
+            return Flux.just(R.ok(Collections.emptyList()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
+            return Flux.just(R.fail(e.getMessage()));
         }
     }
 

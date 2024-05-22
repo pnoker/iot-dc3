@@ -82,7 +82,7 @@ public class NettyServerHandler {
                     case "方向" -> String.valueOf(byteBuf.getInt(start));
                     case "锁定" -> String.valueOf(byteBuf.getBoolean(start));
                     case "经纬" -> byteBuf.toString(start, end, CharsetUtil.CHARSET_ISO_8859_1).trim();
-                    default -> "";
+                    default -> CharSequenceUtil.EMPTY;
                 };
 
                 if (CharSequenceUtil.isNotEmpty(value)) {

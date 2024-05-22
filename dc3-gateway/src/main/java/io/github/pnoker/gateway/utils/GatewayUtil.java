@@ -45,7 +45,7 @@ public class GatewayUtil {
      * @return Remote Ip
      */
     public static String getRemoteIp(ServerHttpRequest request) {
-        String ip = "";
+        String ip = CharSequenceUtil.EMPTY;
         String[] headers = {"X-Original-Forwarded-For", "X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
         for (String header : headers) {
             ip = request.getHeaders().getFirst(header);
@@ -69,7 +69,7 @@ public class GatewayUtil {
      */
     public static String getRequestHeader(ServerHttpRequest request, String key) {
         String header = request.getHeaders().getFirst(key);
-        if (!CharSequenceUtil.isNotEmpty(header)) {
+        if (CharSequenceUtil.isEmpty(header)) {
             throw new NotFoundException("Invalid request header of " + key);
         }
         return header;
@@ -84,7 +84,7 @@ public class GatewayUtil {
      */
     public static String getRequestCookie(ServerHttpRequest request, String key) {
         HttpCookie cookie = request.getCookies().getFirst(key);
-        if (Objects.isNull(cookie) || !CharSequenceUtil.isNotEmpty(cookie.getValue())) {
+        if (Objects.isNull(cookie) || CharSequenceUtil.isEmpty(cookie.getValue())) {
             throw new NotFoundException("Invalid request cookie of " + key);
         }
         return cookie.getValue();

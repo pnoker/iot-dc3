@@ -32,6 +32,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -156,14 +157,14 @@ public class ProfileController implements BaseController {
      * @return Profile 集合
      */
     @GetMapping("/device_id/{deviceId}")
-    public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Flux<R<List<ProfileVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<ProfileBO> entityBOList = profileService.selectByDeviceId(deviceId);
             List<ProfileVO> entityVOList = profileBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVOList));
+            return Flux.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
+            return Flux.just(R.fail(e.getMessage()));
         }
     }
 
