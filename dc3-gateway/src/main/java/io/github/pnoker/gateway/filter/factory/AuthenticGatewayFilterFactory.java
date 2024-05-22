@@ -17,7 +17,6 @@
 package io.github.pnoker.gateway.filter.factory;
 
 import io.github.pnoker.gateway.filter.AuthenticGatewayFilter;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -34,8 +33,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
-    @Resource
-    private AuthenticGatewayFilter authenticGatewayFilter;
+    private final AuthenticGatewayFilter authenticGatewayFilter;
+
+    public AuthenticGatewayFilterFactory(AuthenticGatewayFilter authenticGatewayFilter) {
+        this.authenticGatewayFilter = authenticGatewayFilter;
+    }
 
     @Override
     public GatewayFilter apply(Object config) {

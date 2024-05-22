@@ -32,6 +32,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -61,14 +62,14 @@ public class TenantController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody TenantVO entityVO) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody TenantVO entityVO) {
         try {
             TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);
             tenantService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -79,13 +80,13 @@ public class TenantController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             tenantService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -100,14 +101,14 @@ public class TenantController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody TenantVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody TenantVO entityVO) {
         try {
             TenantBO entityBO = tenantBuilder.buildBOByVO(entityVO);
             tenantService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -118,14 +119,14 @@ public class TenantController implements BaseController {
      * @return TenantVO {@link TenantVO}
      */
     @GetMapping("/id/{id}")
-    public R<TenantVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<TenantVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             TenantBO entityBO = tenantService.selectById(id);
             TenantVO entityVO = tenantBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -136,17 +137,17 @@ public class TenantController implements BaseController {
      * @return {@link TenantBO}
      */
     @GetMapping("/code/{code}")
-    public R<TenantBO> selectByCode(@NotNull @PathVariable(value = "code") String code) {
+    public Mono<R<TenantBO>> selectByCode(@NotNull @PathVariable(value = "code") String code) {
         try {
             TenantBO select = tenantService.selectByCode(code);
             if (!Objects.isNull(select)) {
-                return R.ok(select);
+                return Mono.just(R.ok(select));
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail(ResponseEnum.NO_RESOURCE.getText());
+        return Mono.just(R.fail(ResponseEnum.NO_RESOURCE.getText()));
     }
 
     /**
@@ -156,17 +157,17 @@ public class TenantController implements BaseController {
      * @return 带分页的 {@link TenantBO}
      */
     @PostMapping("/list")
-    public R<Page<TenantVO>> list(@RequestBody(required = false) TenantQuery entityQuery) {
+    public Mono<R<Page<TenantVO>>> list(@RequestBody(required = false) TenantQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new TenantQuery();
             }
             Page<TenantBO> entityPageBO = tenantService.selectByPage(entityQuery);
             Page<TenantVO> entityPageVO = tenantBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

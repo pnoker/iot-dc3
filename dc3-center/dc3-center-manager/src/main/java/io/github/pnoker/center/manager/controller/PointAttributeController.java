@@ -33,8 +33,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,15 +65,15 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    public R<PointAttributeBO> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
+    public Mono<R<PointAttributeBO>> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
         try {
             PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             pointAttributeService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -83,13 +84,13 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             pointAttributeService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -100,14 +101,14 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
         try {
             PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
             pointAttributeService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -118,14 +119,14 @@ public class PointAttributeController implements BaseController {
      * @return PointAttributeVO {@link PointAttributeVO}
      */
     @GetMapping("/id/{id}")
-    public R<PointAttributeVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<PointAttributeVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             PointAttributeBO entityBO = pointAttributeService.selectById(id);
             PointAttributeVO entityVO = pointAttributeBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -136,16 +137,16 @@ public class PointAttributeController implements BaseController {
      * @return 位号属性Array
      */
     @GetMapping("/driver_id/{id}")
-    public R<List<PointAttributeVO>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<List<PointAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
         try {
             List<PointAttributeBO> entityBOList = pointAttributeService.selectByDriverId(id);
             List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (NotFoundException ne) {
-            return R.ok(new ArrayList<>());
+            return Mono.just(R.ok(Collections.emptyList()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -156,7 +157,7 @@ public class PointAttributeController implements BaseController {
      * @return Page Of PointAttribute
      */
     @PostMapping("/list")
-    public R<Page<PointAttributeVO>> list(@RequestBody(required = false) PointAttributeQuery entityQuery) {
+    public Mono<R<Page<PointAttributeVO>>> list(@RequestBody(required = false) PointAttributeQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointAttributeQuery();
@@ -164,10 +165,10 @@ public class PointAttributeController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<PointAttributeBO> entityPageBO = pointAttributeService.selectByPage(entityQuery);
             Page<PointAttributeVO> entityPageVO = pointAttributeBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

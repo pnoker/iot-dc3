@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -45,13 +46,13 @@ public class TopicController implements BaseController {
     }
 
     @PostMapping("/list")
-    public R<Page<List<TopicVO>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
+    public Mono<R<Page<List<TopicVO>>>> query(@RequestBody(required = false) TopicQuery topicQuery) {
         try {
             Page<List<TopicVO>> topicVOList = topicService.query(topicQuery);
-            return R.ok(topicVOList);
+            return Mono.just(R.ok(topicVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 }

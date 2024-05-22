@@ -32,6 +32,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -61,15 +62,15 @@ public class LimitedIpController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody LimitedIpVO entityVO) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody LimitedIpVO entityVO) {
         try {
             LimitedIpBO entityBO = limitedIpBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             limitedIpService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -80,13 +81,13 @@ public class LimitedIpController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             limitedIpService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -101,14 +102,14 @@ public class LimitedIpController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody LimitedIpVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody LimitedIpVO entityVO) {
         try {
             LimitedIpBO entityBO = limitedIpBuilder.buildBOByVO(entityVO);
             limitedIpService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -119,14 +120,14 @@ public class LimitedIpController implements BaseController {
      * @return LimitedIpVO {@link LimitedIpVO}
      */
     @GetMapping("/id/{id}")
-    public R<LimitedIpVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<LimitedIpVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             LimitedIpBO entityBO = limitedIpService.selectById(id);
             LimitedIpVO entityVO = limitedIpBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -137,14 +138,14 @@ public class LimitedIpController implements BaseController {
      * @return {@link LimitedIpBO}
      */
     @GetMapping("/ip/{ip}")
-    public R<LimitedIpVO> selectByIp(@NotNull @PathVariable(value = "ip") String ip) {
+    public Mono<R<LimitedIpVO>> selectByIp(@NotNull @PathVariable(value = "ip") String ip) {
         try {
             LimitedIpBO entityBO = limitedIpService.selectByIp(ip);
             LimitedIpVO entityVO = limitedIpBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -155,7 +156,7 @@ public class LimitedIpController implements BaseController {
      * @return 带分页的 {@link LimitedIpBO}
      */
     @PostMapping("/list")
-    public R<Page<LimitedIpVO>> list(@RequestBody(required = false) LimitedIpQuery entityQuery) {
+    public Mono<R<Page<LimitedIpVO>>> list(@RequestBody(required = false) LimitedIpQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new LimitedIpQuery();
@@ -163,10 +164,10 @@ public class LimitedIpController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<LimitedIpBO> entityPageBO = limitedIpService.selectByPage(entityQuery);
             Page<LimitedIpVO> entityPageVO = limitedIpBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -177,12 +178,12 @@ public class LimitedIpController implements BaseController {
      * @return 当前IP是否在限制IP中
      */
     @GetMapping("/check/{ip}")
-    public R<Boolean> checkValid(@NotNull @PathVariable(value = "ip") String ip) {
+    public Mono<R<Boolean>> checkValid(@NotNull @PathVariable(value = "ip") String ip) {
         try {
-            return Boolean.TRUE.equals(limitedIpService.checkValid(ip)) ? R.ok() : R.fail();
+            return Boolean.TRUE.equals(limitedIpService.checkValid(ip)) ? Mono.just(R.ok()) : Mono.just(R.fail());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

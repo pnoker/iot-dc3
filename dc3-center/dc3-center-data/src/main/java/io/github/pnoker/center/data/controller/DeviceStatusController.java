@@ -27,6 +27,7 @@ import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
@@ -57,14 +58,14 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @PostMapping("/device")
-    public R<Map<Long, String>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
+    public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         try {
             deviceQuery.setTenantId(getTenantId());
             Map<Long, String> statuses = deviceStatusService.device(deviceQuery);
-            return R.ok(statuses);
+            return Mono.just(R.ok(statuses));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -76,15 +77,15 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @GetMapping("/device/driver_id/{driverId}")
-    public R<Map<Long, String>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public Mono<R<Map<Long, String>>> deviceStatusByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setDriverId(driverId);
             Map<Long, String> statuses = deviceStatusService.device(deviceQuery);
-            return R.ok(statuses);
+            return Mono.just(R.ok(statuses));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -96,13 +97,13 @@ public class DeviceStatusController implements BaseController {
      * @return Map String:String
      */
     @GetMapping("/device/profile_id/{profileId}")
-    public R<Map<Long, String>> deviceStatusByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
+    public Mono<R<Map<Long, String>>> deviceStatusByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
         try {
             Map<Long, String> statuses = deviceStatusService.deviceByProfileId(profileId);
-            return R.ok(statuses);
+            return Mono.just(R.ok(statuses));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -113,14 +114,14 @@ public class DeviceStatusController implements BaseController {
      * @return
      */
     @GetMapping("/deviceOnline/{deviceId}")
-    public R<DeviceRunVO> selectOnlineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Mono<R<DeviceRunVO>> selectOnlineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             DeviceRunBO duration = deviceStatusService.selectOnlineByDeviceId(deviceId);
             DeviceRunVO result = deviceDurationBuilder.buildVOByBOList(duration);
-            return R.ok(result);
+            return Mono.just(R.ok(result));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -131,14 +132,14 @@ public class DeviceStatusController implements BaseController {
      * @return
      */
     @GetMapping("/deviceOffline/{deviceId}")
-    public R<DeviceRunVO> selectOfflineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Mono<R<DeviceRunVO>> selectOfflineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             DeviceRunBO duration = deviceStatusService.selectOfflineByDeviceId(deviceId);
             DeviceRunVO result = deviceDurationBuilder.buildVOByBOList(duration);
-            return R.ok(result);
+            return Mono.just(R.ok(result));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

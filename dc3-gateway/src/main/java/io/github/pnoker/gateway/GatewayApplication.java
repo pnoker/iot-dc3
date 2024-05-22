@@ -27,8 +27,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @since 2022.1.0
  */
 @SpringBootApplication
-// 开发环境无需注册中心
-// @EnableDiscoveryClient
 @EnableTransactionManagement
 public class GatewayApplication {
 

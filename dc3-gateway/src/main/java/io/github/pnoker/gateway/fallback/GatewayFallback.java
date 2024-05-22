@@ -18,6 +18,7 @@ package io.github.pnoker.gateway.fallback;
 
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,6 +42,7 @@ import java.util.Optional;
 @Component
 public class GatewayFallback implements HandlerFunction<ServerResponse> {
 
+    @NotNull
     @Override
     public Mono<ServerResponse> handle(ServerRequest serverRequest) {
         log.info(serverRequest.toString());

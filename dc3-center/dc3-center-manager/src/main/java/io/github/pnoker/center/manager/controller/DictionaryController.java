@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -61,7 +62,7 @@ public class DictionaryController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PostMapping("/driver")
-    public R<Page<DictionaryVO>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
+    public Mono<R<Page<DictionaryVO>>> driverDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
@@ -69,10 +70,10 @@ public class DictionaryController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.driverDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -83,7 +84,7 @@ public class DictionaryController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PostMapping("/profile")
-    public R<Page<DictionaryVO>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
+    public Mono<R<Page<DictionaryVO>>> profileDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
@@ -91,10 +92,10 @@ public class DictionaryController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.profileDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -105,7 +106,7 @@ public class DictionaryController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PostMapping("/profile_point")
-    public R<Page<DictionaryVO>> pointDictionaryForProfile(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
+    public Mono<R<Page<DictionaryVO>>> pointDictionaryForProfile(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
@@ -113,10 +114,10 @@ public class DictionaryController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.pointDictionaryForProfile(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -127,7 +128,7 @@ public class DictionaryController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PostMapping("/device_point")
-    public R<Page<DictionaryVO>> pointDictionaryForDevice(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
+    public Mono<R<Page<DictionaryVO>>> pointDictionaryForDevice(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
@@ -135,10 +136,10 @@ public class DictionaryController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.pointDictionaryForDevice(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -149,7 +150,7 @@ public class DictionaryController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PostMapping("/device")
-    public R<Page<DictionaryVO>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
+    public Mono<R<Page<DictionaryVO>>> deviceDictionary(@RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
@@ -157,10 +158,10 @@ public class DictionaryController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.deviceDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -171,7 +172,7 @@ public class DictionaryController implements BaseController {
      * @return R Of DictionaryVO Page
      */
     @PostMapping("/driver_device")
-    public R<Page<DictionaryVO>> deviceDictionaryForDriver(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
+    public Mono<R<Page<DictionaryVO>>> deviceDictionaryForDriver(@Validated(Parent.class) @RequestBody(required = false) DictionaryQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
@@ -179,9 +180,9 @@ public class DictionaryController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<DictionaryBO> entityPageBO = dictionaryService.deviceDictionaryForDriver(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 }

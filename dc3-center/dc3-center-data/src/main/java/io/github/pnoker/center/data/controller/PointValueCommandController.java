@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 /**
  * PointValue Controller
@@ -53,14 +54,14 @@ public class PointValueCommandController implements BaseController {
      * @return PointValue
      */
     @PostMapping("/read")
-    public R<Boolean> read(@Validated @RequestBody PointValueReadVO entityVO) {
+    public Mono<R<Boolean>> read(@Validated @RequestBody PointValueReadVO entityVO) {
         try {
             pointValueCommandService.read(entityVO);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.ok();
+        return Mono.just(R.ok());
     }
 
     /**
@@ -70,14 +71,14 @@ public class PointValueCommandController implements BaseController {
      * @return PointValue
      */
     @PostMapping("/write")
-    public R<Boolean> write(@Validated @RequestBody PointValueWriteVO entityVO) {
+    public Mono<R<Boolean>> write(@Validated @RequestBody PointValueWriteVO entityVO) {
         try {
             pointValueCommandService.write(entityVO);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.ok();
+        return Mono.just(R.ok());
     }
 
 }
