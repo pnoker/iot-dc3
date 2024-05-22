@@ -44,7 +44,7 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByTenantBO(TenantBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getTenantName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getTenantName()).value(entityBO.getId().toString()).build();
     }
 
     /**
@@ -70,7 +70,7 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByUserLoginBO(UserLoginBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getLoginName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getLoginName()).value(entityBO.getId().toString()).build();
     }
 
     /**
@@ -96,7 +96,7 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByLimitedIpBO(LimitedIpBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getIp()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getIp()).value(entityBO.getId().toString()).build();
     }
 
     /**

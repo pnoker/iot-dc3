@@ -43,7 +43,7 @@ public class MetadataEventPublisher {
      *
      * @param event MetadataEvent
      */
-    public void publishEvent(MetadataEvent<?extends BaseBO> event) {
+    public void publishEvent(MetadataEvent<? extends BaseBO> event) {
         log.info("Device metadata event publisher publishEvent: {}", JsonUtil.toJsonString(event));
         applicationEventPublisher.publishEvent(event);
     }

@@ -53,7 +53,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         return entityDOList.stream().map(entityDO -> {
             DictionaryBO driverDictionary = new DictionaryBO();
             driverDictionary.setLabel(entityDO.getTenantName());
-            driverDictionary.setValue(entityDO.getId());
+            driverDictionary.setValue(entityDO.getId().toString());
             return driverDictionary;
         }).toList();
     }
@@ -68,7 +68,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         return entityDOList.stream().map(entityDO -> {
             DictionaryBO driverDictionary = new DictionaryBO();
             driverDictionary.setLabel(entityDO.getIp());
-            driverDictionary.setValue(entityDO.getId());
+            driverDictionary.setValue(entityDO.getId().toString());
             return driverDictionary;
         }).toList();
     }
