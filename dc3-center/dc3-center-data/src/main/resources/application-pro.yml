@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-# Product environment, customizable configuration
+# 生产环境配置, 会覆盖 application-*.yml 中配置的内容
 spring:
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:3306}/${MYSQL_DB:dc3_data}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai

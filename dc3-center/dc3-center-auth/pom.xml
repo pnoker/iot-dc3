@@ -31,12 +31,6 @@
 
     <dependencies>
 
-        <!--Spring Security OAuth2-->
-        <!--<dependency>
-            <groupId>org.springframework.security.oauth</groupId>
-            <artifactId>spring-security-oauth2</artifactId>
-        </dependency>-->
-
         <!-- DC3 Api 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>

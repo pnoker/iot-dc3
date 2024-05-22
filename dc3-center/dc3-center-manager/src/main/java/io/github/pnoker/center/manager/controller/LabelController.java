@@ -32,6 +32,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -61,15 +62,15 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
         try {
             LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             labelService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -80,13 +81,13 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             labelService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -97,14 +98,14 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
         try {
             LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
             labelService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -115,14 +116,14 @@ public class LabelController implements BaseController {
      * @return LabelVO {@link LabelVO}
      */
     @GetMapping("/id/{id}")
-    public R<LabelVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<LabelVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             LabelBO entityBO = labelService.selectById(id);
             LabelVO entityVO = labelForManagerBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -133,7 +134,7 @@ public class LabelController implements BaseController {
      * @return R Of LabelVO Page
      */
     @PostMapping("/list")
-    public R<Page<LabelVO>> list(@RequestBody(required = false) LabelQuery entityQuery) {
+    public Mono<R<Page<LabelVO>>> list(@RequestBody(required = false) LabelQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new LabelQuery();
@@ -141,10 +142,10 @@ public class LabelController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<LabelBO> entityPageBO = labelService.selectByPage(entityQuery);
             Page<LabelVO> entityPageVO = labelForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 }

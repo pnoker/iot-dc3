@@ -35,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -68,15 +69,15 @@ public class DeviceController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             deviceService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -87,13 +88,13 @@ public class DeviceController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             deviceService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -104,14 +105,14 @@ public class DeviceController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
             deviceService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -122,14 +123,14 @@ public class DeviceController implements BaseController {
      * @return DeviceVO {@link DeviceVO}
      */
     @GetMapping("/id/{id}")
-    public R<DeviceVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<DeviceVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             DeviceBO entityBO = deviceService.selectById(id);
             DeviceVO entityVO = deviceBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -140,14 +141,14 @@ public class DeviceController implements BaseController {
      * @return Map(ID, DeviceVO)
      */
     @PostMapping("/ids")
-    public R<Map<Long, DeviceVO>> selectByIds(@RequestBody List<Long> deviceIds) {
+    public Mono<R<Map<Long, DeviceVO>>> selectByIds(@RequestBody List<Long> deviceIds) {
         try {
             List<DeviceBO> entityBOList = deviceService.selectByIds(deviceIds);
             Map<Long, DeviceVO> deviceMap = entityBOList.stream().collect(Collectors.toMap(DeviceBO::getId, entityBO -> deviceBuilder.buildVOByBO(entityBO)));
-            return R.ok(deviceMap);
+            return Mono.just(R.ok(deviceMap));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -158,7 +159,7 @@ public class DeviceController implements BaseController {
      * @return R Of DeviceVO Page
      */
     @PostMapping("/list")
-    public R<Page<DeviceVO>> list(@RequestBody(required = false) DeviceQuery entityQuery) {
+    public Mono<R<Page<DeviceVO>>> list(@RequestBody(required = false) DeviceQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DeviceQuery();
@@ -166,10 +167,10 @@ public class DeviceController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<DeviceBO> entityPageBO = deviceService.selectByPage(entityQuery);
             Page<DeviceVO> entityPageVO = deviceBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -180,15 +181,15 @@ public class DeviceController implements BaseController {
      * @return R of String
      */
     @PostMapping("/import")
-    public R<String> importDevice(@Validated(Update.class) DeviceVO entityVO, @RequestParam("file") MultipartFile multipartFile) {
+    public Mono<R<String>> importDevice(@Validated(Update.class) DeviceVO entityVO, @RequestParam("file") MultipartFile multipartFile) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
             deviceService.importDevice(entityBO, multipartFile);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.ok();
+        return Mono.just(R.ok());
     }
 
     /**
@@ -215,13 +216,13 @@ public class DeviceController implements BaseController {
      * @return
      */
     @GetMapping("/getDeviceByDriverId/{driverId}")
-    public R<String> getDeviceByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public Mono<R<String>> getDeviceByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             List<DeviceBO> deviceBOList = deviceService.selectByDriverId(driverId);
-            return R.ok(String.valueOf(deviceBOList.size()));
+            return Mono.just(R.ok(String.valueOf(deviceBOList.size())));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

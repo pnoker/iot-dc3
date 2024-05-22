@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -55,14 +56,14 @@ public class DictionaryController implements BaseController {
      * @return 字典列表
      */
     @GetMapping("/tenant")
-    public R<List<DictionaryVO>> tenantDictionary() {
+    public Mono<R<List<DictionaryVO>>> tenantDictionary() {
         try {
             List<DictionaryBO> entityBOList = dictionaryService.tenantDictionary();
             List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -72,14 +73,14 @@ public class DictionaryController implements BaseController {
      * @return 字典列表
      */
     @GetMapping("/limited_ip")
-    public R<List<DictionaryVO>> limitedIpDictionary() {
+    public Mono<R<List<DictionaryVO>>> limitedIpDictionary() {
         try {
             List<DictionaryBO> entityBOList = dictionaryService.limitedIpDictionary(getTenantId());
             List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

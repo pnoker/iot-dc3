@@ -34,6 +34,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -69,15 +70,15 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    public R<PointBO> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
+    public Mono<R<PointBO>> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
         try {
             PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             pointService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -88,13 +89,13 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             pointService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -105,14 +106,14 @@ public class PointController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody PointVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointVO entityVO) {
         try {
             PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
             pointService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -123,14 +124,14 @@ public class PointController implements BaseController {
      * @return PointVO {@link PointVO}
      */
     @GetMapping("/id/{id}")
-    public R<PointVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<PointVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             PointBO entityBO = pointService.selectById(id);
             PointVO entityVO = pointBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -141,14 +142,14 @@ public class PointController implements BaseController {
      * @return Map(ID, PointVO)
      */
     @PostMapping("/ids")
-    public R<Map<Long, PointVO>> selectByIds(@RequestBody Set<Long> pointIds) {
+    public Mono<R<Map<Long, PointVO>>> selectByIds(@RequestBody Set<Long> pointIds) {
         try {
             List<PointBO> entityBOList = pointService.selectByIds(pointIds);
             Map<Long, PointVO> deviceMap = entityBOList.stream().collect(Collectors.toMap(PointBO::getId, entityBO -> pointBuilder.buildVOByBO(entityBO)));
-            return R.ok(deviceMap);
+            return Mono.just(R.ok(deviceMap));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -159,14 +160,14 @@ public class PointController implements BaseController {
      * @return Point 集合
      */
     @GetMapping("/profile_id/{profileId}")
-    public R<List<PointVO>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
+    public Mono<R<List<PointVO>>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
         try {
             List<PointBO> entityBOList = pointService.selectByProfileId(profileId);
             List<PointVO> entityVOList = pointBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -177,14 +178,14 @@ public class PointController implements BaseController {
      * @return Point Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<PointVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Mono<R<List<PointVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<PointBO> entityBOList = pointService.selectByDeviceId(deviceId);
             List<PointVO> entityVOList = pointBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -195,7 +196,7 @@ public class PointController implements BaseController {
      * @return Page Of Point
      */
     @PostMapping("/list")
-    public R<Page<PointVO>> list(@RequestBody(required = false) PointQuery entityQuery) {
+    public Mono<R<Page<PointVO>>> list(@RequestBody(required = false) PointQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointQuery();
@@ -203,10 +204,10 @@ public class PointController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<PointBO> entityPageBO = pointService.selectByPage(entityQuery);
             Page<PointVO> entityPageVO = pointBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -217,18 +218,18 @@ public class PointController implements BaseController {
      * @return Map String:String
      */
     @PostMapping("/unit")
-    public R<Map<Long, String>> unit(@RequestBody Set<Long> pointIds) {
+    public Mono<R<Map<Long, String>>> unit(@RequestBody Set<Long> pointIds) {
         try {
             Map<Long, String> units = pointService.unit(pointIds);
             if (!Objects.isNull(units)) {
                 Map<Long, String> unitCodeMap = units.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                return R.ok(unitCodeMap);
+                return Mono.just(R.ok(unitCodeMap));
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
+        return Mono.just(R.fail());
     }
 
 
@@ -240,14 +241,14 @@ public class PointController implements BaseController {
      * @return {@link R}<{@link Set}<{@link Long}>>
      */
     @GetMapping("/selectPointStatisticsWithDevice/{pointId}")
-    public R<DeviceByPointVO> selectPointStatisticsWithDevice(@NotNull @PathVariable(value = "pointId") Long pointId) {
+    public Mono<R<DeviceByPointVO>> selectPointStatisticsWithDevice(@NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
             DeviceByPointBO deviceByPointBO = pointService.selectPointStatisticsWithDevice(pointId);
             DeviceByPointVO deviceByPointVO = deviceBuilder.buildVOPointByBO(deviceByPointBO);
-            return R.ok(deviceByPointVO);
+            return Mono.just(R.ok(deviceByPointVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -261,14 +262,14 @@ public class PointController implements BaseController {
      * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
      */
     @PostMapping("/selectPointStatisticsByDeviceId/{pointId}")
-    public R<List<PointDataVolumeRunVO>> selectPointStatisticsByDeviceId(@NotNull @PathVariable(value = "pointId") Long pointId, @NotNull @RequestBody Set<Long> deviceIds) {
+    public Mono<R<List<PointDataVolumeRunVO>>> selectPointStatisticsByDeviceId(@NotNull @PathVariable(value = "pointId") Long pointId, @NotNull @RequestBody Set<Long> deviceIds) {
         try {
             List<PointDataVolumeRunBO> list = pointService.selectPointStatisticsByDeviceId(pointId, deviceIds);
             List<PointDataVolumeRunVO> pointDataVolumeRunVO = pointBuilder.buildVOPointDataByBO(list);
-            return R.ok(pointDataVolumeRunVO);
+            return Mono.just(R.ok(pointDataVolumeRunVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -280,13 +281,13 @@ public class PointController implements BaseController {
      * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
      */
     @GetMapping("/selectPointStatisticsByPointId/{pointId}")
-    public R<Long> selectPointStatisticsByPointId(@NotNull @PathVariable(value = "pointId") Long pointId) {
+    public Mono<R<Long>> selectPointStatisticsByPointId(@NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
             PointDataVolumeRunDO pointDataVolumeRunDO = pointService.selectPointStatisticsByPointId(pointId);
-            return R.ok(Objects.isNull(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal());
+            return Mono.just(R.ok(Objects.isNull(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -297,13 +298,13 @@ public class PointController implements BaseController {
      * @return
      */
     @GetMapping("/selectPointByDeviceId/{deviceId}")
-    public R<Long> selectPointByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Mono<R<Long>> selectPointByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             Long count = pointService.selectPointByDeviceId(deviceId);
-            return R.ok(count);
+            return Mono.just(R.ok(count));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -314,14 +315,14 @@ public class PointController implements BaseController {
      * @return
      */
     @GetMapping("/selectPointConfigByDeviceId/{deviceId}")
-    public R<PointConfigByDeviceVO> selectPointConfigByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Mono<R<PointConfigByDeviceVO>> selectPointConfigByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             PointConfigByDeviceBO pointConfigByDeviceBO = pointService.selectPointConfigByDeviceId(deviceId);
             PointConfigByDeviceVO pointConfigByDeviceVO = pointBuilder.buildVODeviceByBO(pointConfigByDeviceBO);
-            return R.ok(pointConfigByDeviceVO);
+            return Mono.just(R.ok(pointConfigByDeviceVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -334,14 +335,14 @@ public class PointController implements BaseController {
      * @return
      */
     @PostMapping("/selectDeviceStatisticsByPointId/{deviceId}")
-    public R<List<DeviceDataVolumeRunVO>> selectDeviceStatisticsByPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @RequestBody Set<Long> pointIds) {
+    public Mono<R<List<DeviceDataVolumeRunVO>>> selectDeviceStatisticsByPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @RequestBody Set<Long> pointIds) {
         try {
             List<DeviceDataVolumeRunBO> list = pointService.selectDeviceStatisticsByPointId(deviceId, pointIds);
             List<DeviceDataVolumeRunVO> deviceDataVolumeRunVOList = pointBuilder.buildVODeviceDataByBO(list);
-            return R.ok(deviceDataVolumeRunVOList);
+            return Mono.just(R.ok(deviceDataVolumeRunVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -352,13 +353,13 @@ public class PointController implements BaseController {
      * @return
      */
     @GetMapping("/selectPointDataByDriverId/{driverId}")
-    public R<Long> selectPointDataByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public Mono<R<Long>> selectPointDataByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             PointDataVolumeRunDO pointDataVolumeRunDO = pointService.selectPointDataByDriverId(driverId);
-            return R.ok(Objects.isNull(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal());
+            return Mono.just(R.ok(Objects.isNull(pointDataVolumeRunDO.getTotal()) ? 0 : pointDataVolumeRunDO.getTotal()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -369,25 +370,25 @@ public class PointController implements BaseController {
      * @return
      */
     @GetMapping("/selectPointByDriverId/{driverId}")
-    public R<Long> selectPointByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public Mono<R<Long>> selectPointByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             Long result = pointService.selectPointByDriverId(driverId);
-            return R.ok(result);
+            return Mono.just(R.ok(result));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     @GetMapping("/selectPointDataStatisticsByDriverId/{driverId}")
-    public R<PointDataStatisticsByDriverIdVO> selectPointDataStatisticsByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public Mono<R<PointDataStatisticsByDriverIdVO>> selectPointDataStatisticsByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOList = pointService.selectPointDataStatisticsByDriverId(driverId);
             PointDataStatisticsByDriverIdVO pointDataStatisticsByDriverIdVOList = pointBuilder.buildVOPointDataDriverByBO(pointDataStatisticsByDriverIdBOList);
-            return R.ok(pointDataStatisticsByDriverIdVOList);
+            return Mono.just(R.ok(pointDataStatisticsByDriverIdVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

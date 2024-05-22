@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-# Development environment, customizable configuration
+# 开发环境配置, 会覆盖 application-*.yml 中配置的内容
 spring:
   env: dev
   group: ${user.name}

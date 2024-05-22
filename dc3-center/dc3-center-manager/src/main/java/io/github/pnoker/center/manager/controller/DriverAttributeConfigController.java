@@ -32,6 +32,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
@@ -62,15 +63,15 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
         try {
             DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             driverAttributeConfigService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -81,13 +82,13 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             driverAttributeConfigService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -98,14 +99,14 @@ public class DriverAttributeConfigController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody DriverAttributeConfigVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeConfigVO entityVO) {
         try {
             DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
             driverAttributeConfigService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -116,14 +117,14 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
      */
     @GetMapping("/id/{id}")
-    public R<DriverAttributeConfigVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<DriverAttributeConfigVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectById(id);
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -135,15 +136,15 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverConfig
      */
     @GetMapping("/device_id/{deviceId}/attribute_id/{attributeId}")
-    public R<DriverAttributeConfigVO> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
-                                                                     @NotNull @PathVariable(value = "attributeId") Long attributeId) {
+    public Mono<R<DriverAttributeConfigVO>> selectByDeviceIdAndAttributeId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
+                                                                           @NotNull @PathVariable(value = "attributeId") Long attributeId) {
         try {
             DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectByAttributeIdAndDeviceId(deviceId, attributeId);
             DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -154,14 +155,14 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverConfig 集合
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<DriverAttributeConfigVO>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Mono<R<List<DriverAttributeConfigVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<DriverAttributeConfigBO> entityBOList = driverAttributeConfigService.selectByDeviceId(deviceId);
             List<DriverAttributeConfigVO> entityVOList = driverAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -172,7 +173,7 @@ public class DriverAttributeConfigController implements BaseController {
      * @return Page Of DriverConfig
      */
     @PostMapping("/list")
-    public R<Page<DriverAttributeConfigVO>> list(@RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {
+    public Mono<R<Page<DriverAttributeConfigVO>>> list(@RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DriverAttributeConfigQuery();
@@ -180,10 +181,10 @@ public class DriverAttributeConfigController implements BaseController {
             entityQuery.setTenantId(getTenantId());
             Page<DriverAttributeConfigBO> entityPageBO = driverAttributeConfigService.selectByPage(entityQuery);
             Page<DriverAttributeConfigVO> entityPageVO = driverAttributeConfigBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

@@ -28,6 +28,7 @@ import io.github.pnoker.common.entity.query.PointValueQuery;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
@@ -58,7 +59,7 @@ public class PointValueController implements BaseController {
      * @return 带分页的 {@link PointValueBO}
      */
     @PostMapping("/latest")
-    public R<Page<PointValueVO>> latest(@RequestBody PointValueQuery pointValueQuery) {
+    public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery pointValueQuery) {
         try {
             if (Objects.isNull(pointValueQuery)) {
                 pointValueQuery = new PointValueQuery();
@@ -66,10 +67,10 @@ public class PointValueController implements BaseController {
             pointValueQuery.setTenantId(getTenantId());
             Page<PointValueBO> entityPageBO = pointValueService.latest(pointValueQuery);
             Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -80,17 +81,17 @@ public class PointValueController implements BaseController {
      * @return 带分页的 {@link PointValueBO}
      */
     @PostMapping("/list")
-    public R<Page<PointValueVO>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
+    public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointValueQuery();
             }
             Page<PointValueBO> entityPageBO = pointValueService.page(entityQuery);
             Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -102,16 +103,16 @@ public class PointValueController implements BaseController {
      * @return 带分页的 {@link PointValueBO}
      */
     @GetMapping("/history/device_id/{deviceId}/point_id/{pointId}")
-    public R<List<String>> history(
+    public Mono<R<List<String>>> history(
             @NotNull @PathVariable(name = "deviceId") Long deviceId,
             @NotNull @PathVariable(name = "pointId") Long pointId,
             @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         try {
             List<String> history = pointValueService.history(deviceId, pointId, count);
-            return R.ok(history);
+            return Mono.just(R.ok(history));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

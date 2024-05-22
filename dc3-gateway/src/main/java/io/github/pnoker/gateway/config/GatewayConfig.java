@@ -17,21 +17,22 @@
 package io.github.pnoker.gateway.config;
 
 import io.github.pnoker.gateway.fallback.GatewayFallback;
-import io.github.pnoker.gateway.filter.LimitedIpGlobalFilter;
-import io.github.pnoker.gateway.filter.factory.AuthenticGatewayFilterFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 /**
- * 网关配置
+ * 自定义Route配置
  *
  * @author pnoker
  * @since 2022.1.0
@@ -39,31 +40,40 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Slf4j
 @Configuration
 public class GatewayConfig {
+
     private final GatewayFallback gatewayFallback;
 
     public GatewayConfig(GatewayFallback gatewayFallback) {
         this.gatewayFallback = gatewayFallback;
     }
 
+    /**
+     * 根据 HostAddress 进行限流
+     *
+     * @return KeyResolver
+     */
     @Bean
-    @LoadBalanced
-    public WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
+    public KeyResolver hostKeyResolver() {
+        return exchange -> Mono.just(Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getHostString());
     }
 
+    /**
+     * Redis 令牌桶 限流
+     *
+     * @return RedisRateLimiter
+     */
     @Bean
-    public LimitedIpGlobalFilter limitedIpGlobalFilter() {
-        return new LimitedIpGlobalFilter();
+    RedisRateLimiter redisRateLimiter() {
+        return new RedisRateLimiter(100, 2000);
     }
 
-    @Bean
-    public AuthenticGatewayFilterFactory authenticGatewayFilterFactory() {
-        return new AuthenticGatewayFilterFactory();
-    }
-
+    /**
+     * fallback 配置
+     *
+     * @return RouterFunction
+     */
     @Bean
     public RouterFunction<ServerResponse> routerFunction() {
         return RouterFunctions.route(RequestPredicates.path("/fallback").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), gatewayFallback);
     }
-
 }
