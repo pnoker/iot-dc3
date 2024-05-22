@@ -34,6 +34,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -160,14 +161,14 @@ public class PointController implements BaseController {
      * @return Point 集合
      */
     @GetMapping("/profile_id/{profileId}")
-    public Mono<R<List<PointVO>>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
+    public Flux<R<List<PointVO>>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
         try {
             List<PointBO> entityBOList = pointService.selectByProfileId(profileId);
             List<PointVO> entityVOList = pointBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVOList));
+            return Flux.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
+            return Flux.just(R.fail(e.getMessage()));
         }
     }
 
@@ -178,14 +179,14 @@ public class PointController implements BaseController {
      * @return Point Array
      */
     @GetMapping("/device_id/{deviceId}")
-    public Mono<R<List<PointVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Flux<R<List<PointVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<PointBO> entityBOList = pointService.selectByDeviceId(deviceId);
             List<PointVO> entityVOList = pointBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVOList));
+            return Flux.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
+            return Flux.just(R.fail(e.getMessage()));
         }
     }
 
@@ -262,14 +263,14 @@ public class PointController implements BaseController {
      * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
      */
     @PostMapping("/selectPointStatisticsByDeviceId/{pointId}")
-    public Mono<R<List<PointDataVolumeRunVO>>> selectPointStatisticsByDeviceId(@NotNull @PathVariable(value = "pointId") Long pointId, @NotNull @RequestBody Set<Long> deviceIds) {
+    public Flux<R<List<PointDataVolumeRunVO>>> selectPointStatisticsByDeviceId(@NotNull @PathVariable(value = "pointId") Long pointId, @NotNull @RequestBody Set<Long> deviceIds) {
         try {
             List<PointDataVolumeRunBO> list = pointService.selectPointStatisticsByDeviceId(pointId, deviceIds);
             List<PointDataVolumeRunVO> pointDataVolumeRunVO = pointBuilder.buildVOPointDataByBO(list);
-            return Mono.just(R.ok(pointDataVolumeRunVO));
+            return Flux.just(R.ok(pointDataVolumeRunVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
+            return Flux.just(R.fail(e.getMessage()));
         }
     }
 
@@ -335,14 +336,14 @@ public class PointController implements BaseController {
      * @return
      */
     @PostMapping("/selectDeviceStatisticsByPointId/{deviceId}")
-    public Mono<R<List<DeviceDataVolumeRunVO>>> selectDeviceStatisticsByPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @RequestBody Set<Long> pointIds) {
+    public Flux<R<List<DeviceDataVolumeRunVO>>> selectDeviceStatisticsByPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId, @NotNull @RequestBody Set<Long> pointIds) {
         try {
             List<DeviceDataVolumeRunBO> list = pointService.selectDeviceStatisticsByPointId(deviceId, pointIds);
             List<DeviceDataVolumeRunVO> deviceDataVolumeRunVOList = pointBuilder.buildVODeviceDataByBO(list);
-            return Mono.just(R.ok(deviceDataVolumeRunVOList));
+            return Flux.just(R.ok(deviceDataVolumeRunVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
+            return Flux.just(R.fail(e.getMessage()));
         }
     }
 

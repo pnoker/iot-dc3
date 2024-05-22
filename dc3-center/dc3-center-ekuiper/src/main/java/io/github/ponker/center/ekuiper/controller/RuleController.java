@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -225,7 +226,7 @@ public class RuleController {
      * 显示actionNodes
      */
     @GetMapping("/listAction")
-    public Mono<R<List<Map<String, Map<String, Object>>>>> listActions() {
+    public Mono<Object> listActions() {
         Mono<List<Map<String, Map<String, Object>>>> listMono = ruleService.listActions();
         return listMono.flatMap(actions -> {
             try {

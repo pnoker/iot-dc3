@@ -32,6 +32,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -158,15 +159,15 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @GetMapping("/device_id/{deviceId}/point_id/{pointId}")
-    public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
+    public Flux<R<List<PointAttributeConfigVO>>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
                                                                             @NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
             List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId, pointId);
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVOList));
+            return Flux.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
+            return Flux.just(R.fail(e.getMessage()));
         }
     }
 
@@ -177,13 +178,13 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @GetMapping("/device_id/{deviceId}")
-    public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Flux<R<List<PointAttributeConfigVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceId(deviceId);
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVOList));
+            return Flux.just(R.ok(entityVOList));
         } catch (Exception e) {
-            return Mono.just(R.fail(e.getMessage()));
+            return Flux.just(R.fail(e.getMessage()));
         }
     }
 

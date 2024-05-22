@@ -28,6 +28,7 @@ import io.github.pnoker.common.entity.query.PointValueQuery;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -103,16 +104,16 @@ public class PointValueController implements BaseController {
      * @return 带分页的 {@link PointValueBO}
      */
     @GetMapping("/history/device_id/{deviceId}/point_id/{pointId}")
-    public Mono<R<List<String>>> history(
+    public Flux<R<List<String>>> history(
             @NotNull @PathVariable(name = "deviceId") Long deviceId,
             @NotNull @PathVariable(name = "pointId") Long pointId,
             @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         try {
             List<String> history = pointValueService.history(deviceId, pointId, count);
-            return Mono.just(R.ok(history));
+            return Flux.just(R.ok(history));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
+            return Flux.just(R.fail(e.getMessage()));
         }
     }
 
