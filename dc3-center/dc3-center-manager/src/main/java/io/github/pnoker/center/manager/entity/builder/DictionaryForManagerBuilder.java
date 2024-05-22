@@ -45,7 +45,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByDriverBO(DriverBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getDriverName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getDriverName()).value(entityBO.getId().toString()).build();
     }
 
     /**
@@ -71,7 +71,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByProfileBO(ProfileBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getProfileName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getProfileName()).value(entityBO.getId().toString()).build();
     }
 
     /**
@@ -97,7 +97,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByPointBO(PointBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getPointName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getPointName()).value(entityBO.getId().toString()).build();
     }
 
     /**
@@ -123,7 +123,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByDeviceBO(DeviceBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getDeviceName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getDeviceName()).value(entityBO.getId().toString()).build();
     }
 
     /**

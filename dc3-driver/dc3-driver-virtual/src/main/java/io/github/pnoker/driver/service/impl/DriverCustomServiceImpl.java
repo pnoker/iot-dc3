@@ -23,8 +23,6 @@ import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.MetadataEventBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.driver.event.device.DeviceMetadataEvent;
-import io.github.pnoker.common.driver.event.point.PointMetadataEvent;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
