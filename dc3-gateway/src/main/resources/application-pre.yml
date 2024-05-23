@@ -42,9 +42,8 @@ spring:
             - StripPrefix=2
             - name: RequestRateLimiter
               args:
+                rate-limiter: '#{@redisRateLimiter}'
                 key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
             - name: CircuitBreaker
               args:
                 name: default
@@ -59,9 +58,8 @@ spring:
             - Authentic
             - name: RequestRateLimiter
               args:
+                rate-limiter: '#{@redisRateLimiter}'
                 key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
             - name: CircuitBreaker
               args:
                 name: default
@@ -76,9 +74,8 @@ spring:
             - Authentic
             - name: RequestRateLimiter
               args:
+                rate-limiter: '#{@redisRateLimiter}'
                 key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
             - name: CircuitBreaker
               args:
                 name: default
@@ -93,9 +90,8 @@ spring:
             - Authentic
             - name: RequestRateLimiter
               args:
+                rate-limiter: '#{@redisRateLimiter}'
                 key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
             - name: CircuitBreaker
               args:
                 name: default
@@ -110,9 +106,8 @@ spring:
             - Authentic
             - name: RequestRateLimiter
               args:
+                rate-limiter: '#{@redisRateLimiter}'
                 key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
 
 grpc:
   client:

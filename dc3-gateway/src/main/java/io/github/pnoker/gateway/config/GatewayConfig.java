@@ -16,20 +16,25 @@
 
 package io.github.pnoker.gateway.config;
 
-import io.github.pnoker.gateway.fallback.GatewayFallback;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.utils.RequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
+import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 自定义Route配置
@@ -41,12 +46,6 @@ import java.util.Objects;
 @Configuration
 public class GatewayConfig {
 
-    private final GatewayFallback gatewayFallback;
-
-    public GatewayConfig(GatewayFallback gatewayFallback) {
-        this.gatewayFallback = gatewayFallback;
-    }
-
     /**
      * 根据 HostAddress 进行限流
      *
@@ -54,7 +53,11 @@ public class GatewayConfig {
      */
     @Bean
     public KeyResolver hostKeyResolver() {
-        return exchange -> Mono.just(Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getHostString());
+        return exchange -> {
+            ServerHttpRequest request = exchange.getRequest();
+            String ip = RequestUtil.getRemoteIp(request);
+            return Mono.just(ip);
+        };
     }
 
     /**
@@ -74,6 +77,16 @@ public class GatewayConfig {
      */
     @Bean
     public RouterFunction<ServerResponse> routerFunction() {
-        return RouterFunctions.route(RequestPredicates.path("/fallback").and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), gatewayFallback);
+        return RouterFunctions.route(RequestPredicates.path("/fallback"),
+                request -> {
+                    log.info(request.toString());
+                    Optional<Object> originalUris = request.attribute(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR);
+                    originalUris.ifPresent(originalUri -> log.error("Request Url:{} , Service Fallback", originalUri));
+                    R<String> response = R.fail("No available server for this request");
+                    return ServerResponse
+                            .status(HttpStatus.SERVICE_UNAVAILABLE.value())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(BodyInserters.fromValue(response));
+                });
     }
 }
