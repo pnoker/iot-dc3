@@ -138,16 +138,16 @@ public class DriverAttributeController implements BaseController {
      * @return DriverAttribute
      */
     @GetMapping("/driver_id/{id}")
-    public Flux<R<List<DriverAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<List<DriverAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
         try {
             List<DriverAttributeBO> entityBOList = driverAttributeService.selectByDriverId(id);
             List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOList);
-            return Flux.just(R.ok(entityVO));
+            return Mono.just(R.ok(entityVO));
         } catch (NotFoundException ne) {
-            return Flux.just(R.ok(Collections.emptyList()));
+            return Mono.just(R.ok(Collections.emptyList()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Flux.just(R.fail(e.getMessage()));
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

@@ -156,7 +156,7 @@ public class DriverServiceImpl implements DriverService {
     private LambdaQueryWrapper<DriverDO> fuzzyQuery(DriverQuery entityQuery) {
         LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDriverName()), DriverDO::getDriverName, entityQuery.getDriverName());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDriverCode()), DriverDO::getDriverName, entityQuery.getDriverCode());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDriverCode()), DriverDO::getDriverCode, entityQuery.getDriverCode());
         wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getServiceName()), DriverDO::getServiceName, entityQuery.getServiceName());
         wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getServiceHost()), DriverDO::getServiceHost, entityQuery.getServiceHost());
         wrapper.eq(!Objects.isNull(entityQuery.getDriverTypeFlag()), DriverDO::getDriverTypeFlag, entityQuery.getDriverTypeFlag());

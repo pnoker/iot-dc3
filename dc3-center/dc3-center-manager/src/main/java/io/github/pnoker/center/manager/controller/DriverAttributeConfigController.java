@@ -156,14 +156,14 @@ public class DriverAttributeConfigController implements BaseController {
      * @return DriverConfig 集合
      */
     @GetMapping("/device_id/{deviceId}")
-    public Flux<R<List<DriverAttributeConfigVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Mono<R<List<DriverAttributeConfigVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<DriverAttributeConfigBO> entityBOList = driverAttributeConfigService.selectByDeviceId(deviceId);
             List<DriverAttributeConfigVO> entityVOList = driverAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-            return Flux.just(R.ok(entityVOList));
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Flux.just(R.fail(e.getMessage()));
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

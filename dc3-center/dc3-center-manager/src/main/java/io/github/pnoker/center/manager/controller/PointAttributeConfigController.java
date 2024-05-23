@@ -159,15 +159,15 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @GetMapping("/device_id/{deviceId}/point_id/{pointId}")
-    public Flux<R<List<PointAttributeConfigVO>>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
+    public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
                                                                             @NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
             List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId, pointId);
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-            return Flux.just(R.ok(entityVOList));
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Flux.just(R.fail(e.getMessage()));
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -178,13 +178,13 @@ public class PointAttributeConfigController implements BaseController {
      * @return PointConfig
      */
     @GetMapping("/device_id/{deviceId}")
-    public Flux<R<List<PointAttributeConfigVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceId(deviceId);
             List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-            return Flux.just(R.ok(entityVOList));
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
-            return Flux.just(R.fail(e.getMessage()));
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
