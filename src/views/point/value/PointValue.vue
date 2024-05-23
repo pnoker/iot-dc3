@@ -202,6 +202,11 @@ const currentChange = (current: number) => {
 onMounted(() => {
     list()
 })
+
+defineExpose({
+    refresh,
+    list
+})
 </script>
 
 <style lang="scss"></style>

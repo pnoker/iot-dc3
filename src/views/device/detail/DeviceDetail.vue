@@ -90,6 +90,7 @@ import detailCard from '@/components/card/detail/DetailCard.vue'
 import profile from '@/views/profile/Profile.vue'
 import point from '@/views/point/Point.vue'
 import pointValue from '@/views/point/value/PointValue.vue'
+import { timestamp } from '@/utils/CommonUtil'
 
 const route = useRoute()
 
