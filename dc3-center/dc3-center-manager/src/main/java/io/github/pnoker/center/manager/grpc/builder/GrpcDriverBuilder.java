@@ -97,8 +97,8 @@ public interface GrpcDriverBuilder {
         entityGrpc.setBase(grpcBase);
 
         Optional.ofNullable(entityBO.getDriverExt()).ifPresent(value -> entityGrpc.setDriverExt(JsonUtil.toJsonString(value)));
-        Optional.ofNullable(entityBO.getDriverTypeFlag()).ifPresentOrElse(value -> entityGrpc.setDriverTypeFlag(value.getIndex()), () -> entityGrpc.setDriverTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE));
-        Optional.ofNullable(entityBO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE));
+        Optional.ofNullable(entityBO.getDriverTypeFlag()).ifPresentOrElse(value -> entityGrpc.setDriverTypeFlag(value.getIndex()), () -> entityGrpc.setDriverTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(entityBO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.NULL_INT));
     }
 
     /**

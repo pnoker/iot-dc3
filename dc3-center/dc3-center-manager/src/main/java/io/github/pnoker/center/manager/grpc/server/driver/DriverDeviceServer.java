@@ -91,12 +91,12 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
             GrpcPageDeviceDTO.Builder pageDeviceBuilder = GrpcPageDeviceDTO.newBuilder();
-            GrpcPage.Builder pageBuilder = GrpcPage.newBuilder();
-            pageBuilder.setCurrent(devicePage.getCurrent());
-            pageBuilder.setSize(devicePage.getSize());
-            pageBuilder.setPages(devicePage.getPages());
-            pageBuilder.setTotal(devicePage.getTotal());
-            pageDeviceBuilder.setPage(pageBuilder);
+            GrpcPage.Builder page = GrpcPage.newBuilder();
+            page.setCurrent(devicePage.getCurrent());
+            page.setSize(devicePage.getSize());
+            page.setPages(devicePage.getPages());
+            page.setTotal(devicePage.getTotal());
+            pageDeviceBuilder.setPage(page);
 
             List<GrpcRDeviceAttachDTO> collect = devicePage.getRecords().stream().map(entityBO -> getDeviceAttachDTO(entityBO).build()).toList();
             pageDeviceBuilder.addAllData(collect);

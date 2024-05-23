@@ -101,8 +101,8 @@ public interface GrpcPointAttributeBuilder {
         entityGrpc.setBase(grpcBase);
 
         Optional.ofNullable(entityBO.getAttributeExt()).ifPresent(value -> entityGrpc.setAttributeExt(JsonUtil.toJsonString(value)));
-        Optional.ofNullable(entityBO.getAttributeTypeFlag()).ifPresentOrElse(value -> entityGrpc.setAttributeTypeFlag(value.getIndex()), () -> entityGrpc.setAttributeTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE));
-        Optional.ofNullable(entityBO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE));
+        Optional.ofNullable(entityBO.getAttributeTypeFlag()).ifPresentOrElse(value -> entityGrpc.setAttributeTypeFlag(value.getIndex()), () -> entityGrpc.setAttributeTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(entityBO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.NULL_INT));
     }
 
 }

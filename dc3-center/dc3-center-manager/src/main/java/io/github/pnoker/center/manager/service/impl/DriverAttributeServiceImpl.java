@@ -30,6 +30,7 @@ import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -128,7 +129,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), DriverAttributeDO::getDisplayName, entityQuery.getDisplayName());
         wrapper.eq(!Objects.isNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
-        wrapper.eq(!Objects.isNull(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
         wrapper.eq(DriverAttributeDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

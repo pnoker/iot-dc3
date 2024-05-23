@@ -28,6 +28,7 @@ import io.github.pnoker.center.auth.service.TenantBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -110,8 +111,8 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     private LambdaQueryWrapper<TenantBindDO> fuzzyQuery(TenantBindQuery entityQuery) {
         LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
-        wrapper.eq(!Objects.isNull(entityQuery.getTenantId()), TenantBindDO::getTenantId, entityQuery.getTenantId());
-        wrapper.eq(!Objects.isNull(entityQuery.getUserId()), TenantBindDO::getUserId, entityQuery.getUserId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getTenantId()), TenantBindDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), TenantBindDO::getUserId, entityQuery.getUserId());
         return wrapper;
     }
 

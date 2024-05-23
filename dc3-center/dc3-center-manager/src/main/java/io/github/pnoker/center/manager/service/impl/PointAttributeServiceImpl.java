@@ -30,6 +30,7 @@ import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -124,7 +125,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), PointAttributeDO::getDisplayName, entityQuery.getDisplayName());
         wrapper.eq(!Objects.isNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
-        wrapper.eq(!Objects.isNull(entityQuery.getDriverId()), PointAttributeDO::getDriverId, entityQuery.getDriverId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), PointAttributeDO::getDriverId, entityQuery.getDriverId());
         wrapper.eq(PointAttributeDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

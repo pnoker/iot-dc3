@@ -46,6 +46,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,17 +85,11 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
         }
         if (!Objects.isNull(deviceQuery.getDriverId())) {
             query.setDriverId(deviceQuery.getDriverId());
-        } else {
-            query.setDriverId(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        }
-        if (!Objects.isNull(deviceQuery.getEnableFlag())) {
-            query.setEnableFlag(deviceQuery.getEnableFlag().getIndex());
-        } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         if (!Objects.isNull(deviceQuery.getTenantId())) {
             query.setTenantId(deviceQuery.getTenantId());
         }
+        Optional.ofNullable(deviceQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
         GrpcRPageDeviceDTO list = deviceApiBlockingStub.list(query.build());
         GrpcPageDeviceDTO data = list.getData();
         List<GrpcDeviceDTO> dataList = data.getDataList();

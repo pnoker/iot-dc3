@@ -32,6 +32,7 @@ import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -157,9 +158,9 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
-        wrapper.eq(!Objects.isNull(entityQuery.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, entityQuery.getPointAttributeId());
-        wrapper.eq(!Objects.isNull(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
-        wrapper.eq(!Objects.isNull(entityQuery.getPointId()), PointAttributeConfigDO::getPointId, entityQuery.getPointId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, entityQuery.getPointAttributeId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointId()), PointAttributeConfigDO::getPointId, entityQuery.getPointId());
         wrapper.eq(PointAttributeConfigDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

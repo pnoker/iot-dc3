@@ -117,24 +117,20 @@ public class PointValueServiceImpl implements PointValueService {
         GrpcPage.Builder entityPageGrpcDTO = GrpcPage.newBuilder()
                 .setSize(entityQuery.getPage().getSize())
                 .setCurrent(entityQuery.getPage().getCurrent());
-        GrpcPagePointQuery.Builder entityQueryGrpcDTO = GrpcPagePointQuery.newBuilder()
+        GrpcPagePointQuery.Builder query = GrpcPagePointQuery.newBuilder()
                 .setPage(entityPageGrpcDTO);
         if (CharSequenceUtil.isNotEmpty(entityQuery.getPointName())) {
-            entityQueryGrpcDTO.setPointName(entityQuery.getPointName());
+            query.setPointName(entityQuery.getPointName());
         }
-        entityQueryGrpcDTO.setPointTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        entityQueryGrpcDTO.setRwFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        entityQueryGrpcDTO.setProfileId(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        if (!Objects.isNull(entityQuery.getEnableFlag())) {
-            entityQueryGrpcDTO.setEnableFlag(entityQuery.getEnableFlag().getIndex());
-        } else {
-            entityQueryGrpcDTO.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        }
-        entityQueryGrpcDTO.setTenantId(entityQuery.getTenantId());
+        query.setPointTypeFlag(DefaultConstant.NULL_INT);
+        query.setRwFlag(DefaultConstant.NULL_INT);
+        query.setProfileId(DefaultConstant.NULL_INT);
+        query.setTenantId(entityQuery.getTenantId());
         if (!Objects.isNull(entityQuery.getDeviceId())) {
-            entityQueryGrpcDTO.setDeviceId(entityQuery.getDeviceId());
+            query.setDeviceId(entityQuery.getDeviceId());
         }
-        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.list(entityQueryGrpcDTO.build());
+        Optional.ofNullable(entityQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.list(query.build());
         if (!rPagePointDTO.getResult().getOk()) {
             return entityPageBO;
         }

@@ -61,23 +61,13 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Override
     public Map<Long, String> device(DeviceQuery pageQuery) {
-        GrpcPage.Builder page = GrpcPage.newBuilder()
-                .setSize(pageQuery.getPage().getSize())
-                .setCurrent(pageQuery.getPage().getCurrent());
-        GrpcPageDeviceQuery.Builder query = GrpcPageDeviceQuery.newBuilder()
-                .setPage(page);
+        GrpcPage.Builder page = GrpcPage.newBuilder().setSize(pageQuery.getPage().getSize()).setCurrent(pageQuery.getPage().getCurrent());
+        GrpcPageDeviceQuery.Builder query = GrpcPageDeviceQuery.newBuilder().setPage(page);
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {
             query.setDeviceName(pageQuery.getDeviceName());
         }
         if (!Objects.isNull(pageQuery.getDriverId())) {
             query.setDriverId(pageQuery.getDriverId());
-        } else {
-            query.setDriverId(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        }
-        if (!Objects.isNull(pageQuery.getEnableFlag())) {
-            query.setEnableFlag(pageQuery.getEnableFlag().getIndex());
-        } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
         }
         if (!Objects.isNull(pageQuery.getTenantId())) {
             query.setTenantId(pageQuery.getTenantId());
@@ -85,6 +75,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         if (!Objects.isNull(pageQuery.getProfileId())) {
             query.setProfileId(pageQuery.getProfileId());
         }
+        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
         GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.list(query.build());
 
         if (!rPageDeviceDTO.getResult().getOk()) {

@@ -37,6 +37,7 @@ import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import io.github.pnoker.common.utils.PoiUtil;
@@ -316,7 +317,7 @@ public class DeviceServiceImpl implements DeviceService {
         if (!Objects.isNull(entityQuery)) {
             wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceName()), "dd.device_name", entityQuery.getDeviceName());
             wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code", entityQuery.getDeviceCode());
-            wrapper.eq(!Objects.isNull(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
+            wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
             wrapper.eq(!Objects.isNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
             wrapper.eq("dd.tenant_id", entityQuery.getTenantId());
         }
@@ -343,10 +344,10 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * @param importDeviceBO                       Device
-     * @param driverAttributeBOListDriverAttribute
-     * @param mainSheet                            Sheet
-     * @param rowIndex                             Row Index
+     * @param importDeviceBO        Device
+     * @param driverAttributeBOList DriverAttributeBO Array
+     * @param mainSheet             Sheet
+     * @param rowIndex              Row Index
      */
     private void importDriverAttributeConfig(DeviceBO importDeviceBO, List<DriverAttributeBO> driverAttributeBOList, Sheet mainSheet, int rowIndex) {
         for (int j = 0; j < driverAttributeBOList.size(); j++) {

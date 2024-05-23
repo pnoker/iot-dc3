@@ -69,9 +69,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
 
     @Override
     public Map<Long, String> driver(DriverQuery pageQuery) {
-        GrpcPage.Builder page = GrpcPage.newBuilder()
-                .setSize(pageQuery.getPage().getSize())
-                .setCurrent(pageQuery.getPage().getCurrent());
+        GrpcPage.Builder page = GrpcPage.newBuilder().setSize(pageQuery.getPage().getSize()).setCurrent(pageQuery.getPage().getCurrent());
         GrpcPageDriverQuery.Builder query = GrpcPageDriverQuery.newBuilder()
                 .setPage(page);
         if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverName())) {
@@ -83,19 +81,11 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceHost())) {
             query.setServiceHost(pageQuery.getServiceHost());
         }
-        if (!Objects.isNull(pageQuery.getDriverTypeFlag())) {
-            query.setDriverTypeFlag(pageQuery.getDriverTypeFlag().getIndex());
-        } else {
-            query.setDriverTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        }
-        if (!Objects.isNull(pageQuery.getEnableFlag())) {
-            query.setEnableFlag(pageQuery.getEnableFlag().getIndex());
-        } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        }
         if (!Objects.isNull(pageQuery.getTenantId())) {
             query.setTenantId(pageQuery.getTenantId());
         }
+        Optional.ofNullable(pageQuery.getDriverTypeFlag()).ifPresentOrElse(flag -> query.setDriverTypeFlag(flag.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
         GrpcRPageDriverDTO rPageDriverDTO = driverApiBlockingStub.list(query.build());
 
         if (!rPageDriverDTO.getResult().getOk()) {

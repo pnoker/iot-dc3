@@ -70,12 +70,12 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
             GrpcPageDriverDTO.Builder pageDriverBuilder = GrpcPageDriverDTO.newBuilder();
-            GrpcPage.Builder pageBuilder = GrpcPage.newBuilder();
-            pageBuilder.setCurrent(driverPage.getCurrent());
-            pageBuilder.setSize(driverPage.getSize());
-            pageBuilder.setPages(driverPage.getPages());
-            pageBuilder.setTotal(driverPage.getTotal());
-            pageDriverBuilder.setPage(pageBuilder);
+            GrpcPage.Builder page = GrpcPage.newBuilder();
+            page.setCurrent(driverPage.getCurrent());
+            page.setSize(driverPage.getSize());
+            page.setPages(driverPage.getPages());
+            page.setTotal(driverPage.getTotal());
+            pageDriverBuilder.setPage(page);
             List<GrpcDriverDTO> collect = driverPage.getRecords().stream().map(grpcDriverBuilder::buildGrpcDTOByBO).toList();
             pageDriverBuilder.addAllData(collect);
 

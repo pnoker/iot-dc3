@@ -71,12 +71,12 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
             GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
-            GrpcPage.Builder pageBuilder = GrpcPage.newBuilder();
-            pageBuilder.setCurrent(pointPage.getCurrent());
-            pageBuilder.setSize(pointPage.getSize());
-            pageBuilder.setPages(pointPage.getPages());
-            pageBuilder.setTotal(pointPage.getTotal());
-            pagePointBuilder.setPage(pageBuilder);
+            GrpcPage.Builder page = GrpcPage.newBuilder();
+            page.setCurrent(pointPage.getCurrent());
+            page.setSize(pointPage.getSize());
+            page.setPages(pointPage.getPages());
+            page.setTotal(pointPage.getTotal());
+            pagePointBuilder.setPage(page);
             List<GrpcPointDTO> collect = pointPage.getRecords().stream().map(grpcPointBuilder::buildGrpcDTOByBO).toList();
             pagePointBuilder.addAllData(collect);
 
