@@ -24,8 +24,8 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.DecodeUtil;
+import io.github.pnoker.common.utils.RequestUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.gateway.utils.GatewayUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -100,7 +100,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
     }
 
     private GrpcRTenantDTO getTenantDTO(ServerHttpRequest request) {
-        String tenant = DecodeUtil.byteToString(DecodeUtil.decode(GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT)));
+        String tenant = DecodeUtil.byteToString(DecodeUtil.decode(RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT)));
         if (Objects.isNull(tenant)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
@@ -113,7 +113,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
     }
 
     private GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request) {
-        String user = DecodeUtil.byteToString(DecodeUtil.decode(GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN)));
+        String user = DecodeUtil.byteToString(DecodeUtil.decode(RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN)));
         if (Objects.isNull(user)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
@@ -140,7 +140,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
     }
 
     private void checkValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO) {
-        String token = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
+        String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
         RequestHeader.TokenHeader entityBO = JsonUtil.parseObject(DecodeUtil.decode(token), RequestHeader.TokenHeader.class);
         if (Objects.isNull(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);

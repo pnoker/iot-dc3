@@ -23,13 +23,6 @@ spring:
   profiles:
     active:
       - ${NODE_ENV:dev}
-  transaction:
-    rollback-on-commit-failure: true
-  main:
-    allow-bean-definition-overriding: true
-  web:
-    resources:
-      add-mappings: false
   data:
     redis:
       database: 0

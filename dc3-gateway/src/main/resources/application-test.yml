@@ -36,9 +36,8 @@ spring:
             - StripPrefix=2
             - name: RequestRateLimiter
               args:
+                rate-limiter: '#{@redisRateLimiter}'
                 key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
         # auth
         - id: auth_route
           uri: http://dc3-center-auth:8300
@@ -49,9 +48,8 @@ spring:
             - Authentic
             - name: RequestRateLimiter
               args:
+                rate-limiter: '#{@redisRateLimiter}'
                 key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
         # manager
         - id: manager_route
           uri: http://dc3-center-manager:8400
@@ -62,9 +60,8 @@ spring:
             - Authentic
             - name: RequestRateLimiter
               args:
+                rate-limiter: '#{@redisRateLimiter}'
                 key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
         # data
         - id: data_route
           uri: http://dc3-center-data:8500
@@ -75,9 +72,8 @@ spring:
             - Authentic
             - name: RequestRateLimiter
               args:
+                rate-limiter: '#{@redisRateLimiter}'
                 key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
         # ekuiper
         - id: ekuiper_route
           uri: http://dc3-center-ekuiper:8600
@@ -88,9 +84,8 @@ spring:
             - Authentic
             - name: RequestRateLimiter
               args:
+                rate-limiter: '#{@redisRateLimiter}'
                 key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
 
 grpc:
   client:
