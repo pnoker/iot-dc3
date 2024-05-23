@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
@@ -74,19 +75,11 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
         if (CharSequenceUtil.isNotEmpty(driverQuery.getServiceHost())) {
             query.setServiceHost(driverQuery.getServiceHost());
         }
-        if (!Objects.isNull(driverQuery.getDriverTypeFlag())) {
-            query.setDriverTypeFlag(driverQuery.getDriverTypeFlag().getIndex());
-        } else {
-            query.setDriverTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        }
-        if (!Objects.isNull(driverQuery.getEnableFlag())) {
-            query.setEnableFlag(driverQuery.getEnableFlag().getIndex());
-        } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        }
         if (!Objects.isNull(driverQuery.getTenantId())) {
             query.setTenantId(driverQuery.getTenantId());
         }
+        Optional.ofNullable(driverQuery.getDriverTypeFlag()).ifPresentOrElse(flag -> query.setDriverTypeFlag(flag.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(driverQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
         GrpcRPageDriverDTO list = driverApiBlockingStub.list(query.build());
         GrpcPageDriverDTO data = list.getData();
         List<GrpcDriverDTO> dataList = data.getDataList();

@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,6 +34,7 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -128,8 +128,8 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
     private LambdaQueryWrapper<RoleUserBindDO> fuzzyQuery(RoleUserBindQuery entityQuery) {
         LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
-        wrapper.eq(!Objects.isNull(entityQuery.getUserId()), RoleUserBindDO::getUserId, entityQuery.getUserId());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getRoleId()), RoleUserBindDO::getRoleId, entityQuery.getRoleId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), RoleUserBindDO::getUserId, entityQuery.getUserId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleUserBindDO::getRoleId, entityQuery.getRoleId());
         wrapper.eq(RoleUserBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

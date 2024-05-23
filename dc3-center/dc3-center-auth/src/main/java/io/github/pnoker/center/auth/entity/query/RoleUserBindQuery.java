@@ -48,7 +48,7 @@ public class RoleUserBindQuery implements Serializable {
     /**
      * 角色ID
      */
-    private String roleId;
+    private Long roleId;
 
     /**
      * 用户ID

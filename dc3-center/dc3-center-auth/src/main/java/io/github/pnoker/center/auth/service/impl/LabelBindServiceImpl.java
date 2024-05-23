@@ -28,6 +28,7 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.bo.LabelBindBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -110,8 +111,8 @@ public class LabelBindServiceImpl implements LabelBindService {
      */
     private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery entityQuery) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
-        wrapper.eq(!Objects.isNull(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
-        wrapper.eq(!Objects.isNull(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
         return wrapper;
     }
 

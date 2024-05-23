@@ -48,10 +48,10 @@ public class RoleResourceBindQuery implements Serializable {
     /**
      * 角色ID
      */
-    private String roleId;
+    private Long roleId;
 
     /**
      * 权限资源ID
      */
-    private String resourceId;
+    private Long resourceId;
 }

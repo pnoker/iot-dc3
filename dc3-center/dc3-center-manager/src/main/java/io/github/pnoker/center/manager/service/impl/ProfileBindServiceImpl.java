@@ -29,6 +29,7 @@ import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -145,8 +146,8 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     private LambdaQueryWrapper<ProfileBindDO> fuzzyQuery(ProfileBindQuery entityQuery) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
-        wrapper.eq(!Objects.isNull(entityQuery.getProfileId()), ProfileBindDO::getProfileId, entityQuery.getProfileId());
-        wrapper.eq(!Objects.isNull(entityQuery.getDeviceId()), ProfileBindDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), ProfileBindDO::getProfileId, entityQuery.getProfileId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), ProfileBindDO::getDeviceId, entityQuery.getDeviceId());
         wrapper.eq(ProfileBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

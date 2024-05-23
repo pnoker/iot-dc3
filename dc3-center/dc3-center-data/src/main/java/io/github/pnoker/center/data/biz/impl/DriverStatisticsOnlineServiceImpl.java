@@ -46,6 +46,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -87,19 +88,11 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
         if (CharSequenceUtil.isNotEmpty(driverQuery.getServiceHost())) {
             query.setServiceHost(driverQuery.getServiceHost());
         }
-        if (!Objects.isNull(driverQuery.getDriverTypeFlag())) {
-            query.setDriverTypeFlag(driverQuery.getDriverTypeFlag().getIndex());
-        } else {
-            query.setDriverTypeFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        }
-        if (!Objects.isNull(driverQuery.getEnableFlag())) {
-            query.setEnableFlag(driverQuery.getEnableFlag().getIndex());
-        } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_NULL_INT_VALUE);
-        }
         if (!Objects.isNull(driverQuery.getTenantId())) {
             query.setTenantId(driverQuery.getTenantId());
         }
+        Optional.ofNullable(driverQuery.getDriverTypeFlag()).ifPresentOrElse(flag -> query.setDriverTypeFlag(flag.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(driverQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
         GrpcRPageDriverDTO list = driverApiBlockingStub.list(query.build());
         GrpcPageDriverDTO data = list.getData();
         List<GrpcDriverDTO> dataList = data.getDataList();

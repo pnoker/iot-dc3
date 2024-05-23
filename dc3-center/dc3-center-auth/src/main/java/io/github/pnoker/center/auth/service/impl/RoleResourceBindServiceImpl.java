@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,6 +34,7 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -130,8 +130,8 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
     private LambdaQueryWrapper<RoleResourceBindDO> fuzzyQuery(RoleResourceBindQuery entityQuery) {
         LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getRoleId()), RoleResourceBindDO::getResourceId, entityQuery.getRoleId());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getResourceId()), RoleResourceBindDO::getResourceId, entityQuery.getResourceId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleResourceBindDO::getResourceId, entityQuery.getRoleId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getResourceId()), RoleResourceBindDO::getResourceId, entityQuery.getResourceId());
         wrapper.eq(RoleResourceBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

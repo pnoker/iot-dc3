@@ -43,7 +43,7 @@ import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.optional.LongOptional;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -389,7 +389,7 @@ public class PointServiceImpl implements PointService {
         wrapper.eq(!Objects.isNull(entityQuery.getPointCode()), "dp.point_code", entityQuery.getPointCode());
         wrapper.eq(!Objects.isNull(entityQuery.getPointTypeFlag()), "dp.point_type_flag", entityQuery.getPointTypeFlag());
         wrapper.eq(!Objects.isNull(entityQuery.getRwFlag()), "dp.rw_flag", entityQuery.getRwFlag());
-        LongOptional.ofNullable(entityQuery.getProfileId()).ifPresent(profileId -> wrapper.eq("dp.profile_id", profileId));
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), "dp.profile_id", entityQuery.getProfileId());
         wrapper.eq(!Objects.isNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
         wrapper.eq("dp.tenant_id", entityQuery.getTenantId());
         return wrapper.lambda();

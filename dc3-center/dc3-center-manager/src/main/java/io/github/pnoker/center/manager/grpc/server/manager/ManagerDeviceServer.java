@@ -71,12 +71,12 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
             GrpcPageDeviceDTO.Builder pageDeviceBuilder = GrpcPageDeviceDTO.newBuilder();
-            GrpcPage.Builder pageBuilder = GrpcPage.newBuilder();
-            pageBuilder.setCurrent(devicePage.getCurrent());
-            pageBuilder.setSize(devicePage.getSize());
-            pageBuilder.setPages(devicePage.getPages());
-            pageBuilder.setTotal(devicePage.getTotal());
-            pageDeviceBuilder.setPage(pageBuilder);
+            GrpcPage.Builder page = GrpcPage.newBuilder();
+            page.setCurrent(devicePage.getCurrent());
+            page.setSize(devicePage.getSize());
+            page.setPages(devicePage.getPages());
+            page.setTotal(devicePage.getTotal());
+            pageDeviceBuilder.setPage(page);
             List<GrpcDeviceDTO> collect = devicePage.getRecords().stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
             pageDeviceBuilder.addAllData(collect);
 
