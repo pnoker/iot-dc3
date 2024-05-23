@@ -157,14 +157,14 @@ public class ProfileController implements BaseController {
      * @return Profile 集合
      */
     @GetMapping("/device_id/{deviceId}")
-    public Flux<R<List<ProfileVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
+    public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
             List<ProfileBO> entityBOList = profileService.selectByDeviceId(deviceId);
             List<ProfileVO> entityVOList = profileBuilder.buildVOListByBOList(entityBOList);
-            return Flux.just(R.ok(entityVOList));
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Flux.just(R.fail(e.getMessage()));
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

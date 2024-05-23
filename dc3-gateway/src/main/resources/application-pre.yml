@@ -38,76 +38,34 @@ spring:
           uri: lb://dc3-center-auth
           predicates:
             - Path=/api/v3/auth/token/**
-          filters:
-            - StripPrefix=2
-            - name: RequestRateLimiter
-              args:
-                rate-limiter: '#{@redisRateLimiter}'
-                key-resolver: '#{@hostKeyResolver}'
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # auth
         - id: auth_route
           uri: lb://dc3-center-auth
           predicates:
             - Path=/api/v3/auth/user/**,/api/v3/auth/limited_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
           filters:
-            - StripPrefix=2
             - Authentic
-            - name: RequestRateLimiter
-              args:
-                rate-limiter: '#{@redisRateLimiter}'
-                key-resolver: '#{@hostKeyResolver}'
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # manager
         - id: manager_route
           uri: lb://dc3-center-manager
           predicates:
             - Path=/api/v3/manager/**
           filters:
-            - StripPrefix=2
             - Authentic
-            - name: RequestRateLimiter
-              args:
-                rate-limiter: '#{@redisRateLimiter}'
-                key-resolver: '#{@hostKeyResolver}'
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # data
         - id: data_route
           uri: lb://dc3-center-data
           predicates:
             - Path=/api/v3/data/**
           filters:
-            - StripPrefix=2
             - Authentic
-            - name: RequestRateLimiter
-              args:
-                rate-limiter: '#{@redisRateLimiter}'
-                key-resolver: '#{@hostKeyResolver}'
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # ekuiper
         - id: ekuiper_route
           uri: lb://dc3-center-ekuiper:8600
           predicates:
             - Path=/api/v3/ekuiper/**
           filters:
-            - StripPrefix=2
             - Authentic
-            - name: RequestRateLimiter
-              args:
-                rate-limiter: '#{@redisRateLimiter}'
-                key-resolver: '#{@hostKeyResolver}'
 
 grpc:
   client:

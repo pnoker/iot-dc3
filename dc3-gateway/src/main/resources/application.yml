@@ -26,6 +26,14 @@ spring:
   data:
     redis:
       database: 0
+  cloud:
+    gateway:
+      default-filters:
+        - StripPrefix=2
+        - name: RequestRateLimiter
+          args:
+            rate-limiter: '#{@redisRateLimiter}'
+            key-resolver: '#{@hostKeyResolver}'
 
 logging:
   file:

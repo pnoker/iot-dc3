@@ -104,16 +104,16 @@ public class PointValueController implements BaseController {
      * @return 带分页的 {@link PointValueBO}
      */
     @GetMapping("/history/device_id/{deviceId}/point_id/{pointId}")
-    public Flux<R<List<String>>> history(
+    public Mono<R<List<String>>> history(
             @NotNull @PathVariable(name = "deviceId") Long deviceId,
             @NotNull @PathVariable(name = "pointId") Long pointId,
             @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
         try {
             List<String> history = pointValueService.history(deviceId, pointId, count);
-            return Flux.just(R.ok(history));
+            return Mono.just(R.ok(history));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return Flux.just(R.fail(e.getMessage()));
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
