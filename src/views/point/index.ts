@@ -165,7 +165,7 @@ export default defineComponent({
         }
 
         const showAdd = () => {
-            pointAddFormRef.value.show()
+            pointAddFormRef.value?.show()
         }
 
         const addThing = (form, done) => {

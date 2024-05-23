@@ -119,7 +119,7 @@ export default defineComponent({
             list()
         }
         const showAdd = () => {
-            profileAddFormRef.value.show()
+            profileAddFormRef.value?.show()
         }
 
         const addThing = (form, done) => {

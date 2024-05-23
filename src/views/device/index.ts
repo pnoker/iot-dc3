@@ -169,7 +169,7 @@ export default defineComponent({
         }
 
         const showAdd = () => {
-            deviceAddFormRef.value.show()
+            deviceAddFormRef.value?.show()
         }
 
         const addThing = (form, done) => {
@@ -184,7 +184,7 @@ export default defineComponent({
         }
 
         const showImport = () => {
-            deviceImportFormRef.value.show()
+            deviceImportFormRef.value?.show()
         }
 
         const importTemplate = (form, done) => {

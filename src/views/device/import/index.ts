@@ -147,7 +147,7 @@ export default defineComponent({
             const form = unref(formDataRef)
             form?.resetFields()
 
-            formUploadRef.value!.clearFiles()
+            formUploadRef.value?.clearFiles()
         }
         const importTemplate = () => {
             const form = unref(formDataRef)
@@ -173,17 +173,17 @@ export default defineComponent({
             const form = unref(formDataRef)
             form?.validate((valid) => {
                 if (valid) {
-                    formUploadRef.value!.submit()
+                    formUploadRef.value?.submit()
                     reactiveData.formLoading = true
                 }
             })
         }
 
         const handleExceed: UploadProps['onExceed'] = (files) => {
-            formUploadRef.value!.clearFiles()
+            formUploadRef.value?.clearFiles()
             const file = files[0] as UploadRawFile
             file.uid = genFileId()
-            formUploadRef.value!.handleStart(file)
+            formUploadRef.value?.handleStart(file)
         }
 
         return {
