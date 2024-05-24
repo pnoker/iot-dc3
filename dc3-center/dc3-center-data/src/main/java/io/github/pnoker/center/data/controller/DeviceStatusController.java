@@ -51,7 +51,7 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * 查询 Device 服务状态
+     * 查询设备状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
      * @param deviceQuery Device Dto
@@ -61,7 +61,7 @@ public class DeviceStatusController implements BaseController {
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         try {
             deviceQuery.setTenantId(getTenantId());
-            Map<Long, String> statuses = deviceStatusService.device(deviceQuery);
+            Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
             return Mono.just(R.ok(statuses));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -70,7 +70,7 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * 根据 驱动ID 查询 Device 服务状态
+     * 根据 驱动ID 查询设备状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
      * @param driverId 驱动ID
@@ -81,7 +81,7 @@ public class DeviceStatusController implements BaseController {
         try {
             DeviceQuery deviceQuery = new DeviceQuery();
             deviceQuery.setDriverId(driverId);
-            Map<Long, String> statuses = deviceStatusService.device(deviceQuery);
+            Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
             return Mono.just(R.ok(statuses));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -90,7 +90,7 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * 根据 模板ID 查询 Device 服务状态
+     * 根据 模板ID 查询设备状态
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
      * @param profileId 位号ID
@@ -99,7 +99,7 @@ public class DeviceStatusController implements BaseController {
     @GetMapping("/device/profile_id/{profileId}")
     public Mono<R<Map<Long, String>>> deviceStatusByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
         try {
-            Map<Long, String> statuses = deviceStatusService.deviceByProfileId(profileId);
+            Map<Long, String> statuses = deviceStatusService.selectByProfileId(profileId);
             return Mono.just(R.ok(statuses));
         } catch (Exception e) {
             log.error(e.getMessage(), e);

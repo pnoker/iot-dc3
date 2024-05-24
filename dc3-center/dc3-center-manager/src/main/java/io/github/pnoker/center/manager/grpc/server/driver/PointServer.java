@@ -25,7 +25,6 @@ import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.grpc.builder.GrpcPointBuilder;
 import io.github.pnoker.center.manager.service.PointService;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
@@ -57,7 +56,6 @@ public class PointServer extends PointApiGrpc.PointApiImplBase {
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
-        query.setEnableFlag(EnableFlagEnum.ENABLE);
 
         Page<PointBO> entityPage = pointService.selectByPage(query);
         if (Objects.isNull(entityPage)) {

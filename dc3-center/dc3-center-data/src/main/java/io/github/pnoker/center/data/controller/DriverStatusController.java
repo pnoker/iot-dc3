@@ -51,7 +51,7 @@ public class DriverStatusController implements BaseController {
     }
 
     /**
-     * 查询 Driver 服务状态
+     * 查询驱动状态
      * ONLINE, OFFLINE
      *
      * @param driverQuery 驱动和分页参数
@@ -61,7 +61,7 @@ public class DriverStatusController implements BaseController {
     public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery driverQuery) {
         try {
             driverQuery.setTenantId(getTenantId());
-            Map<Long, String> statuses = driverStatusService.driver(driverQuery);
+            Map<Long, String> statuses = driverStatusService.selectByPage(driverQuery);
             return Mono.just(R.ok(statuses));
         } catch (Exception e) {
             log.error(e.getMessage(), e);

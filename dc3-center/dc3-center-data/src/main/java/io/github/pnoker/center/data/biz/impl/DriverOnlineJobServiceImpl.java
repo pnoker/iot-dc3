@@ -78,9 +78,9 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
         if (!Objects.isNull(driverQuery.getTenantId())) {
             query.setTenantId(driverQuery.getTenantId());
         }
-        Optional.ofNullable(driverQuery.getDriverTypeFlag()).ifPresentOrElse(flag -> query.setDriverTypeFlag(flag.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(driverQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
-        GrpcRPageDriverDTO list = driverApiBlockingStub.list(query.build());
+        Optional.ofNullable(driverQuery.getDriverTypeFlag()).ifPresentOrElse(value -> query.setDriverTypeFlag(value.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(driverQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPageDriverDTO list = driverApiBlockingStub.selectByPage(query.build());
         GrpcPageDriverDTO data = list.getData();
         List<GrpcDriverDTO> dataList = data.getDataList();
         if (CollUtil.isNotEmpty(dataList)) {

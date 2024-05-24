@@ -89,8 +89,8 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
         if (!Objects.isNull(deviceQuery.getTenantId())) {
             query.setTenantId(deviceQuery.getTenantId());
         }
-        Optional.ofNullable(deviceQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
-        GrpcRPageDeviceDTO list = deviceApiBlockingStub.list(query.build());
+        Optional.ofNullable(deviceQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPageDeviceDTO list = deviceApiBlockingStub.selectByPage(query.build());
         GrpcPageDeviceDTO data = list.getData();
         List<GrpcDeviceDTO> dataList = data.getDataList();
         if (!dataList.isEmpty()) {

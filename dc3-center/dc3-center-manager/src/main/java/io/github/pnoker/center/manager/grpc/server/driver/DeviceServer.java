@@ -33,7 +33,6 @@ import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.optional.CollectionOptional;
 import io.grpc.stub.StreamObserver;
@@ -76,7 +75,6 @@ public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
-        query.setEnableFlag(EnableFlagEnum.ENABLE);
 
         Page<DeviceBO> entityPage = deviceService.selectByPage(query);
         if (Objects.isNull(entityPage)) {
@@ -138,18 +136,18 @@ public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         // 附加字段
         List<PointBO> pointBOList = pointService.selectByDeviceId(entityBO.getId());
         CollectionOptional.ofNullable(pointBOList)
-                .ifPresent(list -> builder.addAllPointIds(list.stream().map(PointBO::getId).toList()));
+                .ifPresent(value -> builder.addAllPointIds(value.stream().map(PointBO::getId).toList()));
 
         List<DriverAttributeConfigBO> driverAttributeConfigBOList = driverAttributeConfigService.selectByDeviceId(entityBO.getId());
         CollectionOptional.ofNullable(driverAttributeConfigBOList)
-                .ifPresent(list -> builder.addAllDriverConfigs(list.stream()
+                .ifPresent(value -> builder.addAllDriverConfigs(value.stream()
                         .map(grpcDriverAttributeConfigBuilder::buildGrpcDTOByBO)
                         .toList())
                 );
 
         List<PointAttributeConfigBO> pointAttributeConfigBOList = pointAttributeConfigService.selectByDeviceId(entityBO.getId());
         CollectionOptional.ofNullable(pointAttributeConfigBOList)
-                .ifPresent(list -> builder.addAllPointConfigs(list.stream()
+                .ifPresent(value -> builder.addAllPointConfigs(value.stream()
                         .map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO)
                         .toList())
                 );

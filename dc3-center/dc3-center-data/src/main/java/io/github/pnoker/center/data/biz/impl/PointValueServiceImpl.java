@@ -129,8 +129,8 @@ public class PointValueServiceImpl implements PointValueService {
         if (!Objects.isNull(entityQuery.getDeviceId())) {
             query.setDeviceId(entityQuery.getDeviceId());
         }
-        Optional.ofNullable(entityQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
-        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.list(query.build());
+        Optional.ofNullable(entityQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.selectByPage(query.build());
         if (!rPagePointDTO.getResult().getOk()) {
             return entityPageBO;
         }
