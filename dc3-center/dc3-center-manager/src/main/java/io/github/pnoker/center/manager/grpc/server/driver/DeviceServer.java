@@ -33,9 +33,11 @@ import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.optional.CollectionOptional;
 import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
@@ -50,38 +52,34 @@ import java.util.Objects;
  */
 @Slf4j
 @GrpcService
-public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
+public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
-    private final GrpcDeviceBuilder grpcDeviceBuilder;
-    private final GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder;
-    private final GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
-    private final DeviceService deviceService;
-    private final DriverAttributeConfigService driverAttributeConfigService;
-    private final PointAttributeConfigService pointAttributeConfigService;
-    private final PointService pointService;
+    @Resource
+    private GrpcDeviceBuilder grpcDeviceBuilder;
+    @Resource
+    private GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder;
+    @Resource
+    private GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
 
-    public DriverDeviceServer(GrpcDeviceBuilder grpcDeviceBuilder, GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder,
-                              GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder, DeviceService deviceService,
-                              DriverAttributeConfigService driverAttributeConfigService, PointAttributeConfigService pointAttributeConfigService,
-                              PointService pointService) {
-        this.grpcDeviceBuilder = grpcDeviceBuilder;
-        this.grpcDriverAttributeConfigBuilder = grpcDriverAttributeConfigBuilder;
-        this.grpcPointAttributeConfigBuilder = grpcPointAttributeConfigBuilder;
-        this.deviceService = deviceService;
-        this.driverAttributeConfigService = driverAttributeConfigService;
-        this.pointAttributeConfigService = pointAttributeConfigService;
-        this.pointService = pointService;
-    }
+    @Resource
+    private DeviceService deviceService;
+    @Resource
+    private PointService pointService;
+    @Resource
+    private DriverAttributeConfigService driverAttributeConfigService;
+    @Resource
+    private PointAttributeConfigService pointAttributeConfigService;
 
     @Override
     public void selectByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
         GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DeviceQuery pageQuery = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
+        DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
+        query.setEnableFlag(EnableFlagEnum.ENABLE);
 
-        Page<DeviceBO> devicePage = deviceService.selectByPage(pageQuery);
-        if (Objects.isNull(devicePage)) {
+        Page<DeviceBO> entityPage = deviceService.selectByPage(query);
+        if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -90,18 +88,18 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcPageDeviceDTO.Builder pageDeviceBuilder = GrpcPageDeviceDTO.newBuilder();
+            GrpcPageDeviceDTO.Builder pageBuilder = GrpcPageDeviceDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
-            page.setCurrent(devicePage.getCurrent());
-            page.setSize(devicePage.getSize());
-            page.setPages(devicePage.getPages());
-            page.setTotal(devicePage.getTotal());
-            pageDeviceBuilder.setPage(page);
+            page.setCurrent(entityPage.getCurrent());
+            page.setSize(entityPage.getSize());
+            page.setPages(entityPage.getPages());
+            page.setTotal(entityPage.getTotal());
+            pageBuilder.setPage(page);
 
-            List<GrpcRDeviceAttachDTO> collect = devicePage.getRecords().stream().map(entityBO -> getDeviceAttachDTO(entityBO).build()).toList();
-            pageDeviceBuilder.addAllData(collect);
+            List<GrpcRDeviceAttachDTO> entityGrpcDTOList = entityPage.getRecords().stream().map(entityBO -> getDeviceAttachDTO(entityBO).build()).toList();
+            pageBuilder.addAllData(entityGrpcDTOList);
 
-            builder.setData(pageDeviceBuilder);
+            builder.setData(pageBuilder);
         }
 
         builder.setResult(rBuilder);
@@ -124,9 +122,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcRDeviceAttachDTO.Builder dBuilder = getDeviceAttachDTO(entityBO);
-
-            builder.setData(dBuilder);
+            builder.setData(getDeviceAttachDTO(entityBO));
         }
 
         builder.setResult(rBuilder);
@@ -135,23 +131,28 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     private GrpcRDeviceAttachDTO.Builder getDeviceAttachDTO(DeviceBO entityBO) {
-        GrpcRDeviceAttachDTO.Builder dBuilder = GrpcRDeviceAttachDTO.newBuilder();
-        GrpcDeviceDTO deviceDTO = grpcDeviceBuilder.buildGrpcDTOByBO(entityBO);
-        dBuilder.setDevice(deviceDTO);
+        GrpcRDeviceAttachDTO.Builder builder = GrpcRDeviceAttachDTO.newBuilder();
+        GrpcDeviceDTO entityGrpcDTO = grpcDeviceBuilder.buildGrpcDTOByBO(entityBO);
+        builder.setDevice(entityGrpcDTO);
 
         // 附加字段
         List<PointBO> pointBOList = pointService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(pointBOList).ifPresent(list -> dBuilder.addAllPointIds(list.stream().map(PointBO::getId).toList()));
+        CollectionOptional.ofNullable(pointBOList)
+                .ifPresent(list -> builder.addAllPointIds(list.stream().map(PointBO::getId).toList()));
 
         List<DriverAttributeConfigBO> driverAttributeConfigBOList = driverAttributeConfigService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(driverAttributeConfigBOList).ifPresent(list -> dBuilder.addAllDriverConfigs(list.stream()
-                .map(grpcDriverAttributeConfigBuilder::buildGrpcDTOByBO)
-                .toList()));
+        CollectionOptional.ofNullable(driverAttributeConfigBOList)
+                .ifPresent(list -> builder.addAllDriverConfigs(list.stream()
+                        .map(grpcDriverAttributeConfigBuilder::buildGrpcDTOByBO)
+                        .toList())
+                );
 
         List<PointAttributeConfigBO> pointAttributeConfigBOList = pointAttributeConfigService.selectByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(pointAttributeConfigBOList).ifPresent(list -> dBuilder.addAllPointConfigs(list.stream()
-                .map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO)
-                .toList()));
-        return dBuilder;
+        CollectionOptional.ofNullable(pointAttributeConfigBOList)
+                .ifPresent(list -> builder.addAllPointConfigs(list.stream()
+                        .map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO)
+                        .toList())
+                );
+        return builder;
     }
 }

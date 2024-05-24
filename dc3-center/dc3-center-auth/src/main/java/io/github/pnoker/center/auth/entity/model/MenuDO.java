@@ -145,7 +145,7 @@ public class MenuDO implements Serializable {
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识,0:未删除,1:已删除
+     * 逻辑删除标识, 0:未删除, 1:已删除
      */
     @TableLogic
     @TableField("deleted")

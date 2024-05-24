@@ -47,7 +47,7 @@ import java.util.List;
  */
 @Slf4j
 @GrpcService
-public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
+public class DriverServer extends DriverApiGrpc.DriverApiImplBase {
 
     @Resource
     private GrpcDriverBuilder grpcDriverBuilder;
@@ -68,28 +68,27 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
         try {
             // 注册驱动
-            DriverBO driverBO = driverRegisterService.registerDriver(request);
-            GrpcDriverDTO grpcDriverDTO = grpcDriverBuilder.buildGrpcDTOByBO(driverBO);
-            builder.setDriver(grpcDriverDTO);
-
-            // 查询设备
-            List<Long> idList = deviceService.selectIdsByDriverId(driverBO.getId());
-            builder.addAllDeviceIds(idList);
+            DriverBO entityBO = driverRegisterService.registerDriver(request);
+            GrpcDriverDTO entityGrpcDTO = grpcDriverBuilder.buildGrpcDTOByBO(entityBO);
+            builder.setDriver(entityGrpcDTO);
 
             // 注册驱动属性
-            List<DriverAttributeBO> driverAttributeBOList = driverRegisterService.registerDriverAttribute(request, driverBO);
+            List<DriverAttributeBO> driverAttributeBOList = driverRegisterService.registerDriverAttribute(request, entityBO);
             List<GrpcDriverAttributeDTO> grpcDriverAttributeDTOList = driverAttributeBOList.stream().map(grpcDriverAttributeBuilder::buildGrpcDTOByBO).toList();
             builder.addAllDriverAttributes(grpcDriverAttributeDTOList);
 
             // 注册位号属性
-            List<PointAttributeBO> pointAttributeBOList = driverRegisterService.registerPointAttribute(request, driverBO);
+            List<PointAttributeBO> pointAttributeBOList = driverRegisterService.registerPointAttribute(request, entityBO);
             List<GrpcPointAttributeDTO> grpcPointAttributeDTOList = pointAttributeBOList.stream().map(grpcPointAttributeBuilder::buildGrpcDTOByBO).toList();
             builder.addAllPointAttributes(grpcPointAttributeDTOList);
+
+            // 查询驱动下设备
+            List<Long> idList = deviceService.selectIdsByDriverId(entityBO.getId());
+            builder.addAllDeviceIds(idList);
 
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
-
         } catch (Exception e) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.FAILURE.getCode());
