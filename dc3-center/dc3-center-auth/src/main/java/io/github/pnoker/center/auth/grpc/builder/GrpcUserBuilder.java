@@ -44,6 +44,8 @@ public interface GrpcUserBuilder {
      * @param entityBO UserBO
      * @return GrpcUserDTO
      */
+    @Mapping(target = "socialExt", ignore = true)
+    @Mapping(target = "identityExt", ignore = true)
     @Mapping(target = "mergeFrom", ignore = true)
     @Mapping(target = "clearField", ignore = true)
     @Mapping(target = "clearOneof", ignore = true)
