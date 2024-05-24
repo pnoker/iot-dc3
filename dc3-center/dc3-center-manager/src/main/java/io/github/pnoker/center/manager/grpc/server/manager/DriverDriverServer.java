@@ -17,16 +17,15 @@
 package io.github.pnoker.center.manager.grpc.server.manager;
 
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.GrpcDeviceDTO;
+import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.center.manager.entity.bo.DeviceBO;
-import io.github.pnoker.center.manager.entity.query.DeviceQuery;
-import io.github.pnoker.center.manager.grpc.builder.GrpcDeviceBuilder;
-import io.github.pnoker.center.manager.service.DeviceService;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
+import io.github.pnoker.center.manager.entity.query.DriverQuery;
+import io.github.pnoker.center.manager.grpc.builder.GrpcDriverBuilder;
+import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
@@ -37,29 +36,29 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 设备 Api
+ * Driver Api
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @GrpcService
-public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
+public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
     @Resource
-    private GrpcDeviceBuilder grpcDeviceBuilder;
+    private GrpcDriverBuilder grpcDriverBuilder;
 
     @Resource
-    private DeviceService deviceService;
+    private DriverService driverService;
 
     @Override
-    public void selectByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
-        GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
+    public void selectByPage(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
+        GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
+        DriverQuery query = grpcDriverBuilder.buildQueryByGrpcQuery(request);
 
-        Page<DeviceBO> entityPage = deviceService.selectByPage(query);
+        Page<DriverBO> entityPage = driverService.selectByPage(query);
         if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
@@ -69,7 +68,7 @@ public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcPageDeviceDTO.Builder pageBuilder = GrpcPageDeviceDTO.newBuilder();
+            GrpcPageDriverDTO.Builder pageBuilder = GrpcPageDriverDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
             page.setCurrent(entityPage.getCurrent());
             page.setSize(entityPage.getSize());
@@ -77,7 +76,7 @@ public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             page.setTotal(entityPage.getTotal());
             pageBuilder.setPage(page);
 
-            List<GrpcDeviceDTO> entityGrpcDTOList = entityPage.getRecords().stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
+            List<GrpcDriverDTO> entityGrpcDTOList = entityPage.getRecords().stream().map(grpcDriverBuilder::buildGrpcDTOByBO).toList();
             pageBuilder.addAllData(entityGrpcDTOList);
 
             builder.setData(pageBuilder);
@@ -89,12 +88,12 @@ public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void selectByDriverId(GrpcDriverQuery driver, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
-        GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
+    public void selectByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
+        GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<DeviceBO> entityBOList = deviceService.selectByDriverId(driver.getDriverId());
-        if (CollUtil.isEmpty(entityBOList)) {
+        DriverBO entityDO = driverService.selectByDeviceId(request.getDeviceId());
+        if (Objects.isNull(entityDO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -103,9 +102,7 @@ public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            List<GrpcDeviceDTO> entityGrpcDTOList = entityBOList.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
-
-            builder.addAllData(entityGrpcDTOList);
+            builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(entityDO));
         }
 
         builder.setResult(rBuilder);
@@ -114,12 +111,12 @@ public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     }
 
     @Override
-    public void selectByProfileId(GrpcProfileQuery request, StreamObserver<GrpcRDeviceListDTO> responseObserver) {
-        GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
+    public void selectByDriverId(GrpcDriverQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
+        GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<DeviceBO> entityBOList = deviceService.selectByProfileId(request.getProfileId());
-        if (CollUtil.isEmpty(entityBOList)) {
+        DriverBO driverBO = driverService.selectById(request.getDriverId());
+        if (Objects.isNull(driverBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -128,37 +125,11 @@ public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            List<GrpcDeviceDTO> entityGrpcDTOList = entityBOList.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
-
-            builder.addAllData(entityGrpcDTOList);
+            builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(driverBO));
         }
 
         builder.setResult(rBuilder);
         responseObserver.onNext(builder.build());
         responseObserver.onCompleted();
     }
-
-    @Override
-    public void selectByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
-        GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
-        GrpcR.Builder rBuilder = GrpcR.newBuilder();
-
-        DeviceBO entityBO = deviceService.selectById(request.getDeviceId());
-        if (Objects.isNull(entityBO)) {
-            rBuilder.setOk(false);
-            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-        } else {
-            rBuilder.setOk(true);
-            rBuilder.setCode(ResponseEnum.OK.getCode());
-            rBuilder.setMessage(ResponseEnum.OK.getText());
-
-            builder.setData(grpcDeviceBuilder.buildGrpcDTOByBO(entityBO));
-        }
-
-        builder.setResult(rBuilder);
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
-    }
-
 }

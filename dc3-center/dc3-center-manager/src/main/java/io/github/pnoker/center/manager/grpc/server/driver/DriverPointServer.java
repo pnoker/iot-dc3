@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.manager.grpc.server.manager;
-
+package io.github.pnoker.center.manager.grpc.server.driver;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.GrpcPagePointDTO;
-import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
-import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
-import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.api.common.driver.*;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.grpc.builder.GrpcPointBuilder;
@@ -39,14 +35,14 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Point Api
+ * 设备 Api
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @GrpcService
-public class PointServer extends PointApiGrpc.PointApiImplBase {
+public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
 
     @Resource
     private GrpcPointBuilder grpcPointBuilder;
@@ -71,18 +67,18 @@ public class PointServer extends PointApiGrpc.PointApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
+            GrpcPagePointDTO.Builder pageBuilder = GrpcPagePointDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
             page.setCurrent(entityPage.getCurrent());
             page.setSize(entityPage.getSize());
             page.setPages(entityPage.getPages());
             page.setTotal(entityPage.getTotal());
-            pagePointBuilder.setPage(page);
+            pageBuilder.setPage(page);
 
             List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords().stream().map(grpcPointBuilder::buildGrpcDTOByBO).toList();
-            pagePointBuilder.addAllData(entityGrpcDTOList);
+            pageBuilder.addAllData(entityGrpcDTOList);
 
-            builder.setData(pagePointBuilder);
+            builder.setData(pageBuilder);
         }
 
         builder.setResult(rBuilder);
@@ -90,4 +86,26 @@ public class PointServer extends PointApiGrpc.PointApiImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void selectById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
+        GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+
+        PointBO entityBO = pointService.selectById(request.getPointId());
+        if (Objects.isNull(entityBO)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
+
+            builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
+        }
+
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
 }

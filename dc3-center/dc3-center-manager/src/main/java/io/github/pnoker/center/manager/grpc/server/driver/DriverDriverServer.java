@@ -47,7 +47,7 @@ import java.util.List;
  */
 @Slf4j
 @GrpcService
-public class DriverServer extends DriverApiGrpc.DriverApiImplBase {
+public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
     @Resource
     private GrpcDriverBuilder grpcDriverBuilder;

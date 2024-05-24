@@ -51,7 +51,7 @@ import java.util.Objects;
  */
 @Slf4j
 @GrpcService
-public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
+public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
     @Resource
     private GrpcDeviceBuilder grpcDeviceBuilder;
