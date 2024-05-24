@@ -23,6 +23,7 @@ import io.github.pnoker.center.auth.dal.TenantBindManager;
 import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.center.auth.entity.builder.TenantBindBuilder;
 import io.github.pnoker.center.auth.entity.model.TenantBindDO;
+import io.github.pnoker.center.auth.entity.query.RoleUserBindQuery;
 import io.github.pnoker.center.auth.entity.query.TenantBindQuery;
 import io.github.pnoker.center.auth.service.TenantBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -109,6 +110,12 @@ public class TenantBindServiceImpl implements TenantBindService {
         return tenantBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link TenantBindQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<TenantBindDO> fuzzyQuery(TenantBindQuery entityQuery) {
         LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getTenantId()), TenantBindDO::getTenantId, entityQuery.getTenantId());

@@ -80,7 +80,7 @@ public interface ResourceBuilder {
         // Json Ext
         ResourceExt entityExt = entityBO.getResourceExt();
         JsonExt ext = new JsonExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -125,7 +125,7 @@ public interface ResourceBuilder {
     default void afterProcess(ResourceDO entityDO, @MappingTarget ResourceBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getResourceExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ResourceExt ext = new ResourceExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

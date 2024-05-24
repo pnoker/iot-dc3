@@ -81,6 +81,22 @@ public class NumericLocator extends BaseLocator<Number> {
         validate();
     }
 
+    private static void appendBCD(StringBuilder sb, byte b) {
+        sb.append(bcdNibbleToInt(b, true));
+        sb.append(bcdNibbleToInt(b, false));
+    }
+
+    private static int bcdNibbleToInt(byte b, boolean high) {
+        int n;
+        if (high)
+            n = (b >> 4) & 0xf;
+        else
+            n = b & 0xf;
+        if (n > 9)
+            n = 0;
+        return n;
+    }
+
     private void validate() {
         super.validate(getRegisterCount());
 
@@ -314,22 +330,6 @@ public class NumericLocator extends BaseLocator<Number> {
                     | ((data[offset + 1] & 0xff)));
 
         throw new RuntimeException("Unsupported data type: " + dataType);
-    }
-
-    private static void appendBCD(StringBuilder sb, byte b) {
-        sb.append(bcdNibbleToInt(b, true));
-        sb.append(bcdNibbleToInt(b, false));
-    }
-
-    private static int bcdNibbleToInt(byte b, boolean high) {
-        int n;
-        if (high)
-            n = (b >> 4) & 0xf;
-        else
-            n = b & 0xf;
-        if (n > 9)
-            n = 0;
-        return n;
     }
 
     @Override

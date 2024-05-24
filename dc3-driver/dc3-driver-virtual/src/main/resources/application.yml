@@ -16,7 +16,7 @@
 
 driver:
   tenant: default
-  name: 模拟驱动
+  name: 虚拟驱动
   code: VirtualDriver
   type: DRIVER_CLIENT
   remark: @project.description@

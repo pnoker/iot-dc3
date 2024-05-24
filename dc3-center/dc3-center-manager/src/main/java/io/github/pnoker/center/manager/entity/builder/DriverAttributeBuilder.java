@@ -78,7 +78,7 @@ public interface DriverAttributeBuilder {
         // Json Ext
         DriverAttributeExt entityExt = entityBO.getAttributeExt();
         JsonExt ext = new JsonExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -118,7 +118,7 @@ public interface DriverAttributeBuilder {
     default void afterProcess(DriverAttributeDO entityDO, @MappingTarget DriverAttributeBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getAttributeExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             DriverAttributeExt ext = new DriverAttributeExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

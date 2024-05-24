@@ -28,6 +28,15 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 5.0.0
  */
 public class EncapMessageResponse extends EncapMessage implements IpMessageResponse {
+    /**
+     * <p>Constructor for EncapMessageResponse.</p>
+     *
+     * @param modbusResponse a {@link ModbusResponse} object.
+     */
+    public EncapMessageResponse(ModbusResponse modbusResponse) {
+        super(modbusResponse);
+    }
+
     static EncapMessageResponse createEncapMessageResponse(ByteQueue queue) throws ModbusTransportException {
         // Create the modbus response.
         ModbusResponse response = ModbusResponse.createModbusResponse(queue);
@@ -37,15 +46,6 @@ public class EncapMessageResponse extends EncapMessage implements IpMessageRespo
         ModbusUtils.checkCRC(encapResponse.modbusMessage, queue);
 
         return encapResponse;
-    }
-
-    /**
-     * <p>Constructor for EncapMessageResponse.</p>
-     *
-     * @param modbusResponse a {@link ModbusResponse} object.
-     */
-    public EncapMessageResponse(ModbusResponse modbusResponse) {
-        super(modbusResponse);
     }
 
     /**

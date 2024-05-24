@@ -17,6 +17,7 @@
 package io.github.pnoker.center.manager.dal;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 
 /**
@@ -28,5 +29,22 @@ import io.github.pnoker.center.manager.entity.model.DeviceDO;
  * @since 2022.1.0
  */
 public interface DeviceManager extends IService<DeviceDO> {
+
+    /**
+     * 重复性校验
+     *
+     * @param entityDO {@link DeviceDO}
+     * @param isUpdate 是否为更新操作
+     * @return 是否重复
+     */
+    boolean checkDuplicate(DeviceDO entityDO, boolean isUpdate);
+
+    /**
+     * 内部保存
+     *
+     * @param entityDO {@link DeviceBO}
+     * @return {@link DeviceDO}
+     */
+    DeviceDO innerSave(DeviceDO entityDO);
 
 }

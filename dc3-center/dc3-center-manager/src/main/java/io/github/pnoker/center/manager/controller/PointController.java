@@ -221,7 +221,7 @@ public class PointController implements BaseController {
     public Mono<R<Map<Long, String>>> unit(@RequestBody Set<Long> pointIds) {
         try {
             Map<Long, String> units = pointService.unit(pointIds);
-            if (!Objects.isNull(units)) {
+            if (Objects.nonNull(units)) {
                 Map<Long, String> unitCodeMap = units.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                 return Mono.just(R.ok(unitCodeMap));
             }

@@ -43,10 +43,18 @@ public interface DriverService extends BaseService<DriverBO, DriverQuery> {
     /**
      * 根据 模版ID 查询 驱动集
      *
-     * @param profileId 位号ID
+     * @param profileId 模版ID
      * @return Driver 集合
      */
     List<DriverBO> selectByProfileId(Long profileId);
+
+    /**
+     * 根据 位号ID 查询 驱动集
+     *
+     * @param pointId 位号ID
+     * @return Driver 集合
+     */
+    List<DriverBO> selectByPointId(Long pointId);
 
     /**
      * 根据 驱动ID 查询 驱动

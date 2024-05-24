@@ -76,7 +76,7 @@ public interface RoleBuilder {
         // Json Ext
         RoleExt entityExt = entityBO.getRoleExt();
         JsonExt ext = new JsonExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -111,7 +111,7 @@ public interface RoleBuilder {
     default void afterProcess(RoleDO entityDO, @MappingTarget RoleBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getRoleExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             RoleExt ext = new RoleExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

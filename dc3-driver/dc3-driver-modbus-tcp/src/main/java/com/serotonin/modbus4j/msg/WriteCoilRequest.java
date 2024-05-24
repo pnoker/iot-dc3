@@ -47,15 +47,14 @@ public class WriteCoilRequest extends ModbusRequest {
     }
 
 
-    @Override
-    public void validate(Modbus modbus) throws ModbusTransportException {
-        ModbusUtils.validateOffset(writeOffset);
-    }
-
     WriteCoilRequest(int slaveId) throws ModbusTransportException {
         super(slaveId);
     }
 
+    @Override
+    public void validate(Modbus modbus) throws ModbusTransportException {
+        ModbusUtils.validateOffset(writeOffset);
+    }
 
     @Override
     protected void writeRequest(ByteQueue queue) {

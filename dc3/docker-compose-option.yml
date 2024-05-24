@@ -16,7 +16,7 @@
 
 services:
   register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-register:2024.2.0.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-register:2024.3.0.dev
     restart: always
     ports:
       - "8848:8848"
@@ -47,7 +47,7 @@ services:
           - dc3-register
 
   emqx:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-emqx:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-emqx:2024.3.0.dev
     restart: always
     ports:
       - '1883:1883'

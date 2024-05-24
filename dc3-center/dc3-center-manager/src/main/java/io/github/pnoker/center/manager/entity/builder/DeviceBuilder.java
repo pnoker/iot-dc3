@@ -78,7 +78,7 @@ public interface DeviceBuilder {
         // Json Ext
         DeviceExt entityExt = entityBO.getDeviceExt();
         JsonExt ext = new JsonExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -114,7 +114,7 @@ public interface DeviceBuilder {
     default void afterProcess(DeviceDO entityDO, @MappingTarget DeviceBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getDeviceExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             DeviceExt ext = new DeviceExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

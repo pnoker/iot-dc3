@@ -28,6 +28,7 @@ import io.github.pnoker.center.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.center.auth.entity.builder.RoleUserBindBuilder;
 import io.github.pnoker.center.auth.entity.model.RoleDO;
 import io.github.pnoker.center.auth.entity.model.RoleUserBindDO;
+import io.github.pnoker.center.auth.entity.query.RoleResourceBindQuery;
 import io.github.pnoker.center.auth.entity.query.RoleUserBindQuery;
 import io.github.pnoker.center.auth.service.RoleUserBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -126,6 +127,12 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         return null;
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link RoleUserBindQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<RoleUserBindDO> fuzzyQuery(RoleUserBindQuery entityQuery) {
         LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), RoleUserBindDO::getUserId, entityQuery.getUserId());

@@ -16,11 +16,11 @@
 
 package io.github.pnoker.center.manager.event.metadata;
 
-import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@EnableAsync
 public class MetadataEventPublisher {
 
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -44,7 +45,7 @@ public class MetadataEventPublisher {
      *
      * @param metadataEvent MetadataEvent
      */
-    public void publishEvent(MetadataEvent<? extends BaseBO> metadataEvent) {
+    public void publishEvent(MetadataEvent metadataEvent) {
         log.info("Metadata event publisher publishEvent: {}", JsonUtil.toJsonString(metadataEvent));
         applicationEventPublisher.publishEvent(metadataEvent);
     }

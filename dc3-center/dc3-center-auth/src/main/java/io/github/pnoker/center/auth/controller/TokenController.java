@@ -59,7 +59,7 @@ public class TokenController implements BaseController {
     @PostMapping("/salt")
     public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
         String salt = tokenService.generateSalt(entityVO.getName(), entityVO.getTenant());
-        return !Objects.isNull(salt) ? Mono.just(R.ok(salt, "The salt will expire in 5 minutes")) : Mono.just(R.fail());
+        return Objects.nonNull(salt) ? Mono.just(R.ok(salt, "The salt will expire in 5 minutes")) : Mono.just(R.fail());
     }
 
     /**
@@ -71,7 +71,7 @@ public class TokenController implements BaseController {
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
         String token = tokenService.generateToken(entityVO.getName(), entityVO.getSalt(), entityVO.getPassword(), entityVO.getTenant());
-        return !Objects.isNull(token) ? Mono.just(R.ok(token, "The token will expire in 12 hours.")) : Mono.just(R.fail());
+        return Objects.nonNull(token) ? Mono.just(R.ok(token, "The token will expire in 12 hours.")) : Mono.just(R.fail());
     }
 
     /**
@@ -86,10 +86,10 @@ public class TokenController implements BaseController {
 
         boolean valid = tokenValid.isValid();
         String message = "The token has expired";
-        if (valid && !Objects.isNull(tokenValid.getExpireTime())) {
+        if (valid && Objects.nonNull(tokenValid.getExpireTime())) {
             String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
             message = "The token will expire in " + expireTime;
-        } else if (!valid && !Objects.isNull(tokenValid.getExpireTime())) {
+        } else if (!valid && Objects.nonNull(tokenValid.getExpireTime())) {
             String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
             message = "The token has expired in " + expireTime;
         }

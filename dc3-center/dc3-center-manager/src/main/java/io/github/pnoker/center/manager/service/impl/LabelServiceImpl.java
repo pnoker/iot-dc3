@@ -120,7 +120,7 @@ public class LabelServiceImpl implements LabelService {
     private LambdaQueryWrapper<LabelDO> fuzzyQuery(LabelQuery entityQuery) {
         LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getLabelName()), LabelDO::getLabelName, entityQuery.getLabelName());
-        wrapper.eq(!Objects.isNull(entityQuery.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, entityQuery.getEntityTypeFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, entityQuery.getEntityTypeFlag());
         wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getColor()), LabelDO::getColor, entityQuery.getColor());
         wrapper.eq(LabelDO::getTenantId, entityQuery.getTenantId());
         return wrapper;

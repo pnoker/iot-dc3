@@ -90,6 +90,10 @@ public final class Nodave {
     /* means the data address is beyond the CPUs address range */
     public final static int RESULT_WRITE_DATA_SIZE_MISMATCH = 7;
 
+    private Nodave() {
+        // Not needed because of utility class
+    }
+
     public static float BEFloat(final byte[] b, final int pos) {
         int i = 0;
         // System.out.println("pos" + pos);
@@ -373,10 +377,6 @@ public final class Nodave {
             i += 256;
         }
         return (i);
-    }
-
-    private Nodave() {
-        // Not needed because of utility class
     }
 
 }

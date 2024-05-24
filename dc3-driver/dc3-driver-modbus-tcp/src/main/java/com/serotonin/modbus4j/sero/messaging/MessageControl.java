@@ -38,9 +38,9 @@ import java.io.IOException;
 public class MessageControl implements DataConsumer {
     private static int DEFAULT_RETRIES = 2;
     private static int DEFAULT_TIMEOUT = 500;
-
+    private final WaitingRoom waitingRoom = new WaitingRoom();
+    private final ByteQueue dataBuffer = new ByteQueue();
     public boolean DEBUG = false;
-
     private Transport transport;
     private MessageParser messageParser;
     private RequestHandler requestHandler;
@@ -50,12 +50,8 @@ public class MessageControl implements DataConsumer {
     private int timeout = DEFAULT_TIMEOUT;
     private int discardDataDelay = 0;
     private long lastDataTimestamp;
-
     private BaseIOLog ioLog;
     private TimeSource timeSource = new SystemTimeSource();
-
-    private final WaitingRoom waitingRoom = new WaitingRoom();
-    private final ByteQueue dataBuffer = new ByteQueue();
 
     /**
      * <p>start.</p>

@@ -25,6 +25,7 @@ import io.github.pnoker.center.manager.dal.DriverAttributeManager;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.builder.DriverAttributeBuilder;
 import io.github.pnoker.center.manager.entity.model.DriverAttributeDO;
+import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeQuery;
 import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -124,11 +125,17 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         return driverAttributeBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link DriverAttributeQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<DriverAttributeDO> fuzzyQuery(DriverAttributeQuery entityQuery) {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), DriverAttributeDO::getDisplayName, entityQuery.getDisplayName());
-        wrapper.eq(!Objects.isNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
         wrapper.eq(DriverAttributeDO::getTenantId, entityQuery.getTenantId());
         return wrapper;

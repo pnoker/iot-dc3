@@ -29,29 +29,29 @@ import io.github.pnoker.driver.api.impl.nodave.S7Connection;
 public abstract class S7BaseConnection implements S7Connector {
 
     /**
-     * The Constant MAX_SIZE.
-     */
-    private static final int MAX_SIZE = 96;
-
-    /**
      * The Constant PROPERTY_AREA.
      */
     public static final String PROPERTY_AREA = "area";
-
     /**
      * The Constant PROPERTY_AREANUMBER.
      */
     public static final String PROPERTY_AREANUMBER = "areanumber";
-
     /**
      * The Constant PROPERTY_BYTES.
      */
     public static final String PROPERTY_BYTES = "bytes";
-
     /**
      * The Constant PROPERTY_OFFSET.
      */
     public static final String PROPERTY_OFFSET = "offset";
+    /**
+     * The Constant MAX_SIZE.
+     */
+    private static final int MAX_SIZE = 96;
+    /**
+     * The dc.
+     */
+    private S7Connection dc;
 
     /**
      * Checks the Result.
@@ -75,11 +75,6 @@ public abstract class S7BaseConnection implements S7Connector {
             System.out.print(Integer.toHexString(element & 0xFF) + ",");
         }
     }
-
-    /**
-     * The dc.
-     */
-    private S7Connection dc;
 
     /**
      * Initialize the connection

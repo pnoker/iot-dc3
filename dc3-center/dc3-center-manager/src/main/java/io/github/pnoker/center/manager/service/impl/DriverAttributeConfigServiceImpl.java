@@ -25,9 +25,13 @@ import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.builder.DriverAttributeConfigBuilder;
 import io.github.pnoker.center.manager.entity.model.DriverAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
+import io.github.pnoker.center.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -54,6 +58,9 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     @Resource
     private DriverAttributeConfigManager driverAttributeConfigManager;
 
+    @Resource
+    private MetadataEventPublisher metadataEventPublisher;
+
     @Override
     public void save(DriverAttributeConfigBO entityBO) {
         if (checkDuplicate(entityBO, false)) {
@@ -64,15 +71,37 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         if (!driverAttributeConfigManager.save(entityDO)) {
             throw new AddException("Failed to create driver attribute config");
         }
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
+    }
+
+    @Override
+    public DriverAttributeConfigBO innerSave(DriverAttributeConfigBO entityBO) {
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create driver attribute config: driver attribute config has been duplicated");
+        }
+
+        DriverAttributeConfigDO entityDO = driverAttributeConfigBuilder.buildDOByBO(entityBO);
+        if (!driverAttributeConfigManager.save(entityDO)) {
+            throw new AddException("Failed to create driver attribute config");
+        }
+
+        return driverAttributeConfigBuilder.buildBOByDO(entityDO);
     }
 
     @Override
     public void remove(Long id) {
-        getDOById(id, true);
+        DriverAttributeConfigDO entityDO = getDOById(id, true);
 
         if (!driverAttributeConfigManager.removeById(id)) {
             throw new DeleteException("Failed to remove driver attribute config");
         }
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override
@@ -88,6 +117,10 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         if (!driverAttributeConfigManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update driver attribute config");
         }
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override
@@ -131,6 +164,12 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         return driverAttributeConfigBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link DriverAttributeConfigQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<DriverAttributeConfigDO> fuzzyQuery(DriverAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverAttributeId()), DriverAttributeConfigDO::getDriverAttributeId, entityQuery.getDriverAttributeId());

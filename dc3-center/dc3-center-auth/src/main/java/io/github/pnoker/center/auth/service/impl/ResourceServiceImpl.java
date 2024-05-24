@@ -24,6 +24,7 @@ import io.github.pnoker.center.auth.dal.ResourceManager;
 import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import io.github.pnoker.center.auth.entity.builder.ResourceBuilder;
 import io.github.pnoker.center.auth.entity.model.ResourceDO;
+import io.github.pnoker.center.auth.entity.query.LimitedIpQuery;
 import io.github.pnoker.center.auth.entity.query.ResourceQuery;
 import io.github.pnoker.center.auth.service.ResourceService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -101,12 +102,18 @@ public class ResourceServiceImpl implements ResourceService {
         return resourceBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link ResourceQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<ResourceDO> fuzzyQuery(ResourceQuery entityQuery) {
         LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getResourceName()), ResourceDO::getResourceName, entityQuery.getResourceName());
         wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getResourceCode()), ResourceDO::getResourceCode, entityQuery.getResourceCode());
-        wrapper.eq(!Objects.isNull(entityQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, entityQuery.getResourceTypeFlag());
-        wrapper.eq(!Objects.isNull(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag, entityQuery.getEnableFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, entityQuery.getResourceTypeFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag, entityQuery.getEnableFlag());
         wrapper.eq(ResourceDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

@@ -75,7 +75,7 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
         if (CharSequenceUtil.isNotEmpty(driverQuery.getServiceHost())) {
             query.setServiceHost(driverQuery.getServiceHost());
         }
-        if (!Objects.isNull(driverQuery.getTenantId())) {
+        if (Objects.nonNull(driverQuery.getTenantId())) {
             query.setTenantId(driverQuery.getTenantId());
         }
         Optional.ofNullable(driverQuery.getDriverTypeFlag()).ifPresentOrElse(value -> query.setDriverTypeFlag(value.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
@@ -88,7 +88,7 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
             dataList.forEach(driverDO -> {
                 String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverDO.getBase().getId();
                 String status = redisService.getKey(key);
-                status = !Objects.isNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
+                status = Objects.nonNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
                 DriverStatusHistoryDO driverStatusHistoryDO = new DriverStatusHistoryDO();
                 driverStatusHistoryDO.setDriverId(driverDO.getBase().getId());
                 driverStatusHistoryDO.setDriverName(driverDO.getDriverName());

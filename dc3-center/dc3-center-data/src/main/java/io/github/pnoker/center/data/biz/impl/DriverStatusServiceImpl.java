@@ -176,7 +176,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         deviceIds.forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisService.getKey(key);
-            status = !Objects.isNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
+            status = Objects.nonNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
             list.add(status);
         });
         return list;
@@ -194,7 +194,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         driverIds.forEach(id -> {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + id;
             String status = redisService.getKey(key);
-            status = !Objects.isNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
+            status = Objects.nonNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
             statusMap.put(id, status);
         });
         return statusMap;

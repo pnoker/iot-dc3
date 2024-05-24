@@ -29,12 +29,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ServerStateReader {
 
-    private Server _server = null;
-
-    private ScheduledExecutorService _scheduler = null;
-
     private final List<ServerStateListener> _listeners = new CopyOnWriteArrayList<ServerStateListener>();
-
+    private Server _server = null;
+    private ScheduledExecutorService _scheduler = null;
     private ScheduledFuture<?> _job = null;
 
     public ServerStateReader(final Server server) {

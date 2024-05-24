@@ -23,6 +23,7 @@ import io.github.pnoker.center.auth.dal.UserPasswordManager;
 import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
 import io.github.pnoker.center.auth.entity.builder.UserPasswordBuilder;
 import io.github.pnoker.center.auth.entity.model.UserPasswordDO;
+import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
 import io.github.pnoker.center.auth.entity.query.UserPasswordQuery;
 import io.github.pnoker.center.auth.service.UserPasswordService;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
@@ -34,7 +35,6 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -55,7 +55,6 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     private UserPasswordManager userPasswordManager;
 
     @Override
-    @Transactional
     public void save(UserPasswordBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
@@ -107,12 +106,18 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     @Override
     public void restPassword(Long id) {
         UserPasswordBO userPasswordBO = selectById(id);
-        if (!Objects.isNull(userPasswordBO)) {
+        if (Objects.nonNull(userPasswordBO)) {
             userPasswordBO.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
             update(userPasswordBO);
         }
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link UserPasswordQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<UserPasswordDO> fuzzyQuery(UserPasswordQuery entityQuery) {
         return Wrappers.<UserPasswordDO>query().lambda();
     }

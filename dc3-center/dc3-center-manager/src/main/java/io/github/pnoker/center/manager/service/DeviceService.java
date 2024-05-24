@@ -19,8 +19,8 @@ package io.github.pnoker.center.manager.service;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.base.service.BaseService;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -86,9 +86,9 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
      * 导入设备
      *
      * @param entityBO      {@link DeviceBO}
-     * @param multipartFile {@link MultipartFile}
+     * @param multipartFile {@link File}
      */
-    void importDevice(DeviceBO entityBO, MultipartFile multipartFile);
+    void importDevice(DeviceBO entityBO, File multipartFile);
 
     /**
      * 生成导入模板

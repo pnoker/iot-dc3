@@ -55,21 +55,21 @@ public class BaseBrowser {
     }
 
     /**
-     * Set the batch size
-     *
-     * @param batchSize The new batch size
-     */
-    public void setBatchSize(final int batchSize) {
-        this._batchSize = batchSize;
-    }
-
-    /**
      * Get the batch size
      *
      * @return the current batch size
      */
     public int getBatchSize() {
         return this._batchSize;
+    }
+
+    /**
+     * Set the batch size
+     *
+     * @param batchSize The new batch size
+     */
+    public void setBatchSize(final int batchSize) {
+        this._batchSize = batchSize;
     }
 
     /**

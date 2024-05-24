@@ -16,11 +16,19 @@
 
 package io.github.pnoker.center.manager.dal.impl;
 
+import cn.hutool.core.text.CharSequenceUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.pnoker.center.manager.dal.DeviceManager;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.exception.AddException;
+import io.github.pnoker.common.exception.DuplicateException;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -32,5 +40,33 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DeviceManagerImpl extends ServiceImpl<DeviceMapper, DeviceDO> implements DeviceManager {
+
+    @Override
+    public boolean checkDuplicate(DeviceDO entityDO, boolean isUpdate) {
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+        wrapper.eq(DeviceDO::getDeviceName, entityDO.getDeviceName());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(entityDO.getDeviceCode()), DeviceDO::getDeviceCode, entityDO.getDeviceCode());
+        wrapper.eq(DeviceDO::getTenantId, entityDO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        DeviceDO one = getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        return !isUpdate || !one.getId().equals(entityDO.getId());
+    }
+
+    @Override
+    public DeviceDO innerSave(DeviceDO entityDO) {
+        boolean duplicate = checkDuplicate(entityDO, false);
+        if (duplicate) {
+            throw new DuplicateException("Failed to create device: device has been duplicated");
+        }
+
+        if (!save(entityDO)) {
+            throw new AddException("Failed to create device");
+        }
+        return entityDO;
+    }
+
 
 }

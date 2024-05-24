@@ -140,7 +140,7 @@ public class TenantController implements BaseController {
     public Mono<R<TenantBO>> selectByCode(@NotNull @PathVariable(value = "code") String code) {
         try {
             TenantBO select = tenantService.selectByCode(code);
-            if (!Objects.isNull(select)) {
+            if (Objects.nonNull(select)) {
                 return Mono.just(R.ok(select));
             }
         } catch (Exception e) {

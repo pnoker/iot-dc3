@@ -25,6 +25,7 @@ import io.github.pnoker.center.manager.dal.PointAttributeManager;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeBuilder;
 import io.github.pnoker.center.manager.entity.model.PointAttributeDO;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
 import io.github.pnoker.center.manager.entity.query.PointAttributeQuery;
 import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -120,11 +121,17 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         return pointAttributeBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link PointAttributeQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<PointAttributeDO> fuzzyQuery(PointAttributeQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), PointAttributeDO::getDisplayName, entityQuery.getDisplayName());
-        wrapper.eq(!Objects.isNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), PointAttributeDO::getDriverId, entityQuery.getDriverId());
         wrapper.eq(PointAttributeDO::getTenantId, entityQuery.getTenantId());
         return wrapper;

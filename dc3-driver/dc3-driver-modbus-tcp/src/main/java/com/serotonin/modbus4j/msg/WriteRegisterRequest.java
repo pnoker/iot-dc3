@@ -46,13 +46,13 @@ public class WriteRegisterRequest extends ModbusRequest {
         this.writeValue = writeValue;
     }
 
+    WriteRegisterRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
+
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(writeOffset);
-    }
-
-    WriteRegisterRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
     }
 
     @Override

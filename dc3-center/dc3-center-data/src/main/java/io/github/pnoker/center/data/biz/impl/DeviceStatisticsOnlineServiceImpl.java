@@ -83,10 +83,10 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
         if (CharSequenceUtil.isNotEmpty(deviceQuery.getDeviceName())) {
             query.setDeviceName(deviceQuery.getDeviceName());
         }
-        if (!Objects.isNull(deviceQuery.getDriverId())) {
+        if (Objects.nonNull(deviceQuery.getDriverId())) {
             query.setDriverId(deviceQuery.getDriverId());
         }
-        if (!Objects.isNull(deviceQuery.getTenantId())) {
+        if (Objects.nonNull(deviceQuery.getTenantId())) {
             query.setTenantId(deviceQuery.getTenantId());
         }
         Optional.ofNullable(deviceQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));

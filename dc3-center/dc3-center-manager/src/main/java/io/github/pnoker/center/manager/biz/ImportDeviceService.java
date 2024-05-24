@@ -17,31 +17,31 @@
 package io.github.pnoker.center.manager.biz;
 
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
-import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import org.apache.poi.ss.usermodel.Sheet;
+
+import java.util.List;
 
 /**
- * 元数据通知接口
+ * 导入相关接口
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface MetadataNotifyService {
+public interface ImportDeviceService {
 
     /**
-     * 通知驱动 新增设备(ADD) / 删除设备(DELETE) / 更新设备(UPDATE)
+     * 导入设备
      *
-     * @param operate  Operation Type
-     * @param metadata Device
+     * @param deviceBO              设备
+     * @param pointBOList           位号集合
+     * @param driverAttributeBOList 驱动属性配置集合
+     * @param pointAttributeBOList  驱动属性配置集合
+     * @param sheet                 Sheet
+     * @param row                   Row Index
      */
-    void notifyDevice(MetadataOperateTypeEnum operate, DeviceBO metadata);
-
-    /**
-     * 通知驱动 新增位号(ADD) / 删除位号(DELETE) / 更新位号(UPDATE)
-     *
-     * @param operate  Operation Type
-     * @param metadata Point
-     */
-    void notifyPoint(MetadataOperateTypeEnum operate, PointBO metadata);
+    DeviceBO importDevice(DeviceBO deviceBO, List<PointBO> pointBOList, List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, Sheet sheet, int row);
 
 }

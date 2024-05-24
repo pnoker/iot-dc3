@@ -49,6 +49,15 @@ public class R<T> implements Serializable {
     private T data;
 
     /**
+     * 构造函数
+     *
+     * @param data 数据
+     */
+    private R(T data) {
+        this.data = data;
+    }
+
+    /**
      * 成功
      *
      * @return Response
@@ -150,15 +159,6 @@ public class R<T> implements Serializable {
     @SuppressWarnings("unchecked")
     public static <T> R<T> fail(T data, String message) {
         return new R(data).failure(message);
-    }
-
-    /**
-     * 构造函数
-     *
-     * @param data 数据
-     */
-    private R(T data) {
-        this.data = data;
     }
 
     /**

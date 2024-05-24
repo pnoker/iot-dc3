@@ -20,12 +20,11 @@ import io.github.pnoker.common.driver.entity.bean.RValue;
 import io.github.pnoker.common.driver.entity.bean.WValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
-import io.github.pnoker.common.driver.entity.bo.MetadataEventBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
@@ -72,15 +71,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      */
     private Map<Long, MyS7Connector> connectMap;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private static class MyS7Connector {
-        private ReentrantReadWriteLock lock;
-        private S7Connector connector;
-    }
-
     @Override
     public void initial() {
         /*
@@ -94,7 +84,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     public void schedule() {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
+        上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以:
         - 在read中实现设备状态的判断;
         - 在自定义定时任务中实现设备状态的判断;
         - 根据某种判断机制实现设备状态的判断。
@@ -109,7 +99,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public void event(MetadataEventBO<? extends BaseBO> metadataEvent) {
+    public void event(MetadataEventDTO metadataEvent) {
         /*
         !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
         接收驱动, 设备, 位号元数据新增, 更新, 删除都会触发改事件
@@ -120,17 +110,15 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             // to do something for device event
-            DeviceBO metadata = (DeviceBO) metadataEvent.getMetadata();
-            log.info("Device metadata event: deviceId: {}, operate: {}, metadata: {}", metadata.getId(), operateType, metadata);
+            log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
 
             // 当设备更新或者删除时，移除连接句柄
             if (MetadataOperateTypeEnum.DELETE.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                connectMap.remove(metadata.getId());
+                connectMap.remove(metadataEvent.getId());
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             // to do something for point event
-            PointBO metadata = (PointBO) metadataEvent.getMetadata();
-            log.info("Point metadata event: pointId: {}, operate: {}, metadata: {}", metadata.getId(), operateType, metadata);
+            log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
         }
     }
 
@@ -264,6 +252,15 @@ public class DriverCustomServiceImpl implements DriverCustomService {
             default:
                 break;
         }
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class MyS7Connector {
+        private ReentrantReadWriteLock lock;
+        private S7Connector connector;
     }
 
 }

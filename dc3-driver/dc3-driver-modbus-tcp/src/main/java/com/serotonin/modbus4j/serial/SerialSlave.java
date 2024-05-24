@@ -30,10 +30,9 @@ import org.apache.commons.logging.LogFactory;
 abstract public class SerialSlave extends ModbusSlaveSet {
 
     private final Log LOG = LogFactory.getLog(SerialSlave.class);
-
+    protected StreamTransport transport;
     // Runtime fields
     private SerialPortWrapper wrapper;
-    protected StreamTransport transport;
 
     /**
      * <p>Constructor for SerialSlave.</p>

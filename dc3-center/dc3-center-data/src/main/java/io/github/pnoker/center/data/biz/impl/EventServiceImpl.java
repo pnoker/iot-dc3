@@ -47,28 +47,28 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void addDriverEvent(DriverEvent driverEvent) {
-        if (!Objects.isNull(driverEvent)) {
+        if (Objects.nonNull(driverEvent)) {
             mongoTemplate.insert(driverEvent);
         }
     }
 
     @Override
     public void addDriverEvents(List<DriverEvent> driverEvents) {
-        if (!Objects.isNull(driverEvents) && !driverEvents.isEmpty()) {
+        if (Objects.nonNull(driverEvents) && !driverEvents.isEmpty()) {
             mongoTemplate.insert(driverEvents, DriverEvent.class);
         }
     }
 
     @Override
     public void addDeviceEvent(DeviceEvent deviceEvent) {
-        if (!Objects.isNull(deviceEvent)) {
+        if (Objects.nonNull(deviceEvent)) {
             mongoTemplate.insert(deviceEvent);
         }
     }
 
     @Override
     public void addDeviceEvents(List<DeviceEvent> deviceEvents) {
-        if (!Objects.isNull(deviceEvents) && !deviceEvents.isEmpty()) {
+        if (Objects.nonNull(deviceEvents) && !deviceEvents.isEmpty()) {
             mongoTemplate.insert(deviceEvents, DeviceEvent.class);
         }
     }
@@ -84,10 +84,10 @@ public class EventServiceImpl implements EventService {
         if (Objects.isNull(deviceEventQuery)) {
             deviceEventQuery = new DeviceEventQuery();
         }
-        if (!Objects.isNull(deviceEventQuery.getDeviceId())) {
+        if (Objects.nonNull(deviceEventQuery.getDeviceId())) {
             criteria.and("deviceId").is(deviceEventQuery.getDeviceId());
         }
-        if (!Objects.isNull(deviceEventQuery.getPointId())) {
+        if (Objects.nonNull(deviceEventQuery.getPointId())) {
             criteria.and("pointId").is(deviceEventQuery.getPointId());
         }
 

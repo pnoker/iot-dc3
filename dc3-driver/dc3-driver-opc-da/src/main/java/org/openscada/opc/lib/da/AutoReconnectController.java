@@ -25,13 +25,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class AutoReconnectController implements ServerConnectionStateListener {
 
     private static final int DEFAULT_DELAY = 5 * 1000;
-
-    private int _delay;
-
     private final Server _server;
-
     private final Set<AutoReconnectListener> _listeners = new CopyOnWriteArraySet<AutoReconnectListener>();
-
+    private int _delay;
     private AutoReconnectState _state = AutoReconnectState.DISABLED;
 
     private Thread _connectTask = null;

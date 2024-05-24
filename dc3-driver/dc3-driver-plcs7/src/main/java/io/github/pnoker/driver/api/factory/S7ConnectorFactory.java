@@ -32,14 +32,24 @@ public class S7ConnectorFactory {
     }
 
     /**
+     * @param type choose a siemens plc type to build a tcp connector.
+     * @return returns a new TCP connection builder
+     */
+    public static TCPConnectionBuilder buildTCPConnector(SiemensPLCS type) {
+        return new TCPConnectionBuilder(type);
+    }
+
+    public static TCPConnectionBuilder buildTCPConnector() {
+        return new TCPConnectionBuilder(SiemensPLCS.S_NON_200);
+    }
+
+    /**
      * TCP Connection builder
      */
     public static class TCPConnectionBuilder {
 
-        private String host;
-
         private final SiemensPLCS plcsType;
-
+        private String host;
         private int rack = 0;
         private int slot = 2;
         private int port = 102;
@@ -113,18 +123,6 @@ public class S7ConnectorFactory {
             return this;
         }
 
-    }
-
-    /**
-     * @param type choose a siemens plc type to build a tcp connector.
-     * @return returns a new TCP connection builder
-     */
-    public static TCPConnectionBuilder buildTCPConnector(SiemensPLCS type) {
-        return new TCPConnectionBuilder(type);
-    }
-
-    public static TCPConnectionBuilder buildTCPConnector() {
-        return new TCPConnectionBuilder(SiemensPLCS.S_NON_200);
     }
 
 }

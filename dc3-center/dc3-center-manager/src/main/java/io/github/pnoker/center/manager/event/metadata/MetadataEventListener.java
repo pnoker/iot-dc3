@@ -16,18 +16,22 @@
 
 package io.github.pnoker.center.manager.event.metadata;
 
-import io.github.pnoker.center.manager.biz.MetadataNotifyService;
-import io.github.pnoker.center.manager.entity.bo.DeviceBO;
-import io.github.pnoker.center.manager.entity.bo.PointBO;
-import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
+import io.github.pnoker.center.manager.service.DriverService;
+import io.github.pnoker.common.constant.driver.RabbitConstant;
+import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
-import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 元数据事件 Listener
@@ -37,26 +41,42 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class MetadataEventListener implements ApplicationListener<MetadataEvent<? extends BaseBO>> {
+public class MetadataEventListener implements ApplicationListener<MetadataEvent> {
 
-    private final MetadataNotifyService metadataNotifyService;
+    @Resource
+    private DriverService driverService;
 
-    public MetadataEventListener(MetadataNotifyService metadataNotifyService) {
-        this.metadataNotifyService = metadataNotifyService;
-    }
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
+    @Async
     @Override
     public void onApplicationEvent(@NotNull MetadataEvent metadataEvent) {
         log.info("Metadata event listener received: {}", JsonUtil.toJsonString(metadataEvent));
-        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
-        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            MetadataOperateTypeEnum operate = metadataEvent.getOperateType();
-            DeviceBO metadata = (DeviceBO) metadataEvent.getMetadata();
-            metadataNotifyService.notifyDevice(operate, metadata);
-        } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            MetadataOperateTypeEnum operate = metadataEvent.getOperateType();
-            PointBO metadata = (PointBO) metadataEvent.getMetadata();
-            metadataNotifyService.notifyPoint(operate, metadata);
+        try {
+            Long id = metadataEvent.getId();
+            MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+            MetadataEventDTO entityDTO = new MetadataEventDTO(id, metadataType, metadataEvent.getOperateType());
+            if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+                DriverBO entityBO = driverService.selectByDeviceId(id);
+                notifyDriver(entityBO.getServiceName(), entityDTO);
+            } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
+                List<DriverBO> entityBOList = driverService.selectByPointId(id);
+                entityBOList.forEach(entityBO -> notifyDriver(entityBO.getServiceName(), entityDTO));
+            }
+        } catch (Exception e) {
+            log.error("Metadata event listener error: {}", e.getMessage(), e);
         }
+    }
+
+    /**
+     * 通知驱动
+     *
+     * @param service   驱动服务
+     * @param entityDTO DriverTransferMetadataDTO
+     */
+    private void notifyDriver(String service, MetadataEventDTO entityDTO) {
+        log.info("Notify driver[{}]: {}", service, JsonUtil.toJsonString(entityDTO));
+        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA, RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + service, entityDTO);
     }
 }

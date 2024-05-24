@@ -27,10 +27,6 @@ public enum OPCNAMESPACETYPE {
         this._id = id;
     }
 
-    public int id() {
-        return this._id;
-    }
-
     public static OPCNAMESPACETYPE fromID(final int id) {
         switch (id) {
             case 1:
@@ -40,5 +36,9 @@ public enum OPCNAMESPACETYPE {
             default:
                 return OPC_NS_UNKNOWN;
         }
+    }
+
+    public int id() {
+        return this._id;
     }
 }

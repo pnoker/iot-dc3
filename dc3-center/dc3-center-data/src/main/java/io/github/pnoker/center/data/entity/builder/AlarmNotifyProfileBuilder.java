@@ -78,7 +78,7 @@ public interface AlarmNotifyProfileBuilder {
         // Json Ext
         AlarmNotifyExt entityExt = entityBO.getAlarmNotifyExt();
         JsonExt ext = new JsonExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -118,7 +118,7 @@ public interface AlarmNotifyProfileBuilder {
     default void afterProcess(AlarmNotifyProfileDO entityDO, @MappingTarget AlarmNotifyProfileBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getAlarmNotifyExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             AlarmNotifyExt ext = new AlarmNotifyExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

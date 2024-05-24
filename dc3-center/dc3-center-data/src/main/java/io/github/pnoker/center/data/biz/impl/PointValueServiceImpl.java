@@ -126,7 +126,7 @@ public class PointValueServiceImpl implements PointValueService {
         query.setRwFlag(DefaultConstant.NULL_INT);
         query.setProfileId(DefaultConstant.NULL_INT);
         query.setTenantId(entityQuery.getTenantId());
-        if (!Objects.isNull(entityQuery.getDeviceId())) {
+        if (Objects.nonNull(entityQuery.getDeviceId())) {
             query.setDeviceId(entityQuery.getDeviceId());
         }
         Optional.ofNullable(entityQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
@@ -138,11 +138,13 @@ public class PointValueServiceImpl implements PointValueService {
         List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
         List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).toList();
 
-        List<PointValueBO> pointValueBOList = redisRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
-        if (CollUtil.isEmpty(pointValueBOList)) {
-            RepositoryService repositoryService = getFirstRepositoryService();
-            pointValueBOList = repositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
-        }
+        Map<Long, PointValueBO> pointValueBOMap = redisRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
+        RepositoryService repositoryService = getFirstRepositoryService();
+        List<PointValueBO> pointValueBOList = pointIds.stream().map(id -> {
+            PointValueBO value = pointValueBOMap.get(id);
+            return Objects.isNull(value) ? repositoryService.selectLatestPointValue(entityQuery.getDeviceId(), id) : value;
+        }).filter(Objects::nonNull).toList();
+
         entityPageBO.setCurrent(rPagePointDTO.getData().getPage().getCurrent())
                 .setSize(rPagePointDTO.getData().getPage().getSize())
                 .setTotal(rPagePointDTO.getData().getPage().getTotal())

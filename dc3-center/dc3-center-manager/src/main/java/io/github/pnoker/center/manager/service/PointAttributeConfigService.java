@@ -16,6 +16,8 @@
 
 package io.github.pnoker.center.manager.service;
 
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
 import io.github.pnoker.common.base.service.BaseService;
@@ -64,4 +66,12 @@ public interface PointAttributeConfigService extends BaseService<PointAttributeC
      * @return PointConfig
      */
     PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId);
+
+    /**
+     * 内部保存
+     *
+     * @param entityBO {@link PointAttributeConfigBO}
+     * @return {@link DeviceBO}
+     */
+    PointAttributeConfigBO innerSave(PointAttributeConfigBO entityBO);
 }

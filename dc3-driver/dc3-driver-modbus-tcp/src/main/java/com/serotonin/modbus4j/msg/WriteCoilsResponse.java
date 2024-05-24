@@ -30,11 +30,6 @@ public class WriteCoilsResponse extends ModbusResponse {
     private int startOffset;
     private int numberOfBits;
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.WRITE_COILS;
-    }
-
     WriteCoilsResponse(int slaveId) throws ModbusTransportException {
         super(slaveId);
     }
@@ -43,6 +38,11 @@ public class WriteCoilsResponse extends ModbusResponse {
         super(slaveId);
         this.startOffset = startOffset;
         this.numberOfBits = numberOfBits;
+    }
+
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_COILS;
     }
 
     @Override
