@@ -46,7 +46,7 @@ import java.util.Objects;
  */
 @Slf4j
 @GrpcService
-public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
+public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
 
     @Resource
     private GrpcPointBuilder grpcPointBuilder;
