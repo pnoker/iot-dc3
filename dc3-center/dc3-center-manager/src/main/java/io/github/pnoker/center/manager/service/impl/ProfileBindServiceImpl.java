@@ -24,6 +24,7 @@ import io.github.pnoker.center.manager.dal.ProfileBindManager;
 import io.github.pnoker.center.manager.entity.bo.ProfileBindBO;
 import io.github.pnoker.center.manager.entity.builder.ProfileBindBuilder;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
+import io.github.pnoker.center.manager.entity.query.PointQuery;
 import io.github.pnoker.center.manager.entity.query.ProfileBindQuery;
 import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -144,6 +145,12 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         return profileBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link ProfileBindQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<ProfileBindDO> fuzzyQuery(ProfileBindQuery entityQuery) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), ProfileBindDO::getProfileId, entityQuery.getProfileId());

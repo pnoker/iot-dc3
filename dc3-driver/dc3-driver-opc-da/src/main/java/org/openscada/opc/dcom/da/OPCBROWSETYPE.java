@@ -28,10 +28,6 @@ public enum OPCBROWSETYPE {
         this._id = id;
     }
 
-    public int id() {
-        return this._id;
-    }
-
     public static OPCBROWSETYPE fromID(final int id) {
         switch (id) {
             case 1:
@@ -43,5 +39,9 @@ public enum OPCBROWSETYPE {
             default:
                 return OPC_UNKNOWN;
         }
+    }
+
+    public int id() {
+        return this._id;
     }
 }

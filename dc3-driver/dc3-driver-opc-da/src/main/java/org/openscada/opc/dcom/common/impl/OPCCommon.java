@@ -28,15 +28,6 @@ public class OPCCommon extends BaseCOMObject {
         super(opcObject.queryInterface(org.openscada.opc.dcom.common.Constants.IOPCCommon_IID));
     }
 
-    public void setLocaleID(final int localeID) throws JIException {
-        JICallBuilder callObject = new JICallBuilder(true);
-        callObject.setOpnum(0);
-
-        callObject.addInParamAsInt(localeID, JIFlags.FLAG_NULL);
-
-        getCOMObject().call(callObject);
-    }
-
     public int getLocaleID() throws JIException {
         JICallBuilder callObject = new JICallBuilder(true);
         callObject.setOpnum(1);
@@ -45,6 +36,15 @@ public class OPCCommon extends BaseCOMObject {
 
         Object[] result = getCOMObject().call(callObject);
         return (Integer) result[0];
+    }
+
+    public void setLocaleID(final int localeID) throws JIException {
+        JICallBuilder callObject = new JICallBuilder(true);
+        callObject.setOpnum(0);
+
+        callObject.addInParamAsInt(localeID, JIFlags.FLAG_NULL);
+
+        getCOMObject().call(callObject);
     }
 
     public String getErrorString(final int errorCode, final int localeID) throws JIException {

@@ -69,10 +69,10 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
         if (CharSequenceUtil.isNotEmpty(deviceQuery.getDeviceName())) {
             query.setDeviceName(deviceQuery.getDeviceName());
         }
-        if (!Objects.isNull(deviceQuery.getDriverId())) {
+        if (Objects.nonNull(deviceQuery.getDriverId())) {
             query.setDriverId(deviceQuery.getDriverId());
         }
-        if (!Objects.isNull(deviceQuery.getTenantId())) {
+        if (Objects.nonNull(deviceQuery.getTenantId())) {
             query.setTenantId(deviceQuery.getTenantId());
         }
         Optional.ofNullable(deviceQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
@@ -84,7 +84,7 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
             dataList.forEach(driverDO -> {
                 String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + driverDO.getBase().getId();
                 String status = redisService.getKey(key);
-                status = !Objects.isNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
+                status = Objects.nonNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
                 DeviceStatusHistoryDO deviceStatusHistoryDO = new DeviceStatusHistoryDO();
                 deviceStatusHistoryDO.setDriverId(driverDO.getDriverId());
                 deviceStatusHistoryDO.setDeviceId(driverDO.getBase().getId());

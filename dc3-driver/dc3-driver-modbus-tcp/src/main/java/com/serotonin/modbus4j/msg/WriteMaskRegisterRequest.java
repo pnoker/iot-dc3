@@ -73,6 +73,10 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
         this.orMask = orMask;
     }
 
+    WriteMaskRegisterRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
+
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(writeOffset);
@@ -96,10 +100,6 @@ public class WriteMaskRegisterRequest extends ModbusRequest {
             orMask = orMask | 1 << bit;
         else
             orMask = orMask & ~(1 << bit);
-    }
-
-    WriteMaskRegisterRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
     }
 
     @Override

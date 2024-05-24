@@ -31,11 +31,6 @@ public class WriteMaskRegisterResponse extends ModbusResponse {
     private int andMask;
     private int orMask;
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.WRITE_MASK_REGISTER;
-    }
-
     WriteMaskRegisterResponse(int slaveId) throws ModbusTransportException {
         super(slaveId);
     }
@@ -45,6 +40,11 @@ public class WriteMaskRegisterResponse extends ModbusResponse {
         this.writeOffset = writeOffset;
         this.andMask = andMask;
         this.orMask = orMask;
+    }
+
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_MASK_REGISTER;
     }
 
     @Override

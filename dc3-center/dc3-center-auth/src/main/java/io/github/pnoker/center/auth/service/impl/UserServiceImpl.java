@@ -25,6 +25,7 @@ import io.github.pnoker.center.auth.dal.UserManager;
 import io.github.pnoker.center.auth.entity.bo.UserBO;
 import io.github.pnoker.center.auth.entity.builder.UserBuilder;
 import io.github.pnoker.center.auth.entity.model.UserDO;
+import io.github.pnoker.center.auth.entity.query.UserPasswordQuery;
 import io.github.pnoker.center.auth.entity.query.UserQuery;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -34,7 +35,6 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -55,14 +55,13 @@ public class UserServiceImpl implements UserService {
     private UserManager userManager;
 
     @Override
-    @Transactional
     public void save(UserBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         // 判断手机号是否存在, 如果有手机号不为空, 检查该手机号是否被占用
         if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
             UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
-            if (!Objects.isNull(selectByPhone)) {
+            if (Objects.nonNull(selectByPhone)) {
                 throw new DuplicateException("The user already exists with phone: {}", entityBO.getPhone());
             }
         }
@@ -70,7 +69,7 @@ public class UserServiceImpl implements UserService {
         // 判断邮箱是否存在, 如果有邮箱不为空, 检查该邮箱是否被占用
         if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
             UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
-            if (!Objects.isNull(selectByEmail)) {
+            if (Objects.nonNull(selectByEmail)) {
                 throw new DuplicateException("The user already exists with email: {}", entityBO.getEmail());
             }
         }
@@ -100,7 +99,7 @@ public class UserServiceImpl implements UserService {
         if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
             if (!entityBO.getPhone().equals(selectById.getPhone())) {
                 UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
-                if (!Objects.isNull(selectByPhone)) {
+                if (Objects.nonNull(selectByPhone)) {
                     throw new DuplicateException("The user already exists with phone {}", entityBO.getPhone());
                 }
             }
@@ -110,7 +109,7 @@ public class UserServiceImpl implements UserService {
         if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
             if (!entityBO.getEmail().equals(selectById.getEmail())) {
                 UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
-                if (!Objects.isNull(selectByEmail)) {
+                if (Objects.nonNull(selectByEmail)) {
                     throw new DuplicateException("The user already exists with email {}", entityBO.getEmail());
                 }
             }
@@ -173,6 +172,12 @@ public class UserServiceImpl implements UserService {
         return userBuilder.buildBOPageByDOPage(page);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link UserQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<UserDO> fuzzyQuery(UserQuery entityQuery) {
         LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getNickName()), UserDO::getNickName, entityQuery.getNickName());

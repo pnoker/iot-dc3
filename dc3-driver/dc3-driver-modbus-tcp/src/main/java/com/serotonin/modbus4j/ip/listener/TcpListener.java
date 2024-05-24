@@ -53,10 +53,9 @@ import java.util.concurrent.TimeUnit;
 public class TcpListener extends ModbusMaster {
     // Configuration fields.
     private final Log LOG = LogFactory.getLog(TcpListener.class);
+    private final IpParameters ipParameters;
     private short nextTransactionId = 0;
     private short retries = 0;
-    private final IpParameters ipParameters;
-
     // Runtime fields.
     private ServerSocket serverSocket;
     private Socket socket;

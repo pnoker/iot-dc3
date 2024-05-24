@@ -45,15 +45,15 @@ abstract public class ReadNumericRequest extends ModbusRequest {
         this.numberOfRegisters = numberOfRegisters;
     }
 
+    ReadNumericRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
+
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
         modbus.validateNumberOfRegisters(numberOfRegisters);
         ModbusUtils.validateEndOffset(startOffset + numberOfRegisters - 1);
-    }
-
-    ReadNumericRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
     }
 
     @Override

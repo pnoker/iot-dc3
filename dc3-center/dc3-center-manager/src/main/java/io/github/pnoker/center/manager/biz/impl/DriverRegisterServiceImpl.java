@@ -55,15 +55,14 @@ import java.util.stream.Collectors;
 @Service
 public class DriverRegisterServiceImpl implements DriverRegisterService {
 
-    @GrpcClient(AuthConstant.SERVICE_NAME)
-    private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
-
     private final GrpcDriverBuilder grpcDriverBuilder;
     private final GrpcDriverAttributeBuilder grpcDriverAttributeBuilder;
     private final GrpcPointAttributeBuilder grpcPointAttributeBuilder;
     private final DriverService driverService;
     private final DriverAttributeService driverAttributeService;
     private final PointAttributeService pointAttributeService;
+    @GrpcClient(AuthConstant.SERVICE_NAME)
+    private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
 
     public DriverRegisterServiceImpl(GrpcDriverBuilder grpcDriverBuilder, GrpcDriverAttributeBuilder grpcDriverAttributeBuilder, GrpcPointAttributeBuilder grpcPointAttributeBuilder, DriverService driverService, DriverAttributeService driverAttributeService, PointAttributeService pointAttributeService) {
         this.grpcDriverBuilder = grpcDriverBuilder;
@@ -84,7 +83,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         DriverBO driverBO = grpcDriverBuilder.buildBOByGrpcDTO(entityGrpc.getDriver());
         Objects.requireNonNull(driverBO).setTenantId(rTenantDTO.getData().getBase().getId());
         DriverBO entityBO = driverService.selectByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
-        if (!Objects.isNull(entityBO)) {
+        if (Objects.nonNull(entityBO)) {
             log.info("The driver has been registered, perform update: {}", JsonUtil.toJsonString(driverBO));
             driverBO.setId(entityBO.getId());
             driverService.update(driverBO);
@@ -107,7 +106,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         for (Map.Entry<String, DriverAttributeBO> entry : newDriverAttributeMap.entrySet()) {
             String name = entry.getKey();
             DriverAttributeBO attribute = newDriverAttributeMap.get(name);
-            attribute.setDriverId(attribute.getId());
+            attribute.setDriverId(entityBO.getId());
             if (oldDriverAttributeMap.containsKey(name)) {
                 log.debug("The driver attributes have been registered, update is performed: {}", JsonUtil.toJsonString(attribute));
                 attribute.setId(oldDriverAttributeMap.get(name).getId());
@@ -140,7 +139,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         for (Map.Entry<String, PointAttributeBO> entry : newPointAttributeMap.entrySet()) {
             String name = entry.getKey();
             PointAttributeBO attribute = newPointAttributeMap.get(name);
-            attribute.setDriverId(attribute.getId());
+            attribute.setDriverId(entityBO.getId());
             if (oldPointAttributeMap.containsKey(name)) {
                 log.debug("The point attribute has been registered, update is performed: {}", JsonUtil.toJsonString(attribute));
                 attribute.setId(oldPointAttributeMap.get(name).getId());

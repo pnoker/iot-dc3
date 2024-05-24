@@ -88,7 +88,7 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
         if (CharSequenceUtil.isNotEmpty(driverQuery.getServiceHost())) {
             query.setServiceHost(driverQuery.getServiceHost());
         }
-        if (!Objects.isNull(driverQuery.getTenantId())) {
+        if (Objects.nonNull(driverQuery.getTenantId())) {
             query.setTenantId(driverQuery.getTenantId());
         }
         Optional.ofNullable(driverQuery.getDriverTypeFlag()).ifPresentOrElse(value -> query.setDriverTypeFlag(value.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));

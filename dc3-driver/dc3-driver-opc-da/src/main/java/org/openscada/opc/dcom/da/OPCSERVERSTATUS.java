@@ -46,6 +46,43 @@ public class OPCSERVERSTATUS {
 
     private String _vendorInfo = null;
 
+    public static JIStruct getStruct() throws JIException {
+        JIStruct struct = new JIStruct();
+
+        struct.addMember(FILETIME.getStruct());
+        struct.addMember(FILETIME.getStruct());
+        struct.addMember(FILETIME.getStruct());
+        struct.addMember(Short.class); // enum: OPCSERVERSTATE
+        struct.addMember(Integer.class);
+        struct.addMember(Integer.class);
+        struct.addMember(Short.class);
+        struct.addMember(Short.class);
+        struct.addMember(Short.class);
+        struct.addMember(Short.class);
+        struct.addMember(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)));
+
+        return struct;
+    }
+
+    public static OPCSERVERSTATUS fromStruct(final JIStruct struct) {
+        OPCSERVERSTATUS status = new OPCSERVERSTATUS();
+
+        status._startTime = FILETIME.fromStruct((JIStruct) struct.getMember(0));
+        status._currentTime = FILETIME.fromStruct((JIStruct) struct.getMember(1));
+        status._lastUpdateTime = FILETIME.fromStruct((JIStruct) struct.getMember(2));
+
+        status._serverState = OPCSERVERSTATE.fromID((Short) struct.getMember(3));
+        status._groupCount = (Integer) struct.getMember(4);
+        status._bandWidth = (Integer) struct.getMember(5);
+        status._majorVersion = (Short) struct.getMember(6);
+        status._minorVersion = (Short) struct.getMember(7);
+        status._buildNumber = (Short) struct.getMember(8);
+        status._reserved = (Short) struct.getMember(9);
+        status._vendorInfo = ((JIString) ((JIPointer) struct.getMember(10)).getReferent()).getString();
+
+        return status;
+    }
+
     public int getBandWidth() {
         return this._bandWidth;
     }
@@ -132,42 +169,5 @@ public class OPCSERVERSTATUS {
 
     public void setServerState(final OPCSERVERSTATE dwServerState) {
         this._serverState = dwServerState;
-    }
-
-    public static JIStruct getStruct() throws JIException {
-        JIStruct struct = new JIStruct();
-
-        struct.addMember(FILETIME.getStruct());
-        struct.addMember(FILETIME.getStruct());
-        struct.addMember(FILETIME.getStruct());
-        struct.addMember(Short.class); // enum: OPCSERVERSTATE
-        struct.addMember(Integer.class);
-        struct.addMember(Integer.class);
-        struct.addMember(Short.class);
-        struct.addMember(Short.class);
-        struct.addMember(Short.class);
-        struct.addMember(Short.class);
-        struct.addMember(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)));
-
-        return struct;
-    }
-
-    public static OPCSERVERSTATUS fromStruct(final JIStruct struct) {
-        OPCSERVERSTATUS status = new OPCSERVERSTATUS();
-
-        status._startTime = FILETIME.fromStruct((JIStruct) struct.getMember(0));
-        status._currentTime = FILETIME.fromStruct((JIStruct) struct.getMember(1));
-        status._lastUpdateTime = FILETIME.fromStruct((JIStruct) struct.getMember(2));
-
-        status._serverState = OPCSERVERSTATE.fromID((Short) struct.getMember(3));
-        status._groupCount = (Integer) struct.getMember(4);
-        status._bandWidth = (Integer) struct.getMember(5);
-        status._majorVersion = (Short) struct.getMember(6);
-        status._minorVersion = (Short) struct.getMember(7);
-        status._buildNumber = (Short) struct.getMember(8);
-        status._reserved = (Short) struct.getMember(9);
-        status._vendorInfo = ((JIString) ((JIPointer) struct.getMember(10)).getReferent()).getString();
-
-        return status;
     }
 }

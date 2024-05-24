@@ -17,17 +17,16 @@
 package org.openscada.opc.lib.da;
 
 public class UnknownGroupException extends Exception {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     private String _name = null;
 
     public UnknownGroupException(final String name) {
         super();
         this._name = name;
     }
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
 
     public String getName() {
         return this._name;

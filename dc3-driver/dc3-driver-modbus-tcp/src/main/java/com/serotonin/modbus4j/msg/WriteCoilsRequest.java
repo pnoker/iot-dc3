@@ -48,15 +48,15 @@ public class WriteCoilsRequest extends ModbusRequest {
         data = convertToBytes(bdata);
     }
 
+    WriteCoilsRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
+
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
         modbus.validateNumberOfBits(numberOfBits);
         ModbusUtils.validateEndOffset(startOffset + numberOfBits - 1);
-    }
-
-    WriteCoilsRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
     }
 
     @Override

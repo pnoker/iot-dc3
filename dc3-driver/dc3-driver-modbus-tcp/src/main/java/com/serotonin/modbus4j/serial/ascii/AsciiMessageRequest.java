@@ -29,15 +29,6 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 5.0.0
  */
 public class AsciiMessageRequest extends AsciiMessage implements OutgoingRequestMessage, IncomingRequestMessage {
-    static AsciiMessageRequest createAsciiMessageRequest(ByteQueue queue) throws ModbusTransportException {
-        ByteQueue msgQueue = getUnasciiMessage(queue);
-        ModbusRequest request = ModbusRequest.createModbusRequest(msgQueue);
-        AsciiMessageRequest asciiRequest = new AsciiMessageRequest(request);
-
-        // Return the data.
-        return asciiRequest;
-    }
-
     /**
      * <p>Constructor for AsciiMessageRequest.</p>
      *
@@ -47,6 +38,14 @@ public class AsciiMessageRequest extends AsciiMessage implements OutgoingRequest
         super(modbusMessage);
     }
 
+    static AsciiMessageRequest createAsciiMessageRequest(ByteQueue queue) throws ModbusTransportException {
+        ByteQueue msgQueue = getUnasciiMessage(queue);
+        ModbusRequest request = ModbusRequest.createModbusRequest(msgQueue);
+        AsciiMessageRequest asciiRequest = new AsciiMessageRequest(request);
+
+        // Return the data.
+        return asciiRequest;
+    }
 
     @Override
     public boolean expectsResponse() {

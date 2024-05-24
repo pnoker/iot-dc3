@@ -113,9 +113,15 @@ public class LimitedIpServiceImpl implements LimitedIpService {
     @Override
     public Boolean checkValid(String ip) {
         LimitedIpBO limitedIpBO = selectByIp(ip);
-        return !Objects.isNull(limitedIpBO);
+        return Objects.nonNull(limitedIpBO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link LimitedIpQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<LimitedIpDO> fuzzyQuery(LimitedIpQuery entityQuery) {
         LambdaQueryWrapper<LimitedIpDO> wrapper = Wrappers.<LimitedIpDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getIp()), LimitedIpDO::getIp, entityQuery.getIp());

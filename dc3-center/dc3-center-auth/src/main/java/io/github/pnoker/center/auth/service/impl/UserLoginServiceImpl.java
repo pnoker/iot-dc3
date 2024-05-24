@@ -24,6 +24,7 @@ import io.github.pnoker.center.auth.dal.UserLoginManager;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.entity.builder.UserLoginBuilder;
 import io.github.pnoker.center.auth.entity.model.UserLoginDO;
+import io.github.pnoker.center.auth.entity.query.TenantQuery;
 import io.github.pnoker.center.auth.entity.query.UserLoginQuery;
 import io.github.pnoker.center.auth.service.UserLoginService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -34,7 +35,6 @@ import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -55,7 +55,6 @@ public class UserLoginServiceImpl implements UserLoginService {
     private UserLoginManager userLoginManager;
 
     @Override
-    @Transactional
     public void save(UserLoginBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
@@ -125,13 +124,19 @@ public class UserLoginServiceImpl implements UserLoginService {
     @Override
     public boolean checkLoginNameValid(String loginName) {
         UserLoginBO userLogin = selectByLoginName(loginName, false);
-        if (!Objects.isNull(userLogin)) {
+        if (Objects.nonNull(userLogin)) {
             return EnableFlagEnum.ENABLE.equals(userLogin.getEnableFlag());
         }
 
         return false;
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link UserLoginQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<UserLoginDO> fuzzyQuery(UserLoginQuery entityQuery) {
         LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getLoginName()), UserLoginDO::getLoginName, entityQuery.getLoginName());

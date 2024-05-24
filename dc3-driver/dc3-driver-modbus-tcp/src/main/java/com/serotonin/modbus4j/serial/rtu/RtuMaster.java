@@ -63,6 +63,90 @@ public class RtuMaster extends SerialMaster {
     }
 
     /**
+     * RTU Spec:
+     * For baud greater than 19200
+     * Message Spacing: 1.750uS
+     * <p>
+     * For baud less than 19200
+     * Message Spacing: 3.5 * char time
+     *
+     * @param wrapper a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
+     * @return a long.
+     */
+    public static long computeMessageFrameSpacing(SerialPortWrapper wrapper) {
+        //For Modbus Serial Spec, Message Framing rates at 19200 Baud are fixed
+        if (wrapper.getBaudRate() > 19200) {
+            return 1750000l; //Nanoseconds
+        } else {
+            float charTime = computeCharacterTime(wrapper);
+            return (long) (charTime * 3.5f);
+        }
+    }
+
+    /**
+     * RTU Spec:
+     * For baud greater than 19200
+     * Char Spacing: 750uS
+     * <p>
+     * For baud less than 19200
+     * Char Spacing: 1.5 * char time
+     *
+     * @param wrapper a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
+     * @return a long.
+     */
+    public static long computeCharacterSpacing(SerialPortWrapper wrapper) {
+        //For Modbus Serial Spec, Message Framing rates at 19200 Baud are fixed
+        if (wrapper.getBaudRate() > 19200) {
+            return 750000l; //Nanoseconds
+        } else {
+            float charTime = computeCharacterTime(wrapper);
+            return (long) (charTime * 1.5f);
+        }
+    }
+
+    /**
+     * Compute the time it takes to transmit 1 character with
+     * the provided Serial Parameters.
+     * <p>
+     * RTU Spec:
+     * For baud greater than 19200
+     * Char Spacing: 750uS
+     * Message Spacing: 1.750uS
+     * <p>
+     * For baud less than 19200
+     * Char Spacing: 1.5 * char time
+     * Message Spacing: 3.5 * char time
+     *
+     * @param wrapper a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
+     * @return time in nanoseconds
+     */
+    public static float computeCharacterTime(SerialPortWrapper wrapper) {
+        //Compute the char size
+        float charBits = wrapper.getDataBits();
+        switch (wrapper.getStopBits()) {
+            case 1:
+                //Strangely this results in 0 stop bits.. in JSSC code
+                break;
+            case 2:
+                charBits += 2f;
+                break;
+            case 3:
+                //1.5 stop bits
+                charBits += 1.5f;
+                break;
+            default:
+                throw new ShouldNeverHappenException("Unknown stop bit size: " + wrapper.getStopBits());
+        }
+
+        if (wrapper.getParity() > 0)
+            charBits += 1; //Add another if using parity
+
+        //Compute ns it takes to send one char
+        // ((charSize/symbols per second) ) * ns per second
+        return (charBits / wrapper.getBaudRate()) * 1000000000f;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -129,90 +213,5 @@ public class RtuMaster extends SerialMaster {
                 throw new ModbusTransportException(e2, request.getSlaveId());
             }
         }
-    }
-
-    /**
-     * RTU Spec:
-     * For baud greater than 19200
-     * Message Spacing: 1.750uS
-     * <p>
-     * For baud less than 19200
-     * Message Spacing: 3.5 * char time
-     *
-     * @param wrapper a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
-     * @return a long.
-     */
-    public static long computeMessageFrameSpacing(SerialPortWrapper wrapper) {
-        //For Modbus Serial Spec, Message Framing rates at 19200 Baud are fixed
-        if (wrapper.getBaudRate() > 19200) {
-            return 1750000l; //Nanoseconds
-        } else {
-            float charTime = computeCharacterTime(wrapper);
-            return (long) (charTime * 3.5f);
-        }
-    }
-
-    /**
-     * RTU Spec:
-     * For baud greater than 19200
-     * Char Spacing: 750uS
-     * <p>
-     * For baud less than 19200
-     * Char Spacing: 1.5 * char time
-     *
-     * @param wrapper a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
-     * @return a long.
-     */
-    public static long computeCharacterSpacing(SerialPortWrapper wrapper) {
-        //For Modbus Serial Spec, Message Framing rates at 19200 Baud are fixed
-        if (wrapper.getBaudRate() > 19200) {
-            return 750000l; //Nanoseconds
-        } else {
-            float charTime = computeCharacterTime(wrapper);
-            return (long) (charTime * 1.5f);
-        }
-    }
-
-
-    /**
-     * Compute the time it takes to transmit 1 character with
-     * the provided Serial Parameters.
-     * <p>
-     * RTU Spec:
-     * For baud greater than 19200
-     * Char Spacing: 750uS
-     * Message Spacing: 1.750uS
-     * <p>
-     * For baud less than 19200
-     * Char Spacing: 1.5 * char time
-     * Message Spacing: 3.5 * char time
-     *
-     * @param wrapper a {@link com.serotonin.modbus4j.serial.SerialPortWrapper} object.
-     * @return time in nanoseconds
-     */
-    public static float computeCharacterTime(SerialPortWrapper wrapper) {
-        //Compute the char size
-        float charBits = wrapper.getDataBits();
-        switch (wrapper.getStopBits()) {
-            case 1:
-                //Strangely this results in 0 stop bits.. in JSSC code
-                break;
-            case 2:
-                charBits += 2f;
-                break;
-            case 3:
-                //1.5 stop bits
-                charBits += 1.5f;
-                break;
-            default:
-                throw new ShouldNeverHappenException("Unknown stop bit size: " + wrapper.getStopBits());
-        }
-
-        if (wrapper.getParity() > 0)
-            charBits += 1; //Add another if using parity
-
-        //Compute ns it takes to send one char
-        // ((charSize/symbols per second) ) * ns per second
-        return (charBits / wrapper.getBaudRate()) * 1000000000f;
     }
 }

@@ -29,6 +29,15 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 5.0.0
  */
 public class EncapMessageRequest extends EncapMessage implements OutgoingRequestMessage, IncomingRequestMessage {
+    /**
+     * <p>Constructor for EncapMessageRequest.</p>
+     *
+     * @param modbusRequest a {@link ModbusRequest} object.
+     */
+    public EncapMessageRequest(ModbusRequest modbusRequest) {
+        super(modbusRequest);
+    }
+
     static EncapMessageRequest createEncapMessageRequest(ByteQueue queue) throws ModbusTransportException {
         // Create the modbus response.
         ModbusRequest request = ModbusRequest.createModbusRequest(queue);
@@ -38,15 +47,6 @@ public class EncapMessageRequest extends EncapMessage implements OutgoingRequest
         ModbusUtils.checkCRC(encapRequest.modbusMessage, queue);
 
         return encapRequest;
-    }
-
-    /**
-     * <p>Constructor for EncapMessageRequest.</p>
-     *
-     * @param modbusRequest a {@link ModbusRequest} object.
-     */
-    public EncapMessageRequest(ModbusRequest modbusRequest) {
-        super(modbusRequest);
     }
 
     @Override

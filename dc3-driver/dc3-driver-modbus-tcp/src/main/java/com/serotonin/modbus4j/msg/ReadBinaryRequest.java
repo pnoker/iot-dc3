@@ -45,15 +45,15 @@ abstract public class ReadBinaryRequest extends ModbusRequest {
         this.numberOfBits = numberOfBits;
     }
 
+    ReadBinaryRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
+
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
         modbus.validateNumberOfBits(numberOfBits);
         ModbusUtils.validateEndOffset(startOffset + numberOfBits - 1);
-    }
-
-    ReadBinaryRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
     }
 
     @Override

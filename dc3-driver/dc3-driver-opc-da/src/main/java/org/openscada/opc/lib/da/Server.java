@@ -45,30 +45,18 @@ import java.util.concurrent.ScheduledExecutorService;
 public class Server {
 
     private final ConnectionInformation connectionInformation;
-
-    private JISession session;
-
-    private JIComServer comServer;
-
-    private OPCServer server;
-
-    private boolean defaultActive = true;
-
-    private int defaultUpdateRate = 1000;
-
-    private Integer defaultTimeBias;
-
-    private Float defaultPercentDeadband;
-
-    private int defaultLocaleID = 0;
-
-    private ErrorMessageResolver errorMessageResolver;
-
     private final Map<Integer, Group> groups = new HashMap<>(16);
-
     private final List<ServerConnectionStateListener> stateListeners = new CopyOnWriteArrayList<>();
-
     private final ScheduledExecutorService scheduler;
+    private JISession session;
+    private JIComServer comServer;
+    private OPCServer server;
+    private boolean defaultActive = true;
+    private int defaultUpdateRate = 1000;
+    private Integer defaultTimeBias;
+    private Float defaultPercentDeadband;
+    private int defaultLocaleID = 0;
+    private ErrorMessageResolver errorMessageResolver;
 
     public Server(final ConnectionInformation connectionInformation,
                   final ScheduledExecutorService scheduler) {

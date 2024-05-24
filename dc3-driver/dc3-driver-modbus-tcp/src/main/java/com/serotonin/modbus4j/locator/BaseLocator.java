@@ -37,6 +37,23 @@ abstract public class BaseLocator<T> {
     // Factory methods
     //
 
+    protected final int range;
+    protected final int offset;
+    private final int slaveId;
+
+    /**
+     * <p>Constructor for BaseLocator.</p>
+     *
+     * @param slaveId a int.
+     * @param range   a int.
+     * @param offset  a int.
+     */
+    public BaseLocator(int slaveId, int range, int offset) {
+        this.slaveId = slaveId;
+        this.range = range;
+        this.offset = offset;
+    }
+
     /**
      * <p>coilStatus.</p>
      *
@@ -178,23 +195,6 @@ abstract public class BaseLocator<T> {
         if (dataType == DataType.CHAR || dataType == DataType.VARCHAR)
             return new StringLocator(slaveId, range, offset, dataType, registerCount, charset);
         return new NumericLocator(slaveId, range, offset, dataType);
-    }
-
-    private final int slaveId;
-    protected final int range;
-    protected final int offset;
-
-    /**
-     * <p>Constructor for BaseLocator.</p>
-     *
-     * @param slaveId a int.
-     * @param range   a int.
-     * @param offset  a int.
-     */
-    public BaseLocator(int slaveId, int range, int offset) {
-        this.slaveId = slaveId;
-        this.range = range;
-        this.offset = offset;
     }
 
     /**

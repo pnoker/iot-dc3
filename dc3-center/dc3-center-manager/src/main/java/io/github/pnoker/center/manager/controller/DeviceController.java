@@ -26,17 +26,21 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.utils.FileUtil;
 import io.github.pnoker.common.utils.ResponseUtil;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.github.pnoker.common.valid.Upload;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -181,15 +185,22 @@ public class DeviceController implements BaseController {
      * @return R of String
      */
     @PostMapping("/import")
-    public Mono<R<String>> importDevice(@Validated(Update.class) DeviceVO entityVO, @RequestParam("file") MultipartFile multipartFile) {
+    public Mono<R<String>> importDevice(@Validated(Upload.class) DeviceVO entityVO, @RequestPart("file") Mono<FilePart> filePart) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-            deviceService.importDevice(entityBO, multipartFile);
+            entityBO.setTenantId(getTenantId());
+            return filePart.flatMap(part -> {
+                String filePath = FileUtil.getTempPath() + FileUtil.getRandomXlsxName();
+                File file = new File(filePath);
+                return part.transferTo(file).then(Mono.defer(() -> {
+                    deviceService.importDevice(entityBO, file);
+                    return Mono.just(R.ok());
+                }));
+            });
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return Mono.just(R.fail(e.getMessage()));
         }
-        return Mono.just(R.ok());
     }
 
     /**
@@ -199,14 +210,10 @@ public class DeviceController implements BaseController {
      * @return 模板文件流
      */
     @PostMapping("/export/import_template")
-    public ResponseEntity<org.springframework.core.io.Resource> importTemplate(@Validated(Update.class) @RequestBody DeviceVO entityVO) {
-        try {
-            DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-            Path filePath = deviceService.generateImportTemplate(entityBO);
-            return ResponseUtil.responseFile(filePath);
-        } catch (Exception e) {
-            return null;
-        }
+    public ResponseEntity<Resource> importTemplate(@Validated(Upload.class) @RequestBody DeviceVO entityVO) {
+        DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+        Path filePath = deviceService.generateImportTemplate(entityBO);
+        return ResponseUtil.responseFile(filePath);
     }
 
     /**

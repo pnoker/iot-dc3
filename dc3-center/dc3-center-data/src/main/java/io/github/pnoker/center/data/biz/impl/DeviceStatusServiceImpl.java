@@ -158,7 +158,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         deviceIds.forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisService.getKey(key);
-            status = !Objects.isNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
+            status = Objects.nonNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
             statusMap.put(id, status);
         });
         return statusMap;

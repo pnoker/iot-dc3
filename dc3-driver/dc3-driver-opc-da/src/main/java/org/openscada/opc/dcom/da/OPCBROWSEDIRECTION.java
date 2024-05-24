@@ -28,10 +28,6 @@ public enum OPCBROWSEDIRECTION {
         this._id = id;
     }
 
-    public int id() {
-        return this._id;
-    }
-
     public static OPCBROWSEDIRECTION fromID(final int id) {
         switch (id) {
             case 1:
@@ -43,5 +39,9 @@ public enum OPCBROWSEDIRECTION {
             default:
                 return OPC_BROWSE_UNKNOWN;
         }
+    }
+
+    public int id() {
+        return this._id;
     }
 }

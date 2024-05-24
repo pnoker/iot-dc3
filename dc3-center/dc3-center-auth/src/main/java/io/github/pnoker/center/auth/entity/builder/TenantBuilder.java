@@ -75,7 +75,7 @@ public interface TenantBuilder {
         // Json Ext
         TenantExt entityExt = entityBO.getTenantExt();
         JsonExt ext = new JsonExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -110,7 +110,7 @@ public interface TenantBuilder {
     default void afterProcess(TenantDO entityDO, @MappingTarget TenantBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getTenantExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             TenantExt ext = new TenantExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

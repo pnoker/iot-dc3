@@ -16,7 +16,7 @@
 
 driver:
   tenant: default
-  name: 模拟Tcp/Udp驱动
+  name: 虚拟Tcp/Udp驱动
   code: ListeningVirtualDriver
   type: DRIVER_SERVER
   remark: @project.description@

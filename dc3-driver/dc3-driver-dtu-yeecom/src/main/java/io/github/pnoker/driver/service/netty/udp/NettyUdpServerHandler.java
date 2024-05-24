@@ -54,14 +54,13 @@ import java.util.Objects;
 @ChannelHandler.Sharable
 public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
     private static NettyUdpServerHandler nettyUdpServerHandler;
+    @Resource
+    private NettyServerHandler nettyServerHandler;
 
     @PostConstruct
     public void init() {
         nettyUdpServerHandler = this;
     }
-
-    @Resource
-    private NettyServerHandler nettyServerHandler;
 
     @Override
     @SneakyThrows
@@ -81,7 +80,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
         super.channelActive(context);
         log.info("Channel Active:{}", context);
         Channel channel = context.channel();
-        if (!Objects.isNull(channel)) {
+        if (Objects.nonNull(channel)) {
             channel.writeAndFlush(DecodeUtil.stringToByte("AT*GSTATE?"));
         }
     }

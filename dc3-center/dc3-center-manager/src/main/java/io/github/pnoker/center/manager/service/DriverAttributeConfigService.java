@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service;
 
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.common.base.service.BaseService;
@@ -55,4 +56,11 @@ public interface DriverAttributeConfigService extends BaseService<DriverAttribut
      */
     DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId);
 
+    /**
+     * 内部保存
+     *
+     * @param entityBO {@link DriverAttributeConfigBO}
+     * @return {@link DeviceBO}
+     */
+    DriverAttributeConfigBO innerSave(DriverAttributeConfigBO entityBO);
 }

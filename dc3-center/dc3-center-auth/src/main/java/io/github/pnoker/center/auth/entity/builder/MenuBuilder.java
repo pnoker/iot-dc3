@@ -80,7 +80,7 @@ public interface MenuBuilder {
         // Json Ext
         MenuExt entityExt = entityBO.getMenuExt();
         JsonExt ext = new JsonExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -125,7 +125,7 @@ public interface MenuBuilder {
     default void afterProcess(MenuDO entityDO, @MappingTarget MenuBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getMenuExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             MenuExt ext = new MenuExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

@@ -46,6 +46,10 @@ public class WriteRegistersRequest extends ModbusRequest {
         data = convertToBytes(sdata);
     }
 
+    WriteRegistersRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
+
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(startOffset);
@@ -53,10 +57,6 @@ public class WriteRegistersRequest extends ModbusRequest {
         if (registerCount < 1 || registerCount > modbus.getMaxWriteRegisterCount())
             throw new ModbusTransportException("Invalid number of registers: " + registerCount, slaveId);
         ModbusUtils.validateEndOffset(startOffset + registerCount - 1);
-    }
-
-    WriteRegistersRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
     }
 
     @Override

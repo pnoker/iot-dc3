@@ -207,11 +207,11 @@ public class OPCDataCallback extends EventHandlerImpl {
         return this.coClass;
     }
 
-    public void setCallback(final IOPCDataCallback callback) {
-        this.callback = callback;
-    }
-
     public IOPCDataCallback getCallback() {
         return this.callback;
+    }
+
+    public void setCallback(final IOPCDataCallback callback) {
+        this.callback = callback;
     }
 }

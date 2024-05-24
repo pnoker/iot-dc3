@@ -73,7 +73,7 @@ public interface UserBuilder {
     default void afterProcess(UserBO entityBO, @MappingTarget UserDO entityDO) {
         UserSocialExt entitySocialExt = entityBO.getSocialExt();
         JsonExt socialExt = new JsonExt();
-        if (!Objects.isNull(entitySocialExt)) {
+        if (Objects.nonNull(entitySocialExt)) {
             socialExt.setType(entitySocialExt.getType());
             socialExt.setVersion(entitySocialExt.getVersion());
             socialExt.setVersion(entitySocialExt.getVersion());
@@ -84,7 +84,7 @@ public interface UserBuilder {
 
         UserIdentityExt entityIdentityExt = entityBO.getIdentityExt();
         JsonExt identityExt = new JsonExt();
-        if (!Objects.isNull(entityIdentityExt)) {
+        if (Objects.nonNull(entityIdentityExt)) {
             identityExt.setType(entityIdentityExt.getType());
             identityExt.setVersion(entityIdentityExt.getVersion());
             identityExt.setVersion(entityIdentityExt.getVersion());
@@ -115,7 +115,7 @@ public interface UserBuilder {
     @AfterMapping
     default void afterProcess(UserDO entityDO, @MappingTarget UserBO entityBO) {
         JsonExt entitySocialExt = entityDO.getSocialExt();
-        if (!Objects.isNull(entitySocialExt)) {
+        if (Objects.nonNull(entitySocialExt)) {
             UserSocialExt ext = new UserSocialExt();
             ext.setType(entitySocialExt.getType());
             ext.setVersion(entitySocialExt.getVersion());
@@ -126,7 +126,7 @@ public interface UserBuilder {
         }
 
         JsonExt entityIdentityExt = entityDO.getIdentityExt();
-        if (!Objects.isNull(entityIdentityExt)) {
+        if (Objects.nonNull(entityIdentityExt)) {
             UserIdentityExt ext = new UserIdentityExt();
             ext.setType(entityIdentityExt.getType());
             ext.setVersion(entityIdentityExt.getVersion());

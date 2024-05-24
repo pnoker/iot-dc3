@@ -57,6 +57,16 @@ public class RuleServiceImpl implements RuleService {
 
     @Autowired
     private ObjectMapper objectMapper;
+    private List<Map<String, Map<String, Object>>> actions = new ArrayList<>();
+
+    public static Page<RuleDataVO> getPageSubset2(int current, int size, List<RuleDataVO> ruleDataVOList) {
+        int fromIndex = Math.max((current - 1) * size, 0);
+        int toIndex = Math.min(current * size, ruleDataVOList.size());
+        List<RuleDataVO> subset = ruleDataVOList.subList(fromIndex, toIndex);
+        Page<RuleDataVO> page = new Page<>(current, size, ruleDataVOList.size());
+        page.setRecords(subset);
+        return page;
+    }
 
     @Override
     public Mono<DetailRuleVO> callApilRule(HttpMethod method, String url) {
@@ -121,7 +131,6 @@ public class RuleServiceImpl implements RuleService {
                     return Mono.just(page);
                 });
     }
-
 
     @Override
     public Mono<String> addActions(Object data) {
@@ -237,7 +246,6 @@ public class RuleServiceImpl implements RuleService {
         return Mono.error(new RuntimeException("No configuration found for type: " + type));
     }
 
-
     @Override
     public Mono<String> editActions(Object data, String type, Integer index) {
         // 解析传入的数据为Map对象
@@ -261,8 +269,6 @@ public class RuleServiceImpl implements RuleService {
         // 如果 actions 列表中没有指定类型和索引的结构, 则返回错误信息
         return Mono.error(new RuntimeException("找不到类型为: " + type + ", 索引为: " + index + " 的配置"));
     }
-
-    private List<Map<String, Map<String, Object>>> actions = new ArrayList<>();
 
     @Override
     public Mono<String> editActions(Object data, Integer index) {
@@ -357,15 +363,6 @@ public class RuleServiceImpl implements RuleService {
             e.printStackTrace();
         }
         return ruleDataVOList;
-    }
-
-    public static Page<RuleDataVO> getPageSubset2(int current, int size, List<RuleDataVO> ruleDataVOList) {
-        int fromIndex = Math.max((current - 1) * size, 0);
-        int toIndex = Math.min(current * size, ruleDataVOList.size());
-        List<RuleDataVO> subset = ruleDataVOList.subList(fromIndex, toIndex);
-        Page<RuleDataVO> page = new Page<>(current, size, ruleDataVOList.size());
-        page.setRecords(subset);
-        return page;
     }
 
     private void validateSinkStructure(JsonNode dataJsonNode) throws Exception {

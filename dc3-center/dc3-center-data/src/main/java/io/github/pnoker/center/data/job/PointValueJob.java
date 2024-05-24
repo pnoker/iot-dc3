@@ -44,14 +44,12 @@ public class PointValueJob extends QuartzJobBean {
     public static final AtomicLong VALUE_COUNT = new AtomicLong(0);
     public static final AtomicLong VALUE_SPEED = new AtomicLong(0);
     private static final List<PointValueBO> POINT_VALUE_LIST = new ArrayList<>();
-
+    private final PointValueService pointValueService;
+    private final ThreadPoolExecutor threadPoolExecutor;
     @Value("${data.point.batch.speed}")
     private Integer batchSpeed;
     @Value("${data.point.batch.interval}")
     private Integer interval;
-
-    private final PointValueService pointValueService;
-    private final ThreadPoolExecutor threadPoolExecutor;
 
     public PointValueJob(PointValueService pointValueService, ThreadPoolExecutor threadPoolExecutor) {
         this.pointValueService = pointValueService;

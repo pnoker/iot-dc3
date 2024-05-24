@@ -62,7 +62,7 @@ public class DriverEventController implements BaseController {
                 driverEventQuery = new DriverEventQuery();
             }
             Page<DriverEvent> page = eventService.driverEvent(driverEventQuery);
-            if (!Objects.isNull(page)) {
+            if (Objects.nonNull(page)) {
                 return Mono.just(R.ok(page));
             }
         } catch (Exception e) {

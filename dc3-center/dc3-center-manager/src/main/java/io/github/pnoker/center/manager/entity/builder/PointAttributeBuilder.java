@@ -78,7 +78,7 @@ public interface PointAttributeBuilder {
         // Json Ext
         PointAttributeExt entityExt = entityBO.getAttributeExt();
         JsonExt ext = new JsonExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -118,7 +118,7 @@ public interface PointAttributeBuilder {
     default void afterProcess(PointAttributeDO entityDO, @MappingTarget PointAttributeBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getAttributeExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             PointAttributeExt ext = new PointAttributeExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

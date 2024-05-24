@@ -80,7 +80,7 @@ public interface ProfileBuilder {
         // Json Ext
         ProfileExt entityExt = entityBO.getProfileExt();
         JsonExt ext = new JsonExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -125,7 +125,7 @@ public interface ProfileBuilder {
     default void afterProcess(ProfileDO entityDO, @MappingTarget ProfileBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getProfileExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ProfileExt ext = new ProfileExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

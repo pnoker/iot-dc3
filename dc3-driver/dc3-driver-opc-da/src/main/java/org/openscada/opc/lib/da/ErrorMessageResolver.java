@@ -32,10 +32,8 @@ import java.util.Map;
 @Slf4j
 public class ErrorMessageResolver {
 
-    private OPCCommon _opcCommon = null;
-
     private final Map<Integer, String> _messageCache = new HashMap<Integer, String>();
-
+    private OPCCommon _opcCommon = null;
     private int _localeId = 0;
 
     public ErrorMessageResolver(final OPCCommon opcCommon, final int localeId) {

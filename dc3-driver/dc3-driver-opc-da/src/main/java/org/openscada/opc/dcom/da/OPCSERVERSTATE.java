@@ -31,10 +31,6 @@ public enum OPCSERVERSTATE {
         this._id = id;
     }
 
-    public int id() {
-        return this._id;
-    }
-
     public static OPCSERVERSTATE fromID(final int id) {
         switch (id) {
             case 1:
@@ -52,5 +48,9 @@ public enum OPCSERVERSTATE {
             default:
                 return OPC_STATUS_UNKNOWN;
         }
+    }
+
+    public int id() {
+        return this._id;
     }
 }

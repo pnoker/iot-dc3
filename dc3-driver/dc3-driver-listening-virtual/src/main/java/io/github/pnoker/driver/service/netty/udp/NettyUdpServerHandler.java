@@ -51,14 +51,13 @@ import javax.annotation.PostConstruct;
 @ChannelHandler.Sharable
 public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
     private static NettyUdpServerHandler nettyUdpServerHandler;
+    @Resource
+    private NettyServerHandler nettyServerHandler;
 
     @PostConstruct
     public void init() {
         nettyUdpServerHandler = this;
     }
-
-    @Resource
-    private NettyServerHandler nettyServerHandler;
 
     @Override
     @SneakyThrows

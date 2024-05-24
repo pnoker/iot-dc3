@@ -78,7 +78,7 @@ public interface ApiBuilder {
         // Json Ext
         ApiExt entityExt = entityBO.getApiExt();
         JsonExt ext = new JsonExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -119,7 +119,7 @@ public interface ApiBuilder {
     default void afterProcess(ApiDO entityDO, @MappingTarget ApiBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getApiExt();
-        if (!Objects.isNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ApiExt ext = new ApiExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

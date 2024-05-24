@@ -27,10 +27,14 @@ import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeConfigBuilder;
 import io.github.pnoker.center.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
+import io.github.pnoker.center.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -61,6 +65,9 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     private PointAttributeConfigManager pointAttributeConfigManager;
 
     @Resource
+    private MetadataEventPublisher metadataEventPublisher;
+
+    @Resource
     private PointService pointService;
 
     @Override
@@ -73,15 +80,37 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         if (!pointAttributeConfigManager.save(entityDO)) {
             throw new AddException("Failed to create point attribute config");
         }
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
+    }
+
+    @Override
+    public PointAttributeConfigBO innerSave(PointAttributeConfigBO entityBO) {
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create point attribute config: point attribute config has been duplicated");
+        }
+
+        PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
+        if (!pointAttributeConfigManager.save(entityDO)) {
+            throw new AddException("Failed to create point attribute config");
+        }
+
+        return pointAttributeConfigBuilder.buildBOByDO(entityDO);
     }
 
     @Override
     public void remove(Long id) {
-        getDOById(id, true);
+        PointAttributeConfigDO entityDO = getDOById(id, true);
 
         if (!pointAttributeConfigManager.removeById(id)) {
             throw new DeleteException("Failed to remove point attribute config");
         }
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override
@@ -97,6 +126,10 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         if (!pointAttributeConfigManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update point attribute config");
         }
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override
@@ -156,6 +189,12 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         return pointAttributeConfigBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link PointAttributeConfigQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, entityQuery.getPointAttributeId());

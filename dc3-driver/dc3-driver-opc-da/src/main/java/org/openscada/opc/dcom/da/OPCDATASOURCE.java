@@ -27,10 +27,6 @@ public enum OPCDATASOURCE {
         this._id = id;
     }
 
-    public int id() {
-        return this._id;
-    }
-
     public static OPCDATASOURCE fromID(final int id) {
         switch (id) {
             case 1:
@@ -40,5 +36,9 @@ public enum OPCDATASOURCE {
             default:
                 return OPC_DS_UNKNOWN;
         }
+    }
+
+    public int id() {
+        return this._id;
     }
 }

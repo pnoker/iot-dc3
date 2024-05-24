@@ -27,32 +27,6 @@ import org.openscada.opc.dcom.da.OPCDATASOURCE;
 import java.net.UnknownHostException;
 
 public class OPCAsyncIO2 extends BaseCOMObject {
-    public class AsyncResult {
-        private final ResultSet<Integer> result;
-
-        private final Integer cancelId;
-
-        public AsyncResult() {
-            super();
-            this.result = new ResultSet<Integer>();
-            this.cancelId = null;
-        }
-
-        public AsyncResult(final ResultSet<Integer> result, final Integer cancelId) {
-            super();
-            this.result = result;
-            this.cancelId = cancelId;
-        }
-
-        public Integer getCancelId() {
-            return this.cancelId;
-        }
-
-        public ResultSet<Integer> getResult() {
-            return this.result;
-        }
-    }
-
     public OPCAsyncIO2(final IJIComObject opcAsyncIO2) throws IllegalArgumentException, UnknownHostException, JIException {
         super(opcAsyncIO2.queryInterface(Constants.IOPCAsyncIO2_IID));
     }
@@ -115,5 +89,31 @@ public class OPCAsyncIO2 extends BaseCOMObject {
         }
 
         return new AsyncResult(resultSet, cancelId);
+    }
+
+    public class AsyncResult {
+        private final ResultSet<Integer> result;
+
+        private final Integer cancelId;
+
+        public AsyncResult() {
+            super();
+            this.result = new ResultSet<Integer>();
+            this.cancelId = null;
+        }
+
+        public AsyncResult(final ResultSet<Integer> result, final Integer cancelId) {
+            super();
+            this.result = result;
+            this.cancelId = cancelId;
+        }
+
+        public Integer getCancelId() {
+            return this.cancelId;
+        }
+
+        public ResultSet<Integer> getResult() {
+            return this.result;
+        }
     }
 }

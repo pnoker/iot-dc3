@@ -62,7 +62,7 @@ public class DeviceEventController implements BaseController {
                 deviceEventQuery = new DeviceEventQuery();
             }
             Page<DeviceEvent> page = eventService.deviceEvent(deviceEventQuery);
-            if (!Objects.isNull(page)) {
+            if (Objects.nonNull(page)) {
                 return Mono.just(R.ok(page));
             }
         } catch (Exception e) {

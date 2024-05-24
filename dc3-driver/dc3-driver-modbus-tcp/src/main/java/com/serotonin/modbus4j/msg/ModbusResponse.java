@@ -34,6 +34,11 @@ abstract public class ModbusResponse extends ModbusMessage {
      * Constant <code>MAX_FUNCTION_CODE=(byte) 0x80</code>
      */
     protected static final byte MAX_FUNCTION_CODE = (byte) 0x80;
+    protected byte exceptionCode = -1;
+
+    ModbusResponse(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
 
     /**
      * <p>createModbusResponse.</p>
@@ -83,10 +88,22 @@ abstract public class ModbusResponse extends ModbusMessage {
         return response;
     }
 
-    protected byte exceptionCode = -1;
+    private static boolean greaterThan(byte b1, byte b2) {
+        int i1 = b1 & 0xff;
+        int i2 = b2 & 0xff;
+        return i1 > i2;
+    }
 
-    ModbusResponse(int slaveId) throws ModbusTransportException {
-        super(slaveId);
+    /**
+     * <p>main.</p>
+     *
+     * @param args an array of {@link String} objects.
+     * @throws Exception if any.
+     */
+    public static void main(String[] args) throws Exception {
+        ByteQueue queue = new ByteQueue(new byte[]{3, 2});
+        ModbusResponse r = createModbusResponse(queue);
+        System.out.println(r);
     }
 
     /**
@@ -98,6 +115,10 @@ abstract public class ModbusResponse extends ModbusMessage {
         return exceptionCode != -1;
     }
 
+    void setException(byte exceptionCode) {
+        this.exceptionCode = exceptionCode;
+    }
+
     /**
      * <p>getExceptionMessage.</p>
      *
@@ -105,10 +126,6 @@ abstract public class ModbusResponse extends ModbusMessage {
      */
     public String getExceptionMessage() {
         return ExceptionCode.getExceptionMessage(exceptionCode);
-    }
-
-    void setException(byte exceptionCode) {
-        this.exceptionCode = exceptionCode;
     }
 
     /**
@@ -152,12 +169,6 @@ abstract public class ModbusResponse extends ModbusMessage {
      */
     abstract protected void readResponse(ByteQueue queue);
 
-    private static boolean greaterThan(byte b1, byte b2) {
-        int i1 = b1 & 0xff;
-        int i2 = b2 & 0xff;
-        return i1 > i2;
-    }
-
     /**
      * Ensure that the Response slave id is equal to the requested slave id
      *
@@ -167,17 +178,5 @@ abstract public class ModbusResponse extends ModbusMessage {
     public void validateResponse(ModbusRequest request) throws ModbusTransportException {
         if (getSlaveId() != request.slaveId)
             throw new SlaveIdNotEqual(request.slaveId, getSlaveId());
-    }
-
-    /**
-     * <p>main.</p>
-     *
-     * @param args an array of {@link String} objects.
-     * @throws Exception if any.
-     */
-    public static void main(String[] args) throws Exception {
-        ByteQueue queue = new ByteQueue(new byte[]{3, 2});
-        ModbusResponse r = createModbusResponse(queue);
-        System.out.println(r);
     }
 }
