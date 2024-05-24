@@ -28,6 +28,7 @@ import io.github.pnoker.center.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
@@ -42,25 +43,23 @@ import java.util.Objects;
  */
 @Slf4j
 @GrpcService
-public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
+public class DriverServer extends DriverApiGrpc.DriverApiImplBase {
 
-    private final GrpcDriverBuilder grpcDriverBuilder;
-    private final DriverService driverService;
+    @Resource
+    private GrpcDriverBuilder grpcDriverBuilder;
 
-    public ManagerDriverServer(GrpcDriverBuilder grpcDriverBuilder, DriverService driverService) {
-        this.grpcDriverBuilder = grpcDriverBuilder;
-        this.driverService = driverService;
-    }
+    @Resource
+    private DriverService driverService;
 
     @Override
-    public void list(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
+    public void selectByPage(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
         GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DriverQuery pageQuery = grpcDriverBuilder.buildQueryByGrpcQuery(request);
+        DriverQuery query = grpcDriverBuilder.buildQueryByGrpcQuery(request);
 
-        Page<DriverBO> driverPage = driverService.selectByPage(pageQuery);
-        if (Objects.isNull(driverPage)) {
+        Page<DriverBO> entityPage = driverService.selectByPage(query);
+        if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -69,17 +68,18 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcPageDriverDTO.Builder pageDriverBuilder = GrpcPageDriverDTO.newBuilder();
+            GrpcPageDriverDTO.Builder pageBuilder = GrpcPageDriverDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
-            page.setCurrent(driverPage.getCurrent());
-            page.setSize(driverPage.getSize());
-            page.setPages(driverPage.getPages());
-            page.setTotal(driverPage.getTotal());
-            pageDriverBuilder.setPage(page);
-            List<GrpcDriverDTO> collect = driverPage.getRecords().stream().map(grpcDriverBuilder::buildGrpcDTOByBO).toList();
-            pageDriverBuilder.addAllData(collect);
+            page.setCurrent(entityPage.getCurrent());
+            page.setSize(entityPage.getSize());
+            page.setPages(entityPage.getPages());
+            page.setTotal(entityPage.getTotal());
+            pageBuilder.setPage(page);
 
-            builder.setData(pageDriverBuilder);
+            List<GrpcDriverDTO> entityGrpcDTOList = entityPage.getRecords().stream().map(grpcDriverBuilder::buildGrpcDTOByBO).toList();
+            pageBuilder.addAllData(entityGrpcDTOList);
+
+            builder.setData(pageBuilder);
         }
 
         builder.setResult(rBuilder);
@@ -102,9 +102,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcDriverDTO driverDTO = grpcDriverBuilder.buildGrpcDTOByBO(entityDO);
-
-            builder.setData(driverDTO);
+            builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(entityDO));
         }
 
         builder.setResult(rBuilder);
@@ -127,9 +125,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcDriverDTO driverDTO = grpcDriverBuilder.buildGrpcDTOByBO(driverBO);
-
-            builder.setData(driverDTO);
+            builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(driverBO));
         }
 
         builder.setResult(rBuilder);

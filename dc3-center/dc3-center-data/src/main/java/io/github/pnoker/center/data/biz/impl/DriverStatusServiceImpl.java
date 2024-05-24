@@ -17,14 +17,12 @@
 package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.DriverStatusService;
 import io.github.pnoker.center.data.entity.bo.DriverRunBO;
-import io.github.pnoker.center.data.entity.builder.DriverDurationBuilder;
 import io.github.pnoker.center.data.entity.model.DriverRunDO;
 import io.github.pnoker.center.data.entity.query.DriverQuery;
 import io.github.pnoker.center.data.service.DriverRunService;
@@ -33,6 +31,8 @@ import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.optional.LongOptional;
+import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.redis.service.RedisService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -61,32 +61,21 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Resource
     private DriverRunService driverRunService;
 
-    @Resource
-    private DriverDurationBuilder driverDurationBuilder;
-
     @GrpcClient(ManagerConstant.SERVICE_NAME)
     private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
 
     @Override
-    public Map<Long, String> driver(DriverQuery pageQuery) {
+    public Map<Long, String> selectByPage(DriverQuery pageQuery) {
         GrpcPage.Builder page = GrpcPage.newBuilder().setSize(pageQuery.getPage().getSize()).setCurrent(pageQuery.getPage().getCurrent());
-        GrpcPageDriverQuery.Builder query = GrpcPageDriverQuery.newBuilder()
-                .setPage(page);
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getDriverName())) {
-            query.setDriverName(pageQuery.getDriverName());
-        }
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceName())) {
-            query.setServiceName(pageQuery.getServiceName());
-        }
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getServiceHost())) {
-            query.setServiceHost(pageQuery.getServiceHost());
-        }
-        if (!Objects.isNull(pageQuery.getTenantId())) {
-            query.setTenantId(pageQuery.getTenantId());
-        }
-        Optional.ofNullable(pageQuery.getDriverTypeFlag()).ifPresentOrElse(flag -> query.setDriverTypeFlag(flag.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
-        GrpcRPageDriverDTO rPageDriverDTO = driverApiBlockingStub.list(query.build());
+        GrpcPageDriverQuery.Builder query = GrpcPageDriverQuery.newBuilder().setPage(page);
+        StringOptional.ofNullable(pageQuery.getDriverName()).ifPresent(query::setDriverName);
+        StringOptional.ofNullable(pageQuery.getDriverCode()).ifPresent(query::setDriverCode);
+        StringOptional.ofNullable(pageQuery.getServiceName()).ifPresent(query::setServiceName);
+        StringOptional.ofNullable(pageQuery.getServiceHost()).ifPresent(query::setServiceHost);
+        LongOptional.ofNullable(pageQuery.getTenantId()).ifPresent(query::setTenantId);
+        Optional.ofNullable(pageQuery.getDriverTypeFlag()).ifPresentOrElse(value -> query.setDriverTypeFlag(value.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPageDriverDTO rPageDriverDTO = driverApiBlockingStub.selectByPage(query.build());
 
         if (!rPageDriverDTO.getResult().getOk()) {
             return MapUtil.empty();

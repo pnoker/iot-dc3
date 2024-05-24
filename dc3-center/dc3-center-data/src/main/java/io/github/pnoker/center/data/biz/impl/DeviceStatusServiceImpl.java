@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcPage;
@@ -31,6 +30,8 @@ import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.optional.LongOptional;
+import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.redis.service.RedisService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -60,23 +61,16 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     private DeviceRunService deviceRunService;
 
     @Override
-    public Map<Long, String> device(DeviceQuery pageQuery) {
+    public Map<Long, String> selectByPage(DeviceQuery pageQuery) {
         GrpcPage.Builder page = GrpcPage.newBuilder().setSize(pageQuery.getPage().getSize()).setCurrent(pageQuery.getPage().getCurrent());
         GrpcPageDeviceQuery.Builder query = GrpcPageDeviceQuery.newBuilder().setPage(page);
-        if (CharSequenceUtil.isNotEmpty(pageQuery.getDeviceName())) {
-            query.setDeviceName(pageQuery.getDeviceName());
-        }
-        if (!Objects.isNull(pageQuery.getDriverId())) {
-            query.setDriverId(pageQuery.getDriverId());
-        }
-        if (!Objects.isNull(pageQuery.getTenantId())) {
-            query.setTenantId(pageQuery.getTenantId());
-        }
-        if (!Objects.isNull(pageQuery.getProfileId())) {
-            query.setProfileId(pageQuery.getProfileId());
-        }
-        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(flag -> query.setEnableFlag(flag.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
-        GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.list(query.build());
+        StringOptional.ofNullable(pageQuery.getDeviceName()).ifPresent(query::setDeviceName);
+        StringOptional.ofNullable(pageQuery.getDeviceCode()).ifPresent(query::setDeviceCode);
+        LongOptional.ofNullable(pageQuery.getDriverId()).ifPresent(query::setDriverId);
+        LongOptional.ofNullable(pageQuery.getProfileId()).ifPresent(query::setProfileId);
+        LongOptional.ofNullable(pageQuery.getTenantId()).ifPresent(query::setTenantId);
+        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.selectByPage(query.build());
 
         if (!rPageDeviceDTO.getResult().getOk()) {
             return MapUtil.empty();
@@ -87,10 +81,8 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     }
 
     @Override
-    public Map<Long, String> deviceByProfileId(Long profileId) {
-        GrpcProfileQuery query = GrpcProfileQuery.newBuilder()
-                .setProfileId(profileId)
-                .build();
+    public Map<Long, String> selectByProfileId(Long profileId) {
+        GrpcProfileQuery query = GrpcProfileQuery.newBuilder().setProfileId(profileId).build();
         GrpcRDeviceListDTO rDeviceListDTO = deviceApiBlockingStub.selectByProfileId(query);
         if (!rDeviceListDTO.getResult().getOk()) {
             return MapUtil.empty();
@@ -155,10 +147,10 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     }
 
     /**
-     * Get status map
+     * 获取设备状态 Map
      *
      * @param devices GrpcDeviceDTO Array
-     * @return Status Map
+     * @return 状态 Map
      */
     private Map<Long, String> getStatusMap(List<GrpcDeviceDTO> devices) {
         Map<Long, String> statusMap = new HashMap<>(16);

@@ -31,6 +31,7 @@ import io.github.pnoker.center.manager.grpc.builder.GrpcPointBuilder;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
@@ -45,25 +46,23 @@ import java.util.Objects;
  */
 @Slf4j
 @GrpcService
-public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
+public class PointServer extends PointApiGrpc.PointApiImplBase {
 
-    private final GrpcPointBuilder grpcPointBuilder;
-    private final PointService pointService;
+    @Resource
+    private GrpcPointBuilder grpcPointBuilder;
 
-    public ManagerPointServer(GrpcPointBuilder grpcPointBuilder, PointService pointService) {
-        this.grpcPointBuilder = grpcPointBuilder;
-        this.pointService = pointService;
-    }
+    @Resource
+    private PointService pointService;
 
     @Override
-    public void list(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
+    public void selectByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
         GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        PointQuery pageQuery = grpcPointBuilder.buildQueryByGrpcQuery(request);
+        PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
 
-        Page<PointBO> pointPage = pointService.selectByPage(pageQuery);
-        if (Objects.isNull(pointPage)) {
+        Page<PointBO> entityPage = pointService.selectByPage(query);
+        if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -74,13 +73,14 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
 
             GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
-            page.setCurrent(pointPage.getCurrent());
-            page.setSize(pointPage.getSize());
-            page.setPages(pointPage.getPages());
-            page.setTotal(pointPage.getTotal());
+            page.setCurrent(entityPage.getCurrent());
+            page.setSize(entityPage.getSize());
+            page.setPages(entityPage.getPages());
+            page.setTotal(entityPage.getTotal());
             pagePointBuilder.setPage(page);
-            List<GrpcPointDTO> collect = pointPage.getRecords().stream().map(grpcPointBuilder::buildGrpcDTOByBO).toList();
-            pagePointBuilder.addAllData(collect);
+
+            List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords().stream().map(grpcPointBuilder::buildGrpcDTOByBO).toList();
+            pagePointBuilder.addAllData(entityGrpcDTOList);
 
             builder.setData(pagePointBuilder);
         }

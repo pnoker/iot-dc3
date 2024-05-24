@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.api;
+package io.github.pnoker.center.auth.grpc;
 
 
 import io.github.pnoker.api.center.auth.GrpcIpQuery;
@@ -36,7 +36,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
  */
 @Slf4j
 @GrpcService
-public class LimitedIpApi extends LimitedIpApiGrpc.LimitedIpApiImplBase {
+public class LimitedIpServer extends LimitedIpApiGrpc.LimitedIpApiImplBase {
 
     @Resource
     private LimitedIpService limitedIpService;
@@ -45,6 +45,7 @@ public class LimitedIpApi extends LimitedIpApiGrpc.LimitedIpApiImplBase {
     public void checkValid(GrpcIpQuery request, StreamObserver<GrpcRLimitedIpDTO> responseObserver) {
         GrpcRLimitedIpDTO.Builder builder = GrpcRLimitedIpDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
+
         Boolean ipValid = limitedIpService.checkValid(request.getIp());
         if (!Boolean.TRUE.equals(ipValid)) {
             rBuilder.setOk(false);

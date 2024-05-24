@@ -29,6 +29,7 @@ import io.github.pnoker.center.manager.grpc.builder.GrpcDeviceBuilder;
 import io.github.pnoker.center.manager.service.DeviceService;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 
@@ -43,25 +44,23 @@ import java.util.Objects;
  */
 @Slf4j
 @GrpcService
-public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
+public class DeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
-    private final GrpcDeviceBuilder grpcDeviceBuilder;
-    private final DeviceService deviceService;
+    @Resource
+    private GrpcDeviceBuilder grpcDeviceBuilder;
 
-    public ManagerDeviceServer(GrpcDeviceBuilder grpcDeviceBuilder, DeviceService deviceService) {
-        this.grpcDeviceBuilder = grpcDeviceBuilder;
-        this.deviceService = deviceService;
-    }
+    @Resource
+    private DeviceService deviceService;
 
     @Override
-    public void list(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
+    public void selectByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
         GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DeviceQuery pageQuery = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
+        DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
 
-        Page<DeviceBO> devicePage = deviceService.selectByPage(pageQuery);
-        if (Objects.isNull(devicePage)) {
+        Page<DeviceBO> entityPage = deviceService.selectByPage(query);
+        if (Objects.isNull(entityPage)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -70,17 +69,18 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcPageDeviceDTO.Builder pageDeviceBuilder = GrpcPageDeviceDTO.newBuilder();
+            GrpcPageDeviceDTO.Builder pageBuilder = GrpcPageDeviceDTO.newBuilder();
             GrpcPage.Builder page = GrpcPage.newBuilder();
-            page.setCurrent(devicePage.getCurrent());
-            page.setSize(devicePage.getSize());
-            page.setPages(devicePage.getPages());
-            page.setTotal(devicePage.getTotal());
-            pageDeviceBuilder.setPage(page);
-            List<GrpcDeviceDTO> collect = devicePage.getRecords().stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
-            pageDeviceBuilder.addAllData(collect);
+            page.setCurrent(entityPage.getCurrent());
+            page.setSize(entityPage.getSize());
+            page.setPages(entityPage.getPages());
+            page.setTotal(entityPage.getTotal());
+            pageBuilder.setPage(page);
 
-            builder.setData(pageDeviceBuilder);
+            List<GrpcDeviceDTO> entityGrpcDTOList = entityPage.getRecords().stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
+            pageBuilder.addAllData(entityGrpcDTOList);
+
+            builder.setData(pageBuilder);
         }
 
         builder.setResult(rBuilder);
@@ -93,8 +93,8 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<DeviceBO> deviceBOList = deviceService.selectByDriverId(driver.getDriverId());
-        if (CollUtil.isEmpty(deviceBOList)) {
+        List<DeviceBO> entityBOList = deviceService.selectByDriverId(driver.getDriverId());
+        if (CollUtil.isEmpty(entityBOList)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -103,9 +103,9 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            List<GrpcDeviceDTO> deviceDTOS = deviceBOList.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
+            List<GrpcDeviceDTO> entityGrpcDTOList = entityBOList.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
 
-            builder.addAllData(deviceDTOS);
+            builder.addAllData(entityGrpcDTOList);
         }
 
         builder.setResult(rBuilder);
@@ -118,8 +118,8 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRDeviceListDTO.Builder builder = GrpcRDeviceListDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        List<DeviceBO> deviceBOList = deviceService.selectByProfileId(request.getProfileId());
-        if (CollUtil.isEmpty(deviceBOList)) {
+        List<DeviceBO> entityBOList = deviceService.selectByProfileId(request.getProfileId());
+        if (CollUtil.isEmpty(entityBOList)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -128,9 +128,9 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            List<GrpcDeviceDTO> deviceDTOS = deviceBOList.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
+            List<GrpcDeviceDTO> entityGrpcDTOList = entityBOList.stream().map(grpcDeviceBuilder::buildGrpcDTOByBO).toList();
 
-            builder.addAllData(deviceDTOS);
+            builder.addAllData(entityGrpcDTOList);
         }
 
         builder.setResult(rBuilder);
@@ -143,8 +143,8 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-        DeviceBO deviceBO = deviceService.selectById(request.getDeviceId());
-        if (Objects.isNull(deviceBO)) {
+        DeviceBO entityBO = deviceService.selectById(request.getDeviceId());
+        if (Objects.isNull(entityBO)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -153,9 +153,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
 
-            GrpcDeviceDTO deviceDTO = grpcDeviceBuilder.buildGrpcDTOByBO(deviceBO);
-
-            builder.setData(deviceDTO);
+            builder.setData(grpcDeviceBuilder.buildGrpcDTOByBO(entityBO));
         }
 
         builder.setResult(rBuilder);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth.api;
+package io.github.pnoker.center.auth.grpc;
 
 
 import io.github.pnoker.api.center.auth.GrpcLoginQuery;
@@ -40,7 +40,7 @@ import java.util.Objects;
  */
 @Slf4j
 @GrpcService
-public class TokenApi extends TokenApiGrpc.TokenApiImplBase {
+public class TokenServer extends TokenApiGrpc.TokenApiImplBase {
 
     @Resource
     private TokenService tokenService;
@@ -49,21 +49,22 @@ public class TokenApi extends TokenApiGrpc.TokenApiImplBase {
     public void checkValid(GrpcLoginQuery request, StreamObserver<GrpcRTokenDTO> responseObserver) {
         GrpcRTokenDTO.Builder builder = GrpcRTokenDTO.newBuilder();
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
-        TokenValid select = tokenService.checkValid(request.getName(), request.getSalt(), request.getToken(), request.getTenant());
-        if (Objects.isNull(select)) {
+
+        TokenValid entity = tokenService.checkValid(request.getName(), request.getSalt(), request.getToken(), request.getTenant());
+        if (Objects.isNull(entity)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-        } else if (!select.isValid()) {
+        } else if (!entity.isValid()) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.TOKEN_INVALID.getCode());
             rBuilder.setMessage(ResponseEnum.TOKEN_INVALID.getText());
         } else {
-            String expireTime = TimeUtil.completeFormat(select.getExpireTime());
             rBuilder.setOk(true);
             rBuilder.setCode(ResponseEnum.OK.getCode());
             rBuilder.setMessage(ResponseEnum.OK.getText());
-            builder.setData(expireTime);
+
+            builder.setData(TimeUtil.completeFormat(entity.getExpireTime()));
         }
 
         builder.setResult(rBuilder);
