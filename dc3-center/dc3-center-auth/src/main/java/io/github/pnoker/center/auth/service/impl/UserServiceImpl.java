@@ -25,7 +25,6 @@ import io.github.pnoker.center.auth.dal.UserManager;
 import io.github.pnoker.center.auth.entity.bo.UserBO;
 import io.github.pnoker.center.auth.entity.builder.UserBuilder;
 import io.github.pnoker.center.auth.entity.model.UserDO;
-import io.github.pnoker.center.auth.entity.query.UserPasswordQuery;
 import io.github.pnoker.center.auth.entity.query.UserQuery;
 import io.github.pnoker.center.auth.service.UserService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
