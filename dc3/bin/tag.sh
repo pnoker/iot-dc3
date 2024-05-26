@@ -23,23 +23,23 @@ type=""
 # shellcheck disable=SC2092
 # shellcheck disable=SC2006
 if `git status | grep "develop" &>/dev/null`; then
-    type="test"
-fi
-
-# shellcheck disable=SC2092
-# shellcheck disable=SC2006
-if `git status | grep "pre" &>/dev/null`; then
-    type="pre"
+    type="develop"
 fi
 
 # shellcheck disable=SC2092
 # shellcheck disable=SC2006
 if `git status | grep "release" &>/dev/null`; then
-    type="pro"
+    type="release"
+fi
+
+# shellcheck disable=SC2092
+# shellcheck disable=SC2006
+if `git status | grep "main" &>/dev/null`; then
+    type="release"
 fi
 
 if [[ ${type} == "" ]]; then
-    echo -e "This branch doesn't support tagging, please switch to the \033[31mdevelop\033[0m, \033[31mpre\033[0m or \033[31mrelease\033[0m branch."
+    echo -e "This branch doesn't support tagging, please switch to the \033[31mdevelop\033[0m or \033[31mrelease\033[0m branch."
     exit
 fi
 
