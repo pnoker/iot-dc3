@@ -161,7 +161,7 @@ export const getDeviceStatusByProfileId = (profileId: string) =>
  */
 export const importDeviceTemplate = (device: any) =>
     request<R>({
-        url: `api/v3/manager/device/import/template`,
+        url: `api/v3/manager/device/export/import_template`,
         responseType: 'blob',
         method: 'post',
         data: device

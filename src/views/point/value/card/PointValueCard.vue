@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue'
 
 import { TinyArea } from '@antv/g2plot'
@@ -150,16 +150,11 @@ const copyValue = (data) => {
     copy(JSON.stringify(content, null, 2), '位号值')
 }
 
-onMounted(() => {
-    if (props.embedded == '') {
-        return
-    }
-
-    window.dispatchEvent(new Event('resize'))
-
+let tinyArea: TinyArea
+const history = () => {
     getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
         .then((res) => {
-            let historyData = []
+            let historyData: number[]
             const pointValueType = props.point.pointTypeFlag.toLowerCase()
             if (pointValueType === 'string') {
                 historyData = []
@@ -169,38 +164,57 @@ onMounted(() => {
                 historyData = res.data.reverse().map((value: string) => +value)
             }
 
-            const tinyArea = new TinyArea(props.data.pointId, {
-                height: 60,
-                data: historyData,
-                autoFit: true,
-                smooth: true,
-                annotations: [
-                    {
-                        type: 'line',
-                        start: ['min', 'mean'],
-                        end: ['max', 'mean'],
-                        text: {
-                            content: 'AVG',
-                            offsetY: -5,
-                            style: {
-                                textAlign: 'left',
-                                fontSize: 10,
-                                fill: 'rgba(44, 53, 66, 0.45)',
-                                textBaseline: 'bottom'
-                            }
-                        },
-                        style: {
-                            stroke: 'rgba(0, 0, 0, 0.25)'
-                        }
-                    }
-                ]
-            })
-
-            tinyArea.render()
+            tinyArea.changeData(historyData)
         })
         .catch(() => {
             // nothing to do
         })
+}
+
+watch(
+    () => props.data,
+    () => {
+        if (props.embedded != '') {
+            history()
+        }
+    }
+)
+
+onMounted(() => {
+    window.dispatchEvent(new Event('resize'))
+
+    if (props.embedded != '') {
+        tinyArea = new TinyArea(props.data.pointId, {
+            height: 60,
+            data: [],
+            autoFit: true,
+            smooth: true,
+            annotations: [
+                {
+                    type: 'line',
+                    start: ['min', 'mean'],
+                    end: ['max', 'mean'],
+                    text: {
+                        content: 'AVG',
+                        offsetY: -5,
+                        style: {
+                            textAlign: 'left',
+                            fontSize: 10,
+                            fill: 'rgba(44, 53, 66, 0.45)',
+                            textBaseline: 'bottom'
+                        }
+                    },
+                    style: {
+                        stroke: 'rgba(0, 0, 0, 0.25)'
+                    }
+                }
+            ]
+        })
+
+        tinyArea.render()
+
+        history()
+    }
 })
 </script>
 

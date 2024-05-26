@@ -75,7 +75,11 @@ request.interceptors.response.use(
         const status = response.status || 401
         const responseType = response.config.responseType
 
-        if (ok || responseType === 'blob') {
+        if (responseType === 'blob') {
+            return response
+        }
+
+        if (ok) {
             return response.data
         }
 

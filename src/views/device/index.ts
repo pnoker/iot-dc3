@@ -190,7 +190,7 @@ export default defineComponent({
         const importTemplate = (form, done) => {
             importDeviceTemplate(form)
                 .then((res) => {
-                    const url = window.URL.createObjectURL(new Blob([res.data as BlobPart]))
+                    const url = window.URL.createObjectURL(new Blob([res.data.data as BlobPart]))
                     const name = res.headers['content-disposition'].split(';')[1].split('filename=')[1]
                     const link = document.createElement('a')
                     link.href = url
