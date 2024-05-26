@@ -45,6 +45,7 @@ public interface GrpcUserLoginBuilder {
      * @return GrpcUserLoginDTO
      */
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "loginNameBytes", ignore = true)
     @Mapping(target = "mergeFrom", ignore = true)
     @Mapping(target = "clearField", ignore = true)
     @Mapping(target = "clearOneof", ignore = true)

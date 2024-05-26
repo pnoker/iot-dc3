@@ -45,6 +45,8 @@ public interface GrpcTenantBuilder {
      * @return GrpcTenantDTO
      */
     @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "tenantNameBytes", ignore = true)
+    @Mapping(target = "tenantCodeBytes", ignore = true)
     @Mapping(target = "mergeFrom", ignore = true)
     @Mapping(target = "clearField", ignore = true)
     @Mapping(target = "clearOneof", ignore = true)

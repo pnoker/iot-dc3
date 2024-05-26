@@ -46,6 +46,12 @@ public interface GrpcUserBuilder {
      */
     @Mapping(target = "socialExt", ignore = true)
     @Mapping(target = "identityExt", ignore = true)
+    @Mapping(target = "nickNameBytes", ignore = true)
+    @Mapping(target = "userNameBytes", ignore = true)
+    @Mapping(target = "phoneBytes", ignore = true)
+    @Mapping(target = "emailBytes", ignore = true)
+    @Mapping(target = "socialExtBytes", ignore = true)
+    @Mapping(target = "identityExtBytes", ignore = true)
     @Mapping(target = "mergeFrom", ignore = true)
     @Mapping(target = "clearField", ignore = true)
     @Mapping(target = "clearOneof", ignore = true)
