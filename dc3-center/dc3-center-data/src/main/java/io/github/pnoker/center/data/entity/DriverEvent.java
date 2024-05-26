@@ -16,7 +16,9 @@
 
 package io.github.pnoker.center.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.constant.common.TimeConstant;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -77,7 +79,7 @@ public class DriverEvent implements Serializable {
     /**
      * 操作时间
      */
-    private LocalDateTime updateTime;
+    private LocalDateTime operateTime;
 
     /**
      * 确认时间

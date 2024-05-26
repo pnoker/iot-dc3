@@ -82,7 +82,7 @@ public class DeviceEvent implements Serializable {
     /**
      * 操作时间
      */
-    private LocalDateTime updateTime;
+    private LocalDateTime operateTime;
 
     /**
      * 确认时间

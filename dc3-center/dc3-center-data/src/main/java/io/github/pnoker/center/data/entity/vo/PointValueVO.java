@@ -78,4 +78,10 @@ public class PointValueVO implements Serializable {
      */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
+
+    /**
+     * 操作时间
+     */
+    @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
+    private LocalDateTime operateTime;
 }
