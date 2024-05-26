@@ -31,7 +31,6 @@ import io.github.pnoker.center.manager.entity.builder.ProfileBuilder;
 import io.github.pnoker.center.manager.entity.model.PointDO;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.model.ProfileDO;
-import io.github.pnoker.center.manager.entity.query.ProfileBindQuery;
 import io.github.pnoker.center.manager.entity.query.ProfileQuery;
 import io.github.pnoker.center.manager.mapper.ProfileMapper;
 import io.github.pnoker.center.manager.service.ProfileService;
