@@ -30,7 +30,6 @@ import io.github.pnoker.center.manager.entity.builder.DriverBuilder;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.model.DriverDO;
 import io.github.pnoker.center.manager.entity.model.PointDO;
-import io.github.pnoker.center.manager.entity.query.DriverAttributeQuery;
 import io.github.pnoker.center.manager.entity.query.DriverQuery;
 import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.center.manager.service.ProfileBindService;

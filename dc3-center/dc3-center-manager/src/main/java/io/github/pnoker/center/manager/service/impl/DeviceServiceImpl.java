@@ -17,6 +17,7 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -280,6 +281,9 @@ public class DeviceServiceImpl implements DeviceService {
             MetadataEvent metadataEvent = new MetadataEvent(this, importDeviceBO.getId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD);
             metadataEventPublisher.publishEvent(metadataEvent);
         }
+
+        // 删除文件
+        FileUtil.del(file);
     }
 
     @Override

@@ -24,7 +24,6 @@ import io.github.pnoker.center.auth.dal.ResourceManager;
 import io.github.pnoker.center.auth.entity.bo.ResourceBO;
 import io.github.pnoker.center.auth.entity.builder.ResourceBuilder;
 import io.github.pnoker.center.auth.entity.model.ResourceDO;
-import io.github.pnoker.center.auth.entity.query.LimitedIpQuery;
 import io.github.pnoker.center.auth.entity.query.ResourceQuery;
 import io.github.pnoker.center.auth.service.ResourceService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;

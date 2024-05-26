@@ -28,7 +28,6 @@ import io.github.pnoker.center.auth.entity.builder.ResourceBuilder;
 import io.github.pnoker.center.auth.entity.builder.RoleResourceBindBuilder;
 import io.github.pnoker.center.auth.entity.model.ResourceDO;
 import io.github.pnoker.center.auth.entity.model.RoleResourceBindDO;
-import io.github.pnoker.center.auth.entity.query.ResourceQuery;
 import io.github.pnoker.center.auth.entity.query.RoleResourceBindQuery;
 import io.github.pnoker.center.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
