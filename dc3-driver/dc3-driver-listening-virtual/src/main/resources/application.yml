@@ -1,5 +1,5 @@
 #
-# Copyright 2016-present the original author or authors.
+# Copyright 2016-present the IoT DC3 original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,23 +16,23 @@
 
 driver:
   tenant: default
-  name: 模拟Tcp/Udp驱动
+  name: 虚拟Tcp/Udp驱动
   code: ListeningVirtualDriver
-  type: DRIVER
+  type: DRIVER_SERVER
   remark: @project.description@
   custom:
     tcp:
-      port: 6270
+      port: ${TCP_PORT:6270}
     udp:
-      port: 6271
+      port: ${UDP_PORT:6271}
   schedule:
     # 定时读数据
     read:
       enable: false
-      corn: '0/30 * * * * ?'
+      cron: '0/30 * * * * ?'
     custom:
       enable: true
-      corn: '0/5 * * * * ?'
+      cron: '0/5 * * * * ?'
   point-attribute:
     - display-name: 关键字
       attribute-name: key
@@ -43,17 +43,17 @@ driver:
       attribute-name: start
       attribute-type-flag: INT
       default-value: 0
-      remark: 起始字节，包含该字节
+      remark: 起始字节, 包含该字节
     - display-name: 结束字节
       attribute-name: end
       attribute-type-flag: INT
       default-value: 8
-      remark: 结束字节，不包含该字节
+      remark: 结束字节, 不包含该字节
     - display-name: 类型
       attribute-name: type
       attribute-type-flag: STRING
       default-value: string
-      remark: 解析类型，short、int、long、float、double、boolean、string
+      remark: 解析类型, short, int, long, float, double, boolean, string
 
 spring:
   application:

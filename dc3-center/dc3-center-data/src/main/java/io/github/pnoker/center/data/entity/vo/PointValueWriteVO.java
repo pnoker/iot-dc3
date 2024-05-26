@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,37 @@
 
 package io.github.pnoker.center.data.entity.vo;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Point Value Write VO
+ * PointValueWrite VO
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PointValueWriteVO implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "Driver id can't be empty")
-    private String deviceId;
+    @NotNull(message = "设备ID不能为空")
+    private Long deviceId;
 
-    @NotBlank(message = "Point id can't be empty")
-    private String pointId;
+    @NotNull(message = "位号ID不能为空")
+    private Long pointId;
 
-    @NotBlank(message = "Write value can't be empty")
+    @NotBlank(message = "值不能为空")
     private String value;
 }

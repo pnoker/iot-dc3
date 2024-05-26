@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.query.UserPasswordPageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.UserPassword;
+import io.github.pnoker.center.auth.entity.bo.UserPasswordBO;
+import io.github.pnoker.center.auth.entity.query.UserPasswordQuery;
+import io.github.pnoker.common.base.service.BaseService;
 
 /**
  * UserPassword Interface
@@ -26,12 +26,12 @@ import io.github.pnoker.common.model.UserPassword;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface UserPasswordService extends Service<UserPassword, UserPasswordPageQuery> {
+public interface UserPasswordService extends BaseService<UserPasswordBO, UserPasswordQuery> {
 
     /**
      * 重置密码
      *
      * @param id ID
      */
-    void restPassword(String id);
+    void restPassword(Long id);
 }

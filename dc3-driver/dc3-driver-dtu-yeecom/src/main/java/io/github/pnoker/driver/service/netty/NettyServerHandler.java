@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 package io.github.pnoker.driver.service.netty;
 
-import io.github.pnoker.driver.sdk.DriverContext;
-import io.github.pnoker.driver.sdk.service.DriverSenderService;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
+import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * @author pnoker
@@ -37,7 +36,7 @@ public class NettyServerHandler {
     @Resource
     private DriverSenderService driverSenderService;
     @Resource
-    private DriverContext driverContext;
+    private DeviceMetadata deviceMetadata;
 
     public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
         log.info("1.{}->\n{}", context.channel().remoteAddress(), ByteBufUtil.prettyHexDump(byteBuf));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,52 +16,62 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.PointAttributeConfig;
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
+import io.github.pnoker.common.base.service.BaseService;
 
 import java.util.List;
 
 /**
- * PointInfo Interface
+ * PointConfig Interface
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointAttributeConfigService extends Service<PointAttributeConfig, PointAttributeConfigPageQuery> {
+public interface PointAttributeConfigService extends BaseService<PointAttributeConfigBO, PointAttributeConfigQuery> {
 
     /**
-     * 根据位号配置信息 ID 、 设备 ID 、 位号 ID 查询
-     *
-     * @param pointAttributeId Point Attribute ID
-     * @param deviceId         设备ID
-     * @param pointId          Point ID
-     * @return PointInfo
-     */
-    PointAttributeConfig selectByAttributeIdAndDeviceIdAndPointId(String pointAttributeId, String deviceId, String pointId);
-
-    /**
-     * 根据位号配置信息 ID 查询
-     *
-     * @param pointAttributeId Point Attribute ID
-     * @return PointInfo Array
-     */
-    List<PointAttributeConfig> selectByAttributeId(String pointAttributeId);
-
-    /**
-     * 根据 设备 ID 查询
+     * 根据 设备ID 查询
      *
      * @param deviceId 设备ID
-     * @return PointInfo Array
+     * @return PointConfig 集合
      */
-    List<PointAttributeConfig> selectByDeviceId(String deviceId);
+    List<PointAttributeConfigBO> selectByDeviceId(Long deviceId);
 
     /**
-     * 根据 设备 ID 、 位号 ID 查询
+     * 根据 属性ID 查询
+     *
+     * @param attributeId 属性ID
+     * @return PointConfig 集合
+     */
+    List<PointAttributeConfigBO> selectByAttributeId(Long attributeId);
+
+    /**
+     * 根据 设备ID 和 位号ID 查询
      *
      * @param deviceId 设备ID
      * @param pointId  位号ID
-     * @return PointInfo Array
+     * @return PointConfig 集合
      */
-    List<PointAttributeConfig> selectByDeviceIdAndPointId(String deviceId, String pointId);
+    List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
+
+    /**
+     * 根据 属性ID 和 设备ID 和 位号ID 查询
+     *
+     * @param attributeId 属性ID
+     * @param deviceId    设备ID
+     * @param pointId     位号ID
+     * @return PointConfig
+     */
+    PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId);
+
+    /**
+     * 内部保存
+     *
+     * @param entityBO {@link PointAttributeConfigBO}
+     * @return {@link DeviceBO}
+     */
+    PointAttributeConfigBO innerSave(PointAttributeConfigBO entityBO);
 }

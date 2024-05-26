@@ -1,0 +1,67 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# 生产环境配置, 会覆盖 application-*.yml 中配置的内容
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:3306}/${MYSQL_DB:dc3_data}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:dc3}
+  rabbitmq:
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
+    host: ${RABBITMQ_HOST:dc3-rabbitmq}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:dc3}
+    password: ${RABBITMQ_PASSWORD:dc3}
+  data:
+    redis:
+      host: ${REDIS_HOST:dc3-redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:dc3}
+    mongodb:
+      host: ${MONGO_HOST:dc3-mongo}
+      port: ${MONGO_PORT:27017}
+      database: ${MONGO_DATABASE:dc3}
+      username: ${MONGO_USERNAME:dc3}
+      password: ${MONGO_PASSWORD:dc3}
+  cache:
+    redis:
+      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:12H}
+  cloud:
+    nacos:
+      server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
+      username: dc3
+      password: dc3
+      discovery:
+        namespace: ${NODE_ENV:pro}
+
+driver:
+  mqtt:
+    url: ${MQTT_BROKER_URL:tcp://dc3-rabbitmq:1883}
+    auth-type: USERNAME
+    username: ${MQTT_USERNAME:dc3}
+    password: ${MQTT_PASSWORD:dc3}
+    topic-prefix: dc3/${spring.application.name}/
+    default-send-topic:
+      qos: 1
+      name: device
+
+grpc:
+  client:
+    dc3-center-manager:
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext

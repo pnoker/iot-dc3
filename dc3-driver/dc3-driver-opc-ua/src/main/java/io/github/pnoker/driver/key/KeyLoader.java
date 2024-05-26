@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,15 +36,13 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class KeyLoader {
+    private static final Pattern IP_ADDR_PATTERN = Pattern.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+    private static final char[] PASSWORD = "password".toCharArray();
+    private static final String CLIENT_ALIAS = "client-ai";
     @Getter
     private X509Certificate clientCertificate;
     @Getter
     private KeyPair clientKeyPair;
-
-    private static final Pattern IP_ADDR_PATTERN = Pattern.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
-    private static final char[] PASSWORD = "password".toCharArray();
-    private static final String CLIENT_ALIAS = "client-ai";
-
 
     public KeyLoader load(Path baseDir) throws Exception {
         KeyStore keyStore = KeyStore.getInstance("PKCS12");

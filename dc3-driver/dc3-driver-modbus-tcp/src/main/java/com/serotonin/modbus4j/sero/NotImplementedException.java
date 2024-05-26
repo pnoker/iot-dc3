@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package com.serotonin.modbus4j.sero;
  * @version 5.0.0
  */
 public class NotImplementedException extends RuntimeException {
-    static final long serialVersionUID = -1;
+    private static final long serialVersionUID = -1;
 
     /**
      * <p>Constructor for NotImplementedException.</p>

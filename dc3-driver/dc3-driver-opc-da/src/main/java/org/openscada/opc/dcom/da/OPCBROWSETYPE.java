@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,6 @@ public enum OPCBROWSETYPE {
         this._id = id;
     }
 
-    public int id() {
-        return this._id;
-    }
-
     public static OPCBROWSETYPE fromID(final int id) {
         switch (id) {
             case 1:
@@ -43,5 +39,9 @@ public enum OPCBROWSETYPE {
             default:
                 return OPC_UNKNOWN;
         }
+    }
+
+    public int id() {
+        return this._id;
     }
 }

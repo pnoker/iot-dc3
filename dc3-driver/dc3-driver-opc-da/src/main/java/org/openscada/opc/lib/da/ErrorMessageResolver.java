@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,10 +32,8 @@ import java.util.Map;
 @Slf4j
 public class ErrorMessageResolver {
 
-    private OPCCommon _opcCommon = null;
-
     private final Map<Integer, String> _messageCache = new HashMap<Integer, String>();
-
+    private OPCCommon _opcCommon = null;
     private int _localeId = 0;
 
     public ErrorMessageResolver(final OPCCommon opcCommon, final int localeId) {

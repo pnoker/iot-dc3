@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,42 +16,51 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigPageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.DriverAttributeConfig;
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
+import io.github.pnoker.common.base.service.BaseService;
 
 import java.util.List;
 
 /**
- * DriverInfo Interface
+ * DriverConfig Interface
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverAttributeConfigService extends Service<DriverAttributeConfig, DriverAttributeConfigPageQuery> {
+public interface DriverAttributeConfigService extends BaseService<DriverAttributeConfigBO, DriverAttributeConfigQuery> {
 
     /**
-     * 根据驱动属性配置 ID 和 设备 ID 查询
-     *
-     * @param deviceId          设备ID
-     * @param driverAttributeId Driver Attribute ID
-     * @return DriverInfo
-     */
-    DriverAttributeConfig selectByDeviceIdAndAttributeId(String deviceId, String driverAttributeId);
-
-    /**
-     * 根据驱动属性配置 ID 查询
-     *
-     * @param driverAttributeId Driver Attribute ID
-     * @return DriverInfo Array
-     */
-    List<DriverAttributeConfig> selectByAttributeId(String driverAttributeId);
-
-    /**
-     * 根据设备 ID 查询
+     * 根据 设备ID 查询
      *
      * @param deviceId 设备ID
-     * @return DriverInfo Array
+     * @return DriverConfig 集合
      */
-    List<DriverAttributeConfig> selectByDeviceId(String deviceId);
+    List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId);
+
+    /**
+     * 根据 驱动属性配置ID 查询
+     *
+     * @param attributeId 驱动属性ID
+     * @return DriverConfig 集合
+     */
+    List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId);
+
+    /**
+     * 根据 驱动属性配置ID 和 设备ID 查询
+     *
+     * @param deviceId    设备ID
+     * @param attributeId 驱动属性ID
+     * @return DriverConfig
+     */
+    DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId);
+
+    /**
+     * 内部保存
+     *
+     * @param entityBO {@link DriverAttributeConfigBO}
+     * @return {@link DeviceBO}
+     */
+    DriverAttributeConfigBO innerSave(DriverAttributeConfigBO entityBO);
 }

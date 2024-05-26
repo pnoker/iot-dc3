@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,6 @@ public class IntegerConverter implements S7Serializable {
     private static final int OFFSET_HIGH_BYTE = 0;
     private static final int OFFSET_LOW_BYTE = 1;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T extract(final Class<T> targetClass, final byte[] buffer, final int byteOffset, final int bitOffset) {
         final byte lower = buffer[byteOffset + OFFSET_LOW_BYTE];
@@ -36,33 +33,21 @@ public class IntegerConverter implements S7Serializable {
         return targetClass.cast(i);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public S7Type getS7Type() {
         return S7Type.WORD;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getSizeInBits() {
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getSizeInBytes() {
         return 2;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void insert(final Object javaType, final byte[] buffer, final int byteOffset, final int bitOffset,
                        final int size) {

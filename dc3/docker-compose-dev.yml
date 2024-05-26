@@ -1,5 +1,5 @@
 #
-# Copyright 2016-present the original author or authors.
+# Copyright 2016-present the IoT DC3 original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,43 +14,10 @@
 # limitations under the License.
 #
 
-version: '3'
-
 services:
-  register:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-register:4.0.0-nacos
-    restart: on-failure
-    ports:
-      - "8848:8848"
-      - "9848:9848"
-      - "9555:9555"
-    environment:
-      - PREFER_HOST_MODE=hostname
-      - MODE=standalone
-      - SPRING_DATASOURCE_PLATFORM=mysql
-      - JVM_XMS=512m
-      - JVM_XMX=512m
-      - JVM_XMN=256m
-      - JVM_MS=128m
-      - JVM_MMS=256m
-    container_name: dc3-center-register
-    hostname: dc3-center-register
-    depends_on:
-      - mysql
-    volumes:
-      - logs:/home/nacos/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: '20m'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-center-register
   mysql:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2023.4.0.dev
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2024.3.0.dev
+    restart: always
     ports:
       - '33306:3306'
     environment:
@@ -58,11 +25,12 @@ services:
     container_name: dc3-mysql
     hostname: dc3-mysql
     volumes:
-      - mysql:/var/lib/mysql
+      - mysql_data:/data
+      - mysql_lib:/var/lib/mysql
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:
@@ -70,19 +38,19 @@ services:
           - dc3-mysql
 
   mongo:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2023.4.0.dev
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2024.3.0.dev
+    restart: always
     ports:
       - '37017:27017'
     container_name: dc3-mongo
     hostname: dc3-mongo
     volumes:
+      - mongo_data:/data/db
       - mongo_config:/data/configdb
-      - mongo_db:/data/db
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:
@@ -90,8 +58,8 @@ services:
           - dc3-mongo
 
   redis:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2023.4.0.dev
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2024.3.0.dev
+    restart: always
     ports:
       - '36379:6379'
     container_name: dc3-redis
@@ -101,7 +69,7 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:
@@ -109,13 +77,12 @@ services:
           - dc3-redis
 
   rabbitmq:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2023.4.0.dev
-    restart: on-failure
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2024.3.0.dev
+    restart: always
     ports:
       - '5672:5672'
-      - '1883:1883'
-      - '8883:8883'
-      - '61613:61613'
+      - '2883:1883'
+      - '3883:8883'
       - '15672:15672'
     container_name: dc3-rabbitmq
     hostname: dc3-rabbitmq
@@ -124,42 +91,20 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:
         aliases:
           - dc3-rabbitmq
 
-  portainer:
-    image: portainer/portainer:1.24.2
-    command: -H unix:///var/run/docker.sock
-    restart: on-failure
-    ports:
-      - '9000:9000'
-    container_name: portainer
-    hostname: dc3-portainer
-    volumes:
-      - portainer:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    logging:
-      driver: json-file
-      options:
-        max-size: '20m'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-portainer
-
 volumes:
-  logs:
-  mysql:
+  mysql_data:
+  mysql_lib:
+  mongo_data:
   mongo_config:
-  mongo_db:
   redis:
   rabbitmq:
-  portainer:
 
 networks:
   dc3net:

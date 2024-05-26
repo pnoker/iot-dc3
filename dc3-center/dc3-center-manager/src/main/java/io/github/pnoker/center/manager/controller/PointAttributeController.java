@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,28 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.PointAttributePageQuery;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
+import io.github.pnoker.center.manager.entity.builder.PointAttributeBuilder;
+import io.github.pnoker.center.manager.entity.query.PointAttributeQuery;
+import io.github.pnoker.center.manager.entity.vo.PointAttributeVO;
 import io.github.pnoker.center.manager.service.PointAttributeService;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.model.PointAttribute;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 驱动属性配置信息 Controller
@@ -44,120 +47,129 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.POINT_ATTRIBUTE_URL_PREFIX)
-public class PointAttributeController {
+@RequestMapping(ManagerConstant.POINT_ATTRIBUTE_URL_PREFIX)
+public class PointAttributeController implements BaseController {
 
-    @Resource
-    private PointAttributeService pointAttributeService;
+    private final PointAttributeBuilder pointAttributeBuilder;
+    private final PointAttributeService pointAttributeService;
+
+    public PointAttributeController(PointAttributeBuilder pointAttributeBuilder, PointAttributeService pointAttributeService) {
+        this.pointAttributeBuilder = pointAttributeBuilder;
+        this.pointAttributeService = pointAttributeService;
+    }
 
     /**
      * 新增 PointAttribute
      *
-     * @param pointAttribute PointAttribute
-     * @return PointAttribute
+     * @param entityVO {@link PointAttributeVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<PointAttribute> add(@Validated(Insert.class) @RequestBody PointAttribute pointAttribute) {
+    public Mono<R<PointAttributeBO>> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
         try {
-            pointAttributeService.add(pointAttribute);
-            return R.ok();
+            PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            pointAttributeService.save(entityBO);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
      * 根据 ID 删除 PointAttribute
      *
-     * @param id 位号属性ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            pointAttributeService.delete(id);
-            return R.ok();
+            pointAttributeService.remove(id);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 修改 PointAttribute
+     * 更新 PointAttribute
      *
-     * @param pointAttribute PointAttribute
-     * @return PointAttribute
+     * @param entityVO {@link PointAttributeVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody PointAttribute pointAttribute) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
         try {
-            pointAttributeService.update(pointAttribute);
-            return R.ok();
+            PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
+            pointAttributeService.update(entityBO);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
      * 根据 ID 查询 PointAttribute
      *
-     * @param id 位号属性ID
-     * @return PointAttribute
+     * @param id ID
+     * @return PointAttributeVO {@link PointAttributeVO}
      */
     @GetMapping("/id/{id}")
-    public R<PointAttribute> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<PointAttributeVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            PointAttribute select = pointAttributeService.selectById(id);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            PointAttributeBO entityBO = pointAttributeService.selectById(id);
+            PointAttributeVO entityVO = pointAttributeBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
     /**
      * 根据 驱动ID 查询 PointAttribute
      *
      * @param id 位号属性ID
-     * @return PointAttribute Array
+     * @return 位号属性Array
      */
     @GetMapping("/driver_id/{id}")
-    public R<List<PointAttribute>> selectByDriverId(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<List<PointAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            List<PointAttribute> select = pointAttributeService.selectByDriverId(id, true);
-            if (CollUtil.isNotEmpty(select)) {
-                return R.ok(select);
-            }
+            List<PointAttributeBO> entityBOList = pointAttributeService.selectByDriverId(id);
+            List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVO));
         } catch (NotFoundException ne) {
-            return R.ok(new ArrayList<>());
+            return Mono.just(R.ok(Collections.emptyList()));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
     /**
-     * 模糊分页查询 PointAttribute
+     * 分页查询 PointAttribute
      *
-     * @param pointAttributePageQuery 位号属性和分页参数
+     * @param entityQuery 位号属性和分页参数
      * @return Page Of PointAttribute
      */
     @PostMapping("/list")
-    public R<Page<PointAttribute>> list(@RequestBody(required = false) PointAttributePageQuery pointAttributePageQuery) {
+    public Mono<R<Page<PointAttributeVO>>> list(@RequestBody(required = false) PointAttributeQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(pointAttributePageQuery)) {
-                pointAttributePageQuery = new PointAttributePageQuery();
+            if (Objects.isNull(entityQuery)) {
+                entityQuery = new PointAttributeQuery();
             }
-            Page<PointAttribute> page = pointAttributeService.list(pointAttributePageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<PointAttributeBO> entityPageBO = pointAttributeService.selectByPage(entityQuery);
+            Page<PointAttributeVO> entityPageVO = pointAttributeBuilder.buildVOPageByBOPage(entityPageBO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
 }

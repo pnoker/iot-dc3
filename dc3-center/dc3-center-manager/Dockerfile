@@ -1,5 +1,5 @@
 #
-# Copyright 2016-present the original author or authors.
+# Copyright 2016-present the IoT DC3 original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,32 +15,24 @@
 #
 
 # runtime
-FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.13.14 AS runtime
-MAINTAINER pnoker <pnokers.icloud.com>
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jre:17 AS runtime
+LABEL dc3.author pnokers
+LABEL dc3.author.email pnokers.icloud.com
 
 # default env
-ENV NODE_ENV dev
-ENV EUREKA_TLS_ENABLE false
-ENV SERVER_PORT 8400
+ENV PARAMS        ''
+ENV NODE_ENV      dev
+ENV SERVER_PORT   8400
+ENV GRPC_PORT     9400
+ENV EXECUTOR_PORT 7400
 
 # default jvm & gc env
 ENV JAVA_OPS -server \
-             -Xms128m \
+             -Xms256m \
              -Xmx1024m \
              -Djava.security.egd=file:/dev/./urandom \
-             -XX:CompressedClassSpaceSize=128m \
-             -XX:MetaspaceSize=200m \
-             -XX:MaxMetaspaceSize=200m
-ENV GC_LOG   -XX:+PrintGCDetails \
-             -XX:+PrintGCDateStamps \
-             -XX:+PrintTenuringDistribution \
-             -XX:+PrintHeapAtGC \
-             -XX:+PrintReferenceGC \
-             -XX:+PrintGCApplicationStoppedTime \
-             -XX:+UseGCLogFileRotation \
-             -XX:NumberOfGCLogFiles=10 \
-             -XX:GCLogFileSize=10M \
-             -Xloggc:dc3/logs/center/manager/gc/dc3-center-manager.log
+             -XX:+UseG1GC
+ENV GC_LOG   -Xlog:gc*:file=dc3/logs/center/manager/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
@@ -49,7 +41,8 @@ WORKDIR /dc3-center/dc3-center-manager
 ADD ./target/dc3-center-manager.jar ./
 
 EXPOSE ${SERVER_PORT}
+EXPOSE ${GRPC_PORT}
 VOLUME /dc3-center/dc3-center-manager/dc3/logs
 
 CMD mkdir -p /dc3-center/dc3-center-manager/dc3/logs/center/manager/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-center-manager.jar
+    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-center-manager.jar ${PARAMS}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,26 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.LabelBindPageQuery;
-import io.github.pnoker.center.manager.entity.query.LabelPageQuery;
-import io.github.pnoker.center.manager.mapper.LabelMapper;
-import io.github.pnoker.center.manager.service.LabelBindService;
+import io.github.pnoker.center.manager.dal.LabelBindManager;
+import io.github.pnoker.center.manager.dal.LabelManager;
+import io.github.pnoker.center.manager.entity.builder.LabelForManagerBuilder;
+import io.github.pnoker.center.manager.entity.model.LabelBindDO;
+import io.github.pnoker.center.manager.entity.model.LabelDO;
+import io.github.pnoker.center.manager.entity.query.LabelQuery;
 import io.github.pnoker.center.manager.service.LabelService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.entity.bo.LabelBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.Label;
-import io.github.pnoker.common.model.LabelBind;
+import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * LabelService Impl
@@ -46,102 +49,120 @@ import javax.annotation.Resource;
 public class LabelServiceImpl implements LabelService {
 
     @Resource
-    private LabelMapper labelMapper;
+    private LabelForManagerBuilder labelForManagerBuilder;
 
     @Resource
-    private LabelBindService labelBindService;
+    private LabelManager labelManager;
+    @Resource
+    private LabelBindManager labelBindManager;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void add(Label entityDO) {
-        selectByName(entityDO.getLabelName(), entityDO.getTenantId());
-        if (labelMapper.insert(entityDO) < 1) {
-            throw new AddException("The label {} add failed", entityDO.getLabelName());
+    public void save(LabelBO entityBO) {
+        checkDuplicate(entityBO, false, true);
+
+        LabelDO entityDO = labelForManagerBuilder.buildDOByBO(entityBO);
+        if (!labelManager.save(entityDO)) {
+            throw new AddException("Failed to create label");
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void delete(String id) {
-        LabelBindPageQuery labelBindPageQuery = new LabelBindPageQuery();
-        labelBindPageQuery.setLabelId(id);
-        Page<LabelBind> labelBindPage = labelBindService.list(labelBindPageQuery);
-        if (labelBindPage.getTotal() > 0) {
-            throw new ServiceException("The label already bound by the entity");
-        }
-        Label label = selectById(id);
-        if (ObjectUtil.isNull(label)) {
-            throw new NotFoundException("The label does not exist");
+    public void remove(Long id) {
+        getDOById(id, true);
+
+        // 删除标签之前需要检查该标签是否存在关联
+        LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
+        wrapper.eq(LabelBindDO::getLabelId, id);
+        long count = labelBindManager.count(wrapper);
+        if (count > 0) {
+            throw new AssociatedException("The label has been bound by another entity");
         }
 
-        if (labelMapper.deleteById(id) < 1) {
-            throw new DeleteException("The label delete failed");
+        if (!labelManager.removeById(id)) {
+            throw new DeleteException("Failed to remove label");
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void update(Label entityDO) {
-        selectById(entityDO.getId());
+    public void update(LabelBO entityBO) {
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
+        LabelDO entityDO = labelForManagerBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
-        if (labelMapper.updateById(entityDO) < 1) {
+        if (!labelManager.updateById(entityDO)) {
             throw new UpdateException("The label update failed");
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Label selectById(String id) {
-        Label label = labelMapper.selectById(id);
-        if (ObjectUtil.isNull(label)) {
-            throw new NotFoundException();
-        }
-        return label;
+    public LabelBO selectById(Long id) {
+        LabelDO entityDO = getDOById(id, false);
+        return labelForManagerBuilder.buildBOByDO(entityDO);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Label selectByName(String name, String tenantId) {
-        LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
-        queryWrapper.eq(Label::getLabelName, name);
-        queryWrapper.eq(Label::getTenantId, tenantId);
-        queryWrapper.last("limit 1");
-        Label label = labelMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(label)) {
-            throw new NotFoundException();
+    public Page<LabelBO> selectByPage(LabelQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return label;
+        Page<LabelDO> entityPageDO = labelManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return labelForManagerBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**
-     * {@inheritDoc}
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link LabelQuery}
+     * @return {@link LambdaQueryWrapper}
      */
-    @Override
-    public Page<Label> list(LabelPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
-        }
-        return labelMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+    private LambdaQueryWrapper<LabelDO> fuzzyQuery(LabelQuery entityQuery) {
+        LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getLabelName()), LabelDO::getLabelName, entityQuery.getLabelName());
+        wrapper.eq(Objects.nonNull(entityQuery.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, entityQuery.getEntityTypeFlag());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getColor()), LabelDO::getColor, entityQuery.getColor());
+        wrapper.eq(LabelDO::getTenantId, entityQuery.getTenantId());
+        return wrapper;
     }
 
-    private LambdaQueryWrapper<Label> fuzzyQuery(LabelPageQuery query) {
-        LambdaQueryWrapper<Label> queryWrapper = Wrappers.<Label>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getLabelName()), Label::getLabelName, query.getLabelName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getColor()), Label::getColor, query.getColor());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), Label::getTenantId, query.getTenantId());
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link LabelBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(LabelBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
+        wrapper.eq(LabelDO::getLabelName, entityBO.getLabelName());
+        wrapper.eq(LabelDO::getEntityTypeFlag, entityBO.getEntityTypeFlag());
+        wrapper.eq(LabelDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        LabelDO one = labelManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
         }
-        return queryWrapper;
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("Label has been duplicated");
+        }
+        return duplicate;
     }
 
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link LabelDO}
+     */
+    private LabelDO getDOById(Long id, boolean throwException) {
+        LabelDO entityDO = labelManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Label does not exist");
+        }
+        return entityDO;
+    }
 }

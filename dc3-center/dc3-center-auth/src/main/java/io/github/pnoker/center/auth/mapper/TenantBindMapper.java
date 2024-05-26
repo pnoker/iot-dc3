@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,16 @@
 package io.github.pnoker.center.auth.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.model.TenantBind;
-import org.apache.ibatis.annotations.Mapper;
+import io.github.pnoker.center.auth.entity.model.TenantBindDO;
 
 /**
- * Mapper
+ * <p>
+ * 租户关联表 Mapper 接口
+ * </p>
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper
-public interface TenantBindMapper extends BaseMapper<TenantBind> {
+public interface TenantBindMapper extends BaseMapper<TenantBindDO> {
+
 }

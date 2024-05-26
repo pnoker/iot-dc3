@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,17 +30,11 @@ import com.serotonin.modbus4j.sero.messaging.WaitingRoomKeyFactory;
  * @version 5.0.0
  */
 public class EncapWaitingRoomKeyFactory implements WaitingRoomKeyFactory {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public WaitingRoomKey createWaitingRoomKey(OutgoingRequestMessage request) {
         return createWaitingRoomKey(((IpMessage) request).getModbusMessage());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public WaitingRoomKey createWaitingRoomKey(IncomingResponseMessage response) {
         return createWaitingRoomKey(((IpMessage) response).getModbusMessage());

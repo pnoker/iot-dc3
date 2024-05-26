@@ -1,0 +1,153 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+services:
+  register:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-register:2024.3.0.dev
+    restart: always
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9555:9555"
+    environment:
+      - PREFER_HOST_MODE=hostname
+      - MODE=standalone
+      - FUNCTION_MODE=naming
+      - SPRING_DATASOURCE_PLATFORM=mysql
+      - JVM_XMS=512m
+      - JVM_XMX=512m
+      - JVM_XMN=256m
+      - JVM_MS=128m
+      - JVM_MMS=256m
+    container_name: dc3-register
+    hostname: dc3-register
+    volumes:
+      - register:/home/nacos/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-register
+
+  emqx:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-emqx:2024.3.0.dev
+    restart: always
+    ports:
+      - '1883:1883'
+      - '8883:8883'
+      - '18083:18083'
+    environment:
+      - EMQX_NODE_NAME=dc3@dc3-emqx
+    container_name: dc3-emqx
+    hostname: dc3-emqx
+    volumes:
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
+      - emqx_etc:/opt/emqx/etc
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-emqx
+
+  job:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-job:2024.1.1.dev
+    restart: always
+    ports:
+      - '8100:8100'
+    environment:
+      - MYSQL_HOST=dc3-mysql
+      - MYSQL_PORT=3306
+      - MYSQL_DB=dc3_xxl_job
+    container_name: dc3-job
+    hostname: dc3-job
+    volumes:
+      - logs:/dc3-center/dc3-job/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-job
+
+  tdengine:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-tdengine:2024.1.1.dev
+    restart: always
+    ports:
+      - '36041:6041'
+    container_name: dc3-tdengine
+    hostname: dc3-tdengine
+    volumes:
+      - tdengine_data:/var/lib/taos
+      - tdengine_core:/corefile
+      - tdengine_log:/var/log/taos
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-tdengine
+
+  portainer:
+    image: portainer/portainer-ce:2.20.1
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    ports:
+      - '9000:9000'
+    container_name: portainer
+    hostname: dc3-portainer
+    volumes:
+      - portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-portainer
+
+volumes:
+  logs:
+  register:
+  emqx_data:
+  emqx_log:
+  emqx_etc:
+  tdengine_data:
+  tdengine_core:
+  tdengine_log:
+  portainer:
+
+networks:
+  dc3net:
+    driver: bridge
+...

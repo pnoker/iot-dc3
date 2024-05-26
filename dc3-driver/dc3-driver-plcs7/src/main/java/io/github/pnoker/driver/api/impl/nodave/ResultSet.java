@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,21 +39,21 @@ package io.github.pnoker.driver.api.impl.nodave;
  * @author Thomas Hergenhahn
  */
 public final class ResultSet {
-    private int errorState, numResults;
     public Result[] results;
+    private int errorState, numResults;
 
     public int getErrorState() {
         return this.errorState;
     }
 
-    public int getNumResults() {
-        return this.numResults;
+    public void setErrorState(final int error) {
+        this.errorState = error;
     }
 
     ;
 
-    public void setErrorState(final int error) {
-        this.errorState = error;
+    public int getNumResults() {
+        return this.numResults;
     }
 
     public void setNumResults(final int nr) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.GroupPageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.Group;
+import io.github.pnoker.center.manager.entity.query.GroupQuery;
+import io.github.pnoker.common.base.service.BaseService;
+import io.github.pnoker.common.entity.bo.GroupBO;
 
 /**
  * Group Interface
@@ -26,14 +26,6 @@ import io.github.pnoker.common.model.Group;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface GroupService extends Service<Group, GroupPageQuery> {
-    /**
-     * 根据分组 NAME 查询
-     *
-     * @param name     分组名称
-     * @param tenantId 租户ID
-     * @return Group
-     */
-    Group selectByName(String name, String tenantId);
+public interface GroupService extends BaseService<GroupBO, GroupQuery> {
 
 }

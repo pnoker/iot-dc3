@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.query.TenantPageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.Tenant;
+import io.github.pnoker.center.auth.entity.bo.TenantBO;
+import io.github.pnoker.center.auth.entity.query.TenantQuery;
+import io.github.pnoker.common.base.service.BaseService;
 
 /**
  * Tenant Interface
@@ -26,13 +26,13 @@ import io.github.pnoker.common.model.Tenant;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface TenantService extends Service<Tenant, TenantPageQuery> {
+public interface TenantService extends BaseService<TenantBO, TenantQuery> {
 
     /**
      * 根据租户Code查询租户
      *
      * @param code 租户Code
-     * @return {@link Tenant}
+     * @return {@link TenantBO}
      */
-    Tenant selectByCode(String code);
+    TenantBO selectByCode(String code);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 package io.github.pnoker.center.data.controller;
 
+import io.github.pnoker.center.data.biz.PointValueCommandService;
 import io.github.pnoker.center.data.entity.vo.PointValueReadVO;
 import io.github.pnoker.center.data.entity.vo.PointValueWriteVO;
-import io.github.pnoker.center.data.service.PointValueCommandService;
-import io.github.pnoker.common.constant.service.DataServiceConstant;
+import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -27,8 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
+import reactor.core.publisher.Mono;
 
 /**
  * PointValue Controller
@@ -38,11 +38,14 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping(DataServiceConstant.VALUE_COMMAND_URL_PREFIX)
-public class PointValueCommandController {
+@RequestMapping(DataConstant.POINT_VALUE_COMMAND_URL_PREFIX)
+public class PointValueCommandController implements BaseController {
 
-    @Resource
-    private PointValueCommandService pointValueCommandService;
+    private final PointValueCommandService pointValueCommandService;
+
+    public PointValueCommandController(PointValueCommandService pointValueCommandService) {
+        this.pointValueCommandService = pointValueCommandService;
+    }
 
     /**
      * 读指令
@@ -51,13 +54,14 @@ public class PointValueCommandController {
      * @return PointValue
      */
     @PostMapping("/read")
-    public R<Boolean> read(@Validated @RequestBody PointValueReadVO entityVO) {
+    public Mono<R<Boolean>> read(@Validated @RequestBody PointValueReadVO entityVO) {
         try {
             pointValueCommandService.read(entityVO);
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.ok();
+        return Mono.just(R.ok());
     }
 
     /**
@@ -67,13 +71,14 @@ public class PointValueCommandController {
      * @return PointValue
      */
     @PostMapping("/write")
-    public R<Boolean> write(@Validated @RequestBody PointValueWriteVO entityVO) {
+    public Mono<R<Boolean>> write(@Validated @RequestBody PointValueWriteVO entityVO) {
         try {
             pointValueCommandService.write(entityVO);
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.ok();
+        return Mono.just(R.ok());
     }
 
 }

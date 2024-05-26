@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,22 +32,14 @@ import java.util.*;
 public class Group {
 
     private static Random _random = new Random();
-
-    private Server _server = null;
-
     private final int _serverHandle;
-
-    private OPCGroupStateMgt _group = null;
-
-    private OPCItemMgt _items = null;
-
-    private OPCSyncIO _syncIO = null;
-
     private final Map<String, Integer> _itemHandleMap = new HashMap<String, Integer>();
-
     private final Map<Integer, Item> _itemMap = new HashMap<Integer, Item>();
-
     private final Map<Integer, Item> _itemClientMap = new HashMap<Integer, Item>();
+    private Server _server = null;
+    private OPCGroupStateMgt _group = null;
+    private OPCItemMgt _items = null;
+    private OPCSyncIO _syncIO = null;
 
     Group(final Server server, final int serverHandle, final OPCGroupStateMgt group) throws IllegalArgumentException, UnknownHostException, JIException {
         log.debug("Creating new group instance with COM group " + group);
@@ -56,10 +48,6 @@ public class Group {
         this._group = group;
         this._items = group.getItemManagement();
         this._syncIO = group.getSyncIO();
-    }
-
-    public void setActive(final boolean state) throws JIException {
-        this._group.setState(null, state, null, null, null, null);
     }
 
     /**
@@ -73,6 +61,10 @@ public class Group {
 
     public boolean isActive() throws JIException {
         return this._group.getState().isActive();
+    }
+
+    public void setActive(final boolean state) throws JIException {
+        this._group.setState(null, state, null, null, null, null);
     }
 
     /**
@@ -251,7 +243,7 @@ public class Group {
     protected void checkItems(final Item[] items) {
         for (Item item : items) {
             if (item.getGroup() != this) {
-                throw new IllegalArgumentException("Item does not belong to this group");
+                throw new IllegalArgumentException("Item doesn't belong to this group");
             }
         }
     }

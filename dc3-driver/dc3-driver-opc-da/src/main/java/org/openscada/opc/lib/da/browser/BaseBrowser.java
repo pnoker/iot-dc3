@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,21 +55,21 @@ public class BaseBrowser {
     }
 
     /**
-     * Set the batch size
-     *
-     * @param batchSize The new batch size
-     */
-    public void setBatchSize(final int batchSize) {
-        this._batchSize = batchSize;
-    }
-
-    /**
      * Get the batch size
      *
      * @return the current batch size
      */
     public int getBatchSize() {
         return this._batchSize;
+    }
+
+    /**
+     * Set the batch size
+     *
+     * @param batchSize The new batch size
+     */
+    public void setBatchSize(final int batchSize) {
+        this._batchSize = batchSize;
     }
 
     /**

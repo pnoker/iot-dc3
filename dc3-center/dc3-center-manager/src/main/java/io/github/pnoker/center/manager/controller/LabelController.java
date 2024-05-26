@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,25 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.LabelPageQuery;
+import io.github.pnoker.center.manager.entity.builder.LabelForManagerBuilder;
+import io.github.pnoker.center.manager.entity.query.LabelQuery;
 import io.github.pnoker.center.manager.service.LabelService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.Label;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.entity.bo.LabelBO;
+import io.github.pnoker.common.entity.vo.LabelVO;
+import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * 标签 Controller
@@ -42,107 +44,108 @@ import javax.validation.constraints.NotNull;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.LABEL_URL_PREFIX)
-public class LabelController {
+@RequestMapping(ManagerConstant.LABEL_URL_PREFIX)
+public class LabelController implements BaseController {
 
-    @Resource
-    private LabelService labelService;
+    private final LabelForManagerBuilder labelForManagerBuilder;
+    private final LabelService labelService;
+
+    public LabelController(LabelForManagerBuilder labelForManagerBuilder, LabelService labelService) {
+        this.labelForManagerBuilder = labelForManagerBuilder;
+        this.labelService = labelService;
+    }
 
     /**
-     * 新增 Label
+     * 新增
      *
-     * @param label    Label
-     * @param tenantId 租户ID
-     * @return Label
+     * @param entityVO {@link LabelVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Label label,
-                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
         try {
-            label.setTenantId(tenantId);
-            labelService.add(label);
-            return R.ok();
+            LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            labelService.save(entityBO);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 根据 ID 删除 Label
+     * 删除
      *
-     * @param id 标签ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            labelService.delete(id);
-            return R.ok();
+            labelService.remove(id);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 修改 Label
+     * 更新
      *
-     * @param label    Label
-     * @param tenantId 租户ID
-     * @return Label
+     * @param entityVO {@link LabelVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Label label,
-                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
         try {
-            label.setTenantId(tenantId);
-            labelService.update(label);
-            return R.ok();
+            LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
+            labelService.update(entityBO);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 根据 ID 查询 Label
+     * 单个查询
      *
-     * @param id 标签ID
-     * @return Label
+     * @param id ID
+     * @return LabelVO {@link LabelVO}
      */
     @GetMapping("/id/{id}")
-    public R<Label> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<LabelVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            Label select = labelService.selectById(id);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            LabelBO entityBO = labelService.selectById(id);
+            LabelVO entityVO = labelForManagerBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
     /**
-     * 模糊分页查询 Label
+     * 分页查询
      *
-     * @param labelPageQuery Label Dto
-     * @param tenantId       租户ID
-     * @return Page Of Label
+     * @param entityQuery {@link LabelQuery}
+     * @return R Of LabelVO Page
      */
     @PostMapping("/list")
-    public R<Page<Label>> list(@RequestBody(required = false) LabelPageQuery labelPageQuery,
-                               @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public Mono<R<Page<LabelVO>>> list(@RequestBody(required = false) LabelQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(labelPageQuery)) {
-                labelPageQuery = new LabelPageQuery();
+            if (Objects.isNull(entityQuery)) {
+                entityQuery = new LabelQuery();
             }
-            labelPageQuery.setTenantId(tenantId);
-            Page<Label> page = labelService.list(labelPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<LabelBO> entityPageBO = labelService.selectByPage(entityQuery);
+            Page<LabelVO> entityPageVO = labelForManagerBuilder.buildVOPageByBOPage(entityPageBO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 }

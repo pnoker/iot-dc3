@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,26 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.PointAttributeConfigPageQuery;
+import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.builder.PointAttributeConfigBuilder;
+import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
+import io.github.pnoker.center.manager.entity.vo.PointAttributeConfigVO;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.PointAttributeConfig;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 位号属性配置信息 Controller
@@ -41,162 +45,167 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.POINT_ATTRIBUTE_CONFIG_URL_PREFIX)
-public class PointAttributeConfigController {
+@RequestMapping(ManagerConstant.POINT_ATTRIBUTE_CONFIG_URL_PREFIX)
+public class PointAttributeConfigController implements BaseController {
 
-    @Resource
-    private PointAttributeConfigService pointAttributeConfigService;
+    private final PointAttributeConfigBuilder pointAttributeConfigBuilder;
+    private final PointAttributeConfigService pointAttributeConfigService;
+
+    public PointAttributeConfigController(PointAttributeConfigBuilder pointAttributeConfigBuilder, PointAttributeConfigService pointAttributeConfigService) {
+        this.pointAttributeConfigBuilder = pointAttributeConfigBuilder;
+        this.pointAttributeConfigService = pointAttributeConfigService;
+    }
 
     /**
-     * 新增 PointInfo
+     * 新增 PointConfig
      *
-     * @param pointAttributeConfig PointInfo
-     * @return PointInfo
+     * @param entityVO {@link PointAttributeConfigVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody PointAttributeConfig pointAttributeConfig) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointAttributeConfigVO entityVO) {
         try {
-            pointAttributeConfigService.add(pointAttributeConfig);
-            return R.ok();
+            PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            pointAttributeConfigService.save(entityBO);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 根据 ID 删除 PointInfo
+     * 根据 ID 删除 PointConfig
      *
-     * @param id 位号信息ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            pointAttributeConfigService.delete(id);
-            return R.ok();
+            pointAttributeConfigService.remove(id);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 修改 PointInfo
+     * 更新 PointConfig
      *
-     * @param pointAttributeConfig PointInfo
-     * @return PointInfo
+     * @param entityVO {@link PointAttributeConfigVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody PointAttributeConfig pointAttributeConfig) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeConfigVO entityVO) {
         try {
-            pointAttributeConfigService.update(pointAttributeConfig);
-            return R.ok();
+            PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
+            pointAttributeConfigService.update(entityBO);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 根据 ID 查询 PointInfo
+     * 根据 ID 查询 PointConfig
      *
      * @param id 位号信息ID
-     * @return PointInfo
+     * @return PointAttributeConfigVO {@link PointAttributeConfigVO}
      */
     @GetMapping("/id/{id}")
-    public R<PointAttributeConfig> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<PointAttributeConfigVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            PointAttributeConfig select = pointAttributeConfigService.selectById(id);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            PointAttributeConfigBO entityBO = pointAttributeConfigService.selectById(id);
+            PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
     /**
-     * 根据 属性ID、设备ID 和 位号ID 查询 PointInfo
+     * 根据 属性ID, 设备ID 和 位号ID 查询 PointConfig
      *
      * @param attributeId Attribute ID
      * @param deviceId    设备ID
-     * @param pointId     Point ID
-     * @return PointInfo
+     * @param pointId     位号ID
+     * @return PointConfig
      */
     @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}/point_id/{pointId}")
-    public R<PointAttributeConfig> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") String attributeId,
-                                                                            @NotNull @PathVariable(value = "deviceId") String deviceId,
-                                                                            @NotNull @PathVariable(value = "pointId") String pointId) {
+    public Mono<R<PointAttributeConfigVO>> selectByAttributeIdAndDeviceIdAndPointId(@NotNull @PathVariable(value = "attributeId") Long attributeId,
+                                                                                    @NotNull @PathVariable(value = "deviceId") Long deviceId,
+                                                                                    @NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
-            PointAttributeConfig select = pointAttributeConfigService.selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            PointAttributeConfigBO entityBO = pointAttributeConfigService.selectByAttributeIdAndDeviceIdAndPointId(attributeId, deviceId, pointId);
+            PointAttributeConfigVO entityVO = pointAttributeConfigBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
     /**
-     * 根据 设备ID 和 位号ID 查询 PointInfo
+     * 根据 设备ID 和 位号ID 查询 PointConfig
      *
      * @param deviceId 设备ID
      * @param pointId  位号ID
-     * @return PointInfo
+     * @return PointConfig
      */
     @GetMapping("/device_id/{deviceId}/point_id/{pointId}")
-    public R<List<PointAttributeConfig>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") String deviceId,
-                                                                    @NotNull @PathVariable(value = "pointId") String pointId) {
+    public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceIdAndPointId(@NotNull @PathVariable(value = "deviceId") Long deviceId,
+                                                                            @NotNull @PathVariable(value = "pointId") Long pointId) {
         try {
-            List<PointAttributeConfig> select = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId, pointId);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceIdAndPointId(deviceId, pointId);
+            List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
     /**
-     * 根据 设备ID 查询 PointInfo
+     * 根据 设备ID 查询 PointConfig
      *
      * @param deviceId 设备ID
-     * @return PointInfo
+     * @return PointConfig
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<PointAttributeConfig>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
+    public Mono<R<List<PointAttributeConfigVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<PointAttributeConfig> select = pointAttributeConfigService.selectByDeviceId(deviceId);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            List<PointAttributeConfigBO> entityBOList = pointAttributeConfigService.selectByDeviceId(deviceId);
+            List<PointAttributeConfigVO> entityVOList = pointAttributeConfigBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
     /**
-     * 模糊分页查询 PointInfo
+     * 分页查询 PointConfig
      *
-     * @param pointInfoPageQuery PointInfo Dto
-     * @return Page Of PointInfo
+     * @param entityQuery PointConfig Dto
+     * @return Page Of PointConfig
      */
     @PostMapping("/list")
-    public R<Page<PointAttributeConfig>> list(@RequestBody(required = false) PointAttributeConfigPageQuery pointInfoPageQuery) {
+    public Mono<R<Page<PointAttributeConfigVO>>> list(@RequestBody(required = false) PointAttributeConfigQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(pointInfoPageQuery)) {
-                pointInfoPageQuery = new PointAttributeConfigPageQuery();
+            if (Objects.isNull(entityQuery)) {
+                entityQuery = new PointAttributeConfigQuery();
             }
-            Page<PointAttributeConfig> page = pointAttributeConfigService.list(pointInfoPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<PointAttributeConfigBO> entityPageBO = pointAttributeConfigService.selectByPage(entityQuery);
+            Page<PointAttributeConfigVO> entityPageVO = pointAttributeConfigBuilder.buildVOPageByBOPage(entityPageBO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
 }

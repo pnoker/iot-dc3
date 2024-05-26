@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,25 +38,16 @@ public class ReportSlaveIdRequest extends ModbusRequest {
         super(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Modbus modbus) {
         // no op
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         // no op
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readRequest(ByteQueue queue) {
         // no op
@@ -72,9 +63,6 @@ public class ReportSlaveIdRequest extends ModbusRequest {
         return new ReportSlaveIdResponse(slaveId, processImage.getReportSlaveIdData());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.REPORT_SLAVE_ID;

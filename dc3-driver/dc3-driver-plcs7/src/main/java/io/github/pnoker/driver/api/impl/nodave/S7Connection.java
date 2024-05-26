@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,14 @@ import java.util.concurrent.Semaphore;
  */
 public abstract class S7Connection {
     static int tmo_normal = 150;
+    public int maxPDUlength;
+    public byte messageNumber = 0;
+    public byte[] msgIn;
+    public byte[] msgOut;
+    public int packetNumber = 0; // packetNumber in transport layer
+    public int PDUstartIn;
+    public int PDUstartOut;
+    public Semaphore semaphore;
     int answLen; // length of last message
     /**
      * position in result data, incremented when variables are extracted without
@@ -54,17 +62,7 @@ public abstract class S7Connection {
      */
     int dataPointer;
     PLCinterface iface; // pointer to used interface
-    public int maxPDUlength;
-    public byte messageNumber = 0;
-    public byte[] msgIn;
-    public byte[] msgOut;
-
-    public int packetNumber = 0; // packetNumber in transport layer
-    public int PDUstartIn;
-    public int PDUstartOut;
     PDU rcvdPDU;
-    public Semaphore semaphore;
-
     /**
      * absolute begin of result data
      */

@@ -1,5 +1,5 @@
 #
-# Copyright 2016-present the original author or authors.
+# Copyright 2016-present the IoT DC3 original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,26 +14,23 @@
 # limitations under the License.
 #
 
-# Development environment, customizable configuration
+# 开发环境配置, 会覆盖 application-*.yml 中配置的内容
 spring:
   env: dev
   group: ${user.name}
   datasource:
-    dynamic:
-      datasource:
-        master:
-          url: jdbc:mysql://${DB_HOST:dc3-mysql}:${MYSQL_PORT:33306}/${DB_NAME:dc3}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
-          username: ${DB_USERNAME:root}
-          password: ${DB_PASSWORD:dc3}
-  redis:
-    host: ${REDIS_HOST:dc3-redis}
-    port: ${REDIS_PORT:36379}
-    password: ${REDIS_PASSWORD:dc3}
+    url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:33306}/${MYSQL_DB:dc3_auth}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:dc3}
+  data:
+    redis:
+      host: ${REDIS_HOST:dc3-redis}
+      port: ${REDIS_PORT:36379}
+      password: ${REDIS_PASSWORD:dc3}
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}
-  cloud:
-    nacos:
-      discovery:
-        group: ${spring.group}
-        watch-delay: 5000
+
+logging:
+  level:
+    io.github.pnoker: DEBUG

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,24 @@ public class FILETIME {
     public FILETIME(final int high, final int low) {
         this.high = high;
         this.low = low;
+    }
+
+    public static JIStruct getStruct() throws JIException {
+        final JIStruct struct = new JIStruct();
+
+        struct.addMember(Integer.class);
+        struct.addMember(Integer.class);
+
+        return struct;
+    }
+
+    public static FILETIME fromStruct(final JIStruct struct) {
+        final FILETIME ft = new FILETIME();
+
+        ft.setLow((Integer) struct.getMember(0));
+        ft.setHigh((Integer) struct.getMember(1));
+
+        return ft;
     }
 
     public int getHigh() {
@@ -84,24 +102,6 @@ public class FILETIME {
             return false;
         }
         return true;
-    }
-
-    public static JIStruct getStruct() throws JIException {
-        final JIStruct struct = new JIStruct();
-
-        struct.addMember(Integer.class);
-        struct.addMember(Integer.class);
-
-        return struct;
-    }
-
-    public static FILETIME fromStruct(final JIStruct struct) {
-        final FILETIME ft = new FILETIME();
-
-        ft.setLow((Integer) struct.getMember(0));
-        ft.setHigh((Integer) struct.getMember(1));
-
-        return ft;
     }
 
     public Calendar asCalendar() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ServerStateReader {
 
-    private Server _server = null;
-
-    private ScheduledExecutorService _scheduler = null;
-
     private final List<ServerStateListener> _listeners = new CopyOnWriteArrayList<ServerStateListener>();
-
+    private Server _server = null;
+    private ScheduledExecutorService _scheduler = null;
     private ScheduledFuture<?> _job = null;
 
     public ServerStateReader(final Server server) {

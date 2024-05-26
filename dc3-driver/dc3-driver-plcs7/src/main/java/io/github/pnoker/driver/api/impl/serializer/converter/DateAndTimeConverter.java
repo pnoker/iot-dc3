@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,6 @@ public final class DateAndTimeConverter extends ByteConverter {
     // 12, 1,10,10, 5,50,0,3, (hex)
     // 12-01-10 10:05:50.000
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T extract(final Class<T> targetClass, final byte[] buffer, final int byteOffset, final int bitOffset) {
         final Calendar c = Calendar.getInstance();
@@ -100,33 +97,21 @@ public final class DateAndTimeConverter extends ByteConverter {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public S7Type getS7Type() {
         return S7Type.DATE_AND_TIME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getSizeInBits() {
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getSizeInBytes() {
         return 8;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void insert(final Object javaType, final byte[] buffer, final int byteOffset, final int bitOffset,
                        final int size) {

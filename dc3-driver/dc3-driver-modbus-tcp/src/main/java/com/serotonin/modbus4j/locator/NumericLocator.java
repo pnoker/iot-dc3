@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package com.serotonin.modbus4j.locator;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.code.RegisterRange;
 import com.serotonin.modbus4j.exception.IllegalDataTypeException;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -81,19 +81,31 @@ public class NumericLocator extends BaseLocator<Number> {
         validate();
     }
 
+    private static void appendBCD(StringBuilder sb, byte b) {
+        sb.append(bcdNibbleToInt(b, true));
+        sb.append(bcdNibbleToInt(b, false));
+    }
+
+    private static int bcdNibbleToInt(byte b, boolean high) {
+        int n;
+        if (high)
+            n = (b >> 4) & 0xf;
+        else
+            n = b & 0xf;
+        if (n > 9)
+            n = 0;
+        return n;
+    }
+
     private void validate() {
         super.validate(getRegisterCount());
 
         if (range == RegisterRange.COIL_STATUS || range == RegisterRange.INPUT_STATUS)
             throw new IllegalDataTypeException("Only binary values can be read from Coil and Input ranges");
-
-        if (!ArrayUtils.contains(DATA_TYPES, dataType))
+        if (!ArrayUtil.contains(DATA_TYPES, dataType))
             throw new IllegalDataTypeException("Invalid data type");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getDataType() {
         return dataType;
@@ -117,18 +129,12 @@ public class NumericLocator extends BaseLocator<Number> {
         this.roundingMode = roundingMode;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "NumericLocator(slaveId=" + getSlaveId() + ", range=" + range + ", offset=" + offset + ", dataType="
                 + dataType + ")";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getRegisterCount() {
         switch (dataType) {
@@ -170,25 +176,22 @@ public class NumericLocator extends BaseLocator<Number> {
         throw new RuntimeException("Unsupported data type: " + dataType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Number bytesToValueRealOffset(byte[] data, int offset) {
         offset *= 2;
 
         // 2 bytes
         if (dataType == DataType.TWO_BYTE_INT_UNSIGNED)
-            return new Integer(((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff));
+            return ((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff);
 
         if (dataType == DataType.TWO_BYTE_INT_SIGNED)
-            return new Short((short) (((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff)));
+            return (short) (((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff));
 
         if (dataType == DataType.TWO_BYTE_INT_UNSIGNED_SWAPPED)
-            return new Integer(((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff));
+            return ((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff);
 
         if (dataType == DataType.TWO_BYTE_INT_SIGNED_SWAPPED)
-            return new Short((short) (((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff)));
+            return (short) (((data[offset + 1] & 0xff) << 8) | (data[offset] & 0xff));
 
         if (dataType == DataType.TWO_BYTE_BCD) {
             StringBuilder sb = new StringBuilder();
@@ -199,34 +202,34 @@ public class NumericLocator extends BaseLocator<Number> {
 
         // 1 byte
         if (dataType == DataType.ONE_BYTE_INT_UNSIGNED_LOWER)
-            return new Integer(data[offset + 1] & 0xff);
+            return data[offset + 1] & 0xff;
         if (dataType == DataType.ONE_BYTE_INT_UNSIGNED_UPPER)
-            return new Integer(data[offset] & 0xff);
+            return data[offset] & 0xff;
 
         // 4 bytes
         if (dataType == DataType.FOUR_BYTE_INT_UNSIGNED)
-            return new Long(((long) ((data[offset] & 0xff)) << 24) | ((long) ((data[offset + 1] & 0xff)) << 16)
-                    | ((long) ((data[offset + 2] & 0xff)) << 8) | ((data[offset + 3] & 0xff)));
+            return (long) ((data[offset] & 0xff)) << 24 | ((long) ((data[offset + 1] & 0xff)) << 16)
+                    | ((long) ((data[offset + 2] & 0xff)) << 8) | ((data[offset + 3] & 0xff));
 
         if (dataType == DataType.FOUR_BYTE_INT_SIGNED)
-            return new Integer(((data[offset] & 0xff) << 24) | ((data[offset + 1] & 0xff) << 16)
-                    | ((data[offset + 2] & 0xff) << 8) | (data[offset + 3] & 0xff));
+            return ((data[offset] & 0xff) << 24) | ((data[offset + 1] & 0xff) << 16)
+                    | ((data[offset + 2] & 0xff) << 8) | (data[offset + 3] & 0xff);
 
         if (dataType == DataType.FOUR_BYTE_INT_UNSIGNED_SWAPPED)
-            return new Long(((long) ((data[offset + 2] & 0xff)) << 24) | ((long) ((data[offset + 3] & 0xff)) << 16)
-                    | ((long) ((data[offset] & 0xff)) << 8) | ((data[offset + 1] & 0xff)));
+            return ((long) ((data[offset + 2] & 0xff)) << 24) | ((long) ((data[offset + 3] & 0xff)) << 16)
+                    | ((long) ((data[offset] & 0xff)) << 8) | ((data[offset + 1] & 0xff));
 
         if (dataType == DataType.FOUR_BYTE_INT_SIGNED_SWAPPED)
-            return new Integer(((data[offset + 2] & 0xff) << 24) | ((data[offset + 3] & 0xff) << 16)
-                    | ((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff));
+            return ((data[offset + 2] & 0xff) << 24) | ((data[offset + 3] & 0xff) << 16)
+                    | ((data[offset] & 0xff) << 8) | (data[offset + 1] & 0xff);
 
         if (dataType == DataType.FOUR_BYTE_INT_UNSIGNED_SWAPPED_SWAPPED)
-            return new Long(((long) ((data[offset + 3] & 0xff)) << 24) | (((data[offset + 2] & 0xff) << 16))
-                    | ((long) ((data[offset + 1] & 0xff)) << 8) | (data[offset] & 0xff));
+            return ((long) ((data[offset + 3] & 0xff)) << 24) | (((data[offset + 2] & 0xff) << 16))
+                    | ((long) ((data[offset + 1] & 0xff)) << 8) | (data[offset] & 0xff);
 
         if (dataType == DataType.FOUR_BYTE_INT_SIGNED_SWAPPED_SWAPPED)
-            return new Integer(((data[offset + 3] & 0xff) << 24) | ((data[offset + 2] & 0xff) << 16)
-                    | ((data[offset + 1] & 0xff) << 8) | ((data[offset] & 0xff)));
+            return ((data[offset + 3] & 0xff) << 24) | ((data[offset + 2] & 0xff) << 16)
+                    | ((data[offset + 1] & 0xff) << 8) | ((data[offset] & 0xff));
 
         if (dataType == DataType.FOUR_BYTE_FLOAT)
             return Float.intBitsToFloat(((data[offset] & 0xff) << 24) | ((data[offset + 1] & 0xff) << 16)
@@ -288,10 +291,10 @@ public class NumericLocator extends BaseLocator<Number> {
         }
 
         if (dataType == DataType.EIGHT_BYTE_INT_SIGNED)
-            return new Long(((long) ((data[offset] & 0xff)) << 56) | ((long) ((data[offset + 1] & 0xff)) << 48)
+            return ((long) ((data[offset] & 0xff)) << 56) | ((long) ((data[offset + 1] & 0xff)) << 48)
                     | ((long) ((data[offset + 2] & 0xff)) << 40) | ((long) ((data[offset + 3] & 0xff)) << 32)
                     | ((long) ((data[offset + 4] & 0xff)) << 24) | ((long) ((data[offset + 5] & 0xff)) << 16)
-                    | ((long) ((data[offset + 6] & 0xff)) << 8) | ((data[offset + 7] & 0xff)));
+                    | ((long) ((data[offset + 6] & 0xff)) << 8) | ((data[offset + 7] & 0xff));
 
         if (dataType == DataType.EIGHT_BYTE_INT_UNSIGNED_SWAPPED) {
             byte[] b9 = new byte[9];
@@ -307,10 +310,10 @@ public class NumericLocator extends BaseLocator<Number> {
         }
 
         if (dataType == DataType.EIGHT_BYTE_INT_SIGNED_SWAPPED)
-            return new Long(((long) ((data[offset + 6] & 0xff)) << 56) | ((long) ((data[offset + 7] & 0xff)) << 48)
+            return ((long) ((data[offset + 6] & 0xff)) << 56) | ((long) ((data[offset + 7] & 0xff)) << 48)
                     | ((long) ((data[offset + 4] & 0xff)) << 40) | ((long) ((data[offset + 5] & 0xff)) << 32)
                     | ((long) ((data[offset + 2] & 0xff)) << 24) | ((long) ((data[offset + 3] & 0xff)) << 16)
-                    | ((long) ((data[offset] & 0xff)) << 8) | ((data[offset + 1] & 0xff)));
+                    | ((long) ((data[offset] & 0xff)) << 8) | ((data[offset + 1] & 0xff));
 
         if (dataType == DataType.EIGHT_BYTE_FLOAT)
             return Double.longBitsToDouble(((long) ((data[offset] & 0xff)) << 56)
@@ -329,25 +332,6 @@ public class NumericLocator extends BaseLocator<Number> {
         throw new RuntimeException("Unsupported data type: " + dataType);
     }
 
-    private static void appendBCD(StringBuilder sb, byte b) {
-        sb.append(bcdNibbleToInt(b, true));
-        sb.append(bcdNibbleToInt(b, false));
-    }
-
-    private static int bcdNibbleToInt(byte b, boolean high) {
-        int n;
-        if (high)
-            n = (b >> 4) & 0xf;
-        else
-            n = b & 0xf;
-        if (n > 9)
-            n = 0;
-        return n;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public short[] valueToShorts(Number value) {
         // 2 bytes

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,15 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 5.0.0
  */
 public class EncapMessageRequest extends EncapMessage implements OutgoingRequestMessage, IncomingRequestMessage {
+    /**
+     * <p>Constructor for EncapMessageRequest.</p>
+     *
+     * @param modbusRequest a {@link ModbusRequest} object.
+     */
+    public EncapMessageRequest(ModbusRequest modbusRequest) {
+        super(modbusRequest);
+    }
+
     static EncapMessageRequest createEncapMessageRequest(ByteQueue queue) throws ModbusTransportException {
         // Create the modbus response.
         ModbusRequest request = ModbusRequest.createModbusRequest(queue);
@@ -40,18 +49,6 @@ public class EncapMessageRequest extends EncapMessage implements OutgoingRequest
         return encapRequest;
     }
 
-    /**
-     * <p>Constructor for EncapMessageRequest.</p>
-     *
-     * @param modbusRequest a {@link ModbusRequest} object.
-     */
-    public EncapMessageRequest(ModbusRequest modbusRequest) {
-        super(modbusRequest);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean expectsResponse() {
         return modbusMessage.getSlaveId() != 0;

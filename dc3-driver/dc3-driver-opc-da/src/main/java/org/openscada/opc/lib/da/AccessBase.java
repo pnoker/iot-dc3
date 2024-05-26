@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,32 +32,21 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public abstract class AccessBase implements ServerConnectionStateListener {
 
-    protected Server server = null;
-
-    protected Group group = null;
-
-    protected boolean active = false;
-
     private final List<AccessStateListener> stateListeners = new CopyOnWriteArrayList<AccessStateListener>();
-
-    private boolean bound = false;
-
+    protected Server server = null;
+    protected Group group = null;
+    protected boolean active = false;
     /**
      * Holds the item to callback assignment
      */
     protected Map<Item, DataCallback> items = new HashMap<Item, DataCallback>();
-
     protected Map<String, Item> itemMap = new HashMap<String, Item>();
-
     protected Map<Item, ItemState> itemCache = new HashMap<Item, ItemState>();
-
-    private int period = 0;
-
     protected Map<String, DataCallback> itemSet = new HashMap<String, DataCallback>();
-
     protected String logTag = null;
-
     protected Logger dataLogger = null;
+    private boolean bound = false;
+    private int period = 0;
 
     public AccessBase(final Server server, final int period) throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException, DuplicateGroupException {
         super();

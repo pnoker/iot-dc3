@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,50 +90,40 @@ public class BinaryLocator extends BaseLocator<Boolean> {
         return bit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public int getDataType() {
         return DataType.BINARY;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public int getRegisterCount() {
         return 1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public String toString() {
         return "BinaryLocator(slaveId=" + getSlaveId() + ", range=" + range + ", offset=" + offset + ", bit=" + bit
                 + ")";
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public Boolean bytesToValueRealOffset(byte[] data, int offset) {
         // If this is a coil or input, convert to boolean.
         if (range == RegisterRange.COIL_STATUS || range == RegisterRange.INPUT_STATUS)
-            return new Boolean((((data[offset / 8] & 0xff) >> (offset % 8)) & 0x1) == 1);
+            return (((data[offset / 8] & 0xff) >> (offset % 8)) & 0x1) == 1;
 
         // For the rest of the types, we double the normalized offset to account for short to byte.
         offset *= 2;
 
         // We could still be asking for a binary if it's a bit in a register.
-        return new Boolean((((data[offset + 1 - bit / 8] & 0xff) >> (bit % 8)) & 0x1) == 1);
+        return (((data[offset + 1 - bit / 8] & 0xff) >> (bit % 8)) & 0x1) == 1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public short[] valueToShorts(Boolean value) {
         throw new NotImplementedException();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.query.TenantBindPageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.TenantBind;
+import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
+import io.github.pnoker.center.auth.entity.query.TenantBindQuery;
+import io.github.pnoker.common.base.service.BaseService;
 
 /**
  * TenantBind Interface
@@ -26,7 +26,7 @@ import io.github.pnoker.common.model.TenantBind;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface TenantBindService extends Service<TenantBind, TenantBindPageQuery> {
+public interface TenantBindService extends BaseService<TenantBindBO, TenantBindQuery> {
 
     /**
      * 根据 租户ID 和 关联的用户ID 查询
@@ -35,5 +35,5 @@ public interface TenantBindService extends Service<TenantBind, TenantBindPageQue
      * @param userId   User ID
      * @return TenantBind
      */
-    TenantBind selectByTenantIdAndUserId(String tenantId, String userId);
+    TenantBindBO selectByTenantIdAndUserId(Long tenantId, Long userId);
 }

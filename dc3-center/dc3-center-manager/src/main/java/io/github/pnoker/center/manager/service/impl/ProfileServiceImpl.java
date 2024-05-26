@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,29 +18,38 @@ package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
+import io.github.pnoker.center.manager.dal.PointManager;
+import io.github.pnoker.center.manager.dal.ProfileBindManager;
+import io.github.pnoker.center.manager.dal.ProfileManager;
+import io.github.pnoker.center.manager.entity.bo.ProfileBO;
+import io.github.pnoker.center.manager.entity.builder.ProfileBuilder;
+import io.github.pnoker.center.manager.entity.model.PointDO;
+import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
+import io.github.pnoker.center.manager.entity.model.ProfileDO;
+import io.github.pnoker.center.manager.entity.query.ProfileBindQuery;
+import io.github.pnoker.center.manager.entity.query.ProfileQuery;
 import io.github.pnoker.center.manager.mapper.ProfileMapper;
-import io.github.pnoker.center.manager.service.NotifyService;
-import io.github.pnoker.center.manager.service.PointService;
-import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.center.manager.service.ProfileService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.Profile;
+import io.github.pnoker.common.utils.PageUtil;
+import io.github.pnoker.common.utils.UserHeaderUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * ProfileService Impl
@@ -53,135 +62,156 @@ import java.util.Set;
 public class ProfileServiceImpl implements ProfileService {
 
     @Resource
+    private ProfileBuilder profileBuilder;
+
+    @Resource
+    private ProfileManager profileManager;
+    @Resource
+    private ProfileBindManager profileBindManager;
+    @Resource
+    private PointManager pointManager;
+
+    @Resource
     private ProfileMapper profileMapper;
 
-    @Resource
-    private PointService pointService;
-    @Resource
-    private ProfileBindService profileBindService;
-    @Resource
-    private NotifyService notifyService;
-
     @Override
-    public void add(Profile entityDO) {
-        try {
-            selectByNameAndType(entityDO.getProfileName(), entityDO.getProfileTypeFlag(), entityDO.getTenantId());
-            throw new DuplicateException("The profile already exists");
-        } catch (NotFoundException notFoundException1) {
-            if (profileMapper.insert(entityDO) < 1) {
-                throw new AddException("The profile {} add failed", entityDO.getProfileName());
-            }
+    public void save(ProfileBO entityBO) {
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create profile: profile has been duplicated");
+        }
+
+        ProfileDO entityDO = profileBuilder.buildDOByBO(entityBO);
+        if (!profileManager.save(entityDO)) {
+            throw new AddException("Failed to create profile");
         }
     }
 
 
     @Override
-    public void delete(String id) {
-        try {
-            pointService.selectByProfileId(id);
-            throw new ServiceException("The profile already bound by the point");
-        } catch (NotFoundException notFoundException2) {
-            Profile profile = selectById(id);
-            if (ObjectUtil.isNull(profile)) {
-                throw new NotFoundException("The profile does not exist");
-            }
+    public void remove(Long id) {
+        getDOById(id, true);
 
-            if (profileMapper.deleteById(id) < 1) {
-                throw new DeleteException("The profile delete failed");
-            }
+        // 删除模版之前需要检查该模版是否存在关联
+        LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, id);
+        long count = wrapper.count();
+        if (count > 0) {
+            throw new AssociatedException("Failed to remove profile: some points exists in the template");
+        }
 
-            notifyService.notifyDriverProfile(MetadataCommandTypeEnum.DELETE, profile);
+        if (!profileManager.removeById(id)) {
+            throw new DeleteException("Failed to remove profile");
         }
     }
 
     @Override
-    public void update(Profile entityDO) {
-        selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (profileMapper.updateById(entityDO) < 1) {
-            throw new UpdateException("The profile update failed");
+    public void update(ProfileBO entityBO) {
+        getDOById(entityBO.getId(), true);
+
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("Failed to update profile: profile has been duplicated");
         }
 
-        Profile update = profileMapper.selectById(entityDO.getId());
-        notifyService.notifyDriverProfile(MetadataCommandTypeEnum.UPDATE, update);
+        ProfileDO entityDO = profileBuilder.buildDOByBO(entityBO);
+        entityBO.setOperateTime(null);
+        if (!profileManager.updateById(entityDO)) {
+            throw new UpdateException("Failed to update profile");
+        }
     }
 
     @Override
-    public Profile selectById(String id) {
-        Profile profile = profileMapper.selectById(id);
-        if (ObjectUtil.isNull(profile)) {
-            throw new NotFoundException();
-        }
-        return profile;
+    public ProfileBO selectById(Long id) {
+        ProfileDO entityDO = getDOById(id, true);
+        return profileBuilder.buildBOByDO(entityDO);
     }
 
     @Override
-    public Profile selectByNameAndType(String name, ProfileTypeFlagEnum type, String tenantId) {
-        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        queryWrapper.eq(Profile::getProfileName, name);
-        queryWrapper.eq(Profile::getProfileTypeFlag, type);
-        queryWrapper.eq(Profile::getTenantId, tenantId);
-        queryWrapper.last("limit 1");
-        Profile profile = profileMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(profile)) {
-            throw new NotFoundException();
-        }
-        return profile;
+    public ProfileBO selectByNameAndType(String name, ProfileTypeFlagEnum type) {
+        LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
+        wrapper.eq(ProfileDO::getProfileName, name);
+        wrapper.eq(ProfileDO::getProfileTypeFlag, type);
+        wrapper.eq(ProfileDO::getTenantId, UserHeaderUtil.getUserHeader().getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        ProfileDO entityDO = profileManager.getOne(wrapper);
+        return profileBuilder.buildBOByDO(entityDO);
     }
 
     @Override
-    public List<Profile> selectByIds(Set<String> ids) {
-        List<Profile> profiles = new ArrayList<>();
-        if (CollUtil.isNotEmpty(ids)) {
-            profiles = profileMapper.selectBatchIds(ids);
+    public List<ProfileBO> selectByIds(Set<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
         }
-        return profiles;
+        List<ProfileDO> entityDOList = profileManager.listByIds(ids);
+        return profileBuilder.buildBOListByDOList(entityDOList);
     }
 
     @Override
-    public List<Profile> selectByDeviceId(String deviceId) {
-        Set<String> profileIds = profileBindService.selectProfileIdsByDeviceId(deviceId);
-        if (CollUtil.isNotEmpty(profileIds)) {
-            return selectByIds(profileIds);
-        }
-        return new ArrayList<>();
+    public List<ProfileBO> selectByDeviceId(Long deviceId) {
+        LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery().eq(ProfileBindDO::getDeviceId, deviceId);
+        List<ProfileBindDO> entityDOList = wrapper.list();
+        Set<Long> profileIds = entityDOList.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
+        return selectByIds(profileIds);
     }
 
     @Override
-    public Long count() {
-        return profileMapper.selectCount(new QueryWrapper<>());
+    public Page<ProfileBO> selectByPage(ProfileQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<ProfileDO> entityPageDO = profileMapper.selectPageWithDevice(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery), entityQuery.getDeviceId());
+        return profileBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
-    @Override
-    public Page<Profile> list(ProfilePageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
-        }
-        return profileMapper.selectPageWithDevice(queryDTO.getPage().convert(), customFuzzyQuery(queryDTO), queryDTO.getDeviceId());
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link ProfileQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<ProfileDO> fuzzyQuery(ProfileQuery entityQuery) {
+        QueryWrapper<ProfileDO> wrapper = Wrappers.query();
+        wrapper.eq("dp.deleted", 0);
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getProfileName()), "dp.profile_name", entityQuery.getProfileName());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getProfileCode()), "dp.profile_code", entityQuery.getProfileCode());
+        wrapper.eq(Objects.nonNull(entityQuery.getProfileShareFlag()), "dp.profile_share_flag", entityQuery.getProfileShareFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
+        wrapper.eq("dp.tenant_id", entityQuery.getTenantId());
+        return wrapper.lambda();
     }
 
-    private LambdaQueryWrapper<Profile> fuzzyQuery(ProfilePageQuery query) {
-        LambdaQueryWrapper<Profile> queryWrapper = Wrappers.<Profile>query().lambda();
-        if (ObjectUtil.isNotEmpty(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getProfileName()), Profile::getProfileName, query.getProfileName());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getProfileShareFlag()), Profile::getProfileShareFlag, query.getProfileShareFlag());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getEnableFlag()), Profile::getEnableFlag, query.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), Profile::getTenantId, query.getTenantId());
+    /**
+     * 重复性校验
+     *
+     * @param entityBO {@link ProfileBO}
+     * @param isUpdate 是否为更新操作
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(ProfileBO entityBO, boolean isUpdate) {
+        LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
+        wrapper.eq(ProfileDO::getProfileName, entityBO.getProfileName());
+        wrapper.eq(ProfileDO::getProfileCode, entityBO.getProfileCode());
+        wrapper.eq(ProfileDO::getProfileTypeFlag, entityBO.getProfileTypeFlag());
+        wrapper.eq(ProfileDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        ProfileDO one = profileManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
         }
-        return queryWrapper;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
-    private LambdaQueryWrapper<Profile> customFuzzyQuery(ProfilePageQuery profilePageQuery) {
-        QueryWrapper<Profile> queryWrapper = Wrappers.query();
-        queryWrapper.eq("dp.deleted", 0);
-        if (ObjectUtil.isNotNull(profilePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(profilePageQuery.getProfileName()), "dp.profile_name", profilePageQuery.getProfileName());
-            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileCode()), "dp.profile_code", profilePageQuery.getProfileCode());
-            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getProfileShareFlag()), "dp.profile_share_flag", profilePageQuery.getProfileShareFlag());
-            queryWrapper.eq(ObjectUtil.isNotNull(profilePageQuery.getEnableFlag()), "dp.enable_flag", profilePageQuery.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(profilePageQuery.getTenantId()), "dp.tenant_id", profilePageQuery.getTenantId());
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link ProfileDO}
+     */
+    private ProfileDO getDOById(Long id, boolean throwException) {
+        ProfileDO entityDO = profileManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Profile does not exist");
         }
-        return queryWrapper.lambda();
+        return entityDO;
     }
 
 }

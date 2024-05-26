@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class AutoReconnectController implements ServerConnectionStateListener {
 
     private static final int DEFAULT_DELAY = 5 * 1000;
-
-    private int _delay;
-
     private final Server _server;
-
     private final Set<AutoReconnectListener> _listeners = new CopyOnWriteArraySet<AutoReconnectListener>();
-
+    private int _delay;
     private AutoReconnectState _state = AutoReconnectState.DISABLED;
 
     private Thread _connectTask = null;

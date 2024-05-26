@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ public class AddFailedException extends Exception {
     /**
      *
      */
-    private static final long serialVersionUID = 5299486640366935298L;
+    private static final long serialVersionUID = 1L;
 
     private Map<String, Integer> _errors = new HashMap<String, Integer>();
 

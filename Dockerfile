@@ -1,5 +1,5 @@
 #
-# Copyright 2016-present the original author or authors.
+# Copyright 2016-present the IoT DC3 original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
 #
 
 # builder
-FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-jdk-8.13.14 AS builder
-MAINTAINER pnoker <pnokers.icloud.com>
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:2024.3.0.dev AS builder
+LABEL dc3.author pnokers
+LABEL dc3.author.email pnokers.icloud.com
 
 ARG PROFILE=dev
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 WORKDIR /build
-COPY . /build
 
 COPY ./ ./
 

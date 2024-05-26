@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,17 @@
 package io.github.pnoker.driver.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class WeatherInfo {
     /**
      * 返回状态
@@ -51,7 +55,8 @@ public class WeatherInfo {
      */
     private List<Live> lives;
 
-    @Data
+    @Getter
+    @Setter
     @NoArgsConstructor
     public static class Live {
         /**
@@ -71,12 +76,12 @@ public class WeatherInfo {
         private String adCode;
 
         /**
-         * 天气现象（汉字描述）
+         * 天气现象(汉字描述)
          */
         private String weather;
 
         /**
-         * 实时气温，单位：摄氏度
+         * 实时气温, 单位: 摄氏度
          */
         private String temperature;
 
@@ -87,7 +92,7 @@ public class WeatherInfo {
         private String windDirection;
 
         /**
-         * 风力级别，单位：级
+         * 风力级别, 单位: 级
          */
         @JsonProperty("windpower")
         private String windPower;

@@ -1,5 +1,5 @@
 #
-# Copyright 2016-present the original author or authors.
+# Copyright 2016-present the IoT DC3 original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
 #
 
 server:
-  port: 8500
+  port: ${SERVER_PORT:8500}
+  servlet:
+    context-path: /data
+  undertow:
+    accesslog:
+      dir: dc3/logs/center/data/undertow
 
 grpc:
   server:
     port: ${GRPC_SERVER_PORT:9500}
-  client:
-    dc3-center-manager:
-      enable-keep-alive: true
-      keep-alive-without-calls: true
-      negotiation-type: plaintext
 
 spring:
   application:
@@ -32,30 +32,15 @@ spring:
   profiles:
     active:
       - ${NODE_ENV:dev}
-  redis:
-    database: 3
-  cache:
+  data:
     redis:
-      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:12H}
+      database: 3
 
 data:
   point:
     batch:
       speed: ${POINT_BATCH_SPEED:100}
       interval: ${POINT_BATCH_INTERVAL:5}
-    sava:
-      influxdb:
-        enable: false
-      tdengine:
-        enable: false
-      opentsdb:
-        enable: false
-        host: dc3-opentsdb
-        port: 4242
-      elasticsearch:
-        enable: false
-        host: dc3-elasticsearch
-        port: 9200
 
 logging:
   file:

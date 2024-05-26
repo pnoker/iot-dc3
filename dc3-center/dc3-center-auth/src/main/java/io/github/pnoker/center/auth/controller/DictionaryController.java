@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,19 @@
 
 package io.github.pnoker.center.auth.controller;
 
-import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.center.auth.service.DictionaryService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.service.AuthServiceConstant;
+import io.github.pnoker.center.auth.biz.DictionaryService;
+import io.github.pnoker.center.auth.entity.builder.DictionaryForAuthBuilder;
+import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.common.Dictionary;
+import io.github.pnoker.common.entity.bo.DictionaryBO;
+import io.github.pnoker.common.entity.vo.DictionaryVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -40,11 +39,16 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(AuthServiceConstant.DICTIONARY_URL_PREFIX)
-public class DictionaryController {
+@RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
+public class DictionaryController implements BaseController {
 
-    @Resource
-    private DictionaryService dictionaryService;
+    private final DictionaryForAuthBuilder dictionaryForAuthBuilder;
+    private final DictionaryService dictionaryService;
+
+    public DictionaryController(DictionaryForAuthBuilder dictionaryForAuthBuilder, DictionaryService dictionaryService) {
+        this.dictionaryForAuthBuilder = dictionaryForAuthBuilder;
+        this.dictionaryService = dictionaryService;
+    }
 
     /**
      * 查询租户字典列表
@@ -52,54 +56,32 @@ public class DictionaryController {
      * @return 字典列表
      */
     @GetMapping("/tenant")
-    public R<List<Dictionary>> tenantDictionary() {
+    public Mono<R<List<DictionaryVO>>> tenantDictionary() {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.tenantDictionary();
-            if (ObjectUtil.isNotNull(dictionaryList)) {
-                return R.ok(dictionaryList);
-            }
+            List<DictionaryBO> entityBOList = dictionaryService.tenantDictionary();
+            List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
     /**
-     * 查询用户字典列表
+     * 查询限制IP字典列表
      *
-     * @param tenantId 租户ID
      * @return 字典列表
      */
-    @GetMapping("/user")
-    public R<List<Dictionary>> userDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    @GetMapping("/limited_ip")
+    public Mono<R<List<DictionaryVO>>> limitedIpDictionary() {
         try {
-            List<Dictionary> dictionaryList = dictionaryService.userDictionary(tenantId);
-            if (ObjectUtil.isNotNull(dictionaryList)) {
-                return R.ok(dictionaryList);
-            }
+            List<DictionaryBO> entityBOList = dictionaryService.limitedIpDictionary(getTenantId());
+            List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
-    }
-
-    /**
-     * 查询 Ip 黑名单字典列表
-     *
-     * @param tenantId 租户ID
-     * @return 字典列表
-     */
-    @GetMapping("/black_ip")
-    public R<List<Dictionary>> blackIpDictionary(@RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
-        try {
-            List<Dictionary> dictionaryList = dictionaryService.blackIpDictionary(tenantId);
-            if (ObjectUtil.isNotNull(dictionaryList)) {
-                return R.ok(dictionaryList);
-            }
-        } catch (Exception e) {
-            return R.fail(e.getMessage());
-        }
-        return R.fail();
     }
 
 }
