@@ -23,7 +23,6 @@ import io.github.pnoker.center.auth.dal.TenantBindManager;
 import io.github.pnoker.center.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.center.auth.entity.builder.TenantBindBuilder;
 import io.github.pnoker.center.auth.entity.model.TenantBindDO;
-import io.github.pnoker.center.auth.entity.query.RoleUserBindQuery;
 import io.github.pnoker.center.auth.entity.query.TenantBindQuery;
 import io.github.pnoker.center.auth.service.TenantBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
