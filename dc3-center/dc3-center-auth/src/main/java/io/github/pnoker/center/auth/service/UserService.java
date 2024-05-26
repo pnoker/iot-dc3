@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.auth.service;
 
-import io.github.pnoker.center.auth.entity.query.UserDto;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.center.auth.entity.bo.UserBO;
+import io.github.pnoker.center.auth.entity.query.UserQuery;
+import io.github.pnoker.common.base.service.BaseService;
 
 /**
  * User Interface
@@ -26,7 +26,7 @@ import io.github.pnoker.common.model.User;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface UserService extends Service<User, UserDto> {
+public interface UserService extends BaseService<UserBO, UserQuery> {
 
     /**
      * 根据用户名称查询用户
@@ -35,7 +35,7 @@ public interface UserService extends Service<User, UserDto> {
      * @param throwException Throw Exception
      * @return User
      */
-    User selectByUserName(String userName, boolean throwException);
+    UserBO selectByUserName(String userName, boolean throwException);
 
     /**
      * 根据手机号查询用户
@@ -44,7 +44,7 @@ public interface UserService extends Service<User, UserDto> {
      * @param throwException Throw Exception
      * @return User
      */
-    User selectByPhone(String phone, boolean throwException);
+    UserBO selectByPhone(String phone, boolean throwException);
 
     /**
      * 根据邮箱查询用户
@@ -53,5 +53,5 @@ public interface UserService extends Service<User, UserDto> {
      * @param throwException Throw Exception
      * @return User
      */
-    User selectByEmail(String email, boolean throwException);
+    UserBO selectByEmail(String email, boolean throwException);
 }

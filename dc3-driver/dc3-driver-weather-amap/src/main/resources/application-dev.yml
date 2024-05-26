@@ -1,5 +1,5 @@
 #
-# Copyright 2016-present the original author or authors.
+# Copyright 2016-present the IoT DC3 original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
 # limitations under the License.
 #
 
-# Development environment, customizable configuration
+# 开发环境配置, 会覆盖 application-*.yml 中配置的内容
 driver:
   schedule:
     # 定时读数据
     read:
-      corn: '0/10 * * * * ?'
+      cron: '0/10 * * * * ?'
 
 spring:
-  # 当开启env和group时，需要本地启动auth，manager和data服务
+  # 当开启env和group时, 需要本地启动auth, manager和data服务
   env: dev
   group: ${user.name}
   rabbitmq:

@@ -1,105 +1,180 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.RoleResourceBindPageQuery;
-import io.github.pnoker.center.auth.mapper.ResourceMapper;
-import io.github.pnoker.center.auth.mapper.RoleResourceBindMapper;
+import io.github.pnoker.center.auth.dal.ResourceManager;
+import io.github.pnoker.center.auth.dal.RoleResourceBindManager;
+import io.github.pnoker.center.auth.entity.bo.ResourceBO;
+import io.github.pnoker.center.auth.entity.bo.RoleResourceBindBO;
+import io.github.pnoker.center.auth.entity.builder.ResourceBuilder;
+import io.github.pnoker.center.auth.entity.builder.RoleResourceBindBuilder;
+import io.github.pnoker.center.auth.entity.model.ResourceDO;
+import io.github.pnoker.center.auth.entity.model.RoleResourceBindDO;
+import io.github.pnoker.center.auth.entity.query.ResourceQuery;
+import io.github.pnoker.center.auth.entity.query.RoleResourceBindQuery;
 import io.github.pnoker.center.auth.service.RoleResourceBindService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DeleteException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
-import io.github.pnoker.common.model.RoleResourceBind;
+import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
+import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 /**
  * @author linys
- * @since 2023.04.02
+ * @since 2022.1.0
  */
 @Slf4j
 @Service
 public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
     @Resource
-    private RoleResourceBindMapper bindMapper;
+    private ResourceBuilder resourceBuilder;
+    @Resource
+    private RoleResourceBindBuilder roleResourceBindBuilder;
 
     @Resource
-    private ResourceMapper resourceMapper;
+    private RoleResourceBindManager roleResourceBindManager;
+    @Resource
+    private ResourceManager resourceManager;
 
     @Override
-    public void add(RoleResourceBind entityDo) {
-        //todo check if exists
-        if (bindMapper.insert(entityDo) < 1) {
-            throw new AddException("The tenant bind add failed");
+    public void save(RoleResourceBindBO entityBO) {
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create role resource bind: role resource bind has been duplicated");
+        }
+
+        RoleResourceBindDO entityDO = roleResourceBindBuilder.buildDOByBO(entityBO);
+        if (!roleResourceBindManager.save(entityDO)) {
+            throw new AddException("Failed to create role resource bind");
         }
     }
 
     @Override
-    public void delete(String id) {
-        selectById(id);
-        if (bindMapper.deleteById(id) < 1) {
-            throw new DeleteException("The role resource bind delete failed");
+    public void remove(Long id) {
+        getDOById(id, true);
+
+        if (!roleResourceBindManager.removeById(id)) {
+            throw new DeleteException("Failed to remove role resource bind");
         }
     }
 
     @Override
-    public void update(RoleResourceBind entityDo) {
-        selectById(entityDo.getId());
-        if (bindMapper.updateById(entityDo) < 1) {
-            throw new UpdateException("The role resource bind update failed");
+    public void update(RoleResourceBindBO entityBO) {
+        getDOById(entityBO.getId(), true);
+
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("Failed to update role resource bind: role resource bind has been duplicated");
+        }
+
+        RoleResourceBindDO entityDO = roleResourceBindBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!roleResourceBindManager.updateById(entityDO)) {
+            throw new UpdateException("Failed to update role resource bind");
         }
     }
 
     @Override
-    public RoleResourceBind selectById(String id) {
-        RoleResourceBind bind = bindMapper.selectById(id);
-        if (ObjectUtil.isNull(bind)) {
-            throw new NotFoundException();
-        }
-        return bind;
+    public RoleResourceBindBO selectById(Long id) {
+        RoleResourceBindDO entityDO = getDOById(id, true);
+        return roleResourceBindBuilder.buildBOByDO(entityDO);
     }
 
     @Override
-    public Page<RoleResourceBind> list(RoleResourceBindPageQuery pageQuery) {
-        if (ObjectUtil.isNull(pageQuery.getPage())) {
-            pageQuery.setPage(new Pages());
+    public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return bindMapper.selectPage(pageQuery.getPage().convert(), buildQueryWrapper(pageQuery));
+        Page<RoleResourceBindDO> entityPageDO = roleResourceBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return roleResourceBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     @Override
-    public List<io.github.pnoker.common.model.Resource> listResourceByRoleId(String RoleId) {
-        LambdaQueryWrapper<RoleResourceBind> queryWrapper = Wrappers.<RoleResourceBind>query().lambda();
-        queryWrapper.eq(RoleResourceBind::getRoleId, RoleId);
-        List<RoleResourceBind> roleResourceBinds = bindMapper.selectList(queryWrapper);
-        if (CollUtil.isNotEmpty(roleResourceBinds)) {
-            List<io.github.pnoker.common.model.Resource> resources = resourceMapper.selectBatchIds(roleResourceBinds.stream()
-                    .map(RoleResourceBind::getResourceId).collect(Collectors.toList()));
-            return resources.stream().filter(e -> EnableFlagEnum.ENABLE.equals(e.getEnableFlag()))
-                    .collect(Collectors.toList());
+    public List<ResourceBO> listResourceByRoleId(Long roleId) {
+        LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+        wrapper.eq(RoleResourceBindDO::getRoleId, roleId);
+        List<RoleResourceBindDO> entityDOList = roleResourceBindManager.list(wrapper);
+        if (CollUtil.isNotEmpty(entityDOList)) {
+            List<ResourceDO> resourceDOList = resourceManager.listByIds(entityDOList.stream()
+                    .map(RoleResourceBindDO::getResourceId).toList());
+            List<ResourceDO> collect = resourceDOList.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
+                    .toList();
+            return resourceBuilder.buildBOListByDOList(collect);
         }
 
         return null;
     }
 
-    private LambdaQueryWrapper<RoleResourceBind> buildQueryWrapper(RoleResourceBindPageQuery pageQuery) {
-        LambdaQueryWrapper<RoleResourceBind> queryWrapper = Wrappers.<RoleResourceBind>query().lambda();
-        if (ObjectUtil.isNotNull(pageQuery)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getRoleId()), RoleResourceBind::getResourceId, pageQuery.getRoleId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(pageQuery.getResourceId()), RoleResourceBind::getResourceId, pageQuery.getResourceId());
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link RoleResourceBindQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<RoleResourceBindDO> fuzzyQuery(RoleResourceBindQuery entityQuery) {
+        LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleResourceBindDO::getResourceId, entityQuery.getRoleId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getResourceId()), RoleResourceBindDO::getResourceId, entityQuery.getResourceId());
+        wrapper.eq(RoleResourceBindDO::getTenantId, entityQuery.getTenantId());
+        return wrapper;
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO {@link RoleResourceBindBO}
+     * @param isUpdate 是否为更新操作
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(RoleResourceBindBO entityBO, boolean isUpdate) {
+        LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+        wrapper.eq(RoleResourceBindDO::getRoleId, entityBO.getRoleId());
+        wrapper.eq(RoleResourceBindDO::getResourceId, entityBO.getResourceId());
+        wrapper.eq(RoleResourceBindDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        RoleResourceBindDO one = roleResourceBindManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
         }
-        return queryWrapper;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
+    }
+
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link RoleResourceBindDO}
+     */
+    private RoleResourceBindDO getDOById(Long id, boolean throwException) {
+        RoleResourceBindDO entityDO = roleResourceBindManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Role resource bind does not exist");
+        }
+        return entityDO;
     }
 }

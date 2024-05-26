@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.LabelBindPageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.LabelBind;
+import io.github.pnoker.center.manager.entity.query.LabelBindQuery;
+import io.github.pnoker.common.base.service.BaseService;
+import io.github.pnoker.common.entity.bo.LabelBindBO;
 
 /**
  * LabelBind Interface
@@ -26,6 +26,6 @@ import io.github.pnoker.common.model.LabelBind;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface LabelBindService extends Service<LabelBind, LabelBindPageQuery> {
+public interface LabelBindService extends BaseService<LabelBindBO, LabelBindQuery> {
 
 }

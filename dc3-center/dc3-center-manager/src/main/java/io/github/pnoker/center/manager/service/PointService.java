@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.PointPageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.Point;
+import io.github.pnoker.center.manager.entity.bo.*;
+import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
+import io.github.pnoker.center.manager.entity.query.PointQuery;
+import io.github.pnoker.common.base.service.BaseService;
 
 import java.util.List;
 import java.util.Map;
@@ -30,57 +31,123 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface PointService extends Service<Point, PointPageQuery> {
+public interface PointService extends BaseService<PointBO, PointQuery> {
 
     /**
-     * 根据 位号Name 、 模板Id 查询位号
+     * 根据 模版ID 查询位号
      *
-     * @param name      Point Name
-     * @param profileId Profile ID
-     * @return Point
+     * @param profileId 位号ID
+     * @return Point 集合
      */
-    Point selectByNameAndProfileId(String name, String profileId);
+    List<PointBO> selectByProfileId(Long profileId);
 
     /**
-     * 根据 设备Id 查询位号
+     * 根据 设备ID 查询位号
      *
      * @param deviceId 设备ID
-     * @return Point Array
+     * @return Point 集合
      */
-    List<Point> selectByDeviceId(String deviceId);
+    List<PointBO> selectByDeviceId(Long deviceId);
 
     /**
-     * 根据 模板Id 查询位号
+     * 根据 模板ID 集查询位号
      *
-     * @param profileId Profile ID
-     * @return Point Array
+     * @param profileIds 模版ID集
+     * @return Point 集合
      */
-    List<Point> selectByProfileId(String profileId);
+    List<PointBO> selectByProfileIds(List<Long> profileIds);
 
     /**
-     * 根据 模板Id 集查询位号
+     * 根据 设备ID集合 查询设备
      *
-     * @param profileIds     Profile ID Set
-     * @param throwException Throw Exception
-     * @return Point Array
+     * @param ids 位号ID集
+     * @return Point 集合
      */
-    List<Point> selectByProfileIds(Set<String> profileIds, boolean throwException);
-
-    /**
-     * 根据 设备Id集 查询设备
-     *
-     * @param ids Point ID Set
-     * @return Point Array
-     */
-    List<Point> selectByIds(Set<String> ids);
+    List<PointBO> selectByIds(Set<Long> ids);
 
     /**
      * 查询 位号单位
      *
-     * @param pointIds Point ID Set
+     * @param pointIds 位号ID集
      * @return Map Long:Unit String
      */
-    Map<String, String> unit(Set<String> pointIds);
+    Map<Long, String> unit(Set<Long> pointIds);
 
-    Long count();
+    /**
+     * 位号被多少设备引用
+     * 选择点位统计设备信息
+     *
+     * @param pointId 点位id
+     * @return {@link Set}<{@link Long}>
+     */
+    DeviceByPointBO selectPointStatisticsWithDevice(Long pointId);
+
+    /**
+     * 位号在不同设备下的数据量
+     * 按设备id统计位号数量
+     *
+     * @param pointId   点位id
+     * @param deviceIds 设备id
+     * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
+     */
+    List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds);
+
+
+    /**
+     * 当前位号下数据量
+     * 按位号id统计位号数据量
+     *
+     * @param pointId 点位id
+     * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
+     */
+    PointDataVolumeRunDO selectPointStatisticsByPointId(Long pointId);
+
+    /**
+     * 设备下位号数量
+     *
+     * @param deviceId
+     * @return
+     */
+    Long selectPointByDeviceId(Long deviceId);
+
+    /**
+     * 设备下位号数量 已配置
+     *
+     * @param deviceId
+     * @return
+     */
+    PointConfigByDeviceBO selectPointConfigByDeviceId(Long deviceId);
+
+    /**
+     * 设备在不同位号下的数据量
+     *
+     * @param deviceId
+     * @param pointIds
+     * @return
+     */
+    List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds);
+
+    /**
+     * 驱动下位号数量
+     *
+     * @param driverId
+     * @return
+     */
+    PointDataVolumeRunDO selectPointDataByDriverId(Long driverId);
+
+    /**
+     * 驱动下位号数量
+     *
+     * @param driverId
+     * @return
+     */
+    Long selectPointByDriverId(Long driverId);
+
+    /**
+     * 统计7天驱动下位号数据量
+     *
+     * @param driverId
+     * @return
+     */
+    PointDataStatisticsByDriverIdBO selectPointDataStatisticsByDriverId(Long driverId);
 }

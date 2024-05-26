@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.DriverDO;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
+import io.github.pnoker.center.manager.entity.query.DriverQuery;
+import io.github.pnoker.common.base.service.BaseService;
 
 import java.util.List;
 import java.util.Set;
@@ -29,41 +29,46 @@ import java.util.Set;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverService extends Service<DriverDO, DriverPageQuery> {
-
-    /**
-     * 根据 驱动Id集 查询 驱动集
-     *
-     * @param ids Driver ID Array
-     * @return Driver Array
-     */
-    List<DriverDO> selectByIds(Set<String> ids);
+public interface DriverService extends BaseService<DriverBO, DriverQuery> {
 
     /**
      * 根据 驱动ServiceName 查询 驱动
      *
-     * @param serviceName    驱动服务名称
-     * @param tenantId       租户ID
-     * @param throwException Throw Exception
+     * @param serviceName 驱动服务名称
+     * @param tenantId    租户ID
      * @return Driver
      */
-    DriverDO selectByServiceName(String serviceName, String tenantId, boolean throwException);
+    DriverBO selectByServiceName(String serviceName, Long tenantId);
 
     /**
-     * 根据 模版Id 查询 驱动集
+     * 根据 模版ID 查询 驱动集
      *
-     * @param profileId Profile ID
-     * @return Driver Array
+     * @param profileId 模版ID
+     * @return Driver 集合
      */
-    List<DriverDO> selectByProfileId(String profileId);
+    List<DriverBO> selectByProfileId(Long profileId);
 
     /**
-     * 根据 驱动Id 查询 驱动
+     * 根据 位号ID 查询 驱动集
+     *
+     * @param pointId 位号ID
+     * @return Driver 集合
+     */
+    List<DriverBO> selectByPointId(Long pointId);
+
+    /**
+     * 根据 驱动ID 查询 驱动
      *
      * @param deviceId 设备ID
      * @return Driver
      */
-    DriverDO selectByDeviceId(String deviceId);
+    DriverBO selectByDeviceId(Long deviceId);
 
-    Long count();
+    /**
+     * 根据 驱动ID集 查询 驱动集
+     *
+     * @param ids 驱动ID 集合
+     * @return Driver 集合
+     */
+    List<DriverBO> selectByIds(Set<Long> ids);
 }

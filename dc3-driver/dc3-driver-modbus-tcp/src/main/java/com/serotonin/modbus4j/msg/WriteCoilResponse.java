@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,6 @@ public class WriteCoilResponse extends ModbusResponse {
     private int writeOffset;
     private boolean writeValue;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.WRITE_COIL;
-    }
 
     WriteCoilResponse(int slaveId) throws ModbusTransportException {
         super(slaveId);
@@ -48,18 +41,18 @@ public class WriteCoilResponse extends ModbusResponse {
         this.writeValue = writeValue;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_COIL;
+    }
+
     @Override
     protected void writeResponse(ByteQueue queue) {
         ModbusUtils.pushShort(queue, writeOffset);
         ModbusUtils.pushShort(queue, writeValue ? 0xff00 : 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     protected void readResponse(ByteQueue queue) {
         writeOffset = ModbusUtils.popUnsignedShort(queue);

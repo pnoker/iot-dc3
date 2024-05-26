@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,35 +16,35 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.DriverAttributePageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.DriverAttribute;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeQuery;
+import io.github.pnoker.common.base.service.BaseService;
 
 import java.util.List;
 
 /**
- * DriverAttribute Interface
+ * 驱动属性Interface
  *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DriverAttributeService extends Service<DriverAttribute, DriverAttributePageQuery> {
+public interface DriverAttributeService extends BaseService<DriverAttributeBO, DriverAttributeQuery> {
+
 
     /**
-     * 根据驱动配置属性 NAME 和 驱动 ID 查询
+     * 根据 驱动ID 查询
+     *
+     * @param driverId 驱动ID
+     * @return 驱动属性Array
+     */
+    List<DriverAttributeBO> selectByDriverId(Long driverId);
+
+    /**
+     * 根据 驱动配置属性名称 和 驱动ID 查询
      *
      * @param name     属性名称
      * @param driverId 驱动ID
      * @return DriverAttribute
      */
-    DriverAttribute selectByNameAndDriverId(String name, String driverId);
-
-    /**
-     * 根据驱动 ID 查询
-     *
-     * @param driverId       驱动ID
-     * @param throwException Throw Exception
-     * @return DriverAttribute Array
-     */
-    List<DriverAttribute> selectByDriverId(String driverId, boolean throwException);
+    DriverAttributeBO selectByNameAndDriverId(String name, Long driverId);
 }

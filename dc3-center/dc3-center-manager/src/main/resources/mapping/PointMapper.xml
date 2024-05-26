@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2016-present the original author or authors.
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.center.manager.mapper.PointMapper">
-    <select id="selectPageWithDevice" resultType="io.github.pnoker.common.model.Point">
+
+    <select id="selectPageWithDevice" resultType="io.github.pnoker.center.manager.entity.model.PointDO">
         select
         dp.id,
         dp.point_name,
@@ -30,9 +31,12 @@
         dp.unit,
         dp.profile_id,
         dp.group_id,
+        dp.point_ext,
         dp.enable_flag,
         dp.tenant_id,
         dp.remark,
+        dp.signature,
+        dp.version,
         dp.creator_id,
         dp.creator_name,
         dp.create_time,
@@ -41,8 +45,8 @@
         dp.operate_time,
         dp.deleted
         from dc3_point dp
-        <if test="deviceId != null and deviceId != ''">
-            inner join dc3_profile_bind dpb on dp.profile_id = dpb.profile_id and dpb.device_id = #{deviceId}
+        <if test="deviceId != null and deviceId != '' and deviceId > 0">
+            inner join dc3_profile_bind dpb on dp.profile_id = dpb.profile_id and dpb.device_id = #{deviceId} and dpb.deleted = 0
         </if>
         ${ew.customSqlSegment}
     </select>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,7 @@ public final class DateConverter extends IntegerConverter {
         OFFSET_1990 = c.getTime().getTime();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public <T> T extract(final Class<T> targetClass, final byte[] buffer, final int byteOffset, final int bitOffset) {
         final long days = super.extract(Integer.class, buffer, byteOffset, bitOffset);
@@ -59,17 +57,13 @@ public final class DateConverter extends IntegerConverter {
         return targetClass.cast(c.getTime());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public S7Type getS7Type() {
         return S7Type.DATE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void insert(final Object javaType, final byte[] buffer, final int byteOffset, final int bitOffset,
                        final int size) {

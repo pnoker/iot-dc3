@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,34 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigPageQuery;
-import io.github.pnoker.center.manager.mapper.DriverAttributeConfigMapper;
-import io.github.pnoker.center.manager.mapper.DriverAttributeMapper;
+import io.github.pnoker.center.manager.dal.DriverAttributeConfigManager;
+import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
+import io.github.pnoker.center.manager.entity.builder.DriverAttributeConfigBuilder;
+import io.github.pnoker.center.manager.entity.model.DriverAttributeConfigDO;
+import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
+import io.github.pnoker.center.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.center.manager.service.DriverAttributeConfigService;
-import io.github.pnoker.center.manager.service.NotifyService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.DriverAttribute;
-import io.github.pnoker.common.model.DriverAttributeConfig;
+import io.github.pnoker.common.utils.FieldUtil;
+import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * DriverInfoService Impl
+ * DriverConfigService Impl
  *
  * @author pnoker
  * @since 2022.1.0
@@ -50,148 +53,164 @@ import java.util.List;
 public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigService {
 
     @Resource
-    private DriverAttributeMapper driverAttributeMapper;
-    @Resource
-    private DriverAttributeConfigMapper driverAttributeConfigMapper;
+    private DriverAttributeConfigBuilder driverAttributeConfigBuilder;
 
     @Resource
-    private NotifyService notifyService;
+    private DriverAttributeConfigManager driverAttributeConfigManager;
+
+    @Resource
+    private MetadataEventPublisher metadataEventPublisher;
 
     @Override
-    public void add(DriverAttributeConfig entityDO) {
-        try {
-            selectByDeviceIdAndAttributeId(entityDO.getDeviceId(), entityDO.getDriverAttributeId());
-            throw new ServiceException("The driver attribute config already exists in the device");
-        } catch (NotFoundException notFoundException) {
-            if (driverAttributeConfigMapper.insert(entityDO) < 1) {
-                DriverAttribute driverAttribute = driverAttributeMapper.selectById(entityDO.getDriverAttributeId());
-                throw new AddException("The driver attribute config {} add failed", driverAttribute.getDisplayName());
-            }
-
-            // 通知驱动新增
-            DriverAttributeConfig driverAttributeConfig = driverAttributeConfigMapper.selectById(entityDO.getId());
-            notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.ADD, driverAttributeConfig);
+    public void save(DriverAttributeConfigBO entityBO) {
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create driver attribute config: driver attribute config has been duplicated");
         }
+
+        DriverAttributeConfigDO entityDO = driverAttributeConfigBuilder.buildDOByBO(entityBO);
+        if (!driverAttributeConfigManager.save(entityDO)) {
+            throw new AddException("Failed to create driver attribute config");
+        }
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
+    }
+
+    @Override
+    public DriverAttributeConfigBO innerSave(DriverAttributeConfigBO entityBO) {
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create driver attribute config: driver attribute config has been duplicated");
+        }
+
+        DriverAttributeConfigDO entityDO = driverAttributeConfigBuilder.buildDOByBO(entityBO);
+        if (!driverAttributeConfigManager.save(entityDO)) {
+            throw new AddException("Failed to create driver attribute config");
+        }
+
+        return driverAttributeConfigBuilder.buildBOByDO(entityDO);
+    }
+
+    @Override
+    public void remove(Long id) {
+        DriverAttributeConfigDO entityDO = getDOById(id, true);
+
+        if (!driverAttributeConfigManager.removeById(id)) {
+            throw new DeleteException("Failed to remove driver attribute config");
+        }
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
+    }
+
+    @Override
+    public void update(DriverAttributeConfigBO entityBO) {
+        getDOById(entityBO.getId(), true);
+
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("Failed to update driver attribute config: driver attribute config has been duplicated");
+        }
+
+        DriverAttributeConfigDO entityDO = driverAttributeConfigBuilder.buildDOByBO(entityBO);
+        entityBO.setOperateTime(null);
+        if (!driverAttributeConfigManager.updateById(entityDO)) {
+            throw new UpdateException("Failed to update driver attribute config");
+        }
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
+    }
+
+    @Override
+    public DriverAttributeConfigBO selectById(Long id) {
+        DriverAttributeConfigDO entityDO = getDOById(id, true);
+        return driverAttributeConfigBuilder.buildBOByDO(entityDO);
+    }
+
+    @Override
+    public DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId) {
+        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery()
+                .eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId)
+                .eq(DriverAttributeConfigDO::getDeviceId, deviceId)
+                .last(QueryWrapperConstant.LIMIT_ONE);
+        DriverAttributeConfigDO entityDO = wrapper.one();
+        return driverAttributeConfigBuilder.buildBOByDO(entityDO);
+    }
+
+    @Override
+    public List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId) {
+        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery()
+                .eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId);
+        List<DriverAttributeConfigDO> entityDO = wrapper.list();
+        return driverAttributeConfigBuilder.buildBOListByDOList(entityDO);
+    }
+
+    @Override
+    public List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId) {
+        LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery()
+                .eq(DriverAttributeConfigDO::getDeviceId, deviceId);
+        List<DriverAttributeConfigDO> entityDO = wrapper.list();
+        return driverAttributeConfigBuilder.buildBOListByDOList(entityDO);
+    }
+
+    @Override
+    public Page<DriverAttributeConfigBO> selectByPage(DriverAttributeConfigQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<DriverAttributeConfigDO> entityPageDO = driverAttributeConfigManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return driverAttributeConfigBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**
-     * {@inheritDoc}
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link DriverAttributeConfigQuery}
+     * @return {@link LambdaQueryWrapper}
      */
-    @Override
-    public void delete(String id) {
-        DriverAttributeConfig driverAttributeConfig = selectById(id);
-        if (ObjectUtil.isNull(driverAttributeConfig)) {
-            throw new NotFoundException("The driver attribute config does not exist");
-        }
-
-        if (driverAttributeConfigMapper.deleteById(id) < 1) {
-            throw new DeleteException("The driver attribute config delete failed");
-        }
-
-        notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.DELETE, driverAttributeConfig);
+    private LambdaQueryWrapper<DriverAttributeConfigDO> fuzzyQuery(DriverAttributeConfigQuery entityQuery) {
+        LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverAttributeId()), DriverAttributeConfigDO::getDriverAttributeId, entityQuery.getDriverAttributeId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), DriverAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(DriverAttributeConfigDO::getTenantId, entityQuery.getTenantId());
+        return wrapper;
     }
 
     /**
-     * {@inheritDoc}
+     * 重复性校验
+     *
+     * @param entityBO {@link DriverAttributeConfigBO}
+     * @param isUpdate 是否为更新操作
+     * @return 是否重复
      */
-    @Override
-    public void update(DriverAttributeConfig entityDO) {
-        DriverAttributeConfig oldDriverAttributeConfig = selectById(entityDO.getId());
-        entityDO.setOperateTime(null);
-        if (!oldDriverAttributeConfig.getDriverAttributeId().equals(entityDO.getDriverAttributeId()) || !oldDriverAttributeConfig.getDeviceId().equals(entityDO.getDeviceId())) {
-            try {
-                selectByDeviceIdAndAttributeId(entityDO.getDeviceId(), entityDO.getDriverAttributeId());
-                throw new DuplicateException("The driver attribute config already exists");
-            } catch (NotFoundException ignored) {
-                // nothing to do
-            }
+    private boolean checkDuplicate(DriverAttributeConfigBO entityBO, boolean isUpdate) {
+        LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
+        wrapper.eq(DriverAttributeConfigDO::getDriverAttributeId, entityBO.getDriverAttributeId());
+        wrapper.eq(DriverAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
+        wrapper.eq(DriverAttributeConfigDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        DriverAttributeConfigDO one = driverAttributeConfigManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
         }
-
-        if (driverAttributeConfigMapper.updateById(entityDO) < 1) {
-            throw new UpdateException("The driver attribute config update failed");
-        }
-
-        DriverAttributeConfig select = driverAttributeConfigMapper.selectById(entityDO.getId());
-        entityDO.setDriverAttributeId(select.getDriverAttributeId());
-        entityDO.setDeviceId(select.getDeviceId());
-        notifyService.notifyDriverDriverAttributeConfig(MetadataCommandTypeEnum.UPDATE, select);
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
     /**
-     * {@inheritDoc}
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link DriverAttributeConfigDO}
      */
-    @Override
-    public DriverAttributeConfig selectById(String id) {
-        DriverAttributeConfig driverAttributeConfig = driverAttributeConfigMapper.selectById(id);
-        if (ObjectUtil.isNull(driverAttributeConfig)) {
-            throw new NotFoundException();
+    private DriverAttributeConfigDO getDOById(Long id, boolean throwException) {
+        DriverAttributeConfigDO entityDO = driverAttributeConfigManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Driver attribute does not exist");
         }
-        return driverAttributeConfig;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DriverAttributeConfig selectByDeviceIdAndAttributeId(String deviceId, String driverAttributeId) {
-        DriverAttributeConfigPageQuery driverInfoPageQuery = new DriverAttributeConfigPageQuery();
-        driverInfoPageQuery.setDriverAttributeId(driverAttributeId);
-        driverInfoPageQuery.setDeviceId(deviceId);
-        LambdaQueryWrapper<DriverAttributeConfig> queryWrapper = fuzzyQuery(driverInfoPageQuery);
-        queryWrapper.last("limit 1");
-        DriverAttributeConfig driverAttributeConfig = driverAttributeConfigMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(driverAttributeConfig)) {
-            throw new NotFoundException();
-        }
-        return driverAttributeConfig;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<DriverAttributeConfig> selectByAttributeId(String driverAttributeId) {
-        DriverAttributeConfigPageQuery driverInfoPageQuery = new DriverAttributeConfigPageQuery();
-        driverInfoPageQuery.setDriverAttributeId(driverAttributeId);
-        List<DriverAttributeConfig> driverAttributeConfigs = driverAttributeConfigMapper.selectList(fuzzyQuery(driverInfoPageQuery));
-        if (ObjectUtil.isNull(driverAttributeConfigs) || driverAttributeConfigs.isEmpty()) {
-            throw new NotFoundException();
-        }
-        return driverAttributeConfigs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<DriverAttributeConfig> selectByDeviceId(String deviceId) {
-        DriverAttributeConfigPageQuery driverInfoPageQuery = new DriverAttributeConfigPageQuery();
-        driverInfoPageQuery.setDeviceId(deviceId);
-        List<DriverAttributeConfig> driverAttributeConfigs = driverAttributeConfigMapper.selectList(fuzzyQuery(driverInfoPageQuery));
-        if (CollUtil.isEmpty(driverAttributeConfigs)) {
-            return Collections.emptyList();
-        }
-        return driverAttributeConfigs;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Page<DriverAttributeConfig> list(DriverAttributeConfigPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
-        }
-        return driverAttributeConfigMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
-    }
-
-    private LambdaQueryWrapper<DriverAttributeConfig> fuzzyQuery(DriverAttributeConfigPageQuery query) {
-        LambdaQueryWrapper<DriverAttributeConfig> queryWrapper = Wrappers.<DriverAttributeConfig>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDriverAttributeId()), DriverAttributeConfig::getDriverAttributeId, query.getDriverAttributeId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDeviceId()), DriverAttributeConfig::getDeviceId, query.getDeviceId());
-        }
-        return queryWrapper;
+        return entityDO;
     }
 
 }

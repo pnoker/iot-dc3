@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,20 @@ import java.lang.reflect.Array;
  */
 @Slf4j
 public final class S7SerializerImpl implements S7Serializer {
+
+    /**
+     * The Connector.
+     */
+    private final S7Connector connector;
+
+    /**
+     * Instantiates a new s7 serializer.
+     *
+     * @param connector the connector
+     */
+    public S7SerializerImpl(final S7Connector connector) {
+        this.connector = connector;
+    }
 
     public static Object extractBytes(PlcS7PointVariable plcs7PointVariable, final byte[] buffer, final int byteOffset) {
         try {
@@ -129,23 +143,6 @@ public final class S7SerializerImpl implements S7Serializer {
         }
     }
 
-    /**
-     * The Connector.
-     */
-    private final S7Connector connector;
-
-    /**
-     * Instantiates a new s7 serializer.
-     *
-     * @param connector the connector
-     */
-    public S7SerializerImpl(final S7Connector connector) {
-        this.connector = connector;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized <T> T dispense(final Class<T> beanClass, final int dbNum, final int byteOffset) throws S7Exception {
         try {
@@ -157,9 +154,6 @@ public final class S7SerializerImpl implements S7Serializer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized <T> T dispense(final Class<T> beanClass, final int dbNum, final int byteOffset, final int blockSize) throws S7Exception {
         try {
@@ -183,9 +177,6 @@ public final class S7SerializerImpl implements S7Serializer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void store(final Object bean, final int dbNum, final int byteOffset) {
         try {

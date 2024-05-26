@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,19 +48,33 @@ import java.util.Map;
  * @version 5.0.0
  */
 abstract public class ModbusMaster extends Modbus {
-    private int timeout = 500;
-    private int retries = 2;
-
+    private final Map<Integer, SlaveProfile> slaveProfiles = new HashMap<>();
     /**
      * Should we validate the responses:
      * - ensure that the requested slave id is what is in the response
      */
     protected boolean validateResponse;
-
     /**
      * If connection is established with slave/slaves
      */
     protected boolean connected = false;
+    protected boolean initialized;
+    private int timeout = 500;
+    private int retries = 2;
+    /**
+     * If the slave equipment only supports multiple write commands, set this to true. Otherwise, and combination of
+     * single or multiple write commands will be used as appropriate.
+     */
+    private boolean multipleWritesOnly;
+
+    private int discardDataDelay = 0;
+    private BaseIOLog ioLog;
+
+    /**
+     * An input stream ePoll will use a single thread to read all input streams. If multiple serial or TCP modbus
+     * connections are to be made, an ePoll can be much more efficient.
+     */
+    private InputStreamEPollWrapper ePoll;
 
     /**
      * <p>isConnected.</p>
@@ -79,24 +93,6 @@ abstract public class ModbusMaster extends Modbus {
     public void setConnected(boolean connected) {
         this.connected = connected;
     }
-
-    /**
-     * If the slave equipment only supports multiple write commands, set this to true. Otherwise, and combination of
-     * single or multiple write commands will be used as appropriate.
-     */
-    private boolean multipleWritesOnly;
-
-    private int discardDataDelay = 0;
-    private BaseIOLog ioLog;
-
-    /**
-     * An input stream ePoll will use a single thread to read all input streams. If multiple serial or TCP modbus
-     * connections are to be made, an ePoll can be much more efficient.
-     */
-    private InputStreamEPollWrapper ePoll;
-
-    private final Map<Integer, SlaveProfile> slaveProfiles = new HashMap<>();
-    protected boolean initialized;
 
     /**
      * <p>init.</p>

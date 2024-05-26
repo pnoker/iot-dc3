@@ -1,5 +1,5 @@
 #
-# Copyright 2016-present the original author or authors.
+# Copyright 2016-present the IoT DC3 original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,19 +16,15 @@
 
 server:
   port: ${SERVER_PORT:8400}
+  servlet:
+    context-path: /manager
+  undertow:
+    accesslog:
+      dir: dc3/logs/center/manager/undertow
 
 grpc:
   server:
     port: ${GRPC_SERVER_PORT:9400}
-  client:
-    dc3-center-auth:
-      enable-keep-alive: true
-      keep-alive-without-calls: true
-      negotiation-type: plaintext
-    dc3-center-data:
-      enable-keep-alive: true
-      keep-alive-without-calls: true
-      negotiation-type: plaintext
 
 spring:
   application:
@@ -36,12 +32,10 @@ spring:
   profiles:
     active:
       - ${NODE_ENV:dev}
-  redis:
-    database: 2
+  data:
+    redis:
+      database: 2
 
 logging:
-  level:
-    io.github.pnoker: DEBUG
-    #io.github.pnoker.center.manager.service.rabbit: INFO
   file:
     name: dc3/logs/center/manager/${spring.application.name}.log

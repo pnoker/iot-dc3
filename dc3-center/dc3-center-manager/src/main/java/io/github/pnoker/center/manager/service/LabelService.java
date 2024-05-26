@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package io.github.pnoker.center.manager.service;
 
-import io.github.pnoker.center.manager.entity.query.LabelPageQuery;
-import io.github.pnoker.common.base.Service;
-import io.github.pnoker.common.model.Label;
+import io.github.pnoker.center.manager.entity.query.LabelQuery;
+import io.github.pnoker.common.base.service.BaseService;
+import io.github.pnoker.common.entity.bo.LabelBO;
 
 /**
  * Label Interface
@@ -26,13 +26,5 @@ import io.github.pnoker.common.model.Label;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface LabelService extends Service<Label, LabelPageQuery> {
-    /**
-     * 根据标签 NAME 查询
-     *
-     * @param name     Label Name
-     * @param tenantId 租户ID
-     * @return Label
-     */
-    Label selectByName(String name, String tenantId);
+public interface LabelService extends BaseService<LabelBO, LabelQuery> {
 }

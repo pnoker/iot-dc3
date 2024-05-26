@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 
 package io.github.pnoker.center.data.init;
 
-import io.github.pnoker.center.data.service.ScheduleService;
+import io.github.pnoker.center.data.biz.ScheduleService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * @author pnoker
@@ -30,8 +28,11 @@ import javax.annotation.Resource;
 @Component
 public class DataInitRunner implements ApplicationRunner {
 
-    @Resource
-    private ScheduleService scheduleService;
+    private final ScheduleService scheduleService;
+
+    public DataInitRunner(ScheduleService scheduleService) {
+        this.scheduleService = scheduleService;
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

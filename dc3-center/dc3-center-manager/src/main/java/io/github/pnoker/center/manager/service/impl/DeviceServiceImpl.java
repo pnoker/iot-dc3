@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,31 @@ package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DevicePageQuery;
+import io.github.pnoker.center.manager.biz.ImportDeviceService;
+import io.github.pnoker.center.manager.dal.DeviceManager;
+import io.github.pnoker.center.manager.entity.bo.*;
+import io.github.pnoker.center.manager.entity.builder.DeviceBuilder;
+import io.github.pnoker.center.manager.entity.model.DeviceDO;
+import io.github.pnoker.center.manager.entity.query.DeviceQuery;
+import io.github.pnoker.center.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
 import io.github.pnoker.center.manager.service.*;
-import io.github.pnoker.common.constant.driver.StorageConstant;
-import io.github.pnoker.common.entity.base.Base;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.PageUtil;
 import io.github.pnoker.common.utils.PoiUtil;
-import lombok.SneakyThrows;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -42,20 +50,18 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 /**
  * DeviceService Impl
@@ -68,226 +74,219 @@ import java.util.stream.Collectors;
 public class DeviceServiceImpl implements DeviceService {
 
     @Resource
-    private DeviceMapper deviceMapper;
+    private DeviceBuilder deviceBuilder;
 
     @Resource
-    private DriverAttributeService driverAttributeService;
+    private DeviceManager deviceManager;
     @Resource
-    private DriverAttributeConfigService driverAttributeConfigService;
-    @Resource
-    private PointAttributeService pointAttributeService;
-    @Resource
-    private PointAttributeConfigService pointAttributeConfigService;
-    @Resource
-    private ProfileService profileService;
+    private DeviceMapper deviceMapper;
+
     @Resource
     private PointService pointService;
     @Resource
     private ProfileBindService profileBindService;
     @Resource
-    private NotifyService notifyService;
+    private DriverAttributeService driverAttributeService;
     @Resource
-    private MongoTemplate mongoTemplate;
+    private PointAttributeService pointAttributeService;
+    @Resource
+    private ImportDeviceService importDeviceService;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Resource
+    private MetadataEventPublisher metadataEventPublisher;
+
     @Override
-    public void add(Device entityDO) {
-        if (deviceMapper.insert(entityDO) < 1) {
-            throw new AddException("The device {} add failed", entityDO.getDeviceName());
+    public void save(DeviceBO entityBO) {
+        boolean duplicate = checkDuplicate(entityBO, false);
+        if (duplicate) {
+            throw new DuplicateException("Failed to create device: device has been duplicated");
         }
 
-        addProfileBind(entityDO.getId(), entityDO.getProfileIds());
+        DeviceDO entityDO = deviceBuilder.buildDOByBO(entityBO);
+        if (!deviceManager.save(entityDO)) {
+            throw new AddException("Failed to create device");
+        }
 
-        // 通知驱动新增
-        Device device = deviceMapper.selectById(entityDO.getId());
-        List<Profile> profiles = profileService.selectByDeviceId(entityDO.getId());
-        // ?/pnoker 同步给驱动的设备需要profile id set吗
-        device.setProfileIds(profiles.stream().map(Profile::getId).collect(Collectors.toSet()));
-        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.ADD, device);
+        addProfileBind(entityDO, entityBO.getProfileIds());
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional
-    public void delete(String id) {
-        Device device = selectById(id);
-        if (ObjectUtil.isNull(device)) {
-            throw new NotFoundException("The device does not exist");
+    public void remove(Long id) {
+        DeviceDO entityDO = getDOById(id, true);
+
+        // 删除设备之前需要检查该设备是否存在关联
+        if (!profileBindService.removeByDeviceId(id)) {
+            throw new DeleteException("Failed to remove profile bind");
         }
 
-        if (!profileBindService.deleteByDeviceId(id)) {
-            throw new DeleteException("The profile bind delete failed");
+        if (!deviceManager.removeById(id)) {
+            throw new DeleteException("Failed to remove device");
         }
 
-        if (deviceMapper.deleteById(id) < 1) {
-            throw new DeleteException("The device delete failed");
-        }
-
-        // 通知驱动删除设备
-        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.DELETE, device);
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
-    public void update(Device entityDO) {
-        selectById(entityDO.getId());
+    public void update(DeviceBO entityBO) {
+        DeviceDO entityDO = getDOById(entityBO.getId(), true);
 
-        Set<String> newProfileIds = ObjectUtil.isNotNull(entityDO.getProfileIds()) ? entityDO.getProfileIds() : new HashSet<>();
-        Set<String> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityDO.getId());
+        boolean duplicate = checkDuplicate(entityBO, true);
+        if (duplicate) {
+            throw new DuplicateException("Failed to update device: device has been duplicated");
+        }
 
-        // 新增的模板
-        Set<String> add = new HashSet<>(newProfileIds);
-        add.removeAll(oldProfileIds);
+        List<Long> newProfileIds = entityBO.getProfileIds();
+        List<Long> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityBO.getId());
 
-        // 删除的模板
-        Set<String> delete = new HashSet<>(oldProfileIds);
-        delete.removeAll(newProfileIds);
+        // 新增的模版
+        ArrayList<Long> addIds = new ArrayList<>(newProfileIds);
+        addIds.removeAll(oldProfileIds);
+        addProfileBind(entityDO, addIds);
 
-        addProfileBind(entityDO.getId(), add);
-        delete.forEach(profileId -> profileBindService.deleteByDeviceIdAndProfileId(entityDO.getId(), profileId));
+        // 删除的模版
+        ArrayList<Long> deleteIds = new ArrayList<>(oldProfileIds);
+        deleteIds.removeAll(newProfileIds);
+        deleteIds.forEach(profileId -> profileBindService.removeByDeviceIdAndProfileId(entityBO.getId(), profileId));
 
-        entityDO.setOperateTime(null);
-
-        if (deviceMapper.updateById(entityDO) < 1) {
+        entityDO = deviceBuilder.buildDOByBO(entityBO);
+        entityBO.setOperateTime(null);
+        if (!deviceManager.updateById(entityDO)) {
             throw new UpdateException("The device update failed");
         }
 
-        Device select = deviceMapper.selectById(entityDO.getId());
-        select.setProfileIds(newProfileIds);
-        entityDO.setDeviceName(select.getDeviceName());
-        // 通知驱动更新设备
-        notifyService.notifyDriverDevice(MetadataCommandTypeEnum.UPDATE, select);
+        DeviceBO deviceBO = selectById(entityBO.getId());
+        deviceBO.setProfileIds(CollUtil.isEmpty(newProfileIds) ? oldProfileIds : newProfileIds);
+        entityBO.setDeviceName(deviceBO.getDeviceName());
+
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
-    public Device selectById(String id) {
-        Device device = deviceMapper.selectById(id);
-        if (ObjectUtil.isNull(device)) {
-            throw new NotFoundException();
-        }
-        device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
-        return device;
+    public DeviceBO selectById(Long id) {
+        DeviceDO entityDO = getDOById(id, true);
+        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
+        entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(id));
+        return entityBO;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Device selectByName(String name, String tenantId) {
-        LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        queryWrapper.eq(Device::getDeviceName, name);
-        queryWrapper.eq(Device::getTenantId, tenantId);
-        queryWrapper.last("limit 1");
-        Device device = deviceMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(device)) {
-            throw new NotFoundException();
-        }
-        device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId()));
-        return device;
+    public DeviceBO selectByName(String name, Long tenantId) {
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+        wrapper.eq(DeviceDO::getDeviceName, name);
+        wrapper.eq(DeviceDO::getTenantId, tenantId);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        DeviceDO entityDO = deviceManager.getOne(wrapper);
+        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
+        entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(entityDO.getId()));
+        return entityBO;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Device> selectByDriverId(String driverId) {
-        DevicePageQuery devicePageQuery = new DevicePageQuery();
-        devicePageQuery.setDriverId(driverId);
-        List<Device> devices = deviceMapper.selectList(fuzzyQuery(devicePageQuery));
-        if (ObjectUtil.isNull(devices) || devices.isEmpty()) {
-            throw new NotFoundException();
-        }
-        devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
-        return devices;
+    public DeviceBO selectByCode(String code, Long tenantId) {
+        LambdaQueryChainWrapper<DeviceDO> wrapper = deviceManager.lambdaQuery()
+                .eq(DeviceDO::getDeviceCode, code)
+                .eq(DeviceDO::getTenantId, tenantId)
+                .last(QueryWrapperConstant.LIMIT_ONE);
+        DeviceDO entityDO = wrapper.one();
+        DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
+        entityBO.setProfileIds(profileBindService.selectProfileIdsByDeviceId(entityDO.getId()));
+        return entityBO;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Device> selectByProfileId(String profileId) {
+    public List<DeviceBO> selectByDriverId(Long driverId) {
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+        wrapper.eq(DeviceDO::getDriverId, driverId);
+        List<DeviceDO> entityDOList = deviceManager.list(wrapper);
+        List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOList);
+        deviceBOList.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
+        return deviceBOList;
+    }
+
+    @Override
+    public List<Long> selectIdsByDriverId(Long driverId) {
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+        wrapper.eq(DeviceDO::getDriverId, driverId).select(DeviceDO::getId);
+        return deviceManager.list(wrapper).stream().map(DeviceDO::getId).toList();
+    }
+
+    @Override
+    public List<DeviceBO> selectByProfileId(Long profileId) {
         return selectByIds(profileBindService.selectDeviceIdsByProfileId(profileId));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Device> selectByIds(Set<String> ids) {
-        List<Device> devices = deviceMapper.selectBatchIds(ids);
-        if (CollUtil.isEmpty(devices)) {
-            throw new NotFoundException();
+    public List<DeviceBO> selectByIds(List<Long> ids) {
+        if (CollUtil.isEmpty(ids)) {
+            return Collections.emptyList();
         }
-        devices.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
-        return devices;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Page<Device> list(DevicePageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
-        }
-        return deviceMapper.selectPageWithProfile(queryDTO.getPage().convert(), customFuzzyQuery(queryDTO), queryDTO.getProfileId());
-    }
-
-    private LambdaQueryWrapper<Device> fuzzyQuery(DevicePageQuery query) {
-        LambdaQueryWrapper<Device> queryWrapper = Wrappers.<Device>query().lambda();
-        if (ObjectUtil.isNotEmpty(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getDeviceName()), Device::getDeviceName, query.getDeviceName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDeviceCode()), Device::getDeviceCode, query.getDeviceCode());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getDriverId()), Device::getDriverId, query.getDriverId());
-            queryWrapper.eq(ObjectUtil.isNotEmpty(query.getEnableFlag()), Device::getEnableFlag, query.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getTenantId()), Device::getTenantId, query.getTenantId());
-        }
-        return queryWrapper;
+        List<DeviceDO> entityDOList = deviceManager.listByIds(ids);
+        List<DeviceBO> deviceBOList = deviceBuilder.buildBOListByDOList(entityDOList);
+        deviceBOList.forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
+        return deviceBOList;
     }
 
     @Override
-    @SneakyThrows
-    @Transactional
-    public void importDevice(Device device, MultipartFile multipartFile) {
-        List<DriverAttribute> driverAttributes = driverAttributeService.selectByDriverId(device.getDriverId(), false);
-        List<PointAttribute> pointAttributes = pointAttributeService.selectByDriverId(device.getDriverId(), false);
-        List<Point> points = pointService.selectByProfileIds(device.getProfileIds(), false);
+    public Page<DeviceBO> selectByPage(DeviceQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<DeviceDO> entityPageDO = deviceMapper.selectPageWithProfile(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery), entityQuery.getProfileId());
+        Page<DeviceBO> entityPageBO = deviceBuilder.buildBOPageByDOPage(entityPageDO);
+        entityPageBO.getRecords().forEach(device -> device.setProfileIds(profileBindService.selectProfileIdsByDeviceId(device.getId())));
+        return entityPageBO;
+    }
 
-        Workbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
-        Sheet mainSheet = workbook.getSheet("设备导入");
+    @Override
+    public void importDevice(DeviceBO entityBO, File file) {
+        List<PointBO> pointBOList = pointService.selectByProfileIds(entityBO.getProfileIds());
+        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.selectByDriverId(entityBO.getDriverId());
+        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.selectByDriverId(entityBO.getDriverId());
 
-        if (!configIsEqual(driverAttributes, pointAttributes, points, workbook)) {
+        Workbook workbook;
+        try {
+            workbook = new XSSFWorkbook(file);
+        } catch (Exception e) {
+            throw new ImportException("The import template file incorrectly: {}", e.getMessage());
+        }
+
+        if (!configIsEqual(workbook, driverAttributeBOList, pointAttributeBOList, pointBOList)) {
             throw new ImportException("The import template is formatted incorrectly");
         }
 
-        for (int i = 4; i <= mainSheet.getLastRowNum(); i++) {
-            // 导入设备
-            Device importDevice = importDevice(device, mainSheet, i);
-            log.info("正在导入设备：{}, index: {}", importDevice.getDeviceName(), 1);
+        Sheet sheet = workbook.getSheet("设备导入");
+        for (int i = 4; i <= sheet.getLastRowNum(); i++) {
+            DeviceBO importDeviceBO;
+            try {
+                importDeviceBO = importDeviceService.importDevice(entityBO, pointBOList, driverAttributeBOList, pointAttributeBOList, sheet, i);
+                log.info("Import device succeeded, row index: {}", i + 1);
+            } catch (Exception e) {
+                log.info("Skip import device, row index: {}, {}", i + 1, e.getMessage(), e);
+                continue;
+            }
 
-            // 导入驱动属性配置
-            importDriverAttributeConfig(importDevice, driverAttributes, mainSheet, i);
-
-            // 导入位号属性配置
-            importPointAttributeConfig(driverAttributes, pointAttributes, points, mainSheet, i, importDevice);
+            // 通知驱动
+            MetadataEvent metadataEvent = new MetadataEvent(this, importDeviceBO.getId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD);
+            metadataEventPublisher.publishEvent(metadataEvent);
         }
     }
 
     @Override
-    @SneakyThrows
-    public Path generateImportTemplate(Device device) {
-        List<DriverAttribute> driverAttributes = driverAttributeService.selectByDriverId(device.getDriverId(), false);
-        List<PointAttribute> pointAttributes = pointAttributeService.selectByDriverId(device.getDriverId(), false);
-        List<Point> points = pointService.selectByProfileIds(device.getProfileIds(), false);
+    public Path generateImportTemplate(DeviceBO entityBO) {
+        List<DriverAttributeBO> driverAttributeBOList = driverAttributeService.selectByDriverId(entityBO.getDriverId());
+        List<PointAttributeBO> pointAttributeBOList = pointAttributeService.selectByDriverId(entityBO.getDriverId());
+        List<PointBO> pointBOList = pointService.selectByProfileIds(entityBO.getProfileIds());
 
         Workbook workbook = new XSSFWorkbook();
         CellStyle cellStyle = PoiUtil.getCenterCellStyle(workbook);
@@ -297,12 +296,12 @@ public class DeviceServiceImpl implements DeviceService {
         mainSheet.setDefaultColumnWidth(25);
 
         // 设置配置工作表
-        configConfigSheet(driverAttributes, pointAttributes, points, workbook);
+        configConfigSheet(driverAttributeBOList, pointAttributeBOList, pointBOList, workbook);
 
         // 设置说明
         Row remarkRow = mainSheet.createRow(0);
-        PoiUtil.createCell(remarkRow, 0, "说明：请从第5行开始添加待导入的设备数据");
-        PoiUtil.mergedRegion(mainSheet, 0, 0, 0, 2 + driverAttributes.size() + pointAttributes.size() * points.size() - 1);
+        PoiUtil.createCell(remarkRow, 0, "说明: 请从第5行开始添加待导入的设备数据");
+        PoiUtil.mergedRegion(mainSheet, 0, 0, 0, 2 + driverAttributeBOList.size() + pointAttributeBOList.size() * pointBOList.size() - 1);
 
         // 设置设备列
         Row titleRow = mainSheet.createRow(1);
@@ -313,136 +312,37 @@ public class DeviceServiceImpl implements DeviceService {
 
         Row attributeRow = mainSheet.createRow(3);
         // 设置驱动属性配置列
-        configAttributeCell(driverAttributes, mainSheet, titleRow, attributeRow, cellStyle);
+        configAttributeCell(driverAttributeBOList, mainSheet, titleRow, attributeRow, cellStyle);
         // 设置位号属性配置列
-        configPointCell(driverAttributes, pointAttributes, points, mainSheet, titleRow, attributeRow, cellStyle);
+        configPointCell(driverAttributeBOList, pointAttributeBOList, pointBOList, mainSheet, titleRow, attributeRow, cellStyle);
 
-        // 生成设备导入模板
+        // 生成设备导入模版
         return generateTemplate(workbook);
-    }
-
-    @Override
-    public Long count() {
-        return deviceMapper.selectCount(new QueryWrapper<>());
-    }
-
-    @Override
-    public Long dataCount() {
-        return deviceMapper.selectList(new LambdaQueryWrapper<>()).stream()
-                .map(Base::getId)
-                .mapToLong(deviceId -> mongoTemplate.getCollection(StorageConstant.POINT_VALUE_PREFIX + deviceId).countDocuments())
-                .sum();
-    }
-
-    @Override
-    public List<Device> selectAllByDriverId(String driverId, String tenantId) {
-        return deviceMapper.selectList(new LambdaQueryWrapper<Device>().eq(Device::getDriverId, driverId).eq(Device::getTenantId, tenantId));
-    }
-
-    /**
-     * 导入设备
-     *
-     * @param device    Device
-     * @param mainSheet Sheet
-     * @param rowIndex  Row Index
-     * @return
-     */
-    private Device importDevice(Device device, Sheet mainSheet, int rowIndex) {
-        Device importDevice = getDevice(device, mainSheet, rowIndex);
-        try {
-            add(importDevice);
-        } catch (Exception e) {
-            log.error("导入设备: {}, 错误：{}", device, rowIndex);
-            throw new ServiceException(e.getMessage());
-        }
-        return importDevice;
-    }
-
-    /**
-     * @param importDevice     Device
-     * @param driverAttributes DriverAttribute
-     * @param mainSheet        Sheet
-     * @param rowIndex         Row Index
-     */
-    private void importDriverAttributeConfig(Device importDevice, List<DriverAttribute> driverAttributes, Sheet mainSheet, int rowIndex) {
-        for (int j = 0; j < driverAttributes.size(); j++) {
-            DriverAttributeConfig importAttributeConfig = getDriverAttributeConfig(importDevice, driverAttributes.get(j), mainSheet, rowIndex, 2 + j);
-            driverAttributeConfigService.add(importAttributeConfig);
-        }
-    }
-
-    private static Device getDevice(Device device, Sheet mainSheet, int rowIndex) {
-        String deviceName = PoiUtil.getCellStringValue(mainSheet, rowIndex, 0);
-        if (CharSequenceUtil.isEmpty(deviceName)) {
-            throw new ImportException("The device name in line {} of the import file is empty", rowIndex + 1);
-        }
-
-        Device importDevice = new Device();
-        importDevice.setDeviceName(deviceName);
-        importDevice.setDriverId(device.getDriverId());
-        importDevice.setProfileIds(device.getProfileIds());
-        String deviceRemark = PoiUtil.getCellStringValue(mainSheet, rowIndex, 1);
-        importDevice.setRemark(deviceRemark);
-        importDevice.setTenantId(device.getTenantId());
-
-        return importDevice;
-    }
-
-    private static DriverAttributeConfig getDriverAttributeConfig(Device device, DriverAttribute driverAttribute, Sheet mainSheet, int rowIndex, int cellIndex) {
-        DriverAttributeConfig importAttributeConfig = new DriverAttributeConfig();
-        importAttributeConfig.setDriverAttributeId(driverAttribute.getId());
-        importAttributeConfig.setDeviceId(device.getId());
-        String attributeValue = PoiUtil.getCellStringValue(mainSheet, rowIndex, cellIndex);
-        importAttributeConfig.setConfigValue(attributeValue);
-        importAttributeConfig.setTenantId(device.getTenantId());
-
-        return importAttributeConfig;
-    }
-
-    private void importPointAttributeConfig(List<DriverAttribute> driverAttributes, List<PointAttribute> pointAttributes, List<Point> points, Sheet mainSheet, int i, Device importDevice) {
-        for (int j = 0; j < points.size(); j++) {
-            for (int k = 0; k < pointAttributes.size(); k++) {
-                PointAttributeConfig importAttributeConfig = getPointAttributeConfig(importDevice, points.get(j), pointAttributes.get(k), mainSheet, i, 2 + driverAttributes.size() + k * pointAttributes.size() + j);
-                pointAttributeConfigService.add(importAttributeConfig);
-            }
-        }
-    }
-
-    private static PointAttributeConfig getPointAttributeConfig(Device device, Point point, PointAttribute pointAttribute, Sheet mainSheet, int rowIndex, int cellIndex) {
-        PointAttributeConfig importAttributeConfig = new PointAttributeConfig();
-        importAttributeConfig.setPointAttributeId(pointAttribute.getId());
-        importAttributeConfig.setDeviceId(device.getId());
-        importAttributeConfig.setPointId(point.getId());
-        String attributeValue = PoiUtil.getCellStringValue(mainSheet, rowIndex, cellIndex);
-        importAttributeConfig.setConfigValue(attributeValue);
-        importAttributeConfig.setTenantId(device.getTenantId());
-
-        return importAttributeConfig;
     }
 
     /**
      * 判断配置数据是否一致
      *
-     * @param driverAttributes DriverAttribute Array
-     * @param pointAttributes  PointAttribute Array
-     * @param points           Point Array
-     * @param workbook         Workbook
+     * @param workbook              Workbook
+     * @param driverAttributeBOList 驱动属性Array
+     * @param pointAttributeBOList  位号属性Array
+     * @param pointBOList           Point 集合
      */
-    private boolean configIsEqual(List<DriverAttribute> driverAttributes, List<PointAttribute> pointAttributes, List<Point> points, Workbook workbook) {
-        Sheet configSheet = workbook.getSheet("配置（忽略）");
-        String driverAttributesValueNew = JsonUtil.toJsonString(driverAttributes);
+    private boolean configIsEqual(Workbook workbook, List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, List<PointBO> pointBOList) {
+        Sheet configSheet = workbook.getSheet("配置(忽略)");
+        String driverAttributesValueNew = JsonUtil.toJsonString(driverAttributeBOList);
         String driverAttributesValueOld = PoiUtil.getCellStringValue(configSheet, 0, 0);
         if (!driverAttributesValueNew.equals(driverAttributesValueOld)) {
             return false;
         }
 
-        String pointAttributesValueNewd = JsonUtil.toJsonString(pointAttributes);
-        String pointAttributesValueOld = PoiUtil.getCellStringValue(configSheet, 1, 0);
-        if (!pointAttributesValueNewd.equals(pointAttributesValueOld)) {
+        String newPointAttributesValue = JsonUtil.toJsonString(pointAttributeBOList);
+        String oldPointAttributesValue = PoiUtil.getCellStringValue(configSheet, 1, 0);
+        if (!newPointAttributesValue.equals(oldPointAttributesValue)) {
             return false;
         }
 
-        String pointsValueNew = JsonUtil.toJsonString(points);
+        String pointsValueNew = JsonUtil.toJsonString(pointBOList);
         String pointsValueOld = PoiUtil.getCellStringValue(configSheet, 2, 0);
 
         return pointsValueNew.equals(pointsValueOld);
@@ -451,20 +351,20 @@ public class DeviceServiceImpl implements DeviceService {
     /**
      * 设置驱动属性配置列
      *
-     * @param driverAttributes DriverAttribute Array
-     * @param mainSheet        Main Sheet
-     * @param titleRow         Title Row
-     * @param attributeRow     Attribute Row
+     * @param driverAttributeBOList 驱动属性Array
+     * @param mainSheet             Main Sheet
+     * @param titleRow              Title Row
+     * @param attributeRow          Attribute Row
      */
-    private void configAttributeCell(List<DriverAttribute> driverAttributes, Sheet mainSheet, Row titleRow, Row attributeRow, CellStyle cellStyle) {
-        if (driverAttributes.isEmpty()) {
+    private void configAttributeCell(List<DriverAttributeBO> driverAttributeBOList, Sheet mainSheet, Row titleRow, Row attributeRow, CellStyle cellStyle) {
+        if (driverAttributeBOList.isEmpty()) {
             return;
         }
 
         PoiUtil.createCellWithStyle(titleRow, 2, "驱动属性配置", cellStyle);
-        PoiUtil.mergedRegion(mainSheet, 1, 2, 2, 2 + driverAttributes.size() - 1);
-        for (int i = 0; i < driverAttributes.size(); i++) {
-            PoiUtil.createCellWithStyle(attributeRow, 2 + i, driverAttributes.get(i).getDisplayName(), cellStyle);
+        PoiUtil.mergedRegion(mainSheet, 1, 2, 2, 2 + driverAttributeBOList.size() - 1);
+        for (int i = 0; i < driverAttributeBOList.size(); i++) {
+            PoiUtil.createCellWithStyle(attributeRow, 2 + i, driverAttributeBOList.get(i).getDisplayName(), cellStyle);
         }
 
     }
@@ -472,100 +372,155 @@ public class DeviceServiceImpl implements DeviceService {
     /**
      * 设置配置工作表
      *
-     * @param driverAttributes DriverAttribute Array
-     * @param pointAttributes  PointAttribute Array
-     * @param points           Point Array
-     * @param workbook         Workbook
+     * @param driverAttributeBOList 驱动属性Array
+     * @param pointAttributeBOList  位号属性Array
+     * @param pointBOList           Point Array
+     * @param workbook              Workbook
      */
-    private void configConfigSheet(List<DriverAttribute> driverAttributes, List<PointAttribute> pointAttributes, List<Point> points, Workbook workbook) {
-        Sheet configSheet = workbook.createSheet("配置（忽略）");
+    private void configConfigSheet(List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, List<PointBO> pointBOList, Workbook workbook) {
+        Sheet configSheet = workbook.createSheet("配置(忽略)");
         Row driverAttributesRow = configSheet.createRow(0);
         Row pointAttributesRow = configSheet.createRow(1);
         Row pointsRow = configSheet.createRow(2);
-        PoiUtil.createCell(driverAttributesRow, 0, JsonUtil.toJsonString(driverAttributes));
-        PoiUtil.createCell(pointAttributesRow, 0, JsonUtil.toJsonString(pointAttributes));
-        PoiUtil.createCell(pointsRow, 0, JsonUtil.toJsonString(points));
+        PoiUtil.createCell(driverAttributesRow, 0, JsonUtil.toJsonString(driverAttributeBOList));
+        PoiUtil.createCell(pointAttributesRow, 0, JsonUtil.toJsonString(pointAttributeBOList));
+        PoiUtil.createCell(pointsRow, 0, JsonUtil.toJsonString(pointBOList));
     }
 
     /**
      * 设置位号属性配置列
      *
-     * @param driverAttributes DriverAttribute Array
-     * @param pointAttributes  PointAttribute Array
-     * @param points           Point  Array
-     * @param mainSheet        Main Sheet
-     * @param titleRow         Title Row
-     * @param attributeRow     Attribute Row
-     * @param cellStyle        CellStyle
+     * @param driverAttributeBOList 驱动属性Array
+     * @param pointAttributeBOList  位号属性Array
+     * @param pointBOList           Point  Array
+     * @param mainSheet             Main Sheet
+     * @param titleRow              Title Row
+     * @param attributeRow          Attribute Row
+     * @param cellStyle             CellStyle
      */
-    private void configPointCell(List<DriverAttribute> driverAttributes, List<PointAttribute> pointAttributes, List<Point> points, Sheet mainSheet, Row titleRow, Row attributeRow, CellStyle cellStyle) {
-        if (pointAttributes.isEmpty()) {
+    private void configPointCell(List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, List<PointBO> pointBOList, Sheet mainSheet, Row titleRow, Row attributeRow, CellStyle cellStyle) {
+        if (pointAttributeBOList.isEmpty()) {
             return;
         }
 
         Row pointRow = mainSheet.createRow(2);
-        PoiUtil.createCellWithStyle(titleRow, 2 + driverAttributes.size(), "位号属性配置", cellStyle);
-        PoiUtil.mergedRegion(mainSheet, 1, 1, 2 + driverAttributes.size(), 2 + driverAttributes.size() + pointAttributes.size() * points.size() - 1);
-        for (int i = 0; i < points.size(); i++) {
-            PoiUtil.createCellWithStyle(pointRow, 2 + driverAttributes.size() + i * pointAttributes.size(), points.get(i).getPointName(), cellStyle);
-            PoiUtil.mergedRegion(mainSheet, 2, 2, 2 + driverAttributes.size() + i * pointAttributes.size(), 2 + driverAttributes.size() + i * pointAttributes.size() + pointAttributes.size() - 1);
-            for (int j = 0; j < pointAttributes.size(); j++) {
-                PoiUtil.createCellWithStyle(attributeRow, 2 + driverAttributes.size() + i * pointAttributes.size() + j, pointAttributes.get(j).getDisplayName(), cellStyle);
+        PoiUtil.createCellWithStyle(titleRow, 2 + driverAttributeBOList.size(), "位号属性配置", cellStyle);
+        PoiUtil.mergedRegion(mainSheet, 1, 1, 2 + driverAttributeBOList.size(), 2 + driverAttributeBOList.size() + pointAttributeBOList.size() * pointBOList.size() - 1);
+        for (int i = 0; i < pointBOList.size(); i++) {
+            PoiUtil.createCellWithStyle(pointRow, 2 + driverAttributeBOList.size() + i * pointAttributeBOList.size(), pointBOList.get(i).getPointName(), cellStyle);
+            PoiUtil.mergedRegion(mainSheet, 2, 2, 2 + driverAttributeBOList.size() + i * pointAttributeBOList.size(), 2 + driverAttributeBOList.size() + i * pointAttributeBOList.size() + pointAttributeBOList.size() - 1);
+            for (int j = 0; j < pointAttributeBOList.size(); j++) {
+                PoiUtil.createCellWithStyle(attributeRow, 2 + driverAttributeBOList.size() + i * pointAttributeBOList.size() + j, pointAttributeBOList.get(j).getDisplayName(), cellStyle);
             }
         }
     }
 
     /**
-     * 生成设备导入模板
+     * 生成设备导入模版
      *
      * @param workbook Workbook
      * @return Path
-     * @throws IOException
      */
-    private Path generateTemplate(Workbook workbook) throws IOException {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        org.springframework.core.io.Resource resource = resolver.getResource("classpath:/");
-        Path resourcePath = Paths.get(resource.getURI());
-        String fileName = CharSequenceUtil.format("dc3_device_import_template_{}.xlsx", System.currentTimeMillis());
-        Path path = resourcePath.resolve(fileName);
-        FileOutputStream outputStream = new FileOutputStream(path.toUri().getPath());
-        workbook.write(outputStream);
-        workbook.close();
-        outputStream.close();
+    private Path generateTemplate(Workbook workbook) {
+        Path path;
+        try {
+            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            org.springframework.core.io.Resource resource = resolver.getResource("classpath:/");
+            Path resourcePath = Paths.get(resource.getURI());
+            String fileName = CharSequenceUtil.format("dc3_device_import_template_{}.xlsx", System.currentTimeMillis());
+            path = resourcePath.resolve(fileName);
+            FileOutputStream outputStream = new FileOutputStream(path.toUri().getPath());
+            workbook.write(outputStream);
+            workbook.close();
+            outputStream.close();
+        } catch (IOException e) {
+            throw new ServiceException("Generate template error: {}", e.getMessage());
+        }
         return path;
     }
 
-    public LambdaQueryWrapper<Device> customFuzzyQuery(DevicePageQuery devicePageQuery) {
-        QueryWrapper<Device> queryWrapper = Wrappers.query();
-        queryWrapper.eq("dd.deleted", 0);
-        if (ObjectUtil.isNotNull(devicePageQuery)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceName()), "dd.device_name", devicePageQuery.getDeviceName());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDeviceCode()), "dd.device_code", devicePageQuery.getDeviceCode());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getDriverId()), "dd.driver_id", devicePageQuery.getDriverId());
-            queryWrapper.eq(ObjectUtil.isNotNull(devicePageQuery.getEnableFlag()), "dd.enable_flag", devicePageQuery.getEnableFlag());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(devicePageQuery.getTenantId()), "dd.tenant_id", devicePageQuery.getTenantId());
-        }
-        return queryWrapper.lambda();
-    }
-
-    private void addProfileBind(String deviceId, Set<String> profileIds) {
+    private void addProfileBind(DeviceDO entityDO, List<Long> profileIds) {
         if (CollUtil.isEmpty(profileIds)) {
             return;
         }
 
         profileIds.forEach(profileId -> {
             try {
-                profileService.selectById(profileId);
-                profileBindService.add(new ProfileBind(profileId, deviceId));
-
-                List<Point> points = pointService.selectByProfileId(profileId);
-                // 通知驱动新增位号
-                points.forEach(point -> notifyService.notifyDriverPoint(MetadataCommandTypeEnum.ADD, point));
+                ProfileBindBO entityBO = new ProfileBindBO();
+                entityBO.setProfileId(profileId);
+                entityBO.setDeviceId(entityDO.getId());
+                entityBO.setTenantId(entityDO.getTenantId());
+                profileBindService.save(entityBO);
             } catch (Exception ignored) {
                 // nothing to do
             }
         });
 
+    }
+
+    /**
+     * 存在性校验
+     *
+     * @param id 设备ID
+     * @return 是否存在
+     */
+    private boolean checkExist(Long id) {
+        DeviceDO entityDO = deviceManager.getById(id);
+        return Objects.nonNull(entityDO);
+    }
+
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link DeviceQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<DeviceDO> fuzzyQuery(DeviceQuery entityQuery) {
+        QueryWrapper<DeviceDO> wrapper = Wrappers.query();
+        wrapper.eq("dd.deleted", 0);
+        if (Objects.nonNull(entityQuery)) {
+            wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceName()), "dd.device_name", entityQuery.getDeviceName());
+            wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code", entityQuery.getDeviceCode());
+            wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
+            wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
+            wrapper.eq("dd.tenant_id", entityQuery.getTenantId());
+        }
+        return wrapper.lambda();
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO {@link DeviceBO}
+     * @param isUpdate 是否为更新操作
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(DeviceBO entityBO, boolean isUpdate) {
+        LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
+        wrapper.eq(DeviceDO::getDeviceName, entityBO.getDeviceName());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(entityBO.getDeviceCode()), DeviceDO::getDeviceCode, entityBO.getDeviceCode());
+        wrapper.eq(DeviceDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        DeviceDO one = deviceManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        return !isUpdate || !one.getId().equals(entityBO.getId());
+    }
+
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link DeviceDO}
+     */
+    private DeviceDO getDOById(Long id, boolean throwException) {
+        DeviceDO entityDO = deviceManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Device does not exist");
+        }
+        return entityDO;
     }
 
 }

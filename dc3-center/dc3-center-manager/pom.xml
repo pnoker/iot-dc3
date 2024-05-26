@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2016-present the original author or authors.
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,69 +14,61 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>2023.4.5</version>
+        <version>2024.3.0</version>
     </parent>
 
     <artifactId>dc3-center-manager</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 全部设备集合管理服务，包括设备组注册、权限管理、设备管理等功能。</description>
+    <description>IOT DC3 平台 全部设备集合管理服务, 包括设备组注册, 权限管理, 设备管理等功能。</description>
 
     <dependencies>
 
-        <!-- DC3 Api Manager -->
+        <!-- DC3 Api 相关 -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-driver</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-manager</artifactId>
         </dependency>
 
-        <!-- DC3 Api Auth -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-auth</artifactId>
-        </dependency>
-
-        <!-- DC3 Api Data -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-data</artifactId>
-        </dependency>
-
-
-        <!-- DC3 Common RabbitMQ -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-rabbitmq</artifactId>
-        </dependency>
-
-        <!-- DC3 Common MySQL -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mysql</artifactId>
-        </dependency>
-
-        <!-- DC3 Common Redis -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-redis</artifactId>
-        </dependency>
-
-        <!-- DC3 Common Mongo -->
+        <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mongo</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
-            <version>2.0.25</version>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-mysql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-quartz</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-rabbitmq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-redis</artifactId>
         </dependency>
 
     </dependencies>

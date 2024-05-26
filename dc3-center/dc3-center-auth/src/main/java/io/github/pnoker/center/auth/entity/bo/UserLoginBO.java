@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,23 @@
 
 package io.github.pnoker.center.auth.entity.bo;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
- * User
+ * UserLogin BO
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Data
-@SuperBuilder
-@RequiredArgsConstructor
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserLoginBO extends BaseBO {
 
     /**
@@ -47,12 +43,12 @@ public class UserLoginBO extends BaseBO {
     /**
      * 用户ID
      */
-    private String userId;
+    private Long userId;
 
     /**
      * 用户密码ID
      */
-    private String userPasswordId;
+    private Long userPasswordId;
 
     /**
      * 使能标识

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,23 @@ abstract public class BaseLocator<T> {
     //
     // Factory methods
     //
+
+    protected final int range;
+    protected final int offset;
+    private final int slaveId;
+
+    /**
+     * <p>Constructor for BaseLocator.</p>
+     *
+     * @param slaveId a int.
+     * @param range   a int.
+     * @param offset  a int.
+     */
+    public BaseLocator(int slaveId, int range, int offset) {
+        this.slaveId = slaveId;
+        this.range = range;
+        this.offset = offset;
+    }
 
     /**
      * <p>coilStatus.</p>
@@ -178,23 +195,6 @@ abstract public class BaseLocator<T> {
         if (dataType == DataType.CHAR || dataType == DataType.VARCHAR)
             return new StringLocator(slaveId, range, offset, dataType, registerCount, charset);
         return new NumericLocator(slaveId, range, offset, dataType);
-    }
-
-    private final int slaveId;
-    protected final int range;
-    protected final int offset;
-
-    /**
-     * <p>Constructor for BaseLocator.</p>
-     *
-     * @param slaveId a int.
-     * @param range   a int.
-     * @param offset  a int.
-     */
-    public BaseLocator(int slaveId, int range, int offset) {
-        this.slaveId = slaveId;
-        this.range = range;
-        this.offset = offset;
     }
 
     /**

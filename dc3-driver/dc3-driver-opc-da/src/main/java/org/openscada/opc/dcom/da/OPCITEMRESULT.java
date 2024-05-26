@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,31 @@ public class OPCITEMRESULT {
 
     private int _accessRights = 0;
 
+    public static JIStruct getStruct() throws JIException {
+        JIStruct struct = new JIStruct();
+
+        struct.addMember(Integer.class); // Server handle
+        struct.addMember(Short.class); // data type
+        struct.addMember(Short.class); // reserved
+        struct.addMember(Integer.class); // access rights
+        struct.addMember(Integer.class); // blob size
+        // grab the normally unused byte array
+        struct.addMember(new JIPointer(new JIArray(Byte.class, null, 1, true, false)));
+
+        return struct;
+    }
+
+    public static OPCITEMRESULT fromStruct(final JIStruct struct) {
+        OPCITEMRESULT result = new OPCITEMRESULT();
+
+        result.setServerHandle((Integer) struct.getMember(0));
+        result.setCanonicalDataType((Short) struct.getMember(1));
+        result.setReserved((Short) struct.getMember(2));
+        result.setAccessRights((Integer) struct.getMember(3));
+
+        return result;
+    }
+
     public int getAccessRights() {
         return this._accessRights;
     }
@@ -61,30 +86,5 @@ public class OPCITEMRESULT {
 
     public void setServerHandle(final int serverHandle) {
         this._serverHandle = serverHandle;
-    }
-
-    public static JIStruct getStruct() throws JIException {
-        JIStruct struct = new JIStruct();
-
-        struct.addMember(Integer.class); // Server handle
-        struct.addMember(Short.class); // data type
-        struct.addMember(Short.class); // reserved
-        struct.addMember(Integer.class); // access rights
-        struct.addMember(Integer.class); // blob size
-        // grab the normally unused byte array
-        struct.addMember(new JIPointer(new JIArray(Byte.class, null, 1, true, false)));
-
-        return struct;
-    }
-
-    public static OPCITEMRESULT fromStruct(final JIStruct struct) {
-        OPCITEMRESULT result = new OPCITEMRESULT();
-
-        result.setServerHandle((Integer) struct.getMember(0));
-        result.setCanonicalDataType((Short) struct.getMember(1));
-        result.setReserved((Short) struct.getMember(2));
-        result.setAccessRights((Integer) struct.getMember(3));
-
-        return result;
     }
 }

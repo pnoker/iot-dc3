@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,17 +35,16 @@ import java.util.Date;
  */
 public abstract class BaseIOLog {
 
-    private static final Log LOG = LogFactory.getLog(BaseIOLog.class);
-
     /**
      * Constant <code>DATE_FORMAT="yyyy/MM/dd-HH:mm:ss,SSS"</code>
      */
     protected static final String DATE_FORMAT = "yyyy/MM/dd-HH:mm:ss,SSS";
+    private static final Log LOG = LogFactory.getLog(BaseIOLog.class);
     protected final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-    protected PrintWriter out;
     protected final File file;
     protected final StringBuilder sb = new StringBuilder();
     protected final Date date = new Date();
+    protected PrintWriter out;
 
     /**
      * <p>Constructor for BaseIOLog.</p>

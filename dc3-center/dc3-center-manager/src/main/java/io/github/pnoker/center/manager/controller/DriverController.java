@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,28 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.DriverPageQuery;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
+import io.github.pnoker.center.manager.entity.builder.DriverBuilder;
+import io.github.pnoker.center.manager.entity.query.DriverQuery;
+import io.github.pnoker.center.manager.entity.vo.DriverVO;
 import io.github.pnoker.center.manager.service.DriverService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.DriverDO;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -47,95 +48,104 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.DRIVER_URL_PREFIX)
-public class DriverController {
+@RequestMapping(ManagerConstant.DRIVER_URL_PREFIX)
+public class DriverController implements BaseController {
 
-    @Resource
-    private DriverService driverService;
+    private final DriverBuilder driverBuilder;
+    private final DriverService driverService;
+
+    public DriverController(DriverBuilder driverBuilder, DriverService driverService) {
+        this.driverBuilder = driverBuilder;
+        this.driverService = driverService;
+    }
 
     /**
      * 新增 Driver
      *
-     * @param entityDO Driver
-     * @param tenantId 租户ID
-     * @return Driver
+     * @param entityVO {@link DriverVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody DriverDO entityDO, @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
         try {
-            entityDO.setTenantId(tenantId);
-            driverService.add(entityDO);
-            return R.ok();
+            DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            driverService.save(entityBO);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
      * 根据 ID 删除 Driver
      *
-     * @param id 驱动ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            driverService.delete(id);
-            return R.ok();
+            driverService.remove(id);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 修改 Driver
+     * 更新 Driver
      *
-     * @param entityDO Driver
-     * @param tenantId 租户ID
-     * @return Driver
+     * @param entityVO {@link DriverVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody DriverDO entityDO,
-                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) {
         try {
-            entityDO.setTenantId(tenantId);
-            driverService.update(entityDO);
-            return R.ok();
+            DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
+            driverService.update(entityBO);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
      * 根据 ID 查询 Driver
      *
-     * @param id 驱动ID
-     * @return Driver
+     * @param id ID
+     * @return DriverVO {@link DriverVO}
      */
     @GetMapping("/id/{id}")
-    public R<DriverDO> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<DriverVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            DriverDO select = driverService.selectById(id);
-            return R.ok(select);
+            DriverBO entityBO = driverService.selectById(id);
+            DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
      * 根据 ID 集合查询 Driver
      *
-     * @param driverIds Driver ID Set
-     * @return Map String:Driver
+     * @param driverIds 驱动ID集
+     * @return Map(ID, DriverVO)
      */
     @PostMapping("/ids")
-    public R<Map<String, DriverDO>> selectByIds(@RequestBody Set<String> driverIds) {
+    public Mono<R<Map<Long, DriverVO>>> selectByIds(@RequestBody Set<Long> driverIds) {
         try {
-            List<DriverDO> entityDOS = driverService.selectByIds(driverIds);
-            Map<String, DriverDO> driverMap = entityDOS.stream().collect(Collectors.toMap(DriverDO::getId, Function.identity()));
-            return R.ok(driverMap);
+            List<DriverBO> entityBOList = driverService.selectByIds(driverIds);
+            Map<Long, DriverVO> driverMap = entityBOList.stream().collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
+            return Mono.just(R.ok(driverMap));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -146,39 +156,37 @@ public class DriverController {
      * @return Driver
      */
     @GetMapping("/service/{serviceName}")
-    public R<DriverDO> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName,
-                                           @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public Mono<R<DriverVO>> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
         try {
-            DriverDO select = driverService.selectByServiceName(serviceName, tenantId, true);
-            return R.ok(select);
+            DriverBO entityBO = driverService.selectByServiceName(serviceName, getTenantId());
+            DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 模糊分页查询 Driver
+     * 分页查询 Driver
      *
-     * @param driverPageQuery Driver Dto
-     * @param tenantId        租户ID
+     * @param entityQuery Driver Dto
      * @return Page Of Driver
      */
     @PostMapping("/list")
-    public R<Page<DriverDO>> list(@RequestBody(required = false) DriverPageQuery driverPageQuery,
-                                  @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public Mono<R<Page<DriverVO>>> list(@RequestBody(required = false) DriverQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(driverPageQuery)) {
-                driverPageQuery = new DriverPageQuery();
+            if (Objects.isNull(entityQuery)) {
+                entityQuery = new DriverQuery();
             }
-            driverPageQuery.setTenantId(tenantId);
-            Page<DriverDO> page = driverService.list(driverPageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<DriverBO> entityPageBO = driverService.selectByPage(entityQuery);
+            Page<DriverVO> entityPageVO = driverBuilder.buildVOPageByBOPage(entityPageBO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
 }

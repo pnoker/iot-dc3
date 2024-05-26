@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,16 +40,18 @@ import java.util.Map;
 @ConditionalOnClass(ExchangeConfig.class)
 public class DataTopicConfig {
 
-    @Resource
-    private TopicExchange eventExchange;
+    private final TopicExchange eventExchange;
+    private final TopicExchange valueExchange;
 
-    @Resource
-    private TopicExchange valueExchange;
+    public DataTopicConfig(TopicExchange eventExchange, TopicExchange valueExchange) {
+        this.eventExchange = eventExchange;
+        this.valueExchange = valueExchange;
+    }
 
     @Bean
     Queue driverEventQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        // 30秒：30 * 1000 = 30000L
+        // 30秒: 30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
         return new Queue(RabbitConstant.QUEUE_DRIVER_EVENT, true, false, false, arguments);
     }
@@ -68,7 +69,7 @@ public class DataTopicConfig {
     @Bean
     Queue deviceEventQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        // 30秒：30 * 1000 = 30000L
+        // 30秒: 30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
         return new Queue(RabbitConstant.QUEUE_DEVICE_EVENT, true, false, false, arguments);
     }
@@ -86,7 +87,7 @@ public class DataTopicConfig {
     @Bean
     Queue pointValueQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        // 7天： 7 * 24 * 60 * 60 * 1000 = 604800000L
+        // 7天:  7 * 24 * 60 * 60 * 1000 = 604800000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 604800000L);
         return new Queue(RabbitConstant.QUEUE_POINT_VALUE, true, false, false, arguments);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,25 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.LabelBindPageQuery;
-import io.github.pnoker.center.manager.mapper.LabelBindMapper;
+import io.github.pnoker.center.manager.dal.LabelBindManager;
+import io.github.pnoker.center.manager.entity.builder.LabelBindForManagerBuilder;
+import io.github.pnoker.center.manager.entity.model.LabelBindDO;
+import io.github.pnoker.center.manager.entity.query.LabelBindQuery;
 import io.github.pnoker.center.manager.service.LabelBindService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
+import io.github.pnoker.common.entity.bo.LabelBindBO;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.DeleteException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.UpdateException;
-import io.github.pnoker.common.model.LabelBind;
+import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
+import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * LabelBindService Impl
@@ -46,75 +47,111 @@ import javax.annotation.Resource;
 public class LabelBindServiceImpl implements LabelBindService {
 
     @Resource
-    private LabelBindMapper labelBindMapper;
+    private LabelBindForManagerBuilder labelBindForManagerBuilder;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Resource
+    private LabelBindManager labelBindManager;
+
     @Override
-    public void add(LabelBind entityDO) {
-        if (labelBindMapper.insert(entityDO) < 1) {
-            throw new AddException("The label bind add failed");
+    public void save(LabelBindBO entityBO) {
+        checkDuplicate(entityBO, false, true);
+
+        LabelBindDO entityDO = labelBindForManagerBuilder.buildDOByBO(entityBO);
+        if (!labelBindManager.save(entityDO)) {
+            throw new AddException("Failed to create label bind");
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void delete(String id) {
-        LabelBind labelBind = selectById(id);
-        if (ObjectUtil.isNull(labelBind)) {
-            throw new NotFoundException("The label bind does not exist");
-        }
+    public void remove(Long id) {
+        getDOById(id, true);
 
-        if (labelBindMapper.deleteById(id) < 1) {
-            throw new DeleteException("The label bind delete failed");
+        if (!labelBindManager.removeById(id)) {
+            throw new DeleteException("Failed to remove label bind");
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void update(LabelBind entityDO) {
-        selectById(entityDO.getId());
+    public void update(LabelBindBO entityBO) {
+        getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
+        LabelBindDO entityDO = labelBindForManagerBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
-        if (labelBindMapper.updateById(entityDO) < 1) {
+        if (!labelBindManager.updateById(entityDO)) {
             throw new UpdateException("The label bind update failed");
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public LabelBind selectById(String id) {
-        LabelBind labelBind = labelBindMapper.selectById(id);
-        if (ObjectUtil.isNull(labelBind)) {
-            throw new NotFoundException();
+    public LabelBindBO selectById(Long id) {
+        LabelBindDO entityDO = getDOById(id, false);
+        return labelBindForManagerBuilder.buildBOByDO(entityDO);
+    }
+
+    @Override
+    public Page<LabelBindBO> selectByPage(LabelBindQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return labelBind;
+        Page<LabelBindDO> entityPageDO = labelBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return labelBindForManagerBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**
-     * {@inheritDoc}
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link LabelBindQuery}
+     * @return {@link LambdaQueryWrapper}
      */
-    @Override
-    public Page<LabelBind> list(LabelBindPageQuery queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
-        }
-        return labelBindMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+    private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery entityQuery) {
+        LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
+        wrapper.eq(LabelBindDO::getTenantId, entityQuery.getTenantId());
+        return wrapper;
     }
 
-    private LambdaQueryWrapper<LabelBind> fuzzyQuery(LabelBindPageQuery query) {
-        LambdaQueryWrapper<LabelBind> queryWrapper = Wrappers.<LabelBind>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getLabelId()), LabelBind::getLabelId, query.getLabelId());
-            queryWrapper.eq(CharSequenceUtil.isNotEmpty(query.getEntityId()), LabelBind::getEntityId, query.getEntityId());
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link LabelBindBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(LabelBindBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
+        wrapper.eq(LabelBindDO::getEntityTypeFlag, entityBO.getEntityTypeFlag());
+        wrapper.eq(LabelBindDO::getLabelId, entityBO.getLabelId());
+        wrapper.eq(LabelBindDO::getEntityId, entityBO.getEntityId());
+        wrapper.eq(LabelBindDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        LabelBindDO one = labelBindManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
         }
-        return queryWrapper;
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("Label bind has been duplicated");
+        }
+        return duplicate;
+    }
+
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link LabelBindDO}
+     */
+    private LabelBindDO getDOById(Long id, boolean throwException) {
+        LabelBindDO entityDO = labelBindManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Label bind does not exist");
+        }
+        return entityDO;
     }
 
 }

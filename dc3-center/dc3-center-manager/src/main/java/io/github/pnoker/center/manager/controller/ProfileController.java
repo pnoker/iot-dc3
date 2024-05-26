@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,175 +16,176 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.entity.query.ProfilePageQuery;
+import io.github.pnoker.center.manager.entity.bo.ProfileBO;
+import io.github.pnoker.center.manager.entity.builder.ProfileBuilder;
+import io.github.pnoker.center.manager.entity.query.ProfileQuery;
+import io.github.pnoker.center.manager.entity.vo.ProfileVO;
 import io.github.pnoker.center.manager.service.ProfileService;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.service.ManagerServiceConstant;
+import io.github.pnoker.common.base.BaseController;
+import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.model.Profile;
-import io.github.pnoker.common.valid.Insert;
+import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 模板 Controller
+ * 模版 Controller
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @RestController
-@RequestMapping(ManagerServiceConstant.PROFILE_URL_PREFIX)
-public class ProfileController {
+@RequestMapping(ManagerConstant.PROFILE_URL_PREFIX)
+public class ProfileController implements BaseController {
 
-    @Resource
-    private ProfileService profileService;
+    private final ProfileBuilder profileBuilder;
+    private final ProfileService profileService;
+
+    public ProfileController(ProfileBuilder profileBuilder, ProfileService profileService) {
+        this.profileBuilder = profileBuilder;
+        this.profileService = profileService;
+    }
 
     /**
      * 新增 Profile
      *
-     * @param profile  Profile
-     * @param tenantId 租户ID
-     * @return Profile
+     * @param entityVO {@link ProfileVO}
+     * @return R of String
      */
     @PostMapping("/add")
-    public R<String> add(@Validated(Insert.class) @RequestBody Profile profile,
-                         @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
         try {
-            profile.setTenantId(tenantId);
-            profileService.add(profile);
-            return R.ok();
+            ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
+            entityBO.setTenantId(getTenantId());
+            profileService.save(entityBO);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
      * 根据 ID 删除 Profile
      *
-     * @param id 模板ID
-     * @return 是否删除
+     * @param id ID
+     * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            profileService.delete(id);
-            return R.ok();
+            profileService.remove(id);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 修改 Profile
+     * 更新 Profile
      *
-     * @param profile  Profile
-     * @param tenantId 租户ID
-     * @return Profile
+     * @param entityVO {@link ProfileVO}
+     * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody Profile profile,
-                            @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody ProfileVO entityVO) {
         try {
-            profile.setTenantId(tenantId);
-            profileService.update(profile);
-            return R.ok();
+            ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
+            profileService.update(entityBO);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
      * 根据 ID 查询 Profile
      *
-     * @param id 模板ID
-     * @return Profile
+     * @param id ID
+     * @return ProfileVO {@link ProfileVO}
      */
     @GetMapping("/id/{id}")
-    public R<Profile> selectById(@NotNull @PathVariable(value = "id") String id) {
+    public Mono<R<ProfileVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            Profile select = profileService.selectById(id);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            ProfileBO entityBO = profileService.selectById(id);
+            ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
     /**
      * 根据 ID 集合查询 Profile
      *
-     * @param profileIds Profile ID set
-     * @return Map String:Profile
+     * @param profileIds 模版ID集
+     * @return Map(ID, ProfileVO)
      */
     @PostMapping("/ids")
-    public R<Map<String, Profile>> selectByIds(@RequestBody Set<String> profileIds) {
+    public Mono<R<Map<Long, ProfileVO>>> selectByIds(@RequestBody Set<Long> profileIds) {
         try {
-            List<Profile> profiles = profileService.selectByIds(profileIds);
-            Map<String, Profile> profileMap = profiles.stream().collect(Collectors.toMap(Profile::getId, Function.identity()));
-            return R.ok(profileMap);
+            List<ProfileBO> entityBOList = profileService.selectByIds(profileIds);
+            Map<Long, ProfileVO> deviceMap = entityBOList.stream().collect(Collectors.toMap(ProfileBO::getId, entityBO -> profileBuilder.buildVOByBO(entityBO)));
+            return Mono.just(R.ok(deviceMap));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     /**
-     * 根据 设备 ID 查询 Profile 集合
+     * 根据 设备ID 查询 Profile 集合
      *
      * @param deviceId 设备ID
-     * @return Profile Array
+     * @return Profile 集合
      */
     @GetMapping("/device_id/{deviceId}")
-    public R<List<Profile>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") String deviceId) {
+    public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
         try {
-            List<Profile> select = profileService.selectByDeviceId(deviceId);
-            if (ObjectUtil.isNotNull(select)) {
-                return R.ok(select);
-            }
+            List<ProfileBO> entityBOList = profileService.selectByDeviceId(deviceId);
+            List<ProfileVO> entityVOList = profileBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
     /**
-     * 模糊分页查询 Profile
+     * 分页查询 Profile
      *
-     * @param profilePageQuery Profile Dto
-     * @param tenantId         租户ID
+     * @param entityQuery Profile Dto
      * @return Page Of Profile
      */
     @PostMapping("/list")
-    public R<Page<Profile>> list(@RequestBody(required = false) ProfilePageQuery profilePageQuery,
-                                 @RequestHeader(value = RequestConstant.Header.X_AUTH_TENANT_ID, defaultValue = DefaultConstant.DEFAULT_ID) String tenantId) {
+    public Mono<R<Page<ProfileVO>>> list(@RequestBody(required = false) ProfileQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(profilePageQuery)) {
-                profilePageQuery = new ProfilePageQuery();
+            if (Objects.isNull(entityQuery)) {
+                entityQuery = new ProfileQuery();
             }
-            profilePageQuery.setTenantId(tenantId);
-            Page<Profile> page = profileService.list(profilePageQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
-            }
+            entityQuery.setTenantId(getTenantId());
+            Page<ProfileBO> entityPageBO = profileService.selectByPage(entityQuery);
+            Page<ProfileVO> entityPageVO = profileBuilder.buildVOPageByBOPage(entityPageBO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
     }
 
 }

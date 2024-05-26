@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,26 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.auth.entity.query.UserDto;
-import io.github.pnoker.center.auth.mapper.UserMapper;
+import io.github.pnoker.center.auth.dal.UserManager;
+import io.github.pnoker.center.auth.entity.bo.UserBO;
+import io.github.pnoker.center.auth.entity.builder.UserBuilder;
+import io.github.pnoker.center.auth.entity.model.UserDO;
+import io.github.pnoker.center.auth.entity.query.UserPasswordQuery;
+import io.github.pnoker.center.auth.entity.query.UserQuery;
 import io.github.pnoker.center.auth.service.UserService;
+import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.model.User;
+import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * 用户服务接口实现类
@@ -45,92 +49,86 @@ import javax.annotation.Resource;
 public class UserServiceImpl implements UserService {
 
     @Resource
-    private UserMapper userMapper;
+    private UserBuilder userBuilder;
+
+    @Resource
+    private UserManager userManager;
 
     @Override
-    @Transactional
-    public void add(User entityDO) {
-        // 判断用户是否存在
-        User selectByUserName = selectByUserName(entityDO.getUserName(), false);
-        if (ObjectUtil.isNotNull(selectByUserName)) {
-            throw new DuplicateException("The user already exists with username: {}", entityDO.getUserName());
-        }
+    public void save(UserBO entityBO) {
+        checkDuplicate(entityBO, false, true);
 
-        // 判断 phone 是否存在，如果有 phone 不为空，检查该 phone 是否被占用
-        if (CharSequenceUtil.isNotEmpty(entityDO.getPhone())) {
-            User selectByPhone = selectByPhone(entityDO.getPhone(), false);
-            if (ObjectUtil.isNotNull(selectByPhone)) {
-                throw new DuplicateException("The user already exists with phone: {}", entityDO.getPhone());
+        // 判断手机号是否存在, 如果有手机号不为空, 检查该手机号是否被占用
+        if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
+            UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
+            if (Objects.nonNull(selectByPhone)) {
+                throw new DuplicateException("The user already exists with phone: {}", entityBO.getPhone());
             }
         }
 
-        // 判断 email 是否存在，如果有 email 不为空，检查该 email 是否被占用
-        if (CharSequenceUtil.isNotEmpty(entityDO.getEmail())) {
-            User selectByEmail = selectByEmail(entityDO.getEmail(), false);
-            if (ObjectUtil.isNotNull(selectByEmail)) {
-                throw new DuplicateException("The user already exists with email: {}", entityDO.getEmail());
+        // 判断邮箱是否存在, 如果有邮箱不为空, 检查该邮箱是否被占用
+        if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
+            UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
+            if (Objects.nonNull(selectByEmail)) {
+                throw new DuplicateException("The user already exists with email: {}", entityBO.getEmail());
             }
         }
 
-        // 插入 user 数据，并返回插入后的 user
-        if (userMapper.insert(entityDO) < 1) {
-            throw new AddException("The user add failed: {}", entityDO.toString());
+        UserDO entityDO = userBuilder.buildDOByBO(entityBO);
+        if (!userManager.save(entityDO)) {
+            throw new AddException("Failed to create user: {}", entityBO.toString());
         }
     }
 
     @Override
-    @Transactional
-    public void delete(String id) {
-        User user = selectById(id);
-        if (ObjectUtil.isNull(user)) {
-            throw new NotFoundException("The user does not exist");
-        }
+    public void remove(Long id) {
+        getDOById(id, true);
 
-        if (userMapper.deleteById(id) < 1) {
-            throw new DeleteException("The user delete failed");
+        if (!userManager.removeById(id)) {
+            throw new DeleteException("Failed to remove user");
         }
     }
 
     @Override
-    public void update(User entityDO) {
-        User selectById = selectById(entityDO.getId());
-        // 判断 phone 是否修改
-        if (CharSequenceUtil.isNotEmpty(entityDO.getPhone())) {
-            if (!entityDO.getPhone().equals(selectById.getPhone())) {
-                User selectByPhone = selectByPhone(entityDO.getPhone(), false);
-                if (ObjectUtil.isNotNull(selectByPhone)) {
-                    throw new DuplicateException("The user already exists with phone {}", entityDO.getPhone());
+    public void update(UserBO entityBO) {
+        UserDO selectById = getDOById(entityBO.getId(), true);
+
+        checkDuplicate(entityBO, true, true);
+
+        // 判断手机号是否更新
+        if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
+            if (!entityBO.getPhone().equals(selectById.getPhone())) {
+                UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
+                if (Objects.nonNull(selectByPhone)) {
+                    throw new DuplicateException("The user already exists with phone {}", entityBO.getPhone());
                 }
             }
-        } else {
-            entityDO.setPhone(null);
         }
 
-        // 判断 email 是否修改
-        if (CharSequenceUtil.isNotEmpty(entityDO.getEmail())) {
-            if (!entityDO.getEmail().equals(selectById.getEmail())) {
-                User selectByEmail = selectByEmail(entityDO.getEmail(), false);
-                if (ObjectUtil.isNotNull(selectByEmail)) {
-                    throw new DuplicateException("The user already exists with email {}", entityDO.getEmail());
+        // 判断邮箱是否更新
+        if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
+            if (!entityBO.getEmail().equals(selectById.getEmail())) {
+                UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
+                if (Objects.nonNull(selectByEmail)) {
+                    throw new DuplicateException("The user already exists with email {}", entityBO.getEmail());
                 }
             }
-        } else {
-            entityDO.setEmail(null);
         }
 
-        entityDO.setUserName(null);
+        UserDO entityDO = userBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
-        if (userMapper.updateById(entityDO) < 1) {
+        if (!userManager.updateById(entityDO)) {
             throw new UpdateException("The user update failed");
         }
     }
 
     @Override
-    public User selectById(String id) {
-        return userMapper.selectById(id);
+    public UserBO selectById(Long id) {
+        UserDO entityDO = getDOById(id, true);
+        return userBuilder.buildBOByDO(entityDO);
     }
 
-    public User selectByUserName(String userName, boolean throwException) {
+    public UserBO selectByUserName(String userName, boolean throwException) {
         if (CharSequenceUtil.isEmpty(userName)) {
             if (throwException) {
                 throw new EmptyException("The name is empty");
@@ -138,11 +136,11 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        return selectByKey(User::getUserName, userName, throwException);
+        return selectByKey(UserDO::getUserName, userName, throwException);
     }
 
     @Override
-    public User selectByPhone(String phone, boolean throwException) {
+    public UserBO selectByPhone(String phone, boolean throwException) {
         if (CharSequenceUtil.isEmpty(phone)) {
             if (throwException) {
                 throw new EmptyException("The phone is empty");
@@ -150,11 +148,11 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        return selectByKey(User::getPhone, phone, throwException);
+        return selectByKey(UserDO::getPhone, phone, throwException);
     }
 
     @Override
-    public User selectByEmail(String email, boolean throwException) {
+    public UserBO selectByEmail(String email, boolean throwException) {
         if (CharSequenceUtil.isEmpty(email)) {
             if (throwException) {
                 throw new EmptyException("The phone is empty");
@@ -162,40 +160,83 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        return selectByKey(User::getEmail, email, throwException);
+        return selectByKey(UserDO::getEmail, email, throwException);
     }
 
     @Override
-    public Page<User> list(UserDto queryDTO) {
-        if (ObjectUtil.isNull(queryDTO.getPage())) {
-            queryDTO.setPage(new Pages());
+    public Page<UserBO> selectByPage(UserQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
         }
-        return userMapper.selectPage(queryDTO.getPage().convert(), fuzzyQuery(queryDTO));
+        Page<UserDO> page = userManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return userBuilder.buildBOPageByDOPage(page);
     }
 
-    private LambdaQueryWrapper<User> fuzzyQuery(UserDto query) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        if (ObjectUtil.isNotNull(query)) {
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getNickName()), User::getNickName, query.getNickName());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getUserName()), User::getUserName, query.getUserName());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getPhone()), User::getPhone, query.getPhone());
-            queryWrapper.like(CharSequenceUtil.isNotEmpty(query.getEmail()), User::getEmail, query.getEmail());
-        }
-        return queryWrapper;
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link UserQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<UserDO> fuzzyQuery(UserQuery entityQuery) {
+        LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getNickName()), UserDO::getNickName, entityQuery.getNickName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getUserName()), UserDO::getUserName, entityQuery.getUserName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getPhone()), UserDO::getPhone, entityQuery.getPhone());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getEmail()), UserDO::getEmail, entityQuery.getEmail());
+        return wrapper;
     }
 
-    private User selectByKey(SFunction<User, ?> key, String value, boolean throwException) {
-        LambdaQueryWrapper<User> queryWrapper = Wrappers.<User>query().lambda();
-        queryWrapper.eq(key, value);
-        queryWrapper.last("limit 1");
-        User user = userMapper.selectOne(queryWrapper);
-        if (ObjectUtil.isNull(user)) {
+    private UserBO selectByKey(SFunction<UserDO, ?> key, String value, boolean throwException) {
+        LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
+        wrapper.eq(key, value);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        UserDO userDO = userManager.getOne(wrapper);
+        if (Objects.isNull(userDO)) {
             if (throwException) {
                 throw new NotFoundException();
             }
             return null;
         }
-        return user;
+        return userBuilder.buildBOByDO(userDO);
+    }
+
+    /**
+     * 重复性校验
+     *
+     * @param entityBO       {@link UserBO}
+     * @param isUpdate       是否为更新操作
+     * @param throwException 如果重复是否抛异常
+     * @return 是否重复
+     */
+    private boolean checkDuplicate(UserBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
+        wrapper.eq(UserDO::getUserName, entityBO.getUserName());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        UserDO one = userManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("User has been duplicated");
+        }
+        return duplicate;
+    }
+
+    /**
+     * 根据 主键ID 获取
+     *
+     * @param id             ID
+     * @param throwException 是否抛异常
+     * @return {@link UserDO}
+     */
+    private UserDO getDOById(Long id, boolean throwException) {
+        UserDO entityDO = userManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("User does not exist");
+        }
+        return entityDO;
     }
 
 }

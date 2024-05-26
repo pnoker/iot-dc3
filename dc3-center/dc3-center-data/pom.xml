@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2016-present the original author or authors.
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,100 +14,79 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>2023.4.5</version>
+        <version>2024.3.0</version>
     </parent>
 
     <artifactId>dc3-center-data</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台数据中心,包含Amqp,Websocket,Mqtt等通用消息中间件，通过消息订阅方式收集设备组信息。
+    <description>IOT DC3 平台数据中心, 包含 Amqp, Websocket, Mqtt 等通用消息中间件, 根据消息订阅方式收集设备组信息。
     </description>
 
     <dependencies>
 
-        <!-- Elasticsearch -->
+        <!-- DC3 Api 相关 -->
         <dependency>
-            <groupId>co.elastic.clients</groupId>
-            <artifactId>elasticsearch-java</artifactId>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-auth</artifactId>
         </dependency>
         <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-data</artifactId>
         </dependency>
-
-        <!-- DC3 Api Manager -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-manager</artifactId>
         </dependency>
 
-        <!-- DC3 Api Data -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-data</artifactId>
-        </dependency>
-
-        <!-- DC3 Common RabbitMQ -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-rabbitmq</artifactId>
-        </dependency>
-
-        <!-- DC3 Common MySQL -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mysql</artifactId>
-        </dependency>
-
-        <!-- DC3 Common Mongo -->
+        <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mongo</artifactId>
         </dependency>
-
-        <!-- DC3 Common Redis -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-redis</artifactId>
+            <artifactId>dc3-common-mqtt</artifactId>
         </dependency>
-
-        <!-- DC3 Common Influx -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-influx</artifactId>
+            <artifactId>dc3-common-mysql</artifactId>
         </dependency>
-
-        <!-- DC3 Common tdengine -->
-        <!--<dependency>
+        <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-tdengine</artifactId>
-        </dependency>-->
-
-        <!-- DC3 Common Quartz -->
+            <artifactId>dc3-common-prometheus</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-quartz</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-rabbitmq</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-repository</artifactId>
+        </dependency>
+        <!--   <dependency>
+               <groupId>io.github.pnoker</groupId>
+               <artifactId>dc3-common-tdengine</artifactId>
+           </dependency>-->
+        <!--        <dependency>
+                    <groupId>io.github.pnoker</groupId>
+                    <artifactId>dc3-common-influx</artifactId>
+                </dependency>-->
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

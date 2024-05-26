@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,21 +46,15 @@ public class WriteRegisterRequest extends ModbusRequest {
         this.writeValue = writeValue;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    WriteRegisterRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
+
     @Override
     public void validate(Modbus modbus) throws ModbusTransportException {
         ModbusUtils.validateOffset(writeOffset);
     }
 
-    WriteRegisterRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void writeRequest(ByteQueue queue) {
         ModbusUtils.pushShort(queue, writeOffset);
@@ -73,9 +67,6 @@ public class WriteRegisterRequest extends ModbusRequest {
         return new WriteRegisterResponse(slaveId, writeOffset, writeValue);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public byte getFunctionCode() {
         return FunctionCode.WRITE_REGISTER;
@@ -86,9 +77,6 @@ public class WriteRegisterRequest extends ModbusRequest {
         return new WriteRegisterResponse(slaveId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void readRequest(ByteQueue queue) {
         writeOffset = ModbusUtils.popUnsignedShort(queue);

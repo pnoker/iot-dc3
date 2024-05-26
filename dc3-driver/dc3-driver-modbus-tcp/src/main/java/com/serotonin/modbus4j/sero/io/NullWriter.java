@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,25 +26,16 @@ import java.io.Writer;
  * @version 5.0.0
  */
 public class NullWriter extends Writer {
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
         // no op
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void flush() throws IOException {
         // no op
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void close() throws IOException {
         // no op

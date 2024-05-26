@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,12 +48,11 @@ public class TcpMaster extends ModbusMaster {
 
     // Configuration fields.
     private final Log LOG = LogFactory.getLog(TcpMaster.class);
-    private short nextTransactionId = 0;
     private final IpParameters ipParameters;
     private final boolean keepAlive;
     private final boolean autoIncrementTransactionId;
     private final Integer lingerTime;
-
+    private short nextTransactionId = 0;
     // Runtime fields.
     private Socket socket;
     private Transport transport;
@@ -136,15 +135,6 @@ public class TcpMaster extends ModbusMaster {
     }
 
     /**
-     * <p>Setter for the field <code>nextTransactionId</code>.</p>
-     *
-     * @param id a short.
-     */
-    public void setNextTransactionId(short id) {
-        this.nextTransactionId = id;
-    }
-
-    /**
      * <p>Getter for the field <code>nextTransactionId</code>.</p>
      *
      * @return a short.
@@ -154,8 +144,14 @@ public class TcpMaster extends ModbusMaster {
     }
 
     /**
-     * {@inheritDoc}
+     * <p>Setter for the field <code>nextTransactionId</code>.</p>
+     *
+     * @param id a short.
      */
+    public void setNextTransactionId(short id) {
+        this.nextTransactionId = id;
+    }
+
     @Override
     synchronized public void init() throws ModbusInitException {
         try {
@@ -167,18 +163,12 @@ public class TcpMaster extends ModbusMaster {
         initialized = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     synchronized public void destroy() {
         closeConnection();
         initialized = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     synchronized public ModbusResponse sendImpl(ModbusRequest request) throws ModbusTransportException {
         try {

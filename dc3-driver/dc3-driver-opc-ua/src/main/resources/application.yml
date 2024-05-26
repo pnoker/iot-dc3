@@ -1,5 +1,5 @@
 #
-# Copyright 2016-present the original author or authors.
+# Copyright 2016-present the IoT DC3 original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@ driver:
   tenant: default
   name: OpcUa驱动
   code: OpcUaDriver
-  type: DRIVER
+  type: DRIVER_CLIENT
   remark: @project.description@
   schedule:
     # 定时读数据
     read:
       enable: true
-      corn: '0/30 * * * * ?'
+      cron: '0/30 * * * * ?'
     custom:
       enable: true
-      corn: '0/5 * * * * ?'
+      cron: '0/5 * * * * ?'
   driver-attribute:
     - display-name: 主机
       attribute-name: host

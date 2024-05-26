@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the original author or authors.
+ * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,18 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.model.Profile;
-import org.apache.ibatis.annotations.Mapper;
+import io.github.pnoker.center.manager.entity.model.ProfileDO;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * Mapper
+ * <p>
+ * 设备模版表 Mapper 接口
+ * </p>
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper
-public interface ProfileMapper extends BaseMapper<Profile> {
+public interface ProfileMapper extends BaseMapper<ProfileDO> {
 
-    Page<Profile> selectPageWithDevice(Page<Profile> page, @Param(Constants.WRAPPER) Wrapper<Profile> queryWrapper, @Param("deviceId") String deviceId);
+    Page<ProfileDO> selectPageWithDevice(Page<ProfileDO> page, @Param(Constants.WRAPPER) Wrapper<ProfileDO> wrapper, @Param("deviceId") Long deviceId);
 }
