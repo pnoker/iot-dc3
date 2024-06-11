@@ -21,12 +21,12 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>2024.3.0</version>
+        <version>2024.3.2</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-center</artifactId>
-    <version>2024.3.0</version>
+    <version>2024.3.2</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2016-2022</inceptionYear>
