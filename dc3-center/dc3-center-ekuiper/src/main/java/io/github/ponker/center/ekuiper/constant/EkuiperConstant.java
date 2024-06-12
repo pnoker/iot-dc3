@@ -27,6 +27,7 @@ public interface EkuiperConstant {
         String HTTPPUSH = "httppush";
         String SQL = "sql";
         String REST = "rest";
+        String WEBSOCKET = "websocket";
     }
 
 }

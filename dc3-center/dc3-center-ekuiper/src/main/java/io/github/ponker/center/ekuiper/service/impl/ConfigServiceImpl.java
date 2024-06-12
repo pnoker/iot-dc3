@@ -3,9 +3,11 @@ package io.github.ponker.center.ekuiper.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.ponker.center.ekuiper.constant.EkuiperConstant;
 import io.github.ponker.center.ekuiper.entity.dto.*;
 import io.github.ponker.center.ekuiper.service.ConfigService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Case;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -85,6 +87,9 @@ public class ConfigServiceImpl implements ConfigService {
                     break;
                 case io.github.ponker.center.ekuiper.constant.EkuiperConstant.ConKeyType.REDIS:
                     handleRedisRequest(request, dataJsonNode, dataJsonBody);
+                    break;
+                case io.github.ponker.center.ekuiper.constant.EkuiperConstant.ConKeyType.WEBSOCKET:
+                    handleWebSocketRequest(request, dataJsonNode, dataJsonBody);
                     break;
                 default:
                     throw new IllegalArgumentException("无效的名称");
@@ -197,6 +202,23 @@ public class ConfigServiceImpl implements ConfigService {
             } else {
                 log.info("The data does not contain all fields from redisConfigForm");
                 throw new IllegalArgumentException("The data does not contain all fields from redisConfigForm");
+            }
+
+        } catch (Exception e) {
+            log.info("Failed to serialize object to JSON:");
+            e.printStackTrace();
+        }
+    }
+
+    private void handleWebSocketRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+        try {
+            WebSocketConfigDto webSocketConfigDto = new WebSocketConfigDto();
+            JsonNode webSocketJsonNode = generateJsonNode(webSocketConfigDto);
+            if (containsAllFields(dataJsonNode, webSocketJsonNode)) {
+                request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
+            } else {
+                log.info("The data does not contain all fields from webSocketsConfigForm");
+                throw new IllegalArgumentException("The data does not contain all fields from webSocketConfigForm");
             }
 
         } catch (Exception e) {

@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.github.ponker.center.ekuiper.entity.dto.MqttSinkDto;
-import io.github.ponker.center.ekuiper.entity.dto.RedisSinkDto;
-import io.github.ponker.center.ekuiper.entity.dto.RestSinkDto;
-import io.github.ponker.center.ekuiper.entity.dto.SqlSinkDto;
+import io.github.ponker.center.ekuiper.constant.EkuiperConstant;
+import io.github.ponker.center.ekuiper.entity.dto.*;
 import io.github.ponker.center.ekuiper.service.SinkTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +54,9 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
                     break;
                 case io.github.ponker.center.ekuiper.constant.EkuiperConstant.ConKeyType.REDIS:
                     handleRedisRequest(request, dataJsonNode, dataJsonBody);
+                    break;
+                case EkuiperConstant.ConKeyType.WEBSOCKET:
+                    handleWebSocketRequest(request, dataJsonNode, dataJsonBody);
                     break;
                 default:
                     throw new IllegalArgumentException("无效的名称");
@@ -218,6 +219,23 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
             } else {
                 log.info("The data does not contain all fields from redisConfigForm");
                 throw new IllegalArgumentException("The data does not contain all fields from redisConfigForm");
+            }
+
+        } catch (Exception e) {
+            log.info("Failed to serialize object to JSON:");
+            e.printStackTrace();
+        }
+    }
+
+    private void handleWebSocketRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+        try {
+            WebSocketSinkDto webSocketSinkDto = new WebSocketSinkDto();
+            JsonNode webSocketJsonNode = generateJsonNode(webSocketSinkDto);
+            if (containsAllFields(dataJsonNode, webSocketJsonNode)) {
+                request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
+            } else {
+                log.info("The data does not contain all fields from  webSocketSinkForm");
+                throw new IllegalArgumentException("The data does not contain all fields from webSocketSinkForm");
             }
 
         } catch (Exception e) {

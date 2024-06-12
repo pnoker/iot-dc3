@@ -26,5 +26,4 @@ public class EkuiperConfig {
         return new SqlConfigDto();
     }
 
-
 }

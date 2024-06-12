@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.ponker.center.ekuiper.entity.dto.MqttSinkDto;
-import io.github.ponker.center.ekuiper.entity.dto.RedisSinkDto;
-import io.github.ponker.center.ekuiper.entity.dto.RestSinkDto;
-import io.github.ponker.center.ekuiper.entity.dto.SqlSinkDto;
+import io.github.ponker.center.ekuiper.entity.dto.*;
 import io.github.ponker.center.ekuiper.entity.vo.DetailRuleVO;
 import io.github.ponker.center.ekuiper.entity.vo.RuleDataVO;
 import io.github.ponker.center.ekuiper.entity.vo.RuleStatusVO;
@@ -403,6 +400,8 @@ public class RuleServiceImpl implements RuleService {
                 return containsAllFields(generateJsonNode(new RestSinkDto()), actionNode);
             case "sql":
                 return containsAllFields(generateJsonNode(new SqlSinkDto()), actionNode);
+            case "websocket":
+                return containsAllFields(generateJsonNode(new WebSocketSinkDto()), actionNode);
             default:
                 return false;
         }
