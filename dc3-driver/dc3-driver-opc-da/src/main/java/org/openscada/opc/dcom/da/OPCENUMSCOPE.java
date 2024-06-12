@@ -31,10 +31,6 @@ public enum OPCENUMSCOPE {
         this._id = id;
     }
 
-    public int id() {
-        return this._id;
-    }
-
     public static OPCENUMSCOPE fromID(final int id) {
         switch (id) {
             case 1:
@@ -52,5 +48,9 @@ public enum OPCENUMSCOPE {
             default:
                 return OPC_ENUM_UNKNOWN;
         }
+    }
+
+    public int id() {
+        return this._id;
     }
 }

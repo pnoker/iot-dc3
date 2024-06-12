@@ -17,9 +17,8 @@
 package io.github.pnoker.driver.controller;
 
 import io.github.pnoker.driver.server.Lwm2mServer;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 
 /**
  * 提供部分测试接口,方便驱动测试

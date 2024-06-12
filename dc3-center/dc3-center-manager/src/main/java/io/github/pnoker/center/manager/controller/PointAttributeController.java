@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeBuilder;
@@ -30,16 +29,15 @@ import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 驱动属性配置信息 Controller
@@ -49,15 +47,16 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-位号属性")
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_URL_PREFIX)
 public class PointAttributeController implements BaseController {
 
-    @Resource
-    private PointAttributeBuilder pointAttributeBuilder;
+    private final PointAttributeBuilder pointAttributeBuilder;
+    private final PointAttributeService pointAttributeService;
 
-    @Resource
-    private PointAttributeService pointAttributeService;
+    public PointAttributeController(PointAttributeBuilder pointAttributeBuilder, PointAttributeService pointAttributeService) {
+        this.pointAttributeBuilder = pointAttributeBuilder;
+        this.pointAttributeService = pointAttributeService;
+    }
 
     /**
      * 新增 PointAttribute
@@ -66,16 +65,15 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    @Operation(summary = "新增-位号属性")
-    public R<PointAttributeBO> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
+    public Mono<R<PointAttributeBO>> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
         try {
             PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             pointAttributeService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -86,13 +84,13 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             pointAttributeService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -103,14 +101,14 @@ public class PointAttributeController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
         try {
             PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
             pointAttributeService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -121,14 +119,14 @@ public class PointAttributeController implements BaseController {
      * @return PointAttributeVO {@link PointAttributeVO}
      */
     @GetMapping("/id/{id}")
-    public R<PointAttributeVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<PointAttributeVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             PointAttributeBO entityBO = pointAttributeService.selectById(id);
             PointAttributeVO entityVO = pointAttributeBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -136,19 +134,19 @@ public class PointAttributeController implements BaseController {
      * 根据 驱动ID 查询 PointAttribute
      *
      * @param id 位号属性ID
-     * @return PointAttribute Array
+     * @return 位号属性Array
      */
     @GetMapping("/driver_id/{id}")
-    public R<List<PointAttributeVO>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<List<PointAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
         try {
-            List<PointAttributeBO> entityBOS = pointAttributeService.selectByDriverId(id, true);
-            List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOS);
-            return R.ok(entityVO);
+            List<PointAttributeBO> entityBOList = pointAttributeService.selectByDriverId(id);
+            List<PointAttributeVO> entityVO = pointAttributeBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVO));
         } catch (NotFoundException ne) {
-            return R.ok(new ArrayList<>());
+            return Mono.just(R.ok(Collections.emptyList()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -159,18 +157,18 @@ public class PointAttributeController implements BaseController {
      * @return Page Of PointAttribute
      */
     @PostMapping("/list")
-    public R<Page<PointAttributeVO>> list(@RequestBody(required = false) PointAttributeQuery entityQuery) {
+    public Mono<R<Page<PointAttributeVO>>> list(@RequestBody(required = false) PointAttributeQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointAttributeQuery();
             }
             entityQuery.setTenantId(getTenantId());
             Page<PointAttributeBO> entityPageBO = pointAttributeService.selectByPage(entityQuery);
             Page<PointAttributeVO> entityPageVO = pointAttributeBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

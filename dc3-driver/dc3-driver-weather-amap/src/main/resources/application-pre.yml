@@ -14,12 +14,12 @@
 # limitations under the License.
 #
 
-# Pre-release environment, customizable configuration
+# 预发布环境配置, 会覆盖 application-*.yml 中配置的内容
 driver:
   schedule:
     # 定时读数据
     read:
-      corn: '0 0/15 * * * ?'
+      cron: '0 0/15 * * * ?'
 
 spring:
   rabbitmq:

@@ -16,24 +16,24 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.*;
 import io.github.pnoker.center.manager.entity.model.PointDO;
 import io.github.pnoker.center.manager.entity.vo.*;
-import io.github.pnoker.common.entity.dto.PointDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeFlagEnum;
 import io.github.pnoker.common.enums.RwFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -42,7 +42,7 @@ import java.util.Optional;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface PointBuilder {
 
     /**
@@ -80,7 +80,7 @@ public interface PointBuilder {
         // Json Ext
         PointExt entityExt = entityBO.getPointExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -125,7 +125,7 @@ public interface PointBuilder {
     default void afterProcess(PointDO entityDO, @MappingTarget PointBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getPointExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             PointExt ext = new PointExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
@@ -172,22 +172,6 @@ public interface PointBuilder {
     List<PointVO> buildVOListByBOList(List<PointBO> entityBOList);
 
     /**
-     * BO to DTO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDTO
-     */
-    PointDTO buildDTOByBO(PointBO entityBO);
-
-    /**
-     * BOList to DTOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDTO Array
-     */
-    List<PointDTO> buildDTOListByBOList(List<PointBO> entityBOList);
-
-    /**
      * DOPage to BOPage
      *
      * @param entityPageDO EntityDO Page
@@ -221,5 +205,5 @@ public interface PointBuilder {
 
     List<DeviceDataVolumeRunVO> buildVODeviceDataByBO(List<DeviceDataVolumeRunBO> list);
 
-    PointDataStatisticsByDriverIdVO buildVOPointDataDriverByBO(PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOS);
+    PointDataStatisticsByDriverIdVO buildVOPointDataDriverByBO(PointDataStatisticsByDriverIdBO pointDataStatisticsByDriverIdBOList);
 }

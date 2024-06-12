@@ -38,14 +38,13 @@ import java.util.Map;
  */
 public class BasicProcessImage implements ProcessImage {
     private final int slaveId;
-    private boolean allowInvalidAddress = false;
-    private short invalidAddressValue = 0;
-
     private final Map<Integer, Boolean> coils = new HashMap<>();
     private final Map<Integer, Boolean> inputs = new HashMap<>();
     private final Map<Integer, Short> holdingRegisters = new HashMap<>();
     private final Map<Integer, Short> inputRegisters = new HashMap<>();
     private final List<ProcessImageListener> writeListeners = new ArrayList<>();
+    private boolean allowInvalidAddress = false;
+    private short invalidAddressValue = 0;
     private byte exceptionStatus;
 
     /**
@@ -124,18 +123,6 @@ public class BasicProcessImage implements ProcessImage {
     //
 
     /**
-     * <p>Setter for the field <code>exceptionStatus</code>.</p>
-     *
-     * @param exceptionStatus a byte.
-     */
-    public void setExceptionStatus(byte exceptionStatus) {
-        this.exceptionStatus = exceptionStatus;
-    }
-
-    //
-    // Binaries
-
-    /**
      * <p>setBinary.</p>
      *
      * @param registerId a int.
@@ -145,6 +132,9 @@ public class BasicProcessImage implements ProcessImage {
         RangeAndOffset rao = new RangeAndOffset(registerId);
         setBinary(rao.getRange(), rao.getOffset(), value);
     }
+
+    //
+    // Binaries
 
     /**
      * <p>setBinary.</p>
@@ -162,9 +152,6 @@ public class BasicProcessImage implements ProcessImage {
             throw new ModbusIdException("Invalid range to set binary: " + range);
     }
 
-    //
-    // Numerics
-
     /**
      * <p>setNumeric.</p>
      *
@@ -176,6 +163,9 @@ public class BasicProcessImage implements ProcessImage {
         RangeAndOffset rao = new RangeAndOffset(registerId);
         setNumeric(rao.getRange(), rao.getOffset(), dataType, value);
     }
+
+    //
+    // Numerics
 
     /**
      * <p>setNumeric.</p>
@@ -197,9 +187,6 @@ public class BasicProcessImage implements ProcessImage {
             throw new ModbusIdException("Invalid range to set register: " + range);
     }
 
-    //
-    // Strings
-
     /**
      * <p>setString.</p>
      *
@@ -212,6 +199,9 @@ public class BasicProcessImage implements ProcessImage {
     public synchronized void setString(int range, int offset, int dataType, int registerCount, String s) {
         setString(range, offset, dataType, registerCount, StringLocator.ASCII, s);
     }
+
+    //
+    // Strings
 
     /**
      * <p>setString.</p>
@@ -260,9 +250,6 @@ public class BasicProcessImage implements ProcessImage {
             setInputRegister(offset + i, registers[i]);
     }
 
-    //
-    // Bits
-
     /**
      * <p>setBit.</p>
      *
@@ -279,6 +266,9 @@ public class BasicProcessImage implements ProcessImage {
         else
             throw new ModbusIdException("Invalid range to set register: " + range);
     }
+
+    //
+    // Bits
 
     /**
      * <p>setHoldingRegisterBit.</p>
@@ -430,6 +420,11 @@ public class BasicProcessImage implements ProcessImage {
         return locator.bytesToValueRealOffset(b, 0);
     }
 
+    @Override
+    public synchronized boolean getCoil(int offset) throws IllegalDataAddressException {
+        return getBoolean(offset, coils);
+    }
+
     //
     //
     // ProcessImage interface
@@ -437,11 +432,6 @@ public class BasicProcessImage implements ProcessImage {
 
     //
     // Coils
-
-    @Override
-    public synchronized boolean getCoil(int offset) throws IllegalDataAddressException {
-        return getBoolean(offset, coils);
-    }
 
     @Override
     public synchronized void setCoil(int offset, boolean value) {
@@ -458,13 +448,13 @@ public class BasicProcessImage implements ProcessImage {
             l.coilWrite(offset, old, value);
     }
 
-    //
-    // Inputs
-
     @Override
     public synchronized boolean getInput(int offset) throws IllegalDataAddressException {
         return getBoolean(offset, inputs);
     }
+
+    //
+    // Inputs
 
     @Override
     public synchronized void setInput(int offset, boolean value) {
@@ -472,13 +462,13 @@ public class BasicProcessImage implements ProcessImage {
         inputs.put(offset, value);
     }
 
-    //
-    // Holding registers
-
     @Override
     public synchronized short getHoldingRegister(int offset) throws IllegalDataAddressException {
         return getShort(offset, holdingRegisters);
     }
+
+    //
+    // Holding registers
 
     @Override
     public synchronized void setHoldingRegister(int offset, short value) {
@@ -495,13 +485,13 @@ public class BasicProcessImage implements ProcessImage {
             l.holdingRegisterWrite(offset, old, value);
     }
 
-    //
-    // Input registers
-
     @Override
     public synchronized short getInputRegister(int offset) throws IllegalDataAddressException {
         return getShort(offset, inputRegisters);
     }
+
+    //
+    // Input registers
 
     @Override
     public synchronized void setInputRegister(int offset, short value) {
@@ -509,12 +499,21 @@ public class BasicProcessImage implements ProcessImage {
         inputRegisters.put(offset, value);
     }
 
-    //
-    // Exception status
-
     @Override
     public byte getExceptionStatus() {
         return exceptionStatus;
+    }
+
+    //
+    // Exception status
+
+    /**
+     * <p>Setter for the field <code>exceptionStatus</code>.</p>
+     *
+     * @param exceptionStatus a byte.
+     */
+    public void setExceptionStatus(byte exceptionStatus) {
+        this.exceptionStatus = exceptionStatus;
     }
 
     //

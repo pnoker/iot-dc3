@@ -19,22 +19,35 @@
 set -e
 
 cd ../../
+git fetch --all
+git reset --hard origin/pre_main
 git pull
 
 cd dc3-api
+git fetch --all
+git reset --hard origin/pre_main
 git pull
 
 cd ../dc3-common
+git fetch --all
+git reset --hard origin/pre_main
 git pull
 
 cd ../
-docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3:2024.1.1.dev .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3:2024.3.0.dev .
 
 cd dc3/docker
-docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2024.1.1.dev -f Dockerfile.gateway .
-docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2024.1.1.dev -f Dockerfile.auth .
-docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2024.1.1.dev -f Dockerfile.data .
-docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2024.1.1.dev -f Dockerfile.manager .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2024.3.0.dev -f Dockerfile.gateway .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2024.3.0.dev -f Dockerfile.auth .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2024.3.0.dev -f Dockerfile.data .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2024.3.0.dev -f Dockerfile.manager .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-center-ekuiper:2024.3.0.dev -f Dockerfile.ekuiper .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2024.3.0.dev -f Dockerfile.virtual .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2024.3.0.dev -f Dockerfile.modbus-tcp .
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2024.3.0.dev -f Dockerfile.mqtt .
 
 cd ../
-docker-compose -f docker-compose-test.yml up -d auth manager data gateway virtual
+docker-compose -f docker-compose-test.yml up -d auth manager data gateway ekuiper
+echo 'Waiting for 30 second'
+sleep 30s
+docker-compose -f docker-compose-test.yml up -d virtual modbus-tcp mqtt

@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.biz.EventService;
 import io.github.pnoker.center.data.entity.DeviceEvent;
@@ -24,14 +23,14 @@ import io.github.pnoker.center.data.entity.query.DeviceEventQuery;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * 设备事件 Controller
@@ -41,12 +40,14 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-设备事件")
 @RequestMapping(DataConstant.DEVICE_EVENT_URL_PREFIX)
 public class DeviceEventController implements BaseController {
 
-    @Resource
-    private EventService eventService;
+    private final EventService eventService;
+
+    public DeviceEventController(EventService eventService) {
+        this.eventService = eventService;
+    }
 
     /**
      * 分页查询 DeviceEvent
@@ -55,20 +56,20 @@ public class DeviceEventController implements BaseController {
      * @return Page Of DeviceEvent
      */
     @PostMapping("/device")
-    public R<Page<DeviceEvent>> deviceEvent(@RequestBody(required = false) DeviceEventQuery deviceEventQuery) {
+    public Mono<R<Page<DeviceEvent>>> deviceEvent(@RequestBody(required = false) DeviceEventQuery deviceEventQuery) {
         try {
-            if (ObjectUtil.isEmpty(deviceEventQuery)) {
+            if (Objects.isNull(deviceEventQuery)) {
                 deviceEventQuery = new DeviceEventQuery();
             }
             Page<DeviceEvent> page = eventService.deviceEvent(deviceEventQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
+            if (Objects.nonNull(page)) {
+                return Mono.just(R.ok(page));
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
+        return Mono.just(R.fail());
     }
 
 }

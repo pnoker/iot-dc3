@@ -16,7 +16,8 @@
 
 # runtime
 FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jre:17 AS runtime
-LABEL dc3.author=pnokers dc3.author.email=pnokers.icloud.com
+LABEL dc3.author pnokers
+LABEL dc3.author.email pnokers.icloud.com
 
 # default env
 ENV PARAMS   ''
@@ -26,14 +27,11 @@ ENV UDP_PORT 6271
 
 # default jvm & gc env
 ENV JAVA_OPS -server \
-             -Xms128m \
+             -Xms256m \
              -Xmx1024m \
              -Djava.security.egd=file:/dev/./urandom \
-             -XX:CompressedClassSpaceSize=128m \
-             -XX:MetaspaceSize=200m \
-             -XX:MaxMetaspaceSize=200m \
-             -XX:+UseParallelGC
-ENV GC_LOG   -Xlog:gc*:file=dc3/logs/driver/listening-virtual/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=20M
+             -XX:+UseG1GC
+ENV GC_LOG   -Xlog:gc*:file=dc3/logs/driver/listening-virtual/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 

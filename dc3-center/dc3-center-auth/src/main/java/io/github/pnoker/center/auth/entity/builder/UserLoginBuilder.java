@@ -21,6 +21,7 @@ import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.entity.model.UserLoginDO;
 import io.github.pnoker.center.auth.entity.vo.UserLoginVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -35,7 +36,7 @@ import java.util.Optional;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface UserLoginBuilder {
 
     /**
@@ -49,8 +50,8 @@ public interface UserLoginBuilder {
     /**
      * VOList to BOList
      *
-     * @param entityVOList EntityVO Array
-     * @return EntityBO Array
+     * @param entityVOList EntityVO 集合
+     * @return EntityBO 集合
      */
     List<UserLoginBO> buildBOListByVOList(List<UserLoginVO> entityVOList);
 
@@ -74,8 +75,8 @@ public interface UserLoginBuilder {
     /**
      * BOList to DOList
      *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO Array
+     * @param entityBOList EntityBO 集合
+     * @return EntityDO 集合
      */
     List<UserLoginDO> buildDOListByBOList(List<UserLoginBO> entityBOList);
 
@@ -98,8 +99,8 @@ public interface UserLoginBuilder {
     /**
      * DOList to BOList
      *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
+     * @param entityDOList EntityDO 集合
+     * @return EntityBO 集合
      */
     List<UserLoginBO> buildBOListByDOList(List<UserLoginDO> entityDOList);
 
@@ -114,7 +115,7 @@ public interface UserLoginBuilder {
     /**
      * BOList to VOList
      *
-     * @param entityBOList EntityBO Array
+     * @param entityBOList EntityBO 集合
      * @return EntityVO Array
      */
     List<UserLoginVO> buildVOListByBOList(List<UserLoginBO> entityBOList);

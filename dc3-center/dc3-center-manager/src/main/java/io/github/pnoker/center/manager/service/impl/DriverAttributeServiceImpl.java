@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -31,12 +30,14 @@ import io.github.pnoker.center.manager.service.DriverAttributeService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * DriverAttributeService Impl
@@ -56,11 +57,13 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     @Override
     public void save(DriverAttributeBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create driver attribute: driver attribute has been duplicated");
+        }
 
         DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(entityBO);
         if (!driverAttributeManager.save(entityDO)) {
-            throw new AddException("驱动属性创建失败");
+            throw new AddException("Failed to create driver attribute");
         }
     }
 
@@ -69,7 +72,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         getDOById(id, true);
 
         if (!driverAttributeManager.removeById(id)) {
-            throw new DeleteException("驱动属性删除失败");
+            throw new DeleteException("Failed to remove driver attribute");
         }
     }
 
@@ -77,12 +80,14 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     public void update(DriverAttributeBO entityBO) {
         getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("Failed to update driver attribute: driver attribute has been duplicated");
+        }
 
         DriverAttributeDO entityDO = driverAttributeBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!driverAttributeManager.updateById(entityDO)) {
-            throw new UpdateException("驱动属性更新失败");
+            throw new UpdateException("Failed to update driver attribute");
         }
     }
 
@@ -112,19 +117,25 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
 
     @Override
     public Page<DriverAttributeBO> selectByPage(DriverAttributeQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<DriverAttributeDO> entityPageDO = driverAttributeManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
         return driverAttributeBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link DriverAttributeQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<DriverAttributeDO> fuzzyQuery(DriverAttributeQuery entityQuery) {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), DriverAttributeDO::getDisplayName, entityQuery.getDisplayName());
-        wrapper.eq(ObjectUtil.isNotNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
+        wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
         wrapper.eq(DriverAttributeDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -132,26 +143,21 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
     /**
      * 重复性校验
      *
-     * @param entityBO       {@link DriverAttributeBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
+     * @param entityBO {@link DriverAttributeBO}
+     * @param isUpdate 是否为更新操作
      * @return 是否重复
      */
-    private boolean checkDuplicate(DriverAttributeBO entityBO, boolean isUpdate, boolean throwException) {
+    private boolean checkDuplicate(DriverAttributeBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
         wrapper.eq(DriverAttributeDO::getAttributeName, entityBO.getAttributeName());
         wrapper.eq(DriverAttributeDO::getDriverId, entityBO.getDriverId());
         wrapper.eq(DriverAttributeDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeDO one = driverAttributeManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("驱动属性重复");
-        }
-        return duplicate;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
     /**
@@ -163,8 +169,8 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      */
     private DriverAttributeDO getDOById(Long id, boolean throwException) {
         DriverAttributeDO entityDO = driverAttributeManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("驱动属性不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Driver attribute does not exist");
         }
         return entityDO;
     }

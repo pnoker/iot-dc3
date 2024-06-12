@@ -22,6 +22,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_alarm_notify_profile")
 public class AlarmNotifyProfileDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -65,7 +67,7 @@ public class AlarmNotifyProfileDO implements Serializable {
     private Byte autoConfirmFlag;
 
     /**
-     * 报警通知间隔，毫秒
+     * 报警通知间隔, 毫秒
      */
     @TableField("alarm_notify_interval")
     private Long alarmNotifyInterval;
@@ -131,7 +133,7 @@ public class AlarmNotifyProfileDO implements Serializable {
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识,0:未删除,1:已删除
+     * 逻辑删除标识, 0:未删除, 1:已删除
      */
     @TableLogic
     @TableField("deleted")

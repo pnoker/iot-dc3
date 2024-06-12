@@ -29,6 +29,15 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 5.0.0
  */
 public class RtuMessageRequest extends RtuMessage implements OutgoingRequestMessage, IncomingRequestMessage {
+    /**
+     * <p>Constructor for RtuMessageRequest.</p>
+     *
+     * @param modbusRequest a {@link ModbusRequest} object.
+     */
+    public RtuMessageRequest(ModbusRequest modbusRequest) {
+        super(modbusRequest);
+    }
+
     static RtuMessageRequest createRtuMessageRequest(ByteQueue queue) throws ModbusTransportException {
         ModbusRequest request = ModbusRequest.createModbusRequest(queue);
         RtuMessageRequest rtuRequest = new RtuMessageRequest(request);
@@ -38,15 +47,6 @@ public class RtuMessageRequest extends RtuMessage implements OutgoingRequestMess
 
         // Return the data.
         return rtuRequest;
-    }
-
-    /**
-     * <p>Constructor for RtuMessageRequest.</p>
-     *
-     * @param modbusRequest a {@link ModbusRequest} object.
-     */
-    public RtuMessageRequest(ModbusRequest modbusRequest) {
-        super(modbusRequest);
     }
 
     @Override

@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.center.auth.biz.TokenService;
 import io.github.pnoker.center.auth.entity.bean.TokenValid;
@@ -41,12 +40,13 @@ import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.KeyUtil;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -76,8 +76,8 @@ public class TokenServiceImpl implements TokenService {
     public String generateSalt(String loginName, String tenantCode) {
         checkUserLimit(loginName, tenantCode);
         TenantBO tenantBO = tenantService.selectByCode(tenantCode);
-        if (ObjectUtil.isNull(tenantBO)) {
-            throw new NotFoundException("租户、用户信息不匹配");
+        if (Objects.isNull(tenantBO)) {
+            throw new NotFoundException("租户, 用户信息不匹配");
         }
         String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
         String salt = redisService.getKey(redisSaltKey);
@@ -92,35 +92,35 @@ public class TokenServiceImpl implements TokenService {
     public String generateToken(String loginName, String salt, String password, String tenantCode) {
         checkUserLimit(loginName, tenantCode);
         TenantBO tenantBO = tenantService.selectByCode(tenantCode);
-        if (ObjectUtil.isNull(tenantBO)) {
+        if (Objects.isNull(tenantBO)) {
             updateUserLimit(loginName, tenantCode);
-            throw new NotFoundException("租户、用户信息不匹配");
+            throw new NotFoundException("租户, 用户信息不匹配");
         }
         UserLoginBO userLogin = userLoginService.selectByLoginName(loginName, false);
-        if (ObjectUtil.isNull(userLogin)) {
+        if (Objects.isNull(userLogin)) {
             updateUserLimit(loginName, tenantCode);
-            throw new NotFoundException("租户、用户信息不匹配");
+            throw new NotFoundException("租户, 用户信息不匹配");
         }
         TenantBindBO tenantBindBO = tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
-        if (ObjectUtil.isNull(tenantBindBO)) {
+        if (Objects.isNull(tenantBindBO)) {
             updateUserLimit(loginName, tenantCode);
-            throw new NotFoundException("租户、用户信息不匹配");
+            throw new NotFoundException("租户, 用户信息不匹配");
         }
         UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
-        if (ObjectUtil.isNull(userPasswordBO)) {
+        if (Objects.isNull(userPasswordBO)) {
             updateUserLimit(loginName, tenantCode);
-            throw new NotFoundException("租户、用户信息不匹配");
+            throw new NotFoundException("租户, 用户信息不匹配");
         }
         String redisSaltKey = PrefixConstant.USER + SuffixConstant.SALT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
         String redisSaltValue = redisService.getKey(redisSaltKey);
         if (CharSequenceUtil.isEmpty(redisSaltValue)) {
             updateUserLimit(loginName, tenantCode);
-            throw new NotFoundException("租户、用户信息不匹配");
+            throw new NotFoundException("租户, 用户信息不匹配");
         }
         String md5Password = DecodeUtil.md5(userPasswordBO.getLoginPassword(), redisSaltValue);
         if (!redisSaltValue.equals(salt) || !md5Password.equals(password)) {
             updateUserLimit(loginName, tenantCode);
-            throw new ServiceException("租户、用户信息不匹配");
+            throw new ServiceException("租户, 用户信息不匹配");
         }
         String redisTokenKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
         String token = KeyUtil.generateToken(loginName, redisSaltValue, tenantBO.getId());
@@ -131,8 +131,8 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public TokenValid checkValid(String loginName, String salt, String token, String tenantCode) {
         TenantBO tenantBO = tenantService.selectByCode(tenantCode);
-        if (ObjectUtil.isNull(tenantBO)) {
-            throw new NotFoundException("租户、用户信息不匹配");
+        if (Objects.isNull(tenantBO)) {
+            throw new NotFoundException("租户, 用户信息不匹配");
         }
         String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
         String redisToken = redisService.getKey(redisKey);
@@ -150,8 +150,8 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Boolean cancelToken(String loginName, String tenantCode) {
         TenantBO tenantBO = tenantService.selectByCode(tenantCode);
-        if (ObjectUtil.isNull(tenantBO)) {
-            throw new NotFoundException("租户、用户信息不匹配");
+        if (Objects.isNull(tenantBO)) {
+            throw new NotFoundException("租户, 用户信息不匹配");
         }
         String redisKey = PrefixConstant.USER + SuffixConstant.TOKEN + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantBO.getId();
         redisService.deleteKey(redisKey);
@@ -159,7 +159,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     /**
-     * 检测用户登录限制，返回该用户是否受限
+     * 检测用户登录限制, 返回该用户是否受限
      *
      * @param loginName  登录名称
      * @param tenantCode 租户编号
@@ -168,7 +168,7 @@ public class TokenServiceImpl implements TokenService {
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantCode;
         Object key = redisService.getKey(redisKey);
         UserLimit limit = redisService.getKey(redisKey);
-        if (ObjectUtil.isNull(limit) || limit.getTimes() < 5) {
+        if (Objects.isNull(limit) || limit.getTimes() < 5) {
             return;
         }
         boolean isAfter = limit.getExpireTime().isAfter(LocalDateTime.now());

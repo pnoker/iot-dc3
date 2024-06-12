@@ -32,6 +32,30 @@ public class OPCITEMSTATE {
 
     private JIVariant _value = null;
 
+    public static JIStruct getStruct() throws JIException {
+        JIStruct struct = new JIStruct();
+
+        struct.addMember(Integer.class);
+        struct.addMember(FILETIME.getStruct());
+        struct.addMember(Short.class);
+        struct.addMember(Short.class);
+        struct.addMember(JIVariant.class);
+
+        return struct;
+    }
+
+    public static OPCITEMSTATE fromStruct(final JIStruct struct) {
+        OPCITEMSTATE itemState = new OPCITEMSTATE();
+
+        itemState.setClientHandle((Integer) struct.getMember(0));
+        itemState.setTimestamp(FILETIME.fromStruct((JIStruct) struct.getMember(1)));
+        itemState.setQuality((Short) struct.getMember(2));
+        itemState.setReserved((Short) struct.getMember(3));
+        itemState.setValue((JIVariant) struct.getMember(4));
+
+        return itemState;
+    }
+
     public int getClientHandle() {
         return this._clientHandle;
     }
@@ -70,29 +94,5 @@ public class OPCITEMSTATE {
 
     public void setValue(final JIVariant value) {
         this._value = value;
-    }
-
-    public static JIStruct getStruct() throws JIException {
-        JIStruct struct = new JIStruct();
-
-        struct.addMember(Integer.class);
-        struct.addMember(FILETIME.getStruct());
-        struct.addMember(Short.class);
-        struct.addMember(Short.class);
-        struct.addMember(JIVariant.class);
-
-        return struct;
-    }
-
-    public static OPCITEMSTATE fromStruct(final JIStruct struct) {
-        OPCITEMSTATE itemState = new OPCITEMSTATE();
-
-        itemState.setClientHandle((Integer) struct.getMember(0));
-        itemState.setTimestamp(FILETIME.fromStruct((JIStruct) struct.getMember(1)));
-        itemState.setQuality((Short) struct.getMember(2));
-        itemState.setReserved((Short) struct.getMember(3));
-        itemState.setValue((JIVariant) struct.getMember(4));
-
-        return itemState;
     }
 }

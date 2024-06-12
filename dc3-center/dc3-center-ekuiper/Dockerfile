@@ -15,33 +15,24 @@
 #
 
 # runtime
-FROM registry.cn-beijing.aliyuncs.com/dc3/alpine-java:dragonwell-8.13.14 AS runtime
-MAINTAINER pnoker <pnokers.icloud.com>
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jre:17 AS runtime
+LABEL dc3.author pnokers
+LABEL dc3.author.email pnokers.icloud.com
 
 # default env
 ENV PARAMS        ''
+ENV NODE_ENV      dev
 ENV SERVER_PORT   8600
 ENV GRPC_PORT     9600
 
 
 # default jvm & gc env
 ENV JAVA_OPS -server \
-             -Xms128m \
+             -Xms256m \
              -Xmx1024m \
              -Djava.security.egd=file:/dev/./urandom \
-             -XX:CompressedClassSpaceSize=128m \
-             -XX:MetaspaceSize=200m \
-             -XX:MaxMetaspaceSize=200m
-ENV GC_LOG   -XX:+PrintGCDetails \
-             -XX:+PrintGCDateStamps \
-             -XX:+PrintTenuringDistribution \
-             -XX:+PrintHeapAtGC \
-             -XX:+PrintReferenceGC \
-             -XX:+PrintGCApplicationStoppedTime \
-             -XX:+UseGCLogFileRotation \
-             -XX:NumberOfGCLogFiles=10 \
-             -XX:GCLogFileSize=10M \
-             -Xloggc:dc3/logs/center/ekuiper/gc/gc.log
+             -XX:+UseG1GC
+ENV GC_LOG   -Xlog:gc*:file=dc3/logs/center/ekuiper/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 

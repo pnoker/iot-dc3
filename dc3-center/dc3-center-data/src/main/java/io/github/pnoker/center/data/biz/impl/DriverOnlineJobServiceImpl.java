@@ -16,9 +16,13 @@
 
 package io.github.pnoker.center.data.biz.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.manager.*;
+import io.github.pnoker.api.center.manager.DriverApiGrpc;
+import io.github.pnoker.api.center.manager.GrpcPageDriverDTO;
+import io.github.pnoker.api.center.manager.GrpcPageDriverQuery;
+import io.github.pnoker.api.center.manager.GrpcRPageDriverDTO;
+import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.DriverOnlineJobService;
 import io.github.pnoker.center.data.dal.DriverStatusHistoryManager;
@@ -30,13 +34,14 @@ import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.redis.service.RedisService;
+import jakarta.annotation.Resource;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
@@ -70,36 +75,28 @@ public class DriverOnlineJobServiceImpl implements DriverOnlineJobService {
         if (CharSequenceUtil.isNotEmpty(driverQuery.getServiceHost())) {
             query.setServiceHost(driverQuery.getServiceHost());
         }
-        if (ObjectUtil.isNotNull(driverQuery.getDriverTypeFlag())) {
-            query.setDriverTypeFlag(driverQuery.getDriverTypeFlag().getIndex());
-        } else {
-            query.setDriverTypeFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotNull(driverQuery.getEnableFlag())) {
-            query.setEnableFlag(driverQuery.getEnableFlag().getIndex());
-        } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotEmpty(driverQuery.getTenantId())) {
+        if (Objects.nonNull(driverQuery.getTenantId())) {
             query.setTenantId(driverQuery.getTenantId());
         }
-        GrpcRPageDriverDTO list = driverApiBlockingStub.list(query.build());
+        Optional.ofNullable(driverQuery.getDriverTypeFlag()).ifPresentOrElse(value -> query.setDriverTypeFlag(value.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(driverQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPageDriverDTO list = driverApiBlockingStub.selectByPage(query.build());
         GrpcPageDriverDTO data = list.getData();
         List<GrpcDriverDTO> dataList = data.getDataList();
-        if (ObjectUtils.isNotEmpty(dataList)) {
-            List<DriverStatusHistoryDO> driverStatusHistoryDOS = new ArrayList<>();
+        if (CollUtil.isNotEmpty(dataList)) {
+            List<DriverStatusHistoryDO> driverStatusHistoryDOList = new ArrayList<>();
             dataList.forEach(driverDO -> {
                 String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverDO.getBase().getId();
                 String status = redisService.getKey(key);
-                status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
+                status = Objects.nonNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
                 DriverStatusHistoryDO driverStatusHistoryDO = new DriverStatusHistoryDO();
                 driverStatusHistoryDO.setDriverId(driverDO.getBase().getId());
                 driverStatusHistoryDO.setDriverName(driverDO.getDriverName());
                 driverStatusHistoryDO.setStatus(status);
-                driverStatusHistoryDOS.add(driverStatusHistoryDO);
+                driverStatusHistoryDOList.add(driverStatusHistoryDO);
             });
-            if (driverStatusHistoryDOS != null && driverStatusHistoryDOS.size() > 0) {
-                driverStatusHistoryService.saveBatch(driverStatusHistoryDOS);
+            if (driverStatusHistoryDOList != null && driverStatusHistoryDOList.size() > 0) {
+                driverStatusHistoryService.saveBatch(driverStatusHistoryDOList);
             }
         }
     }

@@ -19,13 +19,12 @@ package io.github.pnoker.center.data.biz.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
-import io.github.pnoker.api.center.manager.GrpcPointDTO;
 import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.common.GrpcPage;
+import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
@@ -36,17 +35,14 @@ import io.github.pnoker.common.exception.RepositoryException;
 import io.github.pnoker.common.redis.service.RedisRepositoryService;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
+import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -69,7 +65,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public void save(PointValueBO pointValueBO) {
-        if (ObjectUtil.isNull(pointValueBO)) {
+        if (Objects.isNull(pointValueBO)) {
             return;
         }
 
@@ -78,12 +74,12 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public void save(List<PointValueBO> pointValueBOS) {
-        if (CollUtil.isEmpty(pointValueBOS)) {
+    public void save(List<PointValueBO> pointValueBOList) {
+        if (CollUtil.isEmpty(pointValueBOList)) {
             return;
         }
 
-        final Map<Long, List<PointValueBO>> group = pointValueBOS.stream()
+        final Map<Long, List<PointValueBO>> group = pointValueBOList.stream()
                 .map(pointValue -> {
                     pointValue.setCreateTime(LocalDateTime.now());
                     return pointValue;
@@ -95,7 +91,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public List<String> history(Long deviceId, Long pointId, int count) {
-        if (!ObjectUtil.isAllNotEmpty(deviceId, pointId)) {
+        if (Objects.isNull(deviceId) || Objects.isNull(pointId)) {
             return Collections.emptyList();
         }
         if (count < 1) {
@@ -111,7 +107,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public Page<PointValueBO> latest(PointValueQuery entityQuery) {
-        if (ObjectUtil.isEmpty(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 
@@ -121,40 +117,38 @@ public class PointValueServiceImpl implements PointValueService {
         GrpcPage.Builder entityPageGrpcDTO = GrpcPage.newBuilder()
                 .setSize(entityQuery.getPage().getSize())
                 .setCurrent(entityQuery.getPage().getCurrent());
-        GrpcPagePointQuery.Builder entityQueryGrpcDTO = GrpcPagePointQuery.newBuilder()
+        GrpcPagePointQuery.Builder query = GrpcPagePointQuery.newBuilder()
                 .setPage(entityPageGrpcDTO);
         if (CharSequenceUtil.isNotEmpty(entityQuery.getPointName())) {
-            entityQueryGrpcDTO.setPointName(entityQuery.getPointName());
+            query.setPointName(entityQuery.getPointName());
         }
-        entityQueryGrpcDTO.setPointTypeFlag(DefaultConstant.DEFAULT_INT);
-        entityQueryGrpcDTO.setRwFlag(DefaultConstant.DEFAULT_INT);
-        entityQueryGrpcDTO.setProfileId(DefaultConstant.DEFAULT_INT);
-        if (ObjectUtil.isNotNull(entityQuery.getEnableFlag())) {
-            entityQueryGrpcDTO.setEnableFlag(entityQuery.getEnableFlag().getIndex());
-        } else {
-            entityQueryGrpcDTO.setEnableFlag(DefaultConstant.DEFAULT_INT);
+        query.setPointTypeFlag(DefaultConstant.NULL_INT);
+        query.setRwFlag(DefaultConstant.NULL_INT);
+        query.setProfileId(DefaultConstant.NULL_INT);
+        query.setTenantId(entityQuery.getTenantId());
+        if (Objects.nonNull(entityQuery.getDeviceId())) {
+            query.setDeviceId(entityQuery.getDeviceId());
         }
-        entityQueryGrpcDTO.setTenantId(entityQuery.getTenantId());
-        if (ObjectUtil.isNotEmpty(entityQuery.getDeviceId())) {
-            entityQueryGrpcDTO.setDeviceId(entityQuery.getDeviceId());
-        }
-        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.list(entityQueryGrpcDTO.build());
+        Optional.ofNullable(entityQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.selectByPage(query.build());
         if (!rPagePointDTO.getResult().getOk()) {
             return entityPageBO;
         }
 
         List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
-        List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).collect(Collectors.toList());
+        List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).toList();
 
-        List<PointValueBO> pointValueBOS = redisRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
-        if (CollUtil.isEmpty(pointValueBOS)) {
-            RepositoryService repositoryService = getFirstRepositoryService();
-            pointValueBOS = repositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
-        }
+        Map<Long, PointValueBO> pointValueBOMap = redisRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
+        RepositoryService repositoryService = getFirstRepositoryService();
+        List<PointValueBO> pointValueBOList = pointIds.stream().map(id -> {
+            PointValueBO value = pointValueBOMap.get(id);
+            return Objects.isNull(value) ? repositoryService.selectLatestPointValue(entityQuery.getDeviceId(), id) : value;
+        }).filter(Objects::nonNull).toList();
+
         entityPageBO.setCurrent(rPagePointDTO.getData().getPage().getCurrent())
                 .setSize(rPagePointDTO.getData().getPage().getSize())
                 .setTotal(rPagePointDTO.getData().getPage().getTotal())
-                .setRecords(pointValueBOS);
+                .setRecords(pointValueBOList);
 
         return entityPageBO;
     }
@@ -162,7 +156,7 @@ public class PointValueServiceImpl implements PointValueService {
     @Override
     @SneakyThrows
     public Page<PointValueBO> page(PointValueQuery entityQuery) {
-        if (ObjectUtil.isEmpty(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 
@@ -191,18 +185,18 @@ public class PointValueServiceImpl implements PointValueService {
     /**
      * 保存 PointValues 到指定存储服务
      *
-     * @param deviceId      设备ID
-     * @param pointValueBOS PointValue Array
+     * @param deviceId                   设备ID
+     * @param pointValueBOListPointValue Array
      */
-    private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOS) {
+    private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOList) {
         try {
             // redis repository
-            redisRepositoryService.savePointValue(deviceId, pointValueBOS);
+            redisRepositoryService.savePointValue(deviceId, pointValueBOList);
 
             // other repository
             RepositoryService repositoryService = getFirstRepositoryService();
-            List<List<PointValueBO>> splitPointValueBOS = ListUtil.split(pointValueBOS, 100);
-            for (List<PointValueBO> splitPointValueBO : splitPointValueBOS) {
+            List<List<PointValueBO>> splitPointValueBOList = ListUtil.split(pointValueBOList, 100);
+            for (List<PointValueBO> splitPointValueBO : splitPointValueBOList) {
                 repositoryService.savePointValue(deviceId, splitPointValueBO);
             }
         } catch (Exception e) {

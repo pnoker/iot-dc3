@@ -20,12 +20,13 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * <p>
- * 模板-设备关联表
+ * 模版-设备关联表
  * </p>
  *
  * @author pnoker
@@ -36,6 +37,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_profile_bind")
 public class ProfileBindDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -105,7 +107,7 @@ public class ProfileBindDO implements Serializable {
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识,0:未删除,1:已删除
+     * 逻辑删除标识, 0:未删除, 1:已删除
      */
     @TableLogic
     @TableField(value = "deleted")

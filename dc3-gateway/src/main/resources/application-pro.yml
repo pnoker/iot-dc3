@@ -14,12 +14,13 @@
 # limitations under the License.
 #
 
-# Product environment, customizable configuration
+# 生产环境配置, 会覆盖 application-*.yml 中配置的内容
 spring:
-  redis:
-    host: ${REDIS_HOST:dc3-redis}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:dc3}
+  data:
+    redis:
+      host: ${REDIS_HOST:dc3-redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:dc3}
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:12H}
@@ -37,68 +38,34 @@ spring:
           uri: lb://dc3-center-auth
           predicates:
             - Path=/api/v3/auth/token/**
-          filters:
-            - StripPrefix=2
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # auth
         - id: auth_route
           uri: lb://dc3-center-auth
           predicates:
             - Path=/api/v3/auth/user/**,/api/v3/auth/limited_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
           filters:
-            - StripPrefix=2
             - Authentic
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # manager
         - id: manager_route
           uri: lb://dc3-center-manager
           predicates:
             - Path=/api/v3/manager/**
           filters:
-            - StripPrefix=2
             - Authentic
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
         # data
         - id: data_route
           uri: lb://dc3-center-data
           predicates:
             - Path=/api/v3/data/**
           filters:
-            - StripPrefix=2
             - Authentic
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: CircuitBreaker
-              args:
-                name: default
-                fallbackUri: 'forward:/fallback'
+        # ekuiper
+        - id: ekuiper_route
+          uri: lb://dc3-center-ekuiper:8600
+          predicates:
+            - Path=/api/v3/ekuiper/**
+          filters:
+            - Authentic
 
 grpc:
   client:

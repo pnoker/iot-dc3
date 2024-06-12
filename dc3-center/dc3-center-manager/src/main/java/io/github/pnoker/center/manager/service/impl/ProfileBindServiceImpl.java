@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -30,14 +29,14 @@ import io.github.pnoker.center.manager.service.ProfileBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 /**
  * ProfileBindService Impl
@@ -57,11 +56,13 @@ public class ProfileBindServiceImpl implements ProfileBindService {
 
     @Override
     public void save(ProfileBindBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create profile bind: profile bind has been duplicated");
+        }
 
         ProfileBindDO entityDO = profileBindBuilder.buildDOByBO(entityBO);
         if (!profileBindManager.save(entityDO)) {
-            throw new AddException("模板绑定创建失败");
+            throw new AddException("Failed to create profile bind");
         }
     }
 
@@ -70,7 +71,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         getDOById(id, true);
 
         if (!profileBindManager.removeById(id)) {
-            throw new DeleteException("模板绑定删除失败");
+            throw new DeleteException("Failed to remove profile bind");
         }
     }
 
@@ -93,12 +94,14 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     public void update(ProfileBindBO entityBO) {
         getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("Failed to update profile bind: profile bind has been duplicated");
+        }
 
         ProfileBindDO entityDO = profileBindBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
         if (!profileBindManager.updateById(entityDO)) {
-            throw new UpdateException("模板绑定更新失败");
+            throw new UpdateException("Failed to update profile bind");
         }
     }
 
@@ -119,34 +122,38 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     @Override
-    public Set<Long> selectDeviceIdsByProfileId(Long profileId) {
+    public List<Long> selectDeviceIdsByProfileId(Long profileId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
-                .eq(ProfileBindDO::getProfileId, profileId);
-        List<ProfileBindDO> entityDOS = wrapper.list();
-        return entityDOS.stream().map(ProfileBindDO::getDeviceId).collect(Collectors.toSet());
+                .eq(ProfileBindDO::getProfileId, profileId).select(ProfileBindDO::getDeviceId);
+        return wrapper.list().stream().map(ProfileBindDO::getDeviceId).toList();
     }
 
     @Override
-    public Set<Long> selectProfileIdsByDeviceId(Long deviceId) {
+    public List<Long> selectProfileIdsByDeviceId(Long deviceId) {
         LambdaQueryChainWrapper<ProfileBindDO> wrapper = profileBindManager.lambdaQuery()
-                .eq(ProfileBindDO::getDeviceId, deviceId);
-        List<ProfileBindDO> entityDOS = wrapper.list();
-        return entityDOS.stream().map(ProfileBindDO::getProfileId).collect(Collectors.toSet());
+                .eq(ProfileBindDO::getDeviceId, deviceId).select(ProfileBindDO::getProfileId);
+        return wrapper.list().stream().map(ProfileBindDO::getProfileId).toList();
     }
 
     @Override
     public Page<ProfileBindBO> selectByPage(ProfileBindQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<ProfileBindDO> entityPageDO = profileBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
         return profileBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link ProfileBindQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<ProfileBindDO> fuzzyQuery(ProfileBindQuery entityQuery) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getProfileId()), ProfileBindDO::getProfileId, entityQuery.getProfileId());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDeviceId()), ProfileBindDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), ProfileBindDO::getProfileId, entityQuery.getProfileId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), ProfileBindDO::getDeviceId, entityQuery.getDeviceId());
         wrapper.eq(ProfileBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -154,26 +161,21 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     /**
      * 重复性校验
      *
-     * @param entityBO       {@link ProfileBindBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
+     * @param entityBO {@link ProfileBindBO}
+     * @param isUpdate 是否为更新操作
      * @return 是否重复
      */
-    private boolean checkDuplicate(ProfileBindBO entityBO, boolean isUpdate, boolean throwException) {
+    private boolean checkDuplicate(ProfileBindBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
         wrapper.eq(ProfileBindDO::getDeviceId, entityBO.getDeviceId());
         wrapper.eq(ProfileBindDO::getProfileId, entityBO.getProfileId());
         wrapper.eq(ProfileBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileBindDO one = profileBindManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("模板绑定重复");
-        }
-        return duplicate;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
     /**
@@ -185,8 +187,8 @@ public class ProfileBindServiceImpl implements ProfileBindService {
      */
     private ProfileBindDO getDOById(Long id, boolean throwException) {
         ProfileBindDO entityDO = profileBindManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("模板绑定不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Profile bind does not exist");
         }
         return entityDO;
     }

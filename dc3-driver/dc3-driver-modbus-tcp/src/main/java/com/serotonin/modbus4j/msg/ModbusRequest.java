@@ -31,6 +31,10 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 5.0.0
  */
 abstract public class ModbusRequest extends ModbusMessage {
+    ModbusRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
+
     /**
      * <p>createModbusRequest.</p>
      *
@@ -71,10 +75,6 @@ abstract public class ModbusRequest extends ModbusMessage {
         request.readRequest(queue);
 
         return request;
-    }
-
-    ModbusRequest(int slaveId) throws ModbusTransportException {
-        super(slaveId);
     }
 
     /**

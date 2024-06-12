@@ -40,6 +40,24 @@ public class FILETIME {
         this.low = low;
     }
 
+    public static JIStruct getStruct() throws JIException {
+        final JIStruct struct = new JIStruct();
+
+        struct.addMember(Integer.class);
+        struct.addMember(Integer.class);
+
+        return struct;
+    }
+
+    public static FILETIME fromStruct(final JIStruct struct) {
+        final FILETIME ft = new FILETIME();
+
+        ft.setLow((Integer) struct.getMember(0));
+        ft.setHigh((Integer) struct.getMember(1));
+
+        return ft;
+    }
+
     public int getHigh() {
         return this.high;
     }
@@ -84,24 +102,6 @@ public class FILETIME {
             return false;
         }
         return true;
-    }
-
-    public static JIStruct getStruct() throws JIException {
-        final JIStruct struct = new JIStruct();
-
-        struct.addMember(Integer.class);
-        struct.addMember(Integer.class);
-
-        return struct;
-    }
-
-    public static FILETIME fromStruct(final JIStruct struct) {
-        final FILETIME ft = new FILETIME();
-
-        ft.setLow((Integer) struct.getMember(0));
-        ft.setHigh((Integer) struct.getMember(1));
-
-        return ft;
     }
 
     public Calendar asCalendar() {

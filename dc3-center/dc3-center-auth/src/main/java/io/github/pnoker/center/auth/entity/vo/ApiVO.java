@@ -24,14 +24,12 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * Api VO
@@ -44,20 +42,17 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "Api", description = "接口")
 public class ApiVO extends BaseVO {
 
     /**
      * Api接口类型标识
      */
-    @Schema(description = "Api接口类型标识")
     private ApiTypeFlagEnum apiTypeFlag;
 
     /**
      * Api接口名称
      */
-    @Schema(description = "Api接口名称")
-    @NotBlank(message = "Api name can't be empty",
+    @NotBlank(message = "Api接口名称不能为空",
             groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
             message = "无效接口名称",
@@ -65,20 +60,17 @@ public class ApiVO extends BaseVO {
     private String apiName;
 
     /**
-     * Api接口编号，一般为URL的MD5编码
+     * Api接口编号, 一般为URL的MD5编码
      */
-    @Schema(description = "Api接口编号")
     private String apiCode;
 
     /**
      * Api接口拓展信息
      */
-    @Schema(description = "Api接口拓展信息")
     private ApiExt apiExt;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

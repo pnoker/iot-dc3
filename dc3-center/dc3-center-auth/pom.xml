@@ -14,14 +14,14 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>2024.1.0</version>
+        <version>2024.3.2</version>
     </parent>
 
     <artifactId>dc3-center-auth</artifactId>
@@ -30,12 +30,6 @@
     <description>IOT DC3 平台 授权服务。</description>
 
     <dependencies>
-
-        <!--Spring Security OAuth2-->
-        <!--<dependency>
-            <groupId>org.springframework.security.oauth</groupId>
-            <artifactId>spring-security-oauth2</artifactId>
-        </dependency>-->
 
         <!-- DC3 Api 相关 -->
         <dependency>

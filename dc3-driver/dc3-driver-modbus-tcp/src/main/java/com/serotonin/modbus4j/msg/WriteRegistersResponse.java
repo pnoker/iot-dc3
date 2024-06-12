@@ -30,11 +30,6 @@ public class WriteRegistersResponse extends ModbusResponse {
     private int startOffset;
     private int numberOfRegisters;
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.WRITE_REGISTERS;
-    }
-
     WriteRegistersResponse(int slaveId) throws ModbusTransportException {
         super(slaveId);
     }
@@ -43,6 +38,11 @@ public class WriteRegistersResponse extends ModbusResponse {
         super(slaveId);
         this.startOffset = startOffset;
         this.numberOfRegisters = numberOfRegisters;
+    }
+
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_REGISTERS;
     }
 
     @Override

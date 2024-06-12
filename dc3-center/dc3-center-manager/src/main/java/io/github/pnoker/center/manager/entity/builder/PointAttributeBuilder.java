@@ -16,32 +16,32 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.center.manager.entity.model.PointAttributeDO;
 import io.github.pnoker.center.manager.entity.vo.PointAttributeVO;
-import io.github.pnoker.common.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.PointAttributeExt;
 import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
- * PointAttribute Builder
+ * 位号属性Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface PointAttributeBuilder {
 
     /**
@@ -78,7 +78,7 @@ public interface PointAttributeBuilder {
         // Json Ext
         PointAttributeExt entityExt = entityBO.getAttributeExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -118,7 +118,7 @@ public interface PointAttributeBuilder {
     default void afterProcess(PointAttributeDO entityDO, @MappingTarget PointAttributeBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getAttributeExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             PointAttributeExt ext = new PointAttributeExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
@@ -159,30 +159,6 @@ public interface PointAttributeBuilder {
      * @return EntityVO Array
      */
     List<PointAttributeVO> buildVOListByBOList(List<PointAttributeBO> entityBOList);
-
-    /**
-     * BO to DTO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDTO
-     */
-    PointAttributeDTO buildDTOByBO(PointAttributeBO entityBO);
-
-    /**
-     * BOList to DTOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDTO Array
-     */
-    List<PointAttributeDTO> buildDTOListByBOList(List<PointAttributeBO> entityBOList);
-
-    /**
-     * DTO to BO
-     *
-     * @param entityDTO EntityDTO
-     * @return EntityBO
-     */
-    PointAttributeBO buildBOByDTO(PointAttributeDTO entityDTO);
 
     /**
      * DOPage to BOPage

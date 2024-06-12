@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -36,6 +37,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_device_run")
 public class DeviceRunDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -63,15 +65,15 @@ public class DeviceRunDO implements Serializable {
     private String deviceName;
 
     /**
-     * CREATE：注册成功；
-     * ONLINE：在线
-     * ；OFFLINE：离线；
+     * CREATE: 注册成功
+     * ONLINE: 在线
+     * OFFLINE: 离线
      */
     @TableField("status")
     private String status;
 
     /**
-     * 时长；单位分钟
+     * 时长, 单位分钟
      */
     @TableField("duration")
     private Long duration;
@@ -125,7 +127,7 @@ public class DeviceRunDO implements Serializable {
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识,0:未删除,1:已删除
+     * 逻辑删除标识, 0:未删除, 1:已删除
      */
     @TableField("deleted")
     @TableLogic

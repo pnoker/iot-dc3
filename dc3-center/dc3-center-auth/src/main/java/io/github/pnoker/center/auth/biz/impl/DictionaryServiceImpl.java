@@ -25,12 +25,11 @@ import io.github.pnoker.center.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.center.auth.entity.model.TenantDO;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author pnoker
@@ -49,14 +48,14 @@ public class DictionaryServiceImpl implements DictionaryService {
     public List<DictionaryBO> tenantDictionary() {
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
         wrapper.eq(TenantDO::getEnableFlag, EnableFlagEnum.ENABLE);
-        List<TenantDO> entityDOS = tenantManager.list(wrapper);
+        List<TenantDO> entityDOList = tenantManager.list(wrapper);
 
-        return entityDOS.stream().map(entityDO -> {
+        return entityDOList.stream().map(entityDO -> {
             DictionaryBO driverDictionary = new DictionaryBO();
             driverDictionary.setLabel(entityDO.getTenantName());
-            driverDictionary.setValue(entityDO.getId());
+            driverDictionary.setValue(entityDO.getId().toString());
             return driverDictionary;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     @Override
@@ -64,14 +63,14 @@ public class DictionaryServiceImpl implements DictionaryService {
         LambdaQueryWrapper<LimitedIpDO> wrapper = Wrappers.<LimitedIpDO>query().lambda();
         wrapper.eq(LimitedIpDO::getTenantId, tenantId);
         wrapper.eq(LimitedIpDO::getEnableFlag, EnableFlagEnum.ENABLE);
-        List<LimitedIpDO> entityDOS = limitedIpManager.list(wrapper);
+        List<LimitedIpDO> entityDOList = limitedIpManager.list(wrapper);
 
-        return entityDOS.stream().map(entityDO -> {
+        return entityDOList.stream().map(entityDO -> {
             DictionaryBO driverDictionary = new DictionaryBO();
             driverDictionary.setLabel(entityDO.getIp());
-            driverDictionary.setValue(entityDO.getId());
+            driverDictionary.setValue(entityDO.getId().toString());
             return driverDictionary;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
 }

@@ -24,14 +24,12 @@ import io.github.pnoker.common.enums.ProfileShareFlagEnum;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * Profile VO
@@ -44,13 +42,11 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "Profile", description = "模版")
 public class ProfileVO extends BaseVO {
 
     /**
-     * 模板名称
+     * 模版名称
      */
-    @Schema(description = "模板名称")
     @NotBlank(message = "模版名称不能为空",
             groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
@@ -59,50 +55,42 @@ public class ProfileVO extends BaseVO {
     private String profileName;
 
     /**
-     * 模板编号
+     * 模版编号
      */
-    @Schema(description = "模板编号")
     private String profileCode;
 
     /**
-     * 模板共享类型标识
+     * 模版共享类型标识
      */
-    @Schema(description = "模板共享类型标识")
     private ProfileShareFlagEnum profileShareFlag;
 
     /**
-     * 模板类型标识
+     * 模版类型标识
      */
-    @Schema(description = "模板类型标识")
     private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
      * 分组ID
      */
-    @Schema(description = "分组ID")
     private Long groupId;
 
     /**
-     * 模板拓展信息
+     * 模版拓展信息
      */
-    @Schema(description = "模板拓展信息")
     private ProfileExt profileExt;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
      * 签名
      */
-    @Schema(description = "签名")
     private String signature;
 
     /**
      * 版本
      */
-    @Schema(description = "版本")
     private Integer version;
 }

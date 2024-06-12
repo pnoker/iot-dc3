@@ -22,7 +22,7 @@ import io.github.pnoker.center.data.entity.query.DeviceQuery;
 import java.util.Map;
 
 /**
- * Device Interface
+ * 设备 Interface
  *
  * @author pnoker
  * @since 2022.1.0
@@ -30,20 +30,20 @@ import java.util.Map;
 public interface DeviceStatusService {
 
     /**
-     * 分页查询 Device 服务状态，同设备分页查询配套使用
+     * 分页查询设备状态, 同设备分页查询配套使用
      *
      * @param deviceQuery 设备和分页参数
      * @return Map String:String
      */
-    Map<Long, String> device(DeviceQuery deviceQuery);
+    Map<Long, String> selectByPage(DeviceQuery deviceQuery);
 
     /**
-     * 根据 模板ID 查询 Device 服务状态
+     * 根据 模板ID 查询设备状态
      *
      * @param profileId 位号ID
      * @return Map String:String
      */
-    Map<Long, String> deviceByProfileId(Long profileId);
+    Map<Long, String> selectByProfileId(Long profileId);
 
     DeviceRunBO selectOnlineByDeviceId(Long deviceId);
 

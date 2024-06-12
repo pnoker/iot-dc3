@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * ProfileBind BO
@@ -39,13 +37,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "ProfileBind", description = "模版绑定")
 public class ProfileBindVO extends BaseVO {
 
     /**
      * 模版ID
      */
-    @Schema(description = "模版ID")
     @NotNull(message = "模版ID不能为空",
             groups = {Add.class, Update.class})
     private Long profileId;
@@ -53,7 +49,6 @@ public class ProfileBindVO extends BaseVO {
     /**
      * 设备ID
      */
-    @Schema(description = "设备ID")
     @NotNull(message = "设备ID不能为空",
             groups = {Add.class, Update.class})
     private Long deviceId;

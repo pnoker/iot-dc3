@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.ponker.center.ekuiper.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,6 +31,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -123,16 +140,16 @@ public class ConfigServiceImpl implements ConfigService {
                 });
     }
 
-    private void handleMqttRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody)  {
+    private void handleMqttRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
-            MqttConfigDto mqttConfigDto  = new MqttConfigDto();
+            MqttConfigDto mqttConfigDto = new MqttConfigDto();
             JsonNode mqttJsonNode = generateJsonNode(mqttConfigDto);
 
             if (containsAllFields(dataJsonNode, mqttJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from mqttConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from mqttConfigForm");
+                log.info("The data doesn't contain all fields from mqttConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from mqttConfigForm");
             }
 
         } catch (Exception e) {
@@ -141,15 +158,15 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private void handleHttpPushRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleHttpPushRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             HttppushConfigDto httppushConfigDto = new HttppushConfigDto();
             JsonNode httppushJsonNode = generateJsonNode(httppushConfigDto);
             if (containsAllFields(dataJsonNode, httppushJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from httpPushConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from httpPushConfigForm");
+                log.info("The data doesn't contain all fields from httpPushConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from httpPushConfigForm");
             }
 
         } catch (Exception e) {
@@ -158,7 +175,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private void handleSqlRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleSqlRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             //SqlConfigDto sqlConfigDto = new SqlConfigDto();
             JsonNode sqlJsonNode = generateJsonNode(SqlConfigDto);
@@ -166,8 +183,8 @@ public class ConfigServiceImpl implements ConfigService {
             if (containsAllFields(dataJsonNode, sqlJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from sqlConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from sqlConfigForm");
+                log.info("The data doesn't contain all fields from sqlConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from sqlConfigForm");
             }
 
         } catch (Exception e) {
@@ -176,15 +193,15 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private void handleHttpPullRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleHttpPullRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             HttppullConfigDto httppullConfigDto = new HttppullConfigDto();
             JsonNode httppulJsonNode = generateJsonNode(httppullConfigDto);
             if (containsAllFields(dataJsonNode, httppulJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from httpPullConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from httpPullConfigForm");
+                log.info("The data doesn't contain all fields from httpPullConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from httpPullConfigForm");
             }
 
         } catch (Exception e) {
@@ -193,15 +210,15 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
-    private void handleRedisRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleRedisRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             RedisConfigDto redisConfigDto = new RedisConfigDto();
             JsonNode redisJsonNode = generateJsonNode(redisConfigDto);
             if (containsAllFields(dataJsonNode, redisJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from redisConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from redisConfigForm");
+                log.info("The data doesn't contain all fields from redisConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from redisConfigForm");
             }
 
         } catch (Exception e) {

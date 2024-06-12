@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * TenantBind VO
@@ -39,13 +37,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "TenantBind", description = "租户绑定")
 public class TenantBindVO extends BaseVO {
 
     /**
      * 租户ID
      */
-    @Schema(description = "租户ID")
     @NotNull(message = "Tenant id can't be empty",
             groups = {Add.class, Update.class})
     private Long tenantId;
@@ -53,7 +49,6 @@ public class TenantBindVO extends BaseVO {
     /**
      * 用户ID
      */
-    @Schema(description = "用户ID")
     @NotNull(message = "User id can't be empty",
             groups = {Add.class, Update.class})
     private Long userId;

@@ -1,7 +1,7 @@
-**/.idea
 **/.git
+**/.idea
+**/.mvn
 **/*.iml
-**dc3
 **/Dockerfile
 
 **/*logs

@@ -76,12 +76,12 @@ public class WeatherInfo {
         private String adCode;
 
         /**
-         * 天气现象（汉字描述）
+         * 天气现象(汉字描述)
          */
         private String weather;
 
         /**
-         * 实时气温，单位：摄氏度
+         * 实时气温, 单位: 摄氏度
          */
         private String temperature;
 
@@ -92,7 +92,7 @@ public class WeatherInfo {
         private String windDirection;
 
         /**
-         * 风力级别，单位：级
+         * 风力级别, 单位: 级
          */
         @JsonProperty("windpower")
         private String windPower;

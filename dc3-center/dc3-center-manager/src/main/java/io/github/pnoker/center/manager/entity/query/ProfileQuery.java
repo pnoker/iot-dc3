@@ -20,9 +20,9 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ProfileShareFlagEnum;
 import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -36,61 +36,53 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "ProfileQuery", description = "模板-查询")
 public class ProfileQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
 
     /**
-     * 模板名称
+     * 模版名称
      */
-    @Schema(description = "模板名称")
     private String profileName;
 
     /**
-     * 模板编号
+     * 模版编号
      */
-    @Schema(description = "模板编号")
     private String profileCode;
 
     /**
-     * 模板共享类型标识
+     * 模版共享类型标识
      */
-    @Schema(description = "模板共享类型标识")
     private ProfileShareFlagEnum profileShareFlag;
 
     /**
-     * 模板类型标识
+     * 模版类型标识
      */
-    @Schema(description = "模板类型标识")
     private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
      * 分组ID
      */
-    @Schema(description = "分组ID")
     private Long groupId;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
      * 版本
      */
-    @Schema(description = "版本")
     private Integer version;
 
     // 附加字段
@@ -98,6 +90,5 @@ public class ProfileQuery implements Serializable {
     /**
      * 设备ID
      */
-    @Schema(description = "设备ID")
     private Long deviceId;
 }

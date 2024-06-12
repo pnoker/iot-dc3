@@ -22,6 +22,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -39,6 +40,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_point")
 public class PointDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -96,19 +98,19 @@ public class PointDO implements Serializable {
     private String unit;
 
     /**
-     * 模板ID
+     * 模版ID
      */
     @TableField("profile_id")
     private Long profileId;
 
     /**
-     * 报警通知模板ID
+     * 报警通知模版ID
      */
     @TableField("alarm_notify_profile_id")
     private Long alarmNotifyProfileId;
 
     /**
-     * 报警信息模板ID
+     * 报警信息模版ID
      */
     @TableField("alarm_message_profile_id")
     private Long alarmMessageProfileId;
@@ -192,7 +194,7 @@ public class PointDO implements Serializable {
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识,0:未删除,1:已删除
+     * 逻辑删除标识, 0:未删除, 1:已删除
      */
     @TableLogic
     @TableField(value = "deleted")

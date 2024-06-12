@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.biz.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -31,6 +30,7 @@ import io.github.pnoker.center.manager.entity.model.DriverDO;
 import io.github.pnoker.center.manager.entity.model.PointDataVolumeHistoryDO;
 import io.github.pnoker.center.manager.entity.model.PointDataVolumeRunDO;
 import io.github.pnoker.center.manager.service.PointService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -38,10 +38,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 点位数据量统计服务实现类
@@ -114,7 +114,7 @@ public class PointStatisticsServiceImpl implements PointStatisticsService {
             wrapper.orderByDesc(PointDataVolumeHistoryDO::getCreateTime).eq(PointDataVolumeHistoryDO::getPointId, pointId).last("LIMIT 1");
             PointDataVolumeHistoryDO pointDataVolumeHistoryDO = pointDataVolumeHistoryManager.getOne(wrapper);
             long count;
-            if (ObjectUtil.isEmpty(pointDataVolumeHistoryDO)) {
+            if (Objects.isNull(pointDataVolumeHistoryDO)) {
                 count = getPointCount(deviceId, pointId, LocalDateTime.of(1970, 1, 1, 0, 0), this.datetime);
             } else {
                 count = getPointCount(deviceId, pointId, pointDataVolumeHistoryDO.getCreateTime(), this.datetime);

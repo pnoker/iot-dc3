@@ -14,34 +14,38 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-parent</artifactId>
-        <version>2024.1.1.1</version>
+        <version>2024.3.2</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>iot-dc3</artifactId>
-    <version>2024.1.0</version>
+    <version>2024.3.2</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2016-2022</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IOT-DC3 可分布式的物联网(IOT)平台 , 基于开源Spring Cloud框架搭建，实现设备互联、管理、数据采集、代码生成、快速开发和可视化等，
-        兼容多种流行的物联网数据接入协议（Mqtt\Socket\Modbus\PLC\OpcUa\OpcDa...），是一整套完整的物联系统解决方案。
+        IOT-DC3 可分布式的物联网(IOT)平台 , 基于开源Spring Cloud框架搭建, 实现设备互联, 管理, 数据采集, 代码生成, 快速开发和可视化等,
+        兼容多种流行的物联网数据接入协议(Mqtt\Socket\Modbus\PLC\OpcUa\OpcDa...), 是一整套完整的物联系统解决方案。
     </description>
 
     <developers>
         <developer>
             <id>pnoker</id>
             <name>pnoker</name>
-            <email>pnokers@icloud.com</email>
+            <email>pnokers@gmail.com</email>
+            <roles>
+                <role>PMC</role>
+            </roles>
             <organization>pnoker.github.io</organization>
+            <url>https://github.com/pnoker/iot-dc3</url>
         </developer>
     </developers>
 
@@ -63,35 +67,35 @@
         <maven.deploy.skip>true</maven.deploy.skip>
 
         <!-- DC3 Api 相关 -->
-        <dc3.api.auth.version>2024.1.0</dc3.api.auth.version>
-        <dc3.api.data.version>2024.1.0</dc3.api.data.version>
-        <dc3.api.driver.version>2024.1.0</dc3.api.driver.version>
-        <dc3.api.manager.version>2024.1.0</dc3.api.manager.version>
+        <dc3.api.auth.version>2024.3.2</dc3.api.auth.version>
+        <dc3.api.data.version>2024.3.2</dc3.api.data.version>
+        <dc3.api.driver.version>2024.3.2</dc3.api.driver.version>
+        <dc3.api.manager.version>2024.3.2</dc3.api.manager.version>
 
         <!-- DC3 Common 相关 -->
-        <dc3.common.api.version>2024.1.0</dc3.common.api.version>
-        <dc3.common.auth.version>2024.1.0</dc3.common.auth.version>
-        <dc3.common.constant.version>2024.1.0</dc3.common.constant.version>
-        <dc3.common.driver.version>2024.1.0</dc3.common.driver.version>
-        <dc3.common.exception.version>2024.1.0</dc3.common.exception.version>
-        <dc3.common.influx.version>2024.1.0</dc3.common.influx.version>
-        <dc3.common.job.version>2024.1.0</dc3.common.job.version>
-        <dc3.common.log.version>2024.1.0</dc3.common.log.version>
-        <dc3.common.model.version>2024.1.0</dc3.common.model.version>
-        <dc3.common.mongo.version>2024.1.0</dc3.common.mongo.version>
-        <dc3.common.mqtt.version>2024.1.0</dc3.common.mqtt.version>
-        <dc3.common.mysql.version>2024.1.0</dc3.common.mysql.version>
-        <dc3.common.prometheus.version>2024.1.0</dc3.common.prometheus.version>
-        <dc3.common.public.version>2024.1.0</dc3.common.public.version>
-        <dc3.common.quartz.version>2024.1.0</dc3.common.quartz.version>
-        <dc3.common.rabbitmq.version>2024.1.0</dc3.common.rabbitmq.version>
-        <dc3.common.redis.version>2024.1.0</dc3.common.redis.version>
-        <dc3.common.register.version>2024.1.0</dc3.common.register.version>
-        <dc3.common.repository.version>2024.1.0</dc3.common.repository.version>
-        <dc3.common.tdengine.version>2024.1.0</dc3.common.tdengine.version>
-        <dc3.common.thread.version>2024.1.0</dc3.common.thread.version>
-        <dc3.common.transfer.version>2024.1.0</dc3.common.transfer.version>
-        <dc3.common.web.version>2024.1.0</dc3.common.web.version>
+        <dc3.common.api.version>2024.3.2</dc3.common.api.version>
+        <dc3.common.auth.version>2024.3.2</dc3.common.auth.version>
+        <dc3.common.constant.version>2024.3.2</dc3.common.constant.version>
+        <dc3.common.driver.version>2024.3.2</dc3.common.driver.version>
+        <dc3.common.exception.version>2024.3.2</dc3.common.exception.version>
+        <dc3.common.influx.version>2024.3.2</dc3.common.influx.version>
+        <dc3.common.job.version>2024.3.2</dc3.common.job.version>
+        <dc3.common.log.version>2024.3.2</dc3.common.log.version>
+        <dc3.common.model.version>2024.3.2</dc3.common.model.version>
+        <dc3.common.mongo.version>2024.3.2</dc3.common.mongo.version>
+        <dc3.common.mqtt.version>2024.3.2</dc3.common.mqtt.version>
+        <dc3.common.mysql.version>2024.3.2</dc3.common.mysql.version>
+        <dc3.common.prometheus.version>2024.3.2</dc3.common.prometheus.version>
+        <dc3.common.public.version>2024.3.2</dc3.common.public.version>
+        <dc3.common.quartz.version>2024.3.2</dc3.common.quartz.version>
+        <dc3.common.rabbitmq.version>2024.3.2</dc3.common.rabbitmq.version>
+        <dc3.common.redis.version>2024.3.2</dc3.common.redis.version>
+        <dc3.common.register.version>2024.3.2</dc3.common.register.version>
+        <dc3.common.repository.version>2024.3.2</dc3.common.repository.version>
+        <dc3.common.tdengine.version>2024.3.2</dc3.common.tdengine.version>
+        <dc3.common.thread.version>2024.3.2</dc3.common.thread.version>
+        <dc3.common.transfer.version>2024.3.2</dc3.common.transfer.version>
+        <dc3.common.web.version>2024.3.2</dc3.common.web.version>
     </properties>
 
     <profiles>

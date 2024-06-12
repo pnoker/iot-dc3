@@ -16,23 +16,23 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.model.DriverDO;
 import io.github.pnoker.center.manager.entity.vo.DriverVO;
-import io.github.pnoker.common.entity.dto.DriverDTO;
 import io.github.pnoker.common.entity.ext.DriverExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -41,7 +41,7 @@ import java.util.Optional;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DriverBuilder {
 
     /**
@@ -78,7 +78,7 @@ public interface DriverBuilder {
         // Json Ext
         DriverExt entityExt = entityBO.getDriverExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -119,7 +119,7 @@ public interface DriverBuilder {
     default void afterProcess(DriverDO entityDO, @MappingTarget DriverBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getDriverExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             DriverExt ext = new DriverExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
@@ -160,30 +160,6 @@ public interface DriverBuilder {
      * @return EntityVO Array
      */
     List<DriverVO> buildVOListByBOList(List<DriverBO> entityBOList);
-
-    /**
-     * BO to DTO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDTO
-     */
-    DriverDTO buildDTOByBO(DriverBO entityBO);
-
-    /**
-     * BOList to DTOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDTO Array
-     */
-    List<DriverDTO> buildDTOListByBOList(List<DriverBO> entityBOList);
-
-    /**
-     * DTO to BO
-     *
-     * @param entityDTO EntityDTO
-     * @return EntityBO
-     */
-    DriverBO buildBOByDTO(DriverDTO entityDTO);
 
     /**
      * DOPage to BOPage

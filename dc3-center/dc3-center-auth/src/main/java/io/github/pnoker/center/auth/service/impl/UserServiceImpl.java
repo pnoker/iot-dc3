@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -32,11 +31,11 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * 用户服务接口实现类
@@ -55,29 +54,28 @@ public class UserServiceImpl implements UserService {
     private UserManager userManager;
 
     @Override
-    @Transactional
     public void save(UserBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
-        // 判断手机号是否存在，如果有手机号不为空，检查该手机号是否被占用
+        // 判断手机号是否存在, 如果有手机号不为空, 检查该手机号是否被占用
         if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
             UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
-            if (ObjectUtil.isNotNull(selectByPhone)) {
+            if (Objects.nonNull(selectByPhone)) {
                 throw new DuplicateException("The user already exists with phone: {}", entityBO.getPhone());
             }
         }
 
-        // 判断邮箱是否存在，如果有邮箱不为空，检查该邮箱是否被占用
+        // 判断邮箱是否存在, 如果有邮箱不为空, 检查该邮箱是否被占用
         if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
             UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
-            if (ObjectUtil.isNotNull(selectByEmail)) {
+            if (Objects.nonNull(selectByEmail)) {
                 throw new DuplicateException("The user already exists with email: {}", entityBO.getEmail());
             }
         }
 
         UserDO entityDO = userBuilder.buildDOByBO(entityBO);
         if (!userManager.save(entityDO)) {
-            throw new AddException("The user add failed: {}", entityBO.toString());
+            throw new AddException("Failed to create user: {}", entityBO.toString());
         }
     }
 
@@ -86,7 +84,7 @@ public class UserServiceImpl implements UserService {
         getDOById(id, true);
 
         if (!userManager.removeById(id)) {
-            throw new DeleteException("The user delete failed");
+            throw new DeleteException("Failed to remove user");
         }
     }
 
@@ -100,7 +98,7 @@ public class UserServiceImpl implements UserService {
         if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
             if (!entityBO.getPhone().equals(selectById.getPhone())) {
                 UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
-                if (ObjectUtil.isNotNull(selectByPhone)) {
+                if (Objects.nonNull(selectByPhone)) {
                     throw new DuplicateException("The user already exists with phone {}", entityBO.getPhone());
                 }
             }
@@ -110,7 +108,7 @@ public class UserServiceImpl implements UserService {
         if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
             if (!entityBO.getEmail().equals(selectById.getEmail())) {
                 UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
-                if (ObjectUtil.isNotNull(selectByEmail)) {
+                if (Objects.nonNull(selectByEmail)) {
                     throw new DuplicateException("The user already exists with email {}", entityBO.getEmail());
                 }
             }
@@ -166,13 +164,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserBO> selectByPage(UserQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<UserDO> page = userManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
         return userBuilder.buildBOPageByDOPage(page);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link UserQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<UserDO> fuzzyQuery(UserQuery entityQuery) {
         LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getNickName()), UserDO::getNickName, entityQuery.getNickName());
@@ -187,7 +191,7 @@ public class UserServiceImpl implements UserService {
         wrapper.eq(key, value);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserDO userDO = userManager.getOne(wrapper);
-        if (ObjectUtil.isNull(userDO)) {
+        if (Objects.isNull(userDO)) {
             if (throwException) {
                 throw new NotFoundException();
             }
@@ -209,12 +213,12 @@ public class UserServiceImpl implements UserService {
         wrapper.eq(UserDO::getUserName, entityBO.getUserName());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserDO one = userManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("用户重复");
+            throw new DuplicateException("User has been duplicated");
         }
         return duplicate;
     }
@@ -228,8 +232,8 @@ public class UserServiceImpl implements UserService {
      */
     private UserDO getDOById(Long id, boolean throwException) {
         UserDO entityDO = userManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("用户不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("User does not exist");
         }
         return entityDO;
     }

@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.entity.bo.AlarmMessageProfileBO;
 import io.github.pnoker.center.data.entity.model.AlarmMessageProfileDO;
@@ -26,12 +25,14 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -40,7 +41,7 @@ import java.util.Optional;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface AlarmMessageProfileBuilder {
 
     /**
@@ -77,7 +78,7 @@ public interface AlarmMessageProfileBuilder {
         // Json Ext
         AlarmMessageExt entityExt = entityBO.getAlarmMessageExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -117,7 +118,7 @@ public interface AlarmMessageProfileBuilder {
     default void afterProcess(AlarmMessageProfileDO entityDO, @MappingTarget AlarmMessageProfileBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getAlarmMessageExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             AlarmMessageExt ext = new AlarmMessageExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

@@ -23,14 +23,12 @@ import io.github.pnoker.common.entity.ext.UserSocialExt;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * User VO
@@ -43,13 +41,11 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "User", description = "用户")
 public class UserVO extends BaseVO {
 
     /**
      * 用户昵称
      */
-    @Schema(description = "用户昵称")
     @NotBlank(message = "Nick name can't be empty",
             groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
@@ -60,7 +56,6 @@ public class UserVO extends BaseVO {
     /**
      * 用户名称
      */
-    @Schema(description = "用户名称")
     @NotBlank(message = "User name can't be empty",
             groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
@@ -71,7 +66,6 @@ public class UserVO extends BaseVO {
     /**
      * 手机号
      */
-    @Schema(description = "手机号")
     @Pattern(regexp = "^1([3-9])\\d{9}$",
             message = "Invalid phone",
             groups = {Add.class, Update.class})
@@ -80,7 +74,6 @@ public class UserVO extends BaseVO {
     /**
      * 邮箱
      */
-    @Schema(description = "邮箱")
     @Pattern(regexp = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$",
             message = "Invalid email",
             groups = {Add.class, Update.class})
@@ -89,12 +82,10 @@ public class UserVO extends BaseVO {
     /**
      * 社交相关拓展信息
      */
-    @Schema(description = "社交相关拓展信息")
     private UserSocialExt socialExt;
 
     /**
      * 身份相关拓展信息
      */
-    @Schema(description = "身份相关拓展信息")
     private UserIdentityExt identityExt;
 }

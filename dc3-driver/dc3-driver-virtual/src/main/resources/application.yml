@@ -16,18 +16,18 @@
 
 driver:
   tenant: default
-  name: 模拟驱动
+  name: 虚拟驱动
   code: VirtualDriver
-  type: DRIVER
+  type: DRIVER_CLIENT
   remark: @project.description@
   schedule:
     # 定时读数据
     read:
       enable: true
-      corn: '0/30 * * * * ?'
+      cron: '0/30 * * * * ?'
     custom:
       enable: true
-      corn: '0/5 * * * * ?'
+      cron: '0/5 * * * * ?'
   driver-attribute:
     - display-name: 主机
       attribute-name: host

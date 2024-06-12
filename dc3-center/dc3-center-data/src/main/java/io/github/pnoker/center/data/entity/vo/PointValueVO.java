@@ -18,15 +18,14 @@ package io.github.pnoker.center.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.pnoker.common.constant.common.TimeConstant;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * PointValue VO
@@ -38,14 +37,15 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "PointValueRead", description = "位号值")
 public class PointValueVO implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
      * ID
      */
-    private Long id;
+    private String id;
 
     /**
      * 设备ID
@@ -66,8 +66,6 @@ public class PointValueVO implements Serializable {
      * 处理值
      */
     private String value;
-
-    private List<String> history;
 
     /**
      * 原始时间

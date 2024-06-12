@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.ponker.center.ekuiper.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,6 +32,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -157,7 +174,7 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
                 });
     }
 
-    private void handleMqttRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody)  {
+    private void handleMqttRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             MqttSinkDto mqttSinkDto = new MqttSinkDto();
             JsonNode mqttJsonNode = generateJsonNode(mqttSinkDto);
@@ -165,8 +182,8 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
             if (containsAllFields(dataJsonNode, mqttJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from mqttSink");
-                throw new IllegalArgumentException("The data does not contain all fields from mqttSink");
+                log.info("The data doesn't contain all fields from mqttSink");
+                throw new IllegalArgumentException("The data doesn't contain all fields from mqttSink");
             }
 
         } catch (Exception e) {
@@ -175,15 +192,15 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
         }
     }
 
-    private void handleRestRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleRestRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             RestSinkDto restSinkDto = new RestSinkDto();
             JsonNode httppushJsonNode = generateJsonNode(restSinkDto);
             if (containsAllFields(dataJsonNode, httppushJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from httpPushConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from httpPushConfigForm");
+                log.info("The data doesn't contain all fields from httpPushConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from httpPushConfigForm");
             }
 
         } catch (Exception e) {
@@ -192,7 +209,7 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
         }
     }
 
-    private void handleSqlRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleSqlRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             SqlSinkDto sqlSinkDto = new SqlSinkDto();
             JsonNode sqlJsonNode = generateJsonNode(sqlSinkDto);
@@ -200,8 +217,8 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
             if (containsAllFields(dataJsonNode, sqlJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from sqlConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from sqlConfigForm");
+                log.info("The data doesn't contain all fields from sqlConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from sqlConfigForm");
             }
 
         } catch (Exception e) {
@@ -210,15 +227,15 @@ public class SinkTemplateServiceImpl implements SinkTemplateService {
         }
     }
 
-    private void handleRedisRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode,String dataJsonBody)  {
+    private void handleRedisRequest(WebClient.RequestBodySpec request, JsonNode dataJsonNode, String dataJsonBody) {
         try {
             RedisSinkDto redisSinkDto = new RedisSinkDto();
             JsonNode redisJsonNode = generateJsonNode(redisSinkDto);
             if (containsAllFields(dataJsonNode, redisJsonNode)) {
                 request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(dataJsonBody));
             } else {
-                log.info("The data does not contain all fields from redisConfigForm");
-                throw new IllegalArgumentException("The data does not contain all fields from redisConfigForm");
+                log.info("The data doesn't contain all fields from redisConfigForm");
+                throw new IllegalArgumentException("The data doesn't contain all fields from redisConfigForm");
             }
 
         } catch (Exception e) {

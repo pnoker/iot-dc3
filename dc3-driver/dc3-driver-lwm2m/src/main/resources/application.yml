@@ -18,7 +18,7 @@ driver:
   tenant: default
   name: Lwm2m协议驱动
   code: Lwm2mDriver
-  type: DRIVER
+  type: DRIVER_SERVER
   remark: @project.description@
   custom:
     coap:
@@ -30,11 +30,11 @@ driver:
     # 定时读数据
     read:
       enable: false
-      corn: '0/30 * * * * ?'
+      cron: '0/30 * * * * ?'
     # 自定义定时任务 本驱动未使用
     custom:
       enable: false
-      corn: '0/5 * * * * ?'
+      cron: '0/5 * * * * ?'
   point-attribute:
     - display-name: 消息上行
       attribute-name: messageUp

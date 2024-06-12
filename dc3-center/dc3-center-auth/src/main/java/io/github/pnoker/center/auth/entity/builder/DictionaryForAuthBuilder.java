@@ -22,6 +22,7 @@ import io.github.pnoker.center.auth.entity.bo.TenantBO;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import io.github.pnoker.common.entity.builder.DictionaryBuilder;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -31,7 +32,7 @@ import org.mapstruct.Mapping;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DictionaryForAuthBuilder extends DictionaryBuilder {
 
     // 租户相关
@@ -43,7 +44,7 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByTenantBO(TenantBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getTenantName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getTenantName()).value(entityBO.getId().toString()).build();
     }
 
     /**
@@ -69,7 +70,7 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByUserLoginBO(UserLoginBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getLoginName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getLoginName()).value(entityBO.getId().toString()).build();
     }
 
     /**
@@ -95,7 +96,7 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByLimitedIpBO(LimitedIpBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getIp()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getIp()).value(entityBO.getId().toString()).build();
     }
 
     /**

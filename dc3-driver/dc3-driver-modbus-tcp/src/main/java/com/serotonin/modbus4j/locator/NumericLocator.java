@@ -16,10 +16,10 @@
 
 package com.serotonin.modbus4j.locator;
 
+import cn.hutool.core.util.ArrayUtil;
 import com.serotonin.modbus4j.code.DataType;
 import com.serotonin.modbus4j.code.RegisterRange;
 import com.serotonin.modbus4j.exception.IllegalDataTypeException;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -81,13 +81,28 @@ public class NumericLocator extends BaseLocator<Number> {
         validate();
     }
 
+    private static void appendBCD(StringBuilder sb, byte b) {
+        sb.append(bcdNibbleToInt(b, true));
+        sb.append(bcdNibbleToInt(b, false));
+    }
+
+    private static int bcdNibbleToInt(byte b, boolean high) {
+        int n;
+        if (high)
+            n = (b >> 4) & 0xf;
+        else
+            n = b & 0xf;
+        if (n > 9)
+            n = 0;
+        return n;
+    }
+
     private void validate() {
         super.validate(getRegisterCount());
 
         if (range == RegisterRange.COIL_STATUS || range == RegisterRange.INPUT_STATUS)
             throw new IllegalDataTypeException("Only binary values can be read from Coil and Input ranges");
-
-        if (!ArrayUtils.contains(DATA_TYPES, dataType))
+        if (!ArrayUtil.contains(DATA_TYPES, dataType))
             throw new IllegalDataTypeException("Invalid data type");
     }
 
@@ -315,22 +330,6 @@ public class NumericLocator extends BaseLocator<Number> {
                     | ((data[offset + 1] & 0xff)));
 
         throw new RuntimeException("Unsupported data type: " + dataType);
-    }
-
-    private static void appendBCD(StringBuilder sb, byte b) {
-        sb.append(bcdNibbleToInt(b, true));
-        sb.append(bcdNibbleToInt(b, false));
-    }
-
-    private static int bcdNibbleToInt(byte b, boolean high) {
-        int n;
-        if (high)
-            n = (b >> 4) & 0xf;
-        else
-            n = b & 0xf;
-        if (n > 9)
-            n = 0;
-        return n;
     }
 
     @Override

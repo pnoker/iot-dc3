@@ -48,7 +48,7 @@ public class ApiBO extends BaseBO {
     private String apiName;
 
     /**
-     * Api接口编号，一般为URL的MD5编码
+     * Api接口编号, 一般为URL的MD5编码
      */
     private String apiCode;
 

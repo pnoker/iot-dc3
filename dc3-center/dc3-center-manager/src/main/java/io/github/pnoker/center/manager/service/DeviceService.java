@@ -19,14 +19,13 @@ package io.github.pnoker.center.manager.service;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.base.service.BaseService;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 
 /**
- * Device Interface
+ * 设备 Interface
  *
  * @author pnoker
  * @since 2022.1.0
@@ -54,34 +53,42 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
     /**
      * 根据 驱动ID 查询该驱动下的全部设备
      *
-     * @param driverId Driver ID
-     * @return {@link DeviceBO} Array
+     * @param driverId 驱动ID
+     * @return {@link DeviceBO} 集合
      */
     List<DeviceBO> selectByDriverId(Long driverId);
+
+    /**
+     * 根据 驱动ID 查询该驱动下的全部设备ID集合
+     *
+     * @param driverId 驱动ID
+     * @return {@link DeviceBO} 集合
+     */
+    List<Long> selectIdsByDriverId(Long driverId);
 
     /**
      * 根据 模板ID 查询该驱动下的全部设备
      *
      * @param profileId 模版ID
-     * @return {@link DeviceBO} Array
+     * @return {@link DeviceBO} 集合
      */
     List<DeviceBO> selectByProfileId(Long profileId);
 
     /**
-     * 根据 设备ID集 查询设备
+     * 根据 设备ID集合 查询设备
      *
      * @param ids 设备ID集
-     * @return {@link DeviceBO} Array
+     * @return {@link DeviceBO} 集合
      */
-    List<DeviceBO> selectByIds(Set<Long> ids);
+    List<DeviceBO> selectByIds(List<Long> ids);
 
     /**
      * 导入设备
      *
      * @param entityBO      {@link DeviceBO}
-     * @param multipartFile {@link MultipartFile}
+     * @param multipartFile {@link File}
      */
-    void importDevice(DeviceBO entityBO, MultipartFile multipartFile);
+    void importDevice(DeviceBO entityBO, File multipartFile);
 
     /**
      * 生成导入模板

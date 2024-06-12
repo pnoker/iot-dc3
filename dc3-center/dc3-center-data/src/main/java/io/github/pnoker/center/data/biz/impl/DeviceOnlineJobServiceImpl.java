@@ -16,9 +16,13 @@
 
 package io.github.pnoker.center.data.biz.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
-import io.github.pnoker.api.center.manager.*;
+import io.github.pnoker.api.center.manager.DeviceApiGrpc;
+import io.github.pnoker.api.center.manager.GrpcPageDeviceDTO;
+import io.github.pnoker.api.center.manager.GrpcPageDeviceQuery;
+import io.github.pnoker.api.center.manager.GrpcRPageDeviceDTO;
+import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.DeviceOnlineJobService;
 import io.github.pnoker.center.data.dal.DeviceStatusHistoryManager;
@@ -30,13 +34,14 @@ import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.redis.service.RedisService;
+import jakarta.annotation.Resource;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
@@ -64,37 +69,31 @@ public class DeviceOnlineJobServiceImpl implements DeviceOnlineJobService {
         if (CharSequenceUtil.isNotEmpty(deviceQuery.getDeviceName())) {
             query.setDeviceName(deviceQuery.getDeviceName());
         }
-        if (ObjectUtil.isNotEmpty(deviceQuery.getDriverId())) {
+        if (Objects.nonNull(deviceQuery.getDriverId())) {
             query.setDriverId(deviceQuery.getDriverId());
-        } else {
-            query.setDriverId(DefaultConstant.DEFAULT_INT);
         }
-        if (ObjectUtil.isNotNull(deviceQuery.getEnableFlag())) {
-            query.setEnableFlag(deviceQuery.getEnableFlag().getIndex());
-        } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotEmpty(deviceQuery.getTenantId())) {
+        if (Objects.nonNull(deviceQuery.getTenantId())) {
             query.setTenantId(deviceQuery.getTenantId());
         }
-        GrpcRPageDeviceDTO list = deviceApiBlockingStub.list(query.build());
+        Optional.ofNullable(deviceQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPageDeviceDTO list = deviceApiBlockingStub.selectByPage(query.build());
         GrpcPageDeviceDTO data = list.getData();
         List<GrpcDeviceDTO> dataList = data.getDataList();
-        if (ObjectUtils.isNotEmpty(dataList)) {
-            List<DeviceStatusHistoryDO> deviceStatusHistoryDOS = new ArrayList<>();
+        if (CollUtil.isNotEmpty(dataList)) {
+            List<DeviceStatusHistoryDO> deviceStatusHistoryDOList = new ArrayList<>();
             dataList.forEach(driverDO -> {
                 String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + driverDO.getBase().getId();
                 String status = redisService.getKey(key);
-                status = ObjectUtil.isNotNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
+                status = Objects.nonNull(status) ? status : DriverStatusEnum.OFFLINE.getCode();
                 DeviceStatusHistoryDO deviceStatusHistoryDO = new DeviceStatusHistoryDO();
                 deviceStatusHistoryDO.setDriverId(driverDO.getDriverId());
                 deviceStatusHistoryDO.setDeviceId(driverDO.getBase().getId());
                 deviceStatusHistoryDO.setDeviceName(driverDO.getDeviceName());
                 deviceStatusHistoryDO.setStatus(status);
-                deviceStatusHistoryDOS.add(deviceStatusHistoryDO);
+                deviceStatusHistoryDOList.add(deviceStatusHistoryDO);
             });
-            if (!deviceStatusHistoryDOS.isEmpty()) {
-                deviceStatusHistoryService.saveBatch(deviceStatusHistoryDOS);
+            if (!deviceStatusHistoryDOList.isEmpty()) {
+                deviceStatusHistoryService.saveBatch(deviceStatusHistoryDOList);
             }
         }
     }

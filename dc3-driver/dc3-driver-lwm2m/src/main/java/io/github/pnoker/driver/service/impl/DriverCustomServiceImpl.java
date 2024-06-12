@@ -17,18 +17,25 @@
 package io.github.pnoker.driver.service.impl;
 
 import com.mchange.v2.lang.StringUtils;
+import io.github.pnoker.common.driver.entity.bean.RValue;
+import io.github.pnoker.common.driver.entity.bean.WValue;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
-import io.github.pnoker.common.entity.dto.AttributeConfigDTO;
-import io.github.pnoker.common.entity.dto.DeviceDTO;
-import io.github.pnoker.common.entity.dto.PointDTO;
+import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.entity.dto.MetadataEventDTO;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.driver.server.Lwm2mServer;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Map;
-
-import static io.github.pnoker.common.utils.DriverUtil.attribute;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -39,15 +46,18 @@ import static io.github.pnoker.common.utils.DriverUtil.attribute;
 public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
-    private Lwm2mServer lwm2mServer;
+    DriverMetadata driverMetadata;
 
+    @Resource
+    private Lwm2mServer lwm2mServer;
+    @Resource
+    private DriverSenderService driverSenderService;
 
     @Override
     public void initial() {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
-        !!!
-        你可以在此处执行一些特定的初始化逻辑，驱动在启动的时候会自动执行该方法。
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
+        你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
         */
         lwm2mServer.startServer();
     }
@@ -55,60 +65,62 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void schedule() {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
-        !!!
-        上传设备状态，可自行灵活拓展，不一定非要在schedule()接口中实现，你可以：
-        - 在read中实现设备状态的判断；
-        - 在自定义定时任务中实现设备状态的判断；
-        - 通过某种判断机制实现设备状态的判断。
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
+        上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
+        - 在read中实现设备状态的判断;
+        - 在自定义定时任务中实现设备状态的判断;
+        - 根据某种判断机制实现设备状态的判断。
 
-        最后通过 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理，其中设备状态（StatusEnum）：
+        最后根据 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理, 其中设备状态(StatusEnum):
         - ONLINE:在线
         - OFFLINE:离线
         - MAINTAIN:维护
         - FAULT:故障
          */
+        driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
-    /**
-     * 读取值 or 订阅
-     *
-     * @param driverInfo Driver Attribute Info
-     * @param pointInfo  Point Attribute Info
-     * @param device     Device
-     * @param point      Point
-     * @return
-     */
     @Override
-    public String read(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, PointDTO point) {
+    public void event(MetadataEventDTO metadataEvent) {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
+        接收驱动, 设备, 位号元数据新增, 更新, 删除都会触发改事件
+        提供元数据类型: MetadataTypeEnum(DRIVER, DEVICE, POINT)
+        提供元数据操作类型: MetadataOperateTypeEnum(ADD, DELETE, UPDATE)
+         */
+        MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
+        MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
+        if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
+            // to do something for device event
+            log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
+        } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
+            // to do something for point event
+            log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
+        }
+    }
+
+    @Override
+    public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
+        /*
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
 
         可以主动读取,也可以订阅资源
          */
-        return lwm2mServer.readValueByPath(String.valueOf(device.getId()), attribute(pointInfo, "messageUp"));
+        String value = lwm2mServer.readValueByPath(String.valueOf(device.getId()), pointConfig.get("messageUp").getValue(String.class));
+        return new RValue(device, point, value);
     }
 
-    /**
-     * 写入值 or 执行函数
-     * <p>
-     * 注意配置只写位号时,只可以配消息下行或命令下行其中一个
-     *
-     * @param driverInfo Driver Attribute Info
-     * @param pointInfo  Point Attribute Info
-     * @param device     Device
-     * @param value      Value Attribute Info
-     * @return
-     */
     @Override
-    public Boolean write(Map<String, AttributeConfigDTO> driverInfo, Map<String, AttributeConfigDTO> pointInfo, DeviceDTO device, AttributeConfigDTO value) {
+    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
-        !!! 提示：此处逻辑仅供参考，请务必结合实际应用场景。!!!
+        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
          */
-        if (StringUtils.nonEmptyString(attribute(pointInfo, "execDown"))) {
+        String execDownValue = pointConfig.get("execDown").getValue(String.class);
+        if (StringUtils.nonEmptyString(execDownValue)) {
             //执行函数
-            return lwm2mServer.execute(String.valueOf(device.getId()), attribute(pointInfo, "execDown"), value.getValue());
+            return lwm2mServer.execute(String.valueOf(device.getId()), execDownValue, wValue.getValue());
         }
-        return lwm2mServer.writeValueByPath(String.valueOf(device.getId()), attribute(pointInfo, "messageDown"), value.getValue(), false);
+        String messageDownValue = pointConfig.get("messageDown").getValue(String.class);
+        return lwm2mServer.writeValueByPath(String.valueOf(device.getId()), messageDownValue, wValue.getValue(), false);
     }
 }

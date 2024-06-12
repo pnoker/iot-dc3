@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -32,10 +31,11 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
 
         AlarmMessageProfileDO entityDO = alarmMessageProfileBuilder.buildDOByBO(entityBO);
         if (!alarmMessageProfileManager.save(entityDO)) {
-            throw new AddException("分组创建失败");
+            throw new AddException("Failed to create group");
         }
     }
 
@@ -74,11 +74,11 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
                 .eq(AlarmMessageProfileDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("分组删除失败，该分组下存在子分组");
+            throw new AssociatedException("Failed to remove group: there are subgroups under the group");
         }
 
         if (!alarmMessageProfileManager.removeById(id)) {
-            throw new DeleteException("分组删除失败");
+            throw new DeleteException("Failed to remove group");
         }
     }
 
@@ -91,7 +91,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         AlarmMessageProfileDO entityDO = alarmMessageProfileBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!alarmMessageProfileManager.updateById(entityDO)) {
-            throw new UpdateException("分组更新失败");
+            throw new UpdateException("Failed to update group");
         }
     }
 
@@ -103,7 +103,7 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
 
     @Override
     public Page<AlarmMessageProfileBO> selectByPage(AlarmMessageProfileQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<AlarmMessageProfileDO> entityPageDO = alarmMessageProfileManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -138,12 +138,12 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
         wrapper.eq(AlarmMessageProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmMessageProfileDO one = alarmMessageProfileManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("报警信息模板重复");
+            throw new DuplicateException("Alarm message profile has been duplicated");
         }
         return duplicate;
     }
@@ -157,8 +157,8 @@ public class AlarmMessageProfileServiceImpl implements AlarmMessageProfileServic
      */
     private AlarmMessageProfileDO getDOById(Long id, boolean throwException) {
         AlarmMessageProfileDO entityDO = alarmMessageProfileManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("报警信息模板不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Alarm message profile does not exist");
         }
         return entityDO;
     }

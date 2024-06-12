@@ -22,8 +22,6 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-
 
 /**
  * 自定义 Request Header 校验过滤器工厂
@@ -35,8 +33,11 @@ import javax.annotation.Resource;
 @Component
 public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
-    @Resource
-    private AuthenticGatewayFilter authenticGatewayFilter;
+    private final AuthenticGatewayFilter authenticGatewayFilter;
+
+    public AuthenticGatewayFilterFactory(AuthenticGatewayFilter authenticGatewayFilter) {
+        this.authenticGatewayFilter = authenticGatewayFilter;
+    }
 
     @Override
     public GatewayFilter apply(Object config) {

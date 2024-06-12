@@ -18,9 +18,9 @@ package io.github.pnoker.center.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -32,17 +32,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "RoleQuery", description = "角色-查询")
 public class RoleQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -50,18 +49,15 @@ public class RoleQuery implements Serializable {
     /**
      * 角色名称
      */
-    @Schema(description = "角色名称")
     private String roleName;
 
     /**
      * 角色编号
      */
-    @Schema(description = "角色编号")
     private String roleCode;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.biz.EventService;
 import io.github.pnoker.center.data.entity.DriverEvent;
@@ -24,14 +23,14 @@ import io.github.pnoker.center.data.entity.query.DriverEventQuery;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * 驱动事件 Controller
@@ -41,12 +40,14 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-驱动事件")
 @RequestMapping(DataConstant.DRIVER_EVENT_URL_PREFIX)
 public class DriverEventController implements BaseController {
 
-    @Resource
-    private EventService eventService;
+    private final EventService eventService;
+
+    public DriverEventController(EventService eventService) {
+        this.eventService = eventService;
+    }
 
     /**
      * 分页查询 DriverEvent
@@ -55,20 +56,20 @@ public class DriverEventController implements BaseController {
      * @return Page Of DriverEvent
      */
     @PostMapping("/driver")
-    public R<Page<DriverEvent>> driverEvent(@RequestBody(required = false) DriverEventQuery driverEventQuery) {
+    public Mono<R<Page<DriverEvent>>> driverEvent(@RequestBody(required = false) DriverEventQuery driverEventQuery) {
         try {
-            if (ObjectUtil.isEmpty(driverEventQuery)) {
+            if (Objects.isNull(driverEventQuery)) {
                 driverEventQuery = new DriverEventQuery();
             }
             Page<DriverEvent> page = eventService.driverEvent(driverEventQuery);
-            if (ObjectUtil.isNotNull(page)) {
-                return R.ok(page);
+            if (Objects.nonNull(page)) {
+                return Mono.just(R.ok(page));
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
-        return R.fail();
+        return Mono.just(R.fail());
     }
 
 }

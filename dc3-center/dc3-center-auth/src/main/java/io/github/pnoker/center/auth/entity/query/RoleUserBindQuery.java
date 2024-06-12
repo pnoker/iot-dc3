@@ -17,9 +17,9 @@
 package io.github.pnoker.center.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -31,17 +31,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "RoleUserBindQuery", description = "角色用户绑定-查询")
 public class RoleUserBindQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -49,12 +48,10 @@ public class RoleUserBindQuery implements Serializable {
     /**
      * 角色ID
      */
-    @Schema(description = "角色ID")
-    private String roleId;
+    private Long roleId;
 
     /**
      * 用户ID
      */
-    @Schema(description = "用户ID")
     private Long userId;
 }

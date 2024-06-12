@@ -16,33 +16,33 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.DeviceByPointBO;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.vo.DeviceByPointVO;
 import io.github.pnoker.center.manager.entity.vo.DeviceVO;
-import io.github.pnoker.common.entity.dto.DeviceDTO;
 import io.github.pnoker.common.entity.ext.DeviceExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Device Builder
+ * 设备 Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DeviceBuilder {
 
     /**
@@ -78,7 +78,7 @@ public interface DeviceBuilder {
         // Json Ext
         DeviceExt entityExt = entityBO.getDeviceExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -114,7 +114,7 @@ public interface DeviceBuilder {
     default void afterProcess(DeviceDO entityDO, @MappingTarget DeviceBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getDeviceExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             DeviceExt ext = new DeviceExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
@@ -151,22 +151,6 @@ public interface DeviceBuilder {
      * @return EntityVO Array
      */
     List<DeviceVO> buildVOListByBOList(List<DeviceBO> entityBOList);
-
-    /**
-     * BO to DTO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDTO
-     */
-    DeviceDTO buildDTOByBO(DeviceBO entityBO);
-
-    /**
-     * BOList to DTOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDTO Array
-     */
-    List<DeviceDTO> buildDTOListByBOList(List<DeviceBO> entityBOList);
 
     /**
      * DOPage to BOPage

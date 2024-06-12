@@ -23,11 +23,10 @@ import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**
- * 通用：每小时执行任务
+ * 通用: 每小时执行任务
  *
  * @author pnoker
  * @since 2022.1.0
@@ -35,8 +34,12 @@ import java.time.LocalDateTime;
 @Slf4j
 @Component
 public class HourlyJob extends QuartzJobBean {
-    @Resource
-    private PointStatisticsService pointStatisticsService;
+
+    private final PointStatisticsService pointStatisticsService;
+
+    public HourlyJob(PointStatisticsService pointStatisticsService) {
+        this.pointStatisticsService = pointStatisticsService;
+    }
 
     /**
      * 任务执行
@@ -48,7 +51,7 @@ public class HourlyJob extends QuartzJobBean {
      */
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        // 暂时调整为30秒，仅供测试
+        // 暂时调整为30秒, 仅供测试
         pointStatisticsService.statisticsPointHistory(LocalDateTime.now());
         log.info("hourlyJobHandler: {}", LocalDateTime.now());
     }

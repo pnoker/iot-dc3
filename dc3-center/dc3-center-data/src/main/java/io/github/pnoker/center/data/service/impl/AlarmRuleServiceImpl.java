@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -32,10 +31,11 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
 
         AlarmRuleDO entityDO = alarmRuleBuilder.buildDOByBO(entityBO);
         if (!alarmRuleManager.save(entityDO)) {
-            throw new AddException("报警规则创建失败");
+            throw new AddException("Failed to create alarm rule");
         }
     }
 
@@ -73,11 +73,11 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
         LambdaQueryChainWrapper<AlarmRuleDO> wrapper = alarmRuleManager.lambdaQuery().eq(AlarmRuleDO::getPointId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("报警规则删除失败，该报警规则下存在子报警规则");
+            throw new AssociatedException("Failed to remove alarm rule: some sub alarm rules exists in the alarm rule");
         }
 
         if (!alarmRuleManager.removeById(id)) {
-            throw new DeleteException("报警规则删除失败");
+            throw new DeleteException("Failed to remove alarm rule");
         }
     }
 
@@ -90,7 +90,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
         AlarmRuleDO entityDO = alarmRuleBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!alarmRuleManager.updateById(entityDO)) {
-            throw new UpdateException("报警规则更新失败");
+            throw new UpdateException("Failed to update alarm rule");
         }
     }
 
@@ -102,7 +102,7 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
 
     @Override
     public Page<AlarmRuleBO> selectByPage(AlarmRuleQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<AlarmRuleDO> entityPageDO = alarmRuleManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -138,12 +138,12 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
         wrapper.eq(AlarmRuleDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmRuleDO one = alarmRuleManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("报警规则重复");
+            throw new DuplicateException("Alarm rule has been duplicated");
         }
         return duplicate;
     }
@@ -157,8 +157,8 @@ public class AlarmRuleServiceImpl implements AlarmRuleService {
      */
     private AlarmRuleDO getDOById(Long id, boolean throwException) {
         AlarmRuleDO entityDO = alarmRuleManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("报警规则不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Alarm rule does not exist");
         }
         return entityDO;
     }

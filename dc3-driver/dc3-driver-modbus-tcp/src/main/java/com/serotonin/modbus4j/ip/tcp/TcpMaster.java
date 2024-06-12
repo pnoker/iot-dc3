@@ -48,12 +48,11 @@ public class TcpMaster extends ModbusMaster {
 
     // Configuration fields.
     private final Log LOG = LogFactory.getLog(TcpMaster.class);
-    private short nextTransactionId = 0;
     private final IpParameters ipParameters;
     private final boolean keepAlive;
     private final boolean autoIncrementTransactionId;
     private final Integer lingerTime;
-
+    private short nextTransactionId = 0;
     // Runtime fields.
     private Socket socket;
     private Transport transport;
@@ -136,21 +135,21 @@ public class TcpMaster extends ModbusMaster {
     }
 
     /**
-     * <p>Setter for the field <code>nextTransactionId</code>.</p>
-     *
-     * @param id a short.
-     */
-    public void setNextTransactionId(short id) {
-        this.nextTransactionId = id;
-    }
-
-    /**
      * <p>Getter for the field <code>nextTransactionId</code>.</p>
      *
      * @return a short.
      */
     protected short getNextTransactionId() {
         return nextTransactionId;
+    }
+
+    /**
+     * <p>Setter for the field <code>nextTransactionId</code>.</p>
+     *
+     * @param id a short.
+     */
+    public void setNextTransactionId(short id) {
+        this.nextTransactionId = id;
     }
 
     @Override

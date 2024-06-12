@@ -49,17 +49,15 @@ public final class PDU {
     public final static byte FUNC_WRITE = 5;
 
     public int data;
-
-    int dlen;
-    int error;
-
-    int header; // the position of the header;
-    int hlen;
-    byte[] mem;
     public int param; // the position of the parameters;
     public int plen;
     public int udata;
     public int udlen;
+    int dlen;
+    int error;
+    int header; // the position of the header;
+    int hlen;
+    byte[] mem;
 
     /**
      * set up the PDU information
@@ -353,6 +351,15 @@ public final class PDU {
     }
 
     /**
+     * set the number of the PDU
+     *
+     * @param n number
+     */
+    public void setNumber(final int n) {
+        Nodave.setUSBEWord(this.mem, this.header + 4, n);
+    }
+
+    /**
      * reserve space for the header of a new PDU
      *
      * @param type Type
@@ -404,15 +411,6 @@ public final class PDU {
         pa[1] = (byte) 0x00;
         this.initHeader(1);
         this.addParam(pa);
-    }
-
-    /**
-     * set the number of the PDU
-     *
-     * @param n number
-     */
-    public void setNumber(final int n) {
-        Nodave.setUSBEWord(this.mem, this.header + 4, n);
     }
 
     /**

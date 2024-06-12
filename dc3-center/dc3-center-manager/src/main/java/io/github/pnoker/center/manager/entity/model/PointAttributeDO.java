@@ -22,12 +22,13 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * <p>
- * 模板配置信息表
+ * 模版配置信息表
  * </p>
  *
  * @author pnoker
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_point_attribute")
 public class PointAttributeDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -149,7 +151,7 @@ public class PointAttributeDO implements Serializable {
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识,0:未删除,1:已删除
+     * 逻辑删除标识, 0:未删除, 1:已删除
      */
     @TableLogic
     @TableField(value = "deleted")

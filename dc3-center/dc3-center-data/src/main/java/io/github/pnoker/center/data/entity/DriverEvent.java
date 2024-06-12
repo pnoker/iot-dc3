@@ -20,11 +20,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author pnoker
@@ -35,6 +38,8 @@ import java.time.LocalDateTime;
 @Document
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DriverEvent implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -51,30 +56,31 @@ public class DriverEvent implements Serializable {
     /**
      * Driver Event
      * <p>
-     * STATUS、ERROR
+     * STATUS, ERROR
      */
     private String type;
 
     private Boolean confirm = false;
     private Object content;
 
+    @Transient
+    private int timeOut = 15;
+
+    @Transient
+    private TimeUnit timeUnit = TimeUnit.MINUTES;
+
     /**
      * 创建时间
      */
     private LocalDateTime createTime;
+
+    /**
+     * 操作时间
+     */
     private LocalDateTime updateTime;
 
-    public DriverEvent(String serviceName, String type) {
-        this.serviceName = serviceName;
-        this.type = type;
-        this.createTime = LocalDateTime.now();
-    }
-
-    public DriverEvent(String serviceName, String type, Object content) {
-        this.serviceName = serviceName;
-        this.type = type;
-        this.content = content;
-        this.createTime = LocalDateTime.now();
-    }
-
+    /**
+     * 确认时间
+     */
+    private LocalDateTime confirmTime;
 }

@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.receiver.rabbit;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.DriverEventService;
 import io.github.pnoker.common.entity.dto.DriverEventDTO;
@@ -28,12 +27,12 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * 接收驱动发送过来的驱动事件数据
- * 其中包括：驱动心跳事件、在线、离线、故障等其他事件
+ * 其中包括: 驱动心跳事件, 在线, 离线, 故障等其他事件
  *
  * @author pnoker
  * @since 2022.1.0
@@ -42,17 +41,20 @@ import java.io.IOException;
 @Component
 public class DriverEventReceiver {
 
-    @Resource
-    private DriverEventService driverEventService;
+    private final DriverEventService driverEventService;
+
+    public DriverEventReceiver(DriverEventService driverEventService) {
+        this.driverEventService = driverEventService;
+    }
 
     @RabbitHandler
     @RabbitListener(queues = "#{driverEventQueue.name}")
     public void driverEventReceive(Channel channel, Message message, DriverEventDTO entityDTO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Receive driver event: {}", JsonUtil.toPrettyJsonString(entityDTO));
-            if (ObjectUtil.isNull(entityDTO)
-                    || ObjectUtil.isNull(entityDTO.getType())
+            log.debug("Receive driver event: {}", JsonUtil.toJsonString(entityDTO));
+            if (Objects.isNull(entityDTO)
+                    || Objects.isNull(entityDTO.getType())
                     || CharSequenceUtil.isEmpty(entityDTO.getContent())) {
                 log.error("Invalid driver event: {}", entityDTO);
                 return;

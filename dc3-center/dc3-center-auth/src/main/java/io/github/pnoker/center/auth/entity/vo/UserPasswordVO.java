@@ -21,14 +21,12 @@ import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * UserPassword VO
@@ -41,13 +39,11 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "UserPassword", description = "用户密码")
 public class UserPasswordVO extends BaseVO {
 
     /**
      * 登录密码
      */
-    @Schema(description = "登录密码")
     @NotBlank(message = "Login password can't be empty",
             groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[a-zA-Z]\\w{7,15}$",

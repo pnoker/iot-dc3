@@ -18,16 +18,16 @@ driver:
   tenant: default
   name: PlcS7驱动
   code: PlcS7Driver
-  type: DRIVER
+  type: DRIVER_CLIENT
   remark: @project.description@
   schedule:
     # 定时读数据
     read:
       enable: true
-      corn: '0/30 * * * * ?'
+      cron: '0/30 * * * * ?'
     custom:
       enable: true
-      corn: '0/5 * * * * ?'
+      cron: '0/5 * * * * ?'
   driver-attribute:
     - display-name: 主机
       attribute-name: host
@@ -44,7 +44,7 @@ driver:
       attribute-name: dbNum
       attribute-type-flag: INT
       default-value: 0
-      remark: 数据块号，从 0 开始计数
+      remark: 数据块号, 从 0 开始计数
     - display-name: 字偏移
       attribute-name: byteOffset
       attribute-type-flag: INT

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.ponker.center.ekuiper.constant;
 
 
@@ -192,25 +208,25 @@ public interface CommonConstant {
          */
         interface Event {
             /**
-             * 驱动注册握手事件，该事件用于校验当前 dc3-center-manager 是否可用
+             * 驱动注册握手事件, 该事件用于校验当前 dc3-center-manager 是否可用
              */
             String DRIVER_HANDSHAKE = "driver_handshake";
             String DRIVER_HANDSHAKE_BACK = "driver_handshake_back";
 
             /**
-             * 驱动注册事件，该事件用于向 dc3-center-manager 注册驱动配置信息
+             * 驱动注册事件, 该事件用于向 dc3-center-manager 注册驱动配置信息
              */
             String DRIVER_REGISTER = "driver_register";
             String DRIVER_REGISTER_BACK = "driver_register_back";
 
             /**
-             * 同步驱动元数据时间，该事件用于向 dc3-center-manager 发送驱动元数据同步请求
+             * 同步驱动元数据时间, 该事件用于向 dc3-center-manager 发送驱动元数据同步请求
              */
             String DRIVER_METADATA_SYNC = "driver_metadata_sync";
             String DRIVER_METADATA_SYNC_BACK = "driver_metadata_sync_back";
 
             /**
-             * 驱动心跳事件，该事件用于向 dc3-center-manager 发送驱动的当前状态
+             * 驱动心跳事件, 该事件用于向 dc3-center-manager 发送驱动的当前状态
              */
             String DRIVER_HEARTBEAT = "driver_heartbeat";
 
@@ -248,13 +264,13 @@ public interface CommonConstant {
             String UPDATE = "update_point";
         }
 
-        interface DriverInfo {
+        interface DriverConfig {
             String ADD = "add_driver_info";
             String DELETE = "delete_driver_info";
             String UPDATE = "update_driver_info";
         }
 
-        interface PointInfo {
+        interface PointConfig {
             String ADD = "add_point_info";
             String DELETE = "delete_point_info";
             String UPDATE = "update_point_info";

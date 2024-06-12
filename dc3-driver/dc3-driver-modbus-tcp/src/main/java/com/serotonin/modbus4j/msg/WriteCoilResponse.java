@@ -31,11 +31,6 @@ public class WriteCoilResponse extends ModbusResponse {
     private boolean writeValue;
 
 
-    @Override
-    public byte getFunctionCode() {
-        return FunctionCode.WRITE_COIL;
-    }
-
     WriteCoilResponse(int slaveId) throws ModbusTransportException {
         super(slaveId);
     }
@@ -46,6 +41,10 @@ public class WriteCoilResponse extends ModbusResponse {
         this.writeValue = writeValue;
     }
 
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_COIL;
+    }
 
     @Override
     protected void writeResponse(ByteQueue queue) {

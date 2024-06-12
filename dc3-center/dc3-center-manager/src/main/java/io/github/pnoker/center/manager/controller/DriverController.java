@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.builder.DriverBuilder;
@@ -29,16 +28,15 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,15 +48,16 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-驱动")
 @RequestMapping(ManagerConstant.DRIVER_URL_PREFIX)
 public class DriverController implements BaseController {
 
-    @Resource
-    private DriverBuilder driverBuilder;
+    private final DriverBuilder driverBuilder;
+    private final DriverService driverService;
 
-    @Resource
-    private DriverService driverService;
+    public DriverController(DriverBuilder driverBuilder, DriverService driverService) {
+        this.driverBuilder = driverBuilder;
+        this.driverService = driverService;
+    }
 
     /**
      * 新增 Driver
@@ -67,16 +66,15 @@ public class DriverController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    @Operation(summary = "新增-驱动")
-    public R<String> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
         try {
             DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             driverService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -87,13 +85,13 @@ public class DriverController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             driverService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -104,14 +102,14 @@ public class DriverController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody DriverVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) {
         try {
             DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
             driverService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -122,14 +120,14 @@ public class DriverController implements BaseController {
      * @return DriverVO {@link DriverVO}
      */
     @GetMapping("/id/{id}")
-    public R<DriverVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<DriverVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             DriverBO entityBO = driverService.selectById(id);
             DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -140,14 +138,14 @@ public class DriverController implements BaseController {
      * @return Map(ID, DriverVO)
      */
     @PostMapping("/ids")
-    public R<Map<Long, DriverVO>> selectByIds(@RequestBody Set<Long> driverIds) {
+    public Mono<R<Map<Long, DriverVO>>> selectByIds(@RequestBody Set<Long> driverIds) {
         try {
-            List<DriverBO> entityBOS = driverService.selectByIds(driverIds);
-            Map<Long, DriverVO> driverMap = entityBOS.stream().collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
-            return R.ok(driverMap);
+            List<DriverBO> entityBOList = driverService.selectByIds(driverIds);
+            Map<Long, DriverVO> driverMap = entityBOList.stream().collect(Collectors.toMap(DriverBO::getId, entityBO -> driverBuilder.buildVOByBO(entityBO)));
+            return Mono.just(R.ok(driverMap));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -158,14 +156,14 @@ public class DriverController implements BaseController {
      * @return Driver
      */
     @GetMapping("/service/{serviceName}")
-    public R<DriverVO> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
+    public Mono<R<DriverVO>> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
         try {
             DriverBO entityBO = driverService.selectByServiceName(serviceName, getTenantId());
             DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -176,18 +174,18 @@ public class DriverController implements BaseController {
      * @return Page Of Driver
      */
     @PostMapping("/list")
-    public R<Page<DriverVO>> list(@RequestBody(required = false) DriverQuery entityQuery) {
+    public Mono<R<Page<DriverVO>>> list(@RequestBody(required = false) DriverQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new DriverQuery();
             }
             entityQuery.setTenantId(getTenantId());
             Page<DriverBO> entityPageBO = driverService.selectByPage(entityQuery);
             Page<DriverVO> entityPageVO = driverBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

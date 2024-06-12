@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,10 +31,11 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * 租户服务接口实现类
@@ -59,7 +59,7 @@ public class TenantServiceImpl implements TenantService {
 
         TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
         if (!tenantManager.save(entityDO)) {
-            throw new AddException("The tenant {} add failed", entityBO.getTenantName());
+            throw new AddException("Failed to create tenant: {}", entityBO.getTenantName());
         }
     }
 
@@ -68,7 +68,7 @@ public class TenantServiceImpl implements TenantService {
         getDOById(id, true);
 
         if (!tenantManager.removeById(id)) {
-            throw new DeleteException("The tenant delete failed");
+            throw new DeleteException("Failed to remove tenant");
         }
     }
 
@@ -81,7 +81,7 @@ public class TenantServiceImpl implements TenantService {
         TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!tenantManager.updateById(entityDO)) {
-            throw new UpdateException("租户更新失败");
+            throw new UpdateException("Failed to update tenant");
         }
     }
 
@@ -103,13 +103,19 @@ public class TenantServiceImpl implements TenantService {
 
     @Override
     public Page<TenantBO> selectByPage(TenantQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<TenantDO> entityPageDO = tenantManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
         return tenantBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link TenantQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<TenantDO> fuzzyQuery(TenantQuery entityQuery) {
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getTenantName()), TenantDO::getTenantName, entityQuery.getTenantName());
@@ -130,12 +136,12 @@ public class TenantServiceImpl implements TenantService {
         wrapper.eq(TenantDO::getTenantCode, entityBO.getTenantCode());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         TenantDO one = tenantManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("租户重复");
+            throw new DuplicateException("Tenant has been duplicated");
         }
         return duplicate;
     }
@@ -149,7 +155,7 @@ public class TenantServiceImpl implements TenantService {
      */
     private TenantDO getDOById(Long id, boolean throwException) {
         TenantDO entityDO = tenantManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
+        if (throwException && Objects.isNull(entityDO)) {
             throw new NotFoundException("租户");
         }
         return entityDO;

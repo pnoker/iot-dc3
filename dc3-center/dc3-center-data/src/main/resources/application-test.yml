@@ -14,26 +14,23 @@
 # limitations under the License.
 #
 
-# Test environment, customizable configuration
+# 测试环境配置, 会覆盖 application-*.yml 中配置的内容
 spring:
   datasource:
-    dynamic:
-      datasource:
-        master:
-          url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:3306}/${MYSQL_DB:dc3_data}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
-          username: ${MYSQL_USERNAME:root}
-          password: ${MYSQL_PASSWORD:dc3}
+    url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:3306}/${MYSQL_DB:dc3_data}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:dc3}
   rabbitmq:
     virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
     host: ${RABBITMQ_HOST:dc3-rabbitmq}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:dc3}
     password: ${RABBITMQ_PASSWORD:dc3}
-  redis:
-    host: ${REDIS_HOST:dc3-redis}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:dc3}
   data:
+    redis:
+      host: ${REDIS_HOST:dc3-redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:dc3}
     mongodb:
       host: ${MONGO_HOST:dc3-mongo}
       port: ${MONGO_PORT:27017}
@@ -62,3 +59,7 @@ driver:
     default-send-topic:
       qos: 1
       name: device
+
+logging:
+  level:
+    io.github.pnoker: DEBUG

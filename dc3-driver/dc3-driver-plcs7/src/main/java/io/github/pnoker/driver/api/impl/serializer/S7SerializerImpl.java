@@ -33,6 +33,20 @@ import java.lang.reflect.Array;
 @Slf4j
 public final class S7SerializerImpl implements S7Serializer {
 
+    /**
+     * The Connector.
+     */
+    private final S7Connector connector;
+
+    /**
+     * Instantiates a new s7 serializer.
+     *
+     * @param connector the connector
+     */
+    public S7SerializerImpl(final S7Connector connector) {
+        this.connector = connector;
+    }
+
     public static Object extractBytes(PlcS7PointVariable plcs7PointVariable, final byte[] buffer, final int byteOffset) {
         try {
             final BeanEntry entry = BeanParser.parse(plcs7PointVariable);
@@ -127,20 +141,6 @@ public final class S7SerializerImpl implements S7Serializer {
         } catch (final Exception e) {
             throw new S7Exception("insertBytes", e);
         }
-    }
-
-    /**
-     * The Connector.
-     */
-    private final S7Connector connector;
-
-    /**
-     * Instantiates a new s7 serializer.
-     *
-     * @param connector the connector
-     */
-    public S7SerializerImpl(final S7Connector connector) {
-        this.connector = connector;
     }
 
     @Override

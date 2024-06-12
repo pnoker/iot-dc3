@@ -17,9 +17,12 @@
 package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.github.pnoker.api.center.manager.*;
+import io.github.pnoker.api.center.manager.DriverApiGrpc;
+import io.github.pnoker.api.center.manager.GrpcPageDriverDTO;
+import io.github.pnoker.api.center.manager.GrpcPageDriverQuery;
+import io.github.pnoker.api.center.manager.GrpcRPageDriverDTO;
+import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.DriverStatisticsOnlineService;
 import io.github.pnoker.center.data.dal.DriverRunHistoryManager;
@@ -34,15 +37,16 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import jakarta.annotation.Resource;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,36 +88,28 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
         if (CharSequenceUtil.isNotEmpty(driverQuery.getServiceHost())) {
             query.setServiceHost(driverQuery.getServiceHost());
         }
-        if (ObjectUtil.isNotNull(driverQuery.getDriverTypeFlag())) {
-            query.setDriverTypeFlag(driverQuery.getDriverTypeFlag().getIndex());
-        } else {
-            query.setDriverTypeFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotNull(driverQuery.getEnableFlag())) {
-            query.setEnableFlag(driverQuery.getEnableFlag().getIndex());
-        } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotEmpty(driverQuery.getTenantId())) {
+        if (Objects.nonNull(driverQuery.getTenantId())) {
             query.setTenantId(driverQuery.getTenantId());
         }
-        GrpcRPageDriverDTO list = driverApiBlockingStub.list(query.build());
+        Optional.ofNullable(driverQuery.getDriverTypeFlag()).ifPresentOrElse(value -> query.setDriverTypeFlag(value.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(driverQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPageDriverDTO list = driverApiBlockingStub.selectByPage(query.build());
         GrpcPageDriverDTO data = list.getData();
         List<GrpcDriverDTO> dataList = data.getDataList();
         if (dataList != null && dataList.size() > 0) {
             dataList.forEach(
                     driverDO -> {
                         //查出状态表最近两条数据
-                        List<DriverStatusHistoryDO> driverStatusHistoryDOS = driverStatusHistoryService.selectRecently2Data(driverDO.getBase().getId());
-                        if (driverStatusHistoryDOS.size() > 1) {
-                            Duration duration = Duration.between(driverStatusHistoryDOS.get(1).getCreateTime(), driverStatusHistoryDOS.get(0).getCreateTime());
+                        List<DriverStatusHistoryDO> driverStatusHistoryDOList = driverStatusHistoryService.selectRecently2Data(driverDO.getBase().getId());
+                        if (driverStatusHistoryDOList.size() > 1) {
+                            Duration duration = Duration.between(driverStatusHistoryDOList.get(1).getCreateTime(), driverStatusHistoryDOList.get(0).getCreateTime());
                             DriverRunHistoryDO driverRunHistoryDO = new DriverRunHistoryDO();
                             long minutes = duration.toMinutes();
                             driverRunHistoryDO.setDuration(minutes);
                             driverRunHistoryDO.setDriverName(driverDO.getDriverName());
                             driverRunHistoryDO.setDriverId(driverDO.getBase().getId());
-                            if (DriverStatusEnum.OFFLINE.getCode().equals(driverStatusHistoryDOS.get(0).getStatus())) {
-                                if (DriverStatusEnum.OFFLINE.getCode().equals(driverStatusHistoryDOS.get(1).getStatus())) {
+                            if (DriverStatusEnum.OFFLINE.getCode().equals(driverStatusHistoryDOList.get(0).getStatus())) {
+                                if (DriverStatusEnum.OFFLINE.getCode().equals(driverStatusHistoryDOList.get(1).getStatus())) {
                                     //都为离线  离线时长
                                     driverRunHistoryDO.setStatus(DriverStatusEnum.OFFLINE.getCode());
                                     driverRunHistoryManager.save(driverRunHistoryDO);
@@ -122,8 +118,8 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
                                     driverRunHistoryDO.setStatus(DriverStatusEnum.ONLINE.getCode());
                                     driverRunHistoryManager.save(driverRunHistoryDO);
                                 }
-                            } else if (DriverStatusEnum.ONLINE.getCode().equals(driverStatusHistoryDOS.get(0).getStatus())) {
-                                if (DriverStatusEnum.ONLINE.getCode().equals(driverStatusHistoryDOS.get(1).getStatus())) {
+                            } else if (DriverStatusEnum.ONLINE.getCode().equals(driverStatusHistoryDOList.get(0).getStatus())) {
+                                if (DriverStatusEnum.ONLINE.getCode().equals(driverStatusHistoryDOList.get(1).getStatus())) {
                                     //都为在线  在线时长
                                     driverRunHistoryDO.setStatus(DriverStatusEnum.ONLINE.getCode());
                                     driverRunHistoryManager.save(driverRunHistoryDO);
@@ -138,8 +134,8 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
             );
         }
         // 查出所有driverids  去重
-        List<DriverRunHistoryDO> driverRunHistoryDOS = driverRunHistoryService.list(new LambdaQueryWrapper<>());
-        Set<Long> driverIds = driverRunHistoryDOS.stream().map(e -> e.getDriverId()).collect(Collectors.toSet());
+        List<DriverRunHistoryDO> driverRunHistoryDOList = driverRunHistoryService.list(new LambdaQueryWrapper<>());
+        Set<Long> driverIds = driverRunHistoryDOList.stream().map(e -> e.getDriverId()).collect(Collectors.toSet());
         LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
         if (driverIds != null) {
@@ -153,7 +149,7 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
                         if (runDO != null && driverRunDO != null) {
                             driverRunDO.setId(runDO.getId());
                             driverRunManager.updateById(driverRunDO);
-                        } else if (ObjectUtils.isEmpty(runDO) && driverRunDO != null) {
+                        } else if (Objects.isNull(runDO) && driverRunDO != null) {
                             driverRunManager.save(driverRunDO);
                         }
                         //查出每天统计表离线时长是否有数据
@@ -164,7 +160,7 @@ public class DriverStatisticsOnlineServiceImpl implements DriverStatisticsOnline
                         if (runOffDO != null && driverOffRunDO != null) {
                             driverOffRunDO.setId(runOffDO.getId());
                             driverRunManager.updateById(driverOffRunDO);
-                        } else if (ObjectUtils.isEmpty(runOffDO) && driverOffRunDO != null) {
+                        } else if (Objects.isNull(runOffDO) && driverOffRunDO != null) {
                             driverRunManager.save(driverOffRunDO);
                         }
                     }

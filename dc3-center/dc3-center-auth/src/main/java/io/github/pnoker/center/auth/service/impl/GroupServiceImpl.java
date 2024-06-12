@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -32,10 +31,11 @@ import io.github.pnoker.common.entity.bo.GroupBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ public class GroupServiceImpl implements GroupService {
 
         GroupDO entityDO = groupForAuthBuilder.buildDOByBO(entityBO);
         if (!groupManager.save(entityDO)) {
-            throw new AddException("分组创建失败");
+            throw new AddException("Failed to create group");
         }
     }
 
@@ -73,11 +73,11 @@ public class GroupServiceImpl implements GroupService {
         LambdaQueryChainWrapper<GroupDO> wrapper = groupManager.lambdaQuery().eq(GroupDO::getParentGroupId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("分组删除失败，该分组下存在子分组");
+            throw new AssociatedException("Failed to remove group: there are subgroups under the group");
         }
 
         if (!groupManager.removeById(id)) {
-            throw new DeleteException("分组删除失败");
+            throw new DeleteException("Failed to remove group");
         }
     }
 
@@ -90,7 +90,7 @@ public class GroupServiceImpl implements GroupService {
         GroupDO entityDO = groupForAuthBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!groupManager.updateById(entityDO)) {
-            throw new UpdateException("分组更新失败");
+            throw new UpdateException("Failed to update group");
         }
     }
 
@@ -102,7 +102,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Page<GroupBO> selectByPage(GroupQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<GroupDO> entityPageDO = groupManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -138,12 +138,12 @@ public class GroupServiceImpl implements GroupService {
         wrapper.eq(GroupDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         GroupDO one = groupManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("分组重复");
+            throw new DuplicateException("Group has been duplicated");
         }
         return duplicate;
     }
@@ -157,8 +157,8 @@ public class GroupServiceImpl implements GroupService {
      */
     private GroupDO getDOById(Long id, boolean throwException) {
         GroupDO entityDO = groupManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("分组不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Group does not exist");
         }
         return entityDO;
     }

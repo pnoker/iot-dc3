@@ -28,10 +28,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @since 2022.1.0
  */
 @SpringBootApplication
-// 开发环境无需注册中心
-// @EnableDiscoveryClient
 @EnableTransactionManagement
-@MapperScan({"io.github.pnoker.center.data.mapper", "io.github.pnoker.common.tdengine.mapper"})
+@MapperScan({"io.github.pnoker.center.data.mapper", "io.github.pnoker.common.tdengine.mapper", "io.github.pnoker.common.prometheus.dashboard.rabbitmq.mapper"})
 public class DataApplication {
     public static void main(String[] args) {
         SpringApplication.run(DataApplication.class, args);

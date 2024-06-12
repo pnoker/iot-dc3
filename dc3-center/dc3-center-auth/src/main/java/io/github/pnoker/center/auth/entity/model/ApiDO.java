@@ -22,6 +22,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_api")
 public class ApiDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -59,7 +61,7 @@ public class ApiDO implements Serializable {
     private String apiName;
 
     /**
-     * Api接口编号，一般为URL的MD5编码
+     * Api接口编号, 一般为URL的MD5编码
      */
     @TableField("api_code")
     private String apiCode;
@@ -125,7 +127,7 @@ public class ApiDO implements Serializable {
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识,0:未删除,1:已删除
+     * 逻辑删除标识, 0:未删除, 1:已删除
      */
     @TableLogic
     @TableField("deleted")

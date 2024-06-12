@@ -24,12 +24,11 @@ import io.github.pnoker.center.data.entity.vo.DriverRunVO;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -40,32 +39,33 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-驱动状态")
 @RequestMapping(DataConstant.DRIVER_STATUS_URL_PREFIX)
 public class DriverStatusController implements BaseController {
 
-    @Resource
-    private DriverStatusService driverStatusService;
+    private final DriverStatusService driverStatusService;
+    private final DriverDurationBuilder driverDurationBuilder;
 
-    @Resource
-    private DriverDurationBuilder driverDurationBuilder;
+    public DriverStatusController(DriverStatusService driverStatusService, DriverDurationBuilder driverDurationBuilder) {
+        this.driverStatusService = driverStatusService;
+        this.driverDurationBuilder = driverDurationBuilder;
+    }
 
     /**
-     * 查询 Driver 服务状态
+     * 查询驱动状态
      * ONLINE, OFFLINE
      *
      * @param driverQuery 驱动和分页参数
      * @return Map String:String
      */
     @PostMapping("/driver")
-    public R<Map<Long, String>> driverStatus(@RequestBody(required = false) DriverQuery driverQuery) {
+    public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery driverQuery) {
         try {
             driverQuery.setTenantId(getTenantId());
-            Map<Long, String> statuses = driverStatusService.driver(driverQuery);
-            return R.ok(statuses);
+            Map<Long, String> statuses = driverStatusService.selectByPage(driverQuery);
+            return Mono.just(R.ok(statuses));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -76,14 +76,14 @@ public class DriverStatusController implements BaseController {
      * @return
      */
     @GetMapping("/driverOnline/{driverId}")
-    public R<DriverRunVO> selectOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public Mono<R<DriverRunVO>> selectOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             DriverRunBO duration = driverStatusService.selectOnlineByDriverId(driverId);
             DriverRunVO result = driverDurationBuilder.buildVOByBOList(duration);
-            return R.ok(result);
+            return Mono.just(R.ok(result));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -94,14 +94,14 @@ public class DriverStatusController implements BaseController {
      * @return
      */
     @GetMapping("/driverOffline/{driverId}")
-    public R<DriverRunVO> selectOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public Mono<R<DriverRunVO>> selectOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             DriverRunBO duration = driverStatusService.selectOfflineByDriverId(driverId);
             DriverRunVO result = driverDurationBuilder.buildVOByBOList(duration);
-            return R.ok(result);
+            return Mono.just(R.ok(result));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -112,13 +112,13 @@ public class DriverStatusController implements BaseController {
      * @return
      */
     @GetMapping("/getDeviceOnlineByDriverId/{driverId}")
-    public R<String> getDeviceOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public Mono<R<String>> getDeviceOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             String result = driverStatusService.getDeviceOnlineByDriverId(driverId);
-            return R.ok(result);
+            return Mono.just(R.ok(result));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -129,13 +129,13 @@ public class DriverStatusController implements BaseController {
      * @return
      */
     @GetMapping("/getDeviceOfflineByDriverId/{driverId}")
-    public R<String> getDeviceOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+    public Mono<R<String>> getDeviceOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
         try {
             String result = driverStatusService.getDeviceOfflineByDriverId(driverId);
-            return R.ok(result);
+            return Mono.just(R.ok(result));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

@@ -17,8 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -36,13 +34,14 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 /**
  * @author linys
@@ -70,7 +69,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
         RoleUserBindDO entityDO = roleUserBindBuilder.buildDOByBO(entityBO);
         if (!roleUserBindManager.save(entityDO)) {
-            throw new AddException("The role user bind add failed");
+            throw new AddException("Failed to create role user bind");
         }
     }
 
@@ -79,7 +78,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         getDOById(id, true);
 
         if (!roleUserBindManager.removeById(id)) {
-            throw new DeleteException("The role user bind delete failed");
+            throw new DeleteException("Failed to remove role user bind");
         }
     }
 
@@ -104,7 +103,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
     @Override
     public Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<RoleUserBindDO> entityPageDO = roleUserBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -115,22 +114,28 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     public List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId) {
         LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
         wrapper.eq(RoleUserBindDO::getUserId, userId);
-        List<RoleUserBindDO> roleUserBindBOS = roleUserBindManager.list(wrapper);
-        if (CollUtil.isNotEmpty(roleUserBindBOS)) {
-            List<RoleDO> roleBOS = roleManager.listByIds(roleUserBindBOS.stream().map(RoleUserBindDO::getRoleId)
-                    .collect(Collectors.toList()));
-            List<RoleDO> collect = roleBOS.stream().filter(e -> EnableFlagEnum.ENABLE.equals(e.getEnableFlag()) && tenantId.equals(e.getTenantId()))
-                    .collect(Collectors.toList());
+        List<RoleUserBindDO> roleUserBindBOList = roleUserBindManager.list(wrapper);
+        if (CollUtil.isNotEmpty(roleUserBindBOList)) {
+            List<RoleDO> roleBOList = roleManager.listByIds(roleUserBindBOList.stream().map(RoleUserBindDO::getRoleId)
+                    .toList());
+            List<RoleDO> collect = roleBOList.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()) && tenantId.equals(e.getTenantId()))
+                    .toList();
             return roleBuilder.buildBOListByDOList(collect);
         }
 
         return null;
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link RoleUserBindQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<RoleUserBindDO> fuzzyQuery(RoleUserBindQuery entityQuery) {
         LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getUserId()), RoleUserBindDO::getUserId, entityQuery.getUserId());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getRoleId()), RoleUserBindDO::getRoleId, entityQuery.getRoleId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), RoleUserBindDO::getUserId, entityQuery.getUserId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleUserBindDO::getRoleId, entityQuery.getRoleId());
         wrapper.eq(RoleUserBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -150,12 +155,12 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         wrapper.eq(RoleUserBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RoleUserBindDO one = roleUserBindManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("角色用户绑定重复");
+            throw new DuplicateException("Role user bind has been duplicated");
         }
         return duplicate;
     }
@@ -169,8 +174,8 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
      */
     private RoleUserBindDO getDOById(Long id, boolean throwException) {
         RoleUserBindDO entityDO = roleUserBindManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("角色用户绑定不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Role user bind does not exist");
         }
         return entityDO;
     }

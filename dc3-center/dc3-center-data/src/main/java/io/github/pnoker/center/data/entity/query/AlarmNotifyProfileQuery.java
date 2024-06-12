@@ -20,9 +20,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -39,17 +39,16 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "AlarmNotifyProfile", description = "报警通知模板")
 public class AlarmNotifyProfileQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -57,30 +56,25 @@ public class AlarmNotifyProfileQuery implements Serializable {
     /**
      * 报警通知模板名称
      */
-    @Schema(description = "报警通知模板名称")
     private String alarmNotifyName;
 
     /**
      * 报警通知模板编号
      */
-    @Schema(description = "报警通知模板编号")
     private String alarmNotifyCode;
 
     /**
      * 自动确认标识
      */
-    @Schema(description = "自动确认标识")
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
-     * 报警通知间隔，毫秒
+     * 报警通知间隔, 毫秒
      */
-    @Schema(description = "报警通知间隔，毫秒")
     private Long alarmNotifyInterval;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

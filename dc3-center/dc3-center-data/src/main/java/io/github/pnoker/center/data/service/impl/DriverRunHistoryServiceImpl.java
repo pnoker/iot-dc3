@@ -21,9 +21,9 @@ import io.github.pnoker.center.data.entity.model.DriverRunDO;
 import io.github.pnoker.center.data.entity.model.DriverRunHistoryDO;
 import io.github.pnoker.center.data.mapper.DriverRunHistoryMapper;
 import io.github.pnoker.center.data.service.DriverRunHistoryService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 @Service

@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -29,11 +28,13 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.bo.LabelBindBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * LabelBindService Impl
@@ -57,7 +58,7 @@ public class LabelBindServiceImpl implements LabelBindService {
 
         LabelBindDO entityDO = labelBindForDataBuilder.buildDOByBO(entityBO);
         if (!labelBindManager.save(entityDO)) {
-            throw new AddException("The label bind add failed");
+            throw new AddException("Failed to create label bind");
         }
     }
 
@@ -66,7 +67,7 @@ public class LabelBindServiceImpl implements LabelBindService {
         getDOById(id, true);
 
         if (!labelBindManager.removeById(id)) {
-            throw new DeleteException("The label bind delete failed");
+            throw new DeleteException("Failed to remove label bind");
         }
     }
 
@@ -91,7 +92,7 @@ public class LabelBindServiceImpl implements LabelBindService {
 
     @Override
     public Page<LabelBindBO> selectByPage(LabelBindQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<LabelBindDO> entityPageDO = labelBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -106,8 +107,8 @@ public class LabelBindServiceImpl implements LabelBindService {
      */
     private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery entityQuery) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
         wrapper.eq(LabelBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -128,12 +129,12 @@ public class LabelBindServiceImpl implements LabelBindService {
         wrapper.eq(LabelBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         LabelBindDO one = labelBindManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("标签绑定重复");
+            throw new DuplicateException("Label bind has been duplicated");
         }
         return duplicate;
     }
@@ -147,8 +148,8 @@ public class LabelBindServiceImpl implements LabelBindService {
      */
     private LabelBindDO getDOById(Long id, boolean throwException) {
         LabelBindDO entityDO = labelBindManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("标签绑定不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Label bind does not exist");
         }
         return entityDO;
     }

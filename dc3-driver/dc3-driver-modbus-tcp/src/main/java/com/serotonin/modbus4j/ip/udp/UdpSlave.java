@@ -43,14 +43,13 @@ import java.util.concurrent.TimeUnit;
  * @version 5.0.0
  */
 public class UdpSlave extends ModbusSlaveSet {
-    // Configuration fields
-    private final int port;
-
-    // Runtime fields.
-    DatagramSocket datagramSocket;
-    private final ExecutorService executorService;
     final BaseMessageParser messageParser;
     final BaseRequestHandler requestHandler;
+    // Configuration fields
+    private final int port;
+    private final ExecutorService executorService;
+    // Runtime fields.
+    DatagramSocket datagramSocket;
 
     /**
      * <p>Constructor for UdpSlave.</p>

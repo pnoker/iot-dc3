@@ -16,6 +16,7 @@
 
 package io.github.pnoker.center.manager.service;
 
+import io.github.pnoker.center.manager.entity.bo.DeviceBO;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.query.DriverAttributeConfigQuery;
 import io.github.pnoker.common.base.service.BaseService;
@@ -23,7 +24,7 @@ import io.github.pnoker.common.base.service.BaseService;
 import java.util.List;
 
 /**
- * DriverInfo Interface
+ * DriverConfig Interface
  *
  * @author pnoker
  * @since 2022.1.0
@@ -34,7 +35,7 @@ public interface DriverAttributeConfigService extends BaseService<DriverAttribut
      * 根据 设备ID 查询
      *
      * @param deviceId 设备ID
-     * @return DriverInfo Array
+     * @return DriverConfig 集合
      */
     List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId);
 
@@ -42,7 +43,7 @@ public interface DriverAttributeConfigService extends BaseService<DriverAttribut
      * 根据 驱动属性配置ID 查询
      *
      * @param attributeId 驱动属性ID
-     * @return DriverInfo Array
+     * @return DriverConfig 集合
      */
     List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId);
 
@@ -51,8 +52,15 @@ public interface DriverAttributeConfigService extends BaseService<DriverAttribut
      *
      * @param deviceId    设备ID
      * @param attributeId 驱动属性ID
-     * @return DriverInfo
+     * @return DriverConfig
      */
     DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId);
 
+    /**
+     * 内部保存
+     *
+     * @param entityBO {@link DriverAttributeConfigBO}
+     * @return {@link DeviceBO}
+     */
+    DriverAttributeConfigBO innerSave(DriverAttributeConfigBO entityBO);
 }

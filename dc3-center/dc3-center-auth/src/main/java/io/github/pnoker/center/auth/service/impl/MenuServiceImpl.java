@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -32,10 +31,11 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ public class MenuServiceImpl implements MenuService {
 
         MenuDO entityDO = menuBuilder.buildDOByBO(entityBO);
         if (!menuManager.save(entityDO)) {
-            throw new AddException("菜单创建失败");
+            throw new AddException("Failed to create menu");
         }
     }
 
@@ -73,11 +73,11 @@ public class MenuServiceImpl implements MenuService {
         LambdaQueryChainWrapper<MenuDO> wrapper = menuManager.lambdaQuery().eq(MenuDO::getParentMenuId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("菜单删除失败，该菜单下存在子菜单");
+            throw new AssociatedException("Failed to remove menu: some sub menus exists in the menu");
         }
 
         if (!menuManager.removeById(id)) {
-            throw new DeleteException("菜单删除失败");
+            throw new DeleteException("Failed to remove menu");
         }
     }
 
@@ -90,7 +90,7 @@ public class MenuServiceImpl implements MenuService {
         MenuDO entityDO = menuBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!menuManager.updateById(entityDO)) {
-            throw new UpdateException("菜单更新失败");
+            throw new UpdateException("Failed to update menu");
         }
     }
 
@@ -102,7 +102,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public Page<MenuBO> selectByPage(MenuQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<MenuDO> entityPageDO = menuManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -139,12 +139,12 @@ public class MenuServiceImpl implements MenuService {
         wrapper.eq(MenuDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         MenuDO one = menuManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("菜单重复");
+            throw new DuplicateException("Menu has been duplicated");
         }
         return duplicate;
     }
@@ -158,8 +158,8 @@ public class MenuServiceImpl implements MenuService {
      */
     private MenuDO getDOById(Long id, boolean throwException) {
         MenuDO entityDO = menuManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("菜单不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Menu does not exist");
         }
         return entityDO;
     }

@@ -24,7 +24,9 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,6 +38,8 @@ import java.util.concurrent.TimeUnit;
 @Document
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeviceEvent implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -55,9 +59,9 @@ public class DeviceEvent implements Serializable {
     private Long pointId;
 
     /**
-     * Device Event
+     * 设备 Event
      * <p>
-     * STATUS、LIMIT、ERROR
+     * STATUS, LIMIT, ERROR
      */
     private String type;
 
@@ -70,40 +74,18 @@ public class DeviceEvent implements Serializable {
     @Transient
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
-    private Long originTime;
-    private Long confirmTime;
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
 
-    public DeviceEvent(Long deviceId, String type, Object content) {
-        this.deviceId = deviceId;
-        this.type = type;
-        this.content = content;
-        this.originTime = System.currentTimeMillis();
-    }
+    /**
+     * 操作时间
+     */
+    private LocalDateTime updateTime;
 
-    public DeviceEvent(Long deviceId, String type, Object content, int timeOut, TimeUnit timeUnit) {
-        this.deviceId = deviceId;
-        this.type = type;
-        this.content = content;
-        this.timeOut = timeOut;
-        this.timeUnit = timeUnit;
-        this.originTime = System.currentTimeMillis();
-    }
-
-    public DeviceEvent(Long deviceId, Long pointId, String type, Object content) {
-        this.deviceId = deviceId;
-        this.pointId = pointId;
-        this.type = type;
-        this.content = content;
-        this.originTime = System.currentTimeMillis();
-    }
-
-    public DeviceEvent(Long deviceId, Long pointId, String type, Object content, int timeOut, TimeUnit timeUnit) {
-        this.deviceId = deviceId;
-        this.pointId = pointId;
-        this.type = type;
-        this.content = content;
-        this.timeOut = timeOut;
-        this.timeUnit = timeUnit;
-        this.originTime = System.currentTimeMillis();
-    }
+    /**
+     * 确认时间
+     */
+    private LocalDateTime confirmTime;
 }

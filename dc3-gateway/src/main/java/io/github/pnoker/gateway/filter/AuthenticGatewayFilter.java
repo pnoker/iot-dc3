@@ -17,7 +17,6 @@
 package io.github.pnoker.gateway.filter;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.AuthConstant;
@@ -26,7 +25,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.gateway.utils.GatewayUtil;
+import io.github.pnoker.common.utils.RequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -36,6 +35,8 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -84,7 +85,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
             return response.writeWith(Mono.just(dataBuffer));
         }*/
 
-        // 20240327 先去掉登录限制，新增一个默认的登录信息逻辑
+        // 20240327 先去掉登录限制, 新增一个默认的登录信息逻辑
         ServerHttpRequest build = request.mutate().headers(headers -> {
             RequestHeader.UserHeader entityBO = new RequestHeader.UserHeader();
             entityBO.setUserId(1L);
@@ -99,8 +100,8 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
     }
 
     private GrpcRTenantDTO getTenantDTO(ServerHttpRequest request) {
-        String tenant = DecodeUtil.byteToString(DecodeUtil.decode(GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT)));
-        if (ObjectUtil.isEmpty(tenant)) {
+        String tenant = DecodeUtil.byteToString(DecodeUtil.decode(RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT)));
+        if (Objects.isNull(tenant)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
@@ -112,8 +113,8 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
     }
 
     private GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request) {
-        String user = DecodeUtil.byteToString(DecodeUtil.decode(GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN)));
-        if (ObjectUtil.isEmpty(user)) {
+        String user = DecodeUtil.byteToString(DecodeUtil.decode(RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN)));
+        if (Objects.isNull(user)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
@@ -139,9 +140,9 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
     }
 
     private void checkValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO) {
-        String token = GatewayUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
+        String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
         RequestHeader.TokenHeader entityBO = JsonUtil.parseObject(DecodeUtil.decode(token), RequestHeader.TokenHeader.class);
-        if (ObjectUtil.isEmpty(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
+        if (Objects.isNull(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 

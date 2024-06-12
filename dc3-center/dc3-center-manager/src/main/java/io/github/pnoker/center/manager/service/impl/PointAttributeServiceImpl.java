@@ -17,7 +17,6 @@
 package io.github.pnoker.center.manager.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -31,12 +30,14 @@ import io.github.pnoker.center.manager.service.PointAttributeService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * PointAttributeService Impl
@@ -60,7 +61,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
         PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(entityBO);
         if (!pointAttributeManager.save(entityDO)) {
-            throw new AddException("位号属性创建失败");
+            throw new AddException("Failed to create point attribute");
         }
     }
 
@@ -69,7 +70,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         getDOById(id, true);
 
         if (!pointAttributeManager.removeById(id)) {
-            throw new DeleteException("位号属性删除失败");
+            throw new DeleteException("Failed to remove point attribute");
         }
     }
 
@@ -82,7 +83,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!pointAttributeManager.updateById(entityDO)) {
-            throw new UpdateException("位号属性更新失败");
+            throw new UpdateException("Failed to update point attribute");
         }
     }
 
@@ -103,7 +104,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     @Override
-    public List<PointAttributeBO> selectByDriverId(Long driverId, boolean throwException) {
+    public List<PointAttributeBO> selectByDriverId(Long driverId) {
         LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery()
                 .eq(PointAttributeDO::getDriverId, driverId);
         List<PointAttributeDO> entityDO = wrapper.list();
@@ -112,19 +113,25 @@ public class PointAttributeServiceImpl implements PointAttributeService {
 
     @Override
     public Page<PointAttributeBO> selectByPage(PointAttributeQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<PointAttributeDO> entityPageDO = pointAttributeManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
         return pointAttributeBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link PointAttributeQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<PointAttributeDO> fuzzyQuery(PointAttributeQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), PointAttributeDO::getDisplayName, entityQuery.getDisplayName());
-        wrapper.eq(ObjectUtil.isNotNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDriverId()), PointAttributeDO::getDriverId, entityQuery.getDriverId());
+        wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), PointAttributeDO::getDriverId, entityQuery.getDriverId());
         wrapper.eq(PointAttributeDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -144,12 +151,12 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         wrapper.eq(PointAttributeDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointAttributeDO one = pointAttributeManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("位号属性重复");
+            throw new DuplicateException("Point attribute has been duplicated");
         }
         return duplicate;
     }
@@ -163,8 +170,8 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      */
     private PointAttributeDO getDOById(Long id, boolean throwException) {
         PointAttributeDO entityDO = pointAttributeManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("位号属性不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Point attribute does not exist");
         }
         return entityDO;
     }

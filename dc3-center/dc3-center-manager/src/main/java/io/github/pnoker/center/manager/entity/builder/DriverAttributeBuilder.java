@@ -16,32 +16,32 @@
 
 package io.github.pnoker.center.manager.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.center.manager.entity.model.DriverAttributeDO;
 import io.github.pnoker.center.manager.entity.vo.DriverAttributeVO;
-import io.github.pnoker.common.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.entity.ext.DriverAttributeExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AttributeTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
- * DriverAttribute Builder
+ * 驱动属性Builder
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DriverAttributeBuilder {
 
     /**
@@ -78,7 +78,7 @@ public interface DriverAttributeBuilder {
         // Json Ext
         DriverAttributeExt entityExt = entityBO.getAttributeExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -118,7 +118,7 @@ public interface DriverAttributeBuilder {
     default void afterProcess(DriverAttributeDO entityDO, @MappingTarget DriverAttributeBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getAttributeExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             DriverAttributeExt ext = new DriverAttributeExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
@@ -159,30 +159,6 @@ public interface DriverAttributeBuilder {
      * @return EntityVO Array
      */
     List<DriverAttributeVO> buildVOListByBOList(List<DriverAttributeBO> entityBOList);
-
-    /**
-     * BO to DTO
-     *
-     * @param entityBO EntityBO
-     * @return EntityDTO
-     */
-    DriverAttributeDTO buildDTOByBO(DriverAttributeBO entityBO);
-
-    /**
-     * BOList to DTOList
-     *
-     * @param entityBOList EntityBO Array
-     * @return EntityDTO Array
-     */
-    List<DriverAttributeDTO> buildDTOListByBOList(List<DriverAttributeBO> entityBOList);
-
-    /**
-     * DTO to BO
-     *
-     * @param entityDTO EntityDTO
-     * @return EntityBO
-     */
-    DriverAttributeBO buildBOByDTO(DriverAttributeDTO entityDTO);
 
     /**
      * DOPage to BOPage

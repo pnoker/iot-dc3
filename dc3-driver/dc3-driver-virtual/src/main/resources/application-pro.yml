@@ -14,12 +14,12 @@
 # limitations under the License.
 #
 
-# Product environment, customizable configuration
+# 生产环境配置, 会覆盖 application-*.yml 中配置的内容
 driver:
   schedule:
     # 定时读数据
     read:
-      corn: '0 0/15 * * * ?'
+      cron: '0 0/15 * * * ?'
 
 spring:
   rabbitmq:
@@ -28,3 +28,10 @@ spring:
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:dc3}
     password: ${RABBITMQ_PASSWORD:dc3}
+
+grpc:
+  client:
+    dc3-center-manager:
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext

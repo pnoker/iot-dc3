@@ -25,14 +25,12 @@ import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 /**
  * Menu VO
@@ -45,13 +43,11 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "Menu", description = "菜单")
 public class MenuVO extends BaseVO {
 
     /**
      * 菜单父级ID
      */
-    @Schema(description = "菜单父级ID")
     @NotBlank(message = "Menu parent id can't be empty",
             groups = {Add.class, Update.class})
     private Long parentMenuId;
@@ -59,13 +55,11 @@ public class MenuVO extends BaseVO {
     /**
      * 菜单类型标识
      */
-    @Schema(description = "菜单类型标识")
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
      * 菜单名称
      */
-    @Schema(description = "菜单名称")
     @NotBlank(message = "Menu name can't be empty",
             groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
@@ -74,32 +68,27 @@ public class MenuVO extends BaseVO {
     private String menuName;
 
     /**
-     * 菜单编号，一般为URL的MD5编码
+     * 菜单编号, 一般为URL的MD5编码
      */
-    @Schema(description = "菜单编号")
     private String menuCode;
 
     /**
      * 菜单层级
      */
-    @Schema(description = "菜单层级")
     private MenuLevelFlagEnum menuLevel;
 
     /**
      * 菜单顺序
      */
-    @Schema(description = "菜单顺序")
     private Integer menuIndex;
 
     /**
      * 菜单拓展信息
      */
-    @Schema(description = "菜单拓展信息")
     private MenuExt menuExt;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }

@@ -18,7 +18,6 @@ package io.github.pnoker.center.auth.biz.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import io.github.pnoker.center.auth.biz.AuthService;
 import io.github.pnoker.center.auth.entity.bean.Login;
 import io.github.pnoker.center.auth.entity.bo.*;
@@ -28,12 +27,13 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.model.AuthUser;
 import io.github.pnoker.common.utils.AuthUtil;
 import io.github.pnoker.common.utils.DecodeUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -68,30 +68,30 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserLoginBO authenticateUser(Login login) {
         TenantBO tenantBO = tenantService.selectByCode(login.getTenant());
-        if (ObjectUtil.isNull(tenantBO)) {
-            throw new NotFoundException("租户{}不存在", login.getTenant());
+        if (Objects.isNull(tenantBO)) {
+            throw new NotFoundException("Tenant[{}] does not exist", login.getTenant());
         }
 
         //todo checkUserLimit
 
         UserLoginBO userLogin = userLoginService.selectByLoginName(login.getName(), false);
-        if (ObjectUtil.isNull(userLogin)) {
-            throw new NotFoundException("用户{}不存在", login.getName());
+        if (Objects.isNull(userLogin)) {
+            throw new NotFoundException("User[{}] does not exist", login.getName());
         }
 
         TenantBindBO tenantBindBO = tenantBindService.selectByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
-        if (ObjectUtil.isNull(tenantBindBO)) {
-            throw new NotFoundException("租户、用户信息不匹配");
+        if (Objects.isNull(tenantBindBO)) {
+            throw new NotFoundException("租户, 用户信息不匹配");
         }
 
         UserPasswordBO userPasswordBO = userPasswordService.selectById(userLogin.getUserPasswordId());
-        if (ObjectUtil.isNull(userPasswordBO)) {
-            throw new NotFoundException("密码不存在，请先设置密码");
+        if (Objects.isNull(userPasswordBO)) {
+            throw new NotFoundException("Password does not exist");
         }
 
         String saltValue = AuthUtil.getPasswordSalt(tenantBO.getId(), login.getName());
         if (CharSequenceUtil.isEmpty(saltValue)) {
-            throw new NotFoundException("密码盐不存在，请重新登录");
+            throw new NotFoundException("Salt does not exist");
         }
 
         String decodedPassword = DecodeUtil.md5(userPasswordBO.getLoginPassword() + saltValue);
@@ -110,7 +110,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthUser login(Login login) {
         //1. authenticate user
         UserLoginBO userLogin = authenticateUser(login);
-        if (ObjectUtil.isNull(userLogin)) {
+        if (Objects.isNull(userLogin)) {
             throw new ServiceException("认证失败！请重试");
         }
 
@@ -122,18 +122,18 @@ public class AuthServiceImpl implements AuthService {
         authUser.setTenantId(tenantBO.getId());
 
         //2.1 roles
-        List<RoleBO> roleBOS = roleUserBindService.listRoleByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
-        if (CollUtil.isEmpty(roleBOS)) {
+        List<RoleBO> roleBOList = roleUserBindService.listRoleByTenantIdAndUserId(tenantBO.getId(), userLogin.getUserId());
+        if (CollUtil.isEmpty(roleBOList)) {
             throw new ServiceException("请先为用户{}分配角色", login.getName());
         }
-        Set<String> roleCodeSet = roleBOS.stream().map(RoleBO::getRoleCode).collect(Collectors.toSet());
+        Set<String> roleCodeSet = roleBOList.stream().map(RoleBO::getRoleCode).collect(Collectors.toSet());
         authUser.setRoleCodeSet(roleCodeSet);
 
         //2.2 resources
         Set<ResourceBO> resourceBOSet = new HashSet<>(4);
-        for (RoleBO roleBO : roleBOS) {
-            List<ResourceBO> resourceBOS = roleResourceBindService.listResourceByRoleId(roleBO.getId());
-            resourceBOSet.addAll(resourceBOS);
+        for (RoleBO roleBO : roleBOList) {
+            List<ResourceBO> resourceBOList = roleResourceBindService.listResourceByRoleId(roleBO.getId());
+            resourceBOSet.addAll(resourceBOList);
         }
         if (CollUtil.isEmpty(resourceBOSet)) {
             throw new ServiceException("请先为用户{}分配权限", login.getName());

@@ -17,9 +17,10 @@
 package io.github.pnoker.driver.server;
 
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.driver.context.DriverContext;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
@@ -37,7 +38,6 @@ import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
@@ -59,7 +59,7 @@ public class Lwm2mServer {
     private LeshanServer server;
 
     @Resource
-    private DriverContext driverContext;
+    private DeviceMetadata deviceMetadata;
     @Resource
     private DriverSenderService driverSenderService;
 
@@ -92,7 +92,7 @@ public class Lwm2mServer {
         } catch (RuntimeException | InterruptedException e) {
             log.error("read exception :{},{},{}", clientEndpoint, path, e.getMessage());
         }
-        return DefaultConstant.DEFAULT_STRING_VALUE;
+        return DefaultConstant.NULL_STRING;
     }
 
 
@@ -187,7 +187,7 @@ public class Lwm2mServer {
             @Override
             public void onResponse(SingleObservation singleObservation, Registration registration, ObserveResponse observeResponse) {
                 /**
-                 * 可以通过MQ发送到其他服务去消费或者入库
+                 * 可以根据MQ发送到其他服务去消费或者入库
                  */
                 log.debug("obs res:{}{},{}", registration.getEndpoint(), singleObservation.getPath(), observeResponse.getContent());
             }

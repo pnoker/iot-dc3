@@ -17,6 +17,7 @@
 package com.serotonin.modbus4j.sero.messaging;
 
 import java.io.IOException;
+import java.io.Serial;
 
 /**
  * <p>TimeoutException class.</p>
@@ -25,6 +26,8 @@ import java.io.IOException;
  * @version 5.0.0
  */
 public class TimeoutException extends IOException {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

@@ -19,10 +19,9 @@ package io.github.pnoker.center.auth.entity.bean;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Check;
 import io.github.pnoker.common.valid.Update;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.validation.constraints.NotBlank;
 
 /**
  * Login
@@ -34,23 +33,23 @@ import javax.validation.constraints.NotBlank;
 @Setter
 public class Login {
 
-    @NotBlank(message = "Tenant can't be empty",
+    @NotBlank(message = "租户不能为空",
             groups = {Auth.class})
     private String tenant;
 
-    @NotBlank(message = "Name can't be empty",
+    @NotBlank(message = "名称不能为空",
             groups = {Check.class, Auth.class, Update.class})
     private String name;
 
-    @NotBlank(message = "Salt can't be empty",
+    @NotBlank(message = "盐值不能为空",
             groups = {Check.class, Auth.class})
     private String salt;
 
-    @NotBlank(message = "Password can't be empty",
+    @NotBlank(message = "密码不能为空",
             groups = {Auth.class})
     private String password;
 
-    @NotBlank(message = "Token can't be empty",
+    @NotBlank(message = "令牌不能为空",
             groups = {Check.class})
     private String token;
 

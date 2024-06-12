@@ -21,13 +21,11 @@ import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * PointAttributeConfig BO
@@ -40,13 +38,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "PointAttributeConfig", description = "位号属性配置")
 public class PointAttributeConfigVO extends BaseVO {
 
     /**
      * 位号属性ID
      */
-    @Schema(description = "位号属性ID")
     @NotNull(message = "位号属性ID不能为空",
             groups = {Add.class, Update.class})
     private Long pointAttributeId;
@@ -54,14 +50,12 @@ public class PointAttributeConfigVO extends BaseVO {
     /**
      * 位号属性配置值
      */
-    @Schema(description = "位号属性配置值")
     @NotNull(message = "位号属性配置值不能为空")
     private String configValue;
 
     /**
      * 设备ID
      */
-    @Schema(description = "设备ID")
     @NotNull(message = "设备ID不能为空",
             groups = {Add.class, Update.class})
     private Long deviceId;
@@ -69,7 +63,6 @@ public class PointAttributeConfigVO extends BaseVO {
     /**
      * 位号ID
      */
-    @Schema(description = "位号ID")
     @NotNull(message = "位号ID不能为空",
             groups = {Add.class, Update.class})
     private Long pointId;
@@ -77,18 +70,15 @@ public class PointAttributeConfigVO extends BaseVO {
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
      * 签名
      */
-    @Schema(description = "签名")
     private String signature;
 
     /**
      * 版本
      */
-    @Schema(description = "版本")
     private Integer version;
 }

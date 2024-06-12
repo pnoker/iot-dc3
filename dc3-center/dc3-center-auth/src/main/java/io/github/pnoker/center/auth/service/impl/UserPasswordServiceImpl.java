@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,11 +31,11 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * 用户密码服务接口实现类
@@ -55,14 +54,13 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     private UserPasswordManager userPasswordManager;
 
     @Override
-    @Transactional
     public void save(UserPasswordBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         UserPasswordDO entityDO = userPasswordBuilder.buildDOByBO(entityBO);
         entityDO.setLoginPassword(DecodeUtil.md5(entityDO.getLoginPassword()));
         if (!userPasswordManager.save(entityDO)) {
-            throw new AddException("The user password add failed: {}", entityBO.toString());
+            throw new AddException("Failed to create user password: {}", entityBO.toString());
         }
     }
 
@@ -71,7 +69,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         getDOById(id, true);
 
         if (!userPasswordManager.removeById(id)) {
-            throw new DeleteException("The user password delete failed");
+            throw new DeleteException("Failed to remove user password");
         }
     }
 
@@ -97,7 +95,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
 
     @Override
     public Page<UserPasswordBO> selectByPage(UserPasswordQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<UserPasswordDO> entityPageDO = userPasswordManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -107,12 +105,18 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     @Override
     public void restPassword(Long id) {
         UserPasswordBO userPasswordBO = selectById(id);
-        if (ObjectUtil.isNotNull(userPasswordBO)) {
+        if (Objects.nonNull(userPasswordBO)) {
             userPasswordBO.setLoginPassword(DecodeUtil.md5(AlgorithmConstant.DEFAULT_PASSWORD));
             update(userPasswordBO);
         }
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link UserPasswordQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<UserPasswordDO> fuzzyQuery(UserPasswordQuery entityQuery) {
         return Wrappers.<UserPasswordDO>query().lambda();
     }
@@ -130,12 +134,12 @@ public class UserPasswordServiceImpl implements UserPasswordService {
         wrapper.eq(UserPasswordDO::getLoginPassword, entityBO.getLoginPassword());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserPasswordDO one = userPasswordManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("用户密码重复");
+            throw new DuplicateException("User password has been duplicated");
         }
         return duplicate;
     }
@@ -149,8 +153,8 @@ public class UserPasswordServiceImpl implements UserPasswordService {
      */
     private UserPasswordDO getDOById(Long id, boolean throwException) {
         UserPasswordDO entityDO = userPasswordManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("用户密码不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("User password does not exist");
         }
         return entityDO;
     }

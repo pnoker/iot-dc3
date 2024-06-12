@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.ponker.center.ekuiper.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -9,12 +25,13 @@ import io.github.ponker.center.ekuiper.entity.vo.RuleStatusVO;
 import io.github.ponker.center.ekuiper.service.ApiService;
 import io.github.ponker.center.ekuiper.service.RuleService;
 import io.github.ponker.center.ekuiper.service.UrlService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import javax.annotation.Resource;
-import javax.validation.Valid;
+
 import java.util.List;
 import java.util.Map;
 
@@ -37,10 +54,10 @@ public class RuleController {
     private UrlService urlService;
 
     /**
-     *新增rule
+     * 新增rule
      */
     @PostMapping("/create")
-    public Mono<R<String>> createRule(@Valid @RequestBody Object form) throws Exception {
+    public Mono<R<String>> createRule(@Validated @RequestBody Object form) throws Exception {
         Mono<String> stringMono = ruleService.callRuleApiWithData(form, HttpMethod.POST, urlService.getRuleUrl());
         return stringMono.flatMap(s -> {
             try {
@@ -53,10 +70,10 @@ public class RuleController {
     }
 
     /**
-     *更新rule
+     * 更新rule
      */
     @PutMapping("/update")
-    public Mono<R<String>> updateRule(@Valid @RequestBody Object form, @RequestParam(name = "id") String id) throws Exception {
+    public Mono<R<String>> updateRule(@Validated @RequestBody Object form, @RequestParam(name = "id") String id) throws Exception {
         String url = urlService.getRuleUrl() + "/" + id;
         Mono<String> stringMono = ruleService.callRuleApiWithData(form, HttpMethod.PUT, url);
         return stringMono.flatMap(s -> {
@@ -70,15 +87,15 @@ public class RuleController {
     }
 
     /**
-     *展示所有规则
+     * 展示所有规则
      */
     @GetMapping("/list")
-    public Mono<R<Page<RuleDataVO>>> listAllRule(@RequestParam(required = false,defaultValue = "1") Integer pageNum,
-                                                 @RequestParam(required = false,defaultValue = "10") Integer pageSize) {
+    public Mono<R<Page<RuleDataVO>>> listAllRule(@RequestParam(required = false, defaultValue = "1") Integer pageNum,
+                                                 @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         Mono<Page<RuleDataVO>> pageMono = ruleService.callApiWithRulePage(HttpMethod.GET, urlService.getRuleUrl(), pageNum, pageSize);
         return pageMono.flatMap(s -> {
             try {
-                return Mono.just(R.ok(s,"successful"));
+                return Mono.just(R.ok(s, "successful"));
             } catch (Exception e) {
                 log.error("Failed to call listAllRule Rule API", e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -87,7 +104,7 @@ public class RuleController {
     }
 
     /**
-     *描述当前规则
+     * 描述当前规则
      */
     @GetMapping("/listOne")
     public Mono<R<DetailRuleVO>> listOneRule(@RequestParam(name = "id") String id) {
@@ -95,7 +112,7 @@ public class RuleController {
         Mono<DetailRuleVO> dynamicEntityMono = ruleService.callApilRule(HttpMethod.GET, url);
         return dynamicEntityMono.flatMap(s -> {
             try {
-                return Mono.just(R.ok(s,"successful"));
+                return Mono.just(R.ok(s, "successful"));
             } catch (Exception e) {
                 log.error("Failed to call listOneRule Rule API", e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -104,7 +121,7 @@ public class RuleController {
     }
 
     /**
-     *查看规则状态
+     * 查看规则状态
      */
     @GetMapping("/status")
     public Mono<R<RuleStatusVO>> lookStatusRule(@RequestParam(name = "id") String id) {
@@ -112,7 +129,7 @@ public class RuleController {
         Mono<RuleStatusVO> ruleStatusMono = ruleService.callApiRuleStatus(HttpMethod.GET, url);
         return ruleStatusMono.flatMap(s -> {
             try {
-                return Mono.just(R.ok(s,"successful"));
+                return Mono.just(R.ok(s, "successful"));
             } catch (Exception e) {
                 log.error("Failed to call lookStatusRule Rule API", e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -121,7 +138,7 @@ public class RuleController {
     }
 
     /**
-     *启动规则
+     * 启动规则
      */
     @PostMapping("/start")
     public Mono<R<String>> startRule(@RequestParam(name = "id") String id) {
@@ -138,7 +155,7 @@ public class RuleController {
     }
 
     /**
-     *停止规则
+     * 停止规则
      */
     @PostMapping("/stop")
     public Mono<R<String>> stopRule(@RequestParam(name = "id") String id) {
@@ -155,7 +172,7 @@ public class RuleController {
     }
 
     /**
-     *重启规则
+     * 重启规则
      */
     @PostMapping("/restart")
     public Mono<R<String>> restartRule(@RequestParam(name = "id") String id) {
@@ -172,7 +189,7 @@ public class RuleController {
     }
 
     /**
-     *删除规则
+     * 删除规则
      */
     @DeleteMapping("/delete")
     public Mono<R<String>> deleteRule(@RequestParam(name = "id") String id) {
@@ -189,10 +206,10 @@ public class RuleController {
     }
 
     /**
-     *添加actionNodes
+     * 添加actionNodes
      */
     @PostMapping("/createAction")
-    public Mono<R<String>> createActions(@RequestBody Object data){
+    public Mono<R<String>> createActions(@RequestBody Object data) {
         Mono<String> stringMono = ruleService.addActions(data);
         return stringMono.flatMap(s -> {
             try {
@@ -205,10 +222,10 @@ public class RuleController {
     }
 
     /**
-     *显示actionNodes
+     * 显示actionNodes
      */
     @GetMapping("/listAction")
-    public Mono<R<List<Map<String, Map<String, Object>>>>> listActions() {
+    public Mono<Object> listActions() {
         Mono<List<Map<String, Map<String, Object>>>> listMono = ruleService.listActions();
         return listMono.flatMap(actions -> {
             try {
@@ -221,10 +238,10 @@ public class RuleController {
     }
 
     /**
-     *删除actionNodes
+     * 删除actionNodes
      */
     @DeleteMapping("/deleteAction3")
-    public Mono<R<String>> deleteActions(@RequestParam(name = "index") Integer  index) {
+    public Mono<R<String>> deleteActions(@RequestParam(name = "index") Integer index) {
         Mono<String> stringMono = ruleService.deleteActions(index);
         return stringMono.flatMap(s -> {
             try {
@@ -237,7 +254,7 @@ public class RuleController {
     }
 
     /**
-     *删除所有actionNodes
+     * 删除所有actionNodes
      */
     @DeleteMapping("/deleteAllAction")
     public Mono<R<String>> deleteAllActions() {
@@ -253,10 +270,10 @@ public class RuleController {
     }
 
     /**
-     *编辑actionNodes
+     * 编辑actionNodes
      */
     @PutMapping("/editAction3")
-    public Mono<R<String>> editActions(@Valid @RequestBody Object data,@RequestParam(name = "index") Integer index) {
+    public Mono<R<String>> editActions(@Validated @RequestBody Object data, @RequestParam(name = "index") Integer index) {
         Mono<String> stringMono = ruleService.editActions(data, index);
         return stringMono.flatMap(s -> {
             try {
@@ -269,7 +286,7 @@ public class RuleController {
     }
 
     @DeleteMapping("/deleteAction")
-    public Mono<R<String>> deleteActions(@RequestParam(name = "actionType") String  actionType) {
+    public Mono<R<String>> deleteActions(@RequestParam(name = "actionType") String actionType) {
         Mono<String> stringMono = ruleService.deleteActions(actionType);
         return stringMono.flatMap(s -> {
             try {
@@ -282,8 +299,8 @@ public class RuleController {
     }
 
     @DeleteMapping("/deleteAction2")
-    public Mono<R<String>> deleteActions(@RequestParam(name = "actionType") String  actionType,@RequestParam(name = "index") Integer  index) {
-        Mono<String> stringMono = ruleService.deleteActions(actionType,index);
+    public Mono<R<String>> deleteActions(@RequestParam(name = "actionType") String actionType, @RequestParam(name = "index") Integer index) {
+        Mono<String> stringMono = ruleService.deleteActions(actionType, index);
         return stringMono.flatMap(s -> {
             try {
                 return Mono.just(R.ok(s));
@@ -295,7 +312,7 @@ public class RuleController {
     }
 
     @PutMapping("/editAction")
-    public Mono<R<String>> editActions(@RequestParam(name = "type") String type,@Valid @RequestBody Object data) {
+    public Mono<R<String>> editActions(@RequestParam(name = "type") String type, @Validated @RequestBody Object data) {
         Mono<String> stringMono = ruleService.editActions(data, type);
         return stringMono.flatMap(s -> {
             try {
@@ -309,7 +326,7 @@ public class RuleController {
 
 
     @PutMapping("/editAction2")
-    public Mono<R<String>> editActions(@RequestParam(name = "type") String type,@Valid @RequestBody Object data,@RequestParam(name = "index") Integer index) {
+    public Mono<R<String>> editActions(@RequestParam(name = "type") String type, @Validated @RequestBody Object data, @RequestParam(name = "index") Integer index) {
         Mono<String> stringMono = ruleService.editActions(data, type, index);
         return stringMono.flatMap(s -> {
             try {

@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.ApiBO;
 import io.github.pnoker.center.auth.entity.model.ApiDO;
@@ -26,12 +25,14 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.ApiTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -40,7 +41,7 @@ import java.util.Optional;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface ApiBuilder {
 
     /**
@@ -77,7 +78,7 @@ public interface ApiBuilder {
         // Json Ext
         ApiExt entityExt = entityBO.getApiExt();
         JsonExt ext = new JsonExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());
             ext.setRemark(entityExt.getRemark());
@@ -118,7 +119,7 @@ public interface ApiBuilder {
     default void afterProcess(ApiDO entityDO, @MappingTarget ApiBO entityBO) {
         // Json Ext
         JsonExt entityExt = entityDO.getApiExt();
-        if (ObjectUtil.isNotNull(entityExt)) {
+        if (Objects.nonNull(entityExt)) {
             ApiExt ext = new ApiExt();
             ext.setType(entityExt.getType());
             ext.setVersion(entityExt.getVersion());

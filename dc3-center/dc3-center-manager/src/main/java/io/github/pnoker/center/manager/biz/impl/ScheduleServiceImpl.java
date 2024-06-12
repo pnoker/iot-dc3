@@ -21,11 +21,10 @@ import io.github.pnoker.center.manager.job.EveryDay6Job;
 import io.github.pnoker.center.manager.job.HourlyJob;
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.quartz.QuartzService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * @author pnoker
@@ -42,8 +41,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     public void initial() {
         try {
             // 自定义调度
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-every-day-6-job", "0 0 6 * * ?", EveryDay6Job.class);
-            quartzService.createJobWithCorn(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-hourly-job", "0 0 0/1 * * ?", HourlyJob.class);
+            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-every-day-6-job", "0 0 6 * * ?", EveryDay6Job.class);
+            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-hourly-job", "0 0 0/1 * * ?", HourlyJob.class);
 
             quartzService.startScheduler();
         } catch (SchedulerException e) {

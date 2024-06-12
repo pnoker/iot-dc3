@@ -89,6 +89,15 @@ public class Modbus {
     }
 
     /**
+     * <p>Getter for the field <code>exceptionHandler</code>.</p>
+     *
+     * @return a {@link MessagingExceptionHandler} object.
+     */
+    public MessagingExceptionHandler getExceptionHandler() {
+        return exceptionHandler;
+    }
+
+    /**
      * <p>Setter for the field <code>exceptionHandler</code>.</p>
      *
      * @param exceptionHandler a {@link MessagingExceptionHandler} object.
@@ -98,15 +107,6 @@ public class Modbus {
             this.exceptionHandler = new DefaultMessagingExceptionHandler();
         else
             this.exceptionHandler = exceptionHandler;
-    }
-
-    /**
-     * <p>Getter for the field <code>exceptionHandler</code>.</p>
-     *
-     * @return a {@link MessagingExceptionHandler} object.
-     */
-    public MessagingExceptionHandler getExceptionHandler() {
-        return exceptionHandler;
     }
 
     /**

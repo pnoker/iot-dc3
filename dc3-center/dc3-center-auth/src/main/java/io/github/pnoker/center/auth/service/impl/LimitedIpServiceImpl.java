@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,10 +31,11 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * 限制IP服务接口实现类
@@ -68,7 +68,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
         getDOById(id, true);
 
         if (!limitedIpManager.removeById(id)) {
-            throw new DeleteException("The ip delete failed");
+            throw new DeleteException("Failed to remove ip");
         }
     }
 
@@ -81,7 +81,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
         LimitedIpDO entityDO = limitedIpBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (limitedIpManager.updateById(entityDO)) {
-            throw new UpdateException("限制IP更新失败");
+            throw new UpdateException("Failed to update limited ip");
         }
     }
 
@@ -103,7 +103,7 @@ public class LimitedIpServiceImpl implements LimitedIpService {
 
     @Override
     public Page<LimitedIpBO> selectByPage(LimitedIpQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<LimitedIpDO> entityPageDO = limitedIpManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -113,9 +113,15 @@ public class LimitedIpServiceImpl implements LimitedIpService {
     @Override
     public Boolean checkValid(String ip) {
         LimitedIpBO limitedIpBO = selectByIp(ip);
-        return ObjectUtil.isNotNull(limitedIpBO);
+        return Objects.nonNull(limitedIpBO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link LimitedIpQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<LimitedIpDO> fuzzyQuery(LimitedIpQuery entityQuery) {
         LambdaQueryWrapper<LimitedIpDO> wrapper = Wrappers.<LimitedIpDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getIp()), LimitedIpDO::getIp, entityQuery.getIp());
@@ -137,12 +143,12 @@ public class LimitedIpServiceImpl implements LimitedIpService {
         wrapper.eq(LimitedIpDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         LimitedIpDO one = limitedIpManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("限制IP重复");
+            throw new DuplicateException("Limited ip has been duplicated");
         }
         return duplicate;
     }
@@ -156,8 +162,8 @@ public class LimitedIpServiceImpl implements LimitedIpService {
      */
     private LimitedIpDO getDOById(Long id, boolean throwException) {
         LimitedIpDO entityDO = limitedIpManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("受限IP不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Limited ip does not exist");
         }
         return entityDO;
     }

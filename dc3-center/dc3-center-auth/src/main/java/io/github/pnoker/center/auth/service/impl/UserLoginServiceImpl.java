@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,11 +31,11 @@ import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * 用户服务接口实现类
@@ -55,13 +54,12 @@ public class UserLoginServiceImpl implements UserLoginService {
     private UserLoginManager userLoginManager;
 
     @Override
-    @Transactional
     public void save(UserLoginBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
         UserLoginDO entityDO = userLoginBuilder.buildDOByBO(entityBO);
         if (!userLoginManager.save(entityDO)) {
-            throw new AddException("The user add failed: {}", entityBO.toString());
+            throw new AddException("Failed to create user: {}", entityBO.toString());
         }
     }
 
@@ -70,7 +68,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         getDOById(id, true);
 
         if (!userLoginManager.removeById(id)) {
-            throw new DeleteException("The user login delete failed");
+            throw new DeleteException("Failed to remove user login");
         }
     }
 
@@ -95,7 +93,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     public Page<UserLoginBO> selectByPage(UserLoginQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<UserLoginDO> entityPageBO = userLoginManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -116,7 +114,7 @@ public class UserLoginServiceImpl implements UserLoginService {
         wrapper.eq(UserLoginDO::getEnableFlag, EnableFlagEnum.ENABLE);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserLoginDO userLogin = userLoginManager.getOne(wrapper);
-        if (ObjectUtil.isNull(userLogin)) {
+        if (Objects.isNull(userLogin)) {
             throw new NotFoundException();
         }
         return userLoginBuilder.buildBOByDO(userLogin);
@@ -125,13 +123,19 @@ public class UserLoginServiceImpl implements UserLoginService {
     @Override
     public boolean checkLoginNameValid(String loginName) {
         UserLoginBO userLogin = selectByLoginName(loginName, false);
-        if (ObjectUtil.isNotNull(userLogin)) {
+        if (Objects.nonNull(userLogin)) {
             return EnableFlagEnum.ENABLE.equals(userLogin.getEnableFlag());
         }
 
         return false;
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link UserLoginQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<UserLoginDO> fuzzyQuery(UserLoginQuery entityQuery) {
         LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getLoginName()), UserLoginDO::getLoginName, entityQuery.getLoginName());
@@ -152,12 +156,12 @@ public class UserLoginServiceImpl implements UserLoginService {
         wrapper.eq(UserLoginDO::getUserId, entityBO.getUserId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         UserLoginDO one = userLoginManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("用户登录重复");
+            throw new DuplicateException("User login has been duplicated");
         }
         return duplicate;
     }
@@ -171,8 +175,8 @@ public class UserLoginServiceImpl implements UserLoginService {
      */
     private UserLoginDO getDOById(Long id, boolean throwException) {
         UserLoginDO entityDO = userLoginManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("用户登录不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("User login does not exist");
         }
         return entityDO;
     }

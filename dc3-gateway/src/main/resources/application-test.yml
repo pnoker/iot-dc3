@@ -14,12 +14,13 @@
 # limitations under the License.
 #
 
-# Test environment, customizable configuration
+# 测试环境配置, 会覆盖 application-*.yml 中配置的内容
 spring:
-  redis:
-    host: ${REDIS_HOST:dc3-redis}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:dc3}
+  data:
+    redis:
+      host: ${REDIS_HOST:dc3-redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:dc3}
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:15M}
@@ -31,52 +32,34 @@ spring:
           uri: http://dc3-center-auth:8300/
           predicates:
             - Path=/api/v3/auth/token/**
-          filters:
-            - StripPrefix=2
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
         # auth
         - id: auth_route
           uri: http://dc3-center-auth:8300
           predicates:
             - Path=/api/v3/auth/user/**,/api/v3/auth/limited_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
           filters:
-            - StripPrefix=2
             - Authentic
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
         # manager
         - id: manager_route
           uri: http://dc3-center-manager:8400
           predicates:
             - Path=/api/v3/manager/**
           filters:
-            - StripPrefix=2
             - Authentic
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
         # data
         - id: data_route
           uri: http://dc3-center-data:8500
           predicates:
             - Path=/api/v3/data/**
           filters:
-            - StripPrefix=2
             - Authentic
-            - name: RequestRateLimiter
-              args:
-                key-resolver: '#{@hostKeyResolver}'
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
+        # ekuiper
+        - id: ekuiper_route
+          uri: http://dc3-center-ekuiper:8600
+          predicates:
+            - Path=/api/v3/ekuiper/**
+          filters:
+            - Authentic
 
 grpc:
   client:
@@ -85,3 +68,7 @@ grpc:
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
+
+logging:
+  level:
+    io.github.pnoker: DEBUG

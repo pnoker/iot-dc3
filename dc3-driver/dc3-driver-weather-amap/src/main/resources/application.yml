@@ -18,7 +18,7 @@ driver:
   tenant: default
   name: 高德天气驱动
   code: WeatherAMapDriver
-  type: DRIVER
+  type: DRIVER_CLIENT
   remark: @project.description@
   custom:
     key: 04ddc2146bc32a4847b7ca6b6dfb1324
@@ -26,10 +26,10 @@ driver:
     # 定时读数据
     read:
       enable: true
-      corn: '0/30 * * * * ?'
+      cron: '0/30 * * * * ?'
     custom:
       enable: true
-      corn: '0/5 * * * * ?'
+      cron: '0/5 * * * * ?'
   driver-attribute:
     - display-name: 坐标
       attribute-name: location

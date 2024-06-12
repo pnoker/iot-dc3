@@ -28,8 +28,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @since 2022.1.0
  */
 @SpringBootApplication
-// 开发环境无需注册中心
-// @EnableDiscoveryClient
 @EnableTransactionManagement
 @MapperScan("io.github.pnoker.center.manager.mapper")
 public class ManagerApplication {
@@ -38,4 +36,3 @@ public class ManagerApplication {
         SpringApplication.run(ManagerApplication.class, args);
     }
 }
-

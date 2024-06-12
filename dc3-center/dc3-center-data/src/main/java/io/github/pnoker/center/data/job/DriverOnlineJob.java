@@ -17,13 +17,12 @@
 package io.github.pnoker.center.data.job;
 
 import io.github.pnoker.center.data.biz.DriverOnlineJobService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 
 /**
@@ -51,6 +50,5 @@ public class DriverOnlineJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         driverOnlineJobService.driverOnline();
-        log.info("驱动状态统计---------");
     }
 }

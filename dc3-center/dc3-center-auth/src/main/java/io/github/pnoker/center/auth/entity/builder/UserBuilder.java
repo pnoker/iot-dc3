@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.entity.builder;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserBO;
 import io.github.pnoker.center.auth.entity.model.UserDO;
@@ -25,12 +24,14 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.UserIdentityExt;
 import io.github.pnoker.common.entity.ext.UserSocialExt;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * User Builder
@@ -38,7 +39,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface UserBuilder {
 
     /**
@@ -72,7 +73,7 @@ public interface UserBuilder {
     default void afterProcess(UserBO entityBO, @MappingTarget UserDO entityDO) {
         UserSocialExt entitySocialExt = entityBO.getSocialExt();
         JsonExt socialExt = new JsonExt();
-        if (ObjectUtil.isNotNull(entitySocialExt)) {
+        if (Objects.nonNull(entitySocialExt)) {
             socialExt.setType(entitySocialExt.getType());
             socialExt.setVersion(entitySocialExt.getVersion());
             socialExt.setVersion(entitySocialExt.getVersion());
@@ -83,7 +84,7 @@ public interface UserBuilder {
 
         UserIdentityExt entityIdentityExt = entityBO.getIdentityExt();
         JsonExt identityExt = new JsonExt();
-        if (ObjectUtil.isNotNull(entityIdentityExt)) {
+        if (Objects.nonNull(entityIdentityExt)) {
             identityExt.setType(entityIdentityExt.getType());
             identityExt.setVersion(entityIdentityExt.getVersion());
             identityExt.setVersion(entityIdentityExt.getVersion());
@@ -114,7 +115,7 @@ public interface UserBuilder {
     @AfterMapping
     default void afterProcess(UserDO entityDO, @MappingTarget UserBO entityBO) {
         JsonExt entitySocialExt = entityDO.getSocialExt();
-        if (ObjectUtil.isNotNull(entitySocialExt)) {
+        if (Objects.nonNull(entitySocialExt)) {
             UserSocialExt ext = new UserSocialExt();
             ext.setType(entitySocialExt.getType());
             ext.setVersion(entitySocialExt.getVersion());
@@ -125,7 +126,7 @@ public interface UserBuilder {
         }
 
         JsonExt entityIdentityExt = entityDO.getIdentityExt();
-        if (ObjectUtil.isNotNull(entityIdentityExt)) {
+        if (Objects.nonNull(entityIdentityExt)) {
             UserIdentityExt ext = new UserIdentityExt();
             ext.setType(entityIdentityExt.getType());
             ext.setVersion(entityIdentityExt.getVersion());

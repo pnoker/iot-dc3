@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.manager.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.manager.entity.builder.LabelForManagerBuilder;
 import io.github.pnoker.center.manager.entity.query.LabelQuery;
@@ -29,14 +28,13 @@ import io.github.pnoker.common.entity.vo.LabelVO;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * 标签 Controller
@@ -46,15 +44,16 @@ import javax.validation.constraints.NotNull;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-标签")
 @RequestMapping(ManagerConstant.LABEL_URL_PREFIX)
 public class LabelController implements BaseController {
 
-    @Resource
-    private LabelForManagerBuilder labelForManagerBuilder;
+    private final LabelForManagerBuilder labelForManagerBuilder;
+    private final LabelService labelService;
 
-    @Resource
-    private LabelService labelService;
+    public LabelController(LabelForManagerBuilder labelForManagerBuilder, LabelService labelService) {
+        this.labelForManagerBuilder = labelForManagerBuilder;
+        this.labelService = labelService;
+    }
 
     /**
      * 新增
@@ -63,16 +62,15 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    @Operation(summary = "新增-标签")
-    public R<String> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
         try {
             LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(getTenantId());
             labelService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -83,13 +81,13 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             labelService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -100,14 +98,14 @@ public class LabelController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
         try {
             LabelBO entityBO = labelForManagerBuilder.buildBOByVO(entityVO);
             labelService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -118,14 +116,14 @@ public class LabelController implements BaseController {
      * @return LabelVO {@link LabelVO}
      */
     @GetMapping("/id/{id}")
-    public R<LabelVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<LabelVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             LabelBO entityBO = labelService.selectById(id);
             LabelVO entityVO = labelForManagerBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -136,18 +134,18 @@ public class LabelController implements BaseController {
      * @return R Of LabelVO Page
      */
     @PostMapping("/list")
-    public R<Page<LabelVO>> list(@RequestBody(required = false) LabelQuery entityQuery) {
+    public Mono<R<Page<LabelVO>>> list(@RequestBody(required = false) LabelQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new LabelQuery();
             }
             entityQuery.setTenantId(getTenantId());
             Page<LabelBO> entityPageBO = labelService.selectByPage(entityQuery);
             Page<LabelVO> entityPageVO = labelForManagerBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 }

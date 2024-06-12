@@ -18,16 +18,16 @@ driver:
   tenant: default
   name: Mqtt驱动
   code: MqttDriver
-  type: DRIVER
+  type: DRIVER_SERVER
   remark: @project.description@
   schedule:
     # 定时读数据
     read:
       enable: false
-      corn: '0/30 * * * * ?'
+      cron: '0/30 * * * * ?'
     custom:
       enable: true
-      corn: '0/5 * * * * ?'
+      cron: '0/5 * * * * ?'
   point-attribute:
     - display-name: 指令Topic
       attribute-name: commandTopic

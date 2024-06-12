@@ -22,6 +22,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_menu")
 public class MenuDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -65,7 +67,7 @@ public class MenuDO implements Serializable {
     private String menuName;
 
     /**
-     * 菜单编号，一般为URL的MD5编码
+     * 菜单编号, 一般为URL的MD5编码
      */
     @TableField("menu_code")
     private String menuCode;
@@ -143,7 +145,7 @@ public class MenuDO implements Serializable {
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识,0:未删除,1:已删除
+     * 逻辑删除标识, 0:未删除, 1:已删除
      */
     @TableLogic
     @TableField("deleted")

@@ -41,10 +41,8 @@ import java.net.*;
  */
 public class UdpMaster extends ModbusMaster {
     private static final int MESSAGE_LENGTH = 1024;
-
-    private short nextTransactionId = 0;
     private final IpParameters ipParameters;
-
+    private short nextTransactionId = 0;
     // Runtime fields.
     private BaseMessageParser messageParser;
     private DatagramSocket socket;

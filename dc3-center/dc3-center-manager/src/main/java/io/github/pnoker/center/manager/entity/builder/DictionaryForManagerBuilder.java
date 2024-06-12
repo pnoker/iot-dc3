@@ -23,6 +23,7 @@ import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.entity.bo.DictionaryBO;
 import io.github.pnoker.common.entity.builder.DictionaryBuilder;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -32,7 +33,7 @@ import org.mapstruct.Mapping;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DictionaryForManagerBuilder extends DictionaryBuilder {
 
     // 驱动相关
@@ -44,7 +45,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByDriverBO(DriverBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getDriverName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getDriverName()).value(entityBO.getId().toString()).build();
     }
 
     /**
@@ -61,7 +62,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByDriverBOPage(Page<DriverBO> entityPageBO);
 
-    // 模板相关
+    // 模版相关
 
     /**
      * BO to VO
@@ -70,7 +71,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByProfileBO(ProfileBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getProfileName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getProfileName()).value(entityBO.getId().toString()).build();
     }
 
     /**
@@ -96,7 +97,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByPointBO(PointBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getPointName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getPointName()).value(entityBO.getId().toString()).build();
     }
 
     /**
@@ -122,7 +123,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
      * @return EntityVO
      */
     default DictionaryBO buildVOByDeviceBO(DeviceBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getDeviceName()).value(entityBO.getId()).build();
+        return DictionaryBO.builder().label(entityBO.getDeviceName()).value(entityBO.getId().toString()).build();
     }
 
     /**

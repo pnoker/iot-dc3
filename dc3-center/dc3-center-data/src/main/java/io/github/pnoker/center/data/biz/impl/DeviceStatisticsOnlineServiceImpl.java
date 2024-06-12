@@ -17,9 +17,12 @@
 package io.github.pnoker.center.data.biz.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.github.pnoker.api.center.manager.*;
+import io.github.pnoker.api.center.manager.DeviceApiGrpc;
+import io.github.pnoker.api.center.manager.GrpcPageDeviceDTO;
+import io.github.pnoker.api.center.manager.GrpcPageDeviceQuery;
+import io.github.pnoker.api.center.manager.GrpcRPageDeviceDTO;
+import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.center.data.biz.DeviceStatisticsOnlineService;
 import io.github.pnoker.center.data.dal.DeviceRunHistoryManager;
@@ -34,15 +37,16 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import jakarta.annotation.Resource;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -79,37 +83,31 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
         if (CharSequenceUtil.isNotEmpty(deviceQuery.getDeviceName())) {
             query.setDeviceName(deviceQuery.getDeviceName());
         }
-        if (ObjectUtil.isNotEmpty(deviceQuery.getDriverId())) {
+        if (Objects.nonNull(deviceQuery.getDriverId())) {
             query.setDriverId(deviceQuery.getDriverId());
-        } else {
-            query.setDriverId(DefaultConstant.DEFAULT_INT);
         }
-        if (ObjectUtil.isNotNull(deviceQuery.getEnableFlag())) {
-            query.setEnableFlag(deviceQuery.getEnableFlag().getIndex());
-        } else {
-            query.setEnableFlag(DefaultConstant.DEFAULT_INT);
-        }
-        if (ObjectUtil.isNotEmpty(deviceQuery.getTenantId())) {
+        if (Objects.nonNull(deviceQuery.getTenantId())) {
             query.setTenantId(deviceQuery.getTenantId());
         }
-        GrpcRPageDeviceDTO list = deviceApiBlockingStub.list(query.build());
+        Optional.ofNullable(deviceQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPageDeviceDTO list = deviceApiBlockingStub.selectByPage(query.build());
         GrpcPageDeviceDTO data = list.getData();
         List<GrpcDeviceDTO> dataList = data.getDataList();
         if (!dataList.isEmpty()) {
             dataList.forEach(
                     driverDO -> {
                         //查出状态表最近两条数据
-                        List<DeviceStatusHistoryDO> deviceStatusHistoryDOS = deviceStatusHistoryService.selectRecently2Data(driverDO.getBase().getId());
-                        if (deviceStatusHistoryDOS.size() > 1) {
-                            Duration duration = Duration.between(deviceStatusHistoryDOS.get(1).getCreateTime(), deviceStatusHistoryDOS.get(0).getCreateTime());
+                        List<DeviceStatusHistoryDO> deviceStatusHistoryDOList = deviceStatusHistoryService.selectRecently2Data(driverDO.getBase().getId());
+                        if (deviceStatusHistoryDOList.size() > 1) {
+                            Duration duration = Duration.between(deviceStatusHistoryDOList.get(1).getCreateTime(), deviceStatusHistoryDOList.get(0).getCreateTime());
                             DeviceRunHistoryDO deviceRunHistoryDO = new DeviceRunHistoryDO();
                             long minutes = duration.toMinutes();
                             deviceRunHistoryDO.setDuration(minutes);
                             deviceRunHistoryDO.setDeviceName(driverDO.getDeviceName());
                             deviceRunHistoryDO.setDriverId(driverDO.getDriverId());
                             deviceRunHistoryDO.setDeviceId(driverDO.getBase().getId());
-                            if (DriverStatusEnum.OFFLINE.getCode().equals(deviceStatusHistoryDOS.get(0).getStatus())) {
-                                if (DriverStatusEnum.OFFLINE.getCode().equals(deviceStatusHistoryDOS.get(1).getStatus())) {
+                            if (DriverStatusEnum.OFFLINE.getCode().equals(deviceStatusHistoryDOList.get(0).getStatus())) {
+                                if (DriverStatusEnum.OFFLINE.getCode().equals(deviceStatusHistoryDOList.get(1).getStatus())) {
                                     //都为离线  离线时长
                                     deviceRunHistoryDO.setStatus(DriverStatusEnum.OFFLINE.getCode());
                                     deviceRunHistoryManager.save(deviceRunHistoryDO);
@@ -118,8 +116,8 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
                                     deviceRunHistoryDO.setStatus(DriverStatusEnum.ONLINE.getCode());
                                     deviceRunHistoryManager.save(deviceRunHistoryDO);
                                 }
-                            } else if (DriverStatusEnum.ONLINE.getCode().equals(deviceStatusHistoryDOS.get(0).getStatus())) {
-                                if (DriverStatusEnum.ONLINE.getCode().equals(deviceStatusHistoryDOS.get(1).getStatus())) {
+                            } else if (DriverStatusEnum.ONLINE.getCode().equals(deviceStatusHistoryDOList.get(0).getStatus())) {
+                                if (DriverStatusEnum.ONLINE.getCode().equals(deviceStatusHistoryDOList.get(1).getStatus())) {
                                     //都为在线  在线时长
                                     deviceRunHistoryDO.setStatus(DriverStatusEnum.ONLINE.getCode());
                                     deviceRunHistoryManager.save(deviceRunHistoryDO);
@@ -134,8 +132,8 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
             );
         }
         // 查出所有driverids  去重
-        List<DeviceRunHistoryDO> deviceRunHistoryDOS = deviceRunHistoryService.list(new LambdaQueryWrapper<>());
-        Set<Long> deviceIds = deviceRunHistoryDOS.stream().map(DeviceRunHistoryDO::getDeviceId).collect(Collectors.toSet());
+        List<DeviceRunHistoryDO> deviceRunHistoryDOList = deviceRunHistoryService.list(new LambdaQueryWrapper<>());
+        Set<Long> deviceIds = deviceRunHistoryDOList.stream().map(DeviceRunHistoryDO::getDeviceId).collect(Collectors.toSet());
         LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
         deviceIds.forEach(
@@ -148,7 +146,7 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
                     if (runDO != null && deviceRunDO != null) {
                         deviceRunDO.setId(runDO.getId());
                         deviceRunManager.updateById(deviceRunDO);
-                    } else if (ObjectUtils.isEmpty(runDO) && deviceRunDO != null) {
+                    } else if (Objects.isNull(runDO) && deviceRunDO != null) {
                         deviceRunManager.save(deviceRunDO);
                     }
                     //查出每天统计表离线时长是否有数据
@@ -159,7 +157,7 @@ public class DeviceStatisticsOnlineServiceImpl implements DeviceStatisticsOnline
                     if (runOffDO != null && deviceOffRunDO != null) {
                         deviceOffRunDO.setId(runOffDO.getId());
                         deviceRunManager.updateById(deviceOffRunDO);
-                    } else if (ObjectUtils.isEmpty(runOffDO) && deviceOffRunDO != null) {
+                    } else if (Objects.isNull(runOffDO) && deviceOffRunDO != null) {
                         deviceRunManager.save(deviceOffRunDO);
                     }
                 }

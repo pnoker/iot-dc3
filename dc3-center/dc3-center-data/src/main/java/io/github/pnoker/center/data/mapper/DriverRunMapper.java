@@ -34,5 +34,5 @@ public interface DriverRunMapper extends BaseMapper<DriverRunDO> {
 
     List<DriverRunDO> get7daysDuration(@Param("driverId") Long driverId, @Param("status") String status);
 
-    Long selectSumDuration(@Param("driverId") Long driverId,@Param("status")  String status);
+    Long selectSumDuration(@Param("driverId") Long driverId, @Param("status") String status);
 }

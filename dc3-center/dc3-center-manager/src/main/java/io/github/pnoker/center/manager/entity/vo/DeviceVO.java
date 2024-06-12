@@ -23,20 +23,18 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.github.pnoker.common.valid.Upload;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Device VO
+ * 设备 VO
  *
  * @author pnoker
  * @since 2022.1.0
@@ -46,13 +44,11 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "Device", description = "设备")
 public class DeviceVO extends BaseVO {
 
     /**
      * 设备名称
      */
-    @Schema(description = "设备名称")
     @NotBlank(message = "设备名称不能为空",
             groups = {Add.class})
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
@@ -63,13 +59,11 @@ public class DeviceVO extends BaseVO {
     /**
      * 设备编号
      */
-    @Schema(description = "设备编号")
     private String deviceCode;
 
     /**
      * 驱动ID
      */
-    @Schema(description = "驱动ID")
     @NotNull(message = "驱动ID不能为空",
             groups = {Add.class, Update.class, Upload.class})
     private Long driverId;
@@ -77,36 +71,30 @@ public class DeviceVO extends BaseVO {
     /**
      * 分组ID
      */
-    @Schema(description = "分组ID")
     private Long groupId;
 
     /**
      * 设备拓展信息
      */
-    @Schema(description = "设备拓展信息")
     private DeviceExt deviceExt;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
      * 签名
      */
-    @Schema(description = "签名")
     private String signature;
 
     /**
      * 版本
      */
-    @Schema(description = "版本")
     private Integer version;
 
     // 附加字段
-    @Schema(description = "模版ID集")
     @NotNull(message = "模版ID集不能为空",
             groups = {Upload.class})
-    private Set<Long> profileIds = new HashSet<>(4);
+    private Set<Long> profileIds;
 }

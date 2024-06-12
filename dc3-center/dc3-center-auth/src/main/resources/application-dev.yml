@@ -14,21 +14,19 @@
 # limitations under the License.
 #
 
-# Development environment, customizable configuration
+# 开发环境配置, 会覆盖 application-*.yml 中配置的内容
 spring:
   env: dev
   group: ${user.name}
   datasource:
-    dynamic:
-      datasource:
-        master:
-          url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:33306}/${MYSQL_DB:dc3_auth}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
-          username: ${MYSQL_USERNAME:root}
-          password: ${MYSQL_PASSWORD:dc3}
-  redis:
-    host: ${REDIS_HOST:dc3-redis}
-    port: ${REDIS_PORT:36379}
-    password: ${REDIS_PASSWORD:dc3}
+    url: jdbc:mysql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:33306}/${MYSQL_DB:dc3_auth}?allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:dc3}
+  data:
+    redis:
+      host: ${REDIS_HOST:dc3-redis}
+      port: ${REDIS_PORT:36379}
+      password: ${REDIS_PASSWORD:dc3}
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}

@@ -19,9 +19,9 @@ package io.github.pnoker.center.data.service.impl;
 import io.github.pnoker.center.data.entity.model.DriverRunDO;
 import io.github.pnoker.center.data.mapper.DriverRunMapper;
 import io.github.pnoker.center.data.service.DriverRunService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 @Service
@@ -36,6 +36,6 @@ public class DriverRunServiceImpl implements DriverRunService {
 
     @Override
     public Long selectSumDuration(Long driverId, String code) {
-        return driverRunMapper.selectSumDuration(driverId,code);
+        return driverRunMapper.selectSumDuration(driverId, code);
     }
 }

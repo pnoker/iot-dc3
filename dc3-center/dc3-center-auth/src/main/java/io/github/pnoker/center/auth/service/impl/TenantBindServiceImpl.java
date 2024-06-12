@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -29,11 +28,13 @@ import io.github.pnoker.center.auth.service.TenantBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * TenantBindService Impl
@@ -57,7 +58,7 @@ public class TenantBindServiceImpl implements TenantBindService {
 
         TenantBindDO entityDO = tenantBindBuilder.buildDOByBO(entityBO);
         if (!tenantBindManager.save(entityDO)) {
-            throw new AddException("The tenant bind add failed");
+            throw new AddException("Failed to create tenant bind");
         }
     }
 
@@ -66,7 +67,7 @@ public class TenantBindServiceImpl implements TenantBindService {
         getDOById(id, true);
 
         if (!tenantBindManager.removeById(id)) {
-            throw new DeleteException("The tenant bind delete failed");
+            throw new DeleteException("Failed to remove tenant bind");
         }
     }
 
@@ -101,17 +102,23 @@ public class TenantBindServiceImpl implements TenantBindService {
 
     @Override
     public Page<TenantBindBO> selectByPage(TenantBindQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<TenantBindDO> entityPageDO = tenantBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
         return tenantBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link TenantBindQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<TenantBindDO> fuzzyQuery(TenantBindQuery entityQuery) {
         LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getTenantId()), TenantBindDO::getTenantId, entityQuery.getTenantId());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getUserId()), TenantBindDO::getUserId, entityQuery.getUserId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getTenantId()), TenantBindDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), TenantBindDO::getUserId, entityQuery.getUserId());
         return wrapper;
     }
 
@@ -129,12 +136,12 @@ public class TenantBindServiceImpl implements TenantBindService {
         wrapper.eq(TenantBindDO::getUserId, entityBO.getUserId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         TenantBindDO one = tenantBindManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("租户绑定重复");
+            throw new DuplicateException("Tenant has been duplicated");
         }
         return duplicate;
     }
@@ -148,8 +155,8 @@ public class TenantBindServiceImpl implements TenantBindService {
      */
     private TenantBindDO getDOById(Long id, boolean throwException) {
         TenantBindDO entityDO = tenantBindManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("租户绑定不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Tenant bind does not exist");
         }
         return entityDO;
     }

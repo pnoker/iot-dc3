@@ -22,6 +22,7 @@ import io.github.pnoker.common.entity.bo.GroupBO;
 import io.github.pnoker.common.entity.builder.GroupBuilder;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.GroupTypeFlagEnum;
+import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -36,7 +37,7 @@ import java.util.Optional;
  * @author pnoker
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GroupForManagerBuilder extends GroupBuilder {
 
 

@@ -16,7 +16,7 @@
 
 services:
   gateway:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2024.3.0.dev
     restart: always
     ports:
       - '8000:8000'
@@ -29,7 +29,7 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:
@@ -37,7 +37,7 @@ services:
           - dc3-gateway
 
   auth:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2024.3.0.dev
     restart: always
     ports:
       - '8300:8300'
@@ -51,7 +51,7 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:
@@ -59,7 +59,7 @@ services:
           - dc3-center-auth
 
   manager:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2024.3.0.dev
     restart: always
     ports:
       - '8400:8400'
@@ -73,7 +73,7 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:
@@ -81,7 +81,7 @@ services:
           - dc3-center-manager
 
   data:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2024.3.0.dev
     restart: always
     ports:
       - '8500:8500'
@@ -95,15 +95,40 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:
         aliases:
           - dc3-center-data
 
+  ekuiper:
+    build:
+      context: ../dc3-center/dc3-center-ekuiper/
+      dockerfile: ./Dockerfile
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-ekuiper:2024.3.0.dev
+    restart: always
+    ports:
+      - '8600:8600'
+      - '9600:9600'
+    environment:
+      - NODE_ENV=test
+    container_name: dc3-center-ekuiper
+    hostname: dc3-center-ekuiper
+    volumes:
+      - logs:/dc3-center/dc3-center-ekuiper/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-center-ekuiper
+
   virtual:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2024.1.1.dev
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2024.3.0.dev
     restart: always
     environment:
       - NODE_ENV=test
@@ -114,12 +139,50 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '20m'
+        max-size: '10M'
         max-file: '20'
     networks:
       dc3net:
         aliases:
           - dc3-driver-virtual
+
+  modbus-tcp:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2024.3.0.dev
+    restart: always
+    environment:
+      - NODE_ENV=test
+    container_name: dc3-driver-modbus-tcp
+    hostname: dc3-driver-modbus-tcp
+    volumes:
+      - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-modbus-tcp
+
+  mqtt:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2024.3.0.dev
+    restart: always
+    environment:
+      - NODE_ENV=test
+    container_name: dc3-driver-mqtt
+    hostname: dc3-driver-mqtt
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mqtt
 
 volumes:
   logs:

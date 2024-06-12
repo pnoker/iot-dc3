@@ -19,9 +19,9 @@ package io.github.pnoker.center.manager.entity.query;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -35,17 +35,16 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(title = "DriverQuery", description = "驱动-查询")
 public class DriverQuery implements Serializable {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "分页")
     private Pages page;
 
     /**
      * 租户ID
      */
-    @Schema(description = "使能标识", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     private Long tenantId;
 
     // 查询字段
@@ -53,42 +52,35 @@ public class DriverQuery implements Serializable {
     /**
      * 驱动名称
      */
-    @Schema(description = "驱动名称")
     private String driverName;
 
     /**
      * 驱动编号
      */
-    @Schema(description = "驱动编号")
     private String driverCode;
 
     /**
      * 驱动服务名称
      */
-    @Schema(description = "驱动服务名称")
     private String serviceName;
 
     /**
      * 服务主机
      */
-    @Schema(description = "服务主机")
     private String serviceHost;
 
     /**
      * 驱动类型标识
      */
-    @Schema(description = "驱动类型标识")
     private DriverTypeFlagEnum driverTypeFlag;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 
     /**
      * 版本
      */
-    @Schema(description = "版本")
     private Integer version;
 }

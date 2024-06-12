@@ -28,56 +28,48 @@ import java.net.Socket;
 /**
  * TCP_Connection to a S7 PLC
  * <p>
- * 参考：<a href="http://libnodave.sourceforge.net/">http://libnodave.sourceforge.net</a>
+ * 参考: <a href="http://libnodave.sourceforge.net/">http://libnodave.sourceforge.net</a>
  *
  * @author Thomas Rudin
  */
 public final class S7TCPConnection extends S7BaseConnection {
 
     /**
-     * The Connection
-     */
-    private TCPConnection tcpConnection;
-
-    /**
-     * The Interface
-     */
-    private PLCinterface plCinterface;
-
-    /**
      * The Host to connect to
      */
     private final String host;
-
     /**
      * The port to connect to
      */
     private final int port;
-
     /**
      * Rack  number
      */
     private final int rack;
-
     /**
      * Slot number
      */
     private final int slot;
-
     /**
      * Timeout number
      */
     private final int timeout;
-
-    /**
-     * The Socket
-     */
-    private Socket socket;
-
     /**
      * To connect device type,such as S200
      */
     private final SiemensPLCS siemensPLCS;
+    /**
+     * The Connection
+     */
+    private TCPConnection tcpConnection;
+    /**
+     * The Interface
+     */
+    private PLCinterface plCinterface;
+    /**
+     * The Socket
+     */
+    private Socket socket;
 
     /**
      * Creates a new Instance to the given host, rack, slot and port

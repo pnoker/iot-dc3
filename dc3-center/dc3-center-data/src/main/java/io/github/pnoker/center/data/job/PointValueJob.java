@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -41,21 +40,21 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class PointValueJob extends QuartzJobBean {
 
+    public static final ReentrantReadWriteLock VALUE_LOCK = new ReentrantReadWriteLock();
+    public static final AtomicLong VALUE_COUNT = new AtomicLong(0);
+    public static final AtomicLong VALUE_SPEED = new AtomicLong(0);
+    private static final List<PointValueBO> POINT_VALUE_LIST = new ArrayList<>();
+    private final PointValueService pointValueService;
+    private final ThreadPoolExecutor threadPoolExecutor;
     @Value("${data.point.batch.speed}")
     private Integer batchSpeed;
     @Value("${data.point.batch.interval}")
     private Integer interval;
 
-    @Resource
-    private PointValueService pointValueService;
-    @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
-
-    public static final ReentrantReadWriteLock valueLock = new ReentrantReadWriteLock();
-    public static final AtomicLong valueCount = new AtomicLong(0);
-    public static final AtomicLong valueSpeed = new AtomicLong(0);
-
-    private static final List<PointValueBO> POINT_VALUE_BOS = new ArrayList<>();
+    public PointValueJob(PointValueService pointValueService, ThreadPoolExecutor threadPoolExecutor) {
+        this.pointValueService = pointValueService;
+        this.threadPoolExecutor = threadPoolExecutor;
+    }
 
     /**
      * 获取 PointValue 长度
@@ -63,14 +62,14 @@ public class PointValueJob extends QuartzJobBean {
      * @return Point Value Size
      */
     public static int getPointValuesSize() {
-        return POINT_VALUE_BOS.size();
+        return POINT_VALUE_LIST.size();
     }
 
     /**
      * 清空 PointValue
      */
     public static void clearPointValues() {
-        POINT_VALUE_BOS.clear();
+        POINT_VALUE_LIST.clear();
     }
 
     /**
@@ -79,14 +78,14 @@ public class PointValueJob extends QuartzJobBean {
      * @param pointValueBO PointValue
      */
     public static void addPointValues(PointValueBO pointValueBO) {
-        POINT_VALUE_BOS.add(pointValueBO);
+        POINT_VALUE_LIST.add(pointValueBO);
     }
 
     @Override
     protected void executeInternal(@NotNull JobExecutionContext jobExecutionContext) throws JobExecutionException {
         // Statistical point value receive rate
-        long speed = valueCount.getAndSet(0);
-        valueSpeed.set(speed);
+        long speed = VALUE_COUNT.getAndSet(0);
+        VALUE_SPEED.set(speed);
         speed /= interval;
         if (speed >= batchSpeed) {
             log.debug("Point value receiver speed: {} /s, value size: {}, interval: {}", speed, getPointValuesSize(), interval);
@@ -94,12 +93,12 @@ public class PointValueJob extends QuartzJobBean {
 
         // Save point value array to Redis & MongoDB
         threadPoolExecutor.execute(() -> {
-            valueLock.writeLock().lock();
-            if (!POINT_VALUE_BOS.isEmpty()) {
-                pointValueService.save(POINT_VALUE_BOS);
+            VALUE_LOCK.writeLock().lock();
+            if (!POINT_VALUE_LIST.isEmpty()) {
+                pointValueService.save(POINT_VALUE_LIST);
                 clearPointValues();
             }
-            valueLock.writeLock().unlock();
+            VALUE_LOCK.writeLock().unlock();
         });
     }
 }

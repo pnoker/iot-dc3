@@ -251,7 +251,7 @@ public class BatchRead<K> {
                 }
 
                 if (!added) {
-                    // This locator does not fit inside the current function...
+                    // This locator doesn't fit inside the current function...
                     if (locator.getOffset() > endOffset)
                         // ... and since the list is sorted by offset, no other locators can either, so quit the loop.
                         break;

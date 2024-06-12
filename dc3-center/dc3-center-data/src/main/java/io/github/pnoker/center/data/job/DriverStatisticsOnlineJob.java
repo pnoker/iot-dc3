@@ -24,16 +24,16 @@ import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-
 
 @Slf4j
 @Component
 public class DriverStatisticsOnlineJob extends QuartzJobBean {
 
-    @Resource
-    private DriverStatisticsOnlineService driverStatisticsOnlineService;
+    private final DriverStatisticsOnlineService driverStatisticsOnlineService;
 
+    public DriverStatisticsOnlineJob(DriverStatisticsOnlineService driverStatisticsOnlineService) {
+        this.driverStatisticsOnlineService = driverStatisticsOnlineService;
+    }
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {

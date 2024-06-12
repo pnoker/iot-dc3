@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.receiver.rabbit;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.center.data.biz.DeviceEventService;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
@@ -28,8 +27,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * 接收驱动发送过来的设备事件
@@ -41,17 +40,20 @@ import java.io.IOException;
 @Component
 public class DeviceEventReceiver {
 
-    @Resource
-    private DeviceEventService deviceEventService;
+    private final DeviceEventService deviceEventService;
+
+    public DeviceEventReceiver(DeviceEventService deviceEventService) {
+        this.deviceEventService = deviceEventService;
+    }
 
     @RabbitHandler
     @RabbitListener(queues = "#{deviceEventQueue.name}")
     public void deviceEventReceive(Channel channel, Message message, DeviceEventDTO entityDTO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-            log.debug("Receive device event: {}", JsonUtil.toPrettyJsonString(entityDTO));
-            if (ObjectUtil.isNull(entityDTO)
-                    || ObjectUtil.isNull(entityDTO.getType())
+            log.debug("Receive device event: {}", JsonUtil.toJsonString(entityDTO));
+            if (Objects.isNull(entityDTO)
+                    || Objects.isNull(entityDTO.getType())
                     || CharSequenceUtil.isEmpty(entityDTO.getContent())) {
                 log.error("Invalid device event: {}", entityDTO);
                 return;

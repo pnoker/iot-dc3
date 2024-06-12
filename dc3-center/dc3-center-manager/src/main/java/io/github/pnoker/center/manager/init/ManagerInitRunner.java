@@ -21,8 +21,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-
 /**
  * 初始化
  *
@@ -32,8 +30,11 @@ import javax.annotation.Resource;
 @Component
 public class ManagerInitRunner implements ApplicationRunner {
 
-    @Resource
-    private ScheduleService scheduleService;
+    private final ScheduleService scheduleService;
+
+    public ManagerInitRunner(ScheduleService scheduleService) {
+        this.scheduleService = scheduleService;
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

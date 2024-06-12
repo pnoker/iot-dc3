@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -32,10 +31,11 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ public class RoleServiceImpl implements RoleService {
 
         RoleDO entityDO = roleBuilder.buildDOByBO(entityBO);
         if (!roleManager.save(entityDO)) {
-            throw new AddException("角色创建失败");
+            throw new AddException("Failed to create role");
         }
     }
 
@@ -74,11 +74,11 @@ public class RoleServiceImpl implements RoleService {
         LambdaQueryChainWrapper<RoleDO> wrapper = roleManager.lambdaQuery().eq(RoleDO::getParentRoleId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("角色删除失败，该角色下存在子角色");
+            throw new AssociatedException("Failed to remove role: some sub roles exists in the role");
         }
 
         if (!roleManager.removeById(id)) {
-            throw new DeleteException("角色删除失败");
+            throw new DeleteException("Failed to remove role");
         }
     }
 
@@ -92,7 +92,7 @@ public class RoleServiceImpl implements RoleService {
         RoleDO entityDO = roleBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!roleManager.updateById(entityDO)) {
-            throw new UpdateException("角色更新失败");
+            throw new UpdateException("Failed to update role");
         }
     }
 
@@ -106,7 +106,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Page<RoleBO> selectByPage(RoleQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<RoleDO> entityPageDO = roleManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -143,12 +143,12 @@ public class RoleServiceImpl implements RoleService {
         wrapper.eq(RoleDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RoleDO one = roleManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("角色重复");
+            throw new DuplicateException("Role has been duplicated");
         }
         return duplicate;
     }
@@ -162,8 +162,8 @@ public class RoleServiceImpl implements RoleService {
      */
     private RoleDO getDOById(Long id, boolean throwException) {
         RoleDO entityDO = roleManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("角色不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Role does not exist");
         }
         return entityDO;
     }

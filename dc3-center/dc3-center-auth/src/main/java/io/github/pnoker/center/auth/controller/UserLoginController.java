@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.auth.controller;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.center.auth.entity.builder.UserLoginBuilder;
@@ -30,14 +29,13 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.Resource;
-import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * 用户 Controller
@@ -47,17 +45,18 @@ import javax.validation.constraints.NotNull;
  */
 @Slf4j
 @RestController
-@Tag(name = "接口-用户登录")
 @RequestMapping(AuthConstant.USER_URL_PREFIX)
 public class UserLoginController implements BaseController {
 
-    @Resource
-    private UserLoginBuilder userLoginBuilder;
+    private final UserLoginBuilder userLoginBuilder;
+    private final UserLoginService userLoginService;
+    private final UserPasswordService userPasswordService;
 
-    @Resource
-    private UserLoginService userLoginService;
-    @Resource
-    private UserPasswordService userPasswordService;
+    public UserLoginController(UserLoginBuilder userLoginBuilder, UserLoginService userLoginService, UserPasswordService userPasswordService) {
+        this.userLoginBuilder = userLoginBuilder;
+        this.userLoginService = userLoginService;
+        this.userPasswordService = userPasswordService;
+    }
 
     /**
      * 新增用户
@@ -66,15 +65,14 @@ public class UserLoginController implements BaseController {
      * @return R of String
      */
     @PostMapping("/add")
-    @Operation(summary = "新增-用户登录")
-    public R<String> add(@Validated(Add.class) @RequestBody UserLoginVO entityVO) {
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserLoginVO entityVO) {
         try {
             UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
             userLoginService.save(entityBO);
-            return R.ok(ResponseEnum.ADD_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -85,13 +83,13 @@ public class UserLoginController implements BaseController {
      * @return R of String
      */
     @PostMapping("/delete/{id}")
-    public R<String> delete(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
         try {
             userLoginService.remove(id);
-            return R.ok(ResponseEnum.DELETE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -106,14 +104,14 @@ public class UserLoginController implements BaseController {
      * @return R of String
      */
     @PostMapping("/update")
-    public R<String> update(@Validated(Update.class) @RequestBody UserLoginVO entityVO) {
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserLoginVO entityVO) {
         try {
             UserLoginBO entityBO = userLoginBuilder.buildBOByVO(entityVO);
             userLoginService.update(entityBO);
-            return R.ok(ResponseEnum.UPDATE_SUCCESS);
+            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -124,13 +122,13 @@ public class UserLoginController implements BaseController {
      * @return 是否重置
      */
     @PostMapping("/reset/{id}")
-    public R<Boolean> restPassword(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<Boolean>> restPassword(@NotNull @PathVariable(value = "id") Long id) {
         try {
             userPasswordService.restPassword(id);
-            return R.ok();
+            return Mono.just(R.ok());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -141,14 +139,14 @@ public class UserLoginController implements BaseController {
      * @return UserLoginVO {@link UserLoginVO}
      */
     @GetMapping("/id/{id}")
-    public R<UserLoginVO> selectById(@NotNull @PathVariable(value = "id") Long id) {
+    public Mono<R<UserLoginVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
         try {
             UserLoginBO entityBO = userLoginService.selectById(id);
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -159,14 +157,14 @@ public class UserLoginController implements BaseController {
      * @return {@link UserLoginBO}
      */
     @GetMapping("/name/{name}")
-    public R<UserLoginVO> selectByName(@NotNull @PathVariable(value = "name") String name) {
+    public Mono<R<UserLoginVO>> selectByName(@NotNull @PathVariable(value = "name") String name) {
         try {
             UserLoginBO entityBO = userLoginService.selectByLoginName(name, false);
             UserLoginVO entityVO = userLoginBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
+            return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -177,16 +175,16 @@ public class UserLoginController implements BaseController {
      * @return 带分页的 {@link UserLoginBO}
      */
     @PostMapping("/list")
-    public R<Page<UserLoginVO>> list(@RequestBody(required = false) UserLoginQuery entityQuery) {
+    public Mono<R<Page<UserLoginVO>>> list(@RequestBody(required = false) UserLoginQuery entityQuery) {
         try {
-            if (ObjectUtil.isEmpty(entityQuery)) {
+            if (Objects.isNull(entityQuery)) {
                 entityQuery = new UserLoginQuery();
             }
             Page<UserLoginBO> entityPageBO = userLoginService.selectByPage(entityQuery);
             Page<UserLoginVO> entityPageVO = userLoginBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
+            return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
@@ -197,11 +195,11 @@ public class UserLoginController implements BaseController {
      * @return 是否有效
      */
     @GetMapping("/check/{name}")
-    public R<Boolean> checkLoginNameValid(@NotNull @PathVariable(value = "name") String name) {
+    public Mono<R<Boolean>> checkLoginNameValid(@NotNull @PathVariable(value = "name") String name) {
         try {
-            return Boolean.TRUE.equals(userLoginService.checkLoginNameValid(name)) ? R.ok() : R.fail();
+            return Boolean.TRUE.equals(userLoginService.checkLoginNameValid(name)) ? Mono.just(R.ok()) : Mono.just(R.fail());
         } catch (Exception e) {
-            return R.fail(e.getMessage());
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

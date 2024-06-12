@@ -16,7 +16,6 @@
 
 package io.github.pnoker.center.data.biz.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.biz.EventService;
 import io.github.pnoker.center.data.entity.DeviceEvent;
@@ -24,6 +23,7 @@ import io.github.pnoker.center.data.entity.DriverEvent;
 import io.github.pnoker.center.data.entity.query.DeviceEventQuery;
 import io.github.pnoker.center.data.entity.query.DriverEventQuery;
 import io.github.pnoker.common.entity.common.Pages;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -31,8 +31,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author pnoker
@@ -47,28 +47,28 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void addDriverEvent(DriverEvent driverEvent) {
-        if (ObjectUtil.isNotNull(driverEvent)) {
+        if (Objects.nonNull(driverEvent)) {
             mongoTemplate.insert(driverEvent);
         }
     }
 
     @Override
     public void addDriverEvents(List<DriverEvent> driverEvents) {
-        if (ObjectUtil.isNotNull(driverEvents) && !driverEvents.isEmpty()) {
+        if (Objects.nonNull(driverEvents) && !driverEvents.isEmpty()) {
             mongoTemplate.insert(driverEvents, DriverEvent.class);
         }
     }
 
     @Override
     public void addDeviceEvent(DeviceEvent deviceEvent) {
-        if (ObjectUtil.isNotNull(deviceEvent)) {
+        if (Objects.nonNull(deviceEvent)) {
             mongoTemplate.insert(deviceEvent);
         }
     }
 
     @Override
     public void addDeviceEvents(List<DeviceEvent> deviceEvents) {
-        if (ObjectUtil.isNotNull(deviceEvents) && !deviceEvents.isEmpty()) {
+        if (Objects.nonNull(deviceEvents) && !deviceEvents.isEmpty()) {
             mongoTemplate.insert(deviceEvents, DeviceEvent.class);
         }
     }
@@ -81,17 +81,17 @@ public class EventServiceImpl implements EventService {
     @Override
     public Page<DeviceEvent> deviceEvent(DeviceEventQuery deviceEventQuery) {
         Criteria criteria = new Criteria();
-        if (ObjectUtil.isNull(deviceEventQuery)) {
+        if (Objects.isNull(deviceEventQuery)) {
             deviceEventQuery = new DeviceEventQuery();
         }
-        if (ObjectUtil.isNotEmpty(deviceEventQuery.getDeviceId())) {
+        if (Objects.nonNull(deviceEventQuery.getDeviceId())) {
             criteria.and("deviceId").is(deviceEventQuery.getDeviceId());
         }
-        if (ObjectUtil.isNotEmpty(deviceEventQuery.getPointId())) {
+        if (Objects.nonNull(deviceEventQuery.getPointId())) {
             criteria.and("pointId").is(deviceEventQuery.getPointId());
         }
 
-        Pages pages = ObjectUtil.isNull(deviceEventQuery.getPage()) ? new Pages() : deviceEventQuery.getPage();
+        Pages pages = Objects.isNull(deviceEventQuery.getPage()) ? new Pages() : deviceEventQuery.getPage();
         if (pages.getStartTime() > 0 && pages.getEndTime() > 0 && pages.getStartTime() <= pages.getEndTime()) {
             criteria.and("createTime").gte(pages.getStartTime()).lte(pages.getEndTime());
         }

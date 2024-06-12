@@ -23,7 +23,7 @@ import io.github.pnoker.common.base.service.BaseService;
 import java.util.List;
 
 /**
- * PointAttribute Interface
+ * 位号属性Interface
  *
  * @author pnoker
  * @since 2022.1.0
@@ -41,9 +41,8 @@ public interface PointAttributeService extends BaseService<PointAttributeBO, Poi
     /**
      * 根据 驱动ID 查询
      *
-     * @param driverId       驱动ID
-     * @param throwException Throw Exception
-     * @return PointAttribute Array
+     * @param driverId 驱动ID
+     * @return 位号属性Array
      */
-    List<PointAttributeBO> selectByDriverId(Long driverId, boolean throwException);
+    List<PointAttributeBO> selectByDriverId(Long driverId);
 }

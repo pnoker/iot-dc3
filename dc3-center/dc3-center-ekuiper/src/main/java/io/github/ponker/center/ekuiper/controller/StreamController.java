@@ -1,4 +1,21 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package io.github.ponker.center.ekuiper.controller;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.ponker.center.ekuiper.constant.ServiceConstant;
 import io.github.ponker.center.ekuiper.entity.R;
@@ -8,12 +25,12 @@ import io.github.ponker.center.ekuiper.entity.vo.DetailStreamVO;
 import io.github.ponker.center.ekuiper.service.ApiService;
 import io.github.ponker.center.ekuiper.service.StreamTableService;
 import io.github.ponker.center.ekuiper.service.UrlService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import javax.annotation.Resource;
 
 /**
  * @author : Zhen
@@ -53,8 +70,8 @@ public class StreamController {
      * 显示所有流
      */
     @GetMapping("/list")
-    public Mono<R<Page<RecordDto>>> listStream(@RequestParam(required = false,defaultValue = "1") Integer pageNum,
-                                               @RequestParam(required = false,defaultValue = "10") Integer pageSize) {
+    public Mono<R<Page<RecordDto>>> listStream(@RequestParam(required = false, defaultValue = "1") Integer pageNum,
+                                               @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         Mono<Page<RecordDto>> pageMono = apiService.callApiWithPage(HttpMethod.GET, urlService.getStreamUrl(), pageNum, pageSize);
         return pageMono.flatMap(s -> {
             try {
@@ -84,7 +101,7 @@ public class StreamController {
     }
 
     /**
-     *描述流
+     * 描述流
      */
     @GetMapping("/detail")
     public Mono<R<DetailStreamVO>> detailStream(@RequestParam(name = "id") String id) {
@@ -92,7 +109,7 @@ public class StreamController {
         Mono<DetailStreamVO> detailStreamMono = streamTableService.callApiStream(HttpMethod.GET, url);
         return detailStreamMono.flatMap(s -> {
             try {
-                return Mono.just(R.ok(s,"successful"));
+                return Mono.just(R.ok(s, "successful"));
             } catch (Exception e) {
                 log.error("Failed to call detail Stream API", e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -104,7 +121,7 @@ public class StreamController {
      * 更新流
      */
     @PutMapping("/update")
-    public Mono<R<String>> updateStream(@Validated @RequestBody StreamFormDto form, @RequestParam(name = "id") String id)  {
+    public Mono<R<String>> updateStream(@Validated @RequestBody StreamFormDto form, @RequestParam(name = "id") String id) {
         String url = urlService.getStreamUrl() + "/" + id;
         Mono<String> stringMono = apiService.callApiWithData(form, HttpMethod.PUT, url);
         return stringMono.flatMap(s -> {

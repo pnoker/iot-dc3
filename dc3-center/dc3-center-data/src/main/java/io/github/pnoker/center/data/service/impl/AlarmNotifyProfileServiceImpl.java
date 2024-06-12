@@ -17,7 +17,6 @@
 package io.github.pnoker.center.data.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -32,10 +31,11 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
 
         AlarmNotifyProfileDO entityDO = alarmNotifyProfileBuilder.buildDOByBO(entityBO);
         if (!alarmNotifyProfileManager.save(entityDO)) {
-            throw new AddException("报警通知模板创建失败");
+            throw new AddException("Failed to create alarm notify profile");
         }
     }
 
@@ -73,11 +73,11 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         LambdaQueryChainWrapper<AlarmNotifyProfileDO> wrapper = alarmNotifyProfileManager.lambdaQuery().eq(AlarmNotifyProfileDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
-            throw new AssociatedException("报警通知模板删除失败，该报警通知模板下存在子报警通知模板");
+            throw new AssociatedException("Failed to remove alarm notify profile: some sub alarm notify profiles exists in the alarm notify profile");
         }
 
         if (!alarmNotifyProfileManager.removeById(id)) {
-            throw new DeleteException("报警通知模板删除失败");
+            throw new DeleteException("Failed to remove alarm notify profile");
         }
     }
 
@@ -90,7 +90,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         AlarmNotifyProfileDO entityDO = alarmNotifyProfileBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!alarmNotifyProfileManager.updateById(entityDO)) {
-            throw new UpdateException("报警通知模板更新失败");
+            throw new UpdateException("Failed to update alarm notify profile");
         }
     }
 
@@ -102,7 +102,7 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
 
     @Override
     public Page<AlarmNotifyProfileBO> selectByPage(AlarmNotifyProfileQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<AlarmNotifyProfileDO> entityPageDO = alarmNotifyProfileManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -137,12 +137,12 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
         wrapper.eq(AlarmNotifyProfileDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         AlarmNotifyProfileDO one = alarmNotifyProfileManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("报警通知模板重复");
+            throw new DuplicateException("Alarm notify profile has been duplicated");
         }
         return duplicate;
     }
@@ -156,8 +156,8 @@ public class AlarmNotifyProfileServiceImpl implements AlarmNotifyProfileService 
      */
     private AlarmNotifyProfileDO getDOById(Long id, boolean throwException) {
         AlarmNotifyProfileDO entityDO = alarmNotifyProfileManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("报警通知模板不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Alarm notify profile does not exist");
         }
         return entityDO;
     }

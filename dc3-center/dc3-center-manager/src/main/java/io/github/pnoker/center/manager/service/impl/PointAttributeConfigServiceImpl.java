@@ -16,35 +16,40 @@
 
 package io.github.pnoker.center.manager.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.center.manager.biz.DriverNotifyService;
 import io.github.pnoker.center.manager.dal.PointAttributeConfigManager;
 import io.github.pnoker.center.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.center.manager.entity.bo.PointBO;
 import io.github.pnoker.center.manager.entity.builder.PointAttributeConfigBuilder;
 import io.github.pnoker.center.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.center.manager.entity.query.PointAttributeConfigQuery;
+import io.github.pnoker.center.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.center.manager.service.PointAttributeConfigService;
 import io.github.pnoker.center.manager.service.PointService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.MetadataCommandTypeEnum;
+import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.*;
+import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * PointInfoService Impl
+ * PointConfigService Impl
  *
  * @author pnoker
  * @since 2022.1.0
@@ -60,23 +65,39 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     private PointAttributeConfigManager pointAttributeConfigManager;
 
     @Resource
-    private PointService pointService;
+    private MetadataEventPublisher metadataEventPublisher;
+
     @Resource
-    private DriverNotifyService driverNotifyService;
+    private PointService pointService;
 
     @Override
     public void save(PointAttributeConfigBO entityBO) {
-        checkDuplicate(entityBO, false, true);
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create point attribute config: point attribute config has been duplicated");
+        }
 
         PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
         if (!pointAttributeConfigManager.save(entityDO)) {
-            throw new AddException("位号属性配置创建失败");
+            throw new AddException("Failed to create point attribute config");
         }
 
-        // 通知驱动新增
-        entityDO = pointAttributeConfigManager.getById(entityDO.getId());
-        entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.ADD, entityBO);
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
+    }
+
+    @Override
+    public PointAttributeConfigBO innerSave(PointAttributeConfigBO entityBO) {
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException("Failed to create point attribute config: point attribute config has been duplicated");
+        }
+
+        PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
+        if (!pointAttributeConfigManager.save(entityDO)) {
+            throw new AddException("Failed to create point attribute config");
+        }
+
+        return pointAttributeConfigBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -84,28 +105,31 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         PointAttributeConfigDO entityDO = getDOById(id, true);
 
         if (!pointAttributeConfigManager.removeById(id)) {
-            throw new DeleteException("位号属性配置删除失败");
+            throw new DeleteException("Failed to remove point attribute config");
         }
 
-        PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.DELETE, entityBO);
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override
     public void update(PointAttributeConfigBO entityBO) {
         getDOById(entityBO.getId(), true);
 
-        checkDuplicate(entityBO, true, true);
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException("Failed to update point attribute config: point attribute config has been duplicated");
+        }
 
         PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
         if (!pointAttributeConfigManager.updateById(entityDO)) {
-            throw new UpdateException("位号属性配置更新失败");
+            throw new UpdateException("Failed to update point attribute config");
         }
 
-        entityDO = pointAttributeConfigManager.getById(entityDO.getId());
-        entityBO = pointAttributeConfigBuilder.buildBOByDO(entityDO);
-        driverNotifyService.notifyPointAttributeConfig(MetadataCommandTypeEnum.UPDATE, entityBO);
+        // 通知驱动
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
     }
 
     @Override
@@ -134,8 +158,12 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Override
     public List<PointAttributeConfigBO> selectByDeviceId(Long deviceId) {
-        List<PointBO> pointBOS = pointService.selectByDeviceId(deviceId);
-        Set<Long> pointIds = pointBOS.stream().map(PointBO::getId).collect(Collectors.toSet());
+        List<PointBO> pointBOList = pointService.selectByDeviceId(deviceId);
+        Set<Long> pointIds = pointBOList.stream().map(PointBO::getId).collect(Collectors.toSet());
+        if (CollUtil.isEmpty(pointIds)) {
+            return Collections.emptyList();
+        }
+
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
                 .eq(PointAttributeConfigDO::getDeviceId, deviceId)
                 .in(PointAttributeConfigDO::getPointId, pointIds);
@@ -154,18 +182,24 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
 
     @Override
     public Page<PointAttributeConfigBO> selectByPage(PointAttributeConfigQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<PointAttributeConfigDO> entityPageDO = pointAttributeConfigManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
         return pointAttributeConfigBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
+    /**
+     * 构造模糊查询
+     *
+     * @param entityQuery {@link PointAttributeConfigQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
     private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, entityQuery.getPointAttributeId());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
-        wrapper.eq(ObjectUtil.isNotEmpty(entityQuery.getPointId()), PointAttributeConfigDO::getPointId, entityQuery.getPointId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, entityQuery.getPointAttributeId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointId()), PointAttributeConfigDO::getPointId, entityQuery.getPointId());
         wrapper.eq(PointAttributeConfigDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
@@ -173,12 +207,11 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     /**
      * 重复性校验
      *
-     * @param entityBO       {@link PointAttributeConfigBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
+     * @param entityBO {@link PointAttributeConfigBO}
+     * @param isUpdate 是否为更新操作
      * @return 是否重复
      */
-    private boolean checkDuplicate(PointAttributeConfigBO entityBO, boolean isUpdate, boolean throwException) {
+    private boolean checkDuplicate(PointAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
         wrapper.eq(PointAttributeConfigDO::getPointAttributeId, entityBO.getPointAttributeId());
         wrapper.eq(PointAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
@@ -186,14 +219,10 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         wrapper.eq(PointAttributeConfigDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         PointAttributeConfigDO one = pointAttributeConfigManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("位号属性配置重复");
-        }
-        return duplicate;
+        return !isUpdate || !one.getId().equals(entityBO.getId());
     }
 
     /**
@@ -205,8 +234,8 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     private PointAttributeConfigDO getDOById(Long id, boolean throwException) {
         PointAttributeConfigDO entityDO = pointAttributeConfigManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("位号属性配置不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Point attribute config does not exist");
         }
         return entityDO;
     }

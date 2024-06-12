@@ -43,6 +43,7 @@ public class NettyTcpServer {
     /**
      * DeviceId:Channel
      * 用于存放设备的 Netty Context Channel
+     * !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
      */
     public static final Map<Long, Channel> deviceChannelMap = new ConcurrentHashMap<>(16);
 

@@ -17,7 +17,6 @@
 package io.github.pnoker.center.auth.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -31,10 +30,11 @@ import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * <p>
@@ -60,7 +60,7 @@ public class ApiServiceImpl implements ApiService {
 
         ApiDO entityDO = apiBuilder.buildDOByBO(entityBO);
         if (!apiManager.save(entityDO)) {
-            throw new AddException("接口创建失败");
+            throw new AddException("Failed to create api");
         }
     }
 
@@ -70,7 +70,7 @@ public class ApiServiceImpl implements ApiService {
         getDOById(id, true);
 
         if (!apiManager.removeById(id)) {
-            throw new DeleteException("接口删除失败");
+            throw new DeleteException("Failed to remove api");
         }
     }
 
@@ -84,7 +84,7 @@ public class ApiServiceImpl implements ApiService {
         ApiDO entityDO = apiBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!apiManager.updateById(entityDO)) {
-            throw new UpdateException("接口更新失败");
+            throw new UpdateException("Failed to update api");
         }
     }
 
@@ -98,7 +98,7 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public Page<ApiBO> selectByPage(ApiQuery entityQuery) {
-        if (ObjectUtil.isNull(entityQuery.getPage())) {
+        if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
         Page<ApiDO> entityPageDO = apiManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
@@ -134,12 +134,12 @@ public class ApiServiceImpl implements ApiService {
         wrapper.eq(ApiDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ApiDO one = apiManager.getOne(wrapper);
-        if (ObjectUtil.isNull(one)) {
+        if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("接口重复");
+            throw new DuplicateException("Api has been duplicated");
         }
         return duplicate;
     }
@@ -153,8 +153,8 @@ public class ApiServiceImpl implements ApiService {
      */
     private ApiDO getDOById(Long id, boolean throwException) {
         ApiDO entityDO = apiManager.getById(id);
-        if (throwException && ObjectUtil.isNull(entityDO)) {
-            throw new NotFoundException("接口不存在");
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Api does not exist");
         }
         return entityDO;
     }

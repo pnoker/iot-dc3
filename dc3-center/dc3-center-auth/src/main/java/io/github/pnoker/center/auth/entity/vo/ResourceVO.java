@@ -25,15 +25,13 @@ import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Update;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 /**
  * Resource VO
@@ -46,13 +44,11 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(title = "Resource", description = "资源")
 public class ResourceVO extends BaseVO {
 
     /**
      * 权限资源父级ID
      */
-    @Schema(description = "权限资源父级ID")
     @NotBlank(message = "Resource parent id can't be empty",
             groups = {Add.class, Update.class})
     private Long parentResourceId;
@@ -60,7 +56,6 @@ public class ResourceVO extends BaseVO {
     /**
      * 权限资源名称
      */
-    @Schema(description = "权限资源名称")
     @NotBlank(message = "Role name can't be empty",
             groups = {Add.class, Auth.class})
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
@@ -71,32 +66,28 @@ public class ResourceVO extends BaseVO {
     /**
      * 权限资源编号
      */
-    @Schema(description = "权限资源编号")
     private String resourceCode;
 
     /**
      * 权限资源类型标识
      */
-    @Schema(description = "权限资源类型标识")
     private ResourceTypeFlagEnum resourceTypeFlag;
 
     /**
-     * 权限资源范围标识，参考：ResourceScopeFlagEnum
+     * 权限资源范围标识, 参考: ResourceScopeFlagEnum
      * <ul>
-     *     <li>0x01：新增</li>
-     *     <li>0x02：删除</li>
-     *     <li>0x04：更新</li>
-     *     <li>0x08：查询</li>
+     *     <li>0x01: 新增</li>
+     *     <li>0x02: 删除</li>
+     *     <li>0x04: 更新</li>
+     *     <li>0x08: 查询</li>
      * </ul>
      * 具有多个权限范围可以累加
      */
-    @Schema(description = "权限资源范围标识")
     private ResourceScopeFlagEnum resourceScopeFlag;
 
     /**
      * 权限资源实体ID
      */
-    @Schema(description = "权限资源实体ID")
     @NotNull(message = "实体ID不能为空",
             groups = {Add.class, Update.class})
     private Long entityId;
@@ -104,12 +95,10 @@ public class ResourceVO extends BaseVO {
     /**
      * 资源拓展信息
      */
-    @Schema(description = "资源拓展信息")
     private ResourceExt resourceExt;
 
     /**
      * 使能标识
      */
-    @Schema(description = "使能标识")
     private EnableFlagEnum enableFlag;
 }
