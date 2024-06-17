@@ -19,7 +19,6 @@ package io.github.ponker.center.ekuiper.entity.vo;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-
 import java.util.HashMap;
 import java.util.Map;
 

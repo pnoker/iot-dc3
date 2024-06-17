@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-present the IoT DC3 original author or authors.
+ * Copyright 2022 Pnoker All Rights Reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 
 package io.github.ponker.center.ekuiper.entity;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.ponker.center.ekuiper.constant.CommonConstant;
 import lombok.AllArgsConstructor;
@@ -23,7 +22,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -35,8 +33,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class R<T> implements Serializable {
-
-    @Serial
     private static final long serialVersionUID = 1L;
 
     private boolean ok = false;
@@ -47,15 +43,6 @@ public class R<T> implements Serializable {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
-
-    /**
-     * 构造函数
-     *
-     * @param data 数据
-     */
-    private R(T data) {
-        this.data = data;
-    }
 
     /**
      * 成功
@@ -159,6 +146,15 @@ public class R<T> implements Serializable {
     @SuppressWarnings("unchecked")
     public static <T> R<T> fail(T data, String message) {
         return new R(data).failure(message);
+    }
+
+    /**
+     * 构造函数
+     *
+     * @param data 数据
+     */
+    private R(T data) {
+        this.data = data;
     }
 
     /**
