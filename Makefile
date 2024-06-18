@@ -15,49 +15,33 @@
 #
 
 # tip:
-# make -f ./Makefile dev
-# make -f ./Makefile deploy
-# make -f ./Makefile package
-# make -f ./Makefile clean
+# make -f ./Makefile help
 
-.PHONY: build clean
+.PHONY: help
 
 help:
 	echo 'You can use make to execute the following commands:' \
 	&& echo 'Usage: make [clean | package | deploy | dev | tag]' \
-	&& echo ' - make demo: build & push demo images' \
-	&& echo ' - make dev: run local development environment' \
-	&& echo ' - make clean: mvn clean' \
-	&& echo ' - make package: mvn package' \
-	&& echo ' - make build: build images' \
-	&& echo ' - make deploy.N: mvn deploy N' \
 	&& echo ' - make tag: git tag' \
+	&& echo ' - make dev: run local development environment' \
+	&& echo ' - make build: build images' \
+	&& echo ' - make deploy: mvn deploy'
 
-demo:
-	mvn clean package \
-	&& cd dc3 \
-	&& docker-compose -f docker-compose-demo.yml build \
-	&& docker-compose -f docker-compose-demo.yml push \
+tag:
+	dc3/bin/tag.sh
 
 dev:
 	cd dc3 \
 	&& docker-compose -f docker-compose-dev.yml up -d \
-
-clean:
-	mvn clean \
-
-package:
-	mvn package \
 
 build:
 	mvn clean package \
     && cd dc3 \
 	&& docker-compose build \
 
-deploy.api:
-	cd dc3-api \
-	&& mvn clean deploy \
-
-deploy.common:
-	cd dc3-common \
-	&& mvn clean deploy \
+deploy:
+	mvn clean package \
+    && cd dc3-api \
+	&& mvn clean deploy -p deploy \
+	&& cd ../dc3-common \
+    && mvn clean deploy -p deploy
