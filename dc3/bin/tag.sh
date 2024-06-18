@@ -18,8 +18,6 @@
 
 set -e
 
-cd ../../
-
 type=""
 
 # shellcheck disable=SC2092
