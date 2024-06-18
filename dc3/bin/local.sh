@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 # Copyright 2016-present the IoT DC3 original author or authors.
 #
@@ -14,26 +16,8 @@
 # limitations under the License.
 #
 
-# builder
-FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:21 AS builder
-LABEL dc3.author pnokers
-LABEL dc3.author.email pnokers.icloud.com
+set -e
 
-ARG PROFILE=dev
+cd ../../
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-
-WORKDIR /build
-
-COPY ./ ./
-
-RUN mvn -U -e -B clean package -DskipTests -P $PROFILE
-
-# runtime
-FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:21 AS runtime
-LABEL dc3.author pnokers
-LABEL dc3.author.email pnokers.icloud.com
-
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-
-COPY --from=builder /root/.m2/repository/ /root/.m2/repository/
+docker build -t registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:2024.3.0.dev -f dc3/docker/Dockerfile.dc3 .
