@@ -16,9 +16,7 @@
 
 package io.github.pnoker.center.data.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.constant.common.TimeConstant;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
