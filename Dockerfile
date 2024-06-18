@@ -15,7 +15,7 @@
 #
 
 # builder
-FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:17 AS builder
+FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jdk:21 AS builder
 LABEL dc3.author pnokers
 LABEL dc3.author.email pnokers.icloud.com
 

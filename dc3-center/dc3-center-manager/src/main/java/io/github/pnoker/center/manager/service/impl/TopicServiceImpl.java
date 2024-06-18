@@ -66,7 +66,7 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO>
                 Long profileBindId = profileBind.getProfileId();
                 List<PointDO> points = Db.lambdaQuery(PointDO.class)
                         .eq(PointDO::getProfileId, profileBindId)
-                       // .eq(PointDO::getEnableFlag, 1)
+                        // .eq(PointDO::getEnableFlag, 1)
                         .eq(PointDO::getDeleted, 0)
                         .list();
                 for (PointDO point : points) {
