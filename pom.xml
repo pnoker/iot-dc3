@@ -130,6 +130,8 @@
     </profiles>
 
     <modules>
+        <module>dc3-api</module>
+        <module>dc3-common</module>
         <module>dc3-center</module>
         <module>dc3-driver</module>
         <module>dc3-gateway</module>
