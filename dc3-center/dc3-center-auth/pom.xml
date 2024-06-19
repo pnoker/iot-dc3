@@ -31,24 +31,10 @@
 
     <dependencies>
 
-        <!-- DC3 Api 相关 -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-auth</artifactId>
-        </dependency>
-
         <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-auth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mysql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-redis</artifactId>
         </dependency>
 
     </dependencies>
