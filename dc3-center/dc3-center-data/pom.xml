@@ -32,57 +32,12 @@
 
     <dependencies>
 
-        <!-- DC3 Api 相关 -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-auth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-data</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-manager</artifactId>
-        </dependency>
-
         <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mongo</artifactId>
+            <artifactId>dc3-common-data</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mqtt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mysql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-quartz</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-rabbitmq</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-redis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-repository</artifactId>
-        </dependency>
-        <!--   <dependency>
-               <groupId>io.github.pnoker</groupId>
-               <artifactId>dc3-common-tdengine</artifactId>
-           </dependency>-->
-        <!--        <dependency>
-                    <groupId>io.github.pnoker</groupId>
-                    <artifactId>dc3-common-influx</artifactId>
-                </dependency>-->
+
     </dependencies>
 
 </project>

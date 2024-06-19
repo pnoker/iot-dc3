@@ -20,7 +20,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * 授权中心服务启动入口
+ * 权限中心服务启动入口
  *
  * @author pnoker
  * @since 2022.1.0

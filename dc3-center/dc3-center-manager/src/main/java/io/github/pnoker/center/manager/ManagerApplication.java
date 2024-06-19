@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * 设备管理服务入口
+ * 管理中心服务启动入口
  *
  * @author pnoker
  * @since 2022.1.0

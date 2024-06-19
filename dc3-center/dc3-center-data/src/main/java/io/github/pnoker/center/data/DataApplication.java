@@ -16,20 +16,16 @@
 
 package io.github.pnoker.center.data;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * 消息中心中心服务启动入口
+ * 数据中心服务启动入口
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @SpringBootApplication
-@EnableTransactionManagement
-@MapperScan({"io.github.pnoker.center.data.mapper", "io.github.pnoker.common.tdengine.mapper"})
 public class DataApplication {
     public static void main(String[] args) {
         SpringApplication.run(DataApplication.class, args);

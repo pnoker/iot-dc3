@@ -75,6 +75,7 @@
         <!-- DC3 Common 相关 -->
         <dc3.common.api.version>2024.3.2</dc3.common.api.version>
         <dc3.common.auth.version>2024.3.2</dc3.common.auth.version>
+        <dc3.common.data.version>2024.3.2</dc3.common.data.version>
         <dc3.common.constant.version>2024.3.2</dc3.common.constant.version>
         <dc3.common.driver.version>2024.3.2</dc3.common.driver.version>
         <dc3.common.exception.version>2024.3.2</dc3.common.exception.version>
@@ -174,6 +175,11 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-auth</artifactId>
                 <version>${dc3.common.auth.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-data</artifactId>
+                <version>${dc3.common.data.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
