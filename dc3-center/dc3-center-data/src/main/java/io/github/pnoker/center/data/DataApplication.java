@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @SpringBootApplication
 @EnableTransactionManagement
-@MapperScan({"io.github.pnoker.center.data.mapper", "io.github.pnoker.common.tdengine.mapper", "io.github.pnoker.common.prometheus.dashboard.rabbitmq.mapper"})
+@MapperScan({"io.github.pnoker.center.data.mapper", "io.github.pnoker.common.tdengine.mapper"})
 public class DataApplication {
     public static void main(String[] args) {
         SpringApplication.run(DataApplication.class, args);
