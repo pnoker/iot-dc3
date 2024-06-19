@@ -27,7 +27,7 @@
     <artifactId>dc3-center-auth</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 授权服务。</description>
+    <description>IOT DC3 平台 权限服务。</description>
 
     <dependencies>
 
@@ -40,15 +40,15 @@
         <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-mysql</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-redis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-auth</artifactId>
         </dependency>
 
     </dependencies>
