@@ -16,10 +16,8 @@
 
 package io.github.pnoker.center.manager;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * 管理中心服务启动入口
@@ -28,8 +26,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @since 2022.1.0
  */
 @SpringBootApplication
-@EnableTransactionManagement
-@MapperScan("io.github.pnoker.center.manager.mapper")
 public class ManagerApplication {
 
     public static void main(String[] args) {

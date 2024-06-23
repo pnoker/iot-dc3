@@ -30,17 +30,13 @@
     <description>IOT DC3 平台 设备协议驱动集合。</description>
 
     <modules>
-        <module>dc3-driver-dtu-yeecom</module>
-        <module>dc3-driver-edge-gateway</module>
         <module>dc3-driver-listening-virtual</module>
-        <module>dc3-driver-lwm2m</module>
         <module>dc3-driver-modbus-tcp</module>
         <module>dc3-driver-mqtt</module>
         <module>dc3-driver-opc-da</module>
         <module>dc3-driver-opc-ua</module>
         <module>dc3-driver-plcs7</module>
         <module>dc3-driver-virtual</module>
-        <module>dc3-driver-weather-amap</module>
     </modules>
 
     <dependencies>
