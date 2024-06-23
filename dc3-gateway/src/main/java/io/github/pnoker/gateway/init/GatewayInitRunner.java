@@ -21,7 +21,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 /**
- * 初始化
+ * Gateway initialization runner
  *
  * @author pnoker
  * @since 2022.1.0

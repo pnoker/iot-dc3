@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-# 生产环境配置, 会覆盖 application-*.yml 中配置的内容
+# Production environment configuration will overwrite the content configured in application-*.yml
 spring:
   data:
     redis:
