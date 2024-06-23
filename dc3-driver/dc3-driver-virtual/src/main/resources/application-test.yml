@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-# 测试环境配置, 会覆盖 application-*.yml 中配置的内容
+# Test environment configuration will overwrite the content configured in application-*.yml
 driver:
   schedule:
     # 定时读数据
