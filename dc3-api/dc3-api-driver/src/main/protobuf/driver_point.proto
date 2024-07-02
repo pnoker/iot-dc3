@@ -1,0 +1,86 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package api.common.driver;
+
+import "api/common/page.proto";
+import "api/common/r.proto";
+import "api/common/entity.proto";
+import "driver_query.proto";
+import "driver_query_page.proto";
+
+/*
+Config
+*/
+option java_package = "io.github.pnoker.api.common.driver";
+option java_outer_classname = "PointProto";
+option objc_class_prefix = "Driver";
+option java_multiple_files = true;
+
+/*
+Api
+*/
+service PointApi {
+  rpc SelectByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
+  rpc SelectById (GrpcPointQuery) returns (GrpcRPointDTO);
+}
+
+/*
+Point R Page
+*/
+message GrpcRPagePointDTO {
+  /*
+  R
+  */
+  GrpcR result = 1;
+
+  /*
+  Data
+  */
+  GrpcPagePointDTO data = 2;
+}
+
+/*
+Point Page
+*/
+message GrpcPagePointDTO {
+  /*
+  Page
+  */
+  GrpcPage page = 1;
+
+  /*
+  Data
+  */
+  repeated GrpcPointDTO data = 2;
+}
+
+/*
+Point
+*/
+message GrpcRPointDTO {
+  /*
+  R
+  */
+  GrpcR result = 1;
+
+  /*
+  Data
+  */
+  GrpcPointDTO data = 2;
+}

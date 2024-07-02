@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.pnoker</groupId>
+        <artifactId>dc3-parent</artifactId>
+        <version>2024.3.2</version>
+        <relativePath/>
+    </parent>
+
+    <name>${project.artifactId}</name>
+    <artifactId>dc3-common</artifactId>
+    <version>2024.3.2</version>
+    <packaging>pom</packaging>
+
+    <inceptionYear>2016-2022</inceptionYear>
+    <url>https://github.com/pnoker/iot-dc3</url>
+    <description>
+        IOT DC3 平台 公共配置。
+    </description>
+
+    <developers>
+        <developer>
+            <id>pnoker</id>
+            <name>pnoker</name>
+            <email>pnokers@gmail.com</email>
+            <roles>
+                <role>PMC</role>
+            </roles>
+            <organization>pnoker.github.io</organization>
+            <url>https://github.com/pnoker/iot-dc3</url>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/pnoker/iot-dc3</url>
+        <connection>https://github.com/pnoker/iot-dc3.git</connection>
+        <developerConnection>https://github.com/pnoker/iot-dc3.git</developerConnection>
+    </scm>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+
+        <!-- DC3 Api 相关 -->
+        <dc3.api.auth.version>2024.3.2</dc3.api.auth.version>
+        <dc3.api.data.version>2024.3.2</dc3.api.data.version>
+        <dc3.api.driver.version>2024.3.2</dc3.api.driver.version>
+        <dc3.api.manager.version>2024.3.2</dc3.api.manager.version>
+
+        <!-- DC3 Common 相关 -->
+        <dc3.common.api.version>2024.3.2</dc3.common.api.version>
+        <dc3.common.auth.version>2024.3.2</dc3.common.auth.version>
+        <dc3.common.constant.version>2024.3.2</dc3.common.constant.version>
+        <dc3.common.data.version>2024.3.2</dc3.common.data.version>
+        <dc3.common.driver.version>2024.3.2</dc3.common.driver.version>
+        <dc3.common.exception.version>2024.3.2</dc3.common.exception.version>
+        <dc3.common.influx.version>2024.3.2</dc3.common.influx.version>
+        <dc3.common.job.version>2024.3.2</dc3.common.job.version>
+        <dc3.common.log.version>2024.3.2</dc3.common.log.version>
+        <dc3.common.manager.version>2024.3.2</dc3.common.manager.version>
+        <dc3.common.model.version>2024.3.2</dc3.common.model.version>
+        <dc3.common.mongo.version>2024.3.2</dc3.common.mongo.version>
+        <dc3.common.mqtt.version>2024.3.2</dc3.common.mqtt.version>
+        <dc3.common.mysql.version>2024.3.2</dc3.common.mysql.version>
+        <dc3.common.public.version>2024.3.2</dc3.common.public.version>
+        <dc3.common.quartz.version>2024.3.2</dc3.common.quartz.version>
+        <dc3.common.rabbitmq.version>2024.3.2</dc3.common.rabbitmq.version>
+        <dc3.common.redis.version>2024.3.2</dc3.common.redis.version>
+        <dc3.common.register.version>2024.3.2</dc3.common.register.version>
+        <dc3.common.repository.version>2024.3.2</dc3.common.repository.version>
+        <dc3.common.tdengine.version>2024.3.2</dc3.common.tdengine.version>
+        <dc3.common.thread.version>2024.3.2</dc3.common.thread.version>
+        <dc3.common.transfer.version>2024.3.2</dc3.common.transfer.version>
+        <dc3.common.web.version>2024.3.2</dc3.common.web.version>
+    </properties>
+
+    <modules>
+        <module>dc3-common-api</module>
+        <module>dc3-common-auth</module>
+        <module>dc3-common-constant</module>
+        <module>dc3-common-data</module>
+        <module>dc3-common-driver</module>
+        <module>dc3-common-exception</module>
+        <module>dc3-common-influx</module>
+        <module>dc3-common-job</module>
+        <module>dc3-common-log</module>
+        <module>dc3-common-manager</module>
+        <module>dc3-common-model</module>
+        <module>dc3-common-mongo</module>
+        <module>dc3-common-mqtt</module>
+        <module>dc3-common-mysql</module>
+        <module>dc3-common-public</module>
+        <module>dc3-common-quartz</module>
+        <module>dc3-common-rabbitmq</module>
+        <module>dc3-common-redis</module>
+        <module>dc3-common-register</module>
+        <module>dc3-common-repository</module>
+        <module>dc3-common-tdengine</module>
+        <module>dc3-common-thread</module>
+        <module>dc3-common-transfer</module>
+        <module>dc3-common-web</module>
+    </modules>
+
+    <dependencies>
+
+        <!-- Guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <!-- HuTool -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+
+            <distributionManagement>
+                <repository>
+                    <id>pnoker</id>
+                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>pnoker</id>
+                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- DC3 Api 相关 -->
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-api-auth</artifactId>
+                <version>${dc3.api.auth.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-api-data</artifactId>
+                <version>${dc3.api.data.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-api-driver</artifactId>
+                <version>${dc3.api.driver.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-api-manager</artifactId>
+                <version>${dc3.api.manager.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <!-- DC3 Common 相关 -->
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-api</artifactId>
+                <version>${dc3.common.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-auth</artifactId>
+                <version>${dc3.common.auth.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-constant</artifactId>
+                <version>${dc3.common.constant.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-data</artifactId>
+                <version>${dc3.common.data.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-driver</artifactId>
+                <version>${dc3.common.driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-exception</artifactId>
+                <version>${dc3.common.exception.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-influx</artifactId>
+                <version>${dc3.common.influx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-job</artifactId>
+                <version>${dc3.common.job.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-log</artifactId>
+                <version>${dc3.common.log.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-manager</artifactId>
+                <version>${dc3.common.manager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-model</artifactId>
+                <version>${dc3.common.model.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-mongo</artifactId>
+                <version>${dc3.common.mongo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-mqtt</artifactId>
+                <version>${dc3.common.mqtt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-mysql</artifactId>
+                <version>${dc3.common.mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-public</artifactId>
+                <version>${dc3.common.public.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-quartz</artifactId>
+                <version>${dc3.common.quartz.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-rabbitmq</artifactId>
+                <version>${dc3.common.rabbitmq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-redis</artifactId>
+                <version>${dc3.common.redis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-register</artifactId>
+                <version>${dc3.common.register.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-repository</artifactId>
+                <version>${dc3.common.repository.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-tdengine</artifactId>
+                <version>${dc3.common.tdengine.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-thread</artifactId>
+                <version>${dc3.common.thread.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-transfer</artifactId>
+                <version>${dc3.common.transfer.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-web</artifactId>
+                <version>${dc3.common.web.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>public</id>
+            <name>Aliyun Public Repository</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring</id>
+            <name>Aliyun Spring Repository</name>
+            <url>https://maven.aliyun.com/repository/spring</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>maven</id>
+            <name>Maven Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sonatype</id>
+            <name>Sonatype Repository</name>
+            <url>https://s01.oss.sonatype.org/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>public-plugin</id>
+            <name>Aliyun Public Plugin Repository</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>spring-plugin</id>
+            <name>Aliyun Spring Plugin Repository</name>
+            <url>https://maven.aliyun.com/repository/spring-plugin</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+</project>

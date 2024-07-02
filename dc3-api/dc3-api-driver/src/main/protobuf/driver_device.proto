@@ -1,0 +1,111 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package api.common.driver;
+
+import "api/common/page.proto";
+import "api/common/r.proto";
+import "api/common/entity.proto";
+import "driver_query.proto";
+import "driver_query_page.proto";
+
+/*
+Config
+*/
+option java_package = "io.github.pnoker.api.common.driver";
+option java_outer_classname = "DeviceProto";
+option objc_class_prefix = "Driver";
+option java_multiple_files = true;
+
+/*
+Api
+*/
+service DeviceApi {
+  rpc SelectByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
+  rpc SelectById (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
+}
+
+/*
+Device R Page
+*/
+message GrpcRPageDeviceDTO {
+  /*
+  R
+  */
+  GrpcR result = 1;
+
+  /*
+  Data
+  */
+  GrpcPageDeviceDTO data = 2;
+}
+
+/*
+Device Page
+*/
+message GrpcPageDeviceDTO {
+  /*
+  Page
+  */
+  GrpcPage page = 1;
+
+  /*
+  Data
+  */
+  repeated GrpcRDeviceAttachDTO data = 2;
+}
+
+/*
+  Device
+  */
+message GrpcRDeviceDTO {
+  /*
+  R
+  */
+  GrpcR result = 1;
+
+  /*
+  Device Attach
+  */
+  GrpcRDeviceAttachDTO data = 2;
+}
+
+/*
+  Device Attach
+  */
+message GrpcRDeviceAttachDTO {
+  /*
+  Device
+  */
+  GrpcDeviceDTO device = 1;
+
+  /*
+  Point ID 集合
+  */
+  repeated int64 point_ids = 2;
+
+  /*
+  DriverAttributeConfig List
+  */
+  repeated GrpcDriverAttributeConfigDTO driverConfigs = 3;
+
+  /*
+  PointAttributeConfig List
+  */
+  repeated GrpcPointAttributeConfigDTO pointConfigs = 4;
+}
