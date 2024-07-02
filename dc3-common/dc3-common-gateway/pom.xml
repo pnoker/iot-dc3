@@ -23,19 +23,19 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>iot-dc3</artifactId>
+        <artifactId>dc3-common</artifactId>
         <version>2024.3.2</version>
     </parent>
 
     <name>${project.artifactId}</name>
-    <artifactId>dc3-gateway</artifactId>
+    <artifactId>dc3-common-gateway</artifactId>
     <version>2024.3.2</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2016-2022</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IOT DC3 平台网关, 用于限流, 权限验证, 服务转发, 方向代理 等。
+        IOT DC3 平台 公共的 网关 依赖。
     </description>
 
     <developers>
@@ -67,21 +67,48 @@
 
     <dependencies>
 
+        <!-- Gateway -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+
+        <!-- gRpc Client -->
+        <dependency>
+            <groupId>net.devh</groupId>
+            <artifactId>grpc-client-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Redis reactive -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+        </dependency>
+
+        <!-- DC3 Api 相关 -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-api-auth</artifactId>
+        </dependency>
+
         <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-gateway</artifactId>
+            <artifactId>dc3-common-log</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-public</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-web</artifactId>
         </dependency>
 
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

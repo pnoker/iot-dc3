@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.gateway.filter.factory;
+package io.github.pnoker.common.gateway.filter.factory;
 
-import io.github.pnoker.gateway.filter.AuthenticGatewayFilter;
+import io.github.pnoker.common.gateway.filter.AuthenticGatewayFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
