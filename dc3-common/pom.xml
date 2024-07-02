@@ -82,6 +82,7 @@
         <dc3.common.data.version>2024.3.2</dc3.common.data.version>
         <dc3.common.driver.version>2024.3.2</dc3.common.driver.version>
         <dc3.common.exception.version>2024.3.2</dc3.common.exception.version>
+        <dc3.common.gateway.version>2024.3.2</dc3.common.gateway.version>
         <dc3.common.influx.version>2024.3.2</dc3.common.influx.version>
         <dc3.common.job.version>2024.3.2</dc3.common.job.version>
         <dc3.common.log.version>2024.3.2</dc3.common.log.version>
@@ -109,6 +110,7 @@
         <module>dc3-common-data</module>
         <module>dc3-common-driver</module>
         <module>dc3-common-exception</module>
+        <module>dc3-common-gateway</module>
         <module>dc3-common-influx</module>
         <module>dc3-common-job</module>
         <module>dc3-common-log</module>
@@ -244,6 +246,11 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-gateway</artifactId>
+                <version>${dc3.common.gateway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-influx</artifactId>
                 <version>${dc3.common.influx.version}</version>
             </dependency>
@@ -334,79 +341,5 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <repositories>
-        <repository>
-            <id>public</id>
-            <name>Aliyun Public Repository</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>spring</id>
-            <name>Aliyun Spring Repository</name>
-            <url>https://maven.aliyun.com/repository/spring</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>maven</id>
-            <name>Maven Central Repository</name>
-            <url>https://repo.maven.apache.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>sonatype</id>
-            <name>Sonatype Repository</name>
-            <url>https://s01.oss.sonatype.org/content/groups/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>public-plugin</id>
-            <name>Aliyun Public Plugin Repository</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-
-        <pluginRepository>
-            <id>spring-plugin</id>
-            <name>Aliyun Spring Plugin Repository</name>
-            <url>https://maven.aliyun.com/repository/spring-plugin</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
 </project>

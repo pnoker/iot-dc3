@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.gateway.filter;
+package io.github.pnoker.common.gateway.filter;
 
 import io.github.pnoker.api.center.auth.LimitedIpApiGrpc;
 import io.github.pnoker.common.constant.service.AuthConstant;

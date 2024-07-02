@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.gateway.service.impl;
+package io.github.pnoker.common.init;
 
-import io.github.pnoker.gateway.service.FilterService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
 /**
+ * Gateway initialization runner
+ *
  * @author pnoker
  * @since 2022.1.0
  */
-@Slf4j
-@Service
-public class FilterServiceImpl implements FilterService {
+@Component
+@ComponentScan(basePackages = {
+        "io.github.pnoker.common.gateway.*"
+})
+public class GatewayInitRunner implements ApplicationRunner {
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        // nothing to do
+    }
 }

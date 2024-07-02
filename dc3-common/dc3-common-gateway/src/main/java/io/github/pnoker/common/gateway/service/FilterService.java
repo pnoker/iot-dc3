@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.gateway.service;
+package io.github.pnoker.common.gateway.service;
 
 /**
  * @author pnoker

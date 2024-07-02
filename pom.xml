@@ -79,6 +79,7 @@
         <dc3.common.data.version>2024.3.2</dc3.common.data.version>
         <dc3.common.driver.version>2024.3.2</dc3.common.driver.version>
         <dc3.common.exception.version>2024.3.2</dc3.common.exception.version>
+        <dc3.common.gateway.version>2024.3.2</dc3.common.gateway.version>
         <dc3.common.influx.version>2024.3.2</dc3.common.influx.version>
         <dc3.common.job.version>2024.3.2</dc3.common.job.version>
         <dc3.common.log.version>2024.3.2</dc3.common.log.version>
@@ -196,6 +197,11 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-exception</artifactId>
                 <version>${dc3.common.exception.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-gateway</artifactId>
+                <version>${dc3.common.gateway.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>

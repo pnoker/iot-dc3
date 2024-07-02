@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.gateway;
+package io.github.pnoker.common.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * 网关中心服务启动入口
+ * Environment Config
  *
  * @author pnoker
  * @since 2022.1.0
  */
-@SpringBootApplication
-@EnableTransactionManagement
-public class GatewayApplication {
+@Slf4j
+@Configuration
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class ActiveGatewayProfileConfig implements EnvironmentPostProcessor {
 
-    public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
+    @Override
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        environment.addActiveProfile("gateway");
     }
-
 }

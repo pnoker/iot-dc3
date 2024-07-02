@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.gateway.config;
+package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.RequestUtil;
