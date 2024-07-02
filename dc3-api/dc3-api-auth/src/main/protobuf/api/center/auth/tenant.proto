@@ -1,0 +1,67 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package api.common.auth;
+
+import "api/common/base.proto";
+import "api/common/r.proto";
+
+/*
+Config
+*/
+option java_package = "io.github.pnoker.api.center.auth";
+option java_outer_classname = "TenantProto";
+option objc_class_prefix = "Auth";
+option java_multiple_files = true;
+
+/*
+Api
+*/
+service TenantApi {
+  rpc SelectByCode (GrpcCodeQuery) returns (GrpcRTenantDTO);
+}
+
+// SelectByCode Query
+message GrpcCodeQuery {
+  string code = 1;
+}
+
+// R of Tenant DTO
+message GrpcRTenantDTO {
+  /*
+  R
+  */
+  GrpcR result = 1;
+
+  /*
+  Data
+  */
+  GrpcTenantDTO data = 2;
+}
+
+// Tenant DTO
+message GrpcTenantDTO {
+  /*
+  Base
+  */
+  GrpcBase base = 1;
+
+  string tenant_name = 2; // 租户名称
+  string tenant_code = 3; // 租户编号
+  int32 enable_flag = 4; // 使能标识
+}

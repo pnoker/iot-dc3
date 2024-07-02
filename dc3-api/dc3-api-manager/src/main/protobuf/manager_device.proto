@@ -1,0 +1,103 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package api.common.manager;
+
+import "api/common/page.proto";
+import "api/common/r.proto";
+import "api/common/entity.proto";
+import "manager_query.proto";
+import "manager_query_page.proto";
+
+/*
+Config
+*/
+option java_package = "io.github.pnoker.api.center.manager";
+option java_outer_classname = "DeviceProto";
+option objc_class_prefix = "Manager";
+option java_multiple_files = true;
+
+/*
+Api
+*/
+service DeviceApi {
+  rpc SelectByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
+  rpc SelectByProfileId (GrpcProfileQuery) returns (GrpcRDeviceListDTO);
+  rpc SelectByDriverId (GrpcDriverQuery) returns (GrpcRDeviceListDTO);
+  rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
+}
+
+/*
+Device R Page
+*/
+message GrpcRPageDeviceDTO {
+  /*
+  R
+  */
+  GrpcR result = 1;
+
+  /*
+  Data
+  */
+  GrpcPageDeviceDTO data = 2;
+}
+
+/*
+Device Page
+*/
+message GrpcPageDeviceDTO {
+  /*
+  Page
+  */
+  GrpcPage page = 1;
+
+  /*
+  Data
+  */
+  repeated GrpcDeviceDTO data = 2;
+}
+
+/*
+Device R 集合
+*/
+message GrpcRDeviceListDTO {
+  /*
+  R
+  */
+  GrpcR result = 1;
+
+  /*
+  Data
+  */
+  repeated GrpcDeviceDTO data = 2;
+}
+
+/*
+Device R
+*/
+message GrpcRDeviceDTO {
+  /*
+  R
+  */
+  GrpcR result = 1;
+
+  /*
+  Data
+  */
+  GrpcDeviceDTO data = 2;
+}

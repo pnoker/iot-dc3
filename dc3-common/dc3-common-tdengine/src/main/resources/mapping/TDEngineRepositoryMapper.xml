@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.pnoker.common.tdengine.mapper.TDEngineRepositoryMapper">
+
+    <insert id="savePointValue" parameterType="io.github.pnoker.common.tdengine.entity.model.TDEnginePointValueDO"
+            statementType="STATEMENT">
+        insert
+        into dc3.${tableName}
+            using dc3.device_point_data(device_id, point_id, origin_time) TAGS (${pointValueDO.deviceId}, ${pointValueDO.pointId}, '${pointValueDO.originTime}')
+        values ('${pointValueDO.createTime}', ${pointValueDO.value}, ${pointValueDO.rawValue});
+    </insert>
+    <insert id="saveBatchPointValue">
+        insert
+        into
+        <foreach separator=" " collection="tdEnginePointValueDOList" item="tdEnginePointValueDO" index="index">
+            dc3.${tableName}
+            using dc3.device_point_data(device_id,point_id,origin_time)
+            TAGS
+            (${tdEnginePointValueDO.deviceId},
+            ${tdEnginePointValueDO.pointId},
+            '${tdEnginePointValueDO.originTime}')
+            values
+            ('${tdEnginePointValueDO.createTime}',
+            ${tdEnginePointValueDO.value},
+            ${tdEnginePointValueDO.rawValue});
+        </foreach>
+    </insert>
+    <select id="selectHistoryPointValue"
+            resultType="io.github.pnoker.common.tdengine.entity.model.TDEnginePointValueDO">
+        select *
+        from dc3.device_point_data
+        where device_id = #{deviceId}
+          and point_id = #{pointId}
+        limit #{count}
+    </select>
+    <select id="selectLatestPointValue"
+            resultType="io.github.pnoker.common.tdengine.entity.model.TDEnginePointValueDO">
+        select
+        last (create_time) as createTime,`value`,raw_value ,device_id ,point_id ,origin_time
+        from
+        dc3.device_point_data
+        <where>
+            <if test="deviceId != null and deviceId != '' and deviceId > 0">
+                device_id = #{deviceId}
+            </if>
+            <if test="pointIds != null and pointIds.size > 0">
+                and point_id in
+                <foreach collection="pointIds" item="pointId" index="index" open="(" close=")" separator=",">
+                    #{pointId}
+                </foreach>
+            </if>
+        </where>
+        group by point_id
+    </select>
+    <select id="count" resultType="java.lang.Long">
+        select count(*)
+        from device_point_data
+        <where>
+            <if test="entityQuery.deviceId != null and entityQuery.deviceId != '' and entityQuery.deviceId > 0">
+                device_id = #{entityQuery.deviceId}
+            </if>
+            <if test="entityQuery.pointId != null and entityQuery.pointId != '' and entityQuery.pointId > 0">
+                and point_id = #{entityQuery.pointId}
+            </if>
+        </where>
+
+    </select>
+    <select id="selectPagePointValue"
+            resultType="io.github.pnoker.common.tdengine.entity.model.TDEnginePointValueDO">
+        select create_time as ts,`value`,raw_value ,device_id ,point_id ,origin_time
+        from device_point_data
+        <where>
+            <if test="entityQuery.deviceId != null and entityQuery.deviceId != '' and entityQuery.deviceId > 0">
+                device_id = #{entityQuery.deviceId}
+            </if>
+            <if test="entityQuery.pointId != null and entityQuery.pointId != '' and entityQuery.pointId > 0">
+                and point_id = #{entityQuery.pointId}
+            </if>
+        </where>
+        order by create_time desc limit #{pages.current},#{pages.size}
+    </select>
+</mapper>

@@ -1,0 +1,63 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package api.common.driver;
+
+import "api/common/entity.proto";
+
+/*
+Config
+*/
+option java_package = "io.github.pnoker.api.common.driver";
+option java_outer_classname = "EntityProto";
+option objc_class_prefix = "Driver";
+option java_multiple_files = true;
+
+/*
+驱动注册信息
+*/
+message GrpcDriverRegisterDTO {
+  /*
+  Tenant name
+  租户编号
+  */
+  string tenant = 1;
+
+  /*
+  Driver client name
+  驱动服务+随机节点编号
+  */
+  string client = 2;
+
+  /*
+  Driver property
+  */
+  GrpcDriverDTO driver = 3;
+
+  /*
+  Driver attribute list
+  */
+  repeated GrpcDriverAttributeDTO driver_attributes = 4;
+
+  /*
+  Point attribute list
+  */
+  repeated GrpcPointAttributeDTO point_attributes = 5;
+}
+
+

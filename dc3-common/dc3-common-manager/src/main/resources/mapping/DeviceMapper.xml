@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.pnoker.common.manager.mapper.DeviceMapper">
+
+    <select id="selectPageWithProfile" resultType="io.github.pnoker.common.manager.entity.model.DeviceDO">
+        select
+        dd.id,
+        dd.device_name,
+        dd.device_code,
+        dd.driver_id,
+        dd.group_id,
+        dd.device_ext,
+        dd.enable_flag,
+        dd.tenant_id,
+        dd.remark,
+        dd.signature,
+        dd.version,
+        dd.creator_id,
+        dd.creator_name,
+        dd.create_time,
+        dd.operator_id,
+        dd.operator_name,
+        dd.operate_time,
+        dd.deleted
+        from dc3_device dd
+        <if test="profileId != null and profileId != '' and profileId > 0">
+            inner join dc3_profile_bind dpb on dd.id = dpb.device_id and dpb.deleted = 0
+            inner join dc3_profile dp on dpb.profile_id = dp.id and dp.id = #{profileId} and dp.deleted = 0
+        </if>
+        ${ew.customSqlSegment}
+    </select>
+</mapper>
