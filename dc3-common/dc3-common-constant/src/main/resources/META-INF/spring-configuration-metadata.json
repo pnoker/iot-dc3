@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "spring.env",
+      "type": "java.lang.String",
+      "description": "Current environment, used only for the development environment."
+    },
+    {
+      "name": "spring.group",
+      "type": "java.lang.String",
+      "description": "Current group, used only for the development environment."
+    }
+  ]
+}

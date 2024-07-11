@@ -1,0 +1,214 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package api.common;
+
+import "api/common/base.proto";
+
+/*
+Config
+*/
+option java_package = "io.github.pnoker.api.common";
+option java_outer_classname = "EntityProto";
+option objc_class_prefix = "Common";
+option java_multiple_files = true;
+
+/*
+Driver
+*/
+message GrpcDriverDTO {
+  /*
+  Base
+  */
+  GrpcBase base = 1;
+
+  /*驱动名称*/
+  string driver_name = 2;
+  string driver_code = 3; // 驱动编号
+  string service_name = 4; // 驱动服务名称
+  string service_host = 5; // 服务主机
+  int32 driver_type_flag = 6; // 驱动类型标识
+  string driver_ext = 7; // 驱动拓展信息
+  int32 enable_flag = 8; // 使能标识
+  string signature = 9; // 签名
+  int32 version = 10; // 版本
+
+  /*
+  租户ID
+  */
+  int64 tenant_id = 11;
+}
+
+/*
+Device
+*/
+message GrpcDeviceDTO {
+  /*
+  Base
+  */
+  GrpcBase base = 1;
+
+  string device_name = 2; // 位号名称
+  string device_code = 3; // 位号编号
+  int64 driver_id = 4; // 驱动ID
+  int64 group_id = 5; // 分组ID
+  string device_ext = 6; // 设备拓展信息
+  int32 enable_flag = 7; // 使能标识
+  string signature = 8; // 签名
+  int32 version = 9; // 版本
+
+  /*
+  附加字段
+  */
+  repeated int64 profile_ids = 10; // 模版ID集
+
+  /*
+  租户ID
+  */
+  int64 tenant_id = 11;
+}
+
+/*
+Point
+*/
+message GrpcPointDTO {
+  /*
+  Base
+  */
+  GrpcBase base = 1;
+
+  string point_name = 2; // 位号名称
+  string point_code = 3; // 位号编号
+  int32 point_type_flag = 4; // 位号类型标识
+  int32 rw_flag = 5; // 读写标识
+  double base_value = 6; // 基础值
+  double multiple = 7; // 比例系数
+  int32 value_decimal = 8; // 数据精度
+  string unit = 9; // 单位
+  int64 profile_id = 10; // 模板ID
+  int64 alarm_notify_profile_id = 11; // 报警通知模板ID
+  int64 alarm_message_profile_id = 12; // 报警信息模板ID
+  int64 group_id = 13; // 分组ID
+  string point_ext = 14; // 位号拓展信息
+  int32 enable_flag = 15; // 使能标识
+  string signature = 16; // 签名
+  int32 version = 17; // 版本
+
+  /*
+  租户ID
+  */
+  int64 tenant_id = 18;
+}
+
+/*
+Driver Attribute
+*/
+message GrpcDriverAttributeDTO {
+  /*
+  Base
+  */
+  GrpcBase base = 1;
+
+  string display_name = 2; // 显示名称
+  string attribute_name = 3; // 属性名称
+  int32 attribute_type_flag = 4; // 属性类型标识
+  string default_value = 5; // 默认值
+  int64 driver_id = 6; // 驱动ID
+  string attribute_ext = 7; // 驱动属性拓展信息
+  int32 enable_flag = 8; // 使能标识
+  string signature = 9; // 签名
+  int32 version = 10; // 版本
+
+  /*
+  租户ID
+  */
+  int64 tenant_id = 11;
+}
+
+/*
+驱动属性配置
+*/
+message GrpcDriverAttributeConfigDTO {
+  /*
+  Base
+  */
+  GrpcBase base = 1;
+
+  int64 driver_attribute_id = 2; // 驱动配置ID
+  string config_value = 3; // 驱动配置值
+  int64 device_id = 4; // 设备ID
+  int32 enable_flag = 5; // 使能标识
+  string signature = 6; // 签名
+  int32 version = 7; // 版本
+
+  /*
+  租户ID
+  */
+  int64 tenant_id = 8;
+}
+
+/*
+Point Attribute
+*/
+message GrpcPointAttributeDTO {
+  /*
+  Base
+  */
+  GrpcBase base = 1;
+
+  string display_name = 2; // 显示名称
+  string attribute_name = 3; // 属性名称
+  int32 attribute_type_flag = 4; // 属性类型标识
+  string default_value = 5; // 默认值
+  int64 driver_id = 6; // 驱动ID
+  string attribute_ext = 7; // 驱动属性拓展信息
+  int32 enable_flag = 8; // 使能标识
+  string signature = 9; // 签名
+  int32 version = 10; // 版本
+
+  /*
+  租户ID
+  */
+  int64 tenant_id = 11;
+}
+
+/*
+位号属性配置
+*/
+message GrpcPointAttributeConfigDTO {
+  /*
+  Base
+  */
+  GrpcBase base = 1;
+
+  int64 point_attribute_id = 2; // 位号配置ID
+  string config_value = 3; // 位号配置值
+  int64 device_id = 4; // 设备ID
+  int64 point_id = 5; // 位号ID
+  int32 enable_flag = 6; // 使能标识
+  string signature = 7; // 签名
+  int32 version = 8; // 版本
+
+  /*
+  租户ID
+  */
+  int64 tenant_id = 9;
+}
+
+
+

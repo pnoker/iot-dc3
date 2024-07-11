@@ -1,0 +1,70 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package api.common.data;
+
+import "api/common/r.proto";
+
+/*
+Config
+*/
+option java_package = "io.github.pnoker.api.center.data";
+option java_outer_classname = "PointValueProto";
+option objc_class_prefix = "Data";
+option java_multiple_files = true;
+
+/*
+Api
+*/
+service PointValueApi {
+  rpc LastValue (GrpcPointValueQuery) returns (GrpcRPointValueDTO);
+}
+
+message GrpcPointValueQuery {
+  int64 device_id = 1; // 设备ID
+  int64 point_id = 2; //点位ID
+
+  /*
+  租户ID
+  */
+  int64 tenant_id = 3;
+}
+
+
+message GrpcRPointValueDTO {
+  /*
+  R
+  */
+  GrpcR result = 1;
+
+  /*
+  Data
+  */
+  GrpcPointValueDTO data = 2;
+}
+
+
+message GrpcPointValueDTO {
+  int64 id = 1;
+  int64 device_id = 2;//设备ID
+  int64 point_id = 3;//位号ID
+  string value = 4;//处理值
+  string raw_value = 5;//原始值
+  int64 origin_time = 6;//采集时间
+  int64 create_time = 7;//入库时间
+}
