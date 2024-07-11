@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    driver-class-name: com.taosdata.jdbc.TSDBDriver
+    url: jdbc:TAOS-RS://192.168.1.67:6041/dc3?charset=UTF-8&locale=en_US.UTF-8&timezone=UTC-8
+    username: root
+    password: taosdata
+    druid:
+      initial-size: 5
+      max-active: 5
+      max-evictable-idle-time-millis: 900000
+      max-wait: 60000
+      min-evictable-idle-time-millis: 600000
+      min-idle: 5
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      time-between-eviction-runs-millis: 60000
+      validation-query: select server_status();
+      validation-query-timeout: 5000

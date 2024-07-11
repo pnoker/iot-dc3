@@ -1,0 +1,73 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+
+package api.common.driver;
+
+/*
+Config
+*/
+option java_package = "io.github.pnoker.api.common.driver";
+option java_outer_classname = "QueryProto";
+option objc_class_prefix = "Driver";
+option java_multiple_files = true;
+
+/*
+Device Query
+在驱动中获取设备信息仅需要限制该设备是否属于该驱动即可
+*/
+message GrpcDriverQuery {
+  /*
+  驱动ID
+  */
+  int64 driver_id = 1;
+}
+
+/*
+Device Query
+在驱动中获取设备信息仅需要限制该设备是否属于该驱动即可
+*/
+message GrpcDeviceQuery {
+  /*
+  驱动ID
+  */
+  int64 driver_id = 1;
+
+  /*
+  Device ID
+  */
+  int64 device_id = 2;
+}
+
+/*
+Point Query
+在驱动中获取位号信息仅需要限制该位号是否属于该驱动即可
+*/
+message GrpcPointQuery {
+  /*
+  驱动ID
+  */
+  int64 driver_id = 1;
+
+  /*
+  Point ID
+  */
+  int64 point_id = 2;
+}
+
+
+
