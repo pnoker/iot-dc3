@@ -48,6 +48,12 @@ spring:
             - Path=/api/v3/manager/**
           filters:
             - Authentic
+        - id: manager_websocket_route
+          uri: ws://dc3-center-manager:8400
+          predicates:
+            - Path=/api/v3/manager/**
+          filters:
+            - StripPrefix=2
         # data
         - id: data_route
           uri: http://dc3-center-data:8500
