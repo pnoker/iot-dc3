@@ -40,6 +40,7 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -98,17 +99,25 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         DriverRunBO driverRunBO = new DriverRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
+        List<LocalDate> dateList = Collections.nCopies(7, LocalDate.now());
+        ArrayList<LocalDate> dates = new ArrayList<>(dateList);
+        for (int i = 1;i<=7;i++){
+            dates.set(i-1,LocalDate.now().minusDays(7-i));
+        }
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         driverRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
         driverRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         if (Objects.isNull(driverRunDOList)) {
             driverRunBO.setDuration(list);
+            driverRunBO.setDates(dates);
             return driverRunBO;
         }
         for (int i = 0; i < driverRunDOList.size(); i++) {
             list.set(i, driverRunDOList.get(i).getDuration());
+            dates.set(i,driverRunDOList.get(i).getCreateTime().toLocalDate());
         }
         driverRunBO.setDuration(list);
+        driverRunBO.setDates(dates);
         return driverRunBO;
     }
 
@@ -125,17 +134,25 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         DriverRunBO driverRunBO = new DriverRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
+        List<LocalDate> dateList = Collections.nCopies(7, LocalDate.now());
+        ArrayList<LocalDate> dates = new ArrayList<>(dateList);
+        for (int i = 1;i<=7;i++){
+            dates.set(i-1,LocalDate.now().minusDays(7-i));
+        }
         driverRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         driverRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
         if (Objects.isNull(driverRunDOList)) {
             driverRunBO.setDuration(list);
+            driverRunBO.setDates(dates);
             return driverRunBO;
         }
         for (int i = 0; i < driverRunDOList.size(); i++) {
             list.set(i, driverRunDOList.get(i).getDuration());
+            dates.set(i,driverRunDOList.get(i).getCreateTime().toLocalDate());
         }
         driverRunBO.setDuration(list);
+        driverRunBO.setDates(dates);
         return driverRunBO;
     }
 

@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -41,6 +42,11 @@ public class DriverRunBO {
      * 驱动在线时长 /分钟
      */
     private List<Long> duration;
+
+    /**
+     * 驱动在线时长 /分钟
+     */
+    private List<LocalDate> dates;
 
     /**
      * 驱动在线总时长 分钟
