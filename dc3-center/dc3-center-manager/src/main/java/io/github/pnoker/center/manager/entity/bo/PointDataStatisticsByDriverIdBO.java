@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -32,6 +33,11 @@ public class PointDataStatisticsByDriverIdBO {
      * 驱动名称
      */
     private String driverName;
+
+    /**
+     * 日期
+     */
+    private List<LocalDate> dates;
 
     /**
      * 7天数据量

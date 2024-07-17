@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -36,4 +37,9 @@ public class DeviceDataVolumeRunBO {
      * 设备数据量 7天
      */
     private List<Long> total;
+
+    /**
+     * 日期
+     */
+    private List<LocalDate> dates;
 }

@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -43,6 +44,10 @@ public class DeviceRunBO {
      */
     private List<Long> duration;
 
+    /**
+     * 设备在线日期
+     */
+    private List<LocalDate> dates;
 
     /**
      * 设备在线总时长 分钟

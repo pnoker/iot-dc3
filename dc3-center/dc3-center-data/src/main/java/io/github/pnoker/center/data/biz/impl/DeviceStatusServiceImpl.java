@@ -38,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -104,18 +105,28 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         }
         DeviceRunBO deviceRunBO = new DeviceRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
+        List<LocalDate> dateList = Collections.nCopies(7, LocalDate.now());
+        ArrayList<LocalDate> dates = new ArrayList<>(dateList);
+        for (int i = 1;i<=7;i++){
+            dates.set(i-1,LocalDate.now().minusDays(7-i));
+        }
         ArrayList<Long> list = new ArrayList<>(zeroList);
         deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
         deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
         if (Objects.isNull(deviceRunDOList)) {
             deviceRunBO.setDuration(list);
+            deviceRunBO.setDates(dates);
             return deviceRunBO;
         }
         for (int i = 0; i < deviceRunDOList.size(); i++) {
             list.set(i, deviceRunDOList.get(i).getDuration());
+            if (Objects.nonNull(deviceRunDOList.get(i).getCreateTime())){
+                dates.set(i,deviceRunDOList.get(i).getCreateTime().toLocalDate());
+            }
         }
         deviceRunBO.setDuration(list);
+        deviceRunBO.setDates(dates);
         return deviceRunBO;
     }
 
@@ -132,17 +143,27 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         DeviceRunBO deviceRunBO = new DeviceRunBO();
         List<Long> zeroList = Collections.nCopies(7, 0L);
         ArrayList<Long> list = new ArrayList<>(zeroList);
+        List<LocalDate> dateList = Collections.nCopies(7, LocalDate.now());
+        ArrayList<LocalDate> dates = new ArrayList<>(dateList);
+        for (int i = 1;i<=7;i++){
+            dates.set(i-1,LocalDate.now().minusDays(7-i));
+        }
         deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
         deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
         if (Objects.isNull(deviceRunDOList)) {
             deviceRunBO.setDuration(list);
+            deviceRunBO.setDates(dates);
             return deviceRunBO;
         }
         for (int i = 0; i < deviceRunDOList.size(); i++) {
             list.set(i, deviceRunDOList.get(i).getDuration());
+            if (Objects.nonNull(deviceRunDOList.get(i).getCreateTime())){
+                dates.set(i,deviceRunDOList.get(i).getCreateTime().toLocalDate());
+            }
         }
         deviceRunBO.setDuration(list);
+        deviceRunBO.setDates(dates);
         return deviceRunBO;
     }
 

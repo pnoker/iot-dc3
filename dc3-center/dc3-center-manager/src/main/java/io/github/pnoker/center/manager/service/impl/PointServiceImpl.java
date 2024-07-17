@@ -49,6 +49,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -309,6 +310,11 @@ public class PointServiceImpl implements PointService {
         List<PointDO> pointDOList = pointManager.list(new LambdaQueryWrapper<PointDO>().in(PointDO::getId, pointIds));
         List<Long> zero = Collections.nCopies(7, 0L);
         ArrayList<Long> zeroList = new ArrayList<>(zero);
+        List<LocalDate> dateList = Collections.nCopies(7, LocalDate.now());
+        ArrayList<LocalDate> dates = new ArrayList<>(dateList);
+        for (int i = 1;i<=7;i++){
+            dates.set(i-1,LocalDate.now().minusDays(7-i));
+        }
         pointDOList.forEach(pointDO -> {
             LambdaQueryWrapper<PointDataVolumeRunDO> wrapper = Wrappers.<PointDataVolumeRunDO>query().lambda();
             wrapper.eq(PointDataVolumeRunDO::getPointId, pointDO.getId()).eq(PointDataVolumeRunDO::getDeviceId, deviceId).ge(PointDataVolumeRunDO::getCreateTime, sevenDaysAgo);
@@ -318,9 +324,13 @@ public class PointServiceImpl implements PointService {
             if (Objects.nonNull(pointDataVolumeRunDOList)) {
                 for (int i = 0; i < pointDataVolumeRunDOList.size(); i++) {
                     zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
+                    if (Objects.nonNull(pointDataVolumeRunDOList.get(i).getCreateTime())){
+                        dates.set(i, pointDataVolumeRunDOList.get(i).getCreateTime().toLocalDate());
+                    }
                 }
             }
             deviceDataVolumeRunBO.setTotal(zeroList);
+            deviceDataVolumeRunBO.setDates(dates);
             list.add(deviceDataVolumeRunBO);
         });
         return list;
@@ -362,6 +372,11 @@ public class PointServiceImpl implements PointService {
         result.setDriverName(driverDO.getDriverName());
         List<Long> zero = Collections.nCopies(7, 0L);
         ArrayList<Long> zeroList = new ArrayList<>(zero);
+        List<LocalDate> dateList = Collections.nCopies(7, LocalDate.now());
+        ArrayList<LocalDate> dates = new ArrayList<>(dateList);
+        for (int i = 1;i<=7;i++){
+            dates.set(i-1,LocalDate.now().minusDays(7-i));
+        }
         LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(6);
         QueryWrapper<PointDataVolumeRunDO> wrapper = new QueryWrapper<>();
         wrapper.select("sum(total) as total");
@@ -372,12 +387,17 @@ public class PointServiceImpl implements PointService {
                 .orderByDesc(PointDataVolumeRunDO::getCreateTime));
         if (Objects.isNull(pointDataVolumeRunDOList)) {
             result.setTotal(zeroList);
+            result.setDates(dates);
             return result;
         }
         for (int i = 0; i < pointDataVolumeRunDOList.size(); i++) {
             zeroList.set(i, pointDataVolumeRunDOList.get(i).getTotal());
+            if (Objects.nonNull(pointDataVolumeRunDOList.get(i).getCreateTime())){
+                dates.set(i, pointDataVolumeRunDOList.get(i).getCreateTime().toLocalDate());
+            }
         }
         result.setTotal(zeroList);
+        result.setDates(dates);
         return result;
     }
 

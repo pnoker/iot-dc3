@@ -114,7 +114,9 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         }
         for (int i = 0; i < driverRunDOList.size(); i++) {
             list.set(i, driverRunDOList.get(i).getDuration());
-            dates.set(i,driverRunDOList.get(i).getCreateTime().toLocalDate());
+            if (Objects.nonNull(driverRunDOList.get(i).getCreateTime())){
+                dates.set(i,driverRunDOList.get(i).getCreateTime().toLocalDate());
+            }
         }
         driverRunBO.setDuration(list);
         driverRunBO.setDates(dates);
@@ -149,7 +151,9 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         }
         for (int i = 0; i < driverRunDOList.size(); i++) {
             list.set(i, driverRunDOList.get(i).getDuration());
-            dates.set(i,driverRunDOList.get(i).getCreateTime().toLocalDate());
+            if (Objects.nonNull(driverRunDOList.get(i).getCreateTime())){
+                dates.set(i,driverRunDOList.get(i).getCreateTime().toLocalDate());
+            }
         }
         driverRunBO.setDuration(list);
         driverRunBO.setDates(dates);
