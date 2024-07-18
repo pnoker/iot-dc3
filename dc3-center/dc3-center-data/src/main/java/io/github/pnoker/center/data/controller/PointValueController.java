@@ -116,4 +116,26 @@ public class PointValueController implements BaseController {
         }
     }
 
+    /**
+     * 分页查询 历史 PointValue
+     *
+     * @param entityQuery 设备ID和分页参数
+     * @return 带分页的 {@link PointValueBO}
+     */
+    @PostMapping("/device_top100")
+    public Mono<R<Page<List<PointValueVO>>>> deviceTop100(@RequestBody(required = false) PointValueQuery entityQuery) {
+        try {
+            if (Objects.isNull(entityQuery)) {
+                entityQuery = new PointValueQuery();
+            }
+
+            Page<List<PointValueBO>> entityPageBO = pointValueService.deviceTop100(entityQuery);
+            Page<List<PointValueVO>> entityPageVO = pointValueBuilder.buildTOP100VOPageByBOPage(entityPageBO);
+            return Mono.just(R.ok(entityPageVO));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
+
 }

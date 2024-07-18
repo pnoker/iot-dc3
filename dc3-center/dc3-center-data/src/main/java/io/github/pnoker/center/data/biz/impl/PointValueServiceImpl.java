@@ -164,6 +164,75 @@ public class PointValueServiceImpl implements PointValueService {
         return repositoryService.selectPagePointValue(entityQuery);
     }
 
+    @Override
+    public Page<List<PointValueBO>> deviceTop100(PointValueQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+
+        Page<List<PointValueBO>> entityPageBO = new Page<>();
+        entityPageBO.setCurrent(entityQuery.getPage().getCurrent()).setSize(entityQuery.getPage().getSize());
+
+        GrpcPage.Builder entityPageGrpcDTO = GrpcPage.newBuilder()
+                .setSize(entityQuery.getPage().getSize())
+                .setCurrent(entityQuery.getPage().getCurrent());
+        GrpcPagePointQuery.Builder query = GrpcPagePointQuery.newBuilder()
+                .setPage(entityPageGrpcDTO);
+        if (CharSequenceUtil.isNotEmpty(entityQuery.getPointName())) {
+            query.setPointName(entityQuery.getPointName());
+        }
+        query.setPointTypeFlag(DefaultConstant.NULL_INT);
+        query.setRwFlag(DefaultConstant.NULL_INT);
+        query.setProfileId(DefaultConstant.NULL_INT);
+        query.setTenantId(DefaultConstant.NULL_INT);
+        if (Objects.nonNull(entityQuery.getDeviceId())) {
+            query.setDeviceId(entityQuery.getDeviceId());
+        }
+        Optional.ofNullable(entityQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.selectPointByPage(query.build());
+        if (!rPagePointDTO.getResult().getOk()) {
+            return entityPageBO;
+        }
+
+        List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
+        List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).toList();
+
+        List<List<PointValueBO>> pointValueTOP100BOS = new ArrayList<>();
+        RepositoryService repositoryService = getFirstRepositoryService();
+        /*PointValueQuery pointValueQuery = new PointValueQuery();
+        pointValueQuery.setDeviceId(entityQuery.getDeviceId());
+        List<PointValueBO> records = repositoryService.selectPagePointValue(pointValueQuery).getRecords();
+        Map<Long, List<PointValueBO>> collect = records.stream().collect(Collectors.groupingBy(PointValueBO::getPointId));
+        for (Map.Entry<Long, List<PointValueBO>> entry : collect.entrySet()) {
+            Long pointId = entry.getKey();
+            if (pointIds.contains(pointId)){
+                List<PointValueBO> entryValue = entry.getValue();
+                if (entryValue.size()>100){
+                    pointValueTOP100BOS.add(entryValue.subList(0,100));
+                }else {
+                    pointValueTOP100BOS.add(entryValue);
+                }
+            }
+        }*/
+        for (Long pointId : pointIds) {
+            PointValueQuery pointValueQuery = new PointValueQuery();
+            Pages pages = new Pages();
+            pages.setCurrent(1);
+            pages.setSize(100);
+            pointValueQuery.setPage(pages);
+            pointValueQuery.setPointId(pointId);
+            pointValueQuery.setDeviceId(entityQuery.getDeviceId());
+            List<PointValueBO> records = repositoryService.selectPagePointValue(pointValueQuery).getRecords();
+            pointValueTOP100BOS.add(records);
+        }
+
+        entityPageBO.setCurrent(rPagePointDTO.getData().getPage().getCurrent())
+                .setSize(rPagePointDTO.getData().getPage().getSize())
+                .setTotal(rPagePointDTO.getData().getPage().getTotal())
+                .setRecords(pointValueTOP100BOS);
+        return entityPageBO;
+    }
+
     /**
      * 保存 PointValue 到指定存储服务
      *

@@ -68,4 +68,12 @@ public interface PointValueService {
      */
     Page<PointValueBO> page(PointValueQuery pointValueQuery);
 
+    /**
+     * 获取带分页, 按照设备查询位号top100 PointValue
+     *
+     * @param pointValueQuery Entry of Query
+     * @return Entity of BO Page
+     */
+    Page<List<PointValueBO>> deviceTop100(PointValueQuery pointValueQuery);
+
 }

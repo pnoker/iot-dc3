@@ -90,4 +90,50 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void selectPointByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
+        GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+
+        PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
+
+        List<PointBO> pointBOS = pointService.selectByDeviceId(request.getDeviceId());
+        GrpcPage requestPage = request.getPage();
+        Page<PointBO> entityPage = new Page<>();
+        int fromIndex = (int) ((requestPage.getCurrent()-1)*requestPage.getSize());
+        int toIndex = (int) (requestPage.getCurrent()*requestPage.getSize()-1);
+        if (toIndex>pointBOS.size()){
+            toIndex = pointBOS.size();
+        }
+        entityPage.setCurrent(requestPage.getCurrent()).setSize(requestPage.getSize()).setTotal(pointBOS.size())
+                .setRecords(pointBOS.subList(fromIndex,toIndex));
+
+        if (Objects.isNull(entityPage)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
+
+            GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
+            GrpcPage.Builder page = GrpcPage.newBuilder();
+            page.setCurrent(entityPage.getCurrent());
+            page.setSize(entityPage.getSize());
+            page.setPages(entityPage.getPages());
+            page.setTotal(entityPage.getTotal());
+            pagePointBuilder.setPage(page);
+
+            List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords().stream().map(grpcPointBuilder::buildGrpcDTOByBO).toList();
+            pagePointBuilder.addAllData(entityGrpcDTOList);
+
+            builder.setData(pagePointBuilder);
+        }
+
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
 }

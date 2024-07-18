@@ -80,4 +80,6 @@ public interface PointValueBuilder {
     @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<PointValueVO> buildVOPageByBOPage(Page<PointValueBO> entityPageBO);
+
+    Page<List<PointValueVO>> buildTOP100VOPageByBOPage(Page<List<PointValueBO>> entityPageBO);
 }

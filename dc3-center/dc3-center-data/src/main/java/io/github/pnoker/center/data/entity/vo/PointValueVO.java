@@ -17,6 +17,8 @@
 package io.github.pnoker.center.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.github.pnoker.common.constant.common.TimeConstant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,11 +52,13 @@ public class PointValueVO implements Serializable {
     /**
      * 设备ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long deviceId;
 
     /**
      * 位号ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long pointId;
 
     /**
