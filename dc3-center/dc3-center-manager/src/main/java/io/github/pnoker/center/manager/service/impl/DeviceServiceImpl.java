@@ -148,14 +148,20 @@ public class DeviceServiceImpl implements DeviceService {
         List<Long> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityBO.getId());
 
         // 新增的模版
-        ArrayList<Long> addIds = new ArrayList<>(newProfileIds);
-        addIds.removeAll(oldProfileIds);
-        addProfileBind(entityDO, addIds);
+        if (null != newProfileIds) {
+            ArrayList<Long> addIds = new ArrayList<>(newProfileIds);
+            addIds.removeAll(oldProfileIds);
+            addProfileBind(entityDO, addIds);
+        }
+
 
         // 删除的模版
         ArrayList<Long> deleteIds = new ArrayList<>(oldProfileIds);
-        deleteIds.removeAll(newProfileIds);
-        deleteIds.forEach(profileId -> profileBindService.removeByDeviceIdAndProfileId(entityBO.getId(), profileId));
+        if (null != newProfileIds) {
+            deleteIds.removeAll(newProfileIds);
+            deleteIds.forEach(profileId -> profileBindService.removeByDeviceIdAndProfileId(entityBO.getId(), profileId));
+        }
+
 
         entityDO = deviceBuilder.buildDOByBO(entityBO);
         entityBO.setOperateTime(null);
