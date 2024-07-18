@@ -12,3 +12,4 @@
 
 dc3-api
 dc3-common
+/dc3-center/dc3-center-manager/src/main/java/io/github/pnoker/center/manager/service/ConnectionProfileService.java
