@@ -196,7 +196,6 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
-        List<String> pointNames = points.stream().map(p -> p.getPointName()).toList();
         List<PointValueTop100BO> result = new ArrayList<>();
         PointValueTop100BO pointValueTop100BO = new PointValueTop100BO();
         RepositoryService repositoryService = getFirstRepositoryService();
@@ -215,8 +214,12 @@ public class PointValueServiceImpl implements PointValueService {
                 }
             }
         }*/
-        List<Map<String, Object>> data = new ArrayList<>();
-        for (GrpcPointDTO point : points) {
+        List<String> nameList = Collections.nCopies(points.size(), null);
+        List<String> pointNames = new ArrayList<>(nameList);
+        List<List<String>> valueList = Collections.nCopies(points.size(),null);
+        List<List<String>> pointValues = new ArrayList<>(valueList);
+        for (int i=0;i<points.size();i++){
+            GrpcPointDTO point = points.get(i);
             PointValueQuery pointValueQuery = new PointValueQuery();
             Pages pages = new Pages();
             pages.setCurrent(1);
@@ -224,14 +227,13 @@ public class PointValueServiceImpl implements PointValueService {
             pointValueQuery.setPage(pages);
             pointValueQuery.setPointId(point.getBase().getId());
             pointValueQuery.setDeviceId(entityQuery.getDeviceId());
-            List<PointValueBO> records = repositoryService.selectPagePointValue(pointValueQuery).getRecords();
-            Map<String, Object> map = new HashMap<>();
-            map.put("pointName",point.getPointName());
-            map.put("pointValue",records);
-            data.add(map);
+            List<String> records = repositoryService.selectPagePointValue(pointValueQuery).getRecords().stream().map(p->p.getValue()).toList();
+
+            pointNames.set(i,point.getPointName());
+            pointValues.set(i,records);
         }
         pointValueTop100BO.setPointNames(pointNames);
-        pointValueTop100BO.setData(data);
+        pointValueTop100BO.setPointValues(pointValues);
         result.add(pointValueTop100BO);
 
         entityPageBO.setCurrent(rPagePointDTO.getData().getPage().getCurrent())

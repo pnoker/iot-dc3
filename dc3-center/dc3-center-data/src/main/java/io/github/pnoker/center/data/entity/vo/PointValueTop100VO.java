@@ -52,7 +52,7 @@ public class PointValueTop100VO implements Serializable {
     private List<String> pointNames;
 
     /**
-     * 100条数据和位号ID
+     * 100条数据
      */
-    private List<Map<String,Object>> data;
+    private List<List<String>> pointValues;
 }
