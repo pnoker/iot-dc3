@@ -19,11 +19,13 @@ package io.github.pnoker.center.data.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.center.data.entity.builder.PointValueBuilder;
+import io.github.pnoker.center.data.entity.vo.PointValueTop100VO;
 import io.github.pnoker.center.data.entity.vo.PointValueVO;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.PointValueTop100BO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -123,14 +126,14 @@ public class PointValueController implements BaseController {
      * @return 带分页的 {@link PointValueBO}
      */
     @PostMapping("/device_top100")
-    public Mono<R<Page<List<PointValueVO>>>> deviceTop100(@RequestBody(required = false) PointValueQuery entityQuery) {
+    public Mono<R<Page<PointValueTop100VO>>> deviceTop100(@RequestBody(required = false) PointValueQuery entityQuery) {
         try {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointValueQuery();
             }
 
-            Page<List<PointValueBO>> entityPageBO = pointValueService.deviceTop100(entityQuery);
-            Page<List<PointValueVO>> entityPageVO = pointValueBuilder.buildTOP100VOPageByBOPage(entityPageBO);
+            Page<PointValueTop100BO> entityPageBO = pointValueService.deviceTop100(entityQuery);
+            Page<PointValueTop100VO> entityPageVO = pointValueBuilder.buildTOP100VOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
             log.error(e.getMessage(), e);

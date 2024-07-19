@@ -17,10 +17,14 @@
 package io.github.pnoker.center.data.biz;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.data.entity.vo.PointValueTop100VO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.PointValueTop100BO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author pnoker
@@ -74,6 +78,6 @@ public interface PointValueService {
      * @param pointValueQuery Entry of Query
      * @return Entity of BO Page
      */
-    Page<List<PointValueBO>> deviceTop100(PointValueQuery pointValueQuery);
+    Page<PointValueTop100BO> deviceTop100(PointValueQuery pointValueQuery);
 
 }

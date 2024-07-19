@@ -17,13 +17,16 @@
 package io.github.pnoker.center.data.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.center.data.entity.vo.PointValueTop100VO;
 import io.github.pnoker.center.data.entity.vo.PointValueVO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.PointValueTop100BO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Group Builder
@@ -81,5 +84,5 @@ public interface PointValueBuilder {
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<PointValueVO> buildVOPageByBOPage(Page<PointValueBO> entityPageBO);
 
-    Page<List<PointValueVO>> buildTOP100VOPageByBOPage(Page<List<PointValueBO>> entityPageBO);
+    Page<PointValueTop100VO> buildTOP100VOPageByBOPage(Page<PointValueTop100BO> entityPageBO);
 }

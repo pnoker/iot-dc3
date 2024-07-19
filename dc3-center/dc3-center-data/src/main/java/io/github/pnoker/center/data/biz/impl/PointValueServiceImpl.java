@@ -29,6 +29,7 @@ import io.github.pnoker.center.data.biz.PointValueService;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.entity.bo.PointValueTop100BO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.common.exception.RepositoryException;
@@ -165,12 +166,12 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public Page<List<PointValueBO>> deviceTop100(PointValueQuery entityQuery) {
+    public Page<PointValueTop100BO> deviceTop100(PointValueQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
 
-        Page<List<PointValueBO>> entityPageBO = new Page<>();
+        Page<PointValueTop100BO> entityPageBO = new Page<>();
         entityPageBO.setCurrent(entityQuery.getPage().getCurrent()).setSize(entityQuery.getPage().getSize());
 
         GrpcPage.Builder entityPageGrpcDTO = GrpcPage.newBuilder()
@@ -195,9 +196,9 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
-        List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).toList();
-
-        List<List<PointValueBO>> pointValueTOP100BOS = new ArrayList<>();
+        List<String> pointNames = points.stream().map(p -> p.getPointName()).toList();
+        List<PointValueTop100BO> result = new ArrayList<>();
+        PointValueTop100BO pointValueTop100BO = new PointValueTop100BO();
         RepositoryService repositoryService = getFirstRepositoryService();
         /*PointValueQuery pointValueQuery = new PointValueQuery();
         pointValueQuery.setDeviceId(entityQuery.getDeviceId());
@@ -214,22 +215,29 @@ public class PointValueServiceImpl implements PointValueService {
                 }
             }
         }*/
-        for (Long pointId : pointIds) {
+        List<Map<String, Object>> data = new ArrayList<>();
+        for (GrpcPointDTO point : points) {
             PointValueQuery pointValueQuery = new PointValueQuery();
             Pages pages = new Pages();
             pages.setCurrent(1);
             pages.setSize(100);
             pointValueQuery.setPage(pages);
-            pointValueQuery.setPointId(pointId);
+            pointValueQuery.setPointId(point.getBase().getId());
             pointValueQuery.setDeviceId(entityQuery.getDeviceId());
             List<PointValueBO> records = repositoryService.selectPagePointValue(pointValueQuery).getRecords();
-            pointValueTOP100BOS.add(records);
+            Map<String, Object> map = new HashMap<>();
+            map.put("pointName",point.getPointName());
+            map.put("pointValue",records);
+            data.add(map);
         }
+        pointValueTop100BO.setPointNames(pointNames);
+        pointValueTop100BO.setData(data);
+        result.add(pointValueTop100BO);
 
         entityPageBO.setCurrent(rPagePointDTO.getData().getPage().getCurrent())
                 .setSize(rPagePointDTO.getData().getPage().getSize())
                 .setTotal(rPagePointDTO.getData().getPage().getTotal())
-                .setRecords(pointValueTOP100BOS);
+                .setRecords(result);
         return entityPageBO;
     }
 
