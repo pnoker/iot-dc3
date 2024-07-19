@@ -1,6 +1,5 @@
 package io.github.pnoker.center.manager.websocket;
 
-import org.apache.commons.collections4.MultiMap;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
@@ -8,40 +7,42 @@ import org.springframework.web.reactive.socket.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.net.URI;
-import java.util.Map;
-import java.util.UUID;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
 public class CustomWebSocketHandler implements WebSocketHandler, CorsConfigurationSource {
+    private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
+    private WebSocketSession currentSession;
+
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        // 在生产环境中，需对url中的参数进行检验，如token，不符合要求的连接的直接关闭
-        HandshakeInfo handshakeInfo = session.getHandshakeInfo();
-//        if (handshakeInfo.getUri().getQuery() == null) {
-//            return session.close(CloseStatus.REQUIRED_EXTENSION);
-//        } else {
-            // 对参数进行解析，在些使用的是jetty-util包
-//            MultiMap<String> values = new MultiMap<String>();
-//            UrlEncoded.decodeTo(handshakeInfo.getUri().getQuery(), values, "UTF-8");
-//            String token = values.getString("token");
-//            boolean isValidate = tokenService.validate(token);
-//            if (!isValidate) {
-//                return session.close();
-//            }
-//        }
-        Flux<WebSocketMessage> output = session.receive()
-                .concatMap(mapper -> {
-                    String msg = mapper.getPayloadAsText();
-                    System.out.println("mapper: " + msg);
-                    return Flux.just(msg);
-                }).map(value -> {
-                    System.out.println("value: " + value);
-                    return session.textMessage("Echo " + value);
-                });
-        return session.send(output);
+        this.currentSession = session;
+        return session.send(Flux.create(sink -> {
+            new Thread(() -> {
+                while (session.isOpen()) {
+                    try {
+                        String message = messageQueue.take();
+                        sink.next(session.textMessage(message));
+                    } catch (Exception e) {
+                        sink.error(e);
+                    }
+                }
+                sink.complete();
+            }).start();
+        })).and(session.receive().doFinally(signalType -> this.currentSession = null));
     }
+
+    public void handleMqttMessage(String topic, MqttMessage message) {
+        try {
+            String payload = "Topic: " + topic + ", Message: " + new String(message.getPayload());
+            messageQueue.put(payload);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public CorsConfiguration getCorsConfiguration(ServerWebExchange exchange) {
         CorsConfiguration configuration = new CorsConfiguration();

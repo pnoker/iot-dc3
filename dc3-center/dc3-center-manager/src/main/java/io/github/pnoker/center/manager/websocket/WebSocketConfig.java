@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Configuration
 public class WebSocketConfig {
-    @Bean
+    @Bean(name = "customWebSocketHandler")
     public CustomWebSocketHandler getMyWebsocketHandler() {
         return new CustomWebSocketHandler();
     }
