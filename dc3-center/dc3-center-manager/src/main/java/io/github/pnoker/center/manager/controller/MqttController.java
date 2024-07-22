@@ -2,6 +2,7 @@ package io.github.pnoker.center.manager.controller;
 
 
 import io.github.pnoker.center.manager.entity.model.ConnectionProfile;
+import io.github.pnoker.center.manager.entity.vo.MQTTSubscribeVO;
 import io.github.pnoker.center.manager.entity.vo.ProfileNameListVO;
 import io.github.pnoker.center.manager.service.ConnectionProfileService;
 import io.github.pnoker.center.manager.service.MqttService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -38,41 +40,45 @@ public class MqttController {
     }
 
     @PostMapping("/connect")
-    public String connect(@RequestBody ConnectionProfile request) {
+    public Mono<R<String>> connect(@RequestBody ConnectionProfile request) {
         try {
-            return mqttService.connect(request);
-        } catch (MqttException e) {
-            e.printStackTrace();
-            return "Failed to connect: " + e.getMessage();
+            return Mono.just(R.ok(mqttService.connect(request)));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     @PostMapping("/subscribe")
-    public String subscribe(@RequestParam String topic) {
+    public Mono<R<List<MQTTSubscribeVO>>> subscribe(@RequestParam String topic) {
         try {
-            return mqttService.subscribe(topic);
-        } catch (MqttException e) {
-            e.printStackTrace();
-            return "Failed to subscribe: " + e.getMessage();
+            List<MQTTSubscribeVO> list = new ArrayList<>();
+            MQTTSubscribeVO vo = new MQTTSubscribeVO();
+            vo.setName(mqttService.subscribe(topic));
+            list.add(vo);
+            return Mono.just(R.ok(list));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
     @PostMapping("/unsubscribe")
-    public String unsubscribe(@RequestParam String topic) {
+    public Mono<R<String>> unsubscribe(@RequestParam String topic) {
         try {
-            return mqttService.unsubscribe(topic);
-        } catch (MqttException e) {
-            e.printStackTrace();
-            return "Failed to unsubscribe: " + e.getMessage();
+            return Mono.just(R.ok(mqttService.unsubscribe(topic)));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 
     @PostMapping("/disconnect")
-    public String disconnect() {
+    public Mono<R<String>> disconnect() {
         try {
-            return mqttService.disconnect();
-        } catch (MqttException e) {
-            e.printStackTrace();
-            return "Failed to disconnect: " + e.getMessage();
+            return Mono.just(R.ok(mqttService.disconnect()));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
         }
     }
 

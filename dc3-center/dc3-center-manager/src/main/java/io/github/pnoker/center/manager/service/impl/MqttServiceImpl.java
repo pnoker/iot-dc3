@@ -66,7 +66,7 @@ public class MqttServiceImpl implements MqttService {
     public String subscribe(String topic) throws MqttException {
         if (mqttClient != null && mqttClient.isConnected()) {
             mqttClient.subscribe(topic);
-            return "Subscribed to topic: " + topic;
+            return topic;
         } else {
             return "MQTT client is not connected.";
         }

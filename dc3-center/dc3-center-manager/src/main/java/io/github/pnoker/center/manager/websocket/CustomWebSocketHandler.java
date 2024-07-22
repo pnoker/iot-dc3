@@ -1,5 +1,8 @@
 package io.github.pnoker.center.manager.websocket;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.pnoker.center.manager.entity.vo.MQTTtopicVO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
@@ -15,7 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class CustomWebSocketHandler implements WebSocketHandler, CorsConfigurationSource {
     private final BlockingQueue<String> messageQueue = new LinkedBlockingQueue<>();
     private WebSocketSession currentSession;
-
+     private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public Mono<Void> handle(WebSocketSession session) {
         this.currentSession = session;
@@ -36,7 +39,11 @@ public class CustomWebSocketHandler implements WebSocketHandler, CorsConfigurati
 
     public void handleMqttMessage(String topic, MqttMessage message) {
         try {
-            String payload = "Topic: " + topic + ", Message: " + new String(message.getPayload());
+            MQTTtopicVO mqttTopicVO = new MQTTtopicVO();
+            mqttTopicVO.setTopic(topic);
+            JsonNode messageJson = objectMapper.readTree(message.getPayload());
+            mqttTopicVO.setMessage(messageJson);
+            String payload = objectMapper.writeValueAsString(mqttTopicVO);
             messageQueue.put(payload);
         } catch (Exception e) {
             e.printStackTrace();
