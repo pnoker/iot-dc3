@@ -29,4 +29,5 @@ public interface UrlService {
     String getConfigUrl();
 
     String getRuleUrl();
+    String getPortableUrl();
 }

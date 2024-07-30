@@ -32,6 +32,7 @@ public interface EkuiperConstant {
         String TABLE_URL = "http://localhost:9081/tables";
         String CONFKEY_URL = "http://localhost:9081/metadata/sources";
         String RULE_URL = "http://localhost:9081/rules";
+        String PORTABLE_URL="http://localhost:9081/portables";
     }
 
 

@@ -41,6 +41,8 @@ public class UrlServiceImpl implements UrlService {
 
     @Value("${driver.custom.RULE_URL}")
     private String ruleUrl;
+    @Value("${driver.custom.PORTABLE_URL}")
+    private String portableUrl;
 
     @Override
     public String getStreamUrl() {
@@ -60,5 +62,10 @@ public class UrlServiceImpl implements UrlService {
     @Override
     public String getRuleUrl() {
         return ruleUrl;
+    }
+
+    @Override
+    public String getPortableUrl() {
+        return portableUrl;
     }
 }

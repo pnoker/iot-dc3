@@ -33,6 +33,7 @@ public interface ServiceConstant {
         String RULE_URL_PREFIX = "/rule";
         String CONFKEY_URL_PREFIX = "/confkey";
         String SINKTEM_URL_PREFIX = "/sinktem";
+        String PORTABLE_URL_PREFIX = "/portable";
     }
 
 }
