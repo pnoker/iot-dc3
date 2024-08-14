@@ -18,9 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.Buffer;
 import java.nio.file.Path;
 
 @Slf4j
@@ -63,14 +62,12 @@ public class PortableController {
     }
 
     @PostMapping("/upload")
-    public Mono<R<String>> uploadFile(@RequestPart("file") FilePart file) {
-        File realPath =new File("/home/dc3/eKuiper-portable");
-        if (!realPath.exists()) {
-            realPath.mkdirs();
-        }
-        File destinationFile = new File(realPath , file.filename());
-        return file.transferTo(destinationFile)
-                .then(Mono.just(R.ok("file://"+destinationFile.getAbsolutePath())));
+    public Mono<R<String>> uploadFile(@RequestPart("file") Mono<FilePart> filePart) {
+        return filePart.flatMap(part -> {
+            String filePath = "/home/dc3/eKuiper-portable/"+part.filename();
+            File file = new File(filePath);
+            return part.transferTo(file).then(Mono.just(R.ok("file://"+filePath)));
+        });
     }
 
     @PostMapping("/create")
