@@ -36,6 +36,7 @@ driver:
     TABLE_URL: ${driver.custom.url}/tables
     CONFKEY_URL: ${driver.custom.url}/metadata
     RULE_URL: ${driver.custom.url}/rules
+    PORTABLE_URL: ${driver.custom.url}/plugins/portables
 
 logging:
   file:
