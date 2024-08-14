@@ -64,7 +64,7 @@ public class PortableController {
 
     @PostMapping("/upload")
     public Mono<R<String>> uploadFile(@RequestPart("file") FilePart file) {
-        File realPath =new File("eKuiper-portable");
+        File realPath =new File("/home/dc3/eKuiper-portable");
         if (!realPath.exists()) {
             realPath.mkdirs();
         }
