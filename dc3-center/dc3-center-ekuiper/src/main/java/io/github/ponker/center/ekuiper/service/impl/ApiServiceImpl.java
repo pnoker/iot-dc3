@@ -25,7 +25,9 @@ import io.github.ponker.center.ekuiper.service.ApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -112,6 +114,17 @@ public class ApiServiceImpl implements ApiService {
                     Page<RecordDto> page = getPageSubset(current, size, dataList); // 修改此处
                     return Mono.just(page);
                 });
+    }
+
+    @Override
+    public Mono<String> callApiWithFile(Mono<FilePart> filePartMono, HttpMethod post, String url) {
+        return webClient
+                .method(post)
+                .uri(url)
+                .body(filePartMono, FilePart.class) // 使用 FilePart.class 而不是 MultipartFile.class
+                .retrieve()
+                .bodyToMono(String.class);
+
     }
 
     private List<RecordDto> getDataList(String response) {

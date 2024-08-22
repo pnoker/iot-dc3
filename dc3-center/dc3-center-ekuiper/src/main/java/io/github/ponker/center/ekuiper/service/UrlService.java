@@ -30,4 +30,5 @@ public interface UrlService {
 
     String getRuleUrl();
     String getPortableUrl();
+    String getUploadFileUrl();
 }

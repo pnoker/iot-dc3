@@ -37,6 +37,7 @@ driver:
     CONFKEY_URL: ${driver.custom.url}/metadata
     RULE_URL: ${driver.custom.url}/rules
     PORTABLE_URL: ${driver.custom.url}/plugins/portables
+    UPLOAD_URL: ${driver.custom.url}/config/uploads
 
 logging:
   file:

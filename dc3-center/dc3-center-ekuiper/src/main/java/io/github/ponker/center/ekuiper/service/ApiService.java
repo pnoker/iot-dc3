@@ -20,6 +20,8 @@ package io.github.ponker.center.ekuiper.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.ponker.center.ekuiper.entity.dto.RecordDto;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
 /**
@@ -38,4 +40,5 @@ public interface ApiService {
 
     Mono<Page<RecordDto>> callApiWithPage(HttpMethod method, String url, Integer current, Integer size);
 
+    Mono<String> callApiWithFile(Mono<FilePart> filePartMono, HttpMethod post, String url);
 }

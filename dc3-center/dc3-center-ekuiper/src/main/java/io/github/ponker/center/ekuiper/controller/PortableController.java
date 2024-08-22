@@ -11,6 +11,8 @@ import io.github.ponker.center.ekuiper.service.UrlService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +22,9 @@ import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.nio.Buffer;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Slf4j
 @RestController
@@ -61,14 +65,21 @@ public class PortableController {
 
     }
 
-    @PostMapping("/upload")
-    public Mono<R<String>> uploadFile(@RequestPart("file") Mono<FilePart> filePart) {
-        return filePart.flatMap(part -> {
-            String filePath = "/home/dc3/eKuiper-portable/"+part.filename();
-            File file = new File(filePath);
-            return part.transferTo(file).then(Mono.just(R.ok("file://"+filePath)));
+
+    @PostMapping(value = "/upload")
+    public Mono<R<String>> uploadFile(@RequestPart("uploadFile") Mono<FilePart> filePartMono) {
+        String url= urlService.getUploadFileUrl();
+        Mono<String> stringMono = apiService.callApiWithFile(filePartMono, HttpMethod.POST, url);
+        return stringMono.flatMap(s -> {
+            try {
+                return Mono.just(R.ok("file://"+s));
+            } catch (Exception e) {
+                log.error("Failed to call create Portable API", e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
         });
     }
+
 
     @PostMapping("/create")
     public Mono<R<String>> createPortable(@Validated @RequestBody Object form) {

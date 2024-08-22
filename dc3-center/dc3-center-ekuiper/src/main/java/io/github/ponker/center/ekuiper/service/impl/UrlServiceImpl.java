@@ -43,7 +43,8 @@ public class UrlServiceImpl implements UrlService {
     private String ruleUrl;
     @Value("${driver.custom.PORTABLE_URL}")
     private String portableUrl;
-
+    @Value("${driver.custom.UPLOAD_URL}")
+    private String uploadFileUrl;
     @Override
     public String getStreamUrl() {
         return streamUrl;
@@ -67,5 +68,10 @@ public class UrlServiceImpl implements UrlService {
     @Override
     public String getPortableUrl() {
         return portableUrl;
+    }
+
+    @Override
+    public String getUploadFileUrl() {
+        return uploadFileUrl;
     }
 }
