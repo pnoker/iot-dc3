@@ -121,10 +121,20 @@ public class ApiServiceImpl implements ApiService {
         return webClient
                 .method(post)
                 .uri(url)
-                .body(filePartMono, FilePart.class) // 使用 FilePart.class 而不是 MultipartFile.class
+                .body(filePartMono, FilePart.class)
                 .retrieve()
                 .bodyToMono(String.class);
 
+    }
+
+    @Override
+    public Mono<String> callApiWithMuFile(MultipartFile uploadFile, HttpMethod post, String url) {
+        return webClient
+                .method(post)
+                .uri(url)
+                .body(uploadFile, MultipartFile.class)
+                .retrieve()
+                .bodyToMono(String.class);
     }
 
     private List<RecordDto> getDataList(String response) {

@@ -40,5 +40,7 @@ public interface ApiService {
 
     Mono<Page<RecordDto>> callApiWithPage(HttpMethod method, String url, Integer current, Integer size);
 
-    Mono<String> callApiWithFile(Mono<FilePart> filePartMono, HttpMethod post, String url);
+    Mono<String> callApiWithFile(Mono<FilePart> uploadFile, HttpMethod post, String url);
+
+    Mono<String> callApiWithMuFile(MultipartFile uploadFile, HttpMethod post, String url);
 }
