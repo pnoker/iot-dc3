@@ -103,11 +103,6 @@ public class InfluxRepositoryServiceImpl implements RepositoryService, Initializ
         return data.subList(startIndex, endIndex);
     }
 
-    @Override
-    public PointValueBO selectLatestPointValue(Long deviceId, Long pointId) {
-        return null;
-    }
-
     /**
      * influx库转为BO类
      *
@@ -134,6 +129,11 @@ public class InfluxRepositoryServiceImpl implements RepositoryService, Initializ
         }
 
         return new ArrayList<>(boMap.values());
+    }
+
+    @Override
+    public PointValueBO selectLatestPointValue(Long deviceId, Long pointId) {
+        return null;
     }
 
     @Override

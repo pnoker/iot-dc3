@@ -22,10 +22,10 @@
               value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} [%clr(%4line){magenta}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"/>
     <property name="FILE_LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] [%4line] %-40.40logger{39} : %m%n%wEx"/>
-    <property name="LOGBACK_ROLLINGPOLICY_MAX_HISTORY" value="7"/>
+    <property name="LOGBACK_ROLLINGPOLICY_MAX_HISTORY" value="30"/>
     <property name="LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START" value="false"/>
-    <property name="LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE" value="10MB"/>
-    <property name="LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP" value="2GB"/>
+    <property name="LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE" value="200MB"/>
+    <property name="LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP" value="20GB"/>
 
     <!-- 引入 base.xml -->
     <include resource="org/springframework/boot/logging/logback/base.xml"/>

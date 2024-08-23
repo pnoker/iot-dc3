@@ -16,13 +16,18 @@
 
 package io.github.pnoker.common.gateway.filter;
 
+import io.github.pnoker.api.center.auth.GrpcIpQuery;
+import io.github.pnoker.api.center.auth.GrpcRLimitedIpDTO;
 import io.github.pnoker.api.center.auth.LimitedIpApiGrpc;
 import io.github.pnoker.common.constant.service.AuthConstant;
+import io.github.pnoker.common.utils.RequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -47,9 +52,8 @@ public class LimitedIpGlobalFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        // 20240327 先去掉登录限制
-        /*ServerHttpRequest request = exchange.getRequest();
-        String remoteIp = GatewayUtil.getRemoteIp(request);
+        ServerHttpRequest request = exchange.getRequest();
+        String remoteIp = RequestUtil.getRemoteIp(request);
         try {
             GrpcRLimitedIpDTO rLimitedIpDTO = limitedIpApiBlockingStub.checkValid(GrpcIpQuery.newBuilder().setIp(remoteIp).build());
             if (rLimitedIpDTO.getResult().getOk()) {
@@ -61,7 +65,7 @@ public class LimitedIpGlobalFilter implements GlobalFilter, Ordered {
             log.error(e.getMessage(), e);
             exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
             return exchange.getResponse().setComplete();
-        }*/
+        }
 
         return chain.filter(exchange);
     }
