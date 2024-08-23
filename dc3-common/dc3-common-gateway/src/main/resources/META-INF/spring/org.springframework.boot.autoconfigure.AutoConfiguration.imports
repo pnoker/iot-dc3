@@ -14,5 +14,5 @@
 # limitations under the License.
 #
 
-io.github.pnoker.common.config.GatewayConfig
+#io.github.pnoker.common.config.GatewayConfig
 io.github.pnoker.common.init.GatewayInitRunner
