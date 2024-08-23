@@ -38,6 +38,7 @@ driver:
     RULE_URL: ${driver.custom.url}/rules
     PORTABLE_URL: ${driver.custom.url}/plugins/portables
     UPLOAD_URL: ${driver.custom.url}/config/uploads
+    FILE_PATH: /home/software/kuiper-1.13.5-linux-amd64/data/uploads
 
 logging:
   file:
