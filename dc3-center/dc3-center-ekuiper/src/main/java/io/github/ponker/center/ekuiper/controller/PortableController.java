@@ -2,8 +2,12 @@ package io.github.ponker.center.ekuiper.controller;
 
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.ponker.center.ekuiper.constant.ServiceConstant;
 import io.github.ponker.center.ekuiper.entity.R;
+import io.github.ponker.center.ekuiper.entity.dto.PortableDto;
+import io.github.ponker.center.ekuiper.entity.po.Portable;
 import io.github.ponker.center.ekuiper.entity.vo.PortableDataVO;
 import io.github.ponker.center.ekuiper.service.ApiService;
 import io.github.ponker.center.ekuiper.service.PortableService;
@@ -105,7 +109,8 @@ public class PortableController {
 
     @PostMapping("/create")
     public Mono<R<String>> createPortable(@Validated @RequestBody Object form) {
-        Mono<String> stringMono = apiService.callApiWithData(form, HttpMethod.POST, urlService.getPortableUrl());
+        ObjectMapper objectMapper = new ObjectMapper();
+        Mono<String> stringMono = portableService.callApiWithPortableCreate(form, HttpMethod.POST, urlService.getPortableUrl());
         return stringMono.flatMap(s -> {
             try {
                 return Mono.just(R.ok(s));
