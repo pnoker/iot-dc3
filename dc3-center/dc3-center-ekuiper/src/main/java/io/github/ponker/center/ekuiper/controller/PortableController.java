@@ -125,6 +125,7 @@ public class PortableController {
     public Mono<R<String>> deletePortable(@PathVariable String name) {
         String url = urlService.getPortableUrl() + "/" + name;
         Mono<String> stringMono = apiService.callApi(HttpMethod.DELETE, url);
+        portableService.deletePortable(name);
         return stringMono.flatMap(s -> {
             try {
                 return Mono.just(R.ok(s));

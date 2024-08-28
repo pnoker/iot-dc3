@@ -105,6 +105,11 @@ public class PortableServiceImpl extends ServiceImpl<PortableMapper, Portable> i
                 });
     }
 
+    @Override
+    public void deletePortable(String name) {
+        portableMapper.delete(new LambdaQueryWrapper<Portable>().eq(Portable::getName,name));
+    }
+
     private PortableDataVO getDataOne(String response) {
         PortableDataVO data=null;
         try {

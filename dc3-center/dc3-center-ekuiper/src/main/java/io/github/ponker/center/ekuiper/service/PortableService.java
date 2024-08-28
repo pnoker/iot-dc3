@@ -15,4 +15,6 @@ public interface PortableService extends IService<Portable> {
     Mono<PortableDataVO> callApiWithPortable(HttpMethod get, String url);
 
     Mono<String> callApiWithPortableCreate(Object form, HttpMethod post, String portableUrl);
+
+    void deletePortable(String name);
 }
