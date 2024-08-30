@@ -140,7 +140,7 @@ public class PortableController {
     @PutMapping("/update/{name}")
     public Mono<R<String>> updatePortable(@Validated @RequestBody Object form, @PathVariable String name) {
         String url = urlService.getPortableUrl() + "/" + name;
-        Mono<String> stringMono = apiService.callApiWithData(form, HttpMethod.PUT, url);
+        Mono<String> stringMono = portableService.callApiWithUpdatePortable(form, HttpMethod.PUT, url);
         return stringMono.flatMap(s -> {
             try {
                 return Mono.just(R.ok(s));

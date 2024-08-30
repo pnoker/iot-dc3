@@ -110,6 +110,45 @@ public class PortableServiceImpl extends ServiceImpl<PortableMapper, Portable> i
         portableMapper.delete(new LambdaQueryWrapper<Portable>().eq(Portable::getName,name));
     }
 
+    @Override
+    public Mono<String> callApiWithUpdatePortable(Object data, HttpMethod method, String url) {
+        WebClient.RequestBodySpec request = webClient.method(method).uri(url);
+        if (Objects.nonNull(data)) {
+            try {
+                String json = objectMapper.writeValueAsString(data);
+                PortableDto portableDto=objectMapper.readValue(json,PortableDto.class);
+                Portable2EkuiperDto portable2EkuiperDto=new Portable2EkuiperDto();
+                portable2EkuiperDto.setName(portableDto.getName());
+                portable2EkuiperDto.setFile(portableDto.getFile());
+                String jsonBody = objectMapper.writeValueAsString(portable2EkuiperDto);
+                request = (WebClient.RequestBodySpec) request.body(BodyInserters.fromValue(jsonBody));
+                LambdaQueryWrapper<Portable> queryWrapper=new LambdaQueryWrapper<>();
+                queryWrapper.eq(Portable::getName,portableDto.getName());
+                Portable portable = portableMapper.selectOne(queryWrapper);
+                portable.setDescribtion(portableDto.getDescribtion());
+                portableMapper.updateById(portable);
+            } catch (Exception e) {
+                log.info("将对象序列化为JSON失败");
+                return Mono.error(e);
+            }
+        }
+        return request
+                .retrieve()
+                .bodyToMono(String.class)
+                .onErrorResume(error -> {
+                    if (error instanceof WebClientResponseException) {
+                        WebClientResponseException responseException = (WebClientResponseException) error;
+                        log.error("调用callApiWithData时发生错误. Status code: {}, Response body: {}",
+                                responseException.getRawStatusCode(), responseException.getResponseBodyAsString());
+                        return Mono.error(new RuntimeException(responseException.getResponseBodyAsString()));
+                    } else {
+                        log.error("调用callApiWithData时发生错误: {}", error.getMessage());
+                        return Mono.error(error);
+                    }
+
+                });
+    }
+
     private PortableDataVO getDataOne(String response) {
         PortableDataVO data=null;
         try {

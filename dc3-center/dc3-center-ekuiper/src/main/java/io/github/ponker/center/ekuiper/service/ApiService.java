@@ -43,4 +43,5 @@ public interface ApiService {
     Mono<String> callApiWithFile(Mono<FilePart> uploadFile, HttpMethod post, String url);
 
     Mono<String> callApiWithMuFile(MultipartFile uploadFile, HttpMethod post, String url);
+
 }
