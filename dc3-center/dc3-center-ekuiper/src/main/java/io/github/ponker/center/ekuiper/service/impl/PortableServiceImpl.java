@@ -82,7 +82,12 @@ public class PortableServiceImpl extends ServiceImpl<PortableMapper, Portable> i
                 Portable portable=new Portable();
                 portable.setName(portableDto.getName());
                 portable.setDescribtion(portableDto.getDescribtion());
-                portableMapper.insert(portable);
+                LambdaQueryWrapper<Portable> queryWrapper=new LambdaQueryWrapper<>();
+                queryWrapper.eq(Portable::getName,portable.getName());
+                List<Portable> portables = portableMapper.selectList(queryWrapper);
+                if (portables.isEmpty()){
+                    portableMapper.insert(portable);
+                }
             } catch (Exception e) {
                 log.info("将对象序列化为JSON失败");
                 return Mono.error(e);
