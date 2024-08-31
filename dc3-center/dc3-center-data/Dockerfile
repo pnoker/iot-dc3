@@ -24,7 +24,6 @@ ENV PARAMS        ''
 ENV NODE_ENV      dev
 ENV SERVER_PORT   8500
 ENV GRPC_PORT     9500
-ENV EXECUTOR_PORT 7500
 
 # default jvm & gc env
 ENV JAVA_OPS -server \

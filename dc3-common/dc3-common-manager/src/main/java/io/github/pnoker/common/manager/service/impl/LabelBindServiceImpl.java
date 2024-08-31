@@ -20,13 +20,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
-import io.github.pnoker.common.entity.bo.LabelBindBO;
+import io.github.pnoker.common.dal.LabelBindManager;
+import io.github.pnoker.common.dal.entity.bo.LabelBindBO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.dal.entity.model.LabelBindDO;
+import io.github.pnoker.common.dal.entity.query.LabelBindQuery;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.manager.dal.LabelBindManager;
 import io.github.pnoker.common.manager.entity.builder.LabelBindForManagerBuilder;
-import io.github.pnoker.common.manager.entity.model.LabelBindDO;
-import io.github.pnoker.common.manager.entity.query.LabelBindQuery;
 import io.github.pnoker.common.manager.service.LabelBindService;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -47,7 +47,7 @@ import java.util.Objects;
 public class LabelBindServiceImpl implements LabelBindService {
 
     @Resource
-    private LabelBindForManagerBuilder labelBindForManagerBuilder;
+    private LabelBindForManagerBuilder labelBindForAuthBuilder;
 
     @Resource
     private LabelBindManager labelBindManager;
@@ -56,11 +56,12 @@ public class LabelBindServiceImpl implements LabelBindService {
     public void save(LabelBindBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
-        LabelBindDO entityDO = labelBindForManagerBuilder.buildDOByBO(entityBO);
+        LabelBindDO entityDO = labelBindForAuthBuilder.buildDOByBO(entityBO);
         if (!labelBindManager.save(entityDO)) {
             throw new AddException("Failed to create label bind");
         }
     }
+
 
     @Override
     public void remove(Long id) {
@@ -71,24 +72,27 @@ public class LabelBindServiceImpl implements LabelBindService {
         }
     }
 
+
     @Override
     public void update(LabelBindBO entityBO) {
         getDOById(entityBO.getId(), true);
 
         checkDuplicate(entityBO, true, true);
 
-        LabelBindDO entityDO = labelBindForManagerBuilder.buildDOByBO(entityBO);
+        LabelBindDO entityDO = labelBindForAuthBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!labelBindManager.updateById(entityDO)) {
             throw new UpdateException("The label bind update failed");
         }
     }
 
+
     @Override
     public LabelBindBO selectById(Long id) {
         LabelBindDO entityDO = getDOById(id, false);
-        return labelBindForManagerBuilder.buildBOByDO(entityDO);
+        return labelBindForAuthBuilder.buildBOByDO(entityDO);
     }
+
 
     @Override
     public Page<LabelBindBO> selectByPage(LabelBindQuery entityQuery) {
@@ -96,7 +100,7 @@ public class LabelBindServiceImpl implements LabelBindService {
             entityQuery.setPage(new Pages());
         }
         Page<LabelBindDO> entityPageDO = labelBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return labelBindForManagerBuilder.buildBOPageByDOPage(entityPageDO);
+        return labelBindForAuthBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**
@@ -109,7 +113,6 @@ public class LabelBindServiceImpl implements LabelBindService {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getLabelId()), LabelBindDO::getLabelId, entityQuery.getLabelId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), LabelBindDO::getEntityId, entityQuery.getEntityId());
-        wrapper.eq(LabelBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

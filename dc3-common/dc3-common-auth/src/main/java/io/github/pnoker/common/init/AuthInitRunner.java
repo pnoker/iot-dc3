@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.init;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -24,21 +25,27 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * Auth  initialization runner
+ * Auth initialization runner
  *
  * @author pnoker
  * @since 2022.1.0
  */
+@Slf4j
 @Component
 @EnableTransactionManagement
 @ComponentScan(basePackages = {
+        "io.github.pnoker.common.dal.*",
         "io.github.pnoker.common.auth.*"
 })
-@MapperScan("io.github.pnoker.common.auth.mapper")
+@MapperScan(basePackages = {
+        "io.github.pnoker.common.dal.mapper",
+        "io.github.pnoker.common.auth.mapper"
+})
 public class AuthInitRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // nothing to do
+        log.info("AuthInitRunner");
     }
 }

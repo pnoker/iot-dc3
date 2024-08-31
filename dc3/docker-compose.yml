@@ -71,7 +71,6 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2024.3.0.dev
     restart: always
     ports:
-      - '7400:7400'
       - '8400:8400'
       - '9400:9400'
     environment:
@@ -97,7 +96,6 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2024.3.0.dev
     restart: always
     ports:
-      - '7500:7500'
       - '8500:8500'
       - '9500:9500'
     environment:

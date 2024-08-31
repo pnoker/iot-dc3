@@ -1,0 +1,47 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+server:
+  port: ${SERVER_PORT:8100}
+  servlet:
+    context-path: /single
+  undertow:
+    accesslog:
+      dir: dc3/logs/center/single/undertow
+
+grpc:
+  server:
+    port: ${GRPC_SERVER_PORT:9100}
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+  data:
+    redis:
+      database: 1
+
+data:
+  point:
+    batch:
+      speed: ${POINT_BATCH_SPEED:100}
+      interval: ${POINT_BATCH_INTERVAL:5}
+
+logging:
+  file:
+    name: dc3/logs/center/single/${spring.application.name}.log

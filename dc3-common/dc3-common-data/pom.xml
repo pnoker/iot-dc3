@@ -60,6 +60,10 @@
         <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-dal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-log</artifactId>
         </dependency>
         <dependency>

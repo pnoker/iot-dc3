@@ -21,15 +21,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
-import io.github.pnoker.common.data.dal.LabelBindManager;
-import io.github.pnoker.common.data.dal.LabelManager;
-import io.github.pnoker.common.data.entity.builder.LabelForAuthBuilder;
-import io.github.pnoker.common.data.entity.model.LabelBindDO;
-import io.github.pnoker.common.data.entity.model.LabelDO;
-import io.github.pnoker.common.data.entity.query.LabelQuery;
+import io.github.pnoker.common.dal.LabelBindManager;
+import io.github.pnoker.common.dal.LabelManager;
+import io.github.pnoker.common.data.entity.builder.LabelForDataBuilder;
 import io.github.pnoker.common.data.service.LabelService;
-import io.github.pnoker.common.entity.bo.LabelBO;
+import io.github.pnoker.common.dal.entity.bo.LabelBO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.dal.entity.model.LabelBindDO;
+import io.github.pnoker.common.dal.entity.model.LabelDO;
+import io.github.pnoker.common.dal.entity.query.LabelQuery;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
@@ -49,7 +49,7 @@ import java.util.Objects;
 public class LabelServiceImpl implements LabelService {
 
     @Resource
-    private LabelForAuthBuilder labelForAuthBuilder;
+    private LabelForDataBuilder labelForAuthBuilder;
 
     @Resource
     private LabelManager labelManager;

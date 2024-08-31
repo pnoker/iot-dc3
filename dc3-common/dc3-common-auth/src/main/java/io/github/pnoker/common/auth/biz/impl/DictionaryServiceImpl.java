@@ -23,7 +23,7 @@ import io.github.pnoker.common.auth.dal.LimitedIpManager;
 import io.github.pnoker.common.auth.dal.TenantManager;
 import io.github.pnoker.common.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.common.auth.entity.model.TenantDO;
-import io.github.pnoker.common.entity.bo.DictionaryBO;
+import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

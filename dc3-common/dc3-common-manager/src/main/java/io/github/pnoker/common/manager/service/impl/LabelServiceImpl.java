@@ -21,15 +21,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
-import io.github.pnoker.common.entity.bo.LabelBO;
+import io.github.pnoker.common.dal.LabelBindManager;
+import io.github.pnoker.common.dal.LabelManager;
+import io.github.pnoker.common.dal.entity.bo.LabelBO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.dal.entity.model.LabelBindDO;
+import io.github.pnoker.common.dal.entity.model.LabelDO;
+import io.github.pnoker.common.dal.entity.query.LabelQuery;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.manager.dal.LabelBindManager;
-import io.github.pnoker.common.manager.dal.LabelManager;
 import io.github.pnoker.common.manager.entity.builder.LabelForManagerBuilder;
-import io.github.pnoker.common.manager.entity.model.LabelBindDO;
-import io.github.pnoker.common.manager.entity.model.LabelDO;
-import io.github.pnoker.common.manager.entity.query.LabelQuery;
 import io.github.pnoker.common.manager.service.LabelService;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
@@ -49,7 +49,7 @@ import java.util.Objects;
 public class LabelServiceImpl implements LabelService {
 
     @Resource
-    private LabelForManagerBuilder labelForManagerBuilder;
+    private LabelForManagerBuilder labelForAuthBuilder;
 
     @Resource
     private LabelManager labelManager;
@@ -60,7 +60,7 @@ public class LabelServiceImpl implements LabelService {
     public void save(LabelBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
-        LabelDO entityDO = labelForManagerBuilder.buildDOByBO(entityBO);
+        LabelDO entityDO = labelForAuthBuilder.buildDOByBO(entityBO);
         if (!labelManager.save(entityDO)) {
             throw new AddException("Failed to create label");
         }
@@ -89,7 +89,7 @@ public class LabelServiceImpl implements LabelService {
 
         checkDuplicate(entityBO, true, true);
 
-        LabelDO entityDO = labelForManagerBuilder.buildDOByBO(entityBO);
+        LabelDO entityDO = labelForAuthBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!labelManager.updateById(entityDO)) {
             throw new UpdateException("The label update failed");
@@ -99,7 +99,7 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public LabelBO selectById(Long id) {
         LabelDO entityDO = getDOById(id, false);
-        return labelForManagerBuilder.buildBOByDO(entityDO);
+        return labelForAuthBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class LabelServiceImpl implements LabelService {
             entityQuery.setPage(new Pages());
         }
         Page<LabelDO> entityPageDO = labelManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return labelForManagerBuilder.buildBOPageByDOPage(entityPageDO);
+        return labelForAuthBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**
