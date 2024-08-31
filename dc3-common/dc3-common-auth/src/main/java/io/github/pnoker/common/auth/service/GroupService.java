@@ -16,9 +16,9 @@
 
 package io.github.pnoker.common.auth.service;
 
-import io.github.pnoker.common.auth.entity.query.GroupQuery;
 import io.github.pnoker.common.base.service.BaseService;
-import io.github.pnoker.common.entity.bo.GroupBO;
+import io.github.pnoker.common.dal.entity.bo.GroupBO;
+import io.github.pnoker.common.dal.entity.query.GroupQuery;
 
 /**
  * Group Interface

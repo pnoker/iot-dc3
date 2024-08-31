@@ -16,7 +16,7 @@
 
 package io.github.pnoker.common.auth.biz;
 
-import io.github.pnoker.common.entity.bo.DictionaryBO;
+import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 
 import java.util.List;
 

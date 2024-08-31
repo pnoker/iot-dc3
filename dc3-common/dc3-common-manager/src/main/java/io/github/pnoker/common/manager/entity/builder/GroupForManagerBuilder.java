@@ -17,11 +17,11 @@
 package io.github.pnoker.common.manager.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.entity.bo.GroupBO;
-import io.github.pnoker.common.entity.builder.GroupBuilder;
+import io.github.pnoker.common.dal.entity.bo.GroupBO;
+import io.github.pnoker.common.dal.entity.builder.GroupBuilder;
+import io.github.pnoker.common.dal.entity.model.GroupDO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.GroupTypeFlagEnum;
-import io.github.pnoker.common.manager.entity.model.GroupDO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;

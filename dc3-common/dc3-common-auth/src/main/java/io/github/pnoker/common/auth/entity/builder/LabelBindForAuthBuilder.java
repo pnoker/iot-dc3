@@ -17,9 +17,9 @@
 package io.github.pnoker.common.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.auth.entity.model.LabelBindDO;
-import io.github.pnoker.common.entity.bo.LabelBindBO;
-import io.github.pnoker.common.entity.builder.LabelBindBuilder;
+import io.github.pnoker.common.dal.entity.bo.LabelBindBO;
+import io.github.pnoker.common.dal.entity.builder.LabelBindBuilder;
+import io.github.pnoker.common.dal.entity.model.LabelBindDO;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
