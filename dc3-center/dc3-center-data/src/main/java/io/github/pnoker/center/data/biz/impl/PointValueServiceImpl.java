@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
+import java.io.FileDescriptor;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -182,6 +183,7 @@ public class PointValueServiceImpl implements PointValueService {
         if (CharSequenceUtil.isNotEmpty(entityQuery.getPointName())) {
             query.setPointName(entityQuery.getPointName());
         }
+
         query.setPointTypeFlag(DefaultConstant.NULL_INT);
         query.setRwFlag(DefaultConstant.NULL_INT);
         query.setProfileId(DefaultConstant.NULL_INT);
@@ -199,26 +201,16 @@ public class PointValueServiceImpl implements PointValueService {
         List<PointValueTop100BO> result = new ArrayList<>();
         PointValueTop100BO pointValueTop100BO = new PointValueTop100BO();
         RepositoryService repositoryService = getFirstRepositoryService();
-        /*PointValueQuery pointValueQuery = new PointValueQuery();
-        pointValueQuery.setDeviceId(entityQuery.getDeviceId());
-        List<PointValueBO> records = repositoryService.selectPagePointValue(pointValueQuery).getRecords();
-        Map<Long, List<PointValueBO>> collect = records.stream().collect(Collectors.groupingBy(PointValueBO::getPointId));
-        for (Map.Entry<Long, List<PointValueBO>> entry : collect.entrySet()) {
-            Long pointId = entry.getKey();
-            if (pointIds.contains(pointId)){
-                List<PointValueBO> entryValue = entry.getValue();
-                if (entryValue.size()>100){
-                    pointValueTOP100BOS.add(entryValue.subList(0,100));
-                }else {
-                    pointValueTOP100BOS.add(entryValue);
-                }
-            }
-        }*/
-        List<String> nameList = Collections.nCopies(points.size(), null);
-        List<String> pointNames = new ArrayList<>(nameList);
-        List<List<String>> valueList = Collections.nCopies(points.size(),null);
-        List<List<String>> pointValues = new ArrayList<>(valueList);
-        for (int i=0;i<points.size();i++){
+
+//        List<String> nameList = Collections.nCopies(points.size(), null);
+        List<String> pointNames = new ArrayList<>();
+//        List<List<String>> valueList = Collections.nCopies(points.size(), null);
+        List<List<String>> pointValues = new ArrayList<>();
+        if (Objects.nonNull(entityQuery.getPointId())) {
+            List<GrpcPointDTO> collect = points.stream().filter(p -> p.getBase().getId() == entityQuery.getPointId()).collect(Collectors.toList());
+            points = collect;
+        }
+        for (int i = 0; i < points.size(); i++) {
             GrpcPointDTO point = points.get(i);
             PointValueQuery pointValueQuery = new PointValueQuery();
             Pages pages = new Pages();
@@ -227,10 +219,10 @@ public class PointValueServiceImpl implements PointValueService {
             pointValueQuery.setPage(pages);
             pointValueQuery.setPointId(point.getBase().getId());
             pointValueQuery.setDeviceId(entityQuery.getDeviceId());
-            List<String> records = repositoryService.selectPagePointValue(pointValueQuery).getRecords().stream().map(p->p.getValue()).toList();
+            List<String> records = repositoryService.selectPagePointValue(pointValueQuery).getRecords().stream().map(p -> p.getValue()).toList();
 
-            pointNames.set(i,point.getPointName());
-            pointValues.set(i,records);
+            pointNames.add(i, point.getPointName());
+            pointValues.add(i, records);
         }
         pointValueTop100BO.setPointNames(pointNames);
         pointValueTop100BO.setPointValues(pointValues);
