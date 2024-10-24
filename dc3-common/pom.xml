@@ -24,13 +24,13 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-parent</artifactId>
-        <version>2024.3.2</version>
+        <version>2024.3.3</version>
         <relativePath/>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-common</artifactId>
-    <version>2024.3.2</version>
+    <version>2024.3.3</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2016-2022</inceptionYear>
@@ -70,38 +70,38 @@
         <maven.deploy.skip>true</maven.deploy.skip>
 
         <!-- DC3 Api 相关 -->
-        <dc3.api.auth.version>2024.3.2</dc3.api.auth.version>
-        <dc3.api.data.version>2024.3.2</dc3.api.data.version>
-        <dc3.api.driver.version>2024.3.2</dc3.api.driver.version>
-        <dc3.api.manager.version>2024.3.2</dc3.api.manager.version>
+        <dc3.api.auth.version>2024.3.3</dc3.api.auth.version>
+        <dc3.api.data.version>2024.3.3</dc3.api.data.version>
+        <dc3.api.driver.version>2024.3.3</dc3.api.driver.version>
+        <dc3.api.manager.version>2024.3.3</dc3.api.manager.version>
 
         <!-- DC3 Common 相关 -->
-        <dc3.common.api.version>2024.3.2</dc3.common.api.version>
-        <dc3.common.auth.version>2024.3.2</dc3.common.auth.version>
-        <dc3.common.constant.version>2024.3.2</dc3.common.constant.version>
-        <dc3.common.dal.version>2024.3.2</dc3.common.dal.version>
-        <dc3.common.data.version>2024.3.2</dc3.common.data.version>
-        <dc3.common.driver.version>2024.3.2</dc3.common.driver.version>
-        <dc3.common.exception.version>2024.3.2</dc3.common.exception.version>
-        <dc3.common.gateway.version>2024.3.2</dc3.common.gateway.version>
-        <dc3.common.influx.version>2024.3.2</dc3.common.influx.version>
-        <dc3.common.job.version>2024.3.2</dc3.common.job.version>
-        <dc3.common.log.version>2024.3.2</dc3.common.log.version>
-        <dc3.common.manager.version>2024.3.2</dc3.common.manager.version>
-        <dc3.common.model.version>2024.3.2</dc3.common.model.version>
-        <dc3.common.mongo.version>2024.3.2</dc3.common.mongo.version>
-        <dc3.common.mqtt.version>2024.3.2</dc3.common.mqtt.version>
-        <dc3.common.mysql.version>2024.3.2</dc3.common.mysql.version>
-        <dc3.common.public.version>2024.3.2</dc3.common.public.version>
-        <dc3.common.quartz.version>2024.3.2</dc3.common.quartz.version>
-        <dc3.common.rabbitmq.version>2024.3.2</dc3.common.rabbitmq.version>
-        <dc3.common.redis.version>2024.3.2</dc3.common.redis.version>
-        <dc3.common.register.version>2024.3.2</dc3.common.register.version>
-        <dc3.common.repository.version>2024.3.2</dc3.common.repository.version>
-        <dc3.common.tdengine.version>2024.3.2</dc3.common.tdengine.version>
-        <dc3.common.thread.version>2024.3.2</dc3.common.thread.version>
-        <dc3.common.transfer.version>2024.3.2</dc3.common.transfer.version>
-        <dc3.common.web.version>2024.3.2</dc3.common.web.version>
+        <dc3.common.api.version>2024.3.3</dc3.common.api.version>
+        <dc3.common.auth.version>2024.3.3</dc3.common.auth.version>
+        <dc3.common.constant.version>2024.3.3</dc3.common.constant.version>
+        <dc3.common.dal.version>2024.3.3</dc3.common.dal.version>
+        <dc3.common.data.version>2024.3.3</dc3.common.data.version>
+        <dc3.common.driver.version>2024.3.3</dc3.common.driver.version>
+        <dc3.common.exception.version>2024.3.3</dc3.common.exception.version>
+        <dc3.common.gateway.version>2024.3.3</dc3.common.gateway.version>
+        <dc3.common.influx.version>2024.3.3</dc3.common.influx.version>
+        <dc3.common.job.version>2024.3.3</dc3.common.job.version>
+        <dc3.common.log.version>2024.3.3</dc3.common.log.version>
+        <dc3.common.manager.version>2024.3.3</dc3.common.manager.version>
+        <dc3.common.model.version>2024.3.3</dc3.common.model.version>
+        <dc3.common.mongo.version>2024.3.3</dc3.common.mongo.version>
+        <dc3.common.mqtt.version>2024.3.3</dc3.common.mqtt.version>
+        <dc3.common.mysql.version>2024.3.3</dc3.common.mysql.version>
+        <dc3.common.public.version>2024.3.3</dc3.common.public.version>
+        <dc3.common.quartz.version>2024.3.3</dc3.common.quartz.version>
+        <dc3.common.rabbitmq.version>2024.3.3</dc3.common.rabbitmq.version>
+        <dc3.common.redis.version>2024.3.3</dc3.common.redis.version>
+        <dc3.common.register.version>2024.3.3</dc3.common.register.version>
+        <dc3.common.repository.version>2024.3.3</dc3.common.repository.version>
+        <dc3.common.tdengine.version>2024.3.3</dc3.common.tdengine.version>
+        <dc3.common.thread.version>2024.3.3</dc3.common.thread.version>
+        <dc3.common.transfer.version>2024.3.3</dc3.common.transfer.version>
+        <dc3.common.web.version>2024.3.3</dc3.common.web.version>
     </properties>
 
     <modules>
