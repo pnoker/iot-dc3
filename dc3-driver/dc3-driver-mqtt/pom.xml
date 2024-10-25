@@ -27,7 +27,7 @@
     <artifactId>dc3-driver-mqtt</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Mqtt 驱动。</description>
+    <description>Mqtt 驱动</description>
 
     <dependencies>
 

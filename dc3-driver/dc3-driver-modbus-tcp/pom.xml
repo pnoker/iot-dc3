@@ -27,7 +27,7 @@
     <artifactId>dc3-driver-modbus-tcp</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Modbus TCP 驱动。</description>
+    <description>Modbus TCP 驱动。</description>
 
     <dependencies>
 
