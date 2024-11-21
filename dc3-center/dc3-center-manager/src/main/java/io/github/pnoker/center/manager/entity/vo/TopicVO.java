@@ -23,4 +23,5 @@ public class TopicVO {
     private String topic;
     private String deviceName;
     private String pointName;
+    private String driverName;
 }

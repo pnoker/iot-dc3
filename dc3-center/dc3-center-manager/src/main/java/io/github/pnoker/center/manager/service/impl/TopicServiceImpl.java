@@ -19,15 +19,18 @@ package io.github.pnoker.center.manager.service.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
+import io.github.pnoker.center.manager.entity.bo.DriverBO;
 import io.github.pnoker.center.manager.entity.model.DeviceDO;
 import io.github.pnoker.center.manager.entity.model.PointDO;
 import io.github.pnoker.center.manager.entity.model.ProfileBindDO;
 import io.github.pnoker.center.manager.entity.query.TopicQuery;
 import io.github.pnoker.center.manager.entity.vo.TopicVO;
 import io.github.pnoker.center.manager.mapper.DeviceMapper;
+import io.github.pnoker.center.manager.service.DriverService;
 import io.github.pnoker.center.manager.service.TopicService;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +39,8 @@ import java.util.List;
 public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO>
         implements TopicService {
 
+    @Resource
+    private DriverService driverService;
 
     @Override
     public Page<List<TopicVO>> query(TopicQuery topicQuery) {
@@ -59,6 +64,8 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO>
         for (DeviceDO device : deviceList) {
             String deviceName = device.getDeviceName();
             Long deviceId = device.getId();
+            //查询驱动名称
+            DriverBO driver = driverService.selectById(device.getDriverId());
             ProfileBindDO profileBind = Db.lambdaQuery(ProfileBindDO.class)
                     .eq(ProfileBindDO::getDeviceId, deviceId)
                     .one();
@@ -66,7 +73,7 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO>
                 Long profileBindId = profileBind.getProfileId();
                 List<PointDO> points = Db.lambdaQuery(PointDO.class)
                         .eq(PointDO::getProfileId, profileBindId)
-                       // .eq(PointDO::getEnableFlag, 1)
+                        // .eq(PointDO::getEnableFlag, 1)
                         .eq(PointDO::getDeleted, 0)
                         .list();
                 for (PointDO point : points) {
@@ -74,6 +81,7 @@ public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO>
                     topicVO.setTopic("dc3/dc3-center-data/device/" + deviceId);
                     topicVO.setDeviceName(deviceName);
                     topicVO.setPointName(point.getPointName());
+                    topicVO.setDriverName(driver.getDriverName());
                     topicVOList.add(topicVO);
                 }
             }
