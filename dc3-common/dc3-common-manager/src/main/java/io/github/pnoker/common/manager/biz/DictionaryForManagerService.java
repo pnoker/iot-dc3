@@ -26,7 +26,7 @@ import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DictionaryService {
+public interface DictionaryForManagerService {
 
     /**
      * 获取驱动字典带分页的列表

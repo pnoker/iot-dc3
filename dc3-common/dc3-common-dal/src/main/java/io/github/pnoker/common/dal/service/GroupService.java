@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.manager.service;
+package io.github.pnoker.common.dal.service;
 
 import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.dal.entity.bo.GroupBO;

@@ -26,7 +26,7 @@ import java.util.List;
  * @author pnoker
  * @since 2022.1.0
  */
-public interface DictionaryService {
+public interface DictionaryForAuthService {
 
     /**
      * 获取租户字典

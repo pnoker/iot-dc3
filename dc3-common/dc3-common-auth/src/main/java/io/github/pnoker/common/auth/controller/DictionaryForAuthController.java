@@ -16,13 +16,13 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import io.github.pnoker.common.auth.biz.DictionaryService;
+import io.github.pnoker.common.auth.biz.DictionaryForAuthService;
 import io.github.pnoker.common.auth.entity.builder.DictionaryForAuthBuilder;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.dal.entity.vo.DictionaryVO;
+import io.github.pnoker.common.entity.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,14 +40,14 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
-public class DictionaryController implements BaseController {
+public class DictionaryForAuthController implements BaseController {
 
     private final DictionaryForAuthBuilder dictionaryForAuthBuilder;
-    private final DictionaryService dictionaryService;
+    private final DictionaryForAuthService dictionaryForAuthService;
 
-    public DictionaryController(DictionaryForAuthBuilder dictionaryForAuthBuilder, DictionaryService dictionaryService) {
+    public DictionaryForAuthController(DictionaryForAuthBuilder dictionaryForAuthBuilder, DictionaryForAuthService dictionaryForAuthService) {
         this.dictionaryForAuthBuilder = dictionaryForAuthBuilder;
-        this.dictionaryService = dictionaryService;
+        this.dictionaryForAuthService = dictionaryForAuthService;
     }
 
     /**
@@ -58,7 +58,7 @@ public class DictionaryController implements BaseController {
     @GetMapping("/tenant")
     public Mono<R<List<DictionaryVO>>> tenantDictionary() {
         try {
-            List<DictionaryBO> entityBOList = dictionaryService.tenantDictionary();
+            List<DictionaryBO> entityBOList = dictionaryForAuthService.tenantDictionary();
             List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
             return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
@@ -75,7 +75,7 @@ public class DictionaryController implements BaseController {
     @GetMapping("/limited_ip")
     public Mono<R<List<DictionaryVO>>> limitedIpDictionary() {
         try {
-            List<DictionaryBO> entityBOList = dictionaryService.limitedIpDictionary(getTenantId());
+            List<DictionaryBO> entityBOList = dictionaryForAuthService.limitedIpDictionary(getTenantId());
             List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
             return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {

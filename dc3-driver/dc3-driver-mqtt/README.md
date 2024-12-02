@@ -21,7 +21,8 @@
 >
 > **1**: 至少一次的传输, (鸡肋), 当client没收到service的puback或者service没有收到client的puback, 那么就会一直发送publisher;
 >
-> **2**:  只有一次的传输, publisher和broker进行了缓存, 其中publisher缓存了message和msgID, 而broker缓存了msgID, 两方都做记录所以可以保证消息不重复。
+> **2**:  只有一次的传输, publisher和broker进行了缓存, 其中publisher缓存了message和msgID, 而broker缓存了msgID,
+> 两方都做记录所以可以保证消息不重复。
 
 ## 测试工具
 

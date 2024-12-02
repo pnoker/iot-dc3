@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.manager.service;
-
-import io.github.pnoker.common.base.service.BaseService;
-import io.github.pnoker.common.dal.entity.bo.LabelBO;
-import io.github.pnoker.common.dal.entity.query.LabelQuery;
+package io.github.pnoker.common.data.biz;
 
 /**
- * Label Interface
- *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface LabelService extends BaseService<LabelBO, LabelQuery> {
+public interface ScheduleForDataService {
+    /**
+     * 初始化调度任务
+     */
+    void initial();
 }

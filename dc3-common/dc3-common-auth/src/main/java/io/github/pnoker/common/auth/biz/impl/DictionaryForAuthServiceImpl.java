@@ -18,7 +18,7 @@ package io.github.pnoker.common.auth.biz.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import io.github.pnoker.common.auth.biz.DictionaryService;
+import io.github.pnoker.common.auth.biz.DictionaryForAuthService;
 import io.github.pnoker.common.auth.dal.LimitedIpManager;
 import io.github.pnoker.common.auth.dal.TenantManager;
 import io.github.pnoker.common.auth.entity.model.LimitedIpDO;
@@ -37,7 +37,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class DictionaryServiceImpl implements DictionaryService {
+public class DictionaryForAuthServiceImpl implements DictionaryForAuthService {
 
     @Resource
     private TenantManager tenantManager;

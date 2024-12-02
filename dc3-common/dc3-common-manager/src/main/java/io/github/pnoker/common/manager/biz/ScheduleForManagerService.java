@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.auth.service;
-
-import io.github.pnoker.common.base.service.BaseService;
-import io.github.pnoker.common.dal.entity.bo.GroupBO;
-import io.github.pnoker.common.dal.entity.query.GroupQuery;
+package io.github.pnoker.common.manager.biz;
 
 /**
- * Group Interface
- *
  * @author pnoker
  * @since 2022.1.0
  */
-public interface GroupService extends BaseService<GroupBO, GroupQuery> {
-
+public interface ScheduleForManagerService {
+    /**
+     * 初始化调度任务
+     */
+    void initial();
 }

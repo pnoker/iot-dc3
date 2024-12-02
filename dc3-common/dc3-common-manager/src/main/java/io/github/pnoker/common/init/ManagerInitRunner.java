@@ -16,7 +16,7 @@
 
 package io.github.pnoker.common.init;
 
-import io.github.pnoker.common.manager.biz.ScheduleService;
+import io.github.pnoker.common.manager.biz.ScheduleForManagerService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -33,19 +33,23 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Component
 @EnableTransactionManagement
 @ComponentScan(basePackages = {
+        "io.github.pnoker.common.dal.*",
         "io.github.pnoker.common.manager.*"
 })
-@MapperScan("io.github.pnoker.common.manager.mapper")
+@MapperScan(basePackages = {
+        "io.github.pnoker.common.dal.mapper",
+        "io.github.pnoker.common.manager.mapper"
+})
 public class ManagerInitRunner implements ApplicationRunner {
 
-    private final ScheduleService scheduleService;
+    private final ScheduleForManagerService scheduleForManagerService;
 
-    public ManagerInitRunner(ScheduleService scheduleService) {
-        this.scheduleService = scheduleService;
+    public ManagerInitRunner(ScheduleForManagerService scheduleForManagerService) {
+        this.scheduleForManagerService = scheduleForManagerService;
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        scheduleService.initial();
+        scheduleForManagerService.initial();
     }
 }

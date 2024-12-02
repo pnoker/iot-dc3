@@ -19,7 +19,7 @@ package io.github.pnoker.common.manager.biz.impl;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.manager.biz.DictionaryService;
+import io.github.pnoker.common.manager.biz.DictionaryForManagerService;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
@@ -42,7 +42,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class DictionaryServiceImpl implements DictionaryService {
+public class DictionaryForManagerServiceImpl implements DictionaryForManagerService {
 
     @Resource
     private DictionaryForManagerBuilder dictionaryBuilder;

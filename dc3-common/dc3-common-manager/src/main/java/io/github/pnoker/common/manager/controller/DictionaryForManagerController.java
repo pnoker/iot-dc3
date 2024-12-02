@@ -19,10 +19,10 @@ package io.github.pnoker.common.manager.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.dal.entity.vo.DictionaryVO;
-import io.github.pnoker.common.manager.biz.DictionaryService;
+import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.manager.biz.DictionaryForManagerService;
 import io.github.pnoker.common.manager.entity.builder.DictionaryForManagerBuilder;
 import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
 import io.github.pnoker.common.valid.Parent;
@@ -45,14 +45,14 @@ import java.util.Objects;
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DICTIONARY_URL_PREFIX)
-public class DictionaryController implements BaseController {
+public class DictionaryForManagerController implements BaseController {
 
     private final DictionaryForManagerBuilder dictionaryForManagerBuilder;
-    private final DictionaryService dictionaryService;
+    private final DictionaryForManagerService dictionaryForManagerService;
 
-    public DictionaryController(DictionaryForManagerBuilder dictionaryForManagerBuilder, DictionaryService dictionaryService) {
+    public DictionaryForManagerController(DictionaryForManagerBuilder dictionaryForManagerBuilder, DictionaryForManagerService dictionaryForManagerService) {
         this.dictionaryForManagerBuilder = dictionaryForManagerBuilder;
-        this.dictionaryService = dictionaryService;
+        this.dictionaryForManagerService = dictionaryForManagerService;
     }
 
     /**
@@ -68,7 +68,7 @@ public class DictionaryController implements BaseController {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
-            Page<DictionaryBO> entityPageBO = dictionaryService.driverDictionary(entityQuery);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.driverDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public class DictionaryController implements BaseController {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
-            Page<DictionaryBO> entityPageBO = dictionaryService.profileDictionary(entityQuery);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.profileDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
@@ -112,7 +112,7 @@ public class DictionaryController implements BaseController {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
-            Page<DictionaryBO> entityPageBO = dictionaryService.pointDictionaryForProfile(entityQuery);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.pointDictionaryForProfile(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
@@ -134,7 +134,7 @@ public class DictionaryController implements BaseController {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
-            Page<DictionaryBO> entityPageBO = dictionaryService.pointDictionaryForDevice(entityQuery);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.pointDictionaryForDevice(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
@@ -156,7 +156,7 @@ public class DictionaryController implements BaseController {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
-            Page<DictionaryBO> entityPageBO = dictionaryService.deviceDictionary(entityQuery);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.deviceDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
@@ -178,7 +178,7 @@ public class DictionaryController implements BaseController {
                 entityQuery = new DictionaryQuery();
             }
             entityQuery.setTenantId(getTenantId());
-            Page<DictionaryBO> entityPageBO = dictionaryService.deviceDictionaryForDriver(entityQuery);
+            Page<DictionaryBO> entityPageBO = dictionaryForManagerService.deviceDictionaryForDriver(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {

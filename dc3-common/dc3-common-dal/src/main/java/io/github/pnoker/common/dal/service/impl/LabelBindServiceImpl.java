@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.auth.service.impl;
+package io.github.pnoker.common.dal.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.auth.entity.builder.LabelBindForAuthBuilder;
-import io.github.pnoker.common.auth.service.LabelBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.dal.LabelBindManager;
 import io.github.pnoker.common.dal.entity.bo.LabelBindBO;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.dal.entity.builder.LabelBindBuilder;
 import io.github.pnoker.common.dal.entity.model.LabelBindDO;
 import io.github.pnoker.common.dal.entity.query.LabelBindQuery;
+import io.github.pnoker.common.dal.service.LabelBindService;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
@@ -47,7 +47,7 @@ import java.util.Objects;
 public class LabelBindServiceImpl implements LabelBindService {
 
     @Resource
-    private LabelBindForAuthBuilder labelBindForAuthBuilder;
+    private LabelBindBuilder labelBindBuilder;
 
     @Resource
     private LabelBindManager labelBindManager;
@@ -56,7 +56,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     public void save(LabelBindBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
-        LabelBindDO entityDO = labelBindForAuthBuilder.buildDOByBO(entityBO);
+        LabelBindDO entityDO = labelBindBuilder.buildDOByBO(entityBO);
         if (!labelBindManager.save(entityDO)) {
             throw new AddException("Failed to create label bind");
         }
@@ -79,7 +79,7 @@ public class LabelBindServiceImpl implements LabelBindService {
 
         checkDuplicate(entityBO, true, true);
 
-        LabelBindDO entityDO = labelBindForAuthBuilder.buildDOByBO(entityBO);
+        LabelBindDO entityDO = labelBindBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!labelBindManager.updateById(entityDO)) {
             throw new UpdateException("The label bind update failed");
@@ -90,7 +90,7 @@ public class LabelBindServiceImpl implements LabelBindService {
     @Override
     public LabelBindBO selectById(Long id) {
         LabelBindDO entityDO = getDOById(id, false);
-        return labelBindForAuthBuilder.buildBOByDO(entityDO);
+        return labelBindBuilder.buildBOByDO(entityDO);
     }
 
 
@@ -100,7 +100,7 @@ public class LabelBindServiceImpl implements LabelBindService {
             entityQuery.setPage(new Pages());
         }
         Page<LabelBindDO> entityPageDO = labelBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return labelBindForAuthBuilder.buildBOPageByDOPage(entityPageDO);
+        return labelBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**
