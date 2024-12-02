@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.manager.job;
+package io.github.pnoker.common.data.job;
 
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
  */
 @Slf4j
 @Component
-public class HourlyJob extends QuartzJobBean {
+public class HourlyJobForData extends QuartzJobBean {
 
     /**
      * 任务执行

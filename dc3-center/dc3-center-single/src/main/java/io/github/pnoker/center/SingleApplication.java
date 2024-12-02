@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.center.auth;
+package io.github.pnoker.center;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -18,12 +18,18 @@ package io.github.pnoker.common.dal.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.dal.entity.bo.GroupBO;
+import io.github.pnoker.common.dal.entity.model.GroupDO;
 import io.github.pnoker.common.dal.entity.vo.GroupVO;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.GroupTypeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Group Builder
@@ -68,6 +74,65 @@ public interface GroupBuilder {
     List<GroupVO> buildVOListByBOList(List<GroupBO> entityBOList);
 
     /**
+     * DO to BO
+     *
+     * @param entityDO EntityDO
+     * @return EntityBO
+     */
+    @Mapping(target = "groupTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    GroupBO buildBOByDO(GroupDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(GroupDO entityDO, @MappingTarget GroupBO entityBO) {
+        // GroupType Flag
+        Byte groupTypeFlag = entityDO.getGroupTypeFlag();
+        entityBO.setGroupTypeFlag(GroupTypeFlagEnum.ofIndex(groupTypeFlag));
+
+        // Enable Flag
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+    }
+
+    /**
+     * DOList to BOList
+     *
+     * @param entityDOList EntityDO Array
+     * @return EntityBO Array
+     */
+    List<GroupBO> buildBOListByDOList(List<GroupDO> entityDOList);
+
+    /**
+     * BO to DO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDO
+     */
+    @Mapping(target = "groupTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    GroupDO buildDOByBO(GroupBO entityBO);
+
+    @AfterMapping
+    default void afterProcess(GroupBO entityBO, @MappingTarget GroupDO entityDO) {
+        // GroupType Flag
+        GroupTypeFlagEnum groupTypeFlag = entityBO.getGroupTypeFlag();
+        Optional.ofNullable(groupTypeFlag).ifPresent(value -> entityDO.setGroupTypeFlag(value.getIndex()));
+
+        // Enable Flag
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+    }
+
+    /**
+     * BOList to DOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDO Array
+     */
+    List<GroupDO> buildDOListByBOList(List<GroupBO> entityBOList);
+
+    /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
@@ -80,4 +145,18 @@ public interface GroupBuilder {
     @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<GroupVO> buildVOPageByBOPage(Page<GroupBO> entityPageBO);
+
+    /**
+     * DOPage to BOPage
+     *
+     * @param entityPageDO EntityDO Page
+     * @return EntityBO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<GroupBO> buildBOPageByDOPage(Page<GroupDO> entityPageDO);
 }

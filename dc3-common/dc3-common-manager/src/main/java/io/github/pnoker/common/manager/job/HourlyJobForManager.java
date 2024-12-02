@@ -14,35 +14,36 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.init;
+package io.github.pnoker.common.manager.job;
 
-import ch.qos.logback.classic.Logger;
 import lombok.extern.slf4j.Slf4j;
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.ComponentScan;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import java.time.LocalDateTime;
 
 /**
- * Dal initialization runner
+ * 通用: 每小时执行任务
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Slf4j
 @Component
-@EnableTransactionManagement
-@ComponentScan(basePackages = {
-        "io.github.pnoker.common.dal.*"
-})
-@MapperScan("io.github.pnoker.common.dal.mapper")
-public class DalInitRunner implements ApplicationRunner {
+public class HourlyJobForManager extends QuartzJobBean {
 
+    /**
+     * 任务执行
+     * * <p>
+     * * 具体逻辑请在 biz service 中定义
+     *
+     * @param context JobExecutionContext
+     * @throws JobExecutionException JobExecutionException
+     */
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        // nothing to do
-        log.info("DalInitRunner");
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+        log.info("hourlyJobHandler: {}", LocalDateTime.now());
     }
 }

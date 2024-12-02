@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.manager.service.impl;
+package io.github.pnoker.common.dal.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -24,12 +24,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.dal.GroupManager;
 import io.github.pnoker.common.dal.entity.bo.GroupBO;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.dal.entity.builder.GroupBuilder;
 import io.github.pnoker.common.dal.entity.model.GroupDO;
 import io.github.pnoker.common.dal.entity.query.GroupQuery;
+import io.github.pnoker.common.dal.service.GroupService;
+import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
-import io.github.pnoker.common.manager.entity.builder.GroupForManagerBuilder;
-import io.github.pnoker.common.manager.service.GroupService;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ import java.util.Objects;
 public class GroupServiceImpl implements GroupService {
 
     @Resource
-    private GroupForManagerBuilder groupForAuthBuilder;
+    private GroupBuilder groupBuilder;
 
     @Resource
     private GroupManager groupManager;
@@ -59,7 +59,7 @@ public class GroupServiceImpl implements GroupService {
     public void save(GroupBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
-        GroupDO entityDO = groupForAuthBuilder.buildDOByBO(entityBO);
+        GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
         if (!groupManager.save(entityDO)) {
             throw new AddException("Failed to create group");
         }
@@ -87,7 +87,7 @@ public class GroupServiceImpl implements GroupService {
 
         checkDuplicate(entityBO, true, true);
 
-        GroupDO entityDO = groupForAuthBuilder.buildDOByBO(entityBO);
+        GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
         if (!groupManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update group");
@@ -97,7 +97,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupBO selectById(Long id) {
         GroupDO entityDO = getDOById(id, true);
-        return groupForAuthBuilder.buildBOByDO(entityDO);
+        return groupBuilder.buildBOByDO(entityDO);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class GroupServiceImpl implements GroupService {
             entityQuery.setPage(new Pages());
         }
         Page<GroupDO> entityPageDO = groupManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return groupForAuthBuilder.buildBOPageByDOPage(entityPageDO);
+        return groupBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**

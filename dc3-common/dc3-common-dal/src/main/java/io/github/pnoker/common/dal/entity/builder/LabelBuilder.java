@@ -18,12 +18,18 @@ package io.github.pnoker.common.dal.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.dal.entity.bo.LabelBO;
+import io.github.pnoker.common.dal.entity.model.LabelDO;
 import io.github.pnoker.common.dal.entity.vo.LabelVO;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Label Builder
@@ -68,6 +74,65 @@ public interface LabelBuilder {
     List<LabelVO> buildVOListByBOList(List<LabelBO> entityBOList);
 
     /**
+     * DO to BO
+     *
+     * @param entityDO EntityDO
+     * @return EntityBO
+     */
+    @Mapping(target = "entityTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    LabelBO buildBOByDO(LabelDO entityDO);
+
+    @AfterMapping
+    default void afterProcess(LabelDO entityDO, @MappingTarget LabelBO entityBO) {
+        // EntityType Flag
+        Byte entityTypeFlag = entityDO.getEntityTypeFlag();
+        entityBO.setEntityTypeFlag(EntityTypeFlagEnum.ofIndex(entityTypeFlag));
+
+        // Enable Flag
+        Byte enableFlag = entityDO.getEnableFlag();
+        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
+    }
+
+    /**
+     * DOList to BOList
+     *
+     * @param entityDOList EntityDO Array
+     * @return EntityBO Array
+     */
+    List<LabelBO> buildBOListByDOList(List<LabelDO> entityDOList);
+
+    /**
+     * BO to DO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDO
+     */
+    @Mapping(target = "entityTypeFlag", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    LabelDO buildDOByBO(LabelBO entityBO);
+
+    @AfterMapping
+    default void afterProcess(LabelBO entityBO, @MappingTarget LabelDO entityDO) {
+        // EntityType Flag
+        EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
+        Optional.ofNullable(entityTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));
+
+        // Enable Flag
+        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
+        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
+    }
+
+    /**
+     * BOList to DOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDO Array
+     */
+    List<LabelDO> buildDOListByBOList(List<LabelBO> entityBOList);
+
+    /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
@@ -80,4 +145,18 @@ public interface LabelBuilder {
     @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<LabelVO> buildVOPageByBOPage(Page<LabelBO> entityPageBO);
+
+    /**
+     * DOPage to BOPage
+     *
+     * @param entityPageDO EntityDO Page
+     * @return EntityBO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<LabelBO> buildBOPageByDOPage(Page<LabelDO> entityPageDO);
 }

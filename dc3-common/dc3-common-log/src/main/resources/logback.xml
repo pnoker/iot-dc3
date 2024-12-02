@@ -56,6 +56,7 @@
     <logger name="org.springframework.integration" level="WARN"/>
     <logger name="org.springframework.scheduling" level="WARN"/>
     <logger name="org.springframework.boot.web" level="WARN"/>
+    <logger name="org.mybatis.spring.mapper" level="WARN"/>
     <logger name="de.codecentric.boot.admin" level="WARN"/>
     <logger name="org.elasticsearch.client" level="WARN"/>
     <logger name="org.springframework.data" level="WARN"/>
