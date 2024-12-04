@@ -76,7 +76,7 @@ public class MybatisUtil {
         }
 
         return FastAutoGenerator.create(
-                String.format("jdbc:mysql://%s:%s/%s?useSSL=false", host, port, db),
+                String.format("jdbc:postgresql://%s:%s/%s?useSSL=false", host, port, db),
                 username,
                 password
         );
