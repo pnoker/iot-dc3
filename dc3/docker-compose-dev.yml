@@ -46,9 +46,8 @@ services:
       - MYSQL_ROOT_PASSWORD=dc3
     container_name: dc3-postgres
     hostname: dc3-postgres
-#    volumes:
-#      - mysql_data:/data
-#      - mysql_lib:/var/lib/mysql
+    volumes:
+      - postgres:/var/lib/postgresql/data
     logging:
       driver: json-file
       options:
@@ -120,13 +119,36 @@ services:
         aliases:
           - dc3-rabbitmq
 
+  portainer:
+    image: portainer/portainer:alpine
+    command: -H unix:///var/run/docker.sock
+    restart: on-failure
+    ports:
+      - '9000:9000'
+    container_name: portainer
+    hostname: dc3-portainer
+    volumes:
+      - portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+      driver: json-file
+      options:
+        max-size: '20m'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-portainer
+
 volumes:
   mysql_data:
   mysql_lib:
   mongo_data:
   mongo_config:
+  postgres:
   redis:
   rabbitmq:
+  portainer:
 
 networks:
   dc3net:
