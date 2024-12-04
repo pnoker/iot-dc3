@@ -16,7 +16,7 @@
 
 services:
   mysql:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mysql:2024.3.0.dev
+    image: pnoker/dc3-mysql:2024.3.dev
     restart: always
     ports:
       - '33306:3306'
@@ -37,8 +37,30 @@ services:
         aliases:
           - dc3-mysql
 
+  postgres:
+    image: pnoker/dc3-postgres:2024.3.dev
+    restart: always
+    ports:
+      - '35432:5432'
+    environment:
+      - MYSQL_ROOT_PASSWORD=dc3
+    container_name: dc3-postgres
+    hostname: dc3-postgres
+#    volumes:
+#      - mysql_data:/data
+#      - mysql_lib:/var/lib/mysql
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-postgres
+
   mongo:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-mongo:2024.3.0.dev
+    image: pnoker/dc3-mongo:2024.3.dev
     restart: always
     ports:
       - '37017:27017'
@@ -58,7 +80,7 @@ services:
           - dc3-mongo
 
   redis:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis:2024.3.0.dev
+    image: pnoker/dc3-redis:2024.3.dev
     restart: always
     ports:
       - '36379:6379'
@@ -77,7 +99,7 @@ services:
           - dc3-redis
 
   rabbitmq:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2024.3.0.dev
+    image: pnoker/dc3-rabbitmq:2024.3.dev
     restart: always
     ports:
       - '5672:5672'

@@ -15,25 +15,26 @@
 #
 
 # runtime
-FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-jre:21 AS runtime
-LABEL dc3.author pnokers
-LABEL dc3.author.email pnokers.icloud.com
+FROM pnoker/dc3-jre:2024.3.dev AS runtime
+LABEL dc3.author=pnoker
+LABEL dc3.author.email=pnokers.icloud.com
 
 # default env
-ENV PARAMS        ''
-ENV NODE_ENV      dev
-ENV SERVER_PORT   8400
-ENV GRPC_PORT     9400
+ENV PARAMS=''
+ENV NODE_ENV=dev
+ENV SERVER_PORT=8400
+ENV GRPC_PORT=9400
 
 # default jvm & gc env
-ENV JAVA_OPS -server \
-             -Xms256m \
-             -Xmx1024m \
-             -Djava.security.egd=file:/dev/./urandom \
-             -XX:+UseG1GC
-ENV GC_LOG   -Xlog:gc*:file=dc3/logs/center/manager/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M
+ENV JAVA_OPS="-server \
+              -Xms256m \
+              -Xmx1024m \
+              -Djava.security.egd=file:/dev/./urandom \
+              -XX:+UseG1GC"
+ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/manager/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && mkdir -p /dc3-center/dc3-center-manager/dc3/logs/center/manager/gc
 
 WORKDIR /dc3-center/dc3-center-manager
 
@@ -43,5 +44,4 @@ EXPOSE ${SERVER_PORT}
 EXPOSE ${GRPC_PORT}
 VOLUME /dc3-center/dc3-center-manager/dc3/logs
 
-CMD mkdir -p /dc3-center/dc3-center-manager/dc3/logs/center/manager/gc \
-    && java ${JAVA_OPS} ${GC_LOG} -jar dc3-center-manager.jar ${PARAMS}
+CMD java ${JAVA_OPS} ${GC_LOG} -jar dc3-center-manager.jar ${PARAMS}
