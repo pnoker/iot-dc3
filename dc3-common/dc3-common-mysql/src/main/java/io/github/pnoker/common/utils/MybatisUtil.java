@@ -53,7 +53,7 @@ public class MybatisUtil {
      * @param defaultPassword 默认的数据库密码
      * @return FastAutoGenerator
      */
-    public static FastAutoGenerator defaultGenerator(String defaultHost, String defaultPort, String defaultDb, String defaultUsername, String defaultPassword) {
+    public static FastAutoGenerator defaultGenerator(String defaultHost, String defaultPort, String defaultDb, String defaultSchema, String defaultUsername, String defaultPassword) {
         String host = System.getenv("MYSQL_HOST");
         if (CharSequenceUtil.isEmpty(host)) {
             host = defaultHost;
@@ -66,6 +66,10 @@ public class MybatisUtil {
         if (CharSequenceUtil.isEmpty(db)) {
             db = defaultDb;
         }
+        String schema = System.getenv("MYSQL_SCHEMA");
+        if (CharSequenceUtil.isEmpty(schema)) {
+            schema = defaultSchema;
+        }
         String username = System.getenv("MYSQL_USERNAME");
         if (CharSequenceUtil.isEmpty(username)) {
             username = defaultUsername;
@@ -76,8 +80,8 @@ public class MybatisUtil {
         }
 
         return FastAutoGenerator.create(
-                String.format("jdbc:mysql://%s:%s/%s?useSSL=false&allowPublicKeyRetrieval=true", host, port, db),
-                //String.format("jdbc:postgresql://%s:%s/%s?useSSL=false", host, port, db),
+                //String.format("jdbc:mysql://%s:%s/%s?useSSL=false&allowPublicKeyRetrieval=true", host, port, db),
+                String.format("jdbc:postgresql://%s:%s/%s?currentSchema=%s&useSSL=false", host, port, db, schema),
                 username,
                 password
         );
