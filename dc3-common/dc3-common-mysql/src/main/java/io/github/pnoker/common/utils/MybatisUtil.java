@@ -22,8 +22,11 @@ import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.GlobalConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
+import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.extern.slf4j.Slf4j;
+
+import java.sql.Types;
 
 /**
  * Mybatis 工具类集合
@@ -100,9 +103,9 @@ public class MybatisUtil {
     public static void defaultDataSourceConfig(DataSourceConfig.Builder builder) {
         builder.typeConvertHandler((globalConfig, typeRegistry, metaInfo) -> {
             int typeCode = metaInfo.getJdbcType().TYPE_CODE;
-            /*if (typeCode == Types.SMALLINT) {
+            if (typeCode == Types.SMALLINT) {
                 return DbColumnType.BYTE;
-            }*/
+            }
             return typeRegistry.getColumnType(metaInfo);
         });
     }
