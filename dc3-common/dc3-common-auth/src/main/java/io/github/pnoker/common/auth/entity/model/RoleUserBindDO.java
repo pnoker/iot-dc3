@@ -19,7 +19,6 @@ package io.github.pnoker.common.auth.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -27,7 +26,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 角色-用户关联表
+ * 角色和用户的关联表
  * </p>
  *
  * @author pnoker
@@ -35,7 +34,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_role_user_bind")
 public class RoleUserBindDO implements Serializable {
 
@@ -111,7 +109,7 @@ public class RoleUserBindDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableLogic
     @TableField("deleted")
+    @TableLogic
     private Byte deleted;
 }

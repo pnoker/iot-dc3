@@ -21,7 +21,7 @@ import io.github.pnoker.common.auth.entity.model.LimitedIpDO;
 
 /**
  * <p>
- * Ip限制表 Mapper 接口
+ * IP限制表 Mapper 接口
  * </p>
  *
  * @author pnoker

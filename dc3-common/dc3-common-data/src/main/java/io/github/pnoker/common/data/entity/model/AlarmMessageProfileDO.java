@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -37,7 +36,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_alarm_message_profile")
 public class AlarmMessageProfileDO implements Serializable {
 
@@ -131,7 +129,7 @@ public class AlarmMessageProfileDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableLogic
     @TableField("deleted")
+    @TableLogic
     private Byte deleted;
 }

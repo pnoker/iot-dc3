@@ -21,7 +21,7 @@ import io.github.pnoker.common.auth.entity.model.RoleUserBindDO;
 
 /**
  * <p>
- * 角色-用户关联表 Mapper 接口
+ * 角色和用户的关联表 Mapper 接口
  * </p>
  *
  * @author pnoker

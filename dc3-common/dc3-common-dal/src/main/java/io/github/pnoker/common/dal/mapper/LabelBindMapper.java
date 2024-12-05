@@ -21,7 +21,7 @@ import io.github.pnoker.common.dal.entity.model.LabelBindDO;
 
 /**
  * <p>
- * 标签关联表 Mapper 接口
+ * 标签与实体的绑定表 Mapper 接口
  * </p>
  *
  * @author pnoker

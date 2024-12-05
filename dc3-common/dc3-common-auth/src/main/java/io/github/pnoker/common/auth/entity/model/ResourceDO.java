@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -29,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 权限资源表
+ * 资源表
  * </p>
  *
  * @author pnoker
@@ -37,7 +36,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_resource")
 public class ResourceDO implements Serializable {
 
@@ -51,37 +49,37 @@ public class ResourceDO implements Serializable {
     private Long id;
 
     /**
-     * 权限资源父级ID
+     * 资源父级ID
      */
     @TableField("parent_resource_id")
     private Long parentResourceId;
 
     /**
-     * 权限资源名称
+     * 资源名称
      */
     @TableField("resource_name")
     private String resourceName;
 
     /**
-     * 权限资源编号
+     * 资源编号
      */
     @TableField("resource_code")
     private String resourceCode;
 
     /**
-     * 权限资源类型标识
+     * 资源类型标识
      */
     @TableField("resource_type_flag")
     private Byte resourceTypeFlag;
 
     /**
-     * 权限资源范围标识
+     * 资源范围标识
      */
     @TableField("resource_scope_flag")
     private Byte resourceScopeFlag;
 
     /**
-     * 权限资源实体ID
+     * 资源实体ID
      */
     @TableField("entity_id")
     private Long entityId;
@@ -93,7 +91,7 @@ public class ResourceDO implements Serializable {
     private JsonExt resourceExt;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;
@@ -149,7 +147,7 @@ public class ResourceDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableLogic
     @TableField("deleted")
+    @TableLogic
     private Byte deleted;
 }

@@ -19,7 +19,6 @@ package io.github.pnoker.common.auth.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -35,7 +34,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_user_login")
 public class UserLoginDO implements Serializable {
 
@@ -49,7 +47,7 @@ public class UserLoginDO implements Serializable {
     private Long id;
 
     /**
-     * 登录名称, 加密存储
+     * 登录名称, 默认是用户名
      */
     @TableField("login_name")
     private String loginName;
@@ -67,7 +65,7 @@ public class UserLoginDO implements Serializable {
     private Long userPasswordId;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;
@@ -117,7 +115,7 @@ public class UserLoginDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableLogic
     @TableField("deleted")
+    @TableLogic
     private Byte deleted;
 }

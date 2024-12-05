@@ -19,7 +19,6 @@ package io.github.pnoker.common.data.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -35,7 +34,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_driver_run_history")
 public class DriverRunHistoryDO implements Serializable {
 

@@ -19,7 +19,6 @@ package io.github.pnoker.common.dal.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -35,7 +34,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_group")
 public class GroupDO implements Serializable {
 
@@ -55,25 +53,37 @@ public class GroupDO implements Serializable {
     private Long parentGroupId;
 
     /**
-     * 分组名称
-     */
-    @TableField("group_name")
-    private String groupName;
-
-    /**
-     * 分组排序位置
-     */
-    @TableField("position")
-    private Integer position;
-
-    /**
      * 分组类型标识
      */
     @TableField("group_type_flag")
     private Byte groupTypeFlag;
 
     /**
-     * 使能标识
+     * 分组名称
+     */
+    @TableField("group_name")
+    private String groupName;
+
+    /**
+     * 分组编号
+     */
+    @TableField("group_code")
+    private String groupCode;
+
+    /**
+     * 分组层级
+     */
+    @TableField("group_level")
+    private Byte groupLevel;
+
+    /**
+     * 分组顺序
+     */
+    @TableField("group_index")
+    private Byte groupIndex;
+
+    /**
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;
@@ -129,7 +139,7 @@ public class GroupDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableLogic
     @TableField("deleted")
+    @TableLogic
     private Byte deleted;
 }

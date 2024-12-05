@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * Ip限制表 服务实现类
+ * IP限制表 服务实现类
  * </p>
  *
  * @author pnoker

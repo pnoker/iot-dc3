@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -37,7 +36,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_api")
 public class ApiDO implements Serializable {
 
@@ -51,31 +49,31 @@ public class ApiDO implements Serializable {
     private Long id;
 
     /**
-     * Api接口类型标识
+     * 接口类型标识
      */
     @TableField("api_type_flag")
     private Byte apiTypeFlag;
 
     /**
-     * Api接口名称
+     * 接口名称
      */
     @TableField("api_name")
     private String apiName;
 
     /**
-     * Api接口编号, 一般为URL的MD5编码
+     * 接口编号
      */
     @TableField("api_code")
     private String apiCode;
 
     /**
-     * Api接口拓展信息
+     * 接口拓展信息
      */
     @TableField(value = "api_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt apiExt;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;
@@ -131,7 +129,7 @@ public class ApiDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableLogic
     @TableField("deleted")
+    @TableLogic
     private Byte deleted;
 }

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 标签关联表 服务实现类
+ * 标签与实体的绑定表 服务实现类
  * </p>
  *
  * @author pnoker
