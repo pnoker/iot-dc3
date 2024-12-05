@@ -21,7 +21,7 @@ import io.github.pnoker.common.auth.entity.model.ResourceDO;
 
 /**
  * <p>
- * 权限资源表 服务类
+ * 资源表 服务类
  * </p>
  *
  * @author pnoker

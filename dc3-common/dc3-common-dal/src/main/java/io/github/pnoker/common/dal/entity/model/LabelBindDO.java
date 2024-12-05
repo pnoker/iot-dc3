@@ -19,7 +19,6 @@ package io.github.pnoker.common.dal.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -27,7 +26,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 标签关联表
+ * 标签与实体的绑定表
  * </p>
  *
  * @author pnoker
@@ -35,7 +34,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_label_bind")
 public class LabelBindDO implements Serializable {
 
@@ -117,7 +115,7 @@ public class LabelBindDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableLogic
     @TableField("deleted")
+    @TableLogic
     private Byte deleted;
 }

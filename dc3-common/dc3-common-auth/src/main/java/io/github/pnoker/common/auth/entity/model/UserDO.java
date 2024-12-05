@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -37,7 +36,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_user")
 public class UserDO implements Serializable {
 
@@ -51,37 +49,37 @@ public class UserDO implements Serializable {
     private Long id;
 
     /**
-     * 用户昵称, 加密存储
-     */
-    @TableField("nick_name")
-    private String nickName;
-
-    /**
-     * 用户名, 加密存储
+     * 用户名
      */
     @TableField("user_name")
     private String userName;
 
     /**
-     * 手机号, 加密存储
+     * 用户昵称
+     */
+    @TableField("nick_name")
+    private String nickName;
+
+    /**
+     * 手机号
      */
     @TableField("phone")
     private String phone;
 
     /**
-     * 邮箱, 加密存储
+     * 邮箱
      */
     @TableField("email")
     private String email;
 
     /**
-     * 社交相关拓展信息, 加密存储
+     * 社交相关拓展信息
      */
     @TableField(value = "social_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt socialExt;
 
     /**
-     * 身份相关拓展信息, 加密存储
+     * 身份相关拓展信息
      */
     @TableField(value = "identity_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt identityExt;
@@ -131,7 +129,7 @@ public class UserDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableLogic
     @TableField("deleted")
+    @TableLogic
     private Byte deleted;
 }

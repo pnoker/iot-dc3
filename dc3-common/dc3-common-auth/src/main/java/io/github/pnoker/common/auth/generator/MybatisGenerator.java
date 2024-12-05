@@ -59,9 +59,9 @@ public class MybatisGenerator {
                         .addInclude(
                                 "dc3_api",
                                 "dc3_limited_ip",
-                                "dc3_group",
+                                /*"dc3_group",
                                 "dc3_label",
-                                "dc3_label_bind",
+                                "dc3_label_bind",*/
                                 "dc3_menu",
                                 "dc3_resource",
                                 "dc3_role",

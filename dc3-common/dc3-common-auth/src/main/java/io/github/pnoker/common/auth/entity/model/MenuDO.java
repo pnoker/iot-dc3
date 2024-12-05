@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -37,7 +36,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_menu")
 public class MenuDO implements Serializable {
 
@@ -69,7 +67,7 @@ public class MenuDO implements Serializable {
     private String menuName;
 
     /**
-     * 菜单编号, 一般为URL的MD5编码
+     * 菜单编号
      */
     @TableField("menu_code")
     private String menuCode;
@@ -93,7 +91,7 @@ public class MenuDO implements Serializable {
     private JsonExt menuExt;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;
@@ -149,7 +147,7 @@ public class MenuDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableLogic
     @TableField("deleted")
+    @TableLogic
     private Byte deleted;
 }

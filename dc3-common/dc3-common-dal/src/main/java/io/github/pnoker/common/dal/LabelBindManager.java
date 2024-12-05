@@ -21,7 +21,7 @@ import io.github.pnoker.common.dal.entity.model.LabelBindDO;
 
 /**
  * <p>
- * 标签关联表 服务类
+ * 标签与实体的绑定表 服务类
  * </p>
  *
  * @author pnoker

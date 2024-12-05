@@ -19,7 +19,6 @@ package io.github.pnoker.common.auth.entity.model;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -27,7 +26,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * Ip限制表
+ * IP限制表
  * </p>
  *
  * @author pnoker
@@ -35,7 +34,6 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@ToString
 @TableName("dc3_limited_ip")
 public class LimitedIpDO implements Serializable {
 
@@ -49,13 +47,13 @@ public class LimitedIpDO implements Serializable {
     private Long id;
 
     /**
-     * 受限IP
+     * IP地址
      */
     @TableField("ip")
     private String ip;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;
@@ -111,7 +109,7 @@ public class LimitedIpDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableLogic
     @TableField("deleted")
+    @TableLogic
     private Byte deleted;
 }

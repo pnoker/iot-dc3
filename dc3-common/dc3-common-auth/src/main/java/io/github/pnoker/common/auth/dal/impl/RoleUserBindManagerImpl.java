@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 角色-用户关联表 服务实现类
+ * 角色和用户的关联表 服务实现类
  * </p>
  *
  * @author pnoker
