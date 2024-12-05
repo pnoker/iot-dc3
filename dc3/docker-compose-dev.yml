@@ -120,9 +120,9 @@ services:
           - dc3-rabbitmq
 
   portainer:
-    image: portainer/portainer:alpine
+    image: portainer/portainer-ce:2.24.1-alpine
     command: -H unix:///var/run/docker.sock
-    restart: on-failure
+    restart: always
     ports:
       - '9000:9000'
     container_name: portainer
