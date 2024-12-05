@@ -17,8 +17,7 @@
 package io.github.pnoker.common.data.generator;
 
 import com.baomidou.mybatisplus.generator.config.OutputFile;
-import com.baomidou.mybatisplus.generator.config.TemplateType;
-import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
+import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import com.google.common.collect.ImmutableMap;
 import io.github.pnoker.common.utils.MybatisUtil;
 
@@ -52,8 +51,8 @@ public class MybatisGenerator {
                                 OutputFile.service, path + "/java/io/github/pnoker/common/data/dal",
                                 OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/data/dal/impl",
                                 OutputFile.xml, path + "/resources/mapping"))
-                ).templateConfig(builder -> builder.disable(TemplateType.CONTROLLER))
-                .templateEngine(new VelocityTemplateEngine())
+                )
+                .templateEngine(new FreemarkerTemplateEngine())
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder
                         .addInclude(

@@ -17,8 +17,7 @@
 package io.github.pnoker.common.auth.generator;
 
 import com.baomidou.mybatisplus.generator.config.OutputFile;
-import com.baomidou.mybatisplus.generator.config.TemplateType;
-import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
+import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import com.google.common.collect.ImmutableMap;
 import io.github.pnoker.common.utils.MybatisUtil;
 
@@ -39,8 +38,8 @@ public class MybatisGenerator {
 
     public static void generator() {
         String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-auth/src/main";
-        MybatisUtil.defaultGenerator("dc3-mysql", "3306", "dc3_auth", "root", "dc3")
-        //MybatisUtil.defaultGenerator("localhost", "35432", "dc3", "dc3", "dc3dc3dc3")
+        MybatisUtil.defaultGenerator("dc3-mysql", "33306", "dc3_auth", "root", "dc3")
+                //MybatisUtil.defaultGenerator("localhost", "35432", "dc3", "dc3", "dc3dc3dc3")
                 .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
                 .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
                 .packageConfig(builder -> builder
@@ -53,27 +52,12 @@ public class MybatisGenerator {
                                 OutputFile.service, path + "/java/io/github/pnoker/common/auth/dal",
                                 OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/auth/dal/impl",
                                 OutputFile.xml, path + "/resources/mapping"))
-                ).templateConfig(builder -> builder.disable(TemplateType.CONTROLLER))
-                .templateEngine(new VelocityTemplateEngine())
+                )
+                .templateEngine(new FreemarkerTemplateEngine())
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder
                         .addInclude(
-                                "dc3_api",
-                                "dc3_limited_ip",
-                                "dc3_group",
-                                "dc3_label",
-                                "dc3_label_bind",
-                                "dc3_menu",
-                                "dc3_resource",
-                                "dc3_role",
-                                "dc3_role_resource_bind",
-                                "dc3_role_user_bind",
-                                "dc3_driver_token",
-                                "dc3_tenant",
-                                "dc3_tenant_bind",
-                                "dc3_user",
-                                "dc3_user_login",
-                                "dc3_user_password"
+                                "dc3_api"
                         )
                 ).execute();
     }
