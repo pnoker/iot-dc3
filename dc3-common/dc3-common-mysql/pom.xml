@@ -42,7 +42,7 @@
         <developer>
             <id>pnoker</id>
             <name>pnoker</name>
-            <email>pnokers@gmail.com</email>
+            <email>pnokers@icloud.com</email>
             <roles>
                 <role>PMC</role>
             </roles>
@@ -91,10 +91,10 @@
             <artifactId>mybatis-plus-generator</artifactId>
         </dependency>
 
-        <!-- Velocity -->
+        <!-- Freemarker -->
         <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity-engine-core</artifactId>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
         </dependency>
 
         <!-- DC3 Common Exception -->
