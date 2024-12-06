@@ -38,8 +38,7 @@ public class MybatisGenerator {
 
     public static void generator() {
         String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-auth/src/main";
-        //MybatisUtil.defaultGenerator("dc3-mysql", "33306", "dc3_auth", "root", "dc3")
-        MybatisUtil.defaultGenerator("localhost", "35432", "dc3", "dc3_auth", "dc3", "dc3dc3dc3")
+        MybatisUtil.defaultGenerator("dc3-mysql", "35432", "dc3", "dc3_auth", "dc3", "dc3dc3dc3")
                 .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
                 .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
                 .packageConfig(builder -> builder
@@ -59,9 +58,6 @@ public class MybatisGenerator {
                         .addInclude(
                                 "dc3_api",
                                 "dc3_limited_ip",
-                                /*"dc3_group",
-                                "dc3_label",
-                                "dc3_label_bind",*/
                                 "dc3_menu",
                                 "dc3_resource",
                                 "dc3_role",

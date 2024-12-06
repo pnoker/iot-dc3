@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.auth.entity.model;
+package io.github.pnoker.common.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 菜单表
+ * 报警规则表
  * </p>
  *
  * @author pnoker
@@ -36,9 +36,10 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@TableName("dc3_menu")
-public class MenuDO implements Serializable {
+@TableName("dc3_rule")
+public class RuleDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -48,49 +49,49 @@ public class MenuDO implements Serializable {
     private Long id;
 
     /**
-     * 菜单父级ID
+     * 报警类型标识
      */
-    @TableField("parent_menu_id")
-    private Long parentMenuId;
+    @TableField("alarm_type_flag")
+    private Byte entityTypeFlag;
 
     /**
-     * 菜单类型标识
+     * 报警规则名称
      */
-    @TableField("menu_type_flag")
-    private Byte menuTypeFlag;
+    @TableField("alarm_rule_name")
+    private String ruleName;
 
     /**
-     * 菜单名称
+     * 报警规则编号
      */
-    @TableField("menu_name")
-    private String menuName;
+    @TableField("alarm_rule_code")
+    private String ruleCode;
 
     /**
-     * 菜单编号
+     * 位号ID
      */
-    @TableField("menu_code")
-    private String menuCode;
+    @TableField("point_id")
+    private Long entityId;
 
     /**
-     * 菜单层级
+     * 报警通知模板ID
      */
-    @TableField("menu_level")
-    private Byte menuLevel;
+    @TableField("alarm_notify_profile_id")
+    private Long notifyId;
 
     /**
-     * 菜单顺序
+     * 报警信息模板ID
      */
-    @TableField("menu_index")
-    private Byte menuIndex;
+    @TableField("alarm_message_profile_id")
+    private Long messageId;
 
     /**
-     * 菜单拓展信息
+     * 报警规则
      */
-    @TableField(value = "menu_ext", typeHandler = JacksonTypeHandler.class)
-    private JsonExt menuExt;
+    @TableField(value = "alarm_rule_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt ruleExt;
 
     /**
-     * 使能标识, 0:启用, 1:禁用
+     * 使能标识
      */
     @TableField("enable_flag")
     private Byte enableFlag;

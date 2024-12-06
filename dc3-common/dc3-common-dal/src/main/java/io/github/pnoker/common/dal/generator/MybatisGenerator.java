@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.data.generator;
+package io.github.pnoker.common.dal.generator;
 
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
@@ -26,7 +26,7 @@ import io.github.pnoker.common.utils.MybatisUtil;
  * <p>
  * 注意:
  * <p>
- * 当前配置仅用于 dc3-common-data 服务模块, 如果需要用于其他模块请重新配置 path 参数。
+ * 当前配置仅用于 dc3-common-dal 服务模块, 如果需要用于其他模块请重新配置 path 参数。
  *
  * @author pnoker
  * @since 2022.1.0
@@ -37,29 +37,27 @@ public class MybatisGenerator {
     }
 
     public static void generator() {
-        String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-data/src/main";
-        MybatisUtil.defaultGenerator("dc3-mysql", "3306", "dc3", "dc3_data", "root", "dc3")
+        String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-dal/src/main";
+        MybatisUtil.defaultGenerator("localhost", "35432", "dc3", "dc3_auth", "dc3", "dc3dc3dc3")
                 .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
                 .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
                 .packageConfig(builder -> builder
-                        .parent("io.github.pnoker.common.data")
+                        .parent("io.github.pnoker.common.dal")
                         .entity("entity.model")
                         .service("dal")
                         .serviceImpl("dal.impl")
                         .mapper("mapper")
                         .pathInfo(ImmutableMap.of(
-                                OutputFile.service, path + "/java/io/github/pnoker/common/data/dal",
-                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/data/dal/impl",
+                                OutputFile.service, path + "/java/io/github/pnoker/common/dal/dal",
+                                OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/dal/dal/impl",
                                 OutputFile.xml, path + "/resources/mapping"))
                 )
                 .templateEngine(new FreemarkerTemplateEngine())
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder
                         .addInclude(
-                                "dc3_message",
-                                "dc3_notify",
-                                "dc3_rule",
                                 "dc3_group",
+                                "dc3_group_bind",
                                 "dc3_label",
                                 "dc3_label_bind"
                         )

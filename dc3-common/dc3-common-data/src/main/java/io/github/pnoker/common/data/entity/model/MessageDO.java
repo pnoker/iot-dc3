@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.auth.entity.model;
+package io.github.pnoker.common.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 菜单表
+ * 报警信息模板表
  * </p>
  *
  * @author pnoker
@@ -36,9 +36,10 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@TableName("dc3_menu")
-public class MenuDO implements Serializable {
+@TableName("dc3_message")
+public class MessageDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -48,49 +49,31 @@ public class MenuDO implements Serializable {
     private Long id;
 
     /**
-     * 菜单父级ID
+     * 报警信息模板标题
      */
-    @TableField("parent_menu_id")
-    private Long parentMenuId;
+    @TableField("alarm_message_title")
+    private String messageName;
 
     /**
-     * 菜单类型标识
+     * 报警信息模板编号
      */
-    @TableField("menu_type_flag")
-    private Byte menuTypeFlag;
+    @TableField("alarm_message_code")
+    private String messageCode;
 
     /**
-     * 菜单名称
+     * 报警信息模板等级
      */
-    @TableField("menu_name")
-    private String menuName;
+    @TableField("alarm_message_level")
+    private Byte messageLevel;
 
     /**
-     * 菜单编号
+     * 报警信息模板内容
      */
-    @TableField("menu_code")
-    private String menuCode;
+    @TableField(value = "alarm_message_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt messageExt;
 
     /**
-     * 菜单层级
-     */
-    @TableField("menu_level")
-    private Byte menuLevel;
-
-    /**
-     * 菜单顺序
-     */
-    @TableField("menu_index")
-    private Byte menuIndex;
-
-    /**
-     * 菜单拓展信息
-     */
-    @TableField(value = "menu_ext", typeHandler = JacksonTypeHandler.class)
-    private JsonExt menuExt;
-
-    /**
-     * 使能标识, 0:启用, 1:禁用
+     * 使能标识
      */
     @TableField("enable_flag")
     private Byte enableFlag;
