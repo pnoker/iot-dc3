@@ -25,13 +25,14 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
- * 设备位号表 Mapper 接口
+ * 位号表 Mapper 接口
  * </p>
  *
  * @author pnoker
  * @since 2022.1.0
  */
 public interface PointMapper extends BaseMapper<PointDO> {
+
     Page<PointDO> selectPageWithDevice(Page<PointDO> page, @Param(Constants.WRAPPER) Wrapper<PointDO> wrapper, @Param("deviceId") Long deviceId);
 
 }

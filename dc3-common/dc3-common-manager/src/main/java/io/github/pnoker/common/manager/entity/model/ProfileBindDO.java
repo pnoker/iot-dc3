@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 模版-设备关联表
+ * 模板-设备关联表
  * </p>
  *
  * @author pnoker
@@ -109,7 +109,7 @@ public class ProfileBindDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
+    @TableField("deleted")
     @TableLogic
-    @TableField(value = "deleted")
     private Byte deleted;
 }

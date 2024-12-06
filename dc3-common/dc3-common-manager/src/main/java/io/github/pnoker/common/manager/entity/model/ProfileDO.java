@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 设备模版表
+ * 模板表
  * </p>
  *
  * @author pnoker
@@ -49,43 +49,37 @@ public class ProfileDO implements Serializable {
     private Long id;
 
     /**
-     * 模版名称
+     * 模板名称
      */
     @TableField("profile_name")
     private String profileName;
 
     /**
-     * 模版编号
+     * 模板编号
      */
     @TableField("profile_code")
     private String profileCode;
 
     /**
-     * 模版共享类型标识
+     * 模板共享类型标识
      */
     @TableField("profile_share_flag")
     private Byte profileShareFlag;
 
     /**
-     * 模版类型标识
+     * 模板类型标识
      */
     @TableField("profile_type_flag")
     private Byte profileTypeFlag;
 
     /**
-     * 分组ID
-     */
-    @TableField("group_id")
-    private Long groupId;
-
-    /**
-     * 模版拓展信息
+     * 模板拓展信息
      */
     @TableField(value = "profile_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt profileExt;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;
@@ -153,7 +147,7 @@ public class ProfileDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
+    @TableField("deleted")
     @TableLogic
-    @TableField(value = "deleted")
     private Byte deleted;
 }

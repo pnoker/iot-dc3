@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 @TableName("dc3_menu")
 public class MenuDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 设备位号表 服务实现类
+ * 位号表 服务实现类
  * </p>
  *
  * @author pnoker

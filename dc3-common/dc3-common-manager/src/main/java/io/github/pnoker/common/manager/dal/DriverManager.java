@@ -21,7 +21,7 @@ import io.github.pnoker.common.manager.entity.model.DriverDO;
 
 /**
  * <p>
- * 协议驱动表 服务类
+ * 驱动表 服务类
  * </p>
  *
  * @author pnoker

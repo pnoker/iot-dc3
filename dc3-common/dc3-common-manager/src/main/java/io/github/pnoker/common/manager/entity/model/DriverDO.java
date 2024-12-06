@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 协议驱动表
+ * 驱动表
  * </p>
  *
  * @author pnoker
@@ -61,7 +61,7 @@ public class DriverDO implements Serializable {
     private String driverCode;
 
     /**
-     * 驱动服务名称
+     * 服务名称
      */
     @TableField("service_name")
     private String serviceName;
@@ -85,7 +85,7 @@ public class DriverDO implements Serializable {
     private JsonExt driverExt;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;
@@ -153,7 +153,7 @@ public class DriverDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
+    @TableField("deleted")
     @TableLogic
-    @TableField(value = "deleted")
     private Byte deleted;
 }

@@ -38,7 +38,7 @@ public class MybatisGenerator {
 
     public static void generator() {
         String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-manager/src/main";
-        MybatisUtil.defaultGenerator("dc3-mysql", "3306", "dc3", "dc3_manager", "root", "dc3")
+        MybatisUtil.defaultGenerator("dc3-mysql", "35432", "dc3", "dc3_manager", "dc3", "dc3dc3dc3")
                 .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
                 .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
                 .packageConfig(builder -> builder
@@ -60,9 +60,6 @@ public class MybatisGenerator {
                                 "dc3_driver",
                                 "dc3_driver_attribute",
                                 "dc3_driver_attribute_config",
-                                "dc3_group",
-                                "dc3_label",
-                                "dc3_label_bind",
                                 "dc3_point",
                                 "dc3_point_attribute",
                                 "dc3_point_attribute_config",

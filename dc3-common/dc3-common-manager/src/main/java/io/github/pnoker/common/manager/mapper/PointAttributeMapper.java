@@ -21,7 +21,7 @@ import io.github.pnoker.common.manager.entity.model.PointAttributeDO;
 
 /**
  * <p>
- * 模版配置信息表 Mapper 接口
+ * 位号属性表 Mapper 接口
  * </p>
  *
  * @author pnoker
