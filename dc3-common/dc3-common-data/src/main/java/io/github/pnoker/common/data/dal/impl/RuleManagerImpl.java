@@ -24,13 +24,13 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 报警规则表 服务实现类
+ * 规则表 服务实现类
  * </p>
  *
  * @author pnoker
  * @since 2022.1.0
  */
 @Service
-public class RuleImpl extends ServiceImpl<RuleMapper, RuleDO> implements RuleManager {
+public class RuleManagerImpl extends ServiceImpl<RuleMapper, RuleDO> implements RuleManager {
 
 }

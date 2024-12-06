@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 报警信息模板表
+ * 信息表
  * </p>
  *
  * @author pnoker
@@ -49,31 +49,31 @@ public class MessageDO implements Serializable {
     private Long id;
 
     /**
-     * 报警信息模板标题
+     * 信息名称
      */
-    @TableField("alarm_message_title")
+    @TableField("message_name")
     private String messageName;
 
     /**
-     * 报警信息模板编号
+     * 信息编号
      */
-    @TableField("alarm_message_code")
+    @TableField("message_code")
     private String messageCode;
 
     /**
-     * 报警信息模板等级
+     * 信息等级
      */
-    @TableField("alarm_message_level")
+    @TableField("message_level")
     private Byte messageLevel;
 
     /**
-     * 报警信息模板内容
+     * 信息配置
      */
-    @TableField(value = "alarm_message_ext", typeHandler = JacksonTypeHandler.class)
+    @TableField(value = "message_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt messageExt;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;

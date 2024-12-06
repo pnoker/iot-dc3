@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 报警规则表
+ * 规则表
  * </p>
  *
  * @author pnoker
@@ -49,49 +49,49 @@ public class RuleDO implements Serializable {
     private Long id;
 
     /**
-     * 报警类型标识
+     * 实体类型标识
      */
-    @TableField("alarm_type_flag")
+    @TableField("entity_type_flag")
     private Byte entityTypeFlag;
 
     /**
-     * 报警规则名称
+     * 规则名称
      */
-    @TableField("alarm_rule_name")
+    @TableField("rule_name")
     private String ruleName;
 
     /**
-     * 报警规则编号
+     * 规则编号
      */
-    @TableField("alarm_rule_code")
+    @TableField("rule_code")
     private String ruleCode;
 
     /**
-     * 位号ID
+     * 实体ID
      */
-    @TableField("point_id")
+    @TableField("entity_id")
     private Long entityId;
 
     /**
-     * 报警通知模板ID
+     * 通知ID
      */
-    @TableField("alarm_notify_profile_id")
+    @TableField("notify_id")
     private Long notifyId;
 
     /**
-     * 报警信息模板ID
+     * 信息ID
      */
-    @TableField("alarm_message_profile_id")
+    @TableField("message_id")
     private Long messageId;
 
     /**
-     * 报警规则
+     * 规则配置
      */
-    @TableField(value = "alarm_rule_ext", typeHandler = JacksonTypeHandler.class)
+    @TableField(value = "rule_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt ruleExt;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;

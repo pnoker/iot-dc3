@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 报警信息模板表 服务实现类
+ * 信息表 服务实现类
  * </p>
  *
  * @author pnoker

@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 报警通知模板表
+ * 通知表
  * </p>
  *
  * @author pnoker
@@ -49,15 +49,15 @@ public class NotifyDO implements Serializable {
     private Long id;
 
     /**
-     * 报警通知模板名称
+     * 通知名称
      */
-    @TableField("alarm_notify_name")
+    @TableField("notify_name")
     private String notifyName;
 
     /**
-     * 报警通知模板编号
+     * 通知编号
      */
-    @TableField("alarm_notify_code")
+    @TableField("notify_code")
     private String notifyCode;
 
     /**
@@ -67,19 +67,19 @@ public class NotifyDO implements Serializable {
     private Byte autoConfirmFlag;
 
     /**
-     * 报警通知间隔, 毫秒
+     * 通知间隔, 毫秒
      */
-    @TableField("alarm_notify_interval")
+    @TableField("notify_interval")
     private Long notifyInterval;
 
     /**
-     * 报警通知模版配置
+     * 通知配置
      */
-    @TableField(value = "alarm_notify_ext", typeHandler = JacksonTypeHandler.class)
+    @TableField(value = "notify_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt notifyExt;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;

@@ -21,7 +21,7 @@ import io.github.pnoker.common.data.entity.model.MessageDO;
 
 /**
  * <p>
- * 报警信息模板表 Mapper 接口
+ * 信息表 Mapper 接口
  * </p>
  *
  * @author pnoker

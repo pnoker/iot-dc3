@@ -21,7 +21,7 @@ import io.github.pnoker.common.data.entity.model.NotifyDO;
 
 /**
  * <p>
- * 报警通知模板表 服务类
+ * 通知表 服务类
  * </p>
  *
  * @author pnoker
