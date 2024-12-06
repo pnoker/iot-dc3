@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.auth.entity.model;
+package io.github.pnoker.common.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 菜单表
+ * 报警通知模板表
  * </p>
  *
  * @author pnoker
@@ -36,9 +36,10 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@TableName("dc3_menu")
-public class MenuDO implements Serializable {
+@TableName("dc3_notify")
+public class NotifyDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -48,49 +49,37 @@ public class MenuDO implements Serializable {
     private Long id;
 
     /**
-     * 菜单父级ID
+     * 报警通知模板名称
      */
-    @TableField("parent_menu_id")
-    private Long parentMenuId;
+    @TableField("alarm_notify_name")
+    private String notifyName;
 
     /**
-     * 菜单类型标识
+     * 报警通知模板编号
      */
-    @TableField("menu_type_flag")
-    private Byte menuTypeFlag;
+    @TableField("alarm_notify_code")
+    private String notifyCode;
 
     /**
-     * 菜单名称
+     * 自动确认标识
      */
-    @TableField("menu_name")
-    private String menuName;
+    @TableField("auto_confirm_flag")
+    private Byte autoConfirmFlag;
 
     /**
-     * 菜单编号
+     * 报警通知间隔, 毫秒
      */
-    @TableField("menu_code")
-    private String menuCode;
+    @TableField("alarm_notify_interval")
+    private Long notifyInterval;
 
     /**
-     * 菜单层级
+     * 报警通知模版配置
      */
-    @TableField("menu_level")
-    private Byte menuLevel;
+    @TableField(value = "alarm_notify_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt notifyExt;
 
     /**
-     * 菜单顺序
-     */
-    @TableField("menu_index")
-    private Byte menuIndex;
-
-    /**
-     * 菜单拓展信息
-     */
-    @TableField(value = "menu_ext", typeHandler = JacksonTypeHandler.class)
-    private JsonExt menuExt;
-
-    /**
-     * 使能标识, 0:启用, 1:禁用
+     * 使能标识
      */
     @TableField("enable_flag")
     private Byte enableFlag;

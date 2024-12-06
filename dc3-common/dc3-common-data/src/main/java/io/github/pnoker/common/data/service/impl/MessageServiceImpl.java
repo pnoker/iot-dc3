@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.dal.service.impl;
+package io.github.pnoker.common.data.service.impl;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -22,12 +22,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
-import io.github.pnoker.common.dal.dal.GroupManager;
-import io.github.pnoker.common.dal.entity.bo.GroupBO;
-import io.github.pnoker.common.dal.entity.builder.GroupBuilder;
-import io.github.pnoker.common.dal.entity.model.GroupDO;
-import io.github.pnoker.common.dal.entity.query.GroupQuery;
-import io.github.pnoker.common.dal.service.GroupService;
+import io.github.pnoker.common.data.dal.MessageManager;
+import io.github.pnoker.common.data.entity.bo.MessageBO;
+import io.github.pnoker.common.data.entity.builder.MessageBuilder;
+import io.github.pnoker.common.data.entity.model.MessageDO;
+import io.github.pnoker.common.data.entity.query.MessageQuery;
+import io.github.pnoker.common.data.service.MessageService;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
@@ -39,7 +39,7 @@ import java.util.Objects;
 
 /**
  * <p>
- * Group Service Impl
+ * AlarmMessageProfile Service Impl
  * </p>
  *
  * @author pnoker
@@ -47,20 +47,20 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class GroupServiceImpl implements GroupService {
+public class MessageServiceImpl implements MessageService {
 
     @Resource
-    private GroupBuilder groupBuilder;
+    private MessageBuilder messageBuilder;
 
     @Resource
-    private GroupManager groupManager;
+    private MessageManager messageManager;
 
     @Override
-    public void save(GroupBO entityBO) {
+    public void save(MessageBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
-        GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
-        if (!groupManager.save(entityDO)) {
+        MessageDO entityDO = messageBuilder.buildDOByBO(entityBO);
+        if (!messageManager.save(entityDO)) {
             throw new AddException("Failed to create group");
         }
     }
@@ -70,80 +70,80 @@ public class GroupServiceImpl implements GroupService {
         getDOById(id, true);
 
         // 删除分组之前需要检查该分组是否存在关联
-        LambdaQueryChainWrapper<GroupDO> wrapper = groupManager.lambdaQuery().eq(GroupDO::getParentGroupId, id);
+        LambdaQueryChainWrapper<MessageDO> wrapper = messageManager.lambdaQuery()
+                .eq(MessageDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
             throw new AssociatedException("Failed to remove group: there are subgroups under the group");
         }
 
-        if (!groupManager.removeById(id)) {
+        if (!messageManager.removeById(id)) {
             throw new DeleteException("Failed to remove group");
         }
     }
 
     @Override
-    public void update(GroupBO entityBO) {
+    public void update(MessageBO entityBO) {
         getDOById(entityBO.getId(), true);
 
         checkDuplicate(entityBO, true, true);
 
-        GroupDO entityDO = groupBuilder.buildDOByBO(entityBO);
+        MessageDO entityDO = messageBuilder.buildDOByBO(entityBO);
         entityDO.setOperateTime(null);
-        if (!groupManager.updateById(entityDO)) {
+        if (!messageManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update group");
         }
     }
 
     @Override
-    public GroupBO selectById(Long id) {
-        GroupDO entityDO = getDOById(id, true);
-        return groupBuilder.buildBOByDO(entityDO);
+    public MessageBO selectById(Long id) {
+        MessageDO entityDO = getDOById(id, true);
+        return messageBuilder.buildBOByDO(entityDO);
     }
 
     @Override
-    public Page<GroupBO> selectByPage(GroupQuery entityQuery) {
+    public Page<MessageBO> selectByPage(MessageQuery entityQuery) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        Page<GroupDO> entityPageDO = groupManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return groupBuilder.buildBOPageByDOPage(entityPageDO);
+        Page<MessageDO> entityPageDO = messageManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return messageBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
     /**
      * 构造模糊查询
      *
-     * @param entityQuery {@link GroupQuery}
+     * @param entityQuery {@link MessageQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupQuery entityQuery) {
-        LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getGroupName()), GroupDO::getGroupName, entityQuery.getGroupName());
-        wrapper.eq(GroupDO::getTenantId, entityQuery.getTenantId());
+    private LambdaQueryWrapper<MessageDO> fuzzyQuery(MessageQuery entityQuery) {
+        LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAlarmMessageTitle()), MessageDO::getMessageName, entityQuery.getAlarmMessageTitle());
+        wrapper.eq(MessageDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
     /**
      * 重复性校验
      *
-     * @param entityBO       {@link GroupBO}
+     * @param entityBO       {@link MessageBO}
      * @param isUpdate       是否为更新操作
      * @param throwException 如果重复是否抛异常
      * @return 是否重复
      */
-    private boolean checkDuplicate(GroupBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
-        wrapper.eq(GroupDO::getGroupName, entityBO.getGroupName());
-        wrapper.eq(GroupDO::getGroupTypeFlag, entityBO.getGroupTypeFlag());
-        wrapper.eq(GroupDO::getParentGroupId, entityBO.getParentGroupId());
-        wrapper.eq(GroupDO::getTenantId, entityBO.getTenantId());
+    private boolean checkDuplicate(MessageBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
+        wrapper.eq(MessageDO::getMessageName, entityBO.getMessageName());
+        wrapper.eq(MessageDO::getMessageCode, entityBO.getMessageCode());
+        wrapper.eq(MessageDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        GroupDO one = groupManager.getOne(wrapper);
+        MessageDO one = messageManager.getOne(wrapper);
         if (Objects.isNull(one)) {
             return false;
         }
         boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
         if (throwException && duplicate) {
-            throw new DuplicateException("Group has been duplicated");
+            throw new DuplicateException("Alarm message profile has been duplicated");
         }
         return duplicate;
     }
@@ -153,12 +153,12 @@ public class GroupServiceImpl implements GroupService {
      *
      * @param id             ID
      * @param throwException 是否抛异常
-     * @return {@link GroupDO}
+     * @return {@link MessageDO}
      */
-    private GroupDO getDOById(Long id, boolean throwException) {
-        GroupDO entityDO = groupManager.getById(id);
+    private MessageDO getDOById(Long id, boolean throwException) {
+        MessageDO entityDO = messageManager.getById(id);
         if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Group does not exist");
+            throw new NotFoundException("Alarm message profile does not exist");
         }
         return entityDO;
     }

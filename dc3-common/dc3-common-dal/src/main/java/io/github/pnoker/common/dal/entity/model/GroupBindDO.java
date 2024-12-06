@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.auth.entity.model;
+package io.github.pnoker.common.dal.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,7 +26,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 菜单表
+ * 分组与实体的绑定表
  * </p>
  *
  * @author pnoker
@@ -36,9 +34,10 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@TableName("dc3_menu")
-public class MenuDO implements Serializable {
+@TableName("dc3_group_bind")
+public class GroupBindDO implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -48,52 +47,22 @@ public class MenuDO implements Serializable {
     private Long id;
 
     /**
-     * 菜单父级ID
+     * 实体类型标识
      */
-    @TableField("parent_menu_id")
-    private Long parentMenuId;
+    @TableField("entity_type_flag")
+    private Byte entityTypeFlag;
 
     /**
-     * 菜单类型标识
+     * 分组ID
      */
-    @TableField("menu_type_flag")
-    private Byte menuTypeFlag;
+    @TableField("group_id")
+    private Long groupId;
 
     /**
-     * 菜单名称
+     * 实体ID
      */
-    @TableField("menu_name")
-    private String menuName;
-
-    /**
-     * 菜单编号
-     */
-    @TableField("menu_code")
-    private String menuCode;
-
-    /**
-     * 菜单层级
-     */
-    @TableField("menu_level")
-    private Byte menuLevel;
-
-    /**
-     * 菜单顺序
-     */
-    @TableField("menu_index")
-    private Byte menuIndex;
-
-    /**
-     * 菜单拓展信息
-     */
-    @TableField(value = "menu_ext", typeHandler = JacksonTypeHandler.class)
-    private JsonExt menuExt;
-
-    /**
-     * 使能标识, 0:启用, 1:禁用
-     */
-    @TableField("enable_flag")
-    private Byte enableFlag;
+    @TableField("entity_id")
+    private Long entityId;
 
     /**
      * 租户ID

@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
-import io.github.pnoker.common.dal.LabelBindManager;
+import io.github.pnoker.common.dal.dal.LabelBindManager;
 import io.github.pnoker.common.dal.entity.bo.LabelBindBO;
 import io.github.pnoker.common.dal.entity.builder.LabelBindBuilder;
 import io.github.pnoker.common.dal.entity.model.LabelBindDO;
