@@ -21,7 +21,7 @@ import io.github.pnoker.common.data.entity.model.RuleDO;
 
 /**
  * <p>
- * 报警规则表 服务类
+ * 规则表 服务类
  * </p>
  *
  * @author pnoker
