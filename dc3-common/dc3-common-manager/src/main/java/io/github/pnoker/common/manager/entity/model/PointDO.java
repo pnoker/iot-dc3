@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 设备位号表
+ * 位号表
  * </p>
  *
  * @author pnoker
@@ -98,28 +98,10 @@ public class PointDO implements Serializable {
     private String unit;
 
     /**
-     * 模版ID
+     * 模板ID
      */
     @TableField("profile_id")
     private Long profileId;
-
-    /**
-     * 报警通知模版ID
-     */
-    @TableField("alarm_notify_profile_id")
-    private Long alarmNotifyProfileId;
-
-    /**
-     * 报警信息模版ID
-     */
-    @TableField("alarm_message_profile_id")
-    private Long alarmMessageProfileId;
-
-    /**
-     * 分组ID
-     */
-    @TableField("group_id")
-    private Long groupId;
 
     /**
      * 位号拓展信息
@@ -128,7 +110,7 @@ public class PointDO implements Serializable {
     private JsonExt pointExt;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;
@@ -196,7 +178,7 @@ public class PointDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
+    @TableField("deleted")
     @TableLogic
-    @TableField(value = "deleted")
     private Byte deleted;
 }

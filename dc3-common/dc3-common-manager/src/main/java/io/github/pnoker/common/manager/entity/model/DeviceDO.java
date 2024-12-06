@@ -67,19 +67,13 @@ public class DeviceDO implements Serializable {
     private Long driverId;
 
     /**
-     * 分组ID
-     */
-    @TableField("group_id")
-    private Long groupId;
-
-    /**
      * 设备拓展信息
      */
     @TableField(value = "device_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt deviceExt;
 
     /**
-     * 使能标识
+     * 使能标识, 0:启用, 1:禁用
      */
     @TableField("enable_flag")
     private Byte enableFlag;
@@ -147,7 +141,7 @@ public class DeviceDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
+    @TableField("deleted")
     @TableLogic
-    @TableField(value = "deleted")
     private Byte deleted;
 }

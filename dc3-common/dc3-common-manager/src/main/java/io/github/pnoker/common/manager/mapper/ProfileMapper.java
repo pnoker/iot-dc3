@@ -25,7 +25,7 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
- * 设备模版表 Mapper 接口
+ * 模板表 Mapper 接口
  * </p>
  *
  * @author pnoker

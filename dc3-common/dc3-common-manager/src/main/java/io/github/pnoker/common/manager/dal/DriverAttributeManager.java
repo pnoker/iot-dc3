@@ -21,7 +21,7 @@ import io.github.pnoker.common.manager.entity.model.DriverAttributeDO;
 
 /**
  * <p>
- * 连接配置信息表 服务类
+ * 驱动属性表 服务类
  * </p>
  *
  * @author pnoker
