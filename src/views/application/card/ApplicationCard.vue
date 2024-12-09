@@ -67,7 +67,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/components/card/styles/things-card.scss';
+@use '@/components/card/styles/things-card.scss';
 
 .things-card-application {
     width: 140px;

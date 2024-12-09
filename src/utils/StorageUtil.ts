@@ -70,7 +70,11 @@ export const getStorage = (key: string, isSession?: boolean) => {
     } else if (obj.dataType === 'number') {
         content = Number(obj.content)
     } else if (obj.dataType === 'boolean') {
-        content = eval(obj.content)
+        if (obj.content === 'true') {
+            content = true
+        } else {
+            content = false
+        }
     } else if (obj.dataType === 'object') {
         content = obj.content
     }

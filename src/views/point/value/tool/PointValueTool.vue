@@ -252,5 +252,5 @@ const currentChange = (current: number) => {
 </script>
 
 <style lang="scss">
-@import '@/components/card/styles/tool-card.scss';
+@use '@/components/card/styles/tool-card.scss';
 </style>

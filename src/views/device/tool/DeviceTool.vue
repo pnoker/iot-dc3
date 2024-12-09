@@ -94,5 +94,5 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '@/components/card/styles/tool-card';
+@use '@/components/card/styles/tool-card';
 </style>

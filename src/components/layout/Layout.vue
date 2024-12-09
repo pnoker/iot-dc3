@@ -109,5 +109,5 @@ const handleCommand = (command: string) => {
 </script>
 
 <style lang="scss">
-@import '@/components/layout/style.scss';
+@use '@/components/layout/style.scss';
 </style>

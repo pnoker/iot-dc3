@@ -77,5 +77,5 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '@/components/dialog/styles/things-dialog';
+@use '@/components/dialog/styles/things-dialog';
 </style>

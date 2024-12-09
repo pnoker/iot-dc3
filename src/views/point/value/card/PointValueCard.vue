@@ -219,5 +219,5 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-@import '@/components/card/styles/things-card';
+@use '@/components/card/styles/things-card';
 </style>

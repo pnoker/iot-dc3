@@ -88,6 +88,6 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '@/components/card/styles/things-card.scss';
-@import '@/views/driver/card/style.scss';
+@use '@/components/card/styles/things-card.scss';
+@use '@/views/driver/card/style.scss';
 </style>

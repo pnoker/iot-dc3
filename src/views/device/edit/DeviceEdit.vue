@@ -219,6 +219,6 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '@/components/card/styles/edit-card';
-@import '@/components/card/styles/tool-card';
+@use '@/components/card/styles/edit-card';
+@use '@/components/card/styles/tool-card';
 </style>

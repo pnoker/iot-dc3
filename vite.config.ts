@@ -60,7 +60,8 @@ export default (configEnv: ConfigEnv) => {
             lodash: ['lodash-es'],
             echarts: ['echarts'],
             element: ['element-plus', '@element-plus/icons-vue'],
-            antv: ['@antv/g2plot', '@amap/amap-jsapi-loader']
+            antv: ['@antv/g2plot'],
+            amap: ['@amap/amap-jsapi-loader']
         }
     }
 
@@ -77,7 +78,7 @@ export default (configEnv: ConfigEnv) => {
             port: Number(process.env.APP_CLI_PORT),
             proxy,
             watch: {
-                ignored: ["**/src-tauri/**"],
+                ignored: ['**/src-tauri/**']
             }
         },
         build: {

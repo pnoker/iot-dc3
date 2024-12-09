@@ -110,5 +110,5 @@ const handleLogin = () => {
 </script>
 
 <style lang="scss">
-@import '@/views/login/style.scss';
+@use '@/views/login/style.scss';
 </style>

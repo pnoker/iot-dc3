@@ -25,5 +25,5 @@
 <script src="./index.ts" lang="ts" />
 
 <style lang="scss">
-@import '@/views/home/style.scss';
+@use '@/views/home/style.scss';
 </style>
