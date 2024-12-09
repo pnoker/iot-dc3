@@ -63,7 +63,7 @@ public class DataTopicConfig {
                 .bind(driverEventQueue)
                 .to(eventExchange)
                 .with(RabbitConstant.ROUTING_DRIVER_EVENT_PREFIX + SymbolConstant.ASTERISK);
-        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }
 
@@ -81,7 +81,7 @@ public class DataTopicConfig {
                 .bind(deviceEventQueue)
                 .to(eventExchange)
                 .with(RabbitConstant.ROUTING_DEVICE_EVENT_PREFIX + SymbolConstant.ASTERISK);
-        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }
 
@@ -99,7 +99,7 @@ public class DataTopicConfig {
                 .bind(pointValueQueue)
                 .to(valueExchange)
                 .with(RabbitConstant.ROUTING_POINT_VALUE_PREFIX + SymbolConstant.ASTERISK);
-        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }
 

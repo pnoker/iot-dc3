@@ -56,7 +56,7 @@ public class DriverTopicConfig {
         Map<String, Object> arguments = new HashMap<>();
         // 30秒: 30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX + driverProperties.getClient(), false, false, true, arguments);
+        return new Queue(RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX + driverProperties.getClient(), false, false, false, arguments);
     }
 
     @Bean
@@ -65,7 +65,7 @@ public class DriverTopicConfig {
                 .bind(metadataQueue)
                 .to(metadataExchange)
                 .with(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + driverProperties.getService());
-        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }
 
@@ -83,7 +83,7 @@ public class DriverTopicConfig {
                 .bind(driverCommandQueue)
                 .to(commandExchange)
                 .with(RabbitConstant.ROUTING_DRIVER_COMMAND_PREFIX + driverProperties.getService());
-        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }
 
@@ -101,7 +101,7 @@ public class DriverTopicConfig {
                 .bind(deviceCommandQueue)
                 .to(commandExchange)
                 .with(RabbitConstant.ROUTING_DEVICE_COMMAND_PREFIX + driverProperties.getService());
-        binding.addArgument(RabbitConstant.AUTO_DELETE, true);
+        binding.addArgument(RabbitConstant.AUTO_DELETE, false);
         return binding;
     }
 
