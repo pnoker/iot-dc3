@@ -72,9 +72,13 @@ export default (configEnv: ConfigEnv) => {
         resolve: {
             alias
         },
+        clearScreen: false,
         server: {
             port: Number(process.env.APP_CLI_PORT),
-            proxy
+            proxy,
+            watch: {
+                ignored: ["**/src-tauri/**"],
+            }
         },
         build: {
             outDir: 'dist',
@@ -95,7 +99,7 @@ export default (configEnv: ConfigEnv) => {
         ],
         css: {
             preprocessorOptions: {
-                css: {
+                scss: {
                     charset: false
                 }
             }

@@ -9,6 +9,7 @@
   },
   "type": "module",
   "scripts": {
+    "tauri": "tauri",
     "serve": "vite --host --mode dev",
     "test": "vite --host --mode test",
     "pre": "vite --host --mode pre",
@@ -23,6 +24,8 @@
     "@amap/amap-jsapi-loader": "^1.0.1",
     "@antv/g2plot": "^2.4.32",
     "@element-plus/icons-vue": "^2.3.1",
+    "@tauri-apps/api": "^2.1.1",
+    "@tauri-apps/plugin-shell": "^2.0.1",
     "axios": "^1.7.9",
     "clipboard": "^2.0.11",
     "core-js": "^3.39.0",
@@ -44,6 +47,7 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0",
     "@types/js-cookie": "^3.0.6",
     "@types/json-bigint": "^1.0.4",
     "@types/node": "^22.10.1",
