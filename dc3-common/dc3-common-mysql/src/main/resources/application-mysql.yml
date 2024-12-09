@@ -23,7 +23,7 @@ spring:
       encoding: utf-8
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
     hikari:
       max-lifetime: 1800000
       idle-timeout: 600000

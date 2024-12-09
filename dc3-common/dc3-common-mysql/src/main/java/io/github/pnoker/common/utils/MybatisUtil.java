@@ -23,7 +23,9 @@ import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.GlobalConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
+import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
+import io.github.pnoker.common.constant.common.TimeConstant;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Types;
@@ -49,6 +51,7 @@ public class MybatisUtil {
      * @param defaultHost     默认的数据库主机
      * @param defaultPort     默认的数据库端口
      * @param defaultDb       默认的数据库名称
+     * @param defaultSchema   默认的数据库 Schema
      * @param defaultUsername 默认的数据库用户名
      * @param defaultPassword 默认的数据库密码
      * @return FastAutoGenerator
@@ -94,7 +97,8 @@ public class MybatisUtil {
      */
     public static void defaultGlobalConfig(GlobalConfig.Builder builder, String path) {
         builder.outputDir(path + "/java")
-                .author("pnoker")
+                .author(DefaultConstant.USER_NAME)
+                .commentDate(TimeConstant.DAY_DATE_FORMAT1)
                 .disableOpenDir();
     }
 

@@ -19,7 +19,7 @@ spring:
   env: dev
   group: ${user.name}
   datasource:
-    url: jdbc:postgresql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:35432}/${MYSQL_DB:dc3}?currentSchema=${MYSQL_SCHEMA:dc3_auth}&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:postgresql://${MYSQL_HOST:dc3-mysql}:${MYSQL_PORT:35432}/${MYSQL_DB:dc3}?currentSchema=${MYSQL_SCHEMA:dc3_auth}&applicationName=dc3&ssl=false&clientEncoding=UTF8&serverTimezone=Asia/Shanghai
     username: ${MYSQL_USERNAME:dc3}
     password: ${MYSQL_PASSWORD:dc3dc3dc3}
   data:

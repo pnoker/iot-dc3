@@ -15,28 +15,6 @@
 #
 
 services:
-  mysql:
-    image: pnoker/dc3-mysql:2024.3.dev
-    restart: always
-    ports:
-      - '33306:3306'
-    environment:
-      - MYSQL_ROOT_PASSWORD=dc3
-    container_name: dc3-mysql
-    hostname: dc3-mysql
-    volumes:
-      - mysql_data:/data
-      - mysql_lib:/var/lib/mysql
-    logging:
-      driver: json-file
-      options:
-        max-size: '10M'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-mysql
-
   postgres:
     image: pnoker/dc3-postgres:2024.3.dev
     restart: always
