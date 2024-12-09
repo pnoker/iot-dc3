@@ -91,7 +91,7 @@
         <dc3.common.model.version>2024.3.7</dc3.common.model.version>
         <dc3.common.mongo.version>2024.3.7</dc3.common.mongo.version>
         <dc3.common.mqtt.version>2024.3.7</dc3.common.mqtt.version>
-        <dc3.common.mysql.version>2024.3.7</dc3.common.mysql.version>
+        <dc3.common.postgres.version>2024.3.7</dc3.common.postgres.version>
         <dc3.common.public.version>2024.3.7</dc3.common.public.version>
         <dc3.common.quartz.version>2024.3.7</dc3.common.quartz.version>
         <dc3.common.rabbitmq.version>2024.3.7</dc3.common.rabbitmq.version>
@@ -120,7 +120,7 @@
         <module>dc3-common-model</module>
         <module>dc3-common-mongo</module>
         <module>dc3-common-mqtt</module>
-        <module>dc3-common-mysql</module>
+        <module>dc3-common-postgres</module>
         <module>dc3-common-public</module>
         <module>dc3-common-quartz</module>
         <module>dc3-common-rabbitmq</module>
@@ -293,8 +293,8 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mysql</artifactId>
-                <version>${dc3.common.mysql.version}</version>
+                <artifactId>dc3-common-postgres</artifactId>
+                <version>${dc3.common.postgres.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>

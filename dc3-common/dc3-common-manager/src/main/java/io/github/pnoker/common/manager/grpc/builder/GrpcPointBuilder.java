@@ -70,7 +70,6 @@ public interface GrpcPointBuilder {
     @Mapping(target = "page", ignore = true)
     @Mapping(target = "pointName", ignore = true)
     @Mapping(target = "pointCode", ignore = true)
-    @Mapping(target = "groupId", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "profileId", ignore = true)
     @Mapping(target = "pointTypeFlag", ignore = true)

@@ -16,4 +16,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   io.github.pnoker.common.config.MybatisPlusConfig
 org.springframework.boot.env.EnvironmentPostProcessor=\
-  io.github.pnoker.common.config.ActiveMysqlProfileConfig
+  io.github.pnoker.common.config.ActivePostgresProfileConfig

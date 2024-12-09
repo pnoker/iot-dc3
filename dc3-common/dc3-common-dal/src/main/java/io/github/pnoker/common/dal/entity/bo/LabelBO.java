@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.dal.entity.bo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
@@ -40,9 +41,14 @@ public class LabelBO extends BaseBO {
     private String labelName;
 
     /**
+     * 标签编号
+     */
+    private String labelCode;
+
+    /**
      * 标签颜色
      */
-    private String color;
+    private String labelColor;
 
     /**
      * 实体标识

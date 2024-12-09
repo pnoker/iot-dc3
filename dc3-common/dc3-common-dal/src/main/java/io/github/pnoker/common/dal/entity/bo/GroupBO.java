@@ -35,24 +35,34 @@ import lombok.*;
 public class GroupBO extends BaseBO {
 
     /**
-     * 分组名称
-     */
-    private String groupName;
-
-    /**
      * 父分组ID
      */
     private String parentGroupId;
 
     /**
-     * 分组排序位置
-     */
-    private Integer position;
-
-    /**
      * 分组标识
      */
     private GroupTypeFlagEnum groupTypeFlag;
+
+    /**
+     * 分组名称
+     */
+    private String groupName;
+
+    /**
+     * 分组编号
+     */
+    private String groupCode;
+
+    /**
+     * 分组层级
+     */
+    private Byte groupLevel;
+
+    /**
+     * 分组顺序
+     */
+    private Byte groupIndex;
 
     /**
      * 使能标识
