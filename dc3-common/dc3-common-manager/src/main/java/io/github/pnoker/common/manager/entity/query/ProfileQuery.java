@@ -72,11 +72,6 @@ public class ProfileQuery implements Serializable {
     private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
-     * 分组ID
-     */
-    private Long groupId;
-
-    /**
      * 使能标识
      */
     private EnableFlagEnum enableFlag;

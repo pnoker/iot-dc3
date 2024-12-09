@@ -71,7 +71,6 @@ public interface GrpcDeviceBuilder {
     @Mapping(target = "page", ignore = true)
     @Mapping(target = "deviceName", ignore = true)
     @Mapping(target = "deviceCode", ignore = true)
-    @Mapping(target = "groupId", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "profileId", ignore = true)

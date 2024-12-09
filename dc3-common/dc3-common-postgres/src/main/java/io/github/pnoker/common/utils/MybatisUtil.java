@@ -57,27 +57,27 @@ public class MybatisUtil {
      * @return FastAutoGenerator
      */
     public static FastAutoGenerator defaultGenerator(String defaultHost, String defaultPort, String defaultDb, String defaultSchema, String defaultUsername, String defaultPassword) {
-        String host = System.getenv("MYSQL_HOST");
+        String host = System.getenv("POSTGRES_HOST");
         if (CharSequenceUtil.isEmpty(host)) {
             host = defaultHost;
         }
-        String port = System.getenv("MYSQL_PORT");
+        String port = System.getenv("POSTGRES_PORT");
         if (CharSequenceUtil.isEmpty(port)) {
             port = defaultPort;
         }
-        String db = System.getenv("MYSQL_DB");
+        String db = System.getenv("POSTGRES_DB");
         if (CharSequenceUtil.isEmpty(db)) {
             db = defaultDb;
         }
-        String schema = System.getenv("MYSQL_SCHEMA");
+        String schema = System.getenv("POSTGRES_SCHEMA");
         if (CharSequenceUtil.isEmpty(schema)) {
             schema = defaultSchema;
         }
-        String username = System.getenv("MYSQL_USERNAME");
+        String username = System.getenv("POSTGRES_USERNAME");
         if (CharSequenceUtil.isEmpty(username)) {
             username = defaultUsername;
         }
-        String password = System.getenv("MYSQL_PASSWORD");
+        String password = System.getenv("POSTGRES_PASSWORD");
         if (CharSequenceUtil.isEmpty(password)) {
             password = defaultPassword;
         }

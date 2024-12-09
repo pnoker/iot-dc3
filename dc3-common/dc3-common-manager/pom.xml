@@ -80,7 +80,7 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-mysql</artifactId>
+            <artifactId>dc3-common-postgres</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>

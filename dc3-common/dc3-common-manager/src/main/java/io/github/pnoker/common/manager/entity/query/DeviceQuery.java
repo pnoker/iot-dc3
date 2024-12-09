@@ -65,11 +65,6 @@ public class DeviceQuery implements Serializable {
     private Long driverId;
 
     /**
-     * 分组ID
-     */
-    private Long groupId;
-
-    /**
      * 使能标识
      */
     private EnableFlagEnum enableFlag;

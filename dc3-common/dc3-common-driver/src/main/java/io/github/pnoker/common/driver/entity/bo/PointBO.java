@@ -94,11 +94,6 @@ public class PointBO extends BaseBO {
     private Long alarmMessageProfileId;
 
     /**
-     * 分组ID
-     */
-    private Long groupId;
-
-    /**
      * 位号拓展信息
      */
     private PointExt pointExt;

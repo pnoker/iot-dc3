@@ -35,7 +35,7 @@
     <inceptionYear>2016-2022</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IOT DC3 平台 公共的 MySQL 配置。
+        IOT DC3 平台 公共的 Influx 配置。
     </description>
 
     <developers>

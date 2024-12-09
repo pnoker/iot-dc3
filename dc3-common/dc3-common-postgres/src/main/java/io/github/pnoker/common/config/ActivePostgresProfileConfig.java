@@ -33,10 +33,10 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Slf4j
 @Configuration
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class ActiveMysqlProfileConfig implements EnvironmentPostProcessor {
+public class ActivePostgresProfileConfig implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("mysql");
+        environment.addActiveProfile("postgres");
     }
 }

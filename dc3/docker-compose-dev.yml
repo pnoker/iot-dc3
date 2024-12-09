@@ -20,8 +20,6 @@ services:
     restart: always
     ports:
       - '35432:5432'
-    environment:
-      - MYSQL_ROOT_PASSWORD=dc3
     container_name: dc3-postgres
     hostname: dc3-postgres
     volumes:
@@ -119,8 +117,6 @@ services:
           - dc3-portainer
 
 volumes:
-  mysql_data:
-  mysql_lib:
   mongo_data:
   mongo_config:
   postgres:

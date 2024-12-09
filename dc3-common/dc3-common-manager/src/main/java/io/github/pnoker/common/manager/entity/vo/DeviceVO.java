@@ -67,11 +67,6 @@ public class DeviceVO extends BaseVO {
     private Long driverId;
 
     /**
-     * 分组ID
-     */
-    private Long groupId;
-
-    /**
      * 设备拓展信息
      */
     private DeviceExt deviceExt;

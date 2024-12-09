@@ -57,11 +57,6 @@ public class ProfileBO extends BaseBO {
     private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
-     * 分组ID
-     */
-    private Long groupId;
-
-    /**
      * 模版拓展信息
      */
     private ProfileExt profileExt;

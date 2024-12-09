@@ -28,14 +28,14 @@
     </parent>
 
     <name>${project.artifactId}</name>
-    <artifactId>dc3-common-mysql</artifactId>
+    <artifactId>dc3-common-postgres</artifactId>
     <version>2024.3.7</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2016-2022</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IOT DC3 平台 公共的 MySQL 配置。
+        IOT DC3 平台 公共的 PostgreSQL 配置。
     </description>
 
     <developers>
@@ -67,14 +67,14 @@
 
     <dependencies>
 
-        <!-- Spring MySQL -->
+        <!-- Spring PostgreSQL -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
 
         <!-- Mybatis Plus -->
@@ -107,11 +107,6 @@
             <artifactId>dc3-common-exception</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.4</version>
-        </dependency>
     </dependencies>
 
 </project>

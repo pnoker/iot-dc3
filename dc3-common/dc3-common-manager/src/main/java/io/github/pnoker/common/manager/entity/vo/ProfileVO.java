@@ -68,11 +68,6 @@ public class ProfileVO extends BaseVO {
     private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
-     * 分组ID
-     */
-    private Long groupId;
-
-    /**
      * 模版拓展信息
      */
     private ProfileExt profileExt;

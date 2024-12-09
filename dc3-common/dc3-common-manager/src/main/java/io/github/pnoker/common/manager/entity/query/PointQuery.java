@@ -77,11 +77,6 @@ public class PointQuery implements Serializable {
     private Long profileId;
 
     /**
-     * 分组ID
-     */
-    private Long groupId;
-
-    /**
      * 使能标识
      */
     private EnableFlagEnum enableFlag;
