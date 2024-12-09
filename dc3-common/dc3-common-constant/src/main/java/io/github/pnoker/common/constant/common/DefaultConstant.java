@@ -28,22 +28,32 @@ public class DefaultConstant {
      * 默认 Integer 空值: -1
      */
     public static final Integer NULL_INT = -1;
+
     /**
      * 零: 0
      */
     public static final Integer ZERO = 0;
+
     /**
      * 一: 1
      */
     public static final Integer ONE = 1;
+
+    /**
+     * 默认 String 空值: nil
+     */
+    public static final String USER_NAME = "pnoker";
+
     /**
      * 默认 String 空值: nil
      */
     public static final String NULL_STRING = "nil";
+
     /**
      * 默认分页数
      */
     public static final Integer PAGE_SIZE = 20;
+
     /**
      * 默认最大分页数
      */
