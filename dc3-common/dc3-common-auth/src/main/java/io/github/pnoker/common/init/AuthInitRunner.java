@@ -17,8 +17,10 @@
 package io.github.pnoker.common.init;
 
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +31,12 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@ComponentScan(basePackages = {
+        "io.github.pnoker.common.auth.*"
+})
+@MapperScan(basePackages = {
+        "io.github.pnoker.common.auth.mapper"
+})
 public class AuthInitRunner implements ApplicationRunner {
 
     @Override

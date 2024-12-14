@@ -21,12 +21,12 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-common</artifactId>
-        <version>2024.3.7</version>
+        <version>2024.3.9</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-common-api</artifactId>
-    <version>2024.3.7</version>
+    <version>2024.3.9</version>
     <packaging>jar</packaging>
 
     <description>IOT DC3 平台 Api 通用 gRpc Proto。</description>
