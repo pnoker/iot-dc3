@@ -24,13 +24,13 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-parent</artifactId>
-        <version>2024.3.7</version>
+        <version>2024.3.9</version>
         <relativePath/>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-api</artifactId>
-    <version>2024.3.7</version>
+    <version>2024.3.9</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2016-2022</inceptionYear>
@@ -68,7 +68,7 @@
 
     <properties>
         <!-- DC3 Common Api -->
-        <dc3.common.api.version>2024.3.7</dc3.common.api.version>
+        <dc3.common.api.version>2024.3.9</dc3.common.api.version>
     </properties>
 
     <modules>

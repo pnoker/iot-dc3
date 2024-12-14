@@ -60,6 +60,10 @@ public class TransformUtil {
         transformClassRecorder.forEach(TransformClass::clearCache);
     }
 
+    public static TransformClass getTransformClassFromClass(Class<?> clazz) {
+        return TRANSFORM_CLASS_CACHE.computeIfAbsent(clazz, TransformClass::new);
+    }
+
     /**
      * 对象属性转换, 其中嵌套属性使用递归方式转换
      *
@@ -113,10 +117,6 @@ public class TransformUtil {
         }
         return getTransformClassFromClass(obj.getClass());
 
-    }
-
-    public static TransformClass getTransformClassFromClass(Class<?> clazz) {
-        return TRANSFORM_CLASS_CACHE.computeIfAbsent(clazz, TransformClass::new);
     }
 }
 

@@ -46,8 +46,7 @@
         select *
         from dc3.device_point_data
         where device_id = #{deviceId}
-          and point_id = #{pointId}
-        limit #{count}
+          and point_id = #{pointId} limit #{count}
     </select>
     <select id="selectLatestPointValue"
             resultType="io.github.pnoker.common.tdengine.entity.model.TDEnginePointValueDO">
