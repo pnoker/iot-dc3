@@ -15,4 +15,5 @@
 #
 
 io.github.pnoker.common.config.DataTopicConfig
+io.github.pnoker.common.config.DataConfig
 io.github.pnoker.common.init.DataInitRunner

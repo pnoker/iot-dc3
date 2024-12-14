@@ -42,6 +42,9 @@
     <!-- 用户 -->
     <logger name="io.github.pnoker.center.manager.receiver.rabbit" level="WARN"/>
 
+    <!-- 自定义 -->
+    <logger name="org.mybatis.spring.mapper.ClassPathMapperScanner" level="ERROR"/>
+
     <!-- 系统 -->
     <logger name="org.springframework.boot.autoconfigure.thymeleaf" level="WARN"/>
     <logger name="org.springframework.boot.web.embedded.undertow" level="WARN"/>

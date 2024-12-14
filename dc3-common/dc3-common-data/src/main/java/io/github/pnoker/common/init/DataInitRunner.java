@@ -17,12 +17,9 @@
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.data.biz.ScheduleForDataService;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Data initialization runner
@@ -31,15 +28,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @since 2022.1.0
  */
 @Component
-@EnableTransactionManagement
-@ComponentScan(basePackages = {
-        "io.github.pnoker.common.dal.*",
-        "io.github.pnoker.common.data.*"
-})
-@MapperScan(basePackages = {
-        "io.github.pnoker.common.dal.mapper",
-        "io.github.pnoker.common.data.mapper"
-})
 public class DataInitRunner implements ApplicationRunner {
 
     private final ScheduleForDataService scheduleForDataService;
