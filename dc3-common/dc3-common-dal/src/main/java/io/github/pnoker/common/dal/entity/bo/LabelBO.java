@@ -16,7 +16,6 @@
 
 package io.github.pnoker.common.dal.entity.bo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;

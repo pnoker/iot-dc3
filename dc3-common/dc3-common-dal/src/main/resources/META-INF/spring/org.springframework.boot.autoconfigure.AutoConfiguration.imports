@@ -14,5 +14,4 @@
 # limitations under the License.
 #
 
-io.github.pnoker.common.config.ManagerConfig
-io.github.pnoker.common.init.ManagerInitRunner
+io.github.pnoker.common.config.DalConfig

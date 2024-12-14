@@ -18,7 +18,6 @@ package io.github.pnoker.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * 网关中心服务启动入口
@@ -27,7 +26,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @since 2022.1.0
  */
 @SpringBootApplication
-@EnableTransactionManagement
 public class GatewayApplication {
 
     public static void main(String[] args) {
