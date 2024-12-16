@@ -17,6 +17,7 @@
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.data.biz.ScheduleForDataService;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,12 @@ import org.springframework.stereotype.Component;
  * @since 2022.1.0
  */
 @Component
+@ComponentScan(basePackages = {
+        "io.github.pnoker.common.data.*"
+})
+@MapperScan(basePackages = {
+        "io.github.pnoker.common.data.mapper"
+})
 public class DataInitRunner implements ApplicationRunner {
 
     private final ScheduleForDataService scheduleForDataService;
