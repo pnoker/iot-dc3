@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "IoTDC3",
+  "productName": "IoT DC3",
   "version": "2024.3.0",
   "identifier": "io.github.pnoker.dc3.client",
   "build": {
