@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.pnoker.common.config.ManagerConfig,\
   io.github.pnoker.common.init.ManagerInitRunner
 org.springframework.boot.env.EnvironmentPostProcessor=\
   io.github.pnoker.common.config.ActiveManagerProfileConfig
