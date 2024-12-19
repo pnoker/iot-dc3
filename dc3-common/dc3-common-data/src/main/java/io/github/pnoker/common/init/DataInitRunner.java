@@ -20,6 +20,7 @@ import io.github.pnoker.common.data.biz.ScheduleForDataService;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
