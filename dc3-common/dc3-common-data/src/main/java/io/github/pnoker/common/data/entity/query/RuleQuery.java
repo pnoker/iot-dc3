@@ -55,12 +55,12 @@ public class RuleQuery implements Serializable {
     // 查询字段
 
     /**
-     * 报警规则名称
+     * 规则名称
      */
     private String alarmRuleName;
 
     /**
-     * 报警规则编号
+     * 规则编号
      */
     private String alarmRuleCode;
 
@@ -70,7 +70,7 @@ public class RuleQuery implements Serializable {
     private Long pointId;
 
     /**
-     * 报警类型标识
+     * 实体类型标识
      */
     private AlarmTypeFlagEnum alarmTypeFlag;
 

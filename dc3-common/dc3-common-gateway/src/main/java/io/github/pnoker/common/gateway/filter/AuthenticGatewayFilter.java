@@ -77,7 +77,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
             // Header
             ServerHttpRequest build = request.mutate().headers(headers -> {
                 RequestHeader.UserHeader entityBO = getUserDTO(rUserLoginDTO, rTenantDTO);
-                headers.set(RequestConstant.Header.X_AUTH_USER, DecodeUtil.byteToString(DecodeUtil.encode(JsonUtil.toJsonBytes(entityBO))));
+                headers.set(RequestConstant.Header.X_AUTH_USER, DecodeUtil.enHexCode(JsonUtil.toJsonString(entityBO)));
             }).build();
 
             exchange.mutate().request(build).build();
@@ -94,7 +94,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
     }
 
     private GrpcRTenantDTO getTenantDTO(ServerHttpRequest request) {
-        String tenant = DecodeUtil.byteToString(DecodeUtil.decode(RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT)));
+        String tenant = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
         if (CharSequenceUtil.isEmpty(tenant)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
@@ -107,7 +107,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
     }
 
     private GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request) {
-        String user = DecodeUtil.byteToString(DecodeUtil.decode(RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN)));
+        String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
         if (CharSequenceUtil.isEmpty(user)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
@@ -135,7 +135,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
 
     private void checkValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO) {
         String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
-        RequestHeader.TokenHeader entityBO = JsonUtil.parseObject(DecodeUtil.decode(token), RequestHeader.TokenHeader.class);
+        RequestHeader.TokenHeader entityBO = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
         if (Objects.isNull(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }

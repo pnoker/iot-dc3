@@ -134,7 +134,7 @@ public class RuleServiceImpl implements RuleService {
         LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
         wrapper.eq(RuleDO::getRuleName, entityBO.getRuleName());
         wrapper.eq(RuleDO::getRuleCode, entityBO.getRuleCode());
-        wrapper.eq(RuleDO::getEntityId, entityBO.getPointId());
+        wrapper.eq(RuleDO::getEntityId, entityBO.getEntityId());
         wrapper.eq(RuleDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RuleDO one = ruleManager.getOne(wrapper);

@@ -72,4 +72,9 @@ public class RedisPointValueDO implements Serializable {
      * 创建时间
      */
     private LocalDateTime createTime;
+
+    /**
+     * 操作时间
+     */
+    private LocalDateTime operateTime;
 }

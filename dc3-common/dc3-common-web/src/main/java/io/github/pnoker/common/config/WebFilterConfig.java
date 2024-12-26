@@ -76,12 +76,12 @@ public class WebFilterConfig {
     public WebFilter interceptor() {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
-            String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_USER);
-            if (CharSequenceUtil.isNotEmpty(user)) {
-                byte[] decode = DecodeUtil.decode(user);
+            String authUser = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_USER);
+            if (CharSequenceUtil.isNotEmpty(authUser)) {
+                byte[] decode = DecodeUtil.deHexCode(authUser);
                 try {
-                    RequestHeader.UserHeader entityBO = JsonUtil.parseObject(decode, RequestHeader.UserHeader.class);
-                    UserHeaderUtil.setUserHeader(entityBO);
+                    RequestHeader.UserHeader userHeader = JsonUtil.parseObject(decode, RequestHeader.UserHeader.class);
+                    UserHeaderUtil.setUserHeader(userHeader);
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }

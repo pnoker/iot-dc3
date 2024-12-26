@@ -51,9 +51,14 @@ public class LabelVO extends BaseVO {
     private String labelName;
 
     /**
+     * 标签编号
+     */
+    private String labelCode;
+
+    /**
      * 标签颜色
      */
-    private String color;
+    private String labelColor;
 
     /**
      * 实体标识

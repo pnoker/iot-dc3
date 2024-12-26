@@ -62,7 +62,7 @@ public class MongoRepositoryServiceImpl implements RepositoryService, Initializi
 
     @Override
     public String getRepositoryName() {
-        return StrategyConstant.Storage.MONGO;
+        return StrategyConstant.Storage.MONGODB;
     }
 
     @Override
@@ -172,7 +172,7 @@ public class MongoRepositoryServiceImpl implements RepositoryService, Initializi
 
     @Override
     public void afterPropertiesSet() {
-        RepositoryStrategyFactory.put(StrategyConstant.Storage.MONGO, this);
+        RepositoryStrategyFactory.put(StrategyConstant.Storage.MONGODB, this);
     }
 
     /**

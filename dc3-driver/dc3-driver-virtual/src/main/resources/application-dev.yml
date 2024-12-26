@@ -35,7 +35,7 @@ spring:
 grpc:
   client:
     dc3-center-manager:
-      address: 'static://dc3-center-manager:9400'
+      address: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9400'
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext

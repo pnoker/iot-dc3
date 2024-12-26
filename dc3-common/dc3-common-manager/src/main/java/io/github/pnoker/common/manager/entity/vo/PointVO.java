@@ -98,16 +98,6 @@ public class PointVO extends BaseVO {
     private Long profileId;
 
     /**
-     * 报警通知模版ID
-     */
-    private Long alarmNotifyProfileId;
-
-    /**
-     * 报警信息模版ID
-     */
-    private Long alarmMessageProfileId;
-
-    /**
      * 位号拓展信息
      */
     private PointExt pointExt;

@@ -46,17 +46,17 @@ spring:
 grpc:
   client:
     dc3-center-auth:
-      address: 'static://dc3-center-auth:9100'
+      address: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9100'
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
     dc3-center-data:
-      address: 'static://dc3-center-data:9100'
+      address: 'static://${CENTER_DATA_HOST:dc3-center-data}:9100'
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext
     dc3-center-manager:
-      address: 'static://dc3-center-manager:9100'
+      address: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9100'
       enable-keep-alive: true
       keep-alive-without-calls: true
       negotiation-type: plaintext

@@ -63,6 +63,11 @@ public class DriverAttributeVO extends BaseVO {
     private String attributeName;
 
     /**
+     * 属性编号
+     */
+    private String attributeCode;
+
+    /**
      * 属性类型标识
      */
     private AttributeTypeFlagEnum attributeTypeFlag;

@@ -42,12 +42,12 @@ public class NotifyVO extends BaseVO {
     /**
      * 报警通知模板名称
      */
-    private String alarmNotifyName;
+    private String notifyName;
 
     /**
      * 报警通知模板编号
      */
-    private String alarmNotifyCode;
+    private String notifyCode;
 
     /**
      * 自动确认标识
@@ -57,7 +57,7 @@ public class NotifyVO extends BaseVO {
     /**
      * 报警通知间隔, 毫秒
      */
-    private Long alarmNotifyInterval;
+    private Long notifyInterval;
 
     /**
      * 报警通知模版配置

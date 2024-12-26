@@ -17,6 +17,7 @@
 package io.github.pnoker.common.manager.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.*;
 
@@ -47,6 +48,11 @@ public class DriverAttributeConfigBO extends BaseBO {
      * 设备ID
      */
     private Long deviceId;
+
+    /**
+     * 驱动配置信息
+     */
+    private JsonExt configExt;
 
     /**
      * 使能标识

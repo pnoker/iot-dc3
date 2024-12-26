@@ -82,6 +82,7 @@ public interface GrpcPointAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "displayNameBytes", ignore = true)
     @Mapping(target = "attributeNameBytes", ignore = true)
+    @Mapping(target = "attributeCodeBytes", ignore = true)
     @Mapping(target = "defaultValueBytes", ignore = true)
     @Mapping(target = "attributeExtBytes", ignore = true)
     @Mapping(target = "signatureBytes", ignore = true)

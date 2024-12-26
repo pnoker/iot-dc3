@@ -99,6 +99,38 @@ public class UserHeaderUtil {
     }
 
     /**
+     * 获取用户请求头的用户昵称
+     *
+     * @return 用户昵称
+     */
+    public static String getNickName() {
+        RequestHeader.UserHeader entityBO = getUserHeader();
+
+        String nickName = entityBO.getNickName();
+        if (Objects.isNull(nickName)) {
+            throw new UnAuthorizedException("Unable to get nick name of user header");
+        }
+
+        return nickName;
+    }
+
+    /**
+     * 获取用户请求头的用户名称
+     *
+     * @return 用户名称
+     */
+    public static String getUserName() {
+        RequestHeader.UserHeader entityBO = getUserHeader();
+
+        String userName = entityBO.getUserName();
+        if (Objects.isNull(userName)) {
+            throw new UnAuthorizedException("Unable to get user name of user header");
+        }
+
+        return userName;
+    }
+
+    /**
      * 清空用户请求头信息
      */
     public static void removeUserHeader() {

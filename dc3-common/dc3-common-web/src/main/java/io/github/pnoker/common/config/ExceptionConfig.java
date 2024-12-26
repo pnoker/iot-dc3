@@ -54,7 +54,11 @@ public class ExceptionConfig {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Mono<R<String>> globalException(Exception exception, ServerHttpRequest request) {
-        log.error("Global exception handler: {}", exception.getMessage(), exception);
+        log.error("""
+                Global exception
+                Request: {}
+                Exception: {}
+                """, request.getURI().getRawPath(), exception.getMessage(), exception);
         return Mono.just(R.fail(exception.getMessage()));
     }
 
