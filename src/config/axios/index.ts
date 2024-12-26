@@ -49,12 +49,12 @@ request.interceptors.request.use(
 
         const tenant = getStorage(CommonConstant.X_AUTH_TENANT)
         if (!isNull(tenant)) {
-            headers[CommonConstant.X_AUTH_TENANT] = encode(tenant)
+            headers[CommonConstant.X_AUTH_TENANT] = tenant
         }
 
         const login = getStorage(CommonConstant.X_AUTH_LOGIN)
         if (!isNull(login)) {
-            headers[CommonConstant.X_AUTH_LOGIN] = encode(login)
+            headers[CommonConstant.X_AUTH_LOGIN] = login
         }
 
         const token = getStorage(CommonConstant.X_AUTH_TOKEN)

@@ -101,7 +101,7 @@
 import { onMounted, watch } from 'vue'
 import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue'
 
-import { TinyArea } from '@antv/g2plot'
+import { Chart } from '@antv/g2'
 
 import { copy, timestamp } from '@/utils/CommonUtil'
 import { getPointValueHistory } from '@/api/point'
@@ -150,7 +150,7 @@ const copyValue = (data) => {
     copy(JSON.stringify(content, null, 2), '位号值')
 }
 
-let tinyArea: TinyArea
+let tinyArea: Chart
 const history = () => {
     getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
         .then((res) => {
