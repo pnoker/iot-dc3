@@ -41,6 +41,16 @@ import lombok.*;
 public class GroupVO extends BaseVO {
 
     /**
+     * 父分组ID
+     */
+    private String parentGroupId;
+
+    /**
+     * 分组标识
+     */
+    private GroupTypeFlagEnum groupTypeFlag;
+
+    /**
      * 分组名称
      */
     @NotBlank(message = "分组名称不能为空",
@@ -51,19 +61,19 @@ public class GroupVO extends BaseVO {
     private String groupName;
 
     /**
-     * 父分组ID
+     * 分组编号
      */
-    private String parentGroupId;
+    private String groupCode;
 
     /**
-     * 分组排序位置
+     * 分组层级
      */
-    private Integer position;
+    private Byte groupLevel;
 
     /**
-     * 分组标识
+     * 分组顺序
      */
-    private GroupTypeFlagEnum groupTypeFlag;
+    private Integer groupIndex;
 
     /**
      * 使能标识

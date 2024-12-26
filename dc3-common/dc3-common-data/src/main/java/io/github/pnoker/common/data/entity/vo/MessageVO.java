@@ -42,17 +42,17 @@ public class MessageVO extends BaseVO {
     /**
      * 报警信息模板标题
      */
-    private String alarmMessageTitle;
+    private String messageName;
 
     /**
      * 报警信息模板编号
      */
-    private String alarmMessageCode;
+    private String messageCode;
 
     /**
      * 报警信息模板等级
      */
-    private AlarmMessageLevelFlagEnum alarmMessageLevel;
+    private AlarmMessageLevelFlagEnum messageLevel;
 
     /**
      * 报警信息模板内容

@@ -37,6 +37,6 @@ public class ActiveMongoProfileConfig implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("mongo");
+        environment.addActiveProfile("mongodb");
     }
 }

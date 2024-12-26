@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HexFormat;
 
 /**
  * 编码 相关工具类
@@ -122,4 +123,23 @@ public class DecodeUtil {
         return decode(stringToByte(content));
     }
 
+    /**
+     * 将字符串进行16进制编码
+     *
+     * @param content 字符串
+     * @return String
+     */
+    public static String enHexCode(String content) {
+        return HexFormat.of().formatHex((stringToByte(content)));
+    }
+
+    /**
+     * 必须配合enHexCode使用, 用于enHexCode编码之后解码
+     *
+     * @param content 字符串
+     * @return Byte Array
+     */
+    public static byte[] deHexCode(String content) {
+        return HexFormat.of().parseHex(content);
+    }
 }

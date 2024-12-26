@@ -38,24 +38,24 @@ import lombok.*;
 public class RuleBO extends BaseBO {
 
     /**
-     * 报警类型标识
+     * 实体类型标识
      */
     private AlarmTypeFlagEnum entityTypeFlag;
 
     /**
-     * 报警规则名称
+     * 规则名称
      */
     private String ruleName;
 
     /**
-     * 报警规则编号
+     * 规则编号
      */
     private String ruleCode;
 
     /**
-     * 位号ID
+     * 实体ID
      */
-    private Long pointId;
+    private Long entityId;
 
     /**
      * 报警通知模板ID

@@ -40,7 +40,7 @@ public class StrategyConstant {
     public static class Storage {
 
         public static final String REPOSITORY_PREFIX = "storage" + SymbolConstant.COLON;
-        public static final String MONGO = "mongo";
+        public static final String MONGODB = "mongodb";
         public static final String INFLUXDB = "influxdb";
         public static final String STRATEGY_OPENTSDB = "opentsdb";
         public static final String STRATEGY_ELASTICSEARCH = "elasticsearch";

@@ -18,6 +18,7 @@ package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -57,6 +58,11 @@ public class PointAttributeConfigVO extends BaseVO {
     @NotNull(message = "设备ID不能为空",
             groups = {Add.class, Update.class})
     private Long deviceId;
+
+    /**
+     * 位号配置信息
+     */
+    private JsonExt configExt;
 
     /**
      * 位号ID

@@ -40,34 +40,34 @@ import lombok.*;
 public class RuleVO extends BaseVO {
 
     /**
-     * 报警规则名称
+     * 实体类型标识
      */
-    private String alarmRuleName;
+    private AlarmTypeFlagEnum entityTypeFlag;
 
     /**
-     * 报警规则编号
+     * 规则名称
      */
-    private String alarmRuleCode;
+    private String ruleName;
 
     /**
-     * 位号ID
+     * 规则编号
      */
-    private Long pointId;
+    private String ruleCode;
+
+    /**
+     * 实体ID
+     */
+    private Long entityId;
 
     /**
      * 报警通知模板ID
      */
-    private Long alarmNotifyProfileId;
+    private Long notifyId;
 
     /**
      * 报警信息模板ID
      */
-    private Long alarmMessageProfileId;
-
-    /**
-     * 报警类型标识
-     */
-    private AlarmTypeFlagEnum alarmTypeFlag;
+    private Long messageId;
 
     /**
      * 报警规则
