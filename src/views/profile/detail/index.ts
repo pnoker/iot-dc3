@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, computed, ref } from 'vue'
+import { computed, defineComponent, reactive, ref } from 'vue'
 import { CollectionTag, Edit, List, Management, Sunset } from '@element-plus/icons-vue'
 
 import router from '@/config/router'

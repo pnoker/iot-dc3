@@ -19,21 +19,21 @@
         <el-card :shadow="data.shadow">
             <div class="things-card-content">
                 <div
-                    class="things-card__header"
                     :class="{
                         'header-enable': isConfig,
                         'header-disable': !isConfig
                     }"
+                    class="things-card__header"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="isSelect" :alt="data.attributeName" />
+                        <img :alt="data.attributeName" :src="isSelect" />
                     </div>
                     <div class="things-card-header-name nowrap-name">{{ data.pointName }}</div>
                 </div>
                 <div class="things-card__body">
                     <div class="things-card-body-content">
                         <ul>
-                            <li class="nowrap-item" v-for="attribute in attributes" :key="attribute.id">
+                            <li v-for="attribute in attributes" :key="attribute.id" class="nowrap-item">
                                 <el-icon>
                                     <Goblet />
                                 </el-icon>
@@ -47,7 +47,7 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/card/styles/things-card.scss';

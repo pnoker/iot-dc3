@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, computed } from 'vue'
+import { computed, defineComponent, reactive, ref } from 'vue'
 
-import { pointAddApi, pointDeleteApi, getPointList, getPointUpdate } from '@/api/point'
+import { getPointList, getPointUpdate, pointAddApi, pointDeleteApi } from '@/api/point'
 import { getProfileByIds } from '@/api/profile'
 
 import { Order } from '@/config/entity'

@@ -31,12 +31,12 @@
                 <el-form ref="formDataRef" :inline="true" :model="reactiveData.pointFormData" :rules="pointFormRule">
                     <div class="edit-form-item">
                         <el-form-item class="edit-form-large" label="位号名称" prop="pointName">
-                            <el-input v-model="reactiveData.pointFormData.pointName" placeholder="请输入位号名称" clearable></el-input>
+                            <el-input v-model="reactiveData.pointFormData.pointName" clearable placeholder="请输入位号名称"></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
                         <el-form-item class="edit-form-large" label="数据类型" prop="pointTypeFlag">
-                            <el-select class="edit-form-large" v-model="reactiveData.pointFormData.pointTypeFlag" placeholder="请选择数据类型" clearable>
+                            <el-select v-model="reactiveData.pointFormData.pointTypeFlag" class="edit-form-large" clearable placeholder="请选择数据类型">
                                 <el-option label="字符串(string)" value="STRING"></el-option>
                                 <el-option label="字节(byte)" value="BYTE"></el-option>
                                 <el-option label="短整数(short)" value="SHORT"></el-option>
@@ -50,7 +50,7 @@
                     </div>
                     <div class="edit-form-item">
                         <el-form-item class="edit-form-large" label="读写标识" prop="rwFlag">
-                            <el-select class="edit-form-large" v-model="reactiveData.pointFormData.rwFlag" placeholder="请选择读写标识" clearable>
+                            <el-select v-model="reactiveData.pointFormData.rwFlag" class="edit-form-large" clearable placeholder="请选择读写标识">
                                 <el-option label="只读" value="R"></el-option>
                                 <el-option label="只写" value="W"></el-option>
                                 <el-option label="读写" value="RW"></el-option>
@@ -59,7 +59,7 @@
                     </div>
                     <div class="edit-form-item">
                         <el-form-item class="edit-form-large" label="使能" prop="enableFlag">
-                            <el-select class="edit-form-large" v-model="reactiveData.pointFormData.enableFlag" placeholder="请选择使能" clearable>
+                            <el-select v-model="reactiveData.pointFormData.enableFlag" class="edit-form-large" clearable placeholder="请选择使能">
                                 <el-option label="启用" value="ENABLE"></el-option>
                                 <el-option label="停用" value="DISABLE"></el-option>
                             </el-select>
@@ -67,42 +67,42 @@
                     </div>
                     <div class="edit-form-item">
                         <el-form-item class="edit-form-large" label="数据精度" prop="valueDecimal">
-                            <el-input v-model="reactiveData.pointFormData.valueDecimal" placeholder="请输入数据精度" clearable></el-input>
+                            <el-input v-model="reactiveData.pointFormData.valueDecimal" clearable placeholder="请输入数据精度"></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
                         <el-form-item class="edit-form-large" label="单位" prop="unit">
-                            <el-input class="edit-form-large" v-model="reactiveData.pointFormData.unit" placeholder="请输入单位" clearable> </el-input>
+                            <el-input v-model="reactiveData.pointFormData.unit" class="edit-form-large" clearable placeholder="请输入单位"></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
                         <el-form-item class="edit-form-large" label="基础值" prop="baseValue">
-                            <el-input v-model="reactiveData.pointFormData.baseValue" placeholder="请输入基础值" clearable></el-input>
+                            <el-input v-model="reactiveData.pointFormData.baseValue" clearable placeholder="请输入基础值"></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
                         <el-form-item class="edit-form-large" label="比例系数" prop="multiple">
-                            <el-input v-model="reactiveData.pointFormData.multiple" placeholder="请输入比例系数" clearable></el-input>
+                            <el-input v-model="reactiveData.pointFormData.multiple" clearable placeholder="请输入比例系数"></el-input>
                         </el-form-item>
                     </div>
                     <div class="edit-form-item">
                         <el-form-item class="edit-form-large" label="位号描述" prop="remark">
-                            <el-input v-model="reactiveData.pointFormData.remark" placeholder="请输入位号描述" type="textarea" maxlength="300" show-word-limit clearable>
+                            <el-input v-model="reactiveData.pointFormData.remark" clearable maxlength="300" placeholder="请输入位号描述" show-word-limit type="textarea">
                             </el-input>
                         </el-form-item>
                     </div>
                     <el-form-item class="edit-form-button">
-                        <el-button type="success" :icon="Back" plain @click="done">返回</el-button>
+                        <el-button :icon="Back" plain type="success" @click="done">返回</el-button>
                         <el-button :icon="RefreshLeft" @click="pointReset">恢复</el-button>
-                        <el-button type="warning" :icon="Right" plain @click="next">下一步</el-button>
+                        <el-button :icon="Right" plain type="warning" @click="next">下一步</el-button>
                     </el-form-item>
                 </el-form>
             </el-card>
             <el-card v-if="reactiveData.active === 1" shadow="hover">
                 <el-divider content-position="left">位号配置完成</el-divider>
-                <el-result icon="success" title="配置完成" sub-title="您可以返回进行下一步操作">
+                <el-result icon="success" sub-title="您可以返回进行下一步操作" title="配置完成">
                     <template #extra>
-                        <el-button type="primary" plain @click="done">返回</el-button>
+                        <el-button plain type="primary" @click="done">返回</el-button>
                     </template>
                 </el-result>
             </el-card>
@@ -110,7 +110,7 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/card/styles/edit-card.scss';

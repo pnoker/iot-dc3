@@ -61,14 +61,14 @@
                     <device ref="deviceViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></device>
                 </el-tab-pane>
                 <!-- <el-tab-pane label="模板模型" name="model">
-                    <el-empty description="暂无模板模型数据！"></el-empty>
-                </el-tab-pane> -->
+            <el-empty description="暂无模板模型数据!"></el-empty>
+        </el-tab-pane> -->
             </el-tabs>
         </base-card>
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/card/styles/things-card.scss';

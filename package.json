@@ -5,7 +5,7 @@
   "author": "pnoker",
   "description": "IoT DC3 平台前端页面",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=18.0.0"
   },
   "type": "module",
   "scripts": {

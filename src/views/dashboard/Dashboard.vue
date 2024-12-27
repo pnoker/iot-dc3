@@ -15,10 +15,10 @@
   -->
 
 <template>
-    <iframe class="things-dashboard-iframe" frameborder="no" border="0" marginwidth="0" marginheight="0" :src="iframeUrl"></iframe>
+    <iframe :src="iframeUrl" border="0" class="things-dashboard-iframe" frameborder="no" marginheight="0" marginwidth="0"></iframe>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 .things-dashboard-iframe {

@@ -21,7 +21,7 @@
                 <div class="things-card__body">
                     <div class="things-card-body-content">
                         <div class="things-card-body-content-application-icon" @click="show()">
-                            <el-avatar shape="square" :size="120" fit="fill" :src="icon"></el-avatar>
+                            <el-avatar :size="120" :src="icon" fit="fill" shape="square"></el-avatar>
                         </div>
                     </div>
                 </div>

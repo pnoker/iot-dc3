@@ -19,26 +19,26 @@
         <point-value-tool
             :embedded="embedded"
             :page="reactiveData.page"
-            @search="search"
-            @reset="reset"
             @refresh="refresh"
+            @reset="reset"
+            @search="search"
             @size-change="sizeChange"
             @current-change="currentChange"
         ></point-value-tool>
 
         <blank-card>
             <el-row>
-                <el-col v-for="data in 12" :key="data" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
+                <el-col v-for="data in 12" :key="data" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
                     <skeleton-card :loading="reactiveData.loading"></skeleton-card>
                 </el-col>
                 <el-col v-if="hasData">
-                    <el-empty :description="embedded == 'device' ? '暂无设备数据' : '暂无数据，请选择设备和位号！'"></el-empty>
+                    <el-empty :description="embedded == 'device' ? '暂无设备数据' : '暂无数据, 请选择设备和位号!'"></el-empty>
                 </el-col>
-                <el-col v-for="data in reactiveData.listData" :key="data.id" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
+                <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
                     <point-value-card
-                        :embedded="embedded"
                         :data="data"
                         :device="reactiveData.deviceTable[data.deviceId]"
+                        :embedded="embedded"
                         :point="reactiveData.pointTable[data.pointId]"
                         :unit="reactiveData.unitTable[data.pointId]"
                     ></point-value-card>
@@ -48,7 +48,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, onMounted, reactive } from 'vue'
 
 import { getPointByIds, getPointUnit, getPointValueLatest, getPointValueList } from '@/api/point'

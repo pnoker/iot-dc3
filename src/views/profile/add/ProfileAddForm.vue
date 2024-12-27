@@ -16,34 +16,34 @@
 
 <template>
     <el-dialog
-        class="things-dialog"
         v-model="reactiveData.formVisible"
-        title="新增模板"
-        :show-close="false"
         :append-to-body="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        :show-close="false"
+        class="things-dialog"
         draggable
+        title="新增模板"
     >
         <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
             <el-form-item class="things-dialog-form-item" label="模板名称" prop="profileName">
-                <el-input v-model="reactiveData.formData.profileName" placeholder="请输入模板名称" clearable></el-input>
+                <el-input v-model="reactiveData.formData.profileName" clearable placeholder="请输入模板名称"></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="描述" prop="remark">
-                <el-input v-model="reactiveData.formData.remark" type="textarea" maxlength="300" show-word-limit placeholder="请输入模板描述" clearable></el-input>
+                <el-input v-model="reactiveData.formData.remark" clearable maxlength="300" placeholder="请输入模板描述" show-word-limit type="textarea"></el-input>
             </el-form-item>
         </el-form>
         <div class="things-dialog-footer">
             <slot name="footer">
                 <el-button @click="cancel">取消</el-button>
-                <el-button type="success" plain @click="reset">重置</el-button>
+                <el-button plain type="success" @click="reset">重置</el-button>
                 <el-button type="primary" @click="addThing">确定</el-button>
             </slot>
         </div>
     </el-dialog>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/dialog/styles/things-dialog.scss';

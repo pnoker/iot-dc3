@@ -154,7 +154,7 @@ export default defineComponent({
             form?.validate((valid) => {
                 if (valid) {
                     emit('import-template', reactiveData.formData, () => {
-                        successMessage('模板生成成功，正在导出！')
+                        successMessage('模板生成成功, 正在导出!')
                     })
                 }
             })
@@ -166,7 +166,7 @@ export default defineComponent({
             emit('import-thing', formData, () => {
                 cancel()
                 reset()
-                successMessage('设备导入成功！')
+                successMessage('设备导入成功!')
             })
         }
         const importThing = () => {

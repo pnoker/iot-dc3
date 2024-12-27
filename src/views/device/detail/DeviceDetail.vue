@@ -61,20 +61,20 @@
                     </detail-card>
                 </el-tab-pane>
                 <el-tab-pane label="关联模板" name="profile">
-                    <profile ref="profileViewRef" :embedded="'device'" :device-id="reactiveData.id"></profile>
+                    <profile ref="profileViewRef" :device-id="reactiveData.id" :embedded="'device'"></profile>
                 </el-tab-pane>
                 <el-tab-pane label="关联位号" name="point">
-                    <point ref="pointViewRef" :embedded="'device'" :device-id="reactiveData.id"></point>
+                    <point ref="pointViewRef" :device-id="reactiveData.id" :embedded="'device'"></point>
                 </el-tab-pane>
                 <el-tab-pane label="设备数据" name="pointValue">
-                    <point-value ref="pointValueViewRef" :embedded="'device'" :device-id="reactiveData.id"></point-value>
+                    <point-value ref="pointValueViewRef" :device-id="reactiveData.id" :embedded="'device'"></point-value>
                 </el-tab-pane>
             </el-tabs>
         </base-card>
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { CollectionTag, Edit, List, Management, Promotion, Sunset } from '@element-plus/icons-vue'
 

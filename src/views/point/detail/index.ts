@@ -22,8 +22,7 @@ import router from '@/config/router'
 
 import { getDeviceByDriverId, getDeviceStatusByDriverId } from '@/api/device'
 import { getProfileByIds } from '@/api/profile'
-import { getDriverByIds } from '@/api/driver'
-import { getDriverById } from '@/api/driver'
+import { getDriverById, getDriverByIds } from '@/api/driver'
 
 import baseCard from '@/components/card/base/BaseCard.vue'
 import detailCard from '@/components/card/detail/DetailCard.vue'

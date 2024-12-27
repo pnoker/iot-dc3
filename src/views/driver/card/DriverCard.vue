@@ -19,25 +19,25 @@
         <el-card shadow="hover">
             <div class="things-card-content">
                 <div
-                    class="things-card__header"
                     :class="{
                         'header-enable': 'ENABLE' === data.enableFlag,
                         'header-disable': 'ENABLE' !== data.enableFlag
                     }"
+                    class="things-card__header"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="icon" :alt="data.driverName" />
+                        <img :alt="data.driverName" :src="icon" />
                     </div>
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '驱动ID')">
                         {{ data.driverName }}
                     </div>
                     <div class="things-card-header-status" title="状态">
-                        <el-tag v-if="status === 'ONLINE'" type="success" effect="plain">在线</el-tag>
-                        <el-tag v-else-if="status === 'MAINTAIN'" type="warning" effect="plain">维护</el-tag>
-                        <el-tag v-else-if="status === 'FAULT'" type="danger" effect="plain">故障</el-tag>
-                        <el-tag v-else-if="status === 'DISABLE'" type="info" effect="plain">停用</el-tag>
-                        <el-tag v-else-if="status === 'REGISTERING'" type="info" effect="plain">注册中</el-tag>
-                        <el-tag v-else type="info" effect="plain">离线</el-tag>
+                        <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">在线</el-tag>
+                        <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">维护</el-tag>
+                        <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">故障</el-tag>
+                        <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">停用</el-tag>
+                        <el-tag v-else-if="status === 'REGISTERING'" effect="plain" type="info">注册中</el-tag>
+                        <el-tag v-else effect="plain" type="info">离线</el-tag>
                     </div>
                 </div>
                 <div class="things-card__body">
@@ -69,15 +69,15 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="things-card-body-content" :title="data.remark ? data.remark : '驱动描述信息'">
+                    <div :title="data.remark ? data.remark : '驱动描述信息'" class="things-card-body-content">
                         <p class="nowrap-description">
                             {{ data.remark ? data.remark : '无描述信息' }}
                         </p>
                     </div>
                 </div>
-                <div class="things-card__footer" v-if="!footer">
+                <div v-if="!footer" class="things-card__footer">
                     <div class="things-card-footer-operation">
-                        <el-button type="primary" link @click="detail">详情</el-button>
+                        <el-button link type="primary" @click="detail">详情</el-button>
                     </div>
                 </div>
             </div>
@@ -85,7 +85,7 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/card/styles/things-card.scss';

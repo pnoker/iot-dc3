@@ -19,29 +19,29 @@
         <el-card shadow="hover">
             <div class="things-card-content">
                 <div
-                    class="things-card__header"
                     :class="{
                         'header-enable': data.interval < 200,
                         'header-disable': data.interval >= 200
                     }"
+                    class="things-card__header"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="icon" :alt="data.pointName" />
+                        <img :alt="data.pointName" :src="icon" />
                     </div>
                     <div class="things-card-header-name nowrap-name" @click="copy(data.pointId, '位号值ID')">
                         {{ point.pointName }}
                     </div>
                     <div class="things-card-header-status" title="读写标识">
-                        <el-tag v-if="data.rwFlag === 'R'" type="warning" effect="plain">只读</el-tag>
-                        <el-tag v-else-if="data.rwFlagrw === 'W'" type="info" effect="plain">只写</el-tag>
-                        <el-tag v-else-if="data.rwFlag === 'RW'" type="success" effect="plain">读写</el-tag>
+                        <el-tag v-if="data.rwFlag === 'R'" effect="plain" type="warning">只读</el-tag>
+                        <el-tag v-else-if="data.rwFlagrw === 'W'" effect="plain" type="info">只写</el-tag>
+                        <el-tag v-else-if="data.rwFlag === 'RW'" effect="plain" type="success">读写</el-tag>
                     </div>
                 </div>
                 <div class="things-card__body">
                     <div class="things-card-body-content">
                         <div class="things-card-body-content-column">
                             <div class="things-card-body-content-value">
-                                <span class="nowrap-item value" title="处理值，点击复制" @click="copyValue(data)">{{ data.value }} {{ unit }}</span>
+                                <span class="nowrap-item value" title="处理值, 点击复制" @click="copyValue(data)">{{ data.value }} {{ unit }}</span>
                             </div>
                             <ul>
                                 <li class="nowrap-item">
@@ -50,7 +50,7 @@
                                     </el-icon>
                                     原始值: {{ data.rawValue }}
                                 </li>
-                                <li class="nowrap-item value-point" v-if="embedded == ''">
+                                <li v-if="embedded == ''" class="nowrap-item value-point">
                                     <el-icon>
                                         <Management />
                                     </el-icon>
@@ -77,19 +77,19 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="things-card-body-content-time" v-if="embedded != ''">
+                    <div v-if="embedded != ''" class="things-card-body-content-time">
                         <div :id="data.pointId"></div>
                     </div>
                 </div>
-                <div class="things-card__footer" v-if="embedded == ''">
+                <div v-if="embedded == ''" class="things-card__footer">
                     <div class="things-card-footer-operation">
-                        <el-popconfirm title="是否确定删除该数据？该数据下的配置将会被全部删除，且该操作不可恢复！" placement="top" :icon="CircleClose" icon-color="#f56c6c">
+                        <el-popconfirm :icon="CircleClose" icon-color="#f56c6c" placement="top" title="是否确定删除该数据?该数据下的配置将会被全部删除, 且该操作不可恢复!">
                             <template #reference>
-                                <el-button type="primary" link>删除</el-button>
+                                <el-button link type="primary">删除</el-button>
                             </template>
                         </el-popconfirm>
-                        <el-button type="primary" link>编辑</el-button>
-                        <el-button type="primary" link>详情</el-button>
+                        <el-button link type="primary">编辑</el-button>
+                        <el-button link type="primary">详情</el-button>
                     </div>
                 </div>
             </div>
@@ -97,7 +97,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { onMounted, watch } from 'vue'
 import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue'
 

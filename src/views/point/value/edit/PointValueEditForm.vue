@@ -16,34 +16,34 @@
 
 <template>
     <el-dialog
-        class="things-dialog"
         v-model="reactiveData.formVisible"
-        title="编辑位号值"
-        :show-close="false"
         :append-to-body="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        :show-close="false"
+        class="things-dialog"
         draggable
+        title="编辑位号值"
     >
         <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
             <el-form-item class="things-dialog-form-item" label="位号值" prop="value">
-                <el-input v-model="formData.value" placeholder="请输入位号值" clearable></el-input>
+                <el-input v-model="formData.value" clearable placeholder="请输入位号值"></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="操作描述" prop="remark">
-                <el-input v-model="reactiveData.remark" type="textarea" maxlength="300" show-word-limit placeholder="请输入本次操作描述" clearable></el-input>
+                <el-input v-model="reactiveData.remark" clearable maxlength="300" placeholder="请输入本次操作描述" show-word-limit type="textarea"></el-input>
             </el-form-item>
         </el-form>
         <div class="things-dialog-footer">
             <slot name="footer">
                 <el-button @click="cancel">取消</el-button>
-                <el-button type="success" plain @click="reset">重置</el-button>
+                <el-button plain type="success" @click="reset">重置</el-button>
                 <el-button type="primary" @click="updateThing">确定</el-button>
             </slot>
         </div>
     </el-dialog>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/dialog/styles/things-dialog';

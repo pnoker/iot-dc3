@@ -17,98 +17,98 @@
 <template>
     <div class="tool-card">
         <el-card shadow="hover">
-            <el-form class="tool-card__body" ref="formDataRef" :model="reactiveData.formData" :rules="formRule" :inline="true">
+            <el-form ref="formDataRef" :inline="true" :model="reactiveData.formData" :rules="formRule" class="tool-card__body">
                 <div class="tool-card-body-form">
-                    <el-form-item v-if="embedded == ''" prop="deviceId" label="设备">
+                    <el-form-item v-if="embedded == ''" label="设备" prop="deviceId">
                         <el-select
-                            class="edit-form-special"
                             v-model="reactiveData.formData.deviceId"
-                            placeholder="请选择设备"
-                            filterable
-                            remote
                             :remote-method="deviceDictionary"
+                            class="edit-form-special"
                             clearable
+                            filterable
+                            placeholder="请选择设备"
+                            remote
                             @change="deviceCurrentChange"
                             @visible-change="deviceDictionaryVisible"
                         >
                             <div class="tool-select">
                                 <el-pagination
-                                    class="tool-select-pagination"
-                                    :hide-on-single-page="true"
-                                    layout="prev, pager, next"
-                                    :pager-count="5"
-                                    :page-size="+reactiveData.devicePage.size"
                                     :current-page="+reactiveData.devicePage.current"
+                                    :hide-on-single-page="true"
+                                    :page-size="+reactiveData.devicePage.size"
+                                    :pager-count="5"
                                     :total="+reactiveData.devicePage.total"
-                                    small
                                     background
+                                    class="tool-select-pagination"
+                                    layout="prev, pager, next"
+                                    small
                                     @current-change="deviceCurrentChange"
                                 ></el-pagination>
                             </div>
                             <el-option v-for="dictionary in reactiveData.deviceDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item v-if="embedded == ''" prop="pointId" label="位号">
+                    <el-form-item v-if="embedded == ''" label="位号" prop="pointId">
                         <el-select
-                            class="edit-form-special"
                             v-model="reactiveData.formData.pointId"
-                            placeholder="请选择位号"
-                            filterable
-                            remote
                             :remote-method="pointDictionary"
+                            class="edit-form-special"
                             clearable
+                            filterable
+                            placeholder="请选择位号"
+                            remote
                             @change="pointCurrentChange"
                             @visible-change="pointDictionaryVisible"
                         >
                             <div class="tool-select">
                                 <el-pagination
-                                    class="tool-select-pagination"
-                                    :hide-on-single-page="true"
-                                    layout="prev, pager, next"
-                                    :pager-count="5"
-                                    :page-size="+reactiveData.pointPage.size"
                                     :current-page="+reactiveData.pointPage.current"
+                                    :hide-on-single-page="true"
+                                    :page-size="+reactiveData.pointPage.size"
+                                    :pager-count="5"
                                     :total="+reactiveData.pointPage.total"
-                                    small
                                     background
+                                    class="tool-select-pagination"
+                                    layout="prev, pager, next"
+                                    small
                                     @current-change="pointCurrentChange"
                                 ></el-pagination>
                             </div>
                             <el-option v-for="dictionary in reactiveData.pointDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item v-if="embedded == 'device'" prop="pointName" label="位号名称">
-                        <el-input class="edit-form-default" v-model="reactiveData.formData.pointName" placeholder="请输入位号名称" clearable @keyup.enter="search"></el-input>
+                    <el-form-item v-if="embedded == 'device'" label="位号名称" prop="pointName">
+                        <el-input v-model="reactiveData.formData.pointName" class="edit-form-default" clearable placeholder="请输入位号名称" @keyup.enter="search"></el-input>
                     </el-form-item>
-                    <el-form-item v-if="embedded == 'device'" prop="enableFlag" label="使能">
-                        <el-select class="edit-form-small" v-model="reactiveData.formData.enableFlag" placeholder="请选择使能" clearable>
+                    <el-form-item v-if="embedded == 'device'" label="使能" prop="enableFlag">
+                        <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" clearable placeholder="请选择使能">
                             <el-option label="启用" value="ENABLE"></el-option>
                             <el-option label="停用" value="DISABLE"></el-option>
                         </el-select>
                     </el-form-item>
                 </div>
                 <el-form-item class="tool-card-body-button">
-                    <el-button type="primary" :icon="Search" @click="search">搜索</el-button>
+                    <el-button :icon="Search" type="primary" @click="search">搜索</el-button>
                     <el-button :icon="RefreshRight" @click="reset">重置</el-button>
                 </el-form-item>
             </el-form>
             <div class="tool-card__footer">
                 <div class="tool-card-footer-button">
-                    <el-button v-if="embedded == ''" type="success" :icon="Plus" disabled>新增</el-button>
+                    <el-button v-if="embedded == ''" :icon="Plus" disabled type="success">新增</el-button>
                 </div>
                 <div class="tool-card-footer-page">
                     <el-pagination
-                        layout="total, prev, pager, next, sizes"
-                        :page-sizes="[6, 12, 24, 36, 48, 96]"
-                        :page-size="+page.size"
                         :current-page="+page.current"
+                        :page-size="+page.size"
+                        :page-sizes="[6, 12, 24, 36, 48, 96]"
                         :total="+page.total"
                         background
+                        layout="total, prev, pager, next, sizes"
                         @size-change="sizeChange"
                         @current-change="currentChange"
                     >
                     </el-pagination>
-                    <el-tooltip class="item" effect="dark" content="刷新" placement="top">
+                    <el-tooltip class="item" content="刷新" effect="dark" placement="top">
                         <el-button :icon="Refresh" circle @click="refresh"></el-button>
                     </el-tooltip>
                 </div>
@@ -117,7 +117,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Plus, Refresh, RefreshRight, Search } from '@element-plus/icons-vue'

@@ -30,7 +30,7 @@ const request: AxiosInstance = axios.create({
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
     validateStatus: (status) => status >= 200 && status <= 500,
     transformResponse: [
-        function (data) {
+        function(data) {
             try {
                 return JSONBigIntStr.parse(data)
             } catch (err) {
@@ -84,9 +84,9 @@ request.interceptors.response.use(
         }
 
         if (status === 401) {
-            warnMessage('检测到您未登录或登陆凭证已失效，请重新登录!', '登录凭证失效')
+            warnMessage('检测到您未登录或登陆凭证已失效, 请重新登录!', '登录凭证失效')
         } else {
-            failMessage('接口请求异常，请联系系统管理员。', response.data.code, response.data)
+            failMessage('接口请求异常, 请联系系统管理员。', response.data.code, response.data)
         }
         return Promise.reject()
     },

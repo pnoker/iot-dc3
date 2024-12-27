@@ -15,7 +15,6 @@
  */
 
 /* eslint-disable */
-import * as axios from 'axios'
 
 declare module 'axios' {
     type MyAxiosPromise<T = any> = Promise<T>

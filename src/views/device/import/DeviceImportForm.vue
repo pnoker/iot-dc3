@@ -16,38 +16,38 @@
 
 <template>
     <el-dialog
-        class="things-dialog"
         v-model="reactiveData.formVisible"
         v-loading="reactiveData.formLoading"
-        title="导入设备"
-        :show-close="false"
         :append-to-body="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        :show-close="false"
+        class="things-dialog"
         draggable
+        title="导入设备"
     >
         <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-            <el-alert class="things-dialog-form-alert" type="warning" show-icon :closable="false">
-                <p>提示：建议每次导入前下载新模板，避免模板配置数据不一致。</p>
-                <p>方法：先选择驱动和模板，然后点击生成导入模板，再将待导入的设备数据填写到导入模板，最后上传导入数据。</p>
+            <el-alert :closable="false" class="things-dialog-form-alert" show-icon type="warning">
+                <p>提示：建议每次导入前下载新模板, 避免模板配置数据不一致。</p>
+                <p>方法：先选择驱动和模板, 然后点击生成导入模板, 再将待导入的设备数据填写到导入模板, 最后上传导入数据。</p>
             </el-alert>
             <dev></dev>
             <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
-                <el-select class="edit-form-special" v-model="reactiveData.formData.driverId" placeholder="请选择所属驱动" clearable @visible-change="driverDictionaryVisible">
+                <el-select v-model="reactiveData.formData.driverId" class="edit-form-special" clearable placeholder="请选择所属驱动" @visible-change="driverDictionaryVisible">
                     <div class="tool-select">
                         <el-form-item class="tool-select-input">
-                            <el-input v-model="reactiveData.driverQuery" placeholder="请选择所属驱动" clearable @input="driverDictionary" />
+                            <el-input v-model="reactiveData.driverQuery" clearable placeholder="请选择所属驱动" @input="driverDictionary" />
                         </el-form-item>
                         <el-pagination
-                            class="tool-select-pagination"
-                            :hide-on-single-page="true"
-                            layout="prev, pager, next"
-                            :pager-count="5"
-                            :page-size="+reactiveData.driverPage.size"
                             :current-page="+reactiveData.driverPage.current"
+                            :hide-on-single-page="true"
+                            :page-size="+reactiveData.driverPage.size"
+                            :pager-count="5"
                             :total="+reactiveData.driverPage.total"
-                            small
                             background
+                            class="tool-select-pagination"
+                            layout="prev, pager, next"
+                            small
                             @current-change="driverCurrentChange"
                         ></el-pagination>
                     </div>
@@ -56,34 +56,34 @@
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="关联模板" prop="profileIds">
                 <el-select
-                    class="edit-form-special"
                     v-model="reactiveData.formData.profileIds"
-                    placeholder="请选择关联模板"
                     :multiple="true"
+                    class="edit-form-special"
                     clearable
+                    placeholder="请选择关联模板"
                     @visible-change="profileDictionaryVisible"
                 >
                     <div class="tool-select">
                         <el-form-item class="tool-select-input">
-                            <el-input v-model="reactiveData.profileQuery" placeholder="请选择关联模板" clearable @input="profileDictionary" />
+                            <el-input v-model="reactiveData.profileQuery" clearable placeholder="请选择关联模板" @input="profileDictionary" />
                         </el-form-item>
                         <el-pagination
-                            class="tool-select-pagination"
-                            :hide-on-single-page="true"
-                            layout="prev, pager, next"
-                            :pager-count="5"
-                            :page-size="+reactiveData.profilePage.size"
                             :current-page="+reactiveData.profilePage.current"
+                            :hide-on-single-page="true"
+                            :page-size="+reactiveData.profilePage.size"
+                            :pager-count="5"
                             :total="+reactiveData.profilePage.total"
-                            small
                             background
+                            class="tool-select-pagination"
+                            layout="prev, pager, next"
+                            small
                             @current-change="profileCurrentChange"
                         ></el-pagination>
                     </div>
                     <el-option v-for="dictionary in reactiveData.profileDictionary" :key="dictionary.value" :label="dictionary.label" :value="dictionary.value"></el-option>
                 </el-select>
             </el-form-item>
-            <el-upload class="things-dialog-upload" ref="formUploadRef" :http-request="uploadRequest" :limit="1" :on-exceed="handleExceed" :auto-upload="false" accept=".xlsx" drag>
+            <el-upload ref="formUploadRef" :auto-upload="false" :http-request="uploadRequest" :limit="1" :on-exceed="handleExceed" accept=".xlsx" class="things-dialog-upload" drag>
                 <el-icon class="el-upload__icon">
                     <UploadFilled />
                 </el-icon>
@@ -93,15 +93,15 @@
         <div class="things-dialog-footer">
             <slot name="footer">
                 <el-button @click="cancel">取消</el-button>
-                <el-button type="success" plain @click="reset">重置</el-button>
-                <el-button type="warning" plain @click="importTemplate">下载导入模板</el-button>
+                <el-button plain type="success" @click="reset">重置</el-button>
+                <el-button plain type="warning" @click="importTemplate">下载导入模板</el-button>
                 <el-button type="primary" @click="importThing">确定</el-button>
             </slot>
         </div>
     </el-dialog>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/dialog/styles/things-dialog';

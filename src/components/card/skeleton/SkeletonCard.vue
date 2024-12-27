@@ -21,7 +21,7 @@
                 <el-card shadow="hover">
                     <div class="skeleton-card__container">
                         <div class="skeleton-card__header">
-                            <el-skeleton-item class="skeleton-card-icon" ariant="image" />
+                            <el-skeleton-item ariant="image" class="skeleton-card-icon" />
                             <el-skeleton-item class="skeleton-card-name" variant="text" />
                         </div>
                         <div class="skeleton-card__body">
@@ -37,7 +37,7 @@
                                 <el-skeleton-item class="skeleton-card-description" variant="text" />
                             </div>
                         </div>
-                        <div class="skeleton-card__footer" v-if="!props.footer">
+                        <div v-if="!props.footer" class="skeleton-card__footer">
                             <div class="skeleton-card-operation">
                                 <el-skeleton-item class="skeleton-card-button" variant="button" />
                                 <el-skeleton-item class="skeleton-card-button" variant="button" />
@@ -53,7 +53,7 @@
     </el-skeleton>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 const props = defineProps({
     loading: {
         type: Boolean,

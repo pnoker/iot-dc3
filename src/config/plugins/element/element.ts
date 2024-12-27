@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Hide, Histogram, List, Management, Promotion, View, Connection } from '@element-plus/icons-vue'
+import { Connection, Hide, Histogram, List, Management, Promotion, View } from '@element-plus/icons-vue'
 import element from 'element-plus'
 import 'element-plus/dist/index.css'
 import './element-variables.scss'

@@ -61,33 +61,33 @@
                     </detail-card>
                 </el-tab-pane>
                 <el-tab-pane label="关联设备" name="device">
-                    <device ref="deviceViewRef" :embedded="'driver'" :driver-id="reactiveData.id"></device>
+                    <device ref="deviceViewRef" :driver-id="reactiveData.id" :embedded="'driver'"></device>
                 </el-tab-pane>
                 <!-- <el-tab-pane label="驱动模型" name="model">
-                    <el-empty description="暂无驱动模型数据！"></el-empty>
-                </el-tab-pane>
-                <el-tab-pane label="驱动事件" name="event">
-                    <el-timeline>
-                        <el-timeline-item timestamp="2021/7/30" placement="top">
-                            <el-card>
-                                <h4>驱动上线</h4>
-                                <p>该驱动于 2021/7/30 20:46 上线</p>
-                            </el-card>
-                        </el-timeline-item>
-                        <el-timeline-item timestamp="2021/7/30" placement="top">
-                            <el-card>
-                                <h4>驱动注册</h4>
-                                <p>该驱动于 2021/7/30 20:46 注册成功</p>
-                            </el-card>
-                        </el-timeline-item>
-                    </el-timeline>
-                </el-tab-pane> -->
+            <el-empty description="暂无驱动模型数据!"></el-empty>
+        </el-tab-pane>
+        <el-tab-pane label="驱动事件" name="event">
+            <el-timeline>
+                <el-timeline-item timestamp="2021/7/30" placement="top">
+                    <el-card>
+                        <h4>驱动上线</h4>
+                        <p>该驱动于 2021/7/30 20:46 上线</p>
+                    </el-card>
+                </el-timeline-item>
+                <el-timeline-item timestamp="2021/7/30" placement="top">
+                    <el-card>
+                        <h4>驱动注册</h4>
+                        <p>该驱动于 2021/7/30 20:46 注册成功</p>
+                    </el-card>
+                </el-timeline-item>
+            </el-timeline>
+        </el-tab-pane> -->
             </el-tabs>
         </base-card>
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 .detail-content {

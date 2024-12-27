@@ -29,7 +29,7 @@ export const getCookies = (key: string) => {
 }
 
 /**
- * 更新、新增 Cookies 值
+ * 更新, 新增 Cookies 值
  *
  * @param key key
  * @param value cookies
@@ -51,7 +51,7 @@ export const removeCookies = (key: string) => {
  * 获取 Storage 值
  *
  * @param key key
- * @param isSession 是否为 Session Storage，默认 false: Local Storage
+ * @param isSession 是否为 Session Storage, 默认 false: Local Storage
  */
 export const getStorage = (key: string, isSession?: boolean) => {
     let obj: any, content: any
@@ -82,11 +82,11 @@ export const getStorage = (key: string, isSession?: boolean) => {
 }
 
 /**
- * 更新、新增 Storage 值
+ * 更新, 新增 Storage 值
  *
  * @param key key
  * @param value storage
- * @param isSession 是否为 Session Storage，默认 false: Local Storage
+ * @param isSession 是否为 Session Storage, 默认 false: Local Storage
  */
 export const setStorage = (key: string, value: any, isSession?: boolean) => {
     const obj = {
@@ -103,7 +103,7 @@ export const setStorage = (key: string, value: any, isSession?: boolean) => {
  * 删除 Storage 值
  *
  * @param key key
- * @param isSession 是否为 Session Storage，默认 false: Local Storage
+ * @param isSession 是否为 Session Storage, 默认 false: Local Storage
  */
 export const removeStorage = (key: string, isSession?: boolean) => {
     if (isSession) window.sessionStorage.removeItem(key)
@@ -113,7 +113,7 @@ export const removeStorage = (key: string, isSession?: boolean) => {
 /**
  * 获取全部的 Storage 值
  *
- * @param isSession 是否为 Session Storage，默认 false: Local Storage
+ * @param isSession 是否为 Session Storage, 默认 false: Local Storage
  */
 export const getAllStorage = (isSession?: boolean) => {
     const list = [] as Array<{ name: string | null; content: any }>
@@ -138,7 +138,7 @@ export const getAllStorage = (isSession?: boolean) => {
 /**
  * 删除全部的 Storage 值
  *
- * @param isSession 是否为 Session Storage，默认 false: Local Storage
+ * @param isSession 是否为 Session Storage, 默认 false: Local Storage
  */
 export const clearAllStorage = (isSession?: boolean) => {
     if (isSession) {

@@ -19,10 +19,10 @@
         <div class="img" style="background-image: url('/images/error/error.svg')"></div>
         <div class="content">
             <h1>403</h1>
-            <div class="desc">抱歉，你无权访问该页面</div>
+            <div class="desc">抱歉, 你无权访问该页面</div>
             <div class="actions">
                 <router-link :to="{ path: '/' }">
-                    <el-button type="primary" plain>返回首页</el-button>
+                    <el-button plain type="primary">返回首页</el-button>
                 </router-link>
             </div>
         </div>

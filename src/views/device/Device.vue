@@ -19,29 +19,29 @@
         <device-tool
             :embedded="embedded"
             :page="reactiveData.page"
-            @search="search"
+            @refresh="refresh"
             @reset="reset"
+            @search="search"
+            @sort="sort"
             @show-add="showAdd"
             @show-import="showImport"
-            @refresh="refresh"
-            @sort="sort"
             @size-change="sizeChange"
             @current-change="currentChange"
         />
 
         <blank-card>
             <el-row>
-                <el-col v-for="data in 12" :key="data" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
+                <el-col v-for="data in 12" :key="data" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
                     <skeleton-card :loading="reactiveData.loading" />
                 </el-col>
                 <el-col v-if="hasData">
-                    <el-empty description="暂无设备数据！" />
+                    <el-empty description="暂无设备数据!" />
                 </el-col>
-                <el-col v-for="data in reactiveData.listData" :key="data.id" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
+                <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
                     <device-card
-                        :embedded="embedded != ''"
                         :data="data"
                         :driver="reactiveData.driverTable[data.driverId]"
+                        :embedded="embedded != ''"
                         :status="reactiveData.statusTable[data.id]"
                         @disable-thing="disableThing"
                         @enable-thing="enableThing"
@@ -56,6 +56,6 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss"></style>

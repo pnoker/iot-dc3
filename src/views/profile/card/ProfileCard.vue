@@ -19,14 +19,14 @@
         <el-card shadow="hover">
             <div class="things-card-content">
                 <div
-                    class="things-card__header"
                     :class="{
                         'header-enable': 'ENABLE' === data.enableFlag,
                         'header-disable': 'ENABLE' !== data.enableFlag
                     }"
+                    class="things-card__header"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="icon" :alt="data.profileName" />
+                        <img :alt="data.profileName" :src="icon" />
                     </div>
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '模板ID')">
                         {{ data.profileName }}
@@ -56,31 +56,31 @@
                         </p>
                     </div>
                 </div>
-                <div class="things-card__footer" v-if="!embedded">
+                <div v-if="!embedded" class="things-card__footer">
                     <div class="things-card-footer-operation">
-                        <el-popconfirm title="是否确定停用该模板？" placement="top" :icon="SwitchButton" icon-color="#e6a23c" @confirm="disableThing">
+                        <el-popconfirm :icon="SwitchButton" icon-color="#e6a23c" placement="top" title="是否确定停用该模板?" @confirm="disableThing">
                             <template #reference>
-                                <el-button type="primary" :disabled="'ENABLE' !== data.enableFlag" link>停用</el-button>
+                                <el-button :disabled="'ENABLE' !== data.enableFlag" link type="primary">停用</el-button>
                             </template>
                         </el-popconfirm>
-                        <el-popconfirm title="是否确定启用该模板？" placement="top" :icon="CircleCheck" icon-color="#67c23a" @confirm="enableThing">
+                        <el-popconfirm :icon="CircleCheck" icon-color="#67c23a" placement="top" title="是否确定启用该模板?" @confirm="enableThing">
                             <template #reference>
-                                <el-button type="primary" :disabled="'ENABLE' === data.enableFlag" link>启用</el-button>
+                                <el-button :disabled="'ENABLE' === data.enableFlag" link type="primary">启用</el-button>
                             </template>
                         </el-popconfirm>
                         <el-popconfirm
-                            title="是否确定删除该模板？该模板下的配置将会被全部删除，且该操作不可恢复！"
-                            placement="top"
                             :icon="CircleClose"
                             icon-color="#f56c6c"
+                            placement="top"
+                            title="是否确定删除该模板?该模板下的配置将会被全部删除, 且该操作不可恢复!"
                             @confirm="deleteThing"
                         >
                             <template #reference>
-                                <el-button type="primary" link>删除</el-button>
+                                <el-button link type="primary">删除</el-button>
                             </template>
                         </el-popconfirm>
-                        <el-button type="primary" link @click="edit">编辑</el-button>
-                        <el-button type="primary" link @click="detail">详情</el-button>
+                        <el-button link type="primary" @click="edit">编辑</el-button>
+                        <el-button link type="primary" @click="detail">详情</el-button>
                     </div>
                 </div>
             </div>
@@ -88,7 +88,7 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/card/styles/things-card.scss';

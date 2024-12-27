@@ -17,11 +17,11 @@
 <template>
     <div class="container">
         <div class="header">
-            <el-col class="header_item" :span="4">
+            <el-col :span="4" class="header_item">
                 <img class="header_logo" src="/images/logo/logo.png" />
             </el-col>
-            <el-col class="header_item" :span="16">
-                <el-menu class="header_menu" :default-active="handleMenuEnter($route.path)" mode="horizontal" :router="true">
+            <el-col :span="16" class="header_item">
+                <el-menu :default-active="handleMenuEnter($route.path)" :router="true" class="header_menu" mode="horizontal">
                     <el-menu-item index="/home">
                         <el-icon>
                             <HomeFilled />
@@ -42,7 +42,7 @@
                     </template>
                 </el-menu>
             </el-col>
-            <el-col class="header_item header_user" :span="4">
+            <el-col :span="4" class="header_item header_user">
                 <el-dropdown class="user_avatar" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
                         <el-avatar>
@@ -56,7 +56,7 @@
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
-                <el-badge class="user_badge" :value="3" :max="99" type="primary">
+                <el-badge :max="99" :value="3" class="user_badge" type="primary">
                     <span class="user_name" @click="handleMessage">管理员</span>
                 </el-badge>
             </el-col>
@@ -69,7 +69,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import router from '@/config/router'
 import menu from '@/config/router/views'
 import { warning } from '@/utils/MessageUtil'

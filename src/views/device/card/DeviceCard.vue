@@ -19,24 +19,24 @@
         <el-card shadow="hover">
             <div class="things-card-content">
                 <div
-                    class="things-card__header"
                     :class="{
                         'header-enable': 'ENABLE' === data.enableFlag,
                         'header-disable': 'ENABLE' !== data.enableFlag
                     }"
+                    class="things-card__header"
                 >
                     <div class="things-card-header-icon">
-                        <img :src="icon" :alt="data.deviceName" />
+                        <img :alt="data.deviceName" :src="icon" />
                     </div>
                     <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '设备ID')">
                         {{ data.deviceName }}
                     </div>
                     <div class="things-card-header-status" title="状态">
-                        <el-tag v-if="status === 'ONLINE'" type="success" effect="plain">在线</el-tag>
-                        <el-tag v-else-if="status === 'MAINTAIN'" type="warning" effect="plain">维护</el-tag>
-                        <el-tag v-else-if="status === 'FAULT'" type="danger" effect="plain">故障</el-tag>
-                        <el-tag v-else-if="status === 'DISABLE'" type="info" effect="plain">停用</el-tag>
-                        <el-tag v-else type="info" effect="plain">离线</el-tag>
+                        <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">在线</el-tag>
+                        <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">维护</el-tag>
+                        <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">故障</el-tag>
+                        <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">停用</el-tag>
+                        <el-tag v-else effect="plain" type="info">离线</el-tag>
                     </div>
                 </div>
                 <div class="things-card__body">
@@ -68,31 +68,31 @@
                         </p>
                     </div>
                 </div>
-                <div class="things-card__footer" v-if="!embedded">
+                <div v-if="!embedded" class="things-card__footer">
                     <div class="things-card-footer-operation">
-                        <el-popconfirm title="是否确定停用该设备？" placement="top" :icon="SwitchButton" icon-color="#e6a23c" @confirm="disableThing">
+                        <el-popconfirm :icon="SwitchButton" icon-color="#e6a23c" placement="top" title="是否确定停用该设备?" @confirm="disableThing">
                             <template #reference>
-                                <el-button type="primary" :disabled="'ENABLE' !== data.enableFlag" link>停用</el-button>
+                                <el-button :disabled="'ENABLE' !== data.enableFlag" link type="primary">停用</el-button>
                             </template>
                         </el-popconfirm>
-                        <el-popconfirm title="是否确定启用该设备？" placement="top" :icon="CircleCheck" icon-color="#67c23a" @confirm="enableThing">
+                        <el-popconfirm :icon="CircleCheck" icon-color="#67c23a" placement="top" title="是否确定启用该设备?" @confirm="enableThing">
                             <template #reference>
-                                <el-button type="primary" :disabled="'ENABLE' === data.enableFlag" link>启用</el-button>
+                                <el-button :disabled="'ENABLE' === data.enableFlag" link type="primary">启用</el-button>
                             </template>
                         </el-popconfirm>
                         <el-popconfirm
-                            title="是否确定删除该设备？该设备下的配置将会被全部删除，且该操作不可恢复！"
-                            placement="top"
                             :icon="CircleClose"
                             icon-color="#f56c6c"
+                            placement="top"
+                            title="是否确定删除该设备?该设备下的配置将会被全部删除, 且该操作不可恢复!"
                             @confirm="deleteThing"
                         >
                             <template #reference>
-                                <el-button type="primary" link>删除</el-button>
+                                <el-button link type="primary">删除</el-button>
                             </template>
                         </el-popconfirm>
-                        <el-button type="primary" link @click="edit">编辑</el-button>
-                        <el-button type="primary" link @click="detail">详情</el-button>
+                        <el-button link type="primary" @click="edit">编辑</el-button>
+                        <el-button link type="primary" @click="detail">详情</el-button>
                     </div>
                 </div>
             </div>
@@ -100,7 +100,7 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/card/styles/things-card.scss';

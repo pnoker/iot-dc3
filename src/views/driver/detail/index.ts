@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, computed } from 'vue'
+import { computed, defineComponent, reactive, ref } from 'vue'
 import { Connection, Edit, Management, Monitor, Position, Promotion, Sunset } from '@element-plus/icons-vue'
 
 import { useRoute } from 'vue-router'
@@ -28,9 +28,9 @@ import detailCard from '@/components/card/detail/DetailCard.vue'
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
 import driverTool from '@/views/driver/tool/DriverTool.vue'
 import deviceList from '@/views/device/Device.vue'
+import device from '@/views/device/Device.vue'
 import driverCard from '@/views/driver/card/DriverCard.vue'
 import deviceCard from '@/views/device/card/DeviceCard.vue'
-import device from '@/views/device/Device.vue'
 import pointCard from '@/views/point/card/PointCard.vue'
 
 import { timestamp } from '@/utils/CommonUtil'

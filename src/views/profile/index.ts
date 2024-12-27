@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { reactive, ref, computed, defineComponent } from 'vue'
+import { computed, defineComponent, reactive, ref } from 'vue'
 
 import { addProfile, deleteProfile, getProfileList, updateProfile } from '@/api/profile'
 

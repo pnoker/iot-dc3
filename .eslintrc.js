@@ -19,12 +19,12 @@ module.exports = {
     env: {
         browser: true,
         es2021: true,
-        node: true,
+        node: true
     },
     parser: 'vue-eslint-parser',
     parserOptions: {
         parser: '@typescript-eslint/parser',
-        sourceType: 'module',
+        sourceType: 'module'
     },
     extends: ['plugin:vue/vue3-recommended', '@vue/typescript/recommended', 'eslint:recommended', 'plugin:prettier/recommended'],
     plugins: ['vue', '@typescript-eslint'],
@@ -32,9 +32,9 @@ module.exports = {
         {
             files: ['*.ts', '*.tsx', '*.vue'],
             rules: {
-                'no-undef': 'off',
-            },
-        },
+                'no-undef': 'off'
+            }
+        }
     ],
     rules: {
         '@typescript-eslint/ban-ts-ignore': 'off',
@@ -84,6 +84,6 @@ module.exports = {
         'no-case-declarations': 'off',
         'eol-last': 'off',
         'no-console': 'off',
-        'no-redeclare': 'off',
-    },
+        'no-redeclare': 'off'
+    }
 }

@@ -24,7 +24,7 @@
     </div>
 </template>
 
-<script setup lang="ts" />
+<script lang="ts" setup />
 
 <style lang="scss">
 .detail-card {

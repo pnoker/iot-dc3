@@ -16,7 +16,7 @@
 
 import { defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
-import { Plus, Refresh, RefreshLeft, Search, Sort, Back, Check } from '@element-plus/icons-vue'
+import { Back, Check, Plus, Refresh, RefreshLeft, Search, Sort } from '@element-plus/icons-vue'
 
 import { Dictionary, Order } from '@/config/entity'
 import { getProfileDictionary } from '@/api/dictionary'

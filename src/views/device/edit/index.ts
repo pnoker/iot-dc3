@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref, computed } from 'vue'
+import { computed, defineComponent, reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Back, Check, Edit, RefreshLeft, Right } from '@element-plus/icons-vue'
 
@@ -24,7 +24,7 @@ import router from '@/config/router'
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary'
 import { getDeviceById, updateDevice } from '@/api/device'
 import { getDriverAttributeByDriverId, getPointAttributeByDriverId } from '@/api/attribute'
-import { addDriverInfo, getDriverInfoByDeviceId, updateDriverInfo, addPointInfo, getPointInfoByDeviceId, updatePointInfo } from '@/api/info'
+import { addDriverInfo, addPointInfo, getDriverInfoByDeviceId, getPointInfoByDeviceId, updateDriverInfo, updatePointInfo } from '@/api/info'
 
 import { Dictionary, Order } from '@/config/entity'
 
@@ -369,15 +369,15 @@ export default defineComponent({
 
                         driverInfo.id
                             ? updateDriverInfo(driverInfo)
-                                  .then(() => loadFormData(driverInfo))
-                                  .catch(() => {
-                                      // nothing to do
-                                  })
+                                .then(() => loadFormData(driverInfo))
+                                .catch(() => {
+                                    // nothing to do
+                                })
                             : addDriverInfo(driverInfo)
-                                  .then(() => loadFormData(driverInfo))
-                                  .catch(() => {
-                                      // nothing to do
-                                  })
+                                .then(() => loadFormData(driverInfo))
+                                .catch(() => {
+                                    // nothing to do
+                                })
 
                         function loadFormData(res: { id: any; driverAttributeId?: any; deviceId?: string; configValue: any }) {
                             driverFormData[attribute.attributeName] = {
@@ -406,15 +406,15 @@ export default defineComponent({
 
                         pointInfo.id
                             ? updatePointInfo(pointInfo)
-                                  .then(() => loadFormData(pointInfo))
-                                  .catch(() => {
-                                      // nothing to do
-                                  })
+                                .then(() => loadFormData(pointInfo))
+                                .catch(() => {
+                                    // nothing to do
+                                })
                             : addPointInfo(pointInfo)
-                                  .then(() => loadFormData(pointInfo))
-                                  .catch(() => {
-                                      // nothing to do
-                                  })
+                                .then(() => loadFormData(pointInfo))
+                                .catch(() => {
+                                    // nothing to do
+                                })
 
                         function loadFormData(res: { id: any; pointAttributeId?: any; deviceId?: string; pointId?: any; configValue: any }) {
                             reactiveData.pointInfoData.forEach((pointInfo) => {

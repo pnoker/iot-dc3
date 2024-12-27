@@ -26,21 +26,21 @@
             <div class="login-right">
                 <div class="login-main">
                     <h4 class="login-title">IoT DC3 平台</h4>
-                    <el-form class="login-form" ref="formDataRef" status-icon :rules="formRule" :model="reactiveData.formData">
+                    <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" class="login-form" status-icon>
                         <el-form-item prop="tenant">
-                            <el-input v-model="reactiveData.formData.tenant" :prefix-icon="Box" placeholder="请输入租户名" auto-complete="off" @keyup.enter="handleLogin">
+                            <el-input v-model="reactiveData.formData.tenant" :prefix-icon="Box" auto-complete="off" placeholder="请输入租户名" @keyup.enter="handleLogin">
                             </el-input>
                         </el-form-item>
                         <el-form-item prop="name">
-                            <el-input v-model="reactiveData.formData.name" :prefix-icon="User" placeholder="请输入用户名" auto-complete="off" @keyup.enter="handleLogin"></el-input>
+                            <el-input v-model="reactiveData.formData.name" :prefix-icon="User" auto-complete="off" placeholder="请输入用户名" @keyup.enter="handleLogin"></el-input>
                         </el-form-item>
                         <el-form-item prop="password">
                             <el-input
                                 v-model="reactiveData.formData.password"
                                 :prefix-icon="Lock"
                                 :type="reactiveData.passwordType"
-                                placeholder="请输入密码"
                                 auto-complete="off"
+                                placeholder="请输入密码"
                                 @keyup.enter="handleLogin"
                             >
                                 <template #append>
@@ -58,7 +58,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { reactive, ref, unref } from 'vue'
 import { FormInstance, FormRules } from 'element-plus'
 import { Box, Lock, User } from '@element-plus/icons-vue'
@@ -94,7 +94,7 @@ const formRule = reactive<FormRules>({
     ]
 })
 
-// 显示、隐藏密码
+// 显示, 隐藏密码
 const showPassword = () => {
     reactiveData.passwordType === '' ? (reactiveData.passwordType = 'password') : (reactiveData.passwordType = '')
     reactiveData.isHide === 'View' ? (reactiveData.isHide = 'Hide') : (reactiveData.isHide = 'View')

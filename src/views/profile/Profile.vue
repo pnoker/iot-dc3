@@ -19,25 +19,25 @@
         <profile-tool
             :embedded="embedded"
             :page="reactiveData.page"
-            @search="search"
-            @reset="reset"
-            @show-add="showAdd"
             @refresh="refresh"
+            @reset="reset"
+            @search="search"
             @sort="sort"
+            @show-add="showAdd"
             @size-change="sizeChange"
             @current-change="currentChange"
         ></profile-tool>
 
         <blank-card>
             <el-row>
-                <el-col v-for="data in 12" :key="data" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
+                <el-col v-for="data in 12" :key="data" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
                     <skeleton-card :loading="reactiveData.loading"></skeleton-card>
                 </el-col>
                 <el-col v-if="hasData">
-                    <el-empty description="暂无模板数据！"></el-empty>
+                    <el-empty description="暂无模板数据!"></el-empty>
                 </el-col>
-                <el-col v-for="data in reactiveData.listData" :key="data.id" :xs="24" :sm="12" :md="8" :lg="6" :xl="4">
-                    <profile-card :embedded="embedded != ''" :data="data" @disable-thing="disableThing" @enable-thing="enableThing" @delete-thing="deleteThing"></profile-card>
+                <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
+                    <profile-card :data="data" :embedded="embedded != ''" @disable-thing="disableThing" @enable-thing="enableThing" @delete-thing="deleteThing"></profile-card>
                 </el-col>
             </el-row>
         </blank-card>
@@ -46,6 +46,6 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss"></style>

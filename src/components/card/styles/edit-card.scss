@@ -15,56 +15,56 @@
  */
 
 .edit-card {
-    margin-top: 1px;
+  margin-top: 1px;
 
-    .edit-card-header {
-        margin-bottom: 4px;
+  .edit-card-header {
+    margin-bottom: 4px;
 
-        .el-card {
-            border: 0;
-        }
+    .el-card {
+      border: 0;
+    }
+  }
+
+  .edit-card-body {
+    .edit-form-item {
+      display: flex;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      justify-content: center;
+
+      .el-row {
+        justify-content: center;
+      }
+
+      .el-alert {
+        margin-bottom: 10px;
+      }
+
+      .el-textarea__inner {
+        height: 80px;
+      }
     }
 
-    .edit-card-body {
-        .edit-form-item {
-            display: flex;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            justify-content: center;
+    .edit-form-button {
+      display: flex;
+      margin-top: 10px;
 
-            .el-row {
-                justify-content: center;
-            }
-
-            .el-alert {
-                margin-bottom: 10px;
-            }
-
-            .el-textarea__inner {
-                height: 80px;
-            }
-        }
-
-        .edit-form-button {
-            display: flex;
-            margin-top: 10px;
-
-            .el-form-item__content {
-                justify-content: center;
-            }
-        }
+      .el-form-item__content {
+        justify-content: center;
+      }
     }
+  }
 
-    .el-form-item__label {
-        display: block;
-        width: 100px;
-        height: 32px;
-        text-align: justify;
-    }
+  .el-form-item__label {
+    display: block;
+    width: 100px;
+    height: 32px;
+    text-align: justify;
+  }
 
-    .el-form-item__label::after {
-        display: inline-block;
-        width: 100%;
-        content: '';
-    }
+  .el-form-item__label::after {
+    display: inline-block;
+    width: 100%;
+    content: '';
+  }
 }

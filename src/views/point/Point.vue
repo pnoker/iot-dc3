@@ -18,32 +18,32 @@
     <div>
         <point-tool
             :embedded="embedded"
-            :pre="pre"
             :next="next"
             :page="reactiveData.page"
+            :pre="pre"
+            @refresh="refresh"
+            @reset="reset"
+            @search="search"
+            @sort="sort"
             @pre-handle="preHandle"
             @next-handle="nextHandle"
-            @search="search"
-            @reset="reset"
             @show-add="showAdd"
-            @refresh="refresh"
-            @sort="sort"
             @size-change="sizeChange"
             @current-change="currentChange"
         ></point-tool>
 
         <blank-card>
             <el-row>
-                <el-col v-for="data in 12" :key="data" :xs="24" :sm="12" :md="12" :lg="8" :xl="6">
+                <el-col v-for="data in 12" :key="data" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
                     <skeleton-card :loading="reactiveData.loading"></skeleton-card>
                 </el-col>
                 <el-col v-if="hasData">
-                    <el-empty description="暂无位号数据！"></el-empty>
+                    <el-empty description="暂无位号数据!"></el-empty>
                 </el-col>
-                <el-col v-for="data in reactiveData.listData" :key="data.id" :xs="24" :sm="12" :md="12" :lg="8" :xl="6">
+                <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
                     <point-card
-                        :embedded="embedded != '' && embedded != 'edit'"
                         :data="data"
+                        :embedded="embedded != '' && embedded != 'edit'"
                         :profile="reactiveData.profileTable[data.profileId]"
                         @disable-thing="disableThing"
                         @enable-thing="enableThing"
@@ -57,4 +57,4 @@
     </div>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />

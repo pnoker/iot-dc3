@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, computed } from 'vue'
+import { computed, defineComponent, reactive } from 'vue'
 
 import { getDriverList, getDriverStatus } from '@/api/driver'
 

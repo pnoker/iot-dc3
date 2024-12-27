@@ -32,12 +32,12 @@ export const setCopyContent = (content: any, detail: any, message: any) => {
 
     input.select()
     if (document.execCommand('copy')) {
-        let tip = '已复制该内容到剪切板！'
+        let tip = '已复制该内容到剪切板!'
         if (detail) {
             if (message) {
-                tip = `已复制 ${message} 到剪切板！`
+                tip = `已复制 ${message} 到剪切板!`
             } else {
-                tip = `已复制 ${content} 到剪切板！`
+                tip = `已复制 ${content} 到剪切板!`
             }
         }
         ElMessage.success({ message: tip, center: true })
@@ -336,16 +336,16 @@ export const listenFullscreen = (callback) => {
         callback()
     }
 
-    document.addEventListener('fullscreenchange', function () {
+    document.addEventListener('fullscreenchange', function() {
         listen()
     })
-    document.addEventListener('mozfullscreenchange', function () {
+    document.addEventListener('mozfullscreenchange', function() {
         listen()
     })
-    document.addEventListener('webkitfullscreenchange', function () {
+    document.addEventListener('webkitfullscreenchange', function() {
         listen()
     })
-    document.addEventListener('msfullscreenchange', function () {
+    document.addEventListener('msfullscreenchange', function() {
         listen()
     })
 }

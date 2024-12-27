@@ -16,14 +16,14 @@
 
 <template>
     <el-dialog
-        class="things-dialog"
         v-model="detailVisible"
-        title="数据信息"
-        :show-close="false"
         :append-to-body="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        :show-close="false"
+        class="things-dialog"
         draggable
+        title="数据信息"
     >
         <pre v-highlightjs>
             <code class="json">{{ detailData }}</code>
@@ -34,7 +34,7 @@
     </el-dialog>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/dialog/styles/things-dialog';

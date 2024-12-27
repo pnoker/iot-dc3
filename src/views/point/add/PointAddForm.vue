@@ -16,21 +16,21 @@
 
 <template>
     <el-dialog
-        class="things-dialog"
         v-model="reactiveData.formVisible"
-        title="新增位号"
-        :show-close="false"
         :append-to-body="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
+        :show-close="false"
+        class="things-dialog"
         draggable
+        title="新增位号"
     >
         <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
             <el-form-item class="things-dialog-form-item" label="位号名称" prop="pointName">
-                <el-input v-model="reactiveData.formData.pointName" placeholder="请输入位号名称" clearable></el-input>
+                <el-input v-model="reactiveData.formData.pointName" clearable placeholder="请输入位号名称"></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="数据类型" prop="pointTypeFlag">
-                <el-select v-model="reactiveData.formData.pointTypeFlag" placeholder="请选择数据类型" clearable>
+                <el-select v-model="reactiveData.formData.pointTypeFlag" clearable placeholder="请选择数据类型">
                     <el-option label="字符串(string)" value="STRING"></el-option>
                     <el-option label="字节(byte)" value="BYTE"></el-option>
                     <el-option label="短整数(short)" value="SHORT"></el-option>
@@ -42,39 +42,39 @@
                 </el-select>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="读写标识" prop="rwFlag">
-                <el-select v-model="reactiveData.formData.rwFlag" placeholder="请选择读写标识" clearable>
+                <el-select v-model="reactiveData.formData.rwFlag" clearable placeholder="请选择读写标识">
                     <el-option label="只读" value="R"></el-option>
                     <el-option label="只写" value="W"></el-option>
                     <el-option label="读写" value="RW"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="数据精度" prop="valueDecimal">
-                <el-input v-model="reactiveData.formData.valueDecimal" placeholder="请输入数据精度" clearable></el-input>
+                <el-input v-model="reactiveData.formData.valueDecimal" clearable placeholder="请输入数据精度"></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="单位" prop="unit">
-                <el-input v-model="reactiveData.formData.unit" placeholder="请输入单位" clearable> </el-input>
+                <el-input v-model="reactiveData.formData.unit" clearable placeholder="请输入单位"></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="基础值" prop="baseValue">
-                <el-input v-model="reactiveData.formData.baseValue" placeholder="请输入基础值" clearable></el-input>
+                <el-input v-model="reactiveData.formData.baseValue" clearable placeholder="请输入基础值"></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="比例系数" prop="multiple">
-                <el-input v-model="reactiveData.formData.multiple" placeholder="请输入比例系数" clearable></el-input>
+                <el-input v-model="reactiveData.formData.multiple" clearable placeholder="请输入比例系数"></el-input>
             </el-form-item>
             <el-form-item class="things-dialog-form-item" label="描述" prop="remark">
-                <el-input v-model="reactiveData.formData.remark" placeholder="请输入位号描述" type="textarea" maxlength="300" show-word-limit clearable></el-input>
+                <el-input v-model="reactiveData.formData.remark" clearable maxlength="300" placeholder="请输入位号描述" show-word-limit type="textarea"></el-input>
             </el-form-item>
         </el-form>
         <div class="things-dialog-footer">
             <slot name="footer">
                 <el-button @click="cancel">取消</el-button>
-                <el-button type="success" plain @click="reset">重置</el-button>
+                <el-button plain type="success" @click="reset">重置</el-button>
                 <el-button type="primary" @click="addThing">确定</el-button>
             </slot>
         </div>
     </el-dialog>
 </template>
 
-<script src="./index.ts" lang="ts" />
+<script lang="ts" src="./index.ts" />
 
 <style lang="scss">
 @use '@/components/dialog/styles/things-dialog';
