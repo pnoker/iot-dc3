@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-module.exports = {
+export default {
     root: true,
     env: {
         browser: true,

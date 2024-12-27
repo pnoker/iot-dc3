@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-module.exports = {
+export default {
     tabWidth: 4 /* 指定每个缩进级别的空格数 */,
     printWidth: 180 /* 一行最多多少个字符 */,
     semi: false /* 在语句末尾打印分号 */,

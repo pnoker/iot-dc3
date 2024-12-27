@@ -25,7 +25,7 @@ export default defineComponent({
     name: 'PointValueCard',
     components: {
         Edit,
-        Sunset,
+        Sunset, 
         Timer,
         Management,
         Sunrise,
