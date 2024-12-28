@@ -77,7 +77,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
             // Header
             ServerHttpRequest build = request.mutate().headers(headers -> {
                 RequestHeader.UserHeader entityBO = getUserDTO(rUserLoginDTO, rTenantDTO);
-                headers.set(RequestConstant.Header.X_AUTH_USER, DecodeUtil.enHexCode(JsonUtil.toJsonString(entityBO)));
+                headers.set(RequestConstant.Header.X_AUTH_USER, JsonUtil.toJsonString(entityBO));
             }).build();
 
             exchange.mutate().request(build).build();

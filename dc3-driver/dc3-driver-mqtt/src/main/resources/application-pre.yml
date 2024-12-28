@@ -21,7 +21,7 @@ driver:
     read:
       cron: '0 0/15 * * * ?'
   mqtt:
-    url: ${MQTT_BROKER_URL:tcp://dc3-rabbitmq:1883}
+    url: tcp://${MQTT_BROKER_HOST:dc3-rabbitmq}:${MQTT_BROKER_PORT:1883}
     auth-type: USERNAME
     username: ${MQTT_USERNAME:dc3}
     password: ${MQTT_PASSWORD:dc3}

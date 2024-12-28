@@ -61,12 +61,6 @@ public class PointAttributeDO implements Serializable {
     private String attributeName;
 
     /**
-     * 属性编号
-     */
-    @TableField("attribute_code")
-    private String attributeCode;
-
-    /**
      * 属性类型标识
      */
     @TableField("attribute_type_flag")
