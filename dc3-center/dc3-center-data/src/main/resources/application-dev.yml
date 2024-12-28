@@ -53,7 +53,7 @@ grpc:
 
 driver:
   mqtt:
-    url: ${MQTT_BROKER_URL:tcp://dc3-rabbitmq:2883}
+    url: tcp://${MQTT_BROKER_HOST:dc3-rabbitmq}:${MQTT_BROKER_PORT:2883}
     auth-type: USERNAME
     username: ${MQTT_USERNAME:dc3}
     password: ${MQTT_PASSWORD:dc3}

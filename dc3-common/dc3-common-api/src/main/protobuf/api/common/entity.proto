@@ -122,19 +122,18 @@ message GrpcDriverAttributeDTO {
 
   string display_name = 2; // 显示名称
   string attribute_name = 3; // 属性名称
-  string attribute_code = 4; // 属性编号
-  int32 attribute_type_flag = 5; // 属性类型标识
-  string default_value = 6; // 默认值
-  int64 driver_id = 7; // 驱动ID
-  string attribute_ext = 8; // 驱动属性拓展信息
-  int32 enable_flag = 9; // 使能标识
-  string signature = 10; // 签名
-  int32 version = 11; // 版本
+  int32 attribute_type_flag = 4; // 属性类型标识
+  string default_value = 5; // 默认值
+  int64 driver_id = 6; // 驱动ID
+  string attribute_ext = 7; // 驱动属性拓展信息
+  int32 enable_flag = 8; // 使能标识
+  string signature = 9; // 签名
+  int32 version = 10; // 版本
 
   /*
   租户ID
   */
-  int64 tenant_id = 12;
+  int64 tenant_id = 11;
 }
 
 /*
@@ -170,19 +169,18 @@ message GrpcPointAttributeDTO {
 
   string display_name = 2; // 显示名称
   string attribute_name = 3; // 属性名称
-  string attribute_code = 4; // 属性编号
-  int32 attribute_type_flag = 5; // 属性类型标识
-  string default_value = 6; // 默认值
-  int64 driver_id = 7; // 驱动ID
-  string attribute_ext = 8; // 驱动属性拓展信息
-  int32 enable_flag = 9; // 使能标识
-  string signature = 10; // 签名
-  int32 version = 11; // 版本
+  int32 attribute_type_flag = 4; // 属性类型标识
+  string default_value = 5; // 默认值
+  int64 driver_id = 6; // 驱动ID
+  string attribute_ext = 7; // 驱动属性拓展信息
+  int32 enable_flag = 8; // 使能标识
+  string signature = 9; // 签名
+  int32 version = 10; // 版本
 
   /*
   租户ID
   */
-  int64 tenant_id = 12;
+  int64 tenant_id = 11;
 }
 
 /*

@@ -63,7 +63,7 @@ public final class DeviceMetadata {
     @Resource
     private DeviceClient deviceClient;
 
-    public DeviceMetadata() {
+    private DeviceMetadata() {
         this.cache = Caffeine.newBuilder()
                 .maximumSize(5000)
                 .expireAfterWrite(24, TimeUnit.HOURS)
@@ -150,6 +150,42 @@ public final class DeviceMetadata {
     }
 
     /**
+     * 获取设备下全部位号属性配置
+     * <p>
+     * 会校验是否完整
+     *
+     * @param deviceId 设备ID
+     * @return 属性配置Map
+     */
+    public Map<Long, Map<String, AttributeBO>> getPointConfig(long deviceId) {
+        Map<Long, PointAttributeDTO> attributeMap = driverMetadata.getPointAttributeIdMap();
+        if (MapUtil.isEmpty(attributeMap)) {
+            return MapUtil.empty();
+        }
+
+        DeviceBO device = getCache(deviceId);
+        if (Objects.isNull(device)) {
+            throw new ConfigException("Failed to get point config[{}], the device is empty", deviceId);
+        }
+
+        Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigMap = device.getPointAttributeConfigIdMap();
+        if (Objects.isNull(pointAttributeConfigMap)) {
+            throw new ConfigException("Failed to get point config[{}], the device point attribute config is empty", deviceId);
+        }
+
+        return pointAttributeConfigMap.entrySet().stream()
+                .filter(entry -> MapUtil.isEmpty(entry.getValue()) && entry.getValue().keySet().containsAll(attributeMap.keySet()))
+                .collect(Collectors.toMap(Map.Entry::getKey, entryMap -> attributeMap.entrySet().stream().collect(Collectors.toMap(
+                                entry -> entry.getValue().getAttributeName(),
+                                entry -> AttributeBO.builder()
+                                        .type(entry.getValue().getAttributeTypeFlag())
+                                        .value(entryMap.getValue().get(entry.getKey()).getConfigValue())
+                                        .build())
+                        )
+                ));
+    }
+
+    /**
      * 获取设备下指定位号属性配置
      * <p>
      * 会校验是否完整
@@ -189,42 +225,6 @@ public final class DeviceMetadata {
                                 .type(entry.getValue().getAttributeTypeFlag())
                                 .value(attributeConfigMap.get(entry.getKey()).getConfigValue())
                                 .build()
-                ));
-    }
-
-    /**
-     * 获取设备下全部位号属性配置
-     * <p>
-     * 会校验是否完整
-     *
-     * @param deviceId 设备ID
-     * @return 属性配置Map
-     */
-    public Map<Long, Map<String, AttributeBO>> getPointConfig(long deviceId) {
-        Map<Long, PointAttributeDTO> attributeMap = driverMetadata.getPointAttributeIdMap();
-        if (MapUtil.isEmpty(attributeMap)) {
-            return MapUtil.empty();
-        }
-
-        DeviceBO device = getCache(deviceId);
-        if (Objects.isNull(device)) {
-            throw new ConfigException("Failed to get point config[{}], the device is empty", deviceId);
-        }
-
-        Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigMap = device.getPointAttributeConfigIdMap();
-        if (Objects.isNull(pointAttributeConfigMap)) {
-            throw new ConfigException("Failed to get point config[{}], the device point attribute config is empty", deviceId);
-        }
-
-        return pointAttributeConfigMap.entrySet().stream()
-                .filter(entry -> MapUtil.isEmpty(entry.getValue()) && entry.getValue().keySet().containsAll(attributeMap.keySet()))
-                .collect(Collectors.toMap(Map.Entry::getKey, entryMap -> attributeMap.entrySet().stream().collect(Collectors.toMap(
-                                entry -> entry.getValue().getAttributeName(),
-                                entry -> AttributeBO.builder()
-                                        .type(entry.getValue().getAttributeTypeFlag())
-                                        .value(entryMap.getValue().get(entry.getKey()).getConfigValue())
-                                        .build())
-                        )
                 ));
     }
 }
