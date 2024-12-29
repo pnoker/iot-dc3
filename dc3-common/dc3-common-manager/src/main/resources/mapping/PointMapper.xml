@@ -30,7 +30,6 @@
         dp.value_decimal,
         dp.unit,
         dp.profile_id,
-        dp.group_id,
         dp.point_ext,
         dp.enable_flag,
         dp.tenant_id,

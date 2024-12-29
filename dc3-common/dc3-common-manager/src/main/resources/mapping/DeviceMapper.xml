@@ -24,7 +24,6 @@
         dd.device_name,
         dd.device_code,
         dd.driver_id,
-        dd.group_id,
         dd.device_ext,
         dd.enable_flag,
         dd.tenant_id,
