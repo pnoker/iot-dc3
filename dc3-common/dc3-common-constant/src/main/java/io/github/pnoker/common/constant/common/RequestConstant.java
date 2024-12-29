@@ -88,4 +88,22 @@ public class RequestConstant {
             throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
         }
     }
+
+    /**
+     * 自定义请求 Key 相关常量
+     *
+     * @author pnoker
+     * @since 2022.1.0
+     */
+    public static class Key {
+
+        /**
+         * 用户请求头关键字
+         */
+        public static final String USER_HEADER = "USER_HEADER_KEY";
+
+        private Key() {
+            throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+        }
+    }
 }

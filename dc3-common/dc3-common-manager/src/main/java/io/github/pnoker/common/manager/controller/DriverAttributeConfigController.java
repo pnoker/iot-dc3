@@ -66,7 +66,7 @@ public class DriverAttributeConfigController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
         try {
             DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
+            entityBO.setTenantId(getTenantId2());
             driverAttributeConfigService.save(entityBO);
             return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
@@ -178,7 +178,7 @@ public class DriverAttributeConfigController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DriverAttributeConfigQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<DriverAttributeConfigBO> entityPageBO = driverAttributeConfigService.selectByPage(entityQuery);
             Page<DriverAttributeConfigVO> entityPageVO = driverAttributeConfigBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));

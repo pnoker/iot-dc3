@@ -19,10 +19,8 @@ package io.github.pnoker.common.config;
 import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RequestUtil;
-import io.github.pnoker.common.utils.UserHeaderUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -30,8 +28,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.WebFilter;
-import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -76,17 +74,25 @@ public class WebFilterConfig {
     public WebFilter interceptor() {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
-            String authUser = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_USER);
-            if (CharSequenceUtil.isNotEmpty(authUser)) {
-                byte[] decode = DecodeUtil.deHexCode(authUser);
+            String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_USER);
+
+            if (CharSequenceUtil.isNotEmpty(user)) {
                 try {
-                    RequestHeader.UserHeader userHeader = JsonUtil.parseObject(decode, RequestHeader.UserHeader.class);
-                    UserHeaderUtil.setUserHeader(userHeader);
+                    RequestHeader.UserHeader userHeader = JsonUtil.parseObject(user, RequestHeader.UserHeader.class);
+
+                    if (Objects.isNull(userHeader) || Objects.isNull(userHeader.getTenantId()) || Objects.isNull(userHeader.getUserId())) {
+                        log.warn("Invalid user header: {}", userHeader);
+                        return chain.filter(exchange).contextWrite(context -> context.delete(RequestConstant.Key.USER_HEADER));
+                    } else {
+                        log.debug("User header: {}", userHeader);
+                        return chain.filter(exchange).contextWrite(context -> context.put(RequestConstant.Key.USER_HEADER, userHeader));
+                    }
                 } catch (Exception e) {
-                    log.error(e.getMessage(), e);
+                    log.error("Error parsing user header", e);
                 }
             }
-            return chain.filter(exchange).then(Mono.fromRunnable(UserHeaderUtil::removeUserHeader));
+
+            return chain.filter(exchange);
         };
     }
 }

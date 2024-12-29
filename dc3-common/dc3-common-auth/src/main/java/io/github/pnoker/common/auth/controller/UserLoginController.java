@@ -184,6 +184,7 @@ public class UserLoginController implements BaseController {
             Page<UserLoginVO> entityPageVO = userLoginBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return Mono.just(R.fail(e.getMessage()));
         }
     }
@@ -199,6 +200,7 @@ public class UserLoginController implements BaseController {
         try {
             return Boolean.TRUE.equals(userLoginService.checkLoginNameValid(name)) ? Mono.just(R.ok()) : Mono.just(R.fail());
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return Mono.just(R.fail(e.getMessage()));
         }
     }

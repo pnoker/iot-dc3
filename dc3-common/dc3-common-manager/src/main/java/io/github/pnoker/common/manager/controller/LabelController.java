@@ -65,7 +65,7 @@ public class LabelController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
         try {
             LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
+            entityBO.setTenantId(getTenantId2());
             labelService.save(entityBO);
             return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
@@ -139,7 +139,7 @@ public class LabelController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new LabelQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<LabelBO> entityPageBO = labelService.selectByPage(entityQuery);
             Page<LabelVO> entityPageVO = labelBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));

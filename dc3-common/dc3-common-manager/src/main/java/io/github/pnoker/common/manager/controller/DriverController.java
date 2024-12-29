@@ -69,7 +69,7 @@ public class DriverController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
         try {
             DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
+            entityBO.setTenantId(getTenantId2());
             driverService.save(entityBO);
             return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
@@ -158,7 +158,7 @@ public class DriverController implements BaseController {
     @GetMapping("/service/{serviceName}")
     public Mono<R<DriverVO>> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
         try {
-            DriverBO entityBO = driverService.selectByServiceName(serviceName, getTenantId());
+            DriverBO entityBO = driverService.selectByServiceName(serviceName, getTenantId2());
             DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
             return Mono.just(R.ok(entityVO));
         } catch (Exception e) {
@@ -175,18 +175,17 @@ public class DriverController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<DriverVO>>> list(@RequestBody(required = false) DriverQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new DriverQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverQuery query = Objects.isNull(entityQuery) ? new DriverQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<DriverBO> entityPageBO = driverService.selectByPage(query);
+                Page<DriverVO> entityPageVO = driverBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            entityQuery.setTenantId(getTenantId());
-            Page<DriverBO> entityPageBO = driverService.selectByPage(entityQuery);
-            Page<DriverVO> entityPageVO = driverBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
-
 }

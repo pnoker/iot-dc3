@@ -67,7 +67,7 @@ public class DictionaryForManagerController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<DictionaryBO> entityPageBO = dictionaryForManagerService.driverDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
@@ -89,7 +89,7 @@ public class DictionaryForManagerController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<DictionaryBO> entityPageBO = dictionaryForManagerService.profileDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
@@ -111,7 +111,7 @@ public class DictionaryForManagerController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<DictionaryBO> entityPageBO = dictionaryForManagerService.pointDictionaryForProfile(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
@@ -133,7 +133,7 @@ public class DictionaryForManagerController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<DictionaryBO> entityPageBO = dictionaryForManagerService.pointDictionaryForDevice(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
@@ -155,7 +155,7 @@ public class DictionaryForManagerController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<DictionaryBO> entityPageBO = dictionaryForManagerService.deviceDictionary(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
@@ -177,7 +177,7 @@ public class DictionaryForManagerController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DictionaryQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<DictionaryBO> entityPageBO = dictionaryForManagerService.deviceDictionaryForDriver(entityQuery);
             Page<DictionaryVO> entityPageVO = dictionaryForManagerBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));

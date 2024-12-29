@@ -65,7 +65,7 @@ public class LimitedIpController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LimitedIpVO entityVO) {
         try {
             LimitedIpBO entityBO = limitedIpBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
+            entityBO.setTenantId(getTenantId2());
             limitedIpService.save(entityBO);
             return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
@@ -161,7 +161,7 @@ public class LimitedIpController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new LimitedIpQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<LimitedIpBO> entityPageBO = limitedIpService.selectByPage(entityQuery);
             Page<LimitedIpVO> entityPageVO = limitedIpBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));

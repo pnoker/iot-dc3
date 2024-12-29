@@ -60,7 +60,7 @@ public class DriverStatusController implements BaseController {
     @PostMapping("/driver")
     public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery driverQuery) {
         try {
-            driverQuery.setTenantId(getTenantId());
+            driverQuery.setTenantId(getTenantId2());
             Map<Long, String> statuses = driverStatusService.selectByPage(driverQuery);
             return Mono.just(R.ok(statuses));
         } catch (Exception e) {

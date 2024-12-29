@@ -69,7 +69,7 @@ public class ProfileController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
         try {
             ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
+            entityBO.setTenantId(getTenantId2());
             profileService.save(entityBO);
             return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
@@ -179,7 +179,7 @@ public class ProfileController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new ProfileQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<ProfileBO> entityPageBO = profileService.selectByPage(entityQuery);
             Page<ProfileVO> entityPageVO = profileBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));

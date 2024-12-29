@@ -24,7 +24,6 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
-import io.github.pnoker.common.utils.DecodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RequestUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +79,7 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
                 headers.set(RequestConstant.Header.X_AUTH_USER, JsonUtil.toJsonString(entityBO));
             }).build();
 
-            exchange.mutate().request(build).build();
+            return chain.filter(exchange.mutate().request(build).build());
         } catch (Exception e) {
             log.error("AuthenticGatewayFilter error: {}, Url: {}", e.getMessage(), request.getURI(), e);
             ServerHttpResponse response = exchange.getResponse();
@@ -89,8 +88,6 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
             DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(e.getMessage())));
             return response.writeWith(Mono.just(dataBuffer));
         }
-
-        return chain.filter(exchange);
     }
 
     private GrpcRTenantDTO getTenantDTO(ServerHttpRequest request) {

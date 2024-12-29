@@ -16,7 +16,9 @@
 
 package io.github.pnoker.common.base;
 
+import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.utils.UserHeaderUtil;
+import reactor.core.publisher.Mono;
 
 /**
  * 基础 Controller 类接口
@@ -29,30 +31,12 @@ public interface BaseController {
     // 默认方法
 
     /**
-     * 获取用户ID
+     * 获取租户ID
      *
-     * @return User ID
+     * @return 租户ID
      */
-    default Long getUserId() {
-        return UserHeaderUtil.getUserHeader().getUserId();
-    }
-
-    /**
-     * 获取用户昵称
-     *
-     * @return Nick Name
-     */
-    default String getNickName() {
-        return UserHeaderUtil.getUserHeader().getNickName();
-    }
-
-    /**
-     * 获取用户名
-     *
-     * @return User Name
-     */
-    default String getUserName() {
-        return UserHeaderUtil.getUserHeader().getUserName();
+    default Mono<RequestHeader.UserHeader> getUserHeader() {
+        return UserHeaderUtil.getUserHeader();
     }
 
     /**
@@ -60,7 +44,43 @@ public interface BaseController {
      *
      * @return 租户ID
      */
-    default Long getTenantId() {
-        return UserHeaderUtil.getUserHeader().getTenantId();
+    default Mono<Long> getTenantId() {
+        return UserHeaderUtil.getTenantId();
+    }
+
+    /**
+     * 获取用户ID
+     *
+     * @return User ID
+     */
+    default Mono<Long> getUserId() {
+        return UserHeaderUtil.getUserId();
+    }
+
+    /**
+     * 获取用户昵称
+     *
+     * @return Nick Name
+     */
+    default Mono<String> getNickName() {
+        return UserHeaderUtil.getNickName();
+    }
+
+    /**
+     * 获取用户名
+     *
+     * @return User Name
+     */
+    default Mono<String> getUserName() {
+        return UserHeaderUtil.getUserName();
+    }
+
+    /**
+     * 获取租户ID
+     *
+     * @return 租户ID
+     */
+    default Long getTenantId2() {
+        return 1L;
     }
 }

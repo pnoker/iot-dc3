@@ -76,7 +76,7 @@ public class DeviceController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
+            entityBO.setTenantId(getTenantId2());
             deviceService.save(entityBO);
             return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public class DeviceController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new DeviceQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<DeviceBO> entityPageBO = deviceService.selectByPage(entityQuery);
             Page<DeviceVO> entityPageVO = deviceBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
@@ -188,7 +188,7 @@ public class DeviceController implements BaseController {
     public Mono<R<String>> importDevice(@Validated(Upload.class) DeviceVO entityVO, @RequestPart("file") Mono<FilePart> filePart) {
         try {
             DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
+            entityBO.setTenantId(getTenantId2());
             return filePart.flatMap(part -> {
                 String filePath = FileUtil.getTempPath() + FileUtil.getRandomXlsxName();
                 File file = new File(filePath);

@@ -65,7 +65,7 @@ public class GroupController implements BaseController {
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
         try {
             GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
+            entityBO.setTenantId(getTenantId2());
             groupService.save(entityBO);
             return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
@@ -139,7 +139,7 @@ public class GroupController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new GroupQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<GroupBO> entityPageBO = groupService.selectByPage(entityQuery);
             Page<GroupVO> entityPageVO = groupBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));

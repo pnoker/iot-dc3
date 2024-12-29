@@ -39,7 +39,6 @@ import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.manager.mapper.ProfileMapper;
 import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.utils.PageUtil;
-import io.github.pnoker.common.utils.UserHeaderUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -124,11 +123,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileBO selectByNameAndType(String name, ProfileTypeFlagEnum type) {
+    public ProfileBO selectByNameAndType(Long tenantId, String name, ProfileTypeFlagEnum type) {
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
         wrapper.eq(ProfileDO::getProfileName, name);
         wrapper.eq(ProfileDO::getProfileTypeFlag, type);
-        wrapper.eq(ProfileDO::getTenantId, UserHeaderUtil.getUserHeader().getTenantId());
+        wrapper.eq(ProfileDO::getTenantId, tenantId);
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ProfileDO entityDO = profileManager.getOne(wrapper);
         return profileBuilder.buildBOByDO(entityDO);
