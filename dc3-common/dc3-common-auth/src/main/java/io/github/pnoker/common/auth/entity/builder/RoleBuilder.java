@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
@@ -23,6 +24,7 @@ import io.github.pnoker.common.auth.entity.vo.RoleVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RoleExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
@@ -38,6 +40,7 @@ import java.util.Optional;
  * Role Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -73,6 +76,11 @@ public interface RoleBuilder {
 
     @AfterMapping
     default void afterProcess(RoleBO entityBO, @MappingTarget RoleDO entityDO) {
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getRoleCode())) {
+            entityDO.setRoleCode(CodeUtil.getCode());
+        }
+
         // Json Ext
         RoleExt entityExt = entityBO.getRoleExt();
         JsonExt ext = new JsonExt();

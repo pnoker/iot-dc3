@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.DriverExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
@@ -24,6 +25,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.model.DriverDO;
 import io.github.pnoker.common.manager.entity.vo.DriverVO;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
@@ -39,6 +41,7 @@ import java.util.Optional;
  * Driver Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -75,7 +78,12 @@ public interface DriverBuilder {
 
     @AfterMapping
     default void afterProcess(DriverBO entityBO, @MappingTarget DriverDO entityDO) {
-        // Json Ext
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getDriverCode())) {
+            entityDO.setDriverCode(CodeUtil.getCode());
+        }
+
+// Json Ext
         DriverExt entityExt = entityBO.getDriverExt();
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {

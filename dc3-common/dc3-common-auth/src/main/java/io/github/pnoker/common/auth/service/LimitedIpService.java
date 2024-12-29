@@ -24,6 +24,7 @@ import io.github.pnoker.common.base.service.BaseService;
  * LimitedIp Interface
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public interface LimitedIpService extends BaseService<LimitedIpBO, LimitedIpQuery> {

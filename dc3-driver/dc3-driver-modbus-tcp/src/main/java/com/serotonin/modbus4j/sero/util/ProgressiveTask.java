@@ -21,7 +21,7 @@ package com.serotonin.modbus4j.sero.util;
  * <p>Abstract ProgressiveTask class.</p>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 abstract public class ProgressiveTask implements Runnable {
     protected boolean completed = false;

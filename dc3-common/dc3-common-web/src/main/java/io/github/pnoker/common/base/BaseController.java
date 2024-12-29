@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono;
  * 基础 Controller 类接口
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public interface BaseController {
@@ -73,14 +74,5 @@ public interface BaseController {
      */
     default Mono<String> getUserName() {
         return UserHeaderUtil.getUserName();
-    }
-
-    /**
-     * 获取租户ID
-     *
-     * @return 租户ID
-     */
-    default Long getTenantId2() {
-        return 1L;
     }
 }

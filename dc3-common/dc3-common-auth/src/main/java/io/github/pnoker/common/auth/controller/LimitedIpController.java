@@ -40,6 +40,7 @@ import java.util.Objects;
  * 限制IP Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -63,15 +64,17 @@ public class LimitedIpController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody LimitedIpVO entityVO) {
-        try {
-            LimitedIpBO entityBO = limitedIpBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId2());
-            limitedIpService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                LimitedIpBO entityBO = limitedIpBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                limitedIpService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**
@@ -157,18 +160,18 @@ public class LimitedIpController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<LimitedIpVO>>> list(@RequestBody(required = false) LimitedIpQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new LimitedIpQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                LimitedIpQuery query = Objects.isNull(entityQuery) ? new LimitedIpQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<LimitedIpBO> entityPageBO = limitedIpService.selectByPage(query);
+                Page<LimitedIpVO> entityPageVO = limitedIpBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            entityQuery.setTenantId(getTenantId2());
-            Page<LimitedIpBO> entityPageBO = limitedIpService.selectByPage(entityQuery);
-            Page<LimitedIpVO> entityPageVO = limitedIpBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
     /**

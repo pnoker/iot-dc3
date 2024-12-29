@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.ProfileExt;
@@ -25,6 +26,7 @@ import io.github.pnoker.common.enums.ProfileTypeFlagEnum;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.model.ProfileDO;
 import io.github.pnoker.common.manager.entity.vo.ProfileVO;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
@@ -40,6 +42,7 @@ import java.util.Optional;
  * Profile Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -77,6 +80,11 @@ public interface ProfileBuilder {
 
     @AfterMapping
     default void afterProcess(ProfileBO entityBO, @MappingTarget ProfileDO entityDO) {
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getProfileCode())) {
+            entityDO.setProfileCode(CodeUtil.getCode());
+        }
+
         // Json Ext
         ProfileExt entityExt = entityBO.getProfileExt();
         JsonExt ext = new JsonExt();

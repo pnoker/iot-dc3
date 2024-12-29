@@ -39,6 +39,7 @@ import java.util.Optional;
  * 位号属性Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -75,7 +76,7 @@ public interface PointAttributeBuilder {
 
     @AfterMapping
     default void afterProcess(PointAttributeBO entityBO, @MappingTarget PointAttributeDO entityDO) {
-        // Json Ext
+// Json Ext
         PointAttributeExt entityExt = entityBO.getAttributeExt();
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {

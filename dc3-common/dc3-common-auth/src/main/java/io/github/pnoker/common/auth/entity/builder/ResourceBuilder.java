@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
@@ -25,6 +26,7 @@ import io.github.pnoker.common.entity.ext.ResourceExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
 import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
@@ -40,6 +42,7 @@ import java.util.Optional;
  * Resource Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -77,6 +80,11 @@ public interface ResourceBuilder {
 
     @AfterMapping
     default void afterProcess(ResourceBO entityBO, @MappingTarget ResourceDO entityDO) {
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getResourceCode())) {
+            entityDO.setResourceCode(CodeUtil.getCode());
+        }
+
         // Json Ext
         ResourceExt entityExt = entityBO.getResourceExt();
         JsonExt ext = new JsonExt();

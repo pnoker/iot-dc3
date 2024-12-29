@@ -22,6 +22,7 @@ import java.lang.annotation.*;
  * 日志切点
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Documented

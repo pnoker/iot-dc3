@@ -35,6 +35,7 @@ import java.util.List;
  * 字典 Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -74,14 +75,16 @@ public class DictionaryForAuthController implements BaseController {
      */
     @GetMapping("/limited_ip")
     public Mono<R<List<DictionaryVO>>> limitedIpDictionary() {
-        try {
-            List<DictionaryBO> entityBOList = dictionaryForAuthService.limitedIpDictionary(getTenantId2());
-            List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
-            return Mono.just(R.ok(entityVOList));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                List<DictionaryBO> entityBOList = dictionaryForAuthService.limitedIpDictionary(tenantId);
+                List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
+                return Mono.just(R.ok(entityVOList));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
 }

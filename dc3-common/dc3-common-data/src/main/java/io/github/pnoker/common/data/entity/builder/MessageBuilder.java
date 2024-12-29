@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.data.entity.model.MessageDO;
@@ -24,6 +25,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.MessageExt;
 import io.github.pnoker.common.enums.AlarmMessageLevelFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
@@ -39,6 +41,7 @@ import java.util.Optional;
  * AlarmMessageProfile Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -75,7 +78,12 @@ public interface MessageBuilder {
 
     @AfterMapping
     default void afterProcess(MessageBO entityBO, @MappingTarget MessageDO entityDO) {
-        // Json Ext
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getMessageCode())) {
+            entityDO.setMessageCode(CodeUtil.getCode());
+        }
+
+// Json Ext
         MessageExt entityExt = entityBO.getMessageExt();
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {

@@ -28,6 +28,7 @@ import java.util.List;
  * 数据存储策略服务接口
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public interface RepositoryService {

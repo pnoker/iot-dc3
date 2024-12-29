@@ -22,7 +22,7 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
  * <p>ReadCoilsResponse class.</p>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 public class ReadCoilsResponse extends ReadResponse {
     ReadCoilsResponse(int slaveId, byte[] data) throws ModbusTransportException {

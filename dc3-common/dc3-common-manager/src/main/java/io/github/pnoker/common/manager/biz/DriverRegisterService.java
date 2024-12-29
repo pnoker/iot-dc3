@@ -27,6 +27,7 @@ import java.util.List;
  * 驱动注册相关接口
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public interface DriverRegisterService {

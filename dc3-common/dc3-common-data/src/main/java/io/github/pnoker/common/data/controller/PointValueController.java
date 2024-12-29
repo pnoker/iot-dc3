@@ -37,6 +37,7 @@ import java.util.Objects;
  * PointValue Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -55,23 +56,23 @@ public class PointValueController implements BaseController {
     /**
      * 分页查询 最新 PointValue
      *
-     * @param pointValueQuery 位号值和分页参数
+     * @param entityQuery 位号值和分页参数
      * @return 带分页的 {@link PointValueBO}
      */
     @PostMapping("/latest")
-    public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery pointValueQuery) {
-        try {
-            if (Objects.isNull(pointValueQuery)) {
-                pointValueQuery = new PointValueQuery();
+    public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<PointValueBO> entityPageBO = pointValueService.latest(query);
+                Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            pointValueQuery.setTenantId(getTenantId2());
-            Page<PointValueBO> entityPageBO = pointValueService.latest(pointValueQuery);
-            Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
     /**

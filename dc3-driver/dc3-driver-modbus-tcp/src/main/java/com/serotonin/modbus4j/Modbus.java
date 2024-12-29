@@ -26,7 +26,7 @@ import com.serotonin.modbus4j.sero.messaging.MessagingExceptionHandler;
  * TODO: - handle echoing in RS485
  *
  * @author mlohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 public class Modbus {
     /**

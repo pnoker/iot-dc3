@@ -37,6 +37,7 @@ import java.util.Objects;
  * User Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -71,6 +72,8 @@ public interface UserBuilder {
 
     @AfterMapping
     default void afterProcess(UserBO entityBO, @MappingTarget UserDO entityDO) {
+
+        // Json Ext
         UserSocialExt entitySocialExt = entityBO.getSocialExt();
         JsonExt socialExt = new JsonExt();
         if (Objects.nonNull(entitySocialExt)) {

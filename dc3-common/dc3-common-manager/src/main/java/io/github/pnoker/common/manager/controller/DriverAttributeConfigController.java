@@ -41,6 +41,7 @@ import java.util.Objects;
  * 驱动属性配置信息 Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -64,15 +65,17 @@ public class DriverAttributeConfigController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
-        try {
-            DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId2());
-            driverAttributeConfigService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                driverAttributeConfigService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**
@@ -174,18 +177,18 @@ public class DriverAttributeConfigController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<DriverAttributeConfigVO>>> list(@RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new DriverAttributeConfigQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverAttributeConfigQuery query = Objects.isNull(entityQuery) ? new DriverAttributeConfigQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<DriverAttributeConfigBO> entityPageBO = driverAttributeConfigService.selectByPage(query);
+                Page<DriverAttributeConfigVO> entityPageVO = driverAttributeConfigBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            entityQuery.setTenantId(getTenantId2());
-            Page<DriverAttributeConfigBO> entityPageBO = driverAttributeConfigService.selectByPage(entityQuery);
-            Page<DriverAttributeConfigVO> entityPageVO = driverAttributeConfigBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
 }

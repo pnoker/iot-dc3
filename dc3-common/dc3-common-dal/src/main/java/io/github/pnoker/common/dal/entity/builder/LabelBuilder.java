@@ -16,12 +16,14 @@
 
 package io.github.pnoker.common.dal.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.dal.entity.bo.LabelBO;
 import io.github.pnoker.common.dal.entity.model.LabelDO;
 import io.github.pnoker.common.dal.entity.vo.LabelVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -35,6 +37,7 @@ import java.util.Optional;
  * Label Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -115,6 +118,11 @@ public interface LabelBuilder {
 
     @AfterMapping
     default void afterProcess(LabelBO entityBO, @MappingTarget LabelDO entityDO) {
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getLabelCode())) {
+            entityDO.setLabelCode(CodeUtil.getCode());
+        }
+
         // EntityType Flag
         EntityTypeFlagEnum entityTypeFlag = entityBO.getEntityTypeFlag();
         Optional.ofNullable(entityTypeFlag).ifPresent(value -> entityDO.setEntityTypeFlag(value.getIndex()));

@@ -25,6 +25,7 @@ import io.github.pnoker.common.dal.entity.model.LabelDO;
  * </p>
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public interface LabelManager extends IService<LabelDO> {

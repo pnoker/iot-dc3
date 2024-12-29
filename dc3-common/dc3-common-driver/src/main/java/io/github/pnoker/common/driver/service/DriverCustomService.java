@@ -29,6 +29,7 @@ import java.util.Map;
  * 自定义驱动接口, 开发的自定义驱动至少需要实现 read 和 write 接口, 可以参考以提供的驱动模块写法
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public interface DriverCustomService {

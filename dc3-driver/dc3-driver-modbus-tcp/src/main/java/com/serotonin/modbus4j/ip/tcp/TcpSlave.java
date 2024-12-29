@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  * <p>TcpSlave class.</p>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 public class TcpSlave extends ModbusSlaveSet {
     final boolean encapsulated;

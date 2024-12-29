@@ -28,7 +28,8 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author pnoker
- * @since 2024-03-07
+ * @version 2024.3.9
+ * @since 2022.1.0
  */
 @Service
 public class DriverStatusHistoryManagerImpl extends ServiceImpl<DriverStatusHistoryMapper, DriverStatusHistoryDO> implements DriverStatusHistoryManager {

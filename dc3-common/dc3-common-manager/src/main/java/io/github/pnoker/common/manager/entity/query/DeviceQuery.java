@@ -27,6 +27,7 @@ import java.io.Serializable;
  * 设备 Query
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Getter

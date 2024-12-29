@@ -25,6 +25,7 @@ import io.github.pnoker.common.manager.entity.model.ProfileBindDO;
  * </p>
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public interface ProfileBindManager extends IService<ProfileBindDO> {

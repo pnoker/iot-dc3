@@ -16,12 +16,14 @@
 
 package io.github.pnoker.common.dal.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.dal.entity.bo.GroupBO;
 import io.github.pnoker.common.dal.entity.model.GroupDO;
 import io.github.pnoker.common.dal.entity.vo.GroupVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.GroupTypeFlagEnum;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -35,6 +37,7 @@ import java.util.Optional;
  * Group Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -115,7 +118,12 @@ public interface GroupBuilder {
 
     @AfterMapping
     default void afterProcess(GroupBO entityBO, @MappingTarget GroupDO entityDO) {
-        // GroupType Flag
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getGroupCode())) {
+            entityDO.setGroupCode(CodeUtil.getCode());
+        }
+
+// GroupType Flag
         GroupTypeFlagEnum groupTypeFlag = entityBO.getGroupTypeFlag();
         Optional.ofNullable(groupTypeFlag).ifPresent(value -> entityDO.setGroupTypeFlag(value.getIndex()));
 

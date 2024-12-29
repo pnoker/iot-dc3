@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.DeviceExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
@@ -25,6 +26,7 @@ import io.github.pnoker.common.manager.entity.bo.DeviceByPointBO;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.entity.vo.DeviceByPointVO;
 import io.github.pnoker.common.manager.entity.vo.DeviceVO;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
@@ -40,6 +42,7 @@ import java.util.Optional;
  * 设备 Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -75,7 +78,12 @@ public interface DeviceBuilder {
 
     @AfterMapping
     default void afterProcess(DeviceBO entityBO, @MappingTarget DeviceDO entityDO) {
-        // Json Ext
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getDeviceCode())) {
+            entityDO.setDeviceCode(CodeUtil.getCode());
+        }
+
+// Json Ext
         DeviceExt entityExt = entityBO.getDeviceExt();
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {

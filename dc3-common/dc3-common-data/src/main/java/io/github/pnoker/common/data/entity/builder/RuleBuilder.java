@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.model.RuleDO;
@@ -24,6 +25,7 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.enums.AlarmTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
@@ -39,6 +41,7 @@ import java.util.Optional;
  * AlarmRule Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -75,7 +78,12 @@ public interface RuleBuilder {
 
     @AfterMapping
     default void afterProcess(RuleBO entityBO, @MappingTarget RuleDO entityDO) {
-        // Json Ext
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getRuleCode())) {
+            entityDO.setRuleCode(CodeUtil.getCode());
+        }
+
+// Json Ext
         RuleExt entityExt = entityBO.getRuleExt();
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {

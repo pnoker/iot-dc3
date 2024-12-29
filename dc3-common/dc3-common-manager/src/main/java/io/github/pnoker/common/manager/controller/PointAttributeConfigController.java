@@ -41,6 +41,7 @@ import java.util.Objects;
  * 位号属性配置信息 Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -64,15 +65,17 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointAttributeConfigVO entityVO) {
-        try {
-            PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId2());
-            pointAttributeConfigService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                PointAttributeConfigBO entityBO = pointAttributeConfigBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                pointAttributeConfigService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**
@@ -195,17 +198,17 @@ public class PointAttributeConfigController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<PointAttributeConfigVO>>> list(@RequestBody(required = false) PointAttributeConfigQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new PointAttributeConfigQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                PointAttributeConfigQuery query = Objects.isNull(entityQuery) ? new PointAttributeConfigQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<PointAttributeConfigBO> entityPageBO = pointAttributeConfigService.selectByPage(query);
+                Page<PointAttributeConfigVO> entityPageVO = pointAttributeConfigBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                return Mono.just(R.fail(e.getMessage()));
             }
-            entityQuery.setTenantId(getTenantId2());
-            Page<PointAttributeConfigBO> entityPageBO = pointAttributeConfigService.selectByPage(entityQuery);
-            Page<PointAttributeConfigVO> entityPageVO = pointAttributeConfigBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
 }

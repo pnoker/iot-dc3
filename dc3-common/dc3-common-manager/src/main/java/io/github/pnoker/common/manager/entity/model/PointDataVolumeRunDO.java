@@ -31,7 +31,8 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author fukq
- * @since 2024-03-06
+ * @version 2024.3.9
+ * @since 2022.1.0
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
