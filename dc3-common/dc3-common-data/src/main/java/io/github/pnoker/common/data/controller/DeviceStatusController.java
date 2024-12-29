@@ -35,6 +35,7 @@ import java.util.Map;
  * 设备 Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -59,14 +60,16 @@ public class DeviceStatusController implements BaseController {
      */
     @PostMapping("/device")
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
-        try {
-            deviceQuery.setTenantId(getTenantId2());
-            Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
-            return Mono.just(R.ok(statuses));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                deviceQuery.setTenantId(tenantId);
+                Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
+                return Mono.just(R.ok(statuses));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**

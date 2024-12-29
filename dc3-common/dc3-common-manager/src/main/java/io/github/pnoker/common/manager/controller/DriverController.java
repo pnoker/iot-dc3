@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
  * 驱动 Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -67,15 +68,17 @@ public class DriverController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) {
-        try {
-            DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId2());
-            driverService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverBO entityBO = driverBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                driverService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**
@@ -157,14 +160,16 @@ public class DriverController implements BaseController {
      */
     @GetMapping("/service/{serviceName}")
     public Mono<R<DriverVO>> selectByServiceName(@NotNull @PathVariable(value = "serviceName") String serviceName) {
-        try {
-            DriverBO entityBO = driverService.selectByServiceName(serviceName, getTenantId2());
-            DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
-            return Mono.just(R.ok(entityVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverBO entityBO = driverService.selectByServiceName(serviceName, tenantId);
+                DriverVO entityVO = driverBuilder.buildVOByBO(entityBO);
+                return Mono.just(R.ok(entityVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**

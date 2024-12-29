@@ -23,7 +23,7 @@ import java.io.Serial;
  * <p>TimeoutException class.</p>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 public class TimeoutException extends IOException {
 

@@ -31,6 +31,7 @@ import java.util.Objects;
  * 写数据实体类
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Getter

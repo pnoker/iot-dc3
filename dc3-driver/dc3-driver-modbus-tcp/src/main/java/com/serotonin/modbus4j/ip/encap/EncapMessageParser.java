@@ -23,7 +23,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>EncapMessageParser class.</p>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 public class EncapMessageParser extends BaseMessageParser {
     /**

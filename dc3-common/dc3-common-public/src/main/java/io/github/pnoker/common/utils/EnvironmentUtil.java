@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
  * 环境相关的工具类集合
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j

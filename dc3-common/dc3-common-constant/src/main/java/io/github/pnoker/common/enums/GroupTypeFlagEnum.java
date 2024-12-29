@@ -27,6 +27,7 @@ import java.util.Optional;
  * 通用实体分组标识枚举
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Getter

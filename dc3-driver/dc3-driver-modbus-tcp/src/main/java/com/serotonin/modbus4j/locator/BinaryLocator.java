@@ -26,7 +26,7 @@ import com.serotonin.modbus4j.sero.NotImplementedException;
  * <p>BinaryLocator class.</p>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 public class BinaryLocator extends BaseLocator<Boolean> {
     private int bit = -1;

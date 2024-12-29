@@ -39,6 +39,7 @@ import java.util.Optional;
  * 驱动属性Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -75,7 +76,7 @@ public interface DriverAttributeBuilder {
 
     @AfterMapping
     default void afterProcess(DriverAttributeBO entityBO, @MappingTarget DriverAttributeDO entityDO) {
-        // Json Ext
+// Json Ext
         DriverAttributeExt entityExt = entityBO.getAttributeExt();
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {

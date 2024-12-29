@@ -14,17 +14,33 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.valid;
+package io.github.pnoker.common.utils;
+
+import cn.hutool.core.util.IdUtil;
+import io.github.pnoker.common.constant.common.ExceptionConstant;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * Update 校验分组
- * <p>
- * 在 {@link org.springframework.validation.annotation.Validated}
- * 注解后添加具体校验的分组名, 可实现不同场景的校验需求
+ * 编码生成工具类，提供唯一编码生成功能
  *
  * @author pnoker
  * @version 2024.3.9
  * @since 2022.1.0
  */
-public interface Update {
+@Slf4j
+public class CodeUtil {
+
+    private CodeUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
+
+
+    /**
+     * 生成一个简化的UUID作为唯一编码
+     *
+     * @return 返回一个简化的UUID字符串
+     */
+    public static String getCode() {
+        return IdUtil.fastSimpleUUID();
+    }
 }

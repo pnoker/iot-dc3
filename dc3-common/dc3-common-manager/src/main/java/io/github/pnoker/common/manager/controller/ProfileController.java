@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
  * 模版 Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -67,15 +68,17 @@ public class ProfileController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
-        try {
-            ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId2());
-            profileService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                profileService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**
@@ -175,17 +178,17 @@ public class ProfileController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<ProfileVO>>> list(@RequestBody(required = false) ProfileQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new ProfileQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                ProfileQuery query = Objects.isNull(entityQuery) ? new ProfileQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<ProfileBO> entityPageBO = profileService.selectByPage(query);
+                Page<ProfileVO> entityPageVO = profileBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                return Mono.just(R.fail(e.getMessage()));
             }
-            entityQuery.setTenantId(getTenantId2());
-            Page<ProfileBO> entityPageBO = profileService.selectByPage(entityQuery);
-            Page<ProfileVO> entityPageVO = profileBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
 }

@@ -19,7 +19,7 @@ package com.serotonin.modbus4j.sero.io;
  * <p>LineHandler interface.</p>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 public interface LineHandler {
     /**

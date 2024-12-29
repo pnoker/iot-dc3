@@ -20,6 +20,7 @@ package io.github.pnoker.common.constant.common;
  * 环境变量, 配置变量 相关常量
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public class EnvironmentConstant {

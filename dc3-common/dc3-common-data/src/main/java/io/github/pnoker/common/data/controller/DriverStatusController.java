@@ -30,11 +30,13 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 设备 Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -54,19 +56,22 @@ public class DriverStatusController implements BaseController {
      * 查询驱动状态
      * ONLINE, OFFLINE
      *
-     * @param driverQuery 驱动和分页参数
+     * @param entityQuery 驱动和分页参数
      * @return Map String:String
      */
     @PostMapping("/driver")
-    public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery driverQuery) {
-        try {
-            driverQuery.setTenantId(getTenantId2());
-            Map<Long, String> statuses = driverStatusService.selectByPage(driverQuery);
-            return Mono.just(R.ok(statuses));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+    public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverQuery query = Objects.isNull(entityQuery) ? new DriverQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Map<Long, String> statuses = driverStatusService.selectByPage(query);
+                return Mono.just(R.ok(statuses));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**

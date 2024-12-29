@@ -22,6 +22,7 @@ import cn.hutool.core.text.CharSequenceUtil;
  * 自定义 超出范围 异常
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public class OutRangeException extends RuntimeException {

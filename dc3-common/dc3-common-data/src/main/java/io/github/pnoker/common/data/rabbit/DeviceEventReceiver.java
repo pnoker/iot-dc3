@@ -34,6 +34,7 @@ import java.util.Objects;
  * 接收驱动发送过来的设备事件
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j

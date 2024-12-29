@@ -25,6 +25,7 @@ import java.util.function.Consumer;
  * 自定义 Collection Optional
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public final class CollectionOptional<T> {

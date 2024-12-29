@@ -34,6 +34,7 @@ import java.util.Optional;
  * PointAttributeConfig Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -68,7 +69,7 @@ public interface PointAttributeConfigBuilder {
 
     @AfterMapping
     default void afterProcess(PointAttributeConfigBO entityBO, @MappingTarget PointAttributeConfigDO entityDO) {
-        // Enable Flag
+// Enable Flag
         EnableFlagEnum enableFlag = entityBO.getEnableFlag();
         Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }

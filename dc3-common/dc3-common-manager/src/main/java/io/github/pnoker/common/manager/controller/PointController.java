@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
  * 位号 Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -71,15 +72,17 @@ public class PointController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<PointBO>> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
-        try {
-            PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId2());
-            pointService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                pointService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**
@@ -197,18 +200,18 @@ public class PointController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<PointVO>>> list(@RequestBody(required = false) PointQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new PointQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                PointQuery query = Objects.isNull(entityQuery) ? new PointQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<PointBO> entityPageBO = pointService.selectByPage(query);
+                Page<PointVO> entityPageVO = pointBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            entityQuery.setTenantId(getTenantId2());
-            Page<PointBO> entityPageBO = pointService.selectByPage(entityQuery);
-            Page<PointVO> entityPageVO = pointBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
     /**

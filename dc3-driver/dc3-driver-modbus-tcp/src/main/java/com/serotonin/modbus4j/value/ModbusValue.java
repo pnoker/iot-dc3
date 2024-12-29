@@ -24,7 +24,7 @@ import java.math.BigInteger;
  * <p>Abstract ModbusValue class.</p>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 abstract public class ModbusValue {
     private final DataType type;

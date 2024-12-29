@@ -32,6 +32,7 @@ import lombok.*;
  * 驱动属性VO
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Getter

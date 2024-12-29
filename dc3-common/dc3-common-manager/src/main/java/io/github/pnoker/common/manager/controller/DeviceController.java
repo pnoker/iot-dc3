@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
  * 设备 Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -74,15 +75,17 @@ public class DeviceController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody DeviceVO entityVO) {
-        try {
-            DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId2());
-            deviceService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                deviceService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**
@@ -164,18 +167,18 @@ public class DeviceController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<DeviceVO>>> list(@RequestBody(required = false) DeviceQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new DeviceQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DeviceQuery query = Objects.isNull(entityQuery) ? new DeviceQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<DeviceBO> entityPageBO = deviceService.selectByPage(query);
+                Page<DeviceVO> entityPageVO = deviceBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            entityQuery.setTenantId(getTenantId2());
-            Page<DeviceBO> entityPageBO = deviceService.selectByPage(entityQuery);
-            Page<DeviceVO> entityPageVO = deviceBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
     /**
@@ -186,21 +189,23 @@ public class DeviceController implements BaseController {
      */
     @PostMapping("/import")
     public Mono<R<String>> importDevice(@Validated(Upload.class) DeviceVO entityVO, @RequestPart("file") Mono<FilePart> filePart) {
-        try {
-            DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId2());
-            return filePart.flatMap(part -> {
-                String filePath = FileUtil.getTempPath() + FileUtil.getRandomXlsxName();
-                File file = new File(filePath);
-                return part.transferTo(file).then(Mono.defer(() -> {
-                    deviceService.importDevice(entityBO, file);
-                    return Mono.just(R.ok());
-                }));
-            });
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DeviceBO entityBO = deviceBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                return filePart.flatMap(part -> {
+                    String filePath = FileUtil.getTempPath() + FileUtil.getRandomXlsxName();
+                    File file = new File(filePath);
+                    return part.transferTo(file).then(Mono.defer(() -> {
+                        deviceService.importDevice(entityBO, file);
+                        return Mono.just(R.ok());
+                    }));
+                });
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**

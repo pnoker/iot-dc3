@@ -40,6 +40,7 @@ import java.util.Objects;
  * 分组 Controller
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -63,15 +64,17 @@ public class GroupController implements BaseController {
      */
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
-        try {
-            GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId2());
-            groupService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                groupService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**
@@ -135,18 +138,18 @@ public class GroupController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<GroupVO>>> list(@RequestBody(required = false) GroupQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new GroupQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                GroupQuery query = Objects.isNull(entityQuery) ? new GroupQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<GroupBO> entityPageBO = groupService.selectByPage(query);
+                Page<GroupVO> entityPageVO = groupBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            entityQuery.setTenantId(getTenantId2());
-            Page<GroupBO> entityPageBO = groupService.selectByPage(entityQuery);
-            Page<GroupVO> entityPageVO = groupBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
 }

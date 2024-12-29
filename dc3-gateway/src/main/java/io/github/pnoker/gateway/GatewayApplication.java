@@ -21,13 +21,21 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * 网关中心服务启动入口
+ * <p>
+ * 该类是网关中心服务的启动类，负责初始化并启动Spring Boot应用。
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @SpringBootApplication
 public class GatewayApplication {
 
+    /**
+     * 主方法，启动Spring Boot应用
+     *
+     * @param args 命令行参数
+     */
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
     }

@@ -29,6 +29,7 @@ import org.apache.ibatis.annotations.Param;
  * </p>
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public interface DeviceMapper extends BaseMapper<DeviceDO> {

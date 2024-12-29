@@ -37,9 +37,13 @@ import reactor.core.publisher.Mono;
 import java.util.Optional;
 
 /**
- * 自定义Route配置
+ * 自定义网关路由配置类
+ * <p>
+ * 该类用于配置网关的路由规则、限流策略以及 fallback 处理逻辑。
+ * 通过注解 {@code @Configuration} 标记为 Spring 配置类，确保在应用启动时加载。
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j
@@ -47,9 +51,12 @@ import java.util.Optional;
 public class GatewayConfig {
 
     /**
-     * 根据 HostAddress 进行限流
+     * 配置基于客户端 IP 地址的限流解析器
+     * <p>
+     * 该解析器从请求中提取客户端的 IP 地址，并将其作为限流的唯一标识。
+     * 适用于根据客户端 IP 地址进行限流的场景。
      *
-     * @return KeyResolver
+     * @return KeyResolver 返回一个基于客户端 IP 地址的限流解析器
      */
     @Bean
     public KeyResolver hostKeyResolver() {
@@ -61,9 +68,12 @@ public class GatewayConfig {
     }
 
     /**
-     * Redis 令牌桶 限流
+     * 配置 Redis 令牌桶限流器
+     * <p>
+     * 该限流器允许每秒最多处理 100 个请求，并且令牌桶的容量为 2000 个令牌。
+     * 当请求速率超过限流器的处理能力时，多余的请求将被限流。
      *
-     * @return RedisRateLimiter
+     * @return RedisRateLimiter 返回一个 Redis 令牌桶限流器实例
      */
     @Bean
     RedisRateLimiter redisRateLimiter() {
@@ -71,9 +81,9 @@ public class GatewayConfig {
     }
 
     /**
-     * fallback 配置
+     * 配置网关的 fallback 路由，用于处理服务不可用时的请求
      *
-     * @return RouterFunction
+     * @return RouterFunction<ServerResponse> 返回一个路由函数，用于处理 "/fallback" 路径的请求
      */
     @Bean
     public RouterFunction<ServerResponse> routerFunction() {

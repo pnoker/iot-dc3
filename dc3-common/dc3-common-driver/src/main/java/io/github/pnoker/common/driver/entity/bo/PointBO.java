@@ -29,6 +29,7 @@ import java.math.BigDecimal;
  * Point BO
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Getter

@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.MenuBO;
 import io.github.pnoker.common.auth.entity.model.MenuDO;
@@ -25,6 +26,7 @@ import io.github.pnoker.common.entity.ext.MenuExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.MenuLevelFlagEnum;
 import io.github.pnoker.common.enums.MenuTypeFlagEnum;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
@@ -40,6 +42,7 @@ import java.util.Optional;
  * Menu Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -77,6 +80,11 @@ public interface MenuBuilder {
 
     @AfterMapping
     default void afterProcess(MenuBO entityBO, @MappingTarget MenuDO entityDO) {
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getMenuCode())) {
+            entityDO.setMenuCode(CodeUtil.getCode());
+        }
+
         // Json Ext
         MenuExt entityExt = entityBO.getMenuExt();
         JsonExt ext = new JsonExt();

@@ -21,7 +21,7 @@ package com.serotonin.modbus4j.sero.messaging;
  * <p>RequestHandler interface.</p>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 public interface RequestHandler {
     /**

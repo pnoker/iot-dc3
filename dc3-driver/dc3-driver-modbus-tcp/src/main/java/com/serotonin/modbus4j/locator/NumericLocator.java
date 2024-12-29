@@ -29,7 +29,7 @@ import java.math.RoundingMode;
  * <p>NumericLocator class.</p>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 public class NumericLocator extends BaseLocator<Number> {
     private static final int[] DATA_TYPES = { //

@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
 import io.github.pnoker.common.auth.entity.model.TenantDO;
@@ -23,6 +24,7 @@ import io.github.pnoker.common.auth.entity.vo.TenantVO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.TenantExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
@@ -38,6 +40,7 @@ import java.util.Optional;
  * Tenant Builder
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
@@ -72,6 +75,11 @@ public interface TenantBuilder {
 
     @AfterMapping
     default void afterProcess(TenantBO entityBO, @MappingTarget TenantDO entityDO) {
+        // Code
+        if (CharSequenceUtil.isEmpty(entityBO.getTenantCode())) {
+            entityDO.setTenantCode(CodeUtil.getCode());
+        }
+
         // Json Ext
         TenantExt entityExt = entityBO.getTenantExt();
         JsonExt ext = new JsonExt();

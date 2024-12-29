@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
  * 元数据事件 Publisher
  *
  * @author zhangzi
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Slf4j

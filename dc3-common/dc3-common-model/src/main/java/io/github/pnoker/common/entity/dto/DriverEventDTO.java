@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
  * 驱动事件
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 @Getter
@@ -66,6 +67,7 @@ public class DriverEventDTO implements Serializable {
      * 驱动状态
      *
      * @author pnoker
+     * @version 2024.3.9
      * @since 2022.1.0
      */
     @Getter

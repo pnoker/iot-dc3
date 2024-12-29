@@ -26,6 +26,7 @@ import java.util.List;
  * 位号属性Interface
  *
  * @author pnoker
+ * @version 2024.3.9
  * @since 2022.1.0
  */
 public interface PointAttributeService extends BaseService<PointAttributeBO, PointAttributeQuery> {

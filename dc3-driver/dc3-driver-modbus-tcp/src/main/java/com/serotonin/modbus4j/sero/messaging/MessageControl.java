@@ -33,7 +33,7 @@ import java.io.IOException;
  * </ol>
  *
  * @author Matthew Lohbihler
- * @version 5.0.0
+ * @version 2024.3.9
  */
 public class MessageControl implements DataConsumer {
     private static int DEFAULT_RETRIES = 2;
