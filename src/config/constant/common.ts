@@ -17,5 +17,5 @@
 export default {
     X_AUTH_TENANT: 'X-Auth-Tenant',
     X_AUTH_LOGIN: 'X-Auth-Login',
-    X_AUTH_TOKEN: 'X-Auth-Token'
+    X_AUTH_TOKEN: 'X-Auth-Token',
 }

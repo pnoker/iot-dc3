@@ -30,14 +30,14 @@ const request: AxiosInstance = axios.create({
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
     validateStatus: (status) => status >= 200 && status <= 500,
     transformResponse: [
-        function(data) {
+        function (data) {
             try {
                 return JSONBigIntStr.parse(data)
             } catch (err) {
                 return { data }
             }
-        }
-    ]
+        },
+    ],
 })
 
 request.interceptors.request.use(
@@ -59,7 +59,7 @@ request.interceptors.request.use(
 
         const token = getStorage(CommonConstant.X_AUTH_TOKEN)
         if (!isNull(token)) {
-            headers[CommonConstant.X_AUTH_TOKEN] = encode(JSON.stringify(token))
+            headers[CommonConstant.X_AUTH_TOKEN] = JSON.stringify(token)
         }
 
         return config
