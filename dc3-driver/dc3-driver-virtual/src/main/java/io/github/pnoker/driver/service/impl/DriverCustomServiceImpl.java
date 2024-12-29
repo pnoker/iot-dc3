@@ -38,6 +38,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 驱动自定义服务实现类
+ *
  * @author pnoker
  * @version 2024.3.9
  * @since 2022.1.0
@@ -54,25 +56,33 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
-        */
+         * 驱动初始化逻辑
+         *
+         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 驱动启动时会自动执行该方法，您可以在此处执行特定的初始化操作。
+         *
+         */
     }
 
     @Override
     public void schedule() {
         /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
-        - 在read中实现设备状态的判断;
-        - 在自定义定时任务中实现设备状态的判断;
-        - 根据某种判断机制实现设备状态的判断。
-
-        最后根据 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理, 其中设备状态(StatusEnum):
-        - ONLINE:在线
-        - OFFLINE:离线
-        - MAINTAIN:维护
-        - FAULT:故障
+         * 设备状态上传逻辑
+         *
+         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 设备状态的上传可以根据具体需求灵活实现，以下是一些常见的实现方式：
+         * - 在 `read` 方法中根据读取的数据判断设备状态；
+         * - 在自定义的定时任务中定期检查设备状态；
+         * - 根据特定的业务逻辑或事件触发设备状态的判断。
+         *
+         * 最终通过 {@link DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} 接口将设备状态提交给 SDK 管理。
+         * 设备状态枚举 {@link DeviceStatusEnum} 包含以下状态：
+         * - ONLINE: 设备在线
+         * - OFFLINE: 设备离线
+         * - MAINTAIN: 设备维护中
+         * - FAULT: 设备故障
+         *
+         * 在以下示例中，所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}，并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
          */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
@@ -80,10 +90,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        接收驱动, 设备, 位号元数据新增, 更新, 删除都会触发改事件
-        提供元数据类型: MetadataTypeEnum(DRIVER, DEVICE, POINT)
-        提供元数据操作类型: MetadataOperateTypeEnum(ADD, DELETE, UPDATE)
+         * 接收驱动、设备、位号元数据的新增、更新、删除事件。
+         *
+         * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
+         * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
+         *
+         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -99,7 +111,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
+         * 读取设备点位数据逻辑
+         *
+         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 根据点位类型生成随机数据：
+         * - 如果点位类型为字符串类型，生成一个长度为8的随机字符串；
+         * - 如果点位类型为布尔类型，生成一个随机的布尔值；
+         * - 其他情况下，生成一个0到100之间的随机浮点数。
          */
         if (PointTypeFlagEnum.STRING.equals(point.getPointTypeFlag())) {
             return new RValue(device, point, RandomUtil.randomString(8));
@@ -114,7 +132,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
+         * 写入设备点位数据逻辑
+         *
+         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 您可以根据具体的业务需求实现点位数据的写入逻辑。
+         * 默认情况下，该方法返回 false，表示写入操作未执行或失败。
          */
         return false;
     }
