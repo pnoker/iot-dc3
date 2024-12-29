@@ -75,7 +75,7 @@ public class DictionaryForAuthController implements BaseController {
     @GetMapping("/limited_ip")
     public Mono<R<List<DictionaryVO>>> limitedIpDictionary() {
         try {
-            List<DictionaryBO> entityBOList = dictionaryForAuthService.limitedIpDictionary(getTenantId());
+            List<DictionaryBO> entityBOList = dictionaryForAuthService.limitedIpDictionary(getTenantId2());
             List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
             return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {

@@ -73,7 +73,7 @@ public class PointController implements BaseController {
     public Mono<R<PointBO>> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
         try {
             PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
+            entityBO.setTenantId(getTenantId2());
             pointService.save(entityBO);
             return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
@@ -201,7 +201,7 @@ public class PointController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<PointBO> entityPageBO = pointService.selectByPage(entityQuery);
             Page<PointVO> entityPageVO = pointBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));

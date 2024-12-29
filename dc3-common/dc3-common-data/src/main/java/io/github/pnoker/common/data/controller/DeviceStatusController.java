@@ -60,7 +60,7 @@ public class DeviceStatusController implements BaseController {
     @PostMapping("/device")
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         try {
-            deviceQuery.setTenantId(getTenantId());
+            deviceQuery.setTenantId(getTenantId2());
             Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
             return Mono.just(R.ok(statuses));
         } catch (Exception e) {

@@ -68,7 +68,7 @@ public class PointAttributeController implements BaseController {
     public Mono<R<PointAttributeBO>> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
         try {
             PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(getTenantId());
+            entityBO.setTenantId(getTenantId2());
             pointAttributeService.save(entityBO);
             return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
         } catch (Exception e) {
@@ -162,7 +162,7 @@ public class PointAttributeController implements BaseController {
             if (Objects.isNull(entityQuery)) {
                 entityQuery = new PointAttributeQuery();
             }
-            entityQuery.setTenantId(getTenantId());
+            entityQuery.setTenantId(getTenantId2());
             Page<PointAttributeBO> entityPageBO = pointAttributeService.selectByPage(entityQuery);
             Page<PointAttributeVO> entityPageVO = pointAttributeBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));

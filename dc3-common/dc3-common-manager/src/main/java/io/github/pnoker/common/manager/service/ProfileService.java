@@ -35,11 +35,12 @@ public interface ProfileService extends BaseService<ProfileBO, ProfileQuery> {
     /**
      * 根据 模板名称和模版类型 查询模版
      *
-     * @param name 模板名称
-     * @param type 模板类型 {@link ProfileTypeFlagEnum}
+     * @param tenantId 租户ID
+     * @param name     模板名称
+     * @param type     模板类型 {@link ProfileTypeFlagEnum}
      * @return ProfileBO
      */
-    ProfileBO selectByNameAndType(String name, ProfileTypeFlagEnum type);
+    ProfileBO selectByNameAndType(Long tenantId, String name, ProfileTypeFlagEnum type);
 
     /**
      * 根据 设备ID 查询模版

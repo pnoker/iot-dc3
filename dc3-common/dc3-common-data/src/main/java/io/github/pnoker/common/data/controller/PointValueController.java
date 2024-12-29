@@ -64,7 +64,7 @@ public class PointValueController implements BaseController {
             if (Objects.isNull(pointValueQuery)) {
                 pointValueQuery = new PointValueQuery();
             }
-            pointValueQuery.setTenantId(getTenantId());
+            pointValueQuery.setTenantId(getTenantId2());
             Page<PointValueBO> entityPageBO = pointValueService.latest(pointValueQuery);
             Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
             return Mono.just(R.ok(entityPageVO));
