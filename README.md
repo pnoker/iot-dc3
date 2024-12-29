@@ -8,52 +8,51 @@
     <img src='https://gitee.com/pnoker/iot-dc3/badge/fork.svg?theme=gvp' alt='fork'/>
 </a>
 <br>
-<strong>IoT DC3 is an open-source distributed Internet of Things (IoT) platform based on Spring Cloud. It is used for rapid development of IoT projects and management of IoT devices, providing a comprehensive solution for IoT system development.</strong>
+<strong>
+IoT DC3 is a 100% open-source, distributed Internet of Things (IoT) platform built on Spring Cloud.
+It accelerates IoT project development and simplifies IoT device management, offering a comprehensive solution for building robust IoT systems.
+All components and code are fully open-source, ensuring transparency, flexibility, and community-driven innovation.
+</strong>
 </p>
 
 ---
 
-![iot-dc3-architecture](dc3/images/architecture1.jpg)
+![iot-dc3-architecture](dc3/images/architecture.png)
 
-# 1Architecture
+# 1 Architecture
 
-- **Driver Layer**: Provides SDKs for connecting physical devices via standard or proprietary protocols, responsible for
-  southbound data collection and command control. The `SDK`
-  enables rapid driver development;
-- **Data Layer**: Responsible for collecting and storing device data, and providing data management interface services;
-- **Management Layer**: Provides a microservice registry, device command interfaces, device registration and pairing,
-  and a data management center. It is the core part of all
-  microservice interactions, managing various configuration data and providing external interface services;
-- **Application Layer**(partially completed): Provides data openness, task scheduling, alarm and message notifications,
-  log management, and the capability to integrate with
-  third-party platforms.
+- **Driver Layer**: Offers SDKs to facilitate seamless connectivity with physical devices using both standard and proprietary protocols. This layer is responsible for southbound
+  data acquisition and command execution, enabling rapid driver development through its comprehensive SDK;
+- **Data Layer**: Manages the collection, storage, and retrieval of device data, providing robust data management interface services to ensure efficient data handling;
+- **Management Layer**: Acts as the core hub for microservice interactions, offering essential services such as microservice registration, device command interfaces, device
+  registration and pairing, and a centralized data management system. It oversees various configuration data and provides external interface services for seamless integration;
+- **Application Layer**: Delivers advanced functionalities including data openness, task scheduling, alarm and message notifications, log management, and the
+  ability to integrate with third-party platforms, enhancing the platform's versatility and usability.
 
-# 2 Target
+# 2 Objectives
 
-- **Scalable**: A horizontally scalable platform built using leading open-source technology, Spring Cloud;
-- **Fault Tolerant**: No single point of failure, with each node in the cluster being identical;
-- **Robust and Efficient**: A single server node can handle even hundreds of thousands of devices depending on the use
-  case;
-- **Customizable**: Add new device protocols and register them to the service center;
-- **Cross-Platform**: Compatible with Java environments, enabling distributed multi-platform deployment;
-- **Autonomous and Controllable**: Supports private cloud, public cloud, and edge deployments;
-- **Comprehensive**: Fast device onboarding, registration, and permission validation;
-- **Secure**: Data transmission is encrypted;
-- **Multi-Tenant**: Supports namespaces and multi-tenancy;
-- **Cloud-Native**: Kubernetes;
-- **Containerized**: Docker.
+- **Scalability**: Designed for horizontal scaling, leveraging the power of Spring Cloud, a leading open-source technology;
+- **Fault Tolerance**: Ensures no single point of failure, with each cluster node being identical and interchangeable;
+- **Performance**: Capable of handling hundreds of thousands of devices on a single server node, depending on the specific use case;
+- **Customizability**: Easily integrate new device protocols and register them within the service center;
+- **Cross-Platform Compatibility**: Fully compatible with Java environments, enabling seamless distributed deployment across multiple platforms;
+- **Deployment Flexibility**: Supports private cloud, public cloud, and edge deployments, offering full control over your infrastructure;
+- **Efficiency**: Streamlines device onboarding, registration, and permission validation processes;
+- **Security**: Ensures data transmission is encrypted, safeguarding sensitive information;
+- **Multi-Tenancy**: Supports namespaces and multi-tenancy, making it ideal for diverse user environments;
+- **Cloud-Native**: Optimized for Kubernetes, ensuring smooth integration with modern cloud infrastructures;
+- **Containerization**: Fully containerized with Docker, simplifying deployment and management.
 
-# 3  Contribution
+# 3 Contribution
 
-- Check out a new branch from the `main` branch (ensure `main` branch is up-to-date);
-- Naming format for the new branch: `feature/you_name/feature_description`, for example: `feature/pnoker/mqtt_driver`;
-- Edit documents and code on the new branch, then commit the changes;
-- Submit a `Pull Request` (PR) to merge the changes into the `develop` branch, and await review and merging by the
-  author;
-- Once merged, we will add your UserID to the  [Contributor](https://doc.dc3.site/contributor) list.
+- **Branch Creation**: Start by creating a new branch from the `main` branch. Ensure that the `main` branch is up-to-date before branching out;
+- **Branch Naming**: Follow the naming convention for the new branch: `feature/your_name/feature_description`. For example: `feature/pnoker/mqtt_driver`;
+- **Code and Documentation**: Make your changes to the code or documentation on the new branch. Once done, commit your changes;
+- **Pull Request**: Submit a `Pull Request` (PR) to merge your changes into the `develop` branch. Your PR will be reviewed and merged by the maintainers;
+- **Acknowledgement**: After your changes are merged, your UserID will be added to the [Contributor](https://doc.dc3.site/contributor) list as a token of appreciation for your
+  contribution.
 
 # 4 License
 
-`IOT DC3` open-source platform follows the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.html), It
-permits commercial use but requires retention of author and
-copyright information.
+The `IoT DC3` open-source platform is licensed under the [Apache 2.0 License](./LICENSE). This license allows for commercial use while
+mandating the retention of author and copyright information.
