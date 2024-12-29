@@ -53,6 +53,8 @@ import java.util.concurrent.*;
 
 
 /**
+ * 驱动自定义服务实现类
+ *
  * @author pnoker
  * @version 2024.3.9
  * @since 2022.1.0
@@ -71,26 +73,34 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        你可以在此处执行一些特定的初始化逻辑, 驱动在启动的时候会自动执行该方法。
-        */
+         * 驱动初始化逻辑
+         *
+         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 驱动启动时会自动执行该方法，您可以在此处执行特定的初始化操作。
+         *
+         */
         connectMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
     public void schedule() {
         /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        上传设备状态, 可自行灵活拓展, 不一定非要在schedule()接口中实现, 你可以: 
-        - 在read中实现设备状态的判断;
-        - 在自定义定时任务中实现设备状态的判断;
-        - 根据某种判断机制实现设备状态的判断。
-
-        最后根据 driverSenderService.deviceStatusSender(deviceId,deviceStatus) 接口将设备状态交给SDK管理, 其中设备状态(StatusEnum):
-        - ONLINE:在线
-        - OFFLINE:离线
-        - MAINTAIN:维护
-        - FAULT:故障
+         * 设备状态上传逻辑
+         *
+         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 设备状态的上传可以根据具体需求灵活实现，以下是一些常见的实现方式：
+         * - 在 `read` 方法中根据读取的数据判断设备状态；
+         * - 在自定义的定时任务中定期检查设备状态；
+         * - 根据特定的业务逻辑或事件触发设备状态的判断。
+         *
+         * 最终通过 {@link DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} 接口将设备状态提交给 SDK 管理。
+         * 设备状态枚举 {@link DeviceStatusEnum} 包含以下状态：
+         * - ONLINE: 设备在线
+         * - OFFLINE: 设备离线
+         * - MAINTAIN: 设备维护中
+         * - FAULT: 设备故障
+         *
+         * 在以下示例中，所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}，并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
          */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
@@ -98,10 +108,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
-        接收驱动, 设备, 位号元数据新增, 更新, 删除都会触发改事件
-        提供元数据类型: MetadataTypeEnum(DRIVER, DEVICE, POINT)
-        提供元数据操作类型: MetadataOperateTypeEnum(ADD, DELETE, UPDATE)
+         * 接收驱动、设备、位号元数据的新增、更新、删除事件。
+         *
+         * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
+         * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
+         *
+         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -109,7 +121,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
             // to do something for device event
             log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
 
-            // 当设备更新或者删除时，移除连接句柄
+            // When the device is updated or deleted, remove the corresponding connection handle
             if (MetadataOperateTypeEnum.DELETE.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 connectMap.remove(metadataEvent.getId());
             }
@@ -122,7 +134,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
+         * 读取 OPC UA 点位值
+         *
+         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 1. 通过设备ID和驱动配置获取 OPC UA 客户端连接。
+         * 2. 使用点位配置读取 OPC UA 节点的值。
+         * 3. 将读取到的值封装为 RValue 对象返回。
          */
         return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
 
@@ -131,21 +148,27 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
-        !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
+         * 写入 OPC UA 点位值
+         *
+         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 1. 通过设备ID和驱动配置获取 OPC UA 客户端连接。
+         * 2. 使用点位配置和写入值将数据写入 OPC UA 节点。
+         * 3. 返回写入操作是否成功。
          */
         OpcUaClient client = getConnector(device.getId(), driverConfig);
         return writeValue(client, pointConfig, wValue);
     }
 
     /**
-     * 获取 Opc Ua Client
+     * 获取 OPC UA 客户端连接
      *
-     * @param deviceId     设备ID
-     * @param driverConfig 驱动信息
-     * @return OpcUaClient
+     * @param deviceId     设备ID，用于标识唯一的设备连接
+     * @param driverConfig 驱动配置信息，包含连接 OPC UA 服务器所需的参数
+     * @return OpcUaClient 返回与指定设备关联的 OPC UA 客户端实例
+     * @throws ConnectorException 如果连接 OPC UA 服务器失败，抛出此异常
      */
     private OpcUaClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
-        log.debug("Opc Ua Server Connection Info {}", JsonUtil.toJsonString(driverConfig));
+        log.debug("OPC UA server connection info: {}", JsonUtil.toJsonString(driverConfig));
         OpcUaClient opcUaClient = connectMap.get(deviceId);
         if (Objects.isNull(opcUaClient)) {
             String host = driverConfig.get("host").getValue(String.class);
@@ -157,14 +180,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                         url,
                         endpoints -> endpoints.stream().findFirst(),
                         configBuilder -> configBuilder
-                                .setIdentityProvider(new AnonymousProvider())
-                                .setRequestTimeout(Unsigned.uint(5000))
+                                .setIdentityProvider(new AnonymousProvider()) // 使用匿名身份验证
+                                .setRequestTimeout(Unsigned.uint(5000)) // 设置请求超时时间为 5000 毫秒
                                 .build()
                 );
                 connectMap.put(deviceId, opcUaClient);
             } catch (UaException e) {
                 connectMap.entrySet().removeIf(next -> next.getKey().equals(deviceId));
-                log.error("Connect opc ua client error: {}", e.getMessage(), e);
+                log.error("Failed to connect OPC UA client: {}", e.getMessage(), e);
                 throw new ConnectorException(e.getMessage());
             }
         }
@@ -172,10 +195,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 获取 Opc Ua Item
+     * 根据点位配置获取 OPC UA 节点
      *
-     * @param pointConfig 位号信息
-     * @return OpcUa Node
+     * @param pointConfig 点位配置信息，包含命名空间和标签
+     * @return OPC UA 节点标识
      */
     private NodeId getNode(Map<String, AttributeBO> pointConfig) {
         int namespace = pointConfig.get("namespace").getValue(Integer.class);
@@ -184,11 +207,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 获取 OpcUa 值
+     * 读取 OPC UA 节点的值
      *
-     * @param client      OpcUaClient
-     * @param pointConfig 位号信息
-     * @return Node Value
+     * @param client      OPC UA 客户端实例
+     * @param pointConfig 点位配置信息
+     * @return 读取到的节点值
+     * @throws ReadPointException 如果读取操作失败，抛出此异常
      */
     private String readValue(OpcUaClient client, Map<String, AttributeBO> pointConfig) {
         try {
@@ -208,15 +232,17 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 写入 OpcUa 值
+     * 写入 OPC UA 节点的值
      *
-     * @param pointConfig 位号信息
+     * @param client      OPC UA 客户端实例
+     * @param pointConfig 点位配置信息
      * @param wValue      写入值
+     * @return 写入操作是否成功
+     * @throws WritePointException 如果写入操作失败，抛出此异常
      */
     private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WValue wValue) {
         try {
             NodeId nodeId = getNode(pointConfig);
-
             client.connect().get();
             return writeNode(client, nodeId, wValue);
         } catch (InterruptedException e) {
@@ -230,14 +256,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Write Opc Ua Node
+     * 将值写入 OPC UA 节点
      *
-     * @param client OpcUaClient
-     * @param nodeId OpcUa Node
-     * @param wValue 写入值
-     * @return 是否写入
-     * @throws ExecutionException   ExecutionException
-     * @throws InterruptedException InterruptedException
+     * @param client OPC UA 客户端实例
+     * @param nodeId OPC UA 节点标识
+     * @param wValue 待写入的值
+     * @return 写入操作是否成功
+     * @throws ExecutionException   写入操作失败时抛出
+     * @throws InterruptedException 写入操作被中断时抛出
      */
     private boolean writeNode(OpcUaClient client, NodeId nodeId, WValue wValue) throws ExecutionException, InterruptedException {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());
