@@ -24,7 +24,6 @@
         dp.profile_code,
         dp.profile_share_flag,
         dp.profile_type_flag,
-        dp.group_id,
         dp.profile_ext,
         dp.enable_flag,
         dp.tenant_id,
