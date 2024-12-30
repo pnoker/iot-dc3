@@ -20,7 +20,6 @@ import CommonConstant from '@/config/constant/common'
 import { failMessage, warnMessage } from '@/utils/NotificationUtil'
 import { getStorage } from '@/utils/StorageUtil'
 import { isNull } from '@/utils/utils'
-import { encode } from 'js-base64'
 import JSONBigInt from 'json-bigint'
 
 const JSONBigIntStr = JSONBigInt({ storeAsString: true })
@@ -36,8 +35,8 @@ const request: AxiosInstance = axios.create({
             } catch (err) {
                 return { data }
             }
-        },
-    ],
+        }
+    ]
 })
 
 request.interceptors.request.use(

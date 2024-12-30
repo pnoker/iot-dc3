@@ -73,24 +73,30 @@
             fill: url(#_GradualChange_14);
             }
         </style>
-        <linearGradient gradientUnits="userSpaceOnUse" y2="995.69" x2="714.93" y1="1290.92" x1="714.93" id="_GradualChange_10">
+        <linearGradient gradientUnits="userSpaceOnUse" y2="995.69" x2="714.93" y1="1290.92" x1="714.93"
+                        id="_GradualChange_10">
             <stop stop-opacity=".5" stop-color="#f7fbff" offset="0"></stop>
             <stop stop-color="#ecf5ff" offset="1"></stop>
         </linearGradient>
-        <linearGradient gradientUnits="userSpaceOnUse" y2="66.57" x2="1007.27" y1="66.57" x1="1227.25" id="_GradualChange_15">
+        <linearGradient gradientUnits="userSpaceOnUse" y2="66.57" x2="1007.27" y1="66.57" x1="1227.25"
+                        id="_GradualChange_15">
             <stop stop-color="#f7fbff" offset="0"></stop>
             <stop stop-color="#ecf5ff" offset="1"></stop>
         </linearGradient>
-        <linearGradient xlink:href="#_GradualChange_15" y2="283.66" x2="191.03" y1="283.66" x1="344.06" id="_GradualChange_15-2"></linearGradient>
-        <linearGradient gradientUnits="userSpaceOnUse" y2="457.32" x2="694.67" y1="784.79" x1="694.67" id="_GradualChange_56">
+        <linearGradient xlink:href="#_GradualChange_15" y2="283.66" x2="191.03" y1="283.66" x1="344.06"
+                        id="_GradualChange_15-2"></linearGradient>
+        <linearGradient gradientUnits="userSpaceOnUse" y2="457.32" x2="694.67" y1="784.79" x1="694.67"
+                        id="_GradualChange_56">
             <stop stop-color="#84bbf1" offset="0"></stop>
             <stop stop-color="#4095e6" offset="1"></stop>
         </linearGradient>
-        <linearGradient gradientUnits="userSpaceOnUse" y2="619.41" x2="694.67" y1="833.6" x1="694.67" id="_GradualChange_14">
+        <linearGradient gradientUnits="userSpaceOnUse" y2="619.41" x2="694.67" y1="833.6" x1="694.67"
+                        id="_GradualChange_14">
             <stop stop-color="#dcedff" offset="0"></stop>
             <stop stop-color="#4095e6" offset="1"></stop>
         </linearGradient>
-        <linearGradient gradientUnits="userSpaceOnUse" y2="758.35" x2="700.46" y1="1042" x1="700.46" id="_GradualChange_64">
+        <linearGradient gradientUnits="userSpaceOnUse" y2="758.35" x2="700.46" y1="1042" x1="700.46"
+                        id="_GradualChange_64">
             <stop stop-opacity="0" stop-color="#eefaff" offset="0"></stop>
             <stop stop-color="#eefaff" offset="1"></stop>
         </linearGradient>
@@ -122,15 +128,18 @@
                   class="cls-6"></path>
             <path d="m353.12,1169.86c0,13,161.58,23.63,361.81,23.63s361.81-10.64,361.81-23.63-161.61-23.65-361.81-23.65c-200.23-.09-361.81,10.04-361.81,23.63"
                   class="cls-11"></path>
-            <path d="m926.22,688.88c0,127.88-463.11,127.88-463.11,0s103.67-231.56,231.56-231.56,231.56,103.67,231.56,231.56Z" class="cls-10"></path>
+            <path d="m926.22,688.88c0,127.88-463.11,127.88-463.11,0s103.67-231.56,231.56-231.56,231.56,103.67,231.56,231.56Z"
+                  class="cls-10"></path>
             <ellipse ry="107.09" rx="411.01" cy="726.51" cx="694.67" class="cls-12"></ellipse>
             <ellipse ry="39.95" rx="237.34" cy="734.61" cx="694.67" class="cls-4"></ellipse>
             <polygon points="932.01 1042 468.9 1042 526.79 758.35 868.33 758.35 932.01 1042" class="cls-5"></polygon>
             <g>
-                <path d="m517.69,975.35l53.75-117.32h37.19l-52.3,115.89h78.33v31.67h-116.97v-30.23Zm70.43-45.58h32.87v102.69h-32.87v-102.69Z" class="cls-2"></path>
+                <path d="m517.69,975.35l53.75-117.32h37.19l-52.3,115.89h78.33v31.67h-116.97v-30.23Zm70.43-45.58h32.87v102.69h-32.87v-102.69Z"
+                      class="cls-2"></path>
                 <path d="m661.58,899.43c-8.88-8.76-13.31-20.89-13.31-36.41v-79.29c0-15.67,4.45-27.85,13.38-36.53,8.91-8.67,21.84-13.01,38.8-13.01s30,4.32,38.87,12.95c8.88,8.64,13.32,20.83,13.32,36.59v79.29c0,15.68-4.47,27.85-13.38,36.53-8.92,8.68-21.86,13.02-38.81,13.02s-30-4.38-38.87-13.14Zm53.51-25.31c3.11-4.52,4.67-11.02,4.67-19.49v-62.5c0-8.48-1.56-14.98-4.67-19.5-3.12-4.52-8-6.78-14.64-6.78s-11.52,2.26-14.63,6.78c-3.12,4.52-4.68,11.02-4.68,19.5v62.5c0,8.48,1.56,14.98,4.68,19.49,3.11,4.52,7.99,6.78,14.63,6.78s11.52-2.26,14.64-6.78Z"
                       class="cls-2"></path>
-                <path d="m769.86,940.61l53.74-117.32h37.19l-52.3,115.89h78.34v31.67h-116.97v-30.23Zm70.42-45.58h32.87v102.69h-32.87v-102.69Z" class="cls-2"></path>
+                <path d="m769.86,940.61l53.74-117.32h37.19l-52.3,115.89h78.34v31.67h-116.97v-30.23Zm70.42-45.58h32.87v102.69h-32.87v-102.69Z"
+                      class="cls-2"></path>
             </g>
         </g>
     </g>

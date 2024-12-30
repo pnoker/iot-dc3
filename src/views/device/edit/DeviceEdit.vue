@@ -191,8 +191,8 @@
                 </el-form>
                 <el-form-item class="edit-form-button">
                     <el-button :icon="Back" plain type="success" @click="pre">上一步</el-button>
-                    <el-button :disabled="!hasPointFormData" :icon="Edit" type="primary" @click="pointUpdate"> 修改</el-button>
-                    <el-button :disabled="!hasPointFormData" :icon="RefreshLeft" @click="pointInfoReset"> 恢复</el-button>
+                    <el-button :disabled="!hasPointFormData" :icon="Edit" type="primary" @click="pointUpdate"> 修改 </el-button>
+                    <el-button :disabled="!hasPointFormData" :icon="RefreshLeft" @click="pointInfoReset"> 恢复 </el-button>
                     <el-button :icon="Check" plain type="warning" @click="next">下一步</el-button>
                 </el-form-item>
                 <el-row>

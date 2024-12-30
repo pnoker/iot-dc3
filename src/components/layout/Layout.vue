@@ -31,7 +31,9 @@
                     <template v-for="menusItem in menus">
                         <el-sub-menu v-if="menusItem.children" :key="menusItem.path" :index="menusItem.path">
                             <template #title>{{ (menusItem.meta as any).title }}</template>
-                            <el-menu-item v-for="item in menusItem.children" :key="item.path" :index="item.path">{{ (menusItem.meta as any).title }}</el-menu-item>
+                            <el-menu-item v-for="item in menusItem.children" :key="item.path" :index="item.path">
+                                {{ (menusItem.meta as any).title }}
+                            </el-menu-item>
                         </el-sub-menu>
                         <el-menu-item v-else :key="menusItem.path" :index="menusItem.path">
                             <el-icon>

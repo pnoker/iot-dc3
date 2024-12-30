@@ -336,16 +336,16 @@ export const listenFullscreen = (callback) => {
         callback()
     }
 
-    document.addEventListener('fullscreenchange', function() {
+    document.addEventListener('fullscreenchange', function () {
         listen()
     })
-    document.addEventListener('mozfullscreenchange', function() {
+    document.addEventListener('mozfullscreenchange', function () {
         listen()
     })
-    document.addEventListener('webkitfullscreenchange', function() {
+    document.addEventListener('webkitfullscreenchange', function () {
         listen()
     })
-    document.addEventListener('msfullscreenchange', function() {
+    document.addEventListener('msfullscreenchange', function () {
         listen()
     })
 }

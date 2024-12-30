@@ -1,6 +1,7 @@
 # 使用 ACME.SH 申请并安装 LET’S ENCRYPT SSL 证书
 
-Let’s Encrypt 是一个免费的, 自动化的, 开放的证书颁发机构（CA）, 为公众的利益而运行。 它是一项由 Internet Security Research Group（ISRG）提供的服务。
+Let’s Encrypt 是一个免费的, 自动化的, 开放的证书颁发机构（CA）, 为公众的利益而运行。 它是一项由 Internet Security Research
+Group（ISRG）提供的服务。
 acme.sh 则是实现了 acme 协议, 可以从 letsencrypt 生成免费的证书。
 
 ## 安装 ACME.SH
@@ -49,7 +50,8 @@ acme.sh --renew -d dc3.site --force
 
 ## 取消更新
 
-有时候你可能需要移除特定域名的自动申请, 这时候可以使用下面的命令让 acme.sh 取消对特定域名的自动续期。当然已申请的证书仍然有效, 不会失效。
+有时候你可能需要移除特定域名的自动申请, 这时候可以使用下面的命令让 acme.sh 取消对特定域名的自动续期。当然已申请的证书仍然有效,
+不会失效。
 
 ```bash
 acme.sh --remove -d dc3.site

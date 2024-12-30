@@ -369,15 +369,15 @@ export default defineComponent({
 
                         driverInfo.id
                             ? updateDriverInfo(driverInfo)
-                                .then(() => loadFormData(driverInfo))
-                                .catch(() => {
-                                    // nothing to do
-                                })
+                                  .then(() => loadFormData(driverInfo))
+                                  .catch(() => {
+                                      // nothing to do
+                                  })
                             : addDriverInfo(driverInfo)
-                                .then(() => loadFormData(driverInfo))
-                                .catch(() => {
-                                    // nothing to do
-                                })
+                                  .then(() => loadFormData(driverInfo))
+                                  .catch(() => {
+                                      // nothing to do
+                                  })
 
                         function loadFormData(res: { id: any; driverAttributeId?: any; deviceId?: string; configValue: any }) {
                             driverFormData[attribute.attributeName] = {
@@ -406,15 +406,15 @@ export default defineComponent({
 
                         pointInfo.id
                             ? updatePointInfo(pointInfo)
-                                .then(() => loadFormData(pointInfo))
-                                .catch(() => {
-                                    // nothing to do
-                                })
+                                  .then(() => loadFormData(pointInfo))
+                                  .catch(() => {
+                                      // nothing to do
+                                  })
                             : addPointInfo(pointInfo)
-                                .then(() => loadFormData(pointInfo))
-                                .catch(() => {
-                                    // nothing to do
-                                })
+                                  .then(() => loadFormData(pointInfo))
+                                  .catch(() => {
+                                      // nothing to do
+                                  })
 
                         function loadFormData(res: { id: any; pointAttributeId?: any; deviceId?: string; pointId?: any; configValue: any }) {
                             reactiveData.pointInfoData.forEach((pointInfo) => {

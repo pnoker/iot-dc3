@@ -1,9 +1,9 @@
 {
-    "tabWidth": 4,
-    "printWidth": 180,
-    "semi": false,
-    "singleQuote": true,
-    "endOfLine": "auto",
-    "trailingComma": "none",
-    "objectCurlySpacing": false
+  "tabWidth": 4,
+  "printWidth": 180,
+  "semi": false,
+  "singleQuote": true,
+  "endOfLine": "auto",
+  "trailingComma": "none",
+  "objectCurlySpacing": false
 }

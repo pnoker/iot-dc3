@@ -38,54 +38,54 @@
                         <ul class="things-body-content-item-column-2">
                             <li class="nowrap-item">
                                 <span
-                                ><el-icon><List /></el-icon> 所属模板: </span
+                                    ><el-icon><List /></el-icon> 所属模板: </span
                                 >{{ profile.profileName }}
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                ><el-icon><Location /></el-icon> 比例系数: </span
+                                    ><el-icon><Location /></el-icon> 比例系数: </span
                                 >{{ data.multiple }}
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                ><el-icon><Location /></el-icon> 数据精度: </span
+                                    ><el-icon><Location /></el-icon> 数据精度: </span
                                 >{{ data.valueDecimal }}
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                ><el-icon><Location /></el-icon> 单位: </span
+                                    ><el-icon><Location /></el-icon> 单位: </span
                                 >{{ data.unit }}
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                ><el-icon><Edit /></el-icon> 修改日期: </span
+                                    ><el-icon><Edit /></el-icon> 修改日期: </span
                                 >{{ timestamp(data.operateTime) }}
                             </li>
                         </ul>
                         <ul class="things-body-content-item-column-2">
                             <li class="nowrap-item">
                                 <span
-                                ><el-icon><Location /></el-icon> 数据类型: </span
+                                    ><el-icon><Location /></el-icon> 数据类型: </span
                                 >{{ pointTypeFlag }}
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                ><el-icon><Location /></el-icon> 基础值: </span
+                                    ><el-icon><Location /></el-icon> 基础值: </span
                                 >{{ data.baseValue }}
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                ><el-icon><Location /></el-icon> 处理值: </span
+                                    ><el-icon><Location /></el-icon> 处理值: </span
                                 >Y = {{ data.multiple }}X + {{ data.baseValue }}, 保留{{ data.valueDecimal }}位小数
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                ><el-icon><Location /></el-icon> 读写标识: </span
+                                    ><el-icon><Location /></el-icon> 读写标识: </span
                                 >{{ rwFlag }}
                             </li>
                             <li class="nowrap-item">
                                 <span
-                                ><el-icon><Sunset /></el-icon> 创建日期: </span
+                                    ><el-icon><Sunset /></el-icon> 创建日期: </span
                                 >{{ timestamp(data.createTime) }}
                             </li>
                         </ul>

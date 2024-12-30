@@ -124,9 +124,14 @@ export default defineComponent({
         }
 
         const edit = () => {
-            router.push({ name: 'pointEdit', query: { id: props.data.id, profileId: props.data.profileId, active: '0' } }).catch(() => {
-                // nothing to do
-            })
+            router
+                .push({
+                    name: 'pointEdit',
+                    query: { id: props.data.id, profileId: props.data.profileId, active: '0' }
+                })
+                .catch(() => {
+                    // nothing to do
+                })
         }
 
         const detail = () => {
