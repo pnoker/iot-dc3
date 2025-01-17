@@ -113,7 +113,7 @@ public interface GrpcDeviceBuilder {
 
         CollectionOptional.ofNullable(entityBO.getProfileIds()).ifPresent(entityGrpc::addAllProfileIds);
         Optional.ofNullable(entityBO.getDeviceExt()).ifPresent(value -> entityGrpc.setDeviceExt(JsonUtil.toJsonString(value)));
-        Optional.ofNullable(entityBO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(entityBO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
 
 }

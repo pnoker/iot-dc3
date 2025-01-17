@@ -61,4 +61,14 @@ public class FieldUtil {
     public static boolean isValidIdField(Long id) {
         return Objects.nonNull(id) && id > DefaultConstant.ZERO;
     }
+
+    /**
+     * 判断是否为有效的枚举索引
+     *
+     * @param id ID
+     * @return 是否有效
+     */
+    public static boolean isValidEnumIndexField(Byte id) {
+        return Objects.nonNull(id) && id > DefaultConstant.ZERO;
+    }
 }

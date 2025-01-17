@@ -92,6 +92,6 @@ public interface GrpcDriverAttributeBuilder {
 
         Optional.ofNullable(entityDTO.getAttributeExt()).ifPresent(value -> entityGrpc.setAttributeExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityDTO.getAttributeTypeFlag()).ifPresentOrElse(value -> entityGrpc.setAttributeTypeFlag(value.getIndex()), () -> entityGrpc.setAttributeTypeFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(entityDTO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(entityDTO.getEnableFlag()).ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()), () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
 }
