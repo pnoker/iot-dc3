@@ -42,8 +42,6 @@ public class PointValue implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String id;
-
     /**
      * 设备ID
      */
@@ -55,14 +53,14 @@ public class PointValue implements Serializable {
     private Long pointId;
 
     /**
-     * 处理值
-     */
-    private String value;
-
-    /**
      * 原始值
      */
     private String rawValue;
+
+    /**
+     * 处理值
+     */
+    private String calValue;
 
     /**
      * 原始时间
@@ -74,11 +72,11 @@ public class PointValue implements Serializable {
      */
     private LocalDateTime createTime;
 
-    public PointValue(RValue value) {
-        this.deviceId = value.getDevice().getId();
-        this.pointId = value.getPoint().getId();
-        this.rawValue = value.getValue();
-        this.value = value.getFinalValue();
+    public PointValue(RValue calValue) {
+        this.deviceId = calValue.getDevice().getId();
+        this.pointId = calValue.getPoint().getId();
+        this.rawValue = calValue.getValue();
+        this.calValue = calValue.getFinalValue();
         this.originTime = LocalDateTime.now();
     }
 }
