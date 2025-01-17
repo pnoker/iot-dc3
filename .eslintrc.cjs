@@ -26,7 +26,7 @@ module.exports = {
         parser: '@typescript-eslint/parser',
         sourceType: 'module'
     },
-    extends: ['plugin:vue/vue3-recommended', 'plugin:prettier/recommended', 'eslint:recommended'],
+    extends: ['plugin:vue/vue3-recommended', 'eslint:recommended', 'plugin:prettier/recommended'],
     plugins: ['vue', '@typescript-eslint'],
     overrides: [
         {
@@ -51,7 +51,6 @@ module.exports = {
         '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
         '@typescript-eslint/no-unused-vars': 'error',
         'vue/custom-event-name-casing': 'off',
-        'vue/attributes-order': 'off',
         'vue/one-component-per-file': 'off',
         'vue/html-closing-bracket-newline': 'off',
         'vue/max-attributes-per-line': 'off',
@@ -84,6 +83,25 @@ module.exports = {
         'no-case-declarations': 'off',
         'eol-last': 'off',
         'no-console': 'off',
-        'no-redeclare': 'off'
+        'no-redeclare': 'off',
+        'vue/attributes-order': [
+            'error',
+            {
+                order: [
+                    'DEFINITION',
+                    'LIST_RENDERING',
+                    'CONDITIONALS',
+                    'RENDER_MODIFIERS',
+                    'GLOBAL',
+                    ['UNIQUE', 'SLOT'],
+                    'TWO_WAY_BINDING',
+                    'OTHER_DIRECTIVES',
+                    'OTHER_ATTR',
+                    'EVENTS',
+                    'CONTENT'
+                ],
+                alphabetical: false
+            }
+        ]
     }
 }
