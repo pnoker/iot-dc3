@@ -26,7 +26,7 @@ module.exports = {
         parser: '@typescript-eslint/parser',
         sourceType: 'module'
     },
-    extends: ['plugin:vue/vue3-recommended', 'eslint:recommended', 'plugin:prettier/recommended'],
+    extends: ['plugin:vue/vue3-recommended', 'plugin:prettier/recommended', 'eslint:recommended'],
     plugins: ['vue', '@typescript-eslint'],
     overrides: [
         {
