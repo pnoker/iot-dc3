@@ -70,7 +70,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         LongOptional.ofNullable(pageQuery.getDriverId()).ifPresent(query::setDriverId);
         LongOptional.ofNullable(pageQuery.getProfileId()).ifPresent(query::setProfileId);
         LongOptional.ofNullable(pageQuery.getTenantId()).ifPresent(query::setTenantId);
-        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.DEFAULT_INT));
         GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.selectByPage(query.build());
 
         if (!rPageDeviceDTO.getResult().getOk()) {

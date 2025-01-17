@@ -31,6 +31,11 @@ public class DefaultConstant {
     public static final Integer NULL_INT = -1;
 
     /**
+     * 默认 Integer 零值: 0
+     */
+    public static final Integer DEFAULT_INT = 0;
+
+    /**
      * 零: 0
      */
     public static final Integer ZERO = 0;

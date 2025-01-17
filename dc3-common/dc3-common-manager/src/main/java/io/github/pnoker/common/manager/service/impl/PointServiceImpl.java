@@ -392,7 +392,7 @@ public class PointServiceImpl implements PointService {
         QueryWrapper<PointDO> wrapper = Wrappers.query();
         wrapper.eq("dp.deleted", 0);
         wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getPointName()), "dp.point_name", entityQuery.getPointName());
-        wrapper.eq(Objects.nonNull(entityQuery.getPointCode()), "dp.point_code", entityQuery.getPointCode());
+        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getPointCode()), "dp.point_code", entityQuery.getPointCode());
         wrapper.eq(Objects.nonNull(entityQuery.getPointTypeFlag()), "dp.point_type_flag", entityQuery.getPointTypeFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getRwFlag()), "dp.rw_flag", entityQuery.getRwFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), "dp.profile_id", entityQuery.getProfileId());

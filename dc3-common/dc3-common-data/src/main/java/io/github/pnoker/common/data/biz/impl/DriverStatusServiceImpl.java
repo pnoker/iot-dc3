@@ -75,7 +75,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         StringOptional.ofNullable(pageQuery.getServiceHost()).ifPresent(query::setServiceHost);
         LongOptional.ofNullable(pageQuery.getTenantId()).ifPresent(query::setTenantId);
         Optional.ofNullable(pageQuery.getDriverTypeFlag()).ifPresentOrElse(value -> query.setDriverTypeFlag(value.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.NULL_INT));
+        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.DEFAULT_INT));
         GrpcRPageDriverDTO rPageDriverDTO = driverApiBlockingStub.selectByPage(query.build());
 
         if (!rPageDriverDTO.getResult().getOk()) {
