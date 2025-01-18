@@ -73,7 +73,7 @@ public class InfluxRepositoryServiceImpl implements RepositoryService, Initializ
             entity.setDeviceId(Long.parseLong(bo.getDeviceId()));
             entity.setPointId(Long.parseLong(bo.getPointId()));
             entity.setRawValue(bo.getRawValue().toString());
-            entity.setValue(bo.getValue().toString());
+            entity.setCalValue(bo.getValue().toString());
             entity.setOriginTime(LocalDateTime.parse(bo.getOriginTime())); // Assuming originTime is in ISO-8601 format
 
             // Convert Instant to LocalDateTime
@@ -153,7 +153,7 @@ public class InfluxRepositoryServiceImpl implements RepositoryService, Initializ
                 .addTag("deviceId", influxPointValueDO.getDeviceId().toString())
                 .addTag("pointId", influxPointValueDO.getPointId().toString())
                 .addTag("originTime", influxPointValueDO.getOriginTime().toString())
-                .addField("value", Long.valueOf(influxPointValueDO.getValue()))
+                .addField("value", Long.valueOf(influxPointValueDO.getCalValue()))
                 .addField("rawValue", Long.valueOf(influxPointValueDO.getRawValue()))
                 .time(Instant.now(), WritePrecision.MS);
         writeApiBlocking.writePoint(point);
@@ -172,7 +172,7 @@ public class InfluxRepositoryServiceImpl implements RepositoryService, Initializ
                     .addTag("deviceId", influxPointValueDO.getDeviceId().toString())
                     .addTag("pointId", influxPointValueDO.getPointId().toString())
                     .addTag("originTime", influxPointValueDO.getOriginTime().toString())
-                    .addField("value", Long.valueOf(influxPointValueDO.getValue()))
+                    .addField("value", Long.valueOf(influxPointValueDO.getCalValue()))
                     .addField("rawValue", Long.valueOf(influxPointValueDO.getRawValue()))
                     .time(Instant.now(), WritePrecision.MS);
             writeApiBlocking.writePoint(point);

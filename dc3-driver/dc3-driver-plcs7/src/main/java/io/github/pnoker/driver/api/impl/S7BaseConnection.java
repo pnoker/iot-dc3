@@ -21,8 +21,9 @@ import io.github.pnoker.driver.api.impl.nodave.Nodave;
 import io.github.pnoker.driver.api.impl.nodave.S7Connection;
 
 /**
- * Base-Connection for the S7-PLC Connection Libnodave:
- * http://libnodave.sourceforge.net/
+ * Base connection implementation for the S7 PLC communication using the Libnodave library.
+ * Libnodave is an open-source library for communicating with Siemens S7 PLCs.
+ * For more information, visit: http://libnodave.sourceforge.net/
  *
  * @author Thomas Rudin
  */
