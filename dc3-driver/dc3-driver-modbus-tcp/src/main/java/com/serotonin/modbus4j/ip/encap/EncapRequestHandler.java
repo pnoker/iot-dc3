@@ -26,7 +26,7 @@ import com.serotonin.modbus4j.sero.messaging.OutgoingResponseMessage;
  * <p>EncapRequestHandler class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public class EncapRequestHandler extends BaseRequestHandler {
     /**

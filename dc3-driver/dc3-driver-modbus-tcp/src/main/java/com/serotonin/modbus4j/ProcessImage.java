@@ -21,7 +21,7 @@ import com.serotonin.modbus4j.exception.IllegalDataAddressException;
  * Used by slave implementors. Provides an interface by which slaves can easily manage data.
  *
  * @author mlohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public interface ProcessImage {
     /**

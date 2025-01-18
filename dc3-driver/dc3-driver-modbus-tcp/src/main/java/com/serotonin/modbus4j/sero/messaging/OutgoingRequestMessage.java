@@ -21,7 +21,7 @@ package com.serotonin.modbus4j.sero.messaging;
  * <p>OutgoingRequestMessage interface.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public interface OutgoingRequestMessage extends OutgoingMessage {
     /**

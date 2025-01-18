@@ -25,7 +25,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>XaMessageResponse class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public class XaMessageResponse extends XaMessage implements IpMessageResponse {
     /**

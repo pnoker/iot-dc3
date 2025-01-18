@@ -21,7 +21,7 @@ import java.math.BigInteger;
  * <p>DataType class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public class DataType {
     /**

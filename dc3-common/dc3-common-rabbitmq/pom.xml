@@ -24,12 +24,12 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-common</artifactId>
-        <version>2024.3.9</version>
+        <version>2024.3.10</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-common-rabbitmq</artifactId>
-    <version>2024.3.9</version>
+    <version>2024.3.10</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2016-2022</inceptionYear>

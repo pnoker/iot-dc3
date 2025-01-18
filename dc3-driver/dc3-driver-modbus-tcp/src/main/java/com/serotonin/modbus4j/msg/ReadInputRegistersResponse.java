@@ -22,7 +22,7 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
  * <p>ReadInputRegistersResponse class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public class ReadInputRegistersResponse extends ReadResponse {
     ReadInputRegistersResponse(int slaveId, byte[] data) throws ModbusTransportException {

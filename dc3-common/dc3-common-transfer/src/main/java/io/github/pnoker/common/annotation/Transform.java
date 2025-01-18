@@ -25,7 +25,7 @@ import java.lang.annotation.*;
  * 最基本的注解, 可以被其他自定义注解衍生
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -21,7 +21,7 @@ import java.io.File;
  * <p>IOLog class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public class IOLog extends BaseIOLog {
     //private static final Log LOG = LogFactory.getLog(IOLog.class);

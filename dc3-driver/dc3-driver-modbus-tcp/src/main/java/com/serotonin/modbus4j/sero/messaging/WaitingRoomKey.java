@@ -21,7 +21,7 @@ package com.serotonin.modbus4j.sero.messaging;
  * definitions.
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public interface WaitingRoomKey {
     // Implementation needs to have hashcode and equals implementations.

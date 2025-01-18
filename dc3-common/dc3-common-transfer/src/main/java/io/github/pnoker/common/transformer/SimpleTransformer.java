@@ -25,7 +25,7 @@ import org.springframework.lang.NonNull;
  * 自定义转换场景中如果自定义注解里不需要额外属性(除开from属性), 直接实现该接口即可
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 public interface SimpleTransformer<T> extends Transformer<T, Transform> {

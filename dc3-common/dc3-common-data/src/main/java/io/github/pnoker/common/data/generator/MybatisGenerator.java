@@ -29,7 +29,7 @@ import io.github.pnoker.common.utils.MybatisUtil;
  * 当前配置仅用于 dc3-common-data 服务模块, 如果需要用于其他模块请重新配置 path 参数。
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 public class MybatisGenerator {
