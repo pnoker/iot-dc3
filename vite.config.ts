@@ -60,7 +60,7 @@ export default (configEnv: ConfigEnv) => {
             lodash: ['lodash-es'],
             echarts: ['echarts'],
             element: ['element-plus', '@element-plus/icons-vue'],
-            antv: ['@antv/g2plot'],
+            antv: ['@antv/g2'],
             amap: ['@amap/amap-jsapi-loader']
         }
     }
