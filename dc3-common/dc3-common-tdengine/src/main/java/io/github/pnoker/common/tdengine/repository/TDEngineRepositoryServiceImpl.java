@@ -79,7 +79,7 @@ public class TDEngineRepositoryServiceImpl implements RepositoryService, Initial
     @Override
     public List<String> selectHistoryPointValue(Long deviceId, Long pointId, int count) {
         List<TDEnginePointValueDO> result = tdEngineRepositoryMapper.selectHistoryPointValue(deviceId, pointId, count);
-        return result.stream().map(TDEnginePointValueDO::getValue).toList();
+        return result.stream().map(TDEnginePointValueDO::getCalValue).toList();
     }
 
     @Override

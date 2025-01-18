@@ -101,11 +101,6 @@ public final class S7TCPConnection extends S7BaseConnection {
         }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        this.close();
-    }
-
     /**
      * Sets up the socket
      */

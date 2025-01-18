@@ -98,11 +98,11 @@ public class MongoRepositoryServiceImpl implements RepositoryService, Initializi
         Criteria criteria = new Criteria();
         Query query = new Query(criteria);
         criteria.and(FieldUtil.getField(MgPointValueDO::getDeviceId)).is(deviceId).and(FieldUtil.getField(MgPointValueDO::getPointId)).is(pointId);
-        query.fields().include(FieldUtil.getField(MgPointValueDO::getValue)).exclude(FieldUtil.getField(MgPointValueDO::getId));
+        query.fields().include(FieldUtil.getField(MgPointValueDO::getCalValue)).exclude(FieldUtil.getField(MgPointValueDO::getId));
         query.limit(count).with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(MgPointValueDO::getCreateTime)));
 
         List<MgPointValueDO> entityDOList = mongoTemplate.find(query, MgPointValueDO.class, StorageConstant.POINT_VALUE_PREFIX + deviceId);
-        return entityDOList.stream().map(MgPointValueDO::getValue).toList();
+        return entityDOList.stream().map(MgPointValueDO::getCalValue).toList();
     }
 
     @Override
@@ -110,7 +110,7 @@ public class MongoRepositoryServiceImpl implements RepositoryService, Initializi
         Criteria criteria = new Criteria();
         Query query = new Query(criteria);
         criteria.and(FieldUtil.getField(MgPointValueDO::getDeviceId)).is(deviceId).and(FieldUtil.getField(MgPointValueDO::getPointId)).is(pointId);
-        query.fields().include(FieldUtil.getField(MgPointValueDO::getValue)).exclude(FieldUtil.getField(MgPointValueDO::getId));
+        query.fields().include(FieldUtil.getField(MgPointValueDO::getCalValue)).exclude(FieldUtil.getField(MgPointValueDO::getId));
         query.limit(1).with(Sort.by(Sort.Direction.DESC, FieldUtil.getField(MgPointValueDO::getCreateTime)));
         MgPointValueDO entityDO = mongoTemplate.findOne(query, MgPointValueDO.class, StorageConstant.POINT_VALUE_PREFIX + deviceId);
         return mgPointValueBuilder.buildBOByMgDO(entityDO);
@@ -131,7 +131,7 @@ public class MongoRepositoryServiceImpl implements RepositoryService, Initializi
                 .first(FieldUtil.getField(MgPointValueDO::getDeviceId)).as(FieldUtil.getField(MgPointValueDO::getDeviceId))
                 .first(FieldUtil.getField(MgPointValueDO::getPointId)).as(FieldUtil.getField(MgPointValueDO::getPointId))
                 .first(FieldUtil.getField(MgPointValueDO::getRawValue)).as(FieldUtil.getField(MgPointValueDO::getRawValue))
-                .first(FieldUtil.getField(MgPointValueDO::getValue)).as(FieldUtil.getField(MgPointValueDO::getValue))
+                .first(FieldUtil.getField(MgPointValueDO::getCalValue)).as(FieldUtil.getField(MgPointValueDO::getCalValue))
                 .first(FieldUtil.getField(MgPointValueDO::getOriginTime)).as(FieldUtil.getField(MgPointValueDO::getOriginTime))
                 .first(FieldUtil.getField(MgPointValueDO::getCreateTime)).as(FieldUtil.getField(MgPointValueDO::getCreateTime));
         Aggregation aggregation = Aggregation.newAggregation(match, sort, group);

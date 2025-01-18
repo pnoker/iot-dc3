@@ -32,9 +32,9 @@
     <inceptionYear>2016-2022</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IOT-DC3 可分布式的物联网(IOT)平台 , 基于开源Spring Cloud框架搭建, 实现设备互联, 管理, 数据采集, 代码生成,
-        快速开发和可视化等,
-        兼容多种流行的物联网数据接入协议(Mqtt\Socket\Modbus\PLC\OpcUa\OpcDa...), 是一整套完整的物联系统解决方案。
+        IoT DC3 is a 100% open-source, distributed Internet of Things (IoT) platform built on Spring Cloud.
+        It accelerates IoT project development and simplifies IoT device management, offering a comprehensive solution for building robust IoT systems.
+        All components and code are fully open-source, ensuring transparency, flexibility, and community-driven innovation.
     </description>
 
     <developers>

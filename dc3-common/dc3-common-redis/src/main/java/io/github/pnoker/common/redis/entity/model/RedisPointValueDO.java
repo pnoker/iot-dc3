@@ -62,7 +62,7 @@ public class RedisPointValueDO implements Serializable {
     /**
      * 处理值
      */
-    private String value;
+    private String calValue;
 
     /**
      * 原始时间
