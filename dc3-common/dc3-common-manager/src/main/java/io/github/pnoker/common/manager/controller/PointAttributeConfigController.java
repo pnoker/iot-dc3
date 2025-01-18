@@ -41,7 +41,7 @@ import java.util.Objects;
  * 位号属性配置信息 Controller
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 @Slf4j

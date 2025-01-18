@@ -22,7 +22,7 @@ import java.io.OutputStream;
  * Wrapper to further aid in abstracting Modbus4J from a serial port implementation
  *
  * @author Terry Packer
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public interface SerialPortWrapper {
 

@@ -26,7 +26,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>EncapMessageRequest class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public class EncapMessageRequest extends EncapMessage implements OutgoingRequestMessage, IncomingRequestMessage {
     /**

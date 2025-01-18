@@ -27,7 +27,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>Abstract ModbusResponse class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 abstract public class ModbusResponse extends ModbusMessage {
     /**

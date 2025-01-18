@@ -26,7 +26,7 @@ import java.util.List;
  * ProfileBind Interface
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 public interface ProfileBindService extends BaseService<ProfileBindBO, ProfileBindQuery> {

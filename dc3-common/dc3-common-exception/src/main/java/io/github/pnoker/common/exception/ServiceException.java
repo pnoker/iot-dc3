@@ -22,7 +22,7 @@ import cn.hutool.core.text.CharSequenceUtil;
  * 自定义 服务 异常
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 public class ServiceException extends RuntimeException {

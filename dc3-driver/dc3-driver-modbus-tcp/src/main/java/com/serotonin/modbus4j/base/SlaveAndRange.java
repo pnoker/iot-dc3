@@ -19,7 +19,7 @@ package com.serotonin.modbus4j.base;
  * <p>SlaveAndRange class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public class SlaveAndRange {
     private final int slaveId;

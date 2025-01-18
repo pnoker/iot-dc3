@@ -21,7 +21,7 @@ package io.github.pnoker.common.base.enums;
  * 枚举对象
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 public class EnumBean implements BaseEnum {

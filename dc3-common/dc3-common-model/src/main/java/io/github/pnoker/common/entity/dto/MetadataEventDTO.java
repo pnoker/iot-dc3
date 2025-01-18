@@ -30,7 +30,7 @@ import java.io.Serializable;
  * 元数据事件 DTO
  *
  * @author zhangzi
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 @Getter

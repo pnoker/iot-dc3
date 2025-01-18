@@ -27,7 +27,7 @@ import java.util.List;
  * RoleResourceBind Interface
  *
  * @author linys
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 public interface RoleResourceBindService extends BaseService<RoleResourceBindBO, RoleResourceBindQuery> {

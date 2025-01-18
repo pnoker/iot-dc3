@@ -30,7 +30,7 @@ import java.io.Serializable;
  * 设备相关拓展信息
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 @Getter

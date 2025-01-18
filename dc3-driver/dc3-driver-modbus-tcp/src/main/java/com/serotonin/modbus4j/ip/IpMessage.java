@@ -21,7 +21,7 @@ import com.serotonin.modbus4j.msg.ModbusMessage;
  * <p>Abstract IpMessage class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 abstract public class IpMessage {
     protected final ModbusMessage modbusMessage;

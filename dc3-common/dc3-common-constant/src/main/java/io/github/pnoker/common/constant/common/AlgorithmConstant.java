@@ -20,7 +20,7 @@ package io.github.pnoker.common.constant.common;
  * 算法 相关常量
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 public class AlgorithmConstant {

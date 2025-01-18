@@ -24,7 +24,7 @@ import io.github.pnoker.common.dal.entity.query.LabelQuery;
  * Label Interface
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 public interface LabelService extends BaseService<LabelBO, LabelQuery> {

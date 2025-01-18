@@ -28,7 +28,7 @@ import java.io.InputStream;
  * stream listeners to safely listen and still respond when they are told to stop.
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public class InputStreamListener implements Runnable {
     private static final int DEFAULT_READ_DELAY = 50;

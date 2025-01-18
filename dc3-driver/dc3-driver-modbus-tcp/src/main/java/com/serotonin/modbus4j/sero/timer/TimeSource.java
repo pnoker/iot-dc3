@@ -21,7 +21,7 @@ package com.serotonin.modbus4j.sero.timer;
  * the time is controlled explicitly.
  *
  * @author Matthew Lohbihler
- * @version 2024.3.9
+ * @version 2024.3.10
  */
 public interface TimeSource {
     /**

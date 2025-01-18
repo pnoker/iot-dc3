@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  * 编码生成工具类，提供唯一编码生成功能
  *
  * @author pnoker
- * @version 2024.3.9
+ * @version 2024.3.10
  * @since 2022.1.0
  */
 @Slf4j
