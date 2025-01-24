@@ -1,5 +1,5 @@
 [package]
-name = "IoT DC3"
+name = "iot_dc3"
 version = "2024.3.0"
 description = "IoT DC3 Application"
 authors = ["pnoker"]
