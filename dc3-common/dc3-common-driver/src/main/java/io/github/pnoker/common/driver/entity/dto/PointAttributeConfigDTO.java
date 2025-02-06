@@ -39,7 +39,7 @@ public class PointAttributeConfigDTO extends BaseDTO {
     /**
      * 位号属性ID
      */
-    private Long pointAttributeId;
+    private Long attributeId;
 
     /**
      * 位号属性配置值

@@ -152,7 +152,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     @Override
     public List<PointAttributeConfigBO> selectByAttributeId(Long attributeId) {
         LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
-                .eq(PointAttributeConfigDO::getPointAttributeId, attributeId);
+                .eq(PointAttributeConfigDO::getAttributeId, attributeId);
         List<PointAttributeConfigDO> entityDO = wrapper.list();
         return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
@@ -198,7 +198,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
-        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointAttributeId()), PointAttributeConfigDO::getPointAttributeId, entityQuery.getPointAttributeId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getAttributeId()), PointAttributeConfigDO::getAttributeId, entityQuery.getAttributeId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointId()), PointAttributeConfigDO::getPointId, entityQuery.getPointId());
         wrapper.eq(PointAttributeConfigDO::getTenantId, entityQuery.getTenantId());
@@ -214,7 +214,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
      */
     private boolean checkDuplicate(PointAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
-        wrapper.eq(PointAttributeConfigDO::getPointAttributeId, entityBO.getPointAttributeId());
+        wrapper.eq(PointAttributeConfigDO::getAttributeId, entityBO.getAttributeId());
         wrapper.eq(PointAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
         wrapper.eq(PointAttributeConfigDO::getPointId, entityBO.getPointId());
         wrapper.eq(PointAttributeConfigDO::getTenantId, entityBO.getTenantId());

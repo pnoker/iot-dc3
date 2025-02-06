@@ -129,7 +129,7 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
         for (int j = 0; j < driverAttributeBOList.size(); j++) {
             DriverAttributeConfigBO entityBO = new DriverAttributeConfigBO();
             DriverAttributeBO driverAttributeBO = driverAttributeBOList.get(j);
-            entityBO.setDriverAttributeId(driverAttributeBO.getId());
+            entityBO.setAttributeId(driverAttributeBO.getId());
             entityBO.setDeviceId(deviceBO.getId());
             String attributeValue = PoiUtil.getCellStringValue(sheet, row, 2 + j);
             entityBO.setConfigValue(attributeValue);
@@ -155,7 +155,7 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
                 PointAttributeConfigBO entityBO = new PointAttributeConfigBO();
                 PointBO pointBO = pointBOList.get(j);
                 PointAttributeBO pointAttributeBO = pointAttributeBOList.get(k);
-                entityBO.setPointAttributeId(pointAttributeBO.getId());
+                entityBO.setAttributeId(pointAttributeBO.getId());
                 entityBO.setDeviceId(deviceBO.getId());
                 entityBO.setPointId(pointBO.getId());
                 String attributeValue = PoiUtil.getCellStringValue(sheet, row, 2 + driverAttributeBOList.size() + k * pointAttributeBOList.size() + j);

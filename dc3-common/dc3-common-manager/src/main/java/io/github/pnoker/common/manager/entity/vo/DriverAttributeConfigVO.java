@@ -45,7 +45,7 @@ public class DriverAttributeConfigVO extends BaseVO {
      */
     @NotNull(message = "驱动属性ID不能为空",
             groups = {Add.class, Update.class})
-    private Long driverAttributeId;
+    private Long attributeId;
 
     /**
      * 驱动属性配置值

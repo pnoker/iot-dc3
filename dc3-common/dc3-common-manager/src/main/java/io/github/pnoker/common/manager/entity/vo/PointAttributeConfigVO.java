@@ -45,7 +45,7 @@ public class PointAttributeConfigVO extends BaseVO {
      */
     @NotNull(message = "位号属性ID不能为空",
             groups = {Add.class, Update.class})
-    private Long pointAttributeId;
+    private Long attributeId;
 
     /**
      * 位号属性配置值

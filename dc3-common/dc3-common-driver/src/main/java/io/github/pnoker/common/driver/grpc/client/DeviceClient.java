@@ -118,13 +118,13 @@ public class DeviceClient {
 
         CollectionOptional.ofNullable(rDeviceAttachDTO.getDriverConfigsList()).ifPresent(value -> {
             Map<Long, DriverAttributeConfigDTO> driverAttributeConfigMap = value.stream()
-                    .collect(Collectors.toMap(GrpcDriverAttributeConfigDTO::getDriverAttributeId, grpcDriverAttributeConfigBuilder::buildDTOByGrpcDTO));
+                    .collect(Collectors.toMap(GrpcDriverAttributeConfigDTO::getAttributeId, grpcDriverAttributeConfigBuilder::buildDTOByGrpcDTO));
             deviceBO.setDriverAttributeConfigIdMap(driverAttributeConfigMap);
         });
 
         CollectionOptional.ofNullable(rDeviceAttachDTO.getPointConfigsList()).ifPresent(value -> {
             Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigMap = value.stream()
-                    .collect(Collectors.groupingBy(GrpcPointAttributeConfigDTO::getPointId, Collectors.toMap(GrpcPointAttributeConfigDTO::getPointAttributeId, grpcPointAttributeConfigBuilder::buildDTOByGrpcDTO)));
+                    .collect(Collectors.groupingBy(GrpcPointAttributeConfigDTO::getPointId, Collectors.toMap(GrpcPointAttributeConfigDTO::getAttributeId, grpcPointAttributeConfigBuilder::buildDTOByGrpcDTO)));
             deviceBO.setPointAttributeConfigIdMap(pointAttributeConfigMap);
         });
 

@@ -120,8 +120,8 @@ message GrpcDriverAttributeDTO {
   */
   GrpcBase base = 1;
 
-  string display_name = 2; // 显示名称
-  string attribute_name = 3; // 属性名称
+  string attribute_name = 2; // 属性名称
+  string attribute_code = 3; // 属性编号
   int32 attribute_type_flag = 4; // 属性类型标识
   string default_value = 5; // 默认值
   int64 driver_id = 6; // 驱动ID
@@ -145,7 +145,7 @@ message GrpcDriverAttributeConfigDTO {
   */
   GrpcBase base = 1;
 
-  int64 driver_attribute_id = 2; // 驱动配置ID
+  int64 attribute_id = 2; // 驱动属性ID
   string config_value = 3; // 驱动配置值
   int64 device_id = 4; // 设备ID
   int32 enable_flag = 5; // 使能标识
@@ -167,8 +167,8 @@ message GrpcPointAttributeDTO {
   */
   GrpcBase base = 1;
 
-  string display_name = 2; // 显示名称
-  string attribute_name = 3; // 属性名称
+  string attribute_name = 2; // 属性名称
+  string attribute_code = 3; // 属性编号
   int32 attribute_type_flag = 4; // 属性类型标识
   string default_value = 5; // 默认值
   int64 driver_id = 6; // 驱动ID
@@ -192,7 +192,7 @@ message GrpcPointAttributeConfigDTO {
   */
   GrpcBase base = 1;
 
-  int64 point_attribute_id = 2; // 位号配置ID
+  int64 attribute_id = 2; // 位号属性ID
   string config_value = 3; // 位号配置值
   int64 device_id = 4; // 设备ID
   int64 point_id = 5; // 位号ID

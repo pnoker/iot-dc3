@@ -50,10 +50,10 @@ public class DriverAttributeConfigDO implements Serializable {
     private Long id;
 
     /**
-     * 驱动配置ID
+     * 驱动属性ID
      */
-    @TableField("driver_attribute_id")
-    private Long driverAttributeId;
+    @TableField("attribute_id")
+    private Long attributeId;
 
     /**
      * 驱动配置值

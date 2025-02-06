@@ -98,13 +98,13 @@ public class DriverClient {
 
         List<GrpcDriverAttributeDTO> driverAttributesList = rDriverRegisterDTO.getDriverAttributesList();
         Map<Long, DriverAttributeDTO> driverAttributeIdMap = driverAttributesList.stream().collect(Collectors.toMap(entity -> entity.getBase().getId(), grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
-        Map<String, DriverAttributeDTO> driverAttributeNameMap = driverAttributesList.stream().collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeName, grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
+        Map<String, DriverAttributeDTO> driverAttributeNameMap = driverAttributesList.stream().collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeCode, grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
         driverMetadata.setDriverAttributeIdMap(driverAttributeIdMap);
         driverMetadata.setDriverAttributeNameMap(driverAttributeNameMap);
 
         List<GrpcPointAttributeDTO> pointAttributesList = rDriverRegisterDTO.getPointAttributesList();
         Map<Long, PointAttributeDTO> pointAttributeIdMap = pointAttributesList.stream().collect(Collectors.toMap(entity -> entity.getBase().getId(), grpcPointAttributeBuilder::buildDTOByGrpcDTO));
-        Map<String, PointAttributeDTO> pointAttributeNameMap = pointAttributesList.stream().collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeName, grpcPointAttributeBuilder::buildDTOByGrpcDTO));
+        Map<String, PointAttributeDTO> pointAttributeNameMap = pointAttributesList.stream().collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeCode, grpcPointAttributeBuilder::buildDTOByGrpcDTO));
         driverMetadata.setPointAttributeIdMap(pointAttributeIdMap);
         driverMetadata.setPointAttributeNameMap(pointAttributeNameMap);
 

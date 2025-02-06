@@ -50,10 +50,10 @@ public class PointAttributeConfigDO implements Serializable {
     private Long id;
 
     /**
-     * 位号配置ID
+     * 位号属性ID
      */
-    @TableField("point_attribute_id")
-    private Long pointAttributeId;
+    @TableField("attribute_id")
+    private Long attributeId;
 
     /**
      * 位号配置值

@@ -50,16 +50,16 @@ public class DriverAttributeDO implements Serializable {
     private Long id;
 
     /**
-     * 显示名称
-     */
-    @TableField("display_name")
-    private String displayName;
-
-    /**
      * 属性名称
      */
     @TableField("attribute_name")
     private String attributeName;
+
+    /**
+     * 属性编号
+     */
+    @TableField("attribute_code")
+    private String attributeCode;
 
     /**
      * 属性类型标识

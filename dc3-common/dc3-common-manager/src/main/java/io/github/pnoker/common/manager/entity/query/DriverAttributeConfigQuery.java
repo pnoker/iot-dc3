@@ -53,7 +53,7 @@ public class DriverAttributeConfigQuery implements Serializable {
     /**
      * 驱动属性ID
      */
-    private Long driverAttributeId;
+    private Long attributeId;
 
     /**
      * 设备ID
