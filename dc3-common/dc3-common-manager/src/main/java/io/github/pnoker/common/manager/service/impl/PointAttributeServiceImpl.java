@@ -97,7 +97,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     @Override
     public PointAttributeBO selectByNameAndDriverId(String name, Long driverId) {
         LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery()
-                .eq(PointAttributeDO::getAttributeName, name)
+                .eq(PointAttributeDO::getAttributeCode, name)
                 .eq(PointAttributeDO::getDriverId, driverId)
                 .last(QueryWrapperConstant.LIMIT_ONE);
         PointAttributeDO entityDO = wrapper.one();
@@ -129,8 +129,8 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      */
     private LambdaQueryWrapper<PointAttributeDO> fuzzyQuery(PointAttributeQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeName, entityQuery.getAttributeName());
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), PointAttributeDO::getDisplayName, entityQuery.getDisplayName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeCode, entityQuery.getAttributeName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), PointAttributeDO::getAttributeName, entityQuery.getDisplayName());
         wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), PointAttributeDO::getDriverId, entityQuery.getDriverId());
         wrapper.eq(PointAttributeDO::getTenantId, entityQuery.getTenantId());
@@ -147,7 +147,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      */
     private boolean checkDuplicate(PointAttributeBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
-        wrapper.eq(PointAttributeDO::getAttributeName, entityBO.getAttributeName());
+        wrapper.eq(PointAttributeDO::getAttributeCode, entityBO.getAttributeName());
         wrapper.eq(PointAttributeDO::getDriverId, entityBO.getDriverId());
         wrapper.eq(PointAttributeDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);

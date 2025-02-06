@@ -34,26 +34,6 @@ services:
         aliases:
           - dc3-postgres
 
-  mongo:
-    image: pnoker/dc3-mongo:2024.3.dev
-    restart: always
-    ports:
-      - '37017:27017'
-    container_name: dc3-mongo
-    hostname: dc3-mongo
-    volumes:
-      - mongo_data:/data/db
-      - mongo_config:/data/configdb
-    logging:
-      driver: json-file
-      options:
-        max-size: '10M'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-mongo
-
   redis:
     image: pnoker/dc3-redis:2024.3.dev
     restart: always
@@ -95,34 +75,12 @@ services:
         aliases:
           - dc3-rabbitmq
 
-  portainer:
-    image: portainer/portainer-ce:2.24.1-alpine
-    command: -H unix:///var/run/docker.sock
-    restart: always
-    ports:
-      - '9000:9000'
-    container_name: portainer
-    hostname: dc3-portainer
-    volumes:
-      - portainer:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    logging:
-      driver: json-file
-      options:
-        max-size: '20m'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-portainer
-
 volumes:
   mongo_data:
   mongo_config:
   postgres:
   redis:
   rabbitmq:
-  portainer:
 
 networks:
   dc3net:

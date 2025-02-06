@@ -133,7 +133,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     @Override
     public DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId) {
         LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery()
-                .eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId)
+                .eq(DriverAttributeConfigDO::getAttributeId, attributeId)
                 .eq(DriverAttributeConfigDO::getDeviceId, deviceId)
                 .last(QueryWrapperConstant.LIMIT_ONE);
         DriverAttributeConfigDO entityDO = wrapper.one();
@@ -143,7 +143,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     @Override
     public List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId) {
         LambdaQueryChainWrapper<DriverAttributeConfigDO> wrapper = driverAttributeConfigManager.lambdaQuery()
-                .eq(DriverAttributeConfigDO::getDriverAttributeId, attributeId);
+                .eq(DriverAttributeConfigDO::getAttributeId, attributeId);
         List<DriverAttributeConfigDO> entityDO = wrapper.list();
         return driverAttributeConfigBuilder.buildBOListByDOList(entityDO);
     }
@@ -173,7 +173,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      */
     private LambdaQueryWrapper<DriverAttributeConfigDO> fuzzyQuery(DriverAttributeConfigQuery entityQuery) {
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
-        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverAttributeId()), DriverAttributeConfigDO::getDriverAttributeId, entityQuery.getDriverAttributeId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getAttributeId()), DriverAttributeConfigDO::getAttributeId, entityQuery.getAttributeId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), DriverAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
         wrapper.eq(DriverAttributeConfigDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
@@ -188,7 +188,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
      */
     private boolean checkDuplicate(DriverAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
-        wrapper.eq(DriverAttributeConfigDO::getDriverAttributeId, entityBO.getDriverAttributeId());
+        wrapper.eq(DriverAttributeConfigDO::getAttributeId, entityBO.getAttributeId());
         wrapper.eq(DriverAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
         wrapper.eq(DriverAttributeConfigDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);

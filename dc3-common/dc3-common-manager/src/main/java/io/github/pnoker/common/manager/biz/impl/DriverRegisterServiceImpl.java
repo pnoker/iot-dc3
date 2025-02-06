@@ -99,7 +99,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     @Override
     public List<DriverAttributeBO> registerDriverAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO) {
         Map<String, DriverAttributeBO> newDriverAttributeMap = entityGrpc.getDriverAttributesList().stream()
-                .collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeName, grpcDriverAttributeBuilder::buildBOByGrpcDTO));
+                .collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeCode, grpcDriverAttributeBuilder::buildBOByGrpcDTO));
 
         Map<String, DriverAttributeBO> oldDriverAttributeMap = driverAttributeService.selectByDriverId(entityBO.getId()).stream()
                 .collect(Collectors.toMap(DriverAttributeBO::getAttributeName, Function.identity()));
@@ -132,7 +132,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     @Override
     public List<PointAttributeBO> registerPointAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO) {
         Map<String, PointAttributeBO> newPointAttributeMap = entityGrpc.getPointAttributesList().stream()
-                .collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeName, grpcPointAttributeBuilder::buildBOByGrpcDTO));
+                .collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeCode, grpcPointAttributeBuilder::buildBOByGrpcDTO));
 
         Map<String, PointAttributeBO> oldPointAttributeMap = pointAttributeService.selectByDriverId(entityBO.getId()).stream()
                 .collect(Collectors.toMap(PointAttributeBO::getAttributeName, Function.identity()));

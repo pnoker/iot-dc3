@@ -39,7 +39,7 @@ public class DriverAttributeConfigDTO extends BaseDTO {
     /**
      * 驱动属性ID
      */
-    private Long driverAttributeId;
+    private Long attributeId;
 
     /**
      * 驱动属性配置值

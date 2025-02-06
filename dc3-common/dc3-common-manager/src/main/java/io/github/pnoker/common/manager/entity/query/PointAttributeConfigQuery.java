@@ -53,7 +53,7 @@ public class PointAttributeConfigQuery implements Serializable {
     /**
      * 位号属性ID
      */
-    private Long pointAttributeId;
+    private Long attributeId;
 
     /**
      * 设备ID
