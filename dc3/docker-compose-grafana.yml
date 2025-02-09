@@ -15,15 +15,13 @@
 #
 
 services:
-  postgres:
-    image: pnoker/dc3-postgres:2024.3.dev
+  prometheus:
+    image: pnoker/dc3-prometheus:2024.3.dev
     restart: always
-    ports:
-      - '35432:5432'
-    container_name: dc3-postgres
-    hostname: dc3-postgres
+    container_name: dc3-prometheus
+    hostname: dc3-prometheus
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - prometheus:/prometheus
     logging:
       driver: json-file
       options:
@@ -32,17 +30,13 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-postgres
+          - dc3-prometheus
 
-  redis:
-    image: pnoker/dc3-redis:2024.3.dev
+  postgres-exporter:
+    image: pnoker/dc3-postgres-exporter:2024.3.dev
     restart: always
-    ports:
-      - '36379:6379'
-    container_name: dc3-redis
-    hostname: dc3-redis
-    volumes:
-      - redis:/data
+    container_name: dc3-postgres-exporter
+    hostname: dc3-postgres-exporter
     logging:
       driver: json-file
       options:
@@ -51,20 +45,19 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-redis
+          - dc3-postgres-exporter
 
-  rabbitmq:
-    image: pnoker/dc3-rabbitmq:2024.3.dev
+  grafana:
+    image: pnoker/dc3-grafana:2024.3.dev
     restart: always
     ports:
-      - '5672:5672'
-      - '2883:1883'
-      - '3883:8883'
-      - '15672:15672'
-    container_name: dc3-rabbitmq
-    hostname: dc3-rabbitmq
+      - '3000:3000'
+    environment:
+      - GF_SERVER_ROOT_URL=http://dc3-grafana:3000
+    container_name: dc3-grafana
+    hostname: dc3-grafana
     volumes:
-      - rabbitmq:/var/lib/rabbitmq
+      - grafana:/var/lib/grafana
     logging:
       driver: json-file
       options:
@@ -73,12 +66,11 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-rabbitmq
+          - dc3-grafana
 
 volumes:
-  postgres:
-  redis:
-  rabbitmq:
+  prometheus:
+  grafana:
 
 networks:
   dc3net:
