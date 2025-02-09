@@ -37,7 +37,7 @@
                                 <el-icon>
                                     <Goblet />
                                 </el-icon>
-                                {{ attribute.displayName }}: {{ data[attribute.attributeName].configValue }}
+                                {{ attribute.attributeName }}: {{ data[attribute.attributeCode].configValue }}
                             </li>
                         </ul>
                     </div>

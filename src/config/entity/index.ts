@@ -31,7 +31,7 @@ export interface Login {
 export interface Attribute {
     id: string
     name: string
-    displayName: string
+    attributeName: string
 }
 
 /**

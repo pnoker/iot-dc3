@@ -142,12 +142,12 @@
                 <el-form ref="driverFormRef" :inline="true" :model="reactiveData.driverFormData" :v-if="reactiveData.driverFormData.length > 0">
                     <div class="edit-form-item">
                         <el-row>
-                            <el-form-item v-for="attribute in reactiveData.driverAttributes" :key="attribute.id" :label="attribute.displayName" :prop="attribute.attributeName">
+                            <el-form-item v-for="attribute in reactiveData.driverAttributes" :key="attribute.id" :label="attribute.attributeName" :prop="attribute.attributeCode">
                                 <el-input
-                                    v-if="reactiveData.driverFormData[attribute.attributeName]"
-                                    :key="reactiveData.driverFormData[attribute.attributeName].id"
-                                    v-model="reactiveData.driverFormData[attribute.attributeName].configValue"
-                                    :placeholder="'请输入' + attribute.displayName"
+                                    v-if="reactiveData.driverFormData[attribute.attributeCode]"
+                                    :key="reactiveData.driverFormData[attribute.attributeCode].id"
+                                    v-model="reactiveData.driverFormData[attribute.attributeCode].configValue"
+                                    :placeholder="'请输入' + attribute.attributeName"
                                     class="edit-form-default"
                                     clearable
                                     @keyup.enter="driverUpdate"
@@ -174,12 +174,12 @@
                     </div>
                     <div class="edit-form-item">
                         <el-row>
-                            <el-form-item v-for="attribute in reactiveData.pointAttributes" :key="attribute.id" :label="attribute.displayName" :prop="attribute.attributeName">
+                            <el-form-item v-for="attribute in reactiveData.pointAttributes" :key="attribute.id" :label="attribute.attributeName" :prop="attribute.attributeCode">
                                 <el-input
-                                    v-if="reactiveData.pointFormData[attribute.attributeName]"
-                                    :key="reactiveData.pointFormData[attribute.attributeName].id"
-                                    v-model="reactiveData.pointFormData[attribute.attributeName].configValue"
-                                    :placeholder="'请输入' + attribute.displayName"
+                                    v-if="reactiveData.pointFormData[attribute.attributeCode]"
+                                    :key="reactiveData.pointFormData[attribute.attributeCode].id"
+                                    v-model="reactiveData.pointFormData[attribute.attributeCode].configValue"
+                                    :placeholder="'请输入' + attribute.attributeName"
                                     class="edit-form-default"
                                     clearable
                                     @keyup.enter="pointUpdate"
