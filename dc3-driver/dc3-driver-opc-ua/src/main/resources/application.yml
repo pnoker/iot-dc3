@@ -29,29 +29,29 @@ driver:
       enable: true
       cron: '0/5 * * * * ?'
   driver-attribute:
-    - display-name: 主机
-      attribute-name: host
+    - attribute-name: 主机
+      attribute-code: host
       attribute-type-flag: STRING
       default-value: localhost
       remark: Opc Ua IP
-    - display-name: 端口
-      attribute-name: port
+    - attribute-name: 端口
+      attribute-code: port
       attribute-type-flag: INT
       default-value: 18600
       remark: Opc Ua Port
-    - display-name: 路径
-      attribute-name: path
+    - attribute-name: 路径
+      attribute-code: path
       attribute-type-flag: STRING
       default-value: /
       remark: Opc Ua Path
   point-attribute:
-    - display-name: 命名空间
-      attribute-name: namespace
+    - attribute-name: 命名空间
+      attribute-code: namespace
       attribute-type-flag: INT
       default-value: 5
       remark: 命名空间索引
-    - display-name: 位号
-      attribute-name: tag
+    - attribute-name: 位号
+      attribute-code: tag
       attribute-type-flag: STRING
       default-value: TAG
       remark: 位号名称

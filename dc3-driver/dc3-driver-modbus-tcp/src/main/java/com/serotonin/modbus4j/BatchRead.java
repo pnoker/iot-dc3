@@ -37,7 +37,7 @@ import java.util.*;
  *
  * @param <K> - Type of read
  * @author mlohbihler
- * @version 2024.3.10
+ * @version 2025.2.0
  */
 public class BatchRead<K> {
     private final List<KeyedModbusLocator<K>> requestValues = new ArrayList<>();
@@ -180,17 +180,13 @@ public class BatchRead<K> {
         Map<SlaveAndRange, List<KeyedModbusLocator<K>>> slaveRangeBatch = new HashMap<>();
 
         // Separate the batch into slave ids and read functions.
-        List<KeyedModbusLocator<K>> functionList;
+        List<KeyedModbusLocator<K>> functions;
         for (KeyedModbusLocator<K> locator : requestValues) {
             // Find the function list for this slave and range. Create it if necessary.
-            functionList = slaveRangeBatch.get(locator.getSlaveAndRange());
-            if (functionList == null) {
-                functionList = new ArrayList<>();
-                slaveRangeBatch.put(locator.getSlaveAndRange(), functionList);
-            }
+            functions = slaveRangeBatch.computeIfAbsent(locator.getSlaveAndRange(), k -> new ArrayList<>());
 
             // Add this locator to the function list.
-            functionList.add(locator);
+            functions.add(locator);
         }
 
         // Now that we have locators grouped into slave and function, check each read function group and break into

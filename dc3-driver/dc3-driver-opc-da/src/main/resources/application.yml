@@ -29,34 +29,34 @@ driver:
       enable: true
       cron: '0/5 * * * * ?'
   driver-attribute:
-    - display-name: 主机
-      attribute-name: host
+    - attribute-name: 主机
+      attribute-code: host
       attribute-type-flag: STRING
       default-value: localhost
       remark: Opc Da Host
-    - display-name: CLSID
-      attribute-name: clsId
+    - attribute-name: CLSID
+      attribute-code: clsId
       attribute-type-flag: STRING
       default-value: F8582CF2-88FB-11D0-B850-00C0F0104305
       remark: Opc Da Server CLAID
-    - display-name: 用户名
-      attribute-name: username
+    - attribute-name: 用户名
+      attribute-code: username
       attribute-type-flag: STRING
       default-value: dc3
       remark: Opc Da UserName
-    - display-name: 密码
-      attribute-name: password
+    - attribute-name: 密码
+      attribute-code: password
       attribute-type-flag: STRING
       default-value: dc3dc3
       remark: Opc Da Passward
   point-attribute:
-    - display-name: 分组
-      attribute-name: group
+    - attribute-name: 分组
+      attribute-code: group
       attribute-type-flag: STRING
       default-value: GROUP
       remark: 分组名称
-    - display-name: 位号
-      attribute-name: tag
+    - attribute-name: 位号
+      attribute-code: tag
       attribute-type-flag: STRING
       default-value: TAG
       remark: 位号名称

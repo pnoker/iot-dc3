@@ -29,34 +29,34 @@ driver:
       enable: true
       cron: '0/5 * * * * ?'
   driver-attribute:
-    - display-name: 主机
-      attribute-name: host
+    - attribute-name: 主机
+      attribute-code: host
       attribute-type-flag: STRING
       default-value: 192.168.0.20
       remark: Ip
-    - display-name: 端口
-      attribute-name: port
+    - attribute-name: 端口
+      attribute-code: port
       attribute-type-flag: INT
       default-value: 102
       remark: Port
   point-attribute:
-    - display-name: DB序号
-      attribute-name: dbNum
+    - attribute-name: DB序号
+      attribute-code: dbNum
       attribute-type-flag: INT
       default-value: 0
       remark: 数据块号, 从 0 开始计数
-    - display-name: 字偏移
-      attribute-name: byteOffset
+    - attribute-name: 字偏移
+      attribute-code: byteOffset
       attribute-type-flag: INT
       default-value: 0
       remark: 字偏移
-    - display-name: 位偏移
-      attribute-name: bitOffset
+    - attribute-name: 位偏移
+      attribute-code: bitOffset
       attribute-type-flag: INT
       default-value: 0
       remark: 位偏移
-    - display-name: 数据块长度
-      attribute-name: blockSize
+    - attribute-name: 数据块长度
+      attribute-code: blockSize
       attribute-type-flag: INT
       default-value: 8
       remark: 数据块长度

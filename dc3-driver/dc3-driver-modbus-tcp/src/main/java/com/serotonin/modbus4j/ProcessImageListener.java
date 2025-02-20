@@ -19,7 +19,7 @@ package com.serotonin.modbus4j;
  * <p>ProcessImageListener interface.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.10
+ * @version 2025.2.0
  */
 public interface ProcessImageListener {
     /**

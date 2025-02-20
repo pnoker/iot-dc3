@@ -33,7 +33,7 @@ import java.util.Set;
  * 驱动元数据
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 @Getter
@@ -65,7 +65,7 @@ public final class DriverMetadata {
     private Map<Long, DriverAttributeDTO> driverAttributeIdMap;
 
     /**
-     * 驱动属性名称 Map
+     * 驱动属性编号 Map
      * <p>
      * attributeName,driverAttribute
      */
@@ -79,7 +79,7 @@ public final class DriverMetadata {
     private Map<Long, PointAttributeDTO> pointAttributeIdMap;
 
     /**
-     * 位号属性名称 Map
+     * 位号属性编号 Map
      * <p>
      * attributeName,driverAttribute
      */

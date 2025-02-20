@@ -21,7 +21,7 @@ import com.serotonin.modbus4j.code.RegisterRange;
  * <p>RangeAndOffset class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.10
+ * @version 2025.2.0
  */
 public class RangeAndOffset {
     private int range;

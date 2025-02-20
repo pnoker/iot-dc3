@@ -32,7 +32,7 @@ import java.util.Map;
  * 可以参考已提供的驱动模块实现方式。
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 public interface DriverCustomService {

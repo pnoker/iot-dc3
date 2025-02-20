@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * 设备元数据
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -142,7 +142,7 @@ public final class DeviceMetadata {
 
         return attributeMap.entrySet().stream()
                 .collect(Collectors.toMap(
-                        entry -> entry.getValue().getAttributeName(),
+                        entry -> entry.getValue().getAttributeCode(),
                         entry -> AttributeBO.builder()
                                 .type(entry.getValue().getAttributeTypeFlag())
                                 .value(attributeConfigMap.get(entry.getKey()).getConfigValue())
@@ -177,7 +177,7 @@ public final class DeviceMetadata {
         return pointAttributeConfigMap.entrySet().stream()
                 .filter(entry -> MapUtil.isEmpty(entry.getValue()) && entry.getValue().keySet().containsAll(attributeMap.keySet()))
                 .collect(Collectors.toMap(Map.Entry::getKey, entryMap -> attributeMap.entrySet().stream().collect(Collectors.toMap(
-                                entry -> entry.getValue().getAttributeName(),
+                                entry -> entry.getValue().getAttributeCode(),
                                 entry -> AttributeBO.builder()
                                         .type(entry.getValue().getAttributeTypeFlag())
                                         .value(entryMap.getValue().get(entry.getKey()).getConfigValue())
@@ -221,7 +221,7 @@ public final class DeviceMetadata {
 
         return attributeMap.entrySet().stream()
                 .collect(Collectors.toMap(
-                        entry -> entry.getValue().getAttributeName(),
+                        entry -> entry.getValue().getAttributeCode(),
                         entry -> AttributeBO.builder()
                                 .type(entry.getValue().getAttributeTypeFlag())
                                 .value(attributeConfigMap.get(entry.getKey()).getConfigValue())

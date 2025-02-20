@@ -23,7 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 权限中心服务启动入口
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 @SpringBootApplication

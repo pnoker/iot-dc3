@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * 自定义 Request Header 校验过滤器工厂
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 @Slf4j

@@ -24,7 +24,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * handling of incomplete messages.
  *
  * @author mlohbihler
- * @version 2024.3.10
+ * @version 2025.2.0
  */
 public class RtuMessageParser extends BaseMessageParser {
     /**

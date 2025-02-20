@@ -36,7 +36,7 @@ import java.util.Optional;
  * WebFilter 配置
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -82,10 +82,10 @@ public class WebFilterConfig {
                     RequestHeader.UserHeader userHeader = JsonUtil.parseObject(user, RequestHeader.UserHeader.class);
 
                     if (Objects.isNull(userHeader) || Objects.isNull(userHeader.getTenantId()) || Objects.isNull(userHeader.getUserId())) {
-                        log.warn("Invalid user header: {}", userHeader);
+                        log.warn("Invalid user header: {}", JsonUtil.toJsonString(userHeader));
                         return chain.filter(exchange).contextWrite(context -> context.delete(RequestConstant.Key.USER_HEADER));
                     } else {
-                        log.debug("User header: {}", userHeader);
+                        log.debug("User header: {}", JsonUtil.toJsonString(userHeader));
                         return chain.filter(exchange).contextWrite(context -> context.put(RequestConstant.Key.USER_HEADER, userHeader));
                     }
                 } catch (Exception e) {

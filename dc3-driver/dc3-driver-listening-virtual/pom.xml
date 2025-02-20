@@ -21,13 +21,13 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-driver</artifactId>
-        <version>2024.3.10</version>
+        <version>2025.2.0</version>
     </parent>
 
     <artifactId>dc3-driver-listening-virtual</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 ListeningVirtual驱动, 监听模式, 提供 Tcp 和 Udp 两种模式, 仅用于测试用途。</description>
+    <description>IoT DC3 平台 ListeningVirtual驱动, 监听模式, 提供 Tcp 和 Udp 两种模式, 仅用于测试用途。</description>
 
     <dependencies>
 
