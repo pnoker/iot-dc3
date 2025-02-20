@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  * 自定义 Enable Optional
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 public final class EnableOptional {

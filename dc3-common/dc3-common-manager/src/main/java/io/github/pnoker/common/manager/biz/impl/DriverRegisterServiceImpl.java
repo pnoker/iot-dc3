@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  * 驱动同步相关接口实现
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -102,7 +102,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
                 .collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeCode, grpcDriverAttributeBuilder::buildBOByGrpcDTO));
 
         Map<String, DriverAttributeBO> oldDriverAttributeMap = driverAttributeService.selectByDriverId(entityBO.getId()).stream()
-                .collect(Collectors.toMap(DriverAttributeBO::getAttributeName, Function.identity()));
+                .collect(Collectors.toMap(DriverAttributeBO::getAttributeCode, Function.identity()));
 
         for (Map.Entry<String, DriverAttributeBO> entry : newDriverAttributeMap.entrySet()) {
             String name = entry.getKey();
@@ -135,7 +135,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
                 .collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeCode, grpcPointAttributeBuilder::buildBOByGrpcDTO));
 
         Map<String, PointAttributeBO> oldPointAttributeMap = pointAttributeService.selectByDriverId(entityBO.getId()).stream()
-                .collect(Collectors.toMap(PointAttributeBO::getAttributeName, Function.identity()));
+                .collect(Collectors.toMap(PointAttributeBO::getAttributeCode, Function.identity()));
 
         for (Map.Entry<String, PointAttributeBO> entry : newPointAttributeMap.entrySet()) {
             String name = entry.getKey();

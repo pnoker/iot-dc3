@@ -36,7 +36,7 @@ import com.serotonin.modbus4j.serial.rtu.RtuSlave;
  * <p>ModbusFactory class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.10
+ * @version 2025.2.0
  */
 public class ModbusFactory {
     //

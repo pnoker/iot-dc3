@@ -26,7 +26,7 @@ import java.util.List;
  * 驱动属性Interface
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 public interface DriverAttributeService extends BaseService<DriverAttributeBO, DriverAttributeQuery> {
@@ -41,9 +41,9 @@ public interface DriverAttributeService extends BaseService<DriverAttributeBO, D
     List<DriverAttributeBO> selectByDriverId(Long driverId);
 
     /**
-     * 根据 驱动配置属性名称 和 驱动ID 查询
+     * 根据 驱动配置属性编号 和 驱动ID 查询
      *
-     * @param name     属性名称
+     * @param name     属性编号
      * @param driverId 驱动ID
      * @return DriverAttribute
      */

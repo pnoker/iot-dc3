@@ -20,7 +20,7 @@ package io.github.pnoker.common.constant.common;
  * 后缀 相关常量
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 public class SuffixConstant {

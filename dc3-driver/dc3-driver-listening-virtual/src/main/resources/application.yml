@@ -34,23 +34,23 @@ driver:
       enable: true
       cron: '0/5 * * * * ?'
   point-attribute:
-    - display-name: 关键字
-      attribute-name: key
+    - attribute-name: 关键字
+      attribute-code: key
       attribute-type-flag: STRING
       default-value: 62
       remark: 报文关键字
-    - display-name: 起始字节
-      attribute-name: start
+    - attribute-name: 起始字节
+      attribute-code: start
       attribute-type-flag: INT
       default-value: 0
       remark: 起始字节, 包含该字节
-    - display-name: 结束字节
-      attribute-name: end
+    - attribute-name: 结束字节
+      attribute-code: end
       attribute-type-flag: INT
       default-value: 8
       remark: 结束字节, 不包含该字节
-    - display-name: 类型
-      attribute-name: type
+    - attribute-name: 类型
+      attribute-code: type
       attribute-type-flag: STRING
       default-value: string
       remark: 解析类型, short, int, long, float, double, boolean, string

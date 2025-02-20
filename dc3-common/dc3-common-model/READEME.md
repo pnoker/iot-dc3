@@ -1,1 +1,1 @@
-IOT DC3 平台 公共的 Model 配置。
+IoT DC3 平台 公共的 Model 配置。

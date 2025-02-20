@@ -43,7 +43,7 @@ import java.util.Objects;
  * PointAttributeService Impl
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -129,8 +129,8 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      */
     private LambdaQueryWrapper<PointAttributeDO> fuzzyQuery(PointAttributeQuery entityQuery) {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeCode, entityQuery.getAttributeName());
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDisplayName()), PointAttributeDO::getAttributeName, entityQuery.getDisplayName());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeCode()), PointAttributeDO::getAttributeCode, entityQuery.getAttributeCode());
+        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), PointAttributeDO::getDriverId, entityQuery.getDriverId());
         wrapper.eq(PointAttributeDO::getTenantId, entityQuery.getTenantId());
@@ -147,7 +147,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
      */
     private boolean checkDuplicate(PointAttributeBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
-        wrapper.eq(PointAttributeDO::getAttributeCode, entityBO.getAttributeName());
+        wrapper.eq(PointAttributeDO::getAttributeCode, entityBO.getAttributeCode());
         wrapper.eq(PointAttributeDO::getDriverId, entityBO.getDriverId());
         wrapper.eq(PointAttributeDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);

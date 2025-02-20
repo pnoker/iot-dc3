@@ -21,13 +21,13 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-center</artifactId>
-        <version>2024.3.10</version>
+        <version>2025.2.0</version>
     </parent>
 
     <artifactId>dc3-center-single</artifactId>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 权限, 数据, 管理, 接口服务合集。</description>
+    <description>IoT DC3 平台 权限, 数据, 管理, 接口服务合集。</description>
 
     <dependencies>
 

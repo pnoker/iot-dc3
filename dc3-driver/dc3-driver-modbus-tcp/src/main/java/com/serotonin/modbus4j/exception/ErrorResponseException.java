@@ -22,7 +22,7 @@ import com.serotonin.modbus4j.msg.ModbusResponse;
  * <p>ErrorResponseException class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.10
+ * @version 2025.2.0
  */
 public class ErrorResponseException extends Exception {
     private static final long serialVersionUID = -1;

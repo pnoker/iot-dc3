@@ -32,7 +32,7 @@ import lombok.*;
  * 位号属性BO
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 @Getter
@@ -44,24 +44,24 @@ import lombok.*;
 public class PointAttributeVO extends BaseVO {
 
     /**
-     * 显示名称
-     */
-    @NotBlank(message = "显示名称不能为空",
-            groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
-            message = "显示名称格式无效",
-            groups = {Add.class, Update.class})
-    private String displayName;
-
-    /**
      * 属性名称
      */
     @NotBlank(message = "属性名称不能为空",
             groups = {Add.class})
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
             message = "属性名称格式无效",
             groups = {Add.class, Update.class})
     private String attributeName;
+
+    /**
+     * 属性编号
+     */
+    @NotBlank(message = "属性编号不能为空",
+            groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "属性编号格式无效",
+            groups = {Add.class, Update.class})
+    private String attributeCode;
 
     /**
      * 属性类型标识

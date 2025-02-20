@@ -29,19 +29,19 @@ driver:
       enable: true
       cron: '0/5 * * * * ?'
   driver-attribute:
-    - display-name: 主机
-      attribute-name: host
+    - attribute-name: 主机
+      attribute-code: host
       attribute-type-flag: STRING
       default-value: localhost
       remark: Ip
-    - display-name: 端口
-      attribute-name: port
+    - attribute-name: 端口
+      attribute-code: port
       attribute-type-flag: INT
       default-value: 18600
       remark: Port
   point-attribute:
-    - display-name: 位号
-      attribute-name: tag
+    - attribute-name: 位号
+      attribute-code: tag
       attribute-type-flag: STRING
       default-value: TAG
       remark: 位号名称

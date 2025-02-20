@@ -21,15 +21,15 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-api</artifactId>
-        <version>2024.3.10</version>
+        <version>2025.2.0</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-api-data</artifactId>
-    <version>2024.3.10</version>
+    <version>2025.2.0</version>
     <packaging>jar</packaging>
 
-    <description>IOT DC3 平台 Data Service gRpc API。</description>
+    <description>IoT DC3 平台 Data Service gRpc API。</description>
 
     <developers>
         <developer>

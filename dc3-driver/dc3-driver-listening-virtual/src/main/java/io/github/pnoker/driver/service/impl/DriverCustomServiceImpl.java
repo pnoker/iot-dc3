@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
  * 驱动自定义服务实现类
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 @Slf4j

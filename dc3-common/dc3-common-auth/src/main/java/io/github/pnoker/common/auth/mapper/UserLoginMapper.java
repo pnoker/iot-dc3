@@ -25,7 +25,7 @@ import io.github.pnoker.common.auth.entity.model.UserLoginDO;
  * </p>
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 public interface UserLoginMapper extends BaseMapper<UserLoginDO> {

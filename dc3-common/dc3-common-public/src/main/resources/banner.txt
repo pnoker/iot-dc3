@@ -4,4 +4,4 @@
 |   (  <_> )    |     |    `   \     \____/       \
 |___|\____/|____|    /_______  /\______  /______  /
                              \/        \/       \/
-${AnsiColor.BRIGHT_CYAN}IoT DC3 Platform V2024.3.10
+${AnsiColor.BRIGHT_CYAN}IoT DC3 Platform V2025.2.0

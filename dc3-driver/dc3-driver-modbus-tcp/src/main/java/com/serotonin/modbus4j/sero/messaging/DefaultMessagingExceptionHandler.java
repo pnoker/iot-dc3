@@ -20,7 +20,7 @@ package com.serotonin.modbus4j.sero.messaging;
  * <p>DefaultMessagingExceptionHandler class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.10
+ * @version 2025.2.0
  */
 public class DefaultMessagingExceptionHandler implements MessagingExceptionHandler {
 

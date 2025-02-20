@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 数据存储策略工厂
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 public class RepositoryStrategyFactory {

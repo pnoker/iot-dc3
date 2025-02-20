@@ -27,7 +27,7 @@ import com.serotonin.modbus4j.sero.messaging.WaitingRoomKeyFactory;
  * <p>EncapWaitingRoomKeyFactory class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.10
+ * @version 2025.2.0
  */
 public class EncapWaitingRoomKeyFactory implements WaitingRoomKeyFactory {
     @Override

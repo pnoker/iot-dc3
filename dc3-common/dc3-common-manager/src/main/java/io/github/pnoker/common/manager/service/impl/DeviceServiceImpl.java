@@ -68,7 +68,7 @@ import java.util.Objects;
  * DeviceService Impl
  *
  * @author pnoker
- * @version 2024.3.10
+ * @version 2025.2.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -369,7 +369,7 @@ public class DeviceServiceImpl implements DeviceService {
         PoiUtil.createCellWithStyle(titleRow, 2, "驱动属性配置", cellStyle);
         PoiUtil.mergedRegion(mainSheet, 1, 2, 2, 2 + driverAttributeBOList.size() - 1);
         for (int i = 0; i < driverAttributeBOList.size(); i++) {
-            PoiUtil.createCellWithStyle(attributeRow, 2 + i, driverAttributeBOList.get(i).getDisplayName(), cellStyle);
+            PoiUtil.createCellWithStyle(attributeRow, 2 + i, driverAttributeBOList.get(i).getAttributeName(), cellStyle);
         }
 
     }
@@ -415,7 +415,7 @@ public class DeviceServiceImpl implements DeviceService {
             PoiUtil.createCellWithStyle(pointRow, 2 + driverAttributeBOList.size() + i * pointAttributeBOList.size(), pointBOList.get(i).getPointName(), cellStyle);
             PoiUtil.mergedRegion(mainSheet, 2, 2, 2 + driverAttributeBOList.size() + i * pointAttributeBOList.size(), 2 + driverAttributeBOList.size() + i * pointAttributeBOList.size() + pointAttributeBOList.size() - 1);
             for (int j = 0; j < pointAttributeBOList.size(); j++) {
-                PoiUtil.createCellWithStyle(attributeRow, 2 + driverAttributeBOList.size() + i * pointAttributeBOList.size() + j, pointAttributeBOList.get(j).getDisplayName(), cellStyle);
+                PoiUtil.createCellWithStyle(attributeRow, 2 + driverAttributeBOList.size() + i * pointAttributeBOList.size() + j, pointAttributeBOList.get(j).getAttributeName(), cellStyle);
             }
         }
     }

@@ -22,7 +22,7 @@ import java.util.List;
  * <p>ArrayUtils class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2024.3.10
+ * @version 2025.2.0
  */
 public class ArrayUtils {
     private static int[] bitFromMask = {0xff, 0x7f, 0x3f, 0x1f, 0xf, 0x7, 0x3, 0x1};
