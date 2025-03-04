@@ -26,7 +26,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * Handles the RTU enveloping of modbus requests.
  *
  * @author mlohbihler
- * @version 2025.2.0
+ * @version 2025.2.1
  */
 public class RtuMessageRequest extends RtuMessage implements OutgoingRequestMessage, IncomingRequestMessage {
     /**

@@ -26,7 +26,7 @@ import java.nio.charset.Charset;
  * <p>StringLocator class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.0
+ * @version 2025.2.1
  */
 public class StringLocator extends BaseLocator<String> {
     /**

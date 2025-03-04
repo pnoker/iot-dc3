@@ -38,7 +38,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * 200万条SinglePointValue会产生: 60M的索引数据以及400M的数据
  *
  * @author pnoker
- * @version 2025.2.0
+ * @version 2025.2.1
  * @since 2022.1.0
  */
 @Slf4j

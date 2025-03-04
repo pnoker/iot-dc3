@@ -30,7 +30,7 @@ import org.mapstruct.Mapping;
  * Dictionary For Auth Builder
  *
  * @author pnoker
- * @version 2025.2.0
+ * @version 2025.2.1
  * @since 2022.1.0
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})

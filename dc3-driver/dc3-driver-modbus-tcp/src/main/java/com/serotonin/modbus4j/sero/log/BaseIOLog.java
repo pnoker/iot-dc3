@@ -31,7 +31,7 @@ import java.util.Date;
  * <p>Abstract BaseIOLog class.</p>
  *
  * @author Terry Packer
- * @version 2025.2.0
+ * @version 2025.2.1
  */
 public abstract class BaseIOLog {
 
