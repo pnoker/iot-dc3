@@ -19,7 +19,7 @@ services:
     build:
       context: ../dc3-gateway/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-gateway:2024.3.dev
+    image: pnoker/dc3-gateway:2025.2.1
     restart: always
     ports:
       - '8000:8000'
@@ -43,7 +43,7 @@ services:
     build:
       context: ../dc3-center/dc3-center-auth/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-center-auth:2024.3.dev
+    image: pnoker/dc3-center-auth:2025.2.1
     restart: always
     ports:
       - '8300:8300'
@@ -68,7 +68,7 @@ services:
     build:
       context: ../dc3-center/dc3-center-manager/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-center-manager:2024.3.dev
+    image: pnoker/dc3-center-manager:2025.2.1
     restart: always
     ports:
       - '8400:8400'
@@ -93,7 +93,7 @@ services:
     build:
       context: ../dc3-center/dc3-center-data/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-center-data:2024.3.dev
+    image: pnoker/dc3-center-data:2025.2.1
     restart: always
     ports:
       - '8500:8500'
@@ -114,18 +114,21 @@ services:
         aliases:
           - dc3-center-data
 
-  virtual:
+  listening-virtual:
     build:
-      context: ../dc3-driver/dc3-driver-virtual/
+      context: ../dc3-driver/dc3-driver-listening-virtual/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-virtual:2024.3.dev
+    image: pnoker/dc3-driver-listening-virtual:2025.2.1
     restart: always
+    ports:
+      - '6270:6270'
+      - '6271:6271'
     environment:
       - NODE_ENV=dev
-    container_name: dc3-driver-virtual
-    hostname: dc3-driver-virtual
+    container_name: dc3-driver-listening-virtual
+    hostname: dc3-driver-listening-virtual
     volumes:
-      - logs:/dc3-driver/dc3-driver-virtual/dc3/logs
+      - logs:/dc3-driver/dc3-driver-listening-virtual/dc3/logs
     logging:
       driver: json-file
       options:
@@ -134,20 +137,20 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-driver-virtual
+          - dc3-driver-listening-virtual
 
-  plcs7:
+  modbus-tcp:
     build:
-      context: ../dc3-driver/dc3-driver-plcs7/
+      context: ../dc3-driver/dc3-driver-modbus-tcp/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-plcs7:2024.3.dev
+    image: pnoker/dc3-driver-modbus-tcp:2025.2.1
     restart: always
     environment:
       - NODE_ENV=dev
-    container_name: dc3-driver-plcs7
-    hostname: dc3-driver-plcs7
+    container_name: dc3-driver-modbus-tcp
+    hostname: dc3-driver-modbus-tcp
     volumes:
-      - logs:/dc3-driver/dc3-driver-plcs7/dc3/logs
+      - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
     logging:
       driver: json-file
       options:
@@ -156,13 +159,35 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-driver-plcs7
+          - dc3-driver-modbus-tcp
+
+  mqtt:
+    build:
+      context: ../dc3-driver/dc3-driver-mqtt/
+      dockerfile: ./Dockerfile
+    image: pnoker/dc3-driver-mqtt:2025.2.1
+    restart: always
+    environment:
+      - NODE_ENV=dev
+    container_name: dc3-driver-mqtt
+    hostname: dc3-driver-mqtt
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mqtt
 
   opc-da:
     build:
       context: ../dc3-driver/dc3-driver-opc-da/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-opc-da:2024.3.dev
+    image: pnoker/dc3-driver-opc-da:2025.2.1
     restart: always
     environment:
       - NODE_ENV=dev
@@ -184,7 +209,7 @@ services:
     build:
       context: ../dc3-driver/dc3-driver-opc-ua/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-opc-ua:2024.3.dev
+    image: pnoker/dc3-driver-opc-ua:2025.2.1
     restart: always
     environment:
       - NODE_ENV=dev
@@ -202,21 +227,18 @@ services:
         aliases:
           - dc3-driver-opc-ua
 
-  listening-virtual:
+  plcs7:
     build:
-      context: ../dc3-driver/dc3-driver-listening-virtual/
+      context: ../dc3-driver/dc3-driver-plcs7/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-listening-virtual:2024.3.dev
+    image: pnoker/dc3-driver-plcs7:2025.2.1
     restart: always
-    ports:
-      - '6270:6270'
-      - '6271:6271'
     environment:
       - NODE_ENV=dev
-    container_name: dc3-driver-listening-virtual
-    hostname: dc3-driver-listening-virtual
+    container_name: dc3-driver-plcs7
+    hostname: dc3-driver-plcs7
     volumes:
-      - logs:/dc3-driver/dc3-driver-listening-virtual/dc3/logs
+      - logs:/dc3-driver/dc3-driver-plcs7/dc3/logs
     logging:
       driver: json-file
       options:
@@ -225,23 +247,20 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-driver-listening-virtual
+          - dc3-driver-plcs7
 
-  dtu-yeecom:
+  virtual:
     build:
-      context: ../dc3-driver/dc3-driver-dtu-yeecom/
+      context: ../dc3-driver/dc3-driver-virtual/
       dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-dtu-yeecom:2024.3.dev
+    image: pnoker/dc3-driver-virtual:2025.2.1
     restart: always
-    ports:
-      - '9001:9001'
-      - '9002:9002'
     environment:
       - NODE_ENV=dev
-    container_name: dc3-driver-dtu-yeecom
-    hostname: dc3-driver-dtu-yeecom
+    container_name: dc3-driver-virtual
+    hostname: dc3-driver-virtual
     volumes:
-      - logs:/dc3-driver/dc3-driver-dtu-yeecom/dc3/logs
+      - logs:/dc3-driver/dc3-driver-virtual/dc3/logs
     logging:
       driver: json-file
       options:
@@ -250,120 +269,7 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-driver-dtu-yeecom
-
-  lwm2m:
-    build:
-      context: ../dc3-driver/dc3-driver-lwm2m/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-lwm2m:2024.3.dev
-    restart: always
-    ports:
-      - '5683:5683'
-      - '5684:5684'
-    environment:
-      - NODE_ENV=dev
-    container_name: dc3-driver-lwm2m
-    hostname: dc3-driver-lwm2m
-    volumes:
-      - logs:/dc3-driver/dc3-driver-lwm2m/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: '10M'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-driver-lwm2m
-
-  mqtt:
-    build:
-      context: ../dc3-driver/dc3-driver-mqtt/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-mqtt:2024.3.dev
-    restart: always
-    environment:
-      - NODE_ENV=dev
-    container_name: dc3-driver-mqtt
-    hostname: dc3-driver-mqtt
-    volumes:
-      - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: '10M'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-driver-mqtt
-
-  edge-gateway:
-    build:
-      context: ../dc3-driver/dc3-driver-edge-gateway/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-edge-gateway:2024.3.dev
-    restart: always
-    environment:
-      - NODE_ENV=dev
-    container_name: dc3-driver-edge-gateway
-    hostname: dc3-driver-edge-gateway
-    volumes:
-      - logs:/dc3-driver/dc3-driver-edge-gateway/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: '10M'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-driver-edge-gateway
-
-  modbus-tcp:
-    build:
-      context: ../dc3-driver/dc3-driver-modbus-tcp/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-modbus-tcp:2024.3.dev
-    restart: always
-    environment:
-      - NODE_ENV=dev
-    container_name: dc3-driver-modbus-tcp
-    hostname: dc3-driver-modbus-tcp
-    volumes:
-      - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: '10M'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-driver-modbus-tcp
-
-  weather-amap:
-    build:
-      context: ../dc3-driver/dc3-driver-weather-amap/
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-driver-weather-amap:2024.3.dev
-    restart: always
-    environment:
-      - NODE_ENV=dev
-    container_name: dc3-driver-weather-amap
-    hostname: dc3-driver-weather-amap
-    volumes:
-      - logs:/dc3-driver/dc3-driver-weather-amap/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: '10M'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-driver-weather-amap
+          - dc3-driver-virtual
 
 volumes:
   logs:
