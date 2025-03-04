@@ -31,7 +31,7 @@ import java.util.*;
  * 缓存相关信息, 提高性能
  *
  * @author pnoker
- * @version 2025.2.0
+ * @version 2025.2.1
  * @since 2022.1.0
  */
 @Data

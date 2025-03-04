@@ -27,7 +27,7 @@ import org.springframework.lang.NonNull;
  * 注意解包之后的返回参数必须是某个bean或者集合类型
  *
  * @author pnoker
- * @version 2025.2.0
+ * @version 2025.2.1
  * @since 2022.1.0
  */
 public interface UnWrapper<T> extends Converter<T, Object> {

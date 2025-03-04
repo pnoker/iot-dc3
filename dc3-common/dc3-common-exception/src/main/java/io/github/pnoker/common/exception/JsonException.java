@@ -22,7 +22,7 @@ import cn.hutool.core.text.CharSequenceUtil;
  * 自定义 Json 异常
  *
  * @author pnoker
- * @version 2025.2.0
+ * @version 2025.2.1
  * @since 2022.1.0
  */
 public class JsonException extends RuntimeException {

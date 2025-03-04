@@ -18,7 +18,7 @@ package io.github.pnoker.driver.api;
 
 /**
  * @author pnoker
- * @version 2025.2.0
+ * @version 2025.2.1
  * @since 2022.1.0
  */
 public enum SiemensPLCS {

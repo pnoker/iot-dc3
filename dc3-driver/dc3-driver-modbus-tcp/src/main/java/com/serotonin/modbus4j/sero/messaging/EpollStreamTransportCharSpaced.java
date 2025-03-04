@@ -25,7 +25,7 @@ import java.io.OutputStream;
  * <p>EpollStreamTransportCharSpaced class.</p>
  *
  * @author Terry Packer
- * @version 2025.2.0
+ * @version 2025.2.1
  */
 public class EpollStreamTransportCharSpaced extends EpollStreamTransport {
 

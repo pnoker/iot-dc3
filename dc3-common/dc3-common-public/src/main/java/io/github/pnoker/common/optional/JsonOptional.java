@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  * 自定义 String Optional
  *
  * @author pnoker
- * @version 2025.2.0
+ * @version 2025.2.1
  * @since 2022.1.0
  */
 public final class JsonOptional {

@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author fukq
- * @version 2025.2.0
+ * @version 2025.2.1
  * @since 2022.1.0
  */
 @Data
