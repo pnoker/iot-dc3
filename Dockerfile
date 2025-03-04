@@ -15,7 +15,7 @@
 #
 
 # builder
-FROM pnoker/dc3-jdk:2024.3.dev AS builder
+FROM pnoker/dc3-jdk:2025.2 AS builder
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 
