@@ -47,6 +47,21 @@ services:
         aliases:
           - dc3-postgres-exporter
 
+  redis-exporter:
+    image: pnoker/dc3-redis-exporter:2025.2.dev
+    restart: always
+    container_name: dc3-redis-exporter
+    hostname: dc3-redis-exporter
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-redis-exporter
+
   grafana:
     image: pnoker/dc3-grafana:2025.2.dev
     restart: always

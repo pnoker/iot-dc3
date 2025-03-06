@@ -27,18 +27,18 @@ spring:
     host: ${RABBITMQ_HOST:dc3-rabbitmq}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:dc3}
-    password: ${RABBITMQ_PASSWORD:dc3}
+    password: ${RABBITMQ_PASSWORD:dc3dc3dc3}
   data:
     redis:
       host: ${REDIS_HOST:dc3-redis}
       port: ${REDIS_PORT:36379}
-      password: ${REDIS_PASSWORD:dc3}
+      password: ${REDIS_PASSWORD:dc3dc3dc3}
     mongodb:
       host: ${MONGO_HOST:dc3-mongo}
       port: ${MONGO_PORT:37017}
       database: ${MONGO_DATABASE:dc3}
       username: ${MONGO_USERNAME:dc3}
-      password: ${MONGO_PASSWORD:dc3}
+      password: ${MONGO_PASSWORD:dc3dc3dc3}
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}
