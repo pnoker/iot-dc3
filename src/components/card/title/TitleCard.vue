@@ -41,31 +41,33 @@ const props = defineProps({
     border-radius: 4px;
     box-sizing: border-box;
 
-    .title-card__header {
-        font-size: 14px;
-        font-weight: bold;
-    }
+    .title-card__container {
+        .title-card__header {
+            font-size: 14px;
+            font-weight: bold;
+        }
 
-    &:first-child {
-        padding-top: 0;
-        padding-left: 0;
-    }
+        &:first-child {
+            padding-top: 0;
+            padding-left: 0;
+        }
 
-    .el-card {
-        width: 100%;
-        box-sizing: border-box;
-    }
+        .el-card {
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-    .el-card__header {
-        padding: 10px;
-    }
+        .el-card__header {
+            padding: 10px;
+        }
 
-    .el-card__body {
-        padding: 10px 5px 0px 5px;
-    }
+        .el-card__body {
+            padding: 10px 5px 0px 5px;
+        }
 
-    .el-tabs__nav {
-        margin: 0 5px 0 5px;
+        .el-tabs__nav {
+            margin: 0 5px 0 5px;
+        }
     }
 }
 </style>

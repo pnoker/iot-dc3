@@ -15,7 +15,7 @@
 #
 
 # builder
-FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-node:20.12 AS builder
+FROM pnoker/dc3-node:2025.2 AS builder
 LABEL dc3.author pnokers
 LABEL dc3.author.email pnokers.icloud.com
 
@@ -29,7 +29,7 @@ RUN yarn
 RUN yarn build
 
 # runtime
-FROM registry.cn-beijing.aliyuncs.com/dc3/dc3-nginx:1.26 AS runtime
+FROM pnoker/dc3-nginx:2025.2 AS runtime
 LABEL dc3.author pnokers
 LABEL dc3.author.email pnokers.icloud.com
 

@@ -59,7 +59,6 @@
                                         background
                                         class="tool-select-pagination"
                                         layout="prev, pager, next"
-                                        small
                                         @current-change="driverCurrentChange"
                                     ></el-pagination>
                                 </div>
@@ -103,7 +102,6 @@
                                         background
                                         class="tool-select-pagination"
                                         layout="prev, pager, next"
-                                        small
                                         @current-change="profileCurrentChange"
                                     ></el-pagination>
                                 </div>
@@ -197,7 +195,7 @@
                 </el-form-item>
                 <el-row>
                     <el-col v-for="data in 12" :key="data" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
-                        <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
+                        <skeleton-card :footer="false" :loading="reactiveData.loading"></skeleton-card>
                     </el-col>
                     <el-col v-for="data in reactiveData.pointInfoData" :key="data.id" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
                         <point-info-card :attributes="reactiveData.pointAttributes" :data="data" @select="selectPoint"></point-info-card>

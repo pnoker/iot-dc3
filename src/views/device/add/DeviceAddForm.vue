@@ -44,7 +44,6 @@
                             background
                             class="tool-select-pagination"
                             layout="prev, pager, next"
-                            small
                             @current-change="driverCurrentChange"
                         ></el-pagination>
                     </div>
@@ -73,7 +72,6 @@
                             background
                             class="tool-select-pagination"
                             layout="prev, pager, next"
-                            small
                             @current-change="profileCurrentChange"
                         ></el-pagination>
                     </div>

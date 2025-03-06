@@ -31,7 +31,6 @@
                 <p>提示：建议每次导入前下载新模板, 避免模板配置数据不一致。</p>
                 <p>方法：先选择驱动和模板, 然后点击生成导入模板, 再将待导入的设备数据填写到导入模板, 最后上传导入数据。</p>
             </el-alert>
-            <dev></dev>
             <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
                 <el-select v-model="reactiveData.formData.driverId" class="edit-form-special" clearable placeholder="请选择所属驱动" @visible-change="driverDictionaryVisible">
                     <div class="tool-select">
@@ -47,7 +46,6 @@
                             background
                             class="tool-select-pagination"
                             layout="prev, pager, next"
-                            small
                             @current-change="driverCurrentChange"
                         ></el-pagination>
                     </div>
@@ -76,7 +74,6 @@
                             background
                             class="tool-select-pagination"
                             layout="prev, pager, next"
-                            small
                             @current-change="profileCurrentChange"
                         ></el-pagination>
                     </div>

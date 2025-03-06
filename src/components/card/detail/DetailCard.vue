@@ -24,7 +24,7 @@
     </div>
 </template>
 
-<script lang="ts" setup />
+<script lang="ts" setup></script>
 
 <style lang="scss">
 .detail-card {
@@ -46,7 +46,7 @@
     }
 
     .el-card__body {
-        padding: 10px 5px 0px 5px;
+        padding: 10px 5px 0 5px;
     }
 
     .el-tabs__nav {

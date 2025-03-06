@@ -41,7 +41,6 @@
                                     background
                                     class="tool-select-pagination"
                                     layout="prev, pager, next"
-                                    small
                                     @current-change="deviceCurrentChange"
                                 ></el-pagination>
                             </div>
@@ -70,7 +69,6 @@
                                     background
                                     class="tool-select-pagination"
                                     layout="prev, pager, next"
-                                    small
                                     @current-change="pointCurrentChange"
                                 ></el-pagination>
                             </div>

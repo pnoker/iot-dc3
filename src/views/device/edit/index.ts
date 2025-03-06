@@ -24,7 +24,14 @@ import router from '@/config/router'
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary'
 import { getDeviceById, updateDevice } from '@/api/device'
 import { getDriverAttributeByDriverId, getPointAttributeByDriverId } from '@/api/attribute'
-import { addDriverInfo, addPointInfo, getDriverInfoByDeviceId, getPointInfoByDeviceId, updateDriverInfo, updatePointInfo } from '@/api/info'
+import {
+    addDriverInfo,
+    addPointInfo,
+    getDriverInfoByDeviceId,
+    getPointInfoByDeviceId,
+    updateDriverInfo,
+    updatePointInfo
+} from '@/api/info'
 
 import { Dictionary, Order } from '@/config/entity'
 

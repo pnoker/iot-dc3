@@ -22,7 +22,7 @@
         <blank-card>
             <el-row>
                 <el-col v-for="data in 12" :key="data.id" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
-                    <skeleton-card :loading="reactiveData.loading"></skeleton-card>
+                    <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
                 </el-col>
                 <el-col v-if="hasData">
                     <el-empty description="暂无驱动数据!"></el-empty>

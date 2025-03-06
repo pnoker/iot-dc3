@@ -15,40 +15,47 @@
   -->
 
 <template>
-    <el-skeleton :loading="props.loading" animated>
+    <el-skeleton :loading="props.loading" :throttle="{ leading: 500 }" animated>
         <template #template>
-            <div class="skeleton-card">
-                <el-card shadow="hover">
-                    <div class="skeleton-card__container">
-                        <div class="skeleton-card__header">
-                            <el-skeleton-item ariant="image" class="skeleton-card-icon" />
-                            <el-skeleton-item class="skeleton-card-name" variant="text" />
-                        </div>
-                        <div class="skeleton-card__body">
-                            <div class="skeleton-card-content">
-                                <ul>
-                                    <el-skeleton-item class="skeleton-card-text" variant="text" />
-                                    <el-skeleton-item class="skeleton-card-text" variant="text" />
-                                    <el-skeleton-item class="skeleton-card-text" variant="text" />
-                                    <el-skeleton-item class="skeleton-card-text" variant="text" />
-                                </ul>
+            <el-row>
+                <el-col v-for="data in 12" :key="data" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
+                    <div class="skeleton-card">
+                        <el-card shadow="hover">
+                            <div class="skeleton-card__container">
+                                <div class="skeleton-card__header">
+                                    <el-skeleton-item ariant="image" class="skeleton-card-icon" />
+                                    <el-skeleton-item class="skeleton-card-name" variant="text" />
+                                </div>
+                                <div class="skeleton-card__body">
+                                    <div class="skeleton-card-content">
+                                        <ul>
+                                            <el-skeleton-item class="skeleton-card-text" variant="text" />
+                                            <el-skeleton-item class="skeleton-card-text" variant="text" />
+                                            <el-skeleton-item class="skeleton-card-text" variant="text" />
+                                            <el-skeleton-item class="skeleton-card-text" variant="text" />
+                                        </ul>
+                                    </div>
+                                    <div class="skeleton-card-content">
+                                        <el-skeleton-item class="skeleton-card-description" variant="text" />
+                                    </div>
+                                </div>
+                                <div v-if="props.footer" class="skeleton-card__footer">
+                                    <div class="skeleton-card-operation">
+                                        <el-skeleton-item class="skeleton-card-button" variant="button" />
+                                        <el-skeleton-item class="skeleton-card-button" variant="button" />
+                                        <el-skeleton-item class="skeleton-card-button" variant="button" />
+                                        <el-skeleton-item class="skeleton-card-button" variant="button" />
+                                        <el-skeleton-item class="skeleton-card-button" variant="button" />
+                                    </div>
+                                </div>
                             </div>
-                            <div class="skeleton-card-content">
-                                <el-skeleton-item class="skeleton-card-description" variant="text" />
-                            </div>
-                        </div>
-                        <div v-if="!props.footer" class="skeleton-card__footer">
-                            <div class="skeleton-card-operation">
-                                <el-skeleton-item class="skeleton-card-button" variant="button" />
-                                <el-skeleton-item class="skeleton-card-button" variant="button" />
-                                <el-skeleton-item class="skeleton-card-button" variant="button" />
-                                <el-skeleton-item class="skeleton-card-button" variant="button" />
-                                <el-skeleton-item class="skeleton-card-button" variant="button" />
-                            </div>
-                        </div>
+                        </el-card>
                     </div>
-                </el-card>
-            </div>
+                </el-col>
+            </el-row>
+        </template>
+        <template #default>
+            <slot />
         </template>
     </el-skeleton>
 </template>
@@ -64,7 +71,7 @@ const props = defineProps({
     footer: {
         type: Boolean,
         default: () => {
-            return false
+            return true
         }
     }
 })

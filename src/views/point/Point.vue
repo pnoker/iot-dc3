@@ -35,7 +35,7 @@
         <blank-card>
             <el-row>
                 <el-col v-for="data in 12" :key="data" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
-                    <skeleton-card :loading="reactiveData.loading"></skeleton-card>
+                    <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
                 </el-col>
                 <el-col v-if="hasData">
                     <el-empty description="暂无位号数据!"></el-empty>

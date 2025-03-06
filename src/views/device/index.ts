@@ -16,7 +16,15 @@
 
 import { computed, defineComponent, reactive, ref } from 'vue'
 
-import { addDevice, deleteDevice, getDeviceList, getDeviceStatus, importDevice, importDeviceTemplate, updateDevice } from '@/api/device'
+import {
+    addDevice,
+    deleteDevice,
+    getDeviceList,
+    getDeviceStatus,
+    importDevice,
+    importDeviceTemplate,
+    updateDevice
+} from '@/api/device'
 import { getDriverByIds } from '@/api/driver'
 
 import { Order } from '@/config/entity'
