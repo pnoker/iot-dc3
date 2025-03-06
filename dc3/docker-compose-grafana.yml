@@ -62,6 +62,21 @@ services:
         aliases:
           - dc3-redis-exporter
 
+  nginx-exporter:
+    image: pnoker/dc3-nginx-exporter:2025.2.dev
+    restart: always
+    container_name: dc3-nginx-exporter
+    hostname: dc3-nginx-exporter
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-nginx-exporter
+
   grafana:
     image: pnoker/dc3-grafana:2025.2.dev
     restart: always
