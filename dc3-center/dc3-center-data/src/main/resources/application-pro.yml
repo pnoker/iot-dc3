@@ -25,18 +25,18 @@ spring:
     host: ${RABBITMQ_HOST:dc3-rabbitmq}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:dc3}
-    password: ${RABBITMQ_PASSWORD:dc3}
+    password: ${RABBITMQ_PASSWORD:dc3dc3dc3}
   data:
     redis:
       host: ${REDIS_HOST:dc3-redis}
       port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:dc3}
+      password: ${REDIS_PASSWORD:dc3dc3dc3}
     mongodb:
       host: ${MONGO_HOST:dc3-mongo}
       port: ${MONGO_PORT:27017}
       database: ${MONGO_DATABASE:dc3}
       username: ${MONGO_USERNAME:dc3}
-      password: ${MONGO_PASSWORD:dc3}
+      password: ${MONGO_PASSWORD:dc3dc3dc3}
   cache:
     redis:
       time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:12H}
@@ -53,7 +53,7 @@ driver:
     url: tcp://${MQTT_BROKER_HOST:dc3-rabbitmq}:${MQTT_BROKER_PORT:1883}
     auth-type: USERNAME
     username: ${MQTT_USERNAME:dc3}
-    password: ${MQTT_PASSWORD:dc3}
+    password: ${MQTT_PASSWORD:dc3dc3dc3}
     topic-prefix: dc3/${spring.application.name}/
     default-send-topic:
       qos: 1
