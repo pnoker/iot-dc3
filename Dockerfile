@@ -16,8 +16,8 @@
 
 # builder
 FROM pnoker/dc3-node:2025.2 AS builder
-LABEL dc3.author pnokers
-LABEL dc3.author.email pnokers.icloud.com
+LABEL dc3.author=pnokers
+LABEL dc3.author.email=pnokers.icloud.com
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
@@ -30,8 +30,8 @@ RUN yarn build
 
 # runtime
 FROM pnoker/dc3-nginx:2025.2 AS runtime
-LABEL dc3.author pnokers
-LABEL dc3.author.email pnokers.icloud.com
+LABEL dc3.author=pnokers
+LABEL dc3.author.email=pnokers.icloud.com
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
