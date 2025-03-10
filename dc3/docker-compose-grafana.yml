@@ -22,7 +22,7 @@ services:
     hostname: dc3-prometheus
     command: 
       - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.retention.time=30d'
+      - '--storage.tsdb.retention.time=7d'
     volumes:
       - prometheus:/prometheus
     logging:
