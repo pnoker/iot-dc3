@@ -20,6 +20,9 @@ services:
     restart: always
     container_name: dc3-prometheus
     hostname: dc3-prometheus
+    command: 
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=30d'
     volumes:
       - prometheus:/prometheus
     logging:
