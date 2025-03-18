@@ -24,9 +24,14 @@ module.exports = {
     parser: 'vue-eslint-parser',
     parserOptions: {
         parser: '@typescript-eslint/parser',
-        sourceType: 'module'
+        sourceType: 'module',
+        ecmaVersion: 'latest'
     },
-    extends: ['plugin:vue/vue3-recommended', 'eslint:recommended', 'plugin:prettier/recommended'],
+    extends: [
+        'plugin:vue/vue3-recommended',
+        'eslint:recommended',
+        'plugin:prettier/recommended'
+    ],
     plugins: ['vue', '@typescript-eslint'],
     overrides: [
         {

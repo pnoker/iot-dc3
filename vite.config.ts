@@ -30,9 +30,9 @@ export default (configEnv: ConfigEnv) => {
     const envDir = './src/config/env'
     const files = [`${envDir}/.env`, `${envDir}/.env.${process.env.NODE_ENV}`]
 
-    files.forEach((file) => {
+    files.forEach(file => {
         const config = dotenv.parse<any>(fs.readFileSync(file))
-        Object.keys(config).forEach((key) => {
+        Object.keys(config).forEach(key => {
             process.env[key] = config[key]
         })
     })
