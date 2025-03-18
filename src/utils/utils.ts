@@ -54,7 +54,7 @@ export const setCopyContent = (content: any, detail: any, message: any) => {
  */
 export const serialize = (data: any) => {
     const list: string[] = []
-    Object.keys(data).forEach((ele) => {
+    Object.keys(data).forEach(ele => {
         list.push(`${ele}=${data[ele]}`)
     })
     return list.join('&')
@@ -165,7 +165,7 @@ export const findParent = (menu, id) => {
  *
  * @param url
  */
-export const loadStyle = (url) => {
+export const loadStyle = url => {
     const link = document.createElement('link')
     link.type = 'text/css'
     link.rel = 'stylesheet'
@@ -226,7 +226,7 @@ export const findDicLabel = (dic, value) => {
     } else if (value instanceof Array) {
         result = []
         let index = 0
-        value.forEach((ele) => {
+        value.forEach(ele => {
             index = findDicIndex(dic, ele)
             if (index !== -1) {
                 result.push(dic[index].label)
@@ -331,7 +331,7 @@ export function dateFormat(date: any): string {
  *
  * @param callback
  */
-export const listenFullscreen = (callback) => {
+export const listenFullscreen = callback => {
     function listen() {
         callback()
     }

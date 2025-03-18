@@ -69,7 +69,7 @@ export default defineComponent({
             }
         })
 
-        const select = (data) => {
+        const select = data => {
             emit('select', data)
         }
 

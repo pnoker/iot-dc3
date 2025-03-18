@@ -36,67 +36,67 @@
 </template>
 
 <script>
-import { encode } from 'js-base64'
+    import { encode } from 'js-base64'
 
-export default {
-    name: 'ApplicationCard',
-    props: {
-        name: {
-            type: String,
-            default: '数据看板'
+    export default {
+        name: 'ApplicationCard',
+        props: {
+            name: {
+                type: String,
+                default: '数据看板'
+            },
+            icon: {
+                type: String,
+                default: 'images/app/application.png'
+            },
+            url: {
+                type: String,
+                default: ''
+            }
         },
-        icon: {
-            type: String,
-            default: 'images/app/application.png'
-        },
-        url: {
-            type: String,
-            default: ''
-        }
-    },
-    methods: {
-        show() {
-            if (this.url) {
-                this.$router.push({ name: 'application', query: { id: encode(this.url) } }).catch(() => {
-                    // nothing to do
-                })
+        methods: {
+            show() {
+                if (this.url) {
+                    this.$router.push({ name: 'application', query: { id: encode(this.url) } }).catch(() => {
+                        // nothing to do
+                    })
+                }
             }
         }
     }
-}
 </script>
 
 <style lang="scss">
-@use '@/components/card/styles/things-card.scss';
+    @use '@/components/card/styles/things-card.scss';
 
-.things-card-application {
-    width: 140px;
-    height: 170px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    .things-card-application {
+        width: 140px;
+        height: 170px;
+        margin-right: 10px;
+        margin-bottom: 10px;
 
-    .el-card {
-        width: 100%;
-        min-width: 140px !important;
-        min-height: 170px !important;
-        box-sizing: border-box;
+        .el-card {
+            width: 100%;
+            min-width: 140px !important;
+            min-height: 170px !important;
+            box-sizing: border-box;
+        }
     }
-}
 
-.things-card-body-content-application-icon {
-    width: 120px;
-    cursor: pointer;
+    .things-card-body-content-application-icon {
+        width: 120px;
+        cursor: pointer;
 
-    .el-avatar {
-        background: transparent;
+        .el-avatar {
+            background: transparent;
+        }
     }
-}
 
-.things-card-body-content-application-name {
-    display: block;
-    width: 120px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
+    .things-card-body-content-application-name {
+        display: block;
+        width: 120px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 </style>

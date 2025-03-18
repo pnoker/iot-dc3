@@ -61,7 +61,7 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
     }
 
     checkTokenValid(login)
-        .then((res) => {
+        .then(res => {
             if (!res.data) {
                 logout()
                 return

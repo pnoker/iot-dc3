@@ -60,7 +60,7 @@ export default defineComponent({
                 page: reactiveData.page,
                 ...reactiveData.query
             })
-                .then((res) => {
+                .then(res => {
                     const data = res.data
                     reactiveData.page.total = data.total
                     reactiveData.listData = data.records
@@ -76,7 +76,7 @@ export default defineComponent({
                 page: reactiveData.page,
                 ...reactiveData.query
             })
-                .then((res) => {
+                .then(res => {
                     reactiveData.statusTable = res.data
                 })
                 .catch(() => {
@@ -84,7 +84,7 @@ export default defineComponent({
                 })
         }
 
-        const search = (params) => {
+        const search = params => {
             reactiveData.query = { ...params, type: 'driver' }
             list()
         }

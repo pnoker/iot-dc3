@@ -69,7 +69,7 @@ export default defineComponent({
         }
         const updateThing = () => {
             const form = unref(formDataRef)
-            form?.validate((valid) => {
+            form?.validate(valid => {
                 if (valid) {
                     emit('update-thing', props.formData, () => {
                         cancel()

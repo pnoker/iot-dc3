@@ -88,7 +88,7 @@ export default defineComponent({
                 page: reactiveData.profilePage,
                 label: reactiveData.profileQuery
             })
-                .then((res) => {
+                .then(res => {
                     const data = res.data
                     reactiveData.profilePage.total = data.total
                     reactiveData.profileDictionary = data.records
@@ -112,7 +112,7 @@ export default defineComponent({
 
         const search = () => {
             const form = unref(formDataRef)
-            form?.validate((valid) => {
+            form?.validate(valid => {
                 if (valid) {
                     emit('search', reactiveData.formData)
                 }

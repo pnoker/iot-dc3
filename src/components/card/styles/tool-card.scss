@@ -15,53 +15,53 @@
  */
 
 .tool-card {
-  margin-top: 1px;
-  margin-bottom: 4px;
+    margin-top: 1px;
+    margin-bottom: 4px;
 
-  .tool-card__body {
-    display: flex;
-    flex-direction: column;
-
-    .tool-card-body-form {
-      display: flex;
-      justify-content: center;
-    }
-
-    .tool-card-body-button {
-      .el-form-item__content {
+    .tool-card__body {
         display: flex;
-        justify-content: center;
-      }
-    }
-  }
+        flex-direction: column;
 
-  .tool-card__footer {
-    display: flex;
-    justify-content: space-between;
+        .tool-card-body-form {
+            display: flex;
+            justify-content: center;
+        }
 
-    .tool-card-footer-button {
-      display: flex;
-    }
-
-    .tool-card-footer-page {
-      display: flex;
-    }
-  }
-
-  .tool-select {
-    .tool-select-input {
-      margin-left: 10px;
-      margin-right: 10px;
-      margin-bottom: 5px;
+        .tool-card-body-button {
+            .el-form-item__content {
+                display: flex;
+                justify-content: center;
+            }
+        }
     }
 
-    .tool-select-pagination {
-      justify-content: center;
-      margin-bottom: 5px;
-    }
-  }
+    .tool-card__footer {
+        display: flex;
+        justify-content: space-between;
 
-  .el-card {
-    border: 0;
-  }
+        .tool-card-footer-button {
+            display: flex;
+        }
+
+        .tool-card-footer-page {
+            display: flex;
+        }
+    }
+
+    .tool-select {
+        .tool-select-input {
+            margin-left: 10px;
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+
+        .tool-select-pagination {
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+    }
+
+    .el-card {
+        border: 0;
+    }
 }

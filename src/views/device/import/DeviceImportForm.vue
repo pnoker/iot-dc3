@@ -101,6 +101,6 @@
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss">
-@use '@/components/dialog/styles/things-dialog';
-@use '@/components/card/styles/tool-card';
+    @use '@/components/dialog/styles/things-dialog';
+    @use '@/components/card/styles/tool-card';
 </style>

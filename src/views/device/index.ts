@@ -16,15 +16,7 @@
 
 import { computed, defineComponent, reactive, ref } from 'vue'
 
-import {
-    addDevice,
-    deleteDevice,
-    getDeviceList,
-    getDeviceStatus,
-    importDevice,
-    importDeviceTemplate,
-    updateDevice
-} from '@/api/device'
+import { addDevice, deleteDevice, getDeviceList, getDeviceStatus, importDevice, importDeviceTemplate, updateDevice } from '@/api/device'
 import { getDriverByIds } from '@/api/driver'
 
 import { Order } from '@/config/entity'
@@ -111,15 +103,15 @@ export default defineComponent({
                 page: reactiveData.page,
                 ...reactiveData.query
             })
-                .then((res) => {
+                .then(res => {
                     const data = res.data
                     reactiveData.page.total = data.total
                     reactiveData.listData = data.records
 
                     // driver
-                    const driverIds = Array.from(new Set(reactiveData.listData.map((device) => device.driverId)))
+                    const driverIds = Array.from(new Set(reactiveData.listData.map(device => device.driverId)))
                     getDriverByIds(driverIds)
-                        .then((res) => {
+                        .then(res => {
                             reactiveData.driverTable = res.data
                         })
                         .catch(() => {
@@ -137,7 +129,7 @@ export default defineComponent({
                 page: reactiveData.page,
                 ...reactiveData.query
             })
-                .then((res) => {
+                .then(res => {
                     reactiveData.statusTable = res.data
                 })
                 .catch(() => {
@@ -145,7 +137,7 @@ export default defineComponent({
                 })
         }
 
-        const search = (params) => {
+        const search = params => {
             if (!isNull(props.driverId)) {
                 params = {
                     ...params,
@@ -197,7 +189,7 @@ export default defineComponent({
 
         const importTemplate = (form, done) => {
             importDeviceTemplate(form)
-                .then((res) => {
+                .then(res => {
                     const url = window.URL.createObjectURL(new Blob([res.data.data as BlobPart]))
                     const name = res.headers['content-disposition'].split(';')[1].split('filename=')[1]
                     const link = document.createElement('a')
@@ -249,7 +241,7 @@ export default defineComponent({
 
         const deleteThing = (id, done) => {
             deleteDevice(id)
-                .then((res) => {
+                .then(res => {
                     if (res.data.ok) {
                         list()
                         done()

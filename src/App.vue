@@ -21,13 +21,13 @@
 </template>
 
 <style lang="scss">
-#app {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
+    #app {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
 
-#nprogress .bar {
-    background: #409eff !important;
-}
+    #nprogress .bar {
+        background: #409eff !important;
+    }
 </style>

@@ -116,139 +116,139 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, unref } from 'vue'
-import { FormInstance, FormRules } from 'element-plus'
-import { Plus, Refresh, RefreshRight, Search } from '@element-plus/icons-vue'
-import { Dictionary, Order } from '@/config/entity'
-import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary'
+    import { reactive, ref, unref } from 'vue'
+    import { FormInstance, FormRules } from 'element-plus'
+    import { Plus, Refresh, RefreshRight, Search } from '@element-plus/icons-vue'
+    import { Dictionary, Order } from '@/config/entity'
+    import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary'
 
-defineProps({
-    embedded: {
-        type: String,
-        default: () => {
-            return ''
+    defineProps({
+        embedded: {
+            type: String,
+            default: () => {
+                return ''
+            }
+        },
+        page: {
+            type: Object,
+            default: () => {
+                return {}
+            }
         }
-    },
-    page: {
-        type: Object,
-        default: () => {
-            return {}
+    })
+
+    const emit = defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change'])
+
+    // 定义表单引用
+    const formDataRef = ref<FormInstance>()
+
+    // 定义响应式数据
+    const reactiveData = reactive({
+        formData: {} as any,
+        deviceQuery: '',
+        deviceDictionary: [] as Dictionary[],
+        devicePage: {
+            total: 0,
+            size: 5,
+            current: 1,
+            orders: [] as Order[]
+        },
+        pointQuery: '',
+        pointDictionary: [] as Dictionary[],
+        pointPage: {
+            total: 0,
+            size: 5,
+            current: 1,
+            orders: [] as Order[]
         }
-    }
-})
-
-const emit = defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change'])
-
-// 定义表单引用
-const formDataRef = ref<FormInstance>()
-
-// 定义响应式数据
-const reactiveData = reactive({
-    formData: {} as any,
-    deviceQuery: '',
-    deviceDictionary: [] as Dictionary[],
-    devicePage: {
-        total: 0,
-        size: 5,
-        current: 1,
-        orders: [] as Order[]
-    },
-    pointQuery: '',
-    pointDictionary: [] as Dictionary[],
-    pointPage: {
-        total: 0,
-        size: 5,
-        current: 1,
-        orders: [] as Order[]
-    }
-})
-
-// 定义表单校验规则
-const formRule = reactive<FormRules>({})
-
-const deviceDictionary = (query?: string) => {
-    getDeviceDictionary({
-        page: reactiveData.devicePage,
-        label: query ? query : reactiveData.deviceQuery
     })
-        .then((res) => {
-            const data = res.data
-            reactiveData.devicePage.total = data.total
-            reactiveData.deviceDictionary = data.records
-        })
-        .catch(() => {
-            // nothing to do
-        })
-}
 
-const deviceCurrentChange = (current: number) => {
-    reactiveData.devicePage.current = current
-    deviceDictionary()
-}
+    // 定义表单校验规则
+    const formRule = reactive<FormRules>({})
 
-const pointDictionary = (query?: string) => {
-    getPointDictionary({
-        page: reactiveData.pointPage,
-        label: query ? query : reactiveData.pointQuery,
-        parentId: reactiveData.formData.deviceId
-    })
-        .then((res) => {
-            const data = res.data
-            reactiveData.pointPage.total = data.total
-            reactiveData.pointDictionary = data.records
+    const deviceDictionary = (query?: string) => {
+        getDeviceDictionary({
+            page: reactiveData.devicePage,
+            label: query ? query : reactiveData.deviceQuery
         })
-        .catch(() => {
-            // nothing to do
-        })
-}
+            .then(res => {
+                const data = res.data
+                reactiveData.devicePage.total = data.total
+                reactiveData.deviceDictionary = data.records
+            })
+            .catch(() => {
+                // nothing to do
+            })
+    }
 
-const pointCurrentChange = (current: number) => {
-    reactiveData.pointPage.current = current
-    pointDictionary()
-}
-
-const deviceDictionaryVisible = (visible: boolean) => {
-    if (visible) {
-        reactiveData.deviceQuery = ''
+    const deviceCurrentChange = (current: number) => {
+        reactiveData.devicePage.current = current
         deviceDictionary()
     }
-}
 
-const pointDictionaryVisible = (visible: boolean) => {
-    if (visible) {
-        reactiveData.pointQuery = ''
+    const pointDictionary = (query?: string) => {
+        getPointDictionary({
+            page: reactiveData.pointPage,
+            label: query ? query : reactiveData.pointQuery,
+            parentId: reactiveData.formData.deviceId
+        })
+            .then(res => {
+                const data = res.data
+                reactiveData.pointPage.total = data.total
+                reactiveData.pointDictionary = data.records
+            })
+            .catch(() => {
+                // nothing to do
+            })
+    }
+
+    const pointCurrentChange = (current: number) => {
+        reactiveData.pointPage.current = current
         pointDictionary()
     }
-}
 
-const search = () => {
-    const form = unref(formDataRef)
-    form?.validate((valid) => {
-        if (valid) {
-            emit('search', reactiveData.formData)
+    const deviceDictionaryVisible = (visible: boolean) => {
+        if (visible) {
+            reactiveData.deviceQuery = ''
+            deviceDictionary()
         }
-    })
-}
+    }
 
-const reset = () => {
-    const form = unref(formDataRef)
-    form?.resetFields()
-    emit('reset')
-}
+    const pointDictionaryVisible = (visible: boolean) => {
+        if (visible) {
+            reactiveData.pointQuery = ''
+            pointDictionary()
+        }
+    }
 
-const refresh = () => {
-    emit('refresh')
-}
+    const search = () => {
+        const form = unref(formDataRef)
+        form?.validate(valid => {
+            if (valid) {
+                emit('search', reactiveData.formData)
+            }
+        })
+    }
 
-const sizeChange = (size: number) => {
-    emit('size-change', size)
-}
+    const reset = () => {
+        const form = unref(formDataRef)
+        form?.resetFields()
+        emit('reset')
+    }
 
-const currentChange = (current: number) => {
-    emit('current-change', current)
-}
+    const refresh = () => {
+        emit('refresh')
+    }
+
+    const sizeChange = (size: number) => {
+        emit('size-change', size)
+    }
+
+    const currentChange = (current: number) => {
+        emit('current-change', current)
+    }
 </script>
 
 <style lang="scss">
-@use '@/components/card/styles/tool-card.scss';
+    @use '@/components/card/styles/tool-card.scss';
 </style>

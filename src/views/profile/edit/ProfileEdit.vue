@@ -75,5 +75,5 @@
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss">
-@use '@/components/card/styles/edit-card.scss';
+    @use '@/components/card/styles/edit-card.scss';
 </style>

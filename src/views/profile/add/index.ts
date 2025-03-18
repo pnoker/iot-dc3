@@ -75,7 +75,7 @@ export default defineComponent({
 
         const addThing = () => {
             const form = unref(formDataRef)
-            form?.validate((valid) => {
+            form?.validate(valid => {
                 if (valid) {
                     emit('add-thing', reactiveData.formData, () => {
                         cancel()

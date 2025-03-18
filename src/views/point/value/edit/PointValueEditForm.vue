@@ -46,5 +46,5 @@
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss">
-@use '@/components/dialog/styles/things-dialog';
+    @use '@/components/dialog/styles/things-dialog';
 </style>

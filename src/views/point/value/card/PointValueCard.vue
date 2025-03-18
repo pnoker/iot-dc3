@@ -98,126 +98,126 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, watch } from 'vue'
-import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue'
+    import { onMounted, watch } from 'vue'
+    import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue'
 
-import { Chart } from '@antv/g2'
+    import { Chart } from '@antv/g2'
 
-import { copy, timestamp } from '@/utils/CommonUtil'
-import { getPointValueHistory } from '@/api/point'
+    import { copy, timestamp } from '@/utils/CommonUtil'
+    import { getPointValueHistory } from '@/api/point'
 
-const props = defineProps({
-    embedded: {
-        type: String,
-        default: () => {
-            return ''
-        }
-    },
-    data: {
-        type: Object,
-        default: () => {
-            return {}
-        }
-    },
-    device: {
-        type: Object,
-        default: () => {
-            return {}
-        }
-    },
-    point: {
-        type: Object,
-        default: () => {
-            return {}
-        }
-    },
-    unit: {
-        type: String,
-        default: ''
-    },
-    icon: {
-        type: String,
-        default: 'images/common/point.png'
-    }
-})
-
-const copyValue = (data) => {
-    const content = {
-        deviceId: data.deviceId,
-        pointId: data.pointId,
-        value: data.value
-    }
-    copy(JSON.stringify(content, null, 2), '位号值')
-}
-
-let tinyArea: Chart
-const history = () => {
-    getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
-        .then((res) => {
-            let historyData: number[]
-            const pointValueType = props.point.pointTypeFlag.toLowerCase()
-            if (pointValueType === 'string') {
-                historyData = []
-            } else if (pointValueType === 'boolean') {
-                historyData = res.data.reverse().map((value: string) => (value === 'true' ? 1 : 0))
-            } else {
-                historyData = res.data.reverse().map((value: string) => +value)
+    const props = defineProps({
+        embedded: {
+            type: String,
+            default: () => {
+                return ''
             }
+        },
+        data: {
+            type: Object,
+            default: () => {
+                return {}
+            }
+        },
+        device: {
+            type: Object,
+            default: () => {
+                return {}
+            }
+        },
+        point: {
+            type: Object,
+            default: () => {
+                return {}
+            }
+        },
+        unit: {
+            type: String,
+            default: ''
+        },
+        icon: {
+            type: String,
+            default: 'images/common/point.png'
+        }
+    })
 
-            tinyArea.changeData(historyData)
-        })
-        .catch(() => {
-            // nothing to do
-        })
-}
+    const copyValue = data => {
+        const content = {
+            deviceId: data.deviceId,
+            pointId: data.pointId,
+            value: data.value
+        }
+        copy(JSON.stringify(content, null, 2), '位号值')
+    }
 
-watch(
-    () => props.data,
-    () => {
+    let tinyArea: Chart
+    const history = () => {
+        getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
+            .then(res => {
+                let historyData: number[]
+                const pointValueType = props.point.pointTypeFlag.toLowerCase()
+                if (pointValueType === 'string') {
+                    historyData = []
+                } else if (pointValueType === 'boolean') {
+                    historyData = res.data.reverse().map((value: string) => (value === 'true' ? 1 : 0))
+                } else {
+                    historyData = res.data.reverse().map((value: string) => +value)
+                }
+
+                tinyArea.changeData(historyData)
+            })
+            .catch(() => {
+                // nothing to do
+            })
+    }
+
+    watch(
+        () => props.data,
+        () => {
+            if (props.embedded != '') {
+                history()
+            }
+        }
+    )
+
+    onMounted(() => {
+        window.dispatchEvent(new Event('resize'))
+
         if (props.embedded != '') {
+            tinyArea = new TinyArea(props.data.pointId, {
+                height: 60,
+                data: [],
+                autoFit: true,
+                smooth: true,
+                annotations: [
+                    {
+                        type: 'line',
+                        start: ['min', 'mean'],
+                        end: ['max', 'mean'],
+                        text: {
+                            content: 'AVG',
+                            offsetY: -5,
+                            style: {
+                                textAlign: 'left',
+                                fontSize: 10,
+                                fill: 'rgba(44, 53, 66, 0.45)',
+                                textBaseline: 'bottom'
+                            }
+                        },
+                        style: {
+                            stroke: 'rgba(0, 0, 0, 0.25)'
+                        }
+                    }
+                ]
+            })
+
+            tinyArea.render()
+
             history()
         }
-    }
-)
-
-onMounted(() => {
-    window.dispatchEvent(new Event('resize'))
-
-    if (props.embedded != '') {
-        tinyArea = new TinyArea(props.data.pointId, {
-            height: 60,
-            data: [],
-            autoFit: true,
-            smooth: true,
-            annotations: [
-                {
-                    type: 'line',
-                    start: ['min', 'mean'],
-                    end: ['max', 'mean'],
-                    text: {
-                        content: 'AVG',
-                        offsetY: -5,
-                        style: {
-                            textAlign: 'left',
-                            fontSize: 10,
-                            fill: 'rgba(44, 53, 66, 0.45)',
-                            textBaseline: 'bottom'
-                        }
-                    },
-                    style: {
-                        stroke: 'rgba(0, 0, 0, 0.25)'
-                    }
-                }
-            ]
-        })
-
-        tinyArea.render()
-
-        history()
-    }
-})
+    })
 </script>
 
 <style lang="scss">
-@use '@/components/card/styles/things-card';
+    @use '@/components/card/styles/things-card';
 </style>

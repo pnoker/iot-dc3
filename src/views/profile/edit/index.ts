@@ -86,7 +86,7 @@ export default defineComponent({
 
         const profile = () => {
             const id = route.query.id as string
-            getProfileById(id).then((res) => {
+            getProfileById(id).then(res => {
                 reactiveData.profileFormData = res.data
                 reactiveData.oldProfileFormData = { ...res.data }
             })
@@ -94,9 +94,9 @@ export default defineComponent({
 
         const profileUpdate = () => {
             const form = unref(formDataRef)
-            form?.validate((valid) => {
+            form?.validate(valid => {
                 if (valid) {
-                    updateProfile(reactiveData.profileFormData).then((res) => {
+                    updateProfile(reactiveData.profileFormData).then(res => {
                         reactiveData.oldProfileFormData = { ...res.data }
                     })
                 }
@@ -127,7 +127,7 @@ export default defineComponent({
             reactiveData.profileFormData = { ...reactiveData.oldProfileFormData }
         }
 
-        const changeActive = (step) => {
+        const changeActive = step => {
             const query = route.query
             router.push({ query: { ...query, active: step } })
         }

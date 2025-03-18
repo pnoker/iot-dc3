@@ -74,13 +74,13 @@ export default defineComponent({
 
         // 加载驱动数据
         const driver = () => {
-            getDriverById(reactiveData.id).then((res) => {
+            getDriverById(reactiveData.id).then(res => {
                 reactiveData.data = res.data
             })
         }
 
         // 切换Tab
-        const changeActive = (tab) => {
+        const changeActive = tab => {
             reactiveData.active = tab.props.name
             const query = route.query
             switch (reactiveData.active) {

@@ -90,11 +90,11 @@ export default defineComponent({
             CircleClose
         }
 
-        const showEdit = (pointValue) => {
+        const showEdit = pointValue => {
             emit('show-edit', pointValue)
         }
 
-        const copyValue = (data) => {
+        const copyValue = data => {
             const content = {
                 deviceId: data.deviceId,
                 pointId: data.pointId,

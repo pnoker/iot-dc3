@@ -110,15 +110,15 @@ export default defineComponent({
                 page: reactiveData.page,
                 ...reactiveData.query
             })
-                .then((res) => {
+                .then(res => {
                     const data = res.data
                     reactiveData.page.total = data.total
                     reactiveData.listData = data.records
 
                     // profile
-                    const profileIds = Array.from(new Set(reactiveData.listData.map((point) => point.profileId)))
+                    const profileIds = Array.from(new Set(reactiveData.listData.map(point => point.profileId)))
                     getProfileByIds(profileIds)
-                        .then((res) => {
+                        .then(res => {
                             reactiveData.profileTable = res.data
                         })
                         .catch(() => {
@@ -133,7 +133,7 @@ export default defineComponent({
                 })
         }
 
-        const search = (params) => {
+        const search = params => {
             if (!isNull(props.profileId)) {
                 params = {
                     ...params,
@@ -203,7 +203,7 @@ export default defineComponent({
 
         const deleteThing = (id, done) => {
             pointDeleteApi(id)
-                .then((res) => {
+                .then(res => {
                     if (res.data.ok) {
                         list()
                         done()

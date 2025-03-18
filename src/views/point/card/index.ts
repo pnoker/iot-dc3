@@ -15,17 +15,7 @@
  */
 
 import { computed, defineComponent } from 'vue'
-import {
-    Bottom,
-    CircleCheck,
-    CircleClose,
-    Edit,
-    List,
-    Location,
-    Sunset,
-    SwitchButton,
-    Top
-} from '@element-plus/icons-vue'
+import { Bottom, CircleCheck, CircleClose, Edit, List, Location, Sunset, SwitchButton, Top } from '@element-plus/icons-vue'
 
 import router from '@/config/router'
 

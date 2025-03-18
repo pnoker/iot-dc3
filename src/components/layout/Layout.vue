@@ -72,44 +72,44 @@
 </template>
 
 <script lang="ts" setup>
-import router from '@/config/router'
-import menu from '@/config/router/views'
-import { warning } from '@/utils/MessageUtil'
-import { HomeFilled } from '@element-plus/icons-vue'
-import { computed } from 'vue'
-import { useStore } from 'vuex'
-import { RouteRecordRaw } from 'vue-router'
+    import router from '@/config/router'
+    import menu from '@/config/router/views'
+    import { warning } from '@/utils/MessageUtil'
+    import { HomeFilled } from '@element-plus/icons-vue'
+    import { computed } from 'vue'
+    import { useStore } from 'vuex'
+    import { RouteRecordRaw } from 'vue-router'
 
-const store = useStore()
+    const store = useStore()
 
-const menus = computed(() => {
-    const children: RouteRecordRaw[] = menu?.children || []
-    return children.filter((view) => view.path !== '/home')
-})
+    const menus = computed(() => {
+        const children: RouteRecordRaw[] = menu?.children || []
+        return children.filter(view => view.path !== '/home')
+    })
 
-const handleMenuEnter = (index: string) => {
-    if (index.indexOf('/') === 0) {
-        const split = index.split('/')
-        if (split.length > 2) {
-            return '/' + split[1]
+    const handleMenuEnter = (index: string) => {
+        if (index.indexOf('/') === 0) {
+            const split = index.split('/')
+            if (split.length > 2) {
+                return '/' + split[1]
+            }
+        }
+        return index
+    }
+
+    const handleMessage = () => {
+        warning('待开发')
+    }
+
+    const handleCommand = (command: string) => {
+        if (command === 'logout') {
+            store.dispatch('auth/logout').then(() => router.push({ name: 'login' }))
+        } else if (command === 'help') {
+            window.open('https://doc.dc3.site')
         }
     }
-    return index
-}
-
-const handleMessage = () => {
-    warning('待开发')
-}
-
-const handleCommand = (command: string) => {
-    if (command === 'logout') {
-        store.dispatch('auth/logout').then(() => router.push({ name: 'login' }))
-    } else if (command === 'help') {
-        window.open('https://doc.dc3.site')
-    }
-}
 </script>
 
 <style lang="scss">
-@use '@/components/layout/style.scss';
+    @use '@/components/layout/style.scss';
 </style>

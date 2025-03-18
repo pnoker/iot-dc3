@@ -27,40 +27,40 @@
 <script lang="ts" setup></script>
 
 <style lang="scss">
-.base-card {
-    border-radius: 4px;
-    box-sizing: border-box;
-
-    ul {
-        list-style: none;
-
-        li {
-            font-size: 13px;
-            margin-top: 8px;
-        }
-    }
-
-    .el-card {
-        width: 100%;
+    .base-card {
+        border-radius: 4px;
         box-sizing: border-box;
-    }
 
-    .el-tabs__nav {
-        margin: 0 5px 0 5px;
-    }
+        ul {
+            list-style: none;
 
-    .base-card__container {
-        .el-tabs__header {
-            margin-bottom: 0;
-
-            .el-tabs__nav-wrap:after {
-                height: 1px;
+            li {
+                font-size: 13px;
+                margin-top: 8px;
             }
         }
 
-        .el-tab-pane {
-            background: #f6f7f9;
+        .el-card {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .el-tabs__nav {
+            margin: 0 5px 0 5px;
+        }
+
+        .base-card__container {
+            .el-tabs__header {
+                margin-bottom: 0;
+
+                .el-tabs__nav-wrap:after {
+                    height: 1px;
+                }
+            }
+
+            .el-tab-pane {
+                background: #f6f7f9;
+            }
         }
     }
-}
 </style>

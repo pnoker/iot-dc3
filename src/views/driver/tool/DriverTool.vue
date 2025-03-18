@@ -73,5 +73,5 @@
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss">
-@use '@/components/card/styles/tool-card.scss';
+    @use '@/components/card/styles/tool-card.scss';
 </style>

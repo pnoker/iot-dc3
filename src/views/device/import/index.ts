@@ -86,7 +86,7 @@ export default defineComponent({
                 page: reactiveData.driverPage,
                 label: reactiveData.driverQuery
             })
-                .then((res) => {
+                .then(res => {
                     const data = res.data
                     reactiveData.driverPage.total = data.total
                     reactiveData.driverDictionary = data.records
@@ -113,7 +113,7 @@ export default defineComponent({
                 page: reactiveData.profilePage,
                 label: reactiveData.profileQuery
             })
-                .then((res) => {
+                .then(res => {
                     const data = res.data
                     reactiveData.profilePage.total = data.total
                     reactiveData.profileDictionary = data.records
@@ -151,7 +151,7 @@ export default defineComponent({
         }
         const importTemplate = () => {
             const form = unref(formDataRef)
-            form?.validate((valid) => {
+            form?.validate(valid => {
                 if (valid) {
                     emit('import-template', reactiveData.formData, () => {
                         successMessage('模板生成成功, 正在导出!')
@@ -159,7 +159,7 @@ export default defineComponent({
                 }
             })
         }
-        const uploadRequest = (param) => {
+        const uploadRequest = param => {
             const formData = reactiveData.formData
             formData['file'] = param.file
 
@@ -171,7 +171,7 @@ export default defineComponent({
         }
         const importThing = () => {
             const form = unref(formDataRef)
-            form?.validate((valid) => {
+            form?.validate(valid => {
                 if (valid) {
                     formUploadRef.value?.submit()
                     reactiveData.formLoading = true
@@ -179,7 +179,7 @@ export default defineComponent({
             })
         }
 
-        const handleExceed: UploadProps['onExceed'] = (files) => {
+        const handleExceed: UploadProps['onExceed'] = files => {
             formUploadRef.value?.clearFiles()
             const file = files[0] as UploadRawFile
             file.uid = genFileId()

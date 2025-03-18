@@ -88,6 +88,6 @@
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss">
-@use '@/components/card/styles/things-card.scss';
-@use '@/views/driver/card/style.scss';
+    @use '@/components/card/styles/things-card.scss';
+    @use '@/views/driver/card/style.scss';
 </style>

@@ -84,7 +84,7 @@ export default defineComponent({
                 page: reactiveData.page,
                 ...reactiveData.query
             })
-                .then((res) => {
+                .then(res => {
                     const data = res.data
                     reactiveData.page.total = data.total
                     reactiveData.listData = data.records
@@ -97,7 +97,7 @@ export default defineComponent({
                 })
         }
 
-        const search = (params) => {
+        const search = params => {
             if (!isNull(props.deviceId)) {
                 params = {
                     ...params,
@@ -145,7 +145,7 @@ export default defineComponent({
 
         const deleteThing = (id, done) => {
             deleteProfile(id)
-                .then((res) => {
+                .then(res => {
                     if (res.data.ok) {
                         list()
                         done()

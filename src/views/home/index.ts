@@ -239,7 +239,7 @@ export default defineComponent({
 
         onMounted(() => {
             const chart = echarts.init(countDataChartRef.value as HTMLElement)
-            reactiveData.data = reactiveData.data.map((item) => [item[1], item[0], item[2]])
+            reactiveData.data = reactiveData.data.map(item => [item[1], item[0], item[2]])
             const option = {
                 legend: {
                     data: ['日/时数据量统计'],
@@ -247,7 +247,7 @@ export default defineComponent({
                 },
                 tooltip: {
                     position: 'top',
-                    formatter: (params) => {
+                    formatter: params => {
                         return params.value[2] + ' commits in ' + reactiveData.hours[params.value[0]] + ' of ' + reactiveData.days[params.value[1]]
                     }
                 },
@@ -279,11 +279,11 @@ export default defineComponent({
                     {
                         name: '日/时数据量统计',
                         type: 'scatter',
-                        symbolSize: (val) => {
+                        symbolSize: val => {
                             return val[2] * 2
                         },
                         data: reactiveData.data,
-                        animationDelay: (idx) => {
+                        animationDelay: idx => {
                             return idx * 5
                         }
                     }

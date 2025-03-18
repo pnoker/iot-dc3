@@ -27,7 +27,7 @@ const request: AxiosInstance = axios.create({
     timeout: 15000,
     withCredentials: true,
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    validateStatus: (status) => status >= 200 && status <= 500,
+    validateStatus: status => status >= 200 && status <= 500,
     transformResponse: [
         function (data) {
             try {
@@ -40,7 +40,7 @@ const request: AxiosInstance = axios.create({
 })
 
 request.interceptors.request.use(
-    (config) => {
+    config => {
         const headers = config.headers
         if (!headers) {
             return config
@@ -69,7 +69,7 @@ request.interceptors.request.use(
 )
 
 request.interceptors.response.use(
-    (response) => {
+    response => {
         const ok = response.data.ok || false
         const status = response.status || 401
         const responseType = response.config.responseType

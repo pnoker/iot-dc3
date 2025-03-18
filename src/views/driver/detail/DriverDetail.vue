@@ -90,14 +90,14 @@
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss">
-.detail-content {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    .detail-content {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
 
-    .detail-content-left {
-        .el-scrollbar {
-            height: calc(100vh - 273px);
+        .detail-content-left {
+            .el-scrollbar {
+                height: calc(100vh - 273px);
+            }
         }
     }
-}
 </style>

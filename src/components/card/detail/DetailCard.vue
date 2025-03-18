@@ -27,30 +27,30 @@
 <script lang="ts" setup></script>
 
 <style lang="scss">
-.detail-card {
-    border-radius: 4px;
-    box-sizing: border-box;
+    .detail-card {
+        border-radius: 4px;
+        box-sizing: border-box;
 
-    ul {
-        list-style: none;
+        ul {
+            list-style: none;
 
-        li {
-            font-size: 13px;
-            margin-top: 8px;
+            li {
+                font-size: 13px;
+                margin-top: 8px;
+            }
+        }
+
+        .el-card {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .el-card__body {
+            padding: 10px 5px 0 5px;
+        }
+
+        .el-tabs__nav {
+            margin: 0 5px 0 5px;
         }
     }
-
-    .el-card {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .el-card__body {
-        padding: 10px 5px 0 5px;
-    }
-
-    .el-tabs__nav {
-        margin: 0 5px 0 5px;
-    }
-}
 </style>

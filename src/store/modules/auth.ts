@@ -65,7 +65,7 @@ const auth = {
                 name: form.name
             }
             generateSalt(login)
-                .then((res) => {
+                .then(res => {
                     const salt: string = res.data
                     const login: Login = {
                         tenant: form.tenant,
@@ -75,7 +75,7 @@ const auth = {
                     }
 
                     generateToken(login)
-                        .then((res) => {
+                        .then(res => {
                             commit('setToken', {
                                 tenant: login.tenant,
                                 name: login.name,

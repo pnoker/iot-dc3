@@ -21,8 +21,8 @@
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss">
-.things-dashboard-iframe {
-    width: 100%;
-    height: 100%;
-}
+    .things-dashboard-iframe {
+        width: 100%;
+        height: 100%;
+    }
 </style>

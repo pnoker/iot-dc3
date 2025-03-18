@@ -76,12 +76,12 @@ export default defineComponent({
         })
 
         const profile = () => {
-            getProfileById(reactiveData.id).then((res) => {
+            getProfileById(reactiveData.id).then(res => {
                 reactiveData.data = res.data
             })
         }
 
-        const changeActive = (tab) => {
+        const changeActive = tab => {
             const query = route.query
             router.push({ query: { ...query, active: tab.props.name } })
             switch (tab.props.name) {

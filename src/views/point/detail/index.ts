@@ -58,7 +58,7 @@ export default defineComponent({
 
         const driver = () => {
             getDriverById(reactiveData.id)
-                .then((res) => {
+                .then(res => {
                     reactiveData.data = res.data
                 })
                 .catch(() => {
@@ -68,13 +68,13 @@ export default defineComponent({
 
         const device = () => {
             getDeviceByDriverId(reactiveData.id)
-                .then((res) => {
+                .then(res => {
                     reactiveData.listDeviceData = res.data
 
                     // driver
-                    const driverIds = Array.from(new Set(reactiveData.listDeviceData.map((device) => device.driverId)))
+                    const driverIds = Array.from(new Set(reactiveData.listDeviceData.map(device => device.driverId)))
                     getDriverByIds(driverIds)
-                        .then((res) => {
+                        .then(res => {
                             reactiveData.driverTable = res.data
                         })
                         .catch(() => {
@@ -91,7 +91,7 @@ export default defineComponent({
                         )
                     )
                     getProfileByIds(profileIds)
-                        .then((res) => {
+                        .then(res => {
                             reactiveData.profileTable = res.data
                         })
                         .catch(() => {
@@ -103,7 +103,7 @@ export default defineComponent({
                 })
 
             getDeviceStatusByDriverId(reactiveData.id)
-                .then((res) => {
+                .then(res => {
                     reactiveData.statusTable = res.data
                 })
                 .catch(() => {
@@ -112,10 +112,10 @@ export default defineComponent({
         }
 
         const deviceName = () => {
-            return reactiveData.listDeviceData.map((device) => device.pointName).join(', ')
+            return reactiveData.listDeviceData.map(device => device.pointName).join(', ')
         }
 
-        const changeActive = (tab) => {
+        const changeActive = tab => {
             const query = route.query
             router.push({ query: { ...query, active: tab.props.name } }).catch(() => {
                 // nothing to do

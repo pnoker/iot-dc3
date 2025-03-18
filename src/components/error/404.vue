@@ -30,5 +30,5 @@
 </template>
 
 <style lang="scss" scoped>
-@use 'style.scss';
+    @use 'style.scss';
 </style>

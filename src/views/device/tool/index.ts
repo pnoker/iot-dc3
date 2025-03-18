@@ -73,7 +73,7 @@ export default defineComponent({
                 page: reactiveData.driverPage,
                 label: query ? query : reactiveData.driverQuery
             })
-                .then((res) => {
+                .then(res => {
                     const data = res.data
                     reactiveData.driverPage.total = data.total
                     reactiveData.driverDictionary = data.records
@@ -97,7 +97,7 @@ export default defineComponent({
 
         const search = () => {
             const form = unref(formDataRef)
-            form?.validate((valid) => {
+            form?.validate(valid => {
                 if (valid) {
                     emit('search', reactiveData.formData)
                 }

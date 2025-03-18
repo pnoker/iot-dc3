@@ -21,7 +21,7 @@ module.exports = {
     singleQuote: true /* 使用单引号而不是双引号 */,
     endOfLine: 'auto' /* 换行符使用 lf 结尾是 可选值"<auto|lf|crlf|cr>" */,
     trailingComma: 'none' /* 在属性末尾打印逗号 */,
-    bracketSpacing: false /* 控制对象字面量中大括号内是否有空格 */,
+    bracketSpacing: true /* 控制对象字面量中大括号内是否有空格 */,
     arrowParens: 'avoid' /* 箭头函数单参数不需要括号 */,
     vueIndentScriptAndStyle: true /* Vue文件中的<script>和<style>标签内容缩进 */
 }

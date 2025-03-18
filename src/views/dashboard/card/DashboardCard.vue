@@ -36,71 +36,71 @@
 </template>
 
 <script>
-import { encode } from 'js-base64'
+    import { encode } from 'js-base64'
 
-export default {
-    name: 'DashboardCard',
-    props: {
-        name: {
-            type: String,
-            default: '数据看板'
+    export default {
+        name: 'DashboardCard',
+        props: {
+            name: {
+                type: String,
+                default: '数据看板'
+            },
+            snapshot: {
+                type: String,
+                default: 'images/dashboard/dashboard.jpg'
+            },
+            url: {
+                type: String,
+                default: ''
+            }
         },
-        snapshot: {
-            type: String,
-            default: 'images/dashboard/dashboard.jpg'
-        },
-        url: {
-            type: String,
-            default: ''
-        }
-    },
-    methods: {
-        show() {
-            if (this.url) {
-                this.$router.push({ name: 'dashboard', query: { id: encode(this.url) } }).catch(() => {
-                    // nothing to do
-                })
+        methods: {
+            show() {
+                if (this.url) {
+                    this.$router.push({ name: 'dashboard', query: { id: encode(this.url) } }).catch(() => {
+                        // nothing to do
+                    })
+                }
             }
         }
     }
-}
 </script>
 
 <style lang="scss">
-@use '@/components/card/styles/things-card.scss';
+    @use '@/components/card/styles/things-card.scss';
 
-.things-card-dashboard {
-    width: 300px;
-    height: 210px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    .things-card-dashboard {
+        width: 300px;
+        height: 210px;
+        margin-right: 10px;
+        margin-bottom: 10px;
 
-    .el-card {
-        width: 100%;
-        min-width: 300px;
-        min-height: 210px !important;
-        box-sizing: border-box;
+        .el-card {
+            width: 100%;
+            min-width: 300px;
+            min-height: 210px !important;
+            box-sizing: border-box;
+        }
     }
-}
 
-.things-card-body-content-dashboard-snapshot {
-    width: 280px;
-    min-width: 200px;
-    max-width: 280px;
-    cursor: pointer;
-
-    img {
+    .things-card-body-content-dashboard-snapshot {
         width: 280px;
         min-width: 200px;
         max-width: 280px;
-    }
-}
+        cursor: pointer;
 
-.things-card-body-content-dashboard-name {
-    display: block;
-    width: 280px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
+        img {
+            width: 280px;
+            min-width: 200px;
+            max-width: 280px;
+        }
+    }
+
+    .things-card-body-content-dashboard-name {
+        display: block;
+        width: 280px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 </style>

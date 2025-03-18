@@ -62,7 +62,7 @@ export default defineComponent({
 
         const search = () => {
             const form = unref(formDataRef)
-            form?.validate((valid) => {
+            form?.validate(valid => {
                 if (valid) {
                     emit('search', reactiveData.formData)
                 }
