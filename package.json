@@ -10,7 +10,7 @@
     "type": "module",
     "scripts": {
         "prepare": "husky",
-        "dev": "vite --host --mode development",
+        "dev": "vite --host --mode dev",
         "build": "vite build",
         "preview": "vite preview",
         "check": "vue-tsc --noEmit --skipLibCheck",
