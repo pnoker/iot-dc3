@@ -1,36 +1,31 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "IoT DC3",
-  "version": "2024.3.0",
-  "identifier": "io.github.pnoker.dc3.client",
-  "build": {
-    "frontendDist": "../dist",
-    "devUrl": "http://localhost:8080",
-    "beforeDevCommand": "yarn serve",
-    "beforeBuildCommand": "yarn build"
-  },
-  "app": {
-    "windows": [
-      {
-        "title": "IoT DC3",
-        "width": 1366,
-        "height": 768,
-        "resizable": true,
-        "fullscreen": false
-      }
-    ],
-    "security": {
-      "csp": null
+    "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+    "productName": "IoT DC3",
+    "version": "2024.3.0",
+    "identifier": "io.github.pnoker.dc3.client",
+    "build": {
+        "frontendDist": "../dist",
+        "devUrl": "http://localhost:8080",
+        "beforeDevCommand": "yarn serve",
+        "beforeBuildCommand": "yarn build"
+    },
+    "app": {
+        "windows": [
+            {
+                "title": "IoT DC3",
+                "width": 1366,
+                "height": 768,
+                "resizable": true,
+                "fullscreen": false
+            }
+        ],
+        "security": {
+            "csp": null
+        }
+    },
+    "bundle": {
+        "active": true,
+        "targets": "all",
+        "icon": ["icons/32.png", "icons/128.png", "icons/256.png", "icons/512.png"]
     }
-  },
-  "bundle": {
-    "active": true,
-    "targets": "all",
-    "icon": [
-      "icons/32.png",
-      "icons/128.png",
-      "icons/256.png",
-      "icons/512.png"
-    ]
-  }
 }

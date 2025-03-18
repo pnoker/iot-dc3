@@ -32,7 +32,7 @@ const request: AxiosInstance = axios.create({
         function (data) {
             try {
                 return JSONBigIntStr.parse(data)
-            } catch (err) {
+            } catch {
                 return { data }
             }
         }

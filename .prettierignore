@@ -1,0 +1,8 @@
+*.min.js
+*.min.css
+
+.github/
+dc3/
+dist/
+public/
+src-tauri/

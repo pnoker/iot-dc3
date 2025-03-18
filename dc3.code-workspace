@@ -22,9 +22,7 @@
                 "cwd": "${workspaceFolder:web}",
                 "name": "yarn serve",
                 "runtimeExecutable": "yarn",
-                "runtimeArgs": [
-                    "serve"
-                ]
+                "runtimeArgs": ["serve"]
             }
         ]
     }

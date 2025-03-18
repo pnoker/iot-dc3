@@ -15,36 +15,35 @@
 #
 
 services:
-  web:
-    build:
-      context: ../
-      dockerfile: ./Dockerfile
-    image: pnoker/dc3-web:2024.3.0.dev
-    restart: always
-    ports:
-      - '8080:80'
-      - '8443:443'
-    environment:
-      - APP_API_HOST=dc3-gateway
-      - APP_API_PORT=8000
-    container_name: dc3-web
-    hostname: dc3-web
-    volumes:
-      - nginx:/var/log/nginx
-    logging:
-      driver: json-file
-      options:
-        max-size: '20m'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-web
+    web:
+        build:
+            context: ../
+            dockerfile: ./Dockerfile
+        image: pnoker/dc3-web:2024.3.0.dev
+        restart: always
+        ports:
+            - '8080:80'
+            - '8443:443'
+        environment:
+            - APP_API_HOST=dc3-gateway
+            - APP_API_PORT=8000
+        container_name: dc3-web
+        hostname: dc3-web
+        volumes:
+            - nginx:/var/log/nginx
+        logging:
+            driver: json-file
+            options:
+                max-size: '20m'
+                max-file: '20'
+        networks:
+            dc3net:
+                aliases:
+                    - dc3-web
 
 volumes:
-  nginx:
+    nginx:
 
 networks:
-  dc3net:
-    driver: bridge
-...
+    dc3net:
+        driver: bridge

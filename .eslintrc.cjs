@@ -27,18 +27,12 @@ module.exports = {
         sourceType: 'module',
         ecmaVersion: 'latest'
     },
-    extends: [
-        'plugin:vue/vue3-recommended',
-        'eslint:recommended',
-        'plugin:prettier/recommended'
-    ],
+    extends: ['plugin:vue/vue3-recommended', 'eslint:recommended', '@vue/eslint-config-typescript', 'plugin:prettier/recommended'],
     plugins: ['vue', '@typescript-eslint'],
     overrides: [
         {
             files: ['*.ts', '*.tsx', '*.vue'],
-            rules: {
-                'no-undef': 'off'
-            }
+            rules: {}
         }
     ],
     rules: {
@@ -55,6 +49,7 @@ module.exports = {
         '@typescript-eslint/no-redeclare': 'error',
         '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
         '@typescript-eslint/no-unused-vars': 'error',
+
         'vue/custom-event-name-casing': 'off',
         'vue/one-component-per-file': 'off',
         'vue/html-closing-bracket-newline': 'off',
@@ -73,22 +68,6 @@ module.exports = {
         'vue/no-parsing-error': 'off',
         'vue/no-deprecated-v-on-native-modifier': 'off',
         'vue/multi-word-component-names': 'off',
-        'no-useless-escape': 'off',
-        'no-sparse-arrays': 'off',
-        'no-prototype-builtins': 'off',
-        'no-constant-condition': 'off',
-        'no-use-before-define': 'off',
-        'no-restricted-globals': 'off',
-        'no-restricted-syntax': 'off',
-        'generator-star-spacing': 'off',
-        'no-unreachable': 'off',
-        'no-multiple-template-root': 'off',
-        'no-unused-vars': 'error',
-        'no-v-model-argument': 'off',
-        'no-case-declarations': 'off',
-        'eol-last': 'off',
-        'no-console': 'off',
-        'no-redeclare': 'off',
         'vue/attributes-order': [
             'error',
             {
@@ -107,6 +86,24 @@ module.exports = {
                 ],
                 alphabetical: false
             }
-        ]
+        ],
+
+        'no-useless-escape': 'off',
+        'no-sparse-arrays': 'off',
+        'no-prototype-builtins': 'off',
+        'no-constant-condition': 'off',
+        'no-use-before-define': 'off',
+        'no-restricted-globals': 'off',
+        'no-restricted-syntax': 'off',
+        'generator-star-spacing': 'off',
+        'no-unreachable': 'off',
+        'no-multiple-template-root': 'off',
+        'no-unused-vars': 'error',
+        'no-v-model-argument': 'off',
+        'no-case-declarations': 'off',
+        'eol-last': 'off',
+        'no-console': 'off',
+        'no-redeclare': 'off',
+        'prettier/prettier': 'error'
     }
 }
