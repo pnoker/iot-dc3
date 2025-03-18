@@ -9,6 +9,7 @@
     },
     "type": "module",
     "scripts": {
+        "prepare": "husky",
         "dev": "vite --host --mode development",
         "build": "vite build",
         "preview": "vite preview",
@@ -58,6 +59,8 @@
         "eslint-config-prettier": "^10.1.1",
         "eslint-plugin-prettier": "^5.2.3",
         "eslint-plugin-vue": "^9.33.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^15.5.0",
         "minimist": "^1.2.8",
         "path": "^0.12.7",
         "prettier": "^3.5.3",
@@ -73,5 +76,17 @@
         "vue-template-compiler": "^2.7.16",
         "vue-tsc": "^2.2.8",
         "vuex": "^4.1.0"
+    },
+    "lint-staged": {
+        "*.{vue,js,ts,jsx,tsx}": [
+            "eslint --fix",
+            "prettier --write"
+        ],
+        "*.{scss,css}": [
+            "prettier --write"
+        ],
+        "*.{json,md}": [
+            "prettier --write"
+        ]
     }
 }
