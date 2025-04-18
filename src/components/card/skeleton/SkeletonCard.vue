@@ -20,7 +20,7 @@
             <el-row>
                 <el-col v-for="data in 12" :key="data" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
                     <div class="skeleton-card">
-                        <el-card shadow="hover">
+                        <el-card class="skeleton-card__body" shadow="hover">
                             <div class="skeleton-card__container">
                                 <div class="skeleton-card__header">
                                     <el-skeleton-item ariant="image" class="skeleton-card-icon" />
@@ -77,14 +77,11 @@
     })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     .skeleton-card {
         border-radius: 4px;
         box-sizing: border-box;
-
-        margin-left: 3px;
-        margin-right: 3px;
-        margin-bottom: 6px;
+        margin: 0 3px 6px;
     }
 
     .skeleton-card__container {
@@ -92,79 +89,79 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+    }
 
-        .skeleton-card__header {
+    .skeleton-card__header {
+        width: 100%;
+        height: 55px;
+        display: flex;
+        border-bottom: 1px solid #dcdfe6;
+    }
+
+    .skeleton-card-icon {
+        width: 55px;
+        height: 48px;
+        margin-right: 12px;
+        border-radius: 4px;
+        overflow: hidden;
+
+        img {
             width: 100%;
-            height: 55px;
-            display: flex;
-            border-bottom: 1px solid #dcdfe6;
+            height: 100%;
+        }
+    }
 
-            .skeleton-card-icon {
-                width: 55px;
-                height: 48px;
-                margin-right: 12px;
-                border-radius: 4px;
-                overflow: hidden;
+    .skeleton-card-name {
+        height: 28px;
+        margin-top: 10px;
+        line-height: 48px;
+    }
 
-                img {
-                    width: 100%;
-                    height: 100%;
-                }
-            }
+    .skeleton-card__body {
+        display: flex;
+        flex-direction: column;
+    }
 
-            .skeleton-card-name {
-                height: 28px;
-                margin-top: 10px;
-                line-height: 48px;
+    .skeleton-card-content {
+        display: flex;
+        justify-content: space-around;
+
+        ul {
+            width: 100%;
+            padding-inline-start: 25px;
+            list-style: none;
+
+            li {
+                font-size: 13px;
+                margin-top: 8px;
             }
         }
+    }
 
-        .skeleton-card__body {
-            display: flex;
-            flex-direction: column;
+    .skeleton-card-text {
+        margin-top: 2px;
+    }
 
-            .skeleton-card-content {
-                display: flex;
-                justify-content: space-around;
+    .skeleton-card-description {
+        margin-top: 10px;
+    }
 
-                ul {
-                    width: 100%;
-                    padding-inline-start: 25px;
-                    list-style: none;
+    .skeleton-card__footer {
+        height: 35px;
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        border-top: 1px solid #dcdfe6;
+    }
 
-                    li {
-                        font-size: 13px;
-                        margin-top: 8px;
-                    }
-                }
+    .skeleton-card-operation {
+        display: flex;
+    }
 
-                .skeleton-card-text {
-                    margin-top: 2px;
-                }
-
-                .skeleton-card-description {
-                    margin-top: 10px;
-                }
-            }
-        }
-
-        .skeleton-card__footer {
-            height: 35px;
-            margin-top: 10px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            border-top: 1px solid #dcdfe6;
-
-            .skeleton-card-operation {
-                display: flex;
-
-                .skeleton-card-button {
-                    width: 28px;
-                    height: 20px;
-                    margin-right: 10px;
-                }
-            }
-        }
+    .skeleton-card-button {
+        width: 28px;
+        height: 20px;
+        margin-right: 10px;
     }
 </style>

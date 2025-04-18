@@ -15,8 +15,7 @@
  */
 
 .tool-card {
-    margin-top: 1px;
-    margin-bottom: 4px;
+    margin: 1px 0 4px;
 
     .tool-card__body {
         display: flex;
@@ -28,7 +27,7 @@
         }
 
         .tool-card-body-button {
-            .el-form-item__content {
+            :deep(.el-form-item__content) {
                 display: flex;
                 justify-content: center;
             }
@@ -50,9 +49,7 @@
 
     .tool-select {
         .tool-select-input {
-            margin-left: 10px;
-            margin-right: 10px;
-            margin-bottom: 5px;
+            margin: 0 10px 5px;
         }
 
         .tool-select-pagination {
@@ -61,7 +58,7 @@
         }
     }
 
-    .el-card {
+    :deep(.el-card) {
         border: 0;
     }
 }

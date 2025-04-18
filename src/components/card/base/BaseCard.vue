@@ -16,7 +16,7 @@
 
 <template>
     <div class="base-card">
-        <el-card shadow="hover">
+        <el-card class="base-card__body" shadow="hover">
             <div class="base-card__container">
                 <slot />
             </div>
@@ -26,7 +26,7 @@
 
 <script lang="ts" setup></script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     .base-card {
         border-radius: 4px;
         box-sizing: border-box;
@@ -40,17 +40,17 @@
             }
         }
 
-        .el-card {
+        :deep(.el-card) {
             width: 100%;
             box-sizing: border-box;
         }
 
-        .el-tabs__nav {
-            margin: 0 5px 0 5px;
+        :deep(.el-tabs__nav) {
+            margin: 0 5px;
         }
 
         .base-card__container {
-            .el-tabs__header {
+            :deep(.el-tabs__header) {
                 margin-bottom: 0;
 
                 .el-tabs__nav-wrap:after {
@@ -58,7 +58,7 @@
                 }
             }
 
-            .el-tab-pane {
+            :deep(.el-tab-pane) {
                 background: #f6f7f9;
             }
         }

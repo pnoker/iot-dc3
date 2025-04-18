@@ -16,53 +16,52 @@
 
 .edit-card {
     margin-top: 1px;
+}
 
-    .edit-card-header {
-        margin-bottom: 4px;
+.edit-card-header {
+    margin-bottom: 4px;
 
-        .el-card {
-            border: 0;
-        }
+    :deep(.el-card) {
+        border: 0;
     }
+}
 
-    .edit-card-body {
-        .edit-form-item {
-            display: flex;
-            margin-top: 10px;
-            margin-bottom: 10px;
+.edit-card-body {
+    .edit-form-item {
+        display: flex;
+        margin: 10px 0;
+        justify-content: center;
+
+        :deep(.el-row) {
             justify-content: center;
-
-            .el-row {
-                justify-content: center;
-            }
-
-            .el-alert {
-                margin-bottom: 10px;
-            }
-
-            .el-textarea__inner {
-                height: 80px;
-            }
         }
 
-        .edit-form-button {
-            display: flex;
-            margin-top: 10px;
+        :deep(.el-alert) {
+            margin-bottom: 10px;
+        }
 
-            .el-form-item__content {
-                justify-content: center;
-            }
+        :deep(.el-textarea__inner) {
+            height: 80px;
         }
     }
 
-    .el-form-item__label {
-        display: block;
-        width: 100px;
-        height: 32px;
-        text-align: justify;
-    }
+    .edit-form-button {
+        display: flex;
+        margin-top: 10px;
 
-    .el-form-item__label::after {
+        :deep(.el-form-item__content) {
+            justify-content: center;
+        }
+    }
+}
+
+:deep(.el-form-item__label) {
+    display: block;
+    width: 100px;
+    height: 32px;
+    text-align: justify;
+
+    &::after {
         display: inline-block;
         width: 100%;
         content: '';

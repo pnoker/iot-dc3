@@ -20,7 +20,7 @@
 
 <script lang="ts" src="./index.ts" />
 
-<style lang="scss">
+<style lang="scss" scoped>
     .things-application-iframe {
         width: 100%;
         height: 100%;

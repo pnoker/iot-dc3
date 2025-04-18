@@ -87,7 +87,7 @@
 
 <script lang="ts" src="./index.ts" />
 
-<style lang="scss">
+<style lang="scss" scoped>
     @use '@/components/card/styles/things-card.scss';
     @use '@/views/driver/card/style.scss';
 </style>

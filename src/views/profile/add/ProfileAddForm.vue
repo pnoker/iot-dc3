@@ -45,6 +45,6 @@
 
 <script lang="ts" src="./index.ts" />
 
-<style lang="scss">
+<style lang="scss" scoped>
     @use '@/components/dialog/styles/things-dialog.scss';
 </style>

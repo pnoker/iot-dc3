@@ -66,7 +66,7 @@
     }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     @use '@/components/card/styles/things-card.scss';
 
     .things-card-dashboard {

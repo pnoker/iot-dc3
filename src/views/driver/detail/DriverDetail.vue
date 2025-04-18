@@ -89,7 +89,7 @@
 
 <script lang="ts" src="./index.ts" />
 
-<style lang="scss">
+<style lang="scss" scoped>
     .detail-content {
         margin-left: 0 !important;
         margin-right: 0 !important;

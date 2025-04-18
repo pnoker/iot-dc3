@@ -26,7 +26,7 @@
 
 <script lang="ts" setup></script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     .blank-card {
         border-radius: 4px;
         box-sizing: border-box;
@@ -40,21 +40,21 @@
             }
         }
 
-        .el-card {
+        :deep(.el-card) {
             width: 100%;
             box-sizing: border-box;
         }
 
-        .el-card.blank-card__body {
+        :deep(.el-card.blank-card__body) {
             border: 0;
         }
 
-        .el-card__body {
-            padding: 10px 5px 0 5px;
+        :deep(.el-card__body) {
+            padding: 10px 5px 0;
         }
 
-        .el-tabs__nav {
-            margin: 0 5px 0 5px;
+        :deep(.el-tabs__nav) {
+            margin: 0 5px;
         }
     }
 </style>

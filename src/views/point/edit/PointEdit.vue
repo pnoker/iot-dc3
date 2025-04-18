@@ -112,6 +112,6 @@
 
 <script lang="ts" src="./index.ts" />
 
-<style lang="scss">
+<style lang="scss" scoped>
     @use '@/components/card/styles/edit-card.scss';
 </style>

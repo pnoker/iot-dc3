@@ -410,7 +410,7 @@
     }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     canvas {
         display: block;
     }

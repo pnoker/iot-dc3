@@ -249,6 +249,6 @@
     }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     @use '@/components/card/styles/tool-card.scss';
 </style>

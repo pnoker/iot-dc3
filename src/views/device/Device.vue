@@ -76,4 +76,4 @@
 
 <script lang="ts" src="./index.ts" />
 
-<style lang="scss"></style>
+<style lang="scss" scoped></style>
