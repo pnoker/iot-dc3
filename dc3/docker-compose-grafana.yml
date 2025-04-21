@@ -16,7 +16,7 @@
 
 services:
   prometheus:
-    image: pnoker/dc3-prometheus:2025.2.dev
+    image: pnoker/dc3-prometheus:2025.2
     restart: always
     container_name: dc3-prometheus
     hostname: dc3-prometheus
@@ -36,7 +36,7 @@ services:
           - dc3-prometheus
 
   postgres-exporter:
-    image: pnoker/dc3-postgres-exporter:2025.2.dev
+    image: pnoker/dc3-postgres-exporter:2025.2
     restart: always
     container_name: dc3-postgres-exporter
     hostname: dc3-postgres-exporter
@@ -51,7 +51,7 @@ services:
           - dc3-postgres-exporter
 
   redis-exporter:
-    image: pnoker/dc3-redis-exporter:2025.2.dev
+    image: pnoker/dc3-redis-exporter:2025.2
     restart: always
     container_name: dc3-redis-exporter
     hostname: dc3-redis-exporter
@@ -66,7 +66,7 @@ services:
           - dc3-redis-exporter
 
   nginx-exporter:
-    image: pnoker/dc3-nginx-exporter:2025.2.dev
+    image: pnoker/dc3-nginx-exporter:2025.2
     restart: always
     container_name: dc3-nginx-exporter
     hostname: dc3-nginx-exporter
@@ -81,7 +81,7 @@ services:
           - dc3-nginx-exporter
 
   grafana:
-    image: pnoker/dc3-grafana:2025.2.dev
+    image: pnoker/dc3-grafana:2025.2
     restart: always
     ports:
       - '3000:3000'
