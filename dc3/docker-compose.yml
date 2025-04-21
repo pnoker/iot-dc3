@@ -16,7 +16,7 @@
 
 services:
     web:
-        image: pnoker/dc3-web:2025.2.dev
+        image: pnoker/dc3-web:2025.4.1
         restart: always
         ports:
             - '8080:80'

@@ -1,6 +1,6 @@
 {
     "name": "iot-dc3-web",
-    "version": "2024.3.0",
+    "version": "2025.4.1",
     "private": true,
     "author": "pnoker",
     "description": "IoT DC3 平台前端页面",

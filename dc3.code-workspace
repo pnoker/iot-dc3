@@ -14,7 +14,7 @@
         }
     ],
     "launch": {
-        "version": "2024.3.0",
+        "version": "2025.4.1",
         "configurations": [
             {
                 "type": "node",
