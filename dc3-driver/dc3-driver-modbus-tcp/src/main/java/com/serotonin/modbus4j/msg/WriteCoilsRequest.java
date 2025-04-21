@@ -26,7 +26,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>WriteCoilsRequest class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public class WriteCoilsRequest extends ModbusRequest {
     private int startOffset;

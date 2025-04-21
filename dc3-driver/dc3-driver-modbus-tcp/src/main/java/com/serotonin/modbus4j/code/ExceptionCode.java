@@ -19,7 +19,7 @@ package com.serotonin.modbus4j.code;
  * <p>ExceptionCode class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public class ExceptionCode {
     /**

@@ -20,7 +20,7 @@ package io.github.pnoker.common.driver.service;
  * Driver Schedule Service
  *
  * @author pnoker
- * @version 2025.2.1
+ * @version 2025.2.2
  * @since 2022.1.0
  */
 public interface DriverScheduleService {

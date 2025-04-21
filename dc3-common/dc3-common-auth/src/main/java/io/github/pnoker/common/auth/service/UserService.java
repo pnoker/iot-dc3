@@ -24,7 +24,7 @@ import io.github.pnoker.common.base.service.BaseService;
  * User Interface
  *
  * @author pnoker
- * @version 2025.2.1
+ * @version 2025.2.2
  * @since 2022.1.0
  */
 public interface UserService extends BaseService<UserBO, UserQuery> {

@@ -24,7 +24,7 @@ import java.util.List;
  * <p>ReadFunctionGroup class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public class ReadFunctionGroup<K> {
     private final SlaveAndRange slaveAndRange;

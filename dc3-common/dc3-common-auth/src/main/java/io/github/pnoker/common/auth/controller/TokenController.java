@@ -37,7 +37,7 @@ import java.util.Objects;
  * 令牌 Controller
  *
  * @author pnoker
- * @version 2025.2.1
+ * @version 2025.2.2
  * @since 2022.1.0
  */
 @Slf4j

@@ -23,7 +23,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>Abstract ModbusMessage class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 abstract public class ModbusMessage {
     protected int slaveId;
