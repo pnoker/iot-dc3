@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 枚举池, 所有Dict的实现类都会在这里注册
  *
  * @author pnoker
- * @version 2025.2.1
+ * @version 2025.2.2
  * @since 2022.1.0
  */
 public interface EnumPool {

@@ -31,7 +31,7 @@ import java.util.Objects;
  * 分页 相关工具类
  *
  * @author pnoker
- * @version 2025.2.1
+ * @version 2025.2.2
  * @since 2022.1.0
  */
 @Slf4j

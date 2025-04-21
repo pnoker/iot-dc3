@@ -25,7 +25,7 @@ import java.io.IOException;
  * notification to this callback.
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public interface Modbus4JInputStreamCallback {
     /**

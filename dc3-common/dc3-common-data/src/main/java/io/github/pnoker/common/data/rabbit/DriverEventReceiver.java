@@ -35,7 +35,7 @@ import java.util.Objects;
  * 其中包括: 驱动心跳事件, 在线, 离线, 故障等其他事件
  *
  * @author pnoker
- * @version 2025.2.1
+ * @version 2025.2.2
  * @since 2022.1.0
  */
 @Slf4j

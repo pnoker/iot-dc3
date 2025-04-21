@@ -22,7 +22,7 @@ import cn.hutool.core.text.CharSequenceUtil;
  * 自定义 注册 异常
  *
  * @author pnoker
- * @version 2025.2.1
+ * @version 2025.2.2
  * @since 2022.1.0
  */
 public class RegisterException extends RuntimeException {

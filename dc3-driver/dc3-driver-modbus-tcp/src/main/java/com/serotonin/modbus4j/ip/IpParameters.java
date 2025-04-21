@@ -21,7 +21,7 @@ import com.serotonin.modbus4j.base.ModbusUtils;
  * <p>IpParameters class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public class IpParameters {
     private String host;

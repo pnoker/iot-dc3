@@ -19,7 +19,7 @@ package com.serotonin.modbus4j.sero;
  * <p>NotImplementedException class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public class NotImplementedException extends RuntimeException {
     private static final long serialVersionUID = -1;

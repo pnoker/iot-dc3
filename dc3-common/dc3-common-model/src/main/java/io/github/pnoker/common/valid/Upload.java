@@ -23,7 +23,7 @@ package io.github.pnoker.common.valid;
  * 注解后添加具体校验的分组名, 可实现不同场景的校验需求
  *
  * @author pnoker
- * @version 2025.2.1
+ * @version 2025.2.2
  * @since 2022.1.0
  */
 public interface Upload {

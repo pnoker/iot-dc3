@@ -19,7 +19,7 @@ package com.serotonin.modbus4j.sero;
  * <p>ShouldNeverHappenException class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public class ShouldNeverHappenException extends RuntimeException {
     private static final long serialVersionUID = -1;

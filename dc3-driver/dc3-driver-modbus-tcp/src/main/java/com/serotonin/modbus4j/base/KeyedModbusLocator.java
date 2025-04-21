@@ -23,7 +23,7 @@ import com.serotonin.modbus4j.locator.BaseLocator;
  * <p>KeyedModbusLocator class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public class KeyedModbusLocator<K> {
     private final K key;

@@ -24,7 +24,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>WriteRegisterResponse class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public class WriteRegisterResponse extends ModbusResponse {
     private int writeOffset;

@@ -25,7 +25,7 @@ import java.nio.charset.Charset;
  * <p>ByteQueue class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public class ByteQueue implements Cloneable {
     private byte[] queue;

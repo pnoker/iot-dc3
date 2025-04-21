@@ -21,7 +21,7 @@ package com.serotonin.modbus4j.sero.messaging;
  * <p>IncomingRequestMessage interface.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public interface IncomingRequestMessage extends IncomingMessage {
     // A marker interface.

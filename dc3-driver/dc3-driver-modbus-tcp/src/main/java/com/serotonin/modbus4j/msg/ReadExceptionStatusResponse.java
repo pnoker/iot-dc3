@@ -23,7 +23,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>ReadExceptionStatusResponse class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.1
+ * @version 2025.2.2
  */
 public class ReadExceptionStatusResponse extends ModbusResponse {
     private byte exceptionStatus;

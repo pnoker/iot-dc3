@@ -25,7 +25,7 @@ import java.util.function.IntConsumer;
  * 自定义 Integer Optional
  *
  * @author pnoker
- * @version 2025.2.1
+ * @version 2025.2.2
  * @since 2022.1.0
  */
 public final class IntegerOptional {
