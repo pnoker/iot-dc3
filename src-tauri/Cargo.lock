@@ -1636,7 +1636,7 @@ dependencies = [
 
 [[package]]
 name = "iot_dc3"
-version = "2025.4.1"
+version = "2025.2.2"
 dependencies = [
  "log",
  "serde",

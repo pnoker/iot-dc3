@@ -31,4 +31,4 @@ jobs:
                   file: Dockerfile
                   context: '{{defaultContext}}:/'
                   platforms: linux/arm64,linux/amd64
-                  tags: pnoker/dc3-web:2025.4.1
+                  tags: pnoker/dc3-web:2025.2.2

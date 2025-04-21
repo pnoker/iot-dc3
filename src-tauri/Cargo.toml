@@ -1,6 +1,6 @@
 [package]
 name = "iot_dc3"
-version = "2025.4.1"
+version = "2025.2.2"
 description = "IoT DC3 Application"
 authors = ["pnoker"]
 license = "Apache 2.0"
