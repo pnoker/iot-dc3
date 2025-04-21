@@ -15,15 +15,17 @@
 #
 
 services:
-  postgres:
-    image: pnoker/dc3-postgres:2025.2
+  grafana:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-grafana:2025.2
     restart: always
     ports:
-      - '35432:5432'
-    container_name: dc3-postgres
-    hostname: dc3-postgres
+      - '3000:3000'
+    environment:
+      - GF_SERVER_ROOT_URL=http://dc3-grafana:3000
+    container_name: dc3-grafana
+    hostname: dc3-grafana
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - grafana:/var/lib/grafana
     logging:
       driver: json-file
       options:
@@ -32,19 +34,18 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-postgres
+          - dc3-grafana
 
-  rabbitmq:
-    image: pnoker/dc3-rabbitmq:2025.2
+  prometheus:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-prometheus:2025.2
     restart: always
-    ports:
-      - '5671:5671'
-      - '5672:5672'
-      - '15672:15672'
-    container_name: dc3-rabbitmq
-    hostname: dc3-rabbitmq
+    container_name: dc3-prometheus
+    hostname: dc3-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=7d'
     volumes:
-      - rabbitmq:/var/lib/rabbitmq
+      - prometheus:/prometheus
     logging:
       driver: json-file
       options:
@@ -53,22 +54,13 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-rabbitmq
+          - dc3-prometheus
 
-emqx:
-    image: pnoker/dc3-emqx:2025.2
+  postgres-exporter:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-postgres-exporter:2025.2
     restart: always
-    ports:
-      - '8083:8083'
-      - '8084:8084'
-      - '1883:1883'
-      - '8883:8883'
-      - '18083:18083'
-    container_name: dc3-emqx
-    hostname: dc3-emqx
-    volumes:
-      - emqx_data:/opt/emqx/data
-      - emqx_log:/opt/emqx/log
+    container_name: dc3-postgres-exporter
+    hostname: dc3-postgres-exporter
     logging:
       driver: json-file
       options:
@@ -77,14 +69,27 @@ emqx:
     networks:
       dc3net:
         aliases:
-          - dc3-emqx
+          - dc3-postgres-exporter
+
+  nginx-exporter:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-nginx-exporter:2025.2
+    restart: always
+    container_name: dc3-nginx-exporter
+    hostname: dc3-nginx-exporter
+    logging:
+      driver: json-file
+      options:
+        max-size: '10M'
+        max-file: '20'
+    networks:
+      dc3net:
+        aliases:
+          - dc3-nginx-exporter
 
 volumes:
-  postgres:
-  redis:
-  rabbitmq:
-  emqx_data:
-  emqx_log:
+  prometheus:
+  grafana:
+
 
 networks:
   dc3net:

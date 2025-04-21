@@ -16,7 +16,7 @@
 
 services:
   postgres:
-    image: pnoker/dc3-postgres:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-postgres:2025.2
     restart: always
     ports:
       - '35432:5432'
@@ -35,7 +35,7 @@ services:
           - dc3-postgres
 
   rabbitmq:
-    image: pnoker/dc3-rabbitmq:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2025.2
     restart: always
     ports:
       - '5671:5671'
@@ -55,8 +55,8 @@ services:
         aliases:
           - dc3-rabbitmq
 
-emqx:
-    image: pnoker/dc3-emqx:2025.2
+  emqx:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-emqx:2025.2
     restart: always
     ports:
       - '8083:8083'
@@ -81,10 +81,10 @@ emqx:
 
 volumes:
   postgres:
-  redis:
   rabbitmq:
   emqx_data:
   emqx_log:
+
 
 networks:
   dc3net:
