@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  * <p>UdpSlave class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.2
+ * @version 2025.2.4
  */
 public class UdpSlave extends ModbusSlaveSet {
     final BaseMessageParser messageParser;

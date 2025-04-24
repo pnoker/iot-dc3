@@ -34,7 +34,7 @@ import java.sql.Types;
  * Mybatis 工具类集合
  *
  * @author pnoker
- * @version 2025.2.2
+ * @version 2025.2.4
  * @since 2022.1.0
  */
 @Slf4j

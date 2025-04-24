@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>RtuMaster class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.2
+ * @version 2025.2.4
  */
 public class RtuMaster extends SerialMaster {
 

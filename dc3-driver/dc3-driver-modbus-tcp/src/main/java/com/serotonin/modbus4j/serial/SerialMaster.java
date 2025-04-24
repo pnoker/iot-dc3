@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>Abstract SerialMaster class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.2
+ * @version 2025.2.4
  */
 abstract public class SerialMaster extends ModbusMaster {
 

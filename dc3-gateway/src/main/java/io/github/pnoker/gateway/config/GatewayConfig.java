@@ -43,7 +43,7 @@ import java.util.Optional;
  * 通过注解 {@code @Configuration} 标记为 Spring 配置类，确保在应用启动时加载。
  *
  * @author pnoker
- * @version 2025.2.2
+ * @version 2025.2.4
  * @since 2022.1.0
  */
 @Slf4j
