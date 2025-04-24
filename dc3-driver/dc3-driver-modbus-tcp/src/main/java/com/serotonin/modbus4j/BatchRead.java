@@ -37,7 +37,7 @@ import java.util.*;
  *
  * @param <K> - Type of read
  * @author mlohbihler
- * @version 2025.2.2
+ * @version 2025.2.4
  */
 public class BatchRead<K> {
     private final List<KeyedModbusLocator<K>> requestValues = new ArrayList<>();

@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
  * Base BO
  *
  * @author pnoker
- * @version 2025.2.2
+ * @version 2025.2.4
  * @since 2022.1.0
  */
 @Getter

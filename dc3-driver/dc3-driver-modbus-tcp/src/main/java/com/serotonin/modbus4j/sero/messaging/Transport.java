@@ -23,7 +23,7 @@ import java.io.IOException;
  * ports, sockets, UDP, email, etc.
  *
  * @author Matthew Lohbihler
- * @version 2025.2.2
+ * @version 2025.2.4
  */
 public interface Transport {
     /**

@@ -25,7 +25,7 @@ import java.math.RoundingMode;
  * 提供精确的浮点数运算, 包括加减乘除和四舍五入
  *
  * @author pnoker
- * @version 2025.2.2
+ * @version 2025.2.4
  * @since 2022.1.0
  */
 public class ArithmeticUtil {

@@ -23,7 +23,7 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
  * 策略工厂 相关常量
  *
  * @author pnoker
- * @version 2025.2.2
+ * @version 2025.2.4
  * @since 2022.1.0
  */
 public class StrategyConstant {
@@ -36,7 +36,7 @@ public class StrategyConstant {
      * 存储相关的策略工厂 相关常量
      *
      * @author pnoker
-     * @version 2025.2.2
+     * @version 2025.2.4
      * @since 2022.1.0
      */
     public static class Storage {

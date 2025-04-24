@@ -1,4 +1,4 @@
-name: Docker Image
+name: Docker Image For Gateway
 on:
     push:
         tags:
@@ -31,4 +31,4 @@ jobs:
                   file: dc3-gateway/Dockerfile
                   context: '{{defaultContext}}:/'
                   platforms: linux/arm64,linux/amd64
-                  tags: pnoker/dc3-gateway:2025.2.2
+                  tags: pnoker/dc3-gateway:2025.2.4

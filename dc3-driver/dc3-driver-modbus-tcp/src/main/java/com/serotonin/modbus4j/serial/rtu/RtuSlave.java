@@ -26,7 +26,7 @@ import java.io.IOException;
  * <p>RtuSlave class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.2
+ * @version 2025.2.4
  */
 public class RtuSlave extends SerialSlave {
     // Runtime fields

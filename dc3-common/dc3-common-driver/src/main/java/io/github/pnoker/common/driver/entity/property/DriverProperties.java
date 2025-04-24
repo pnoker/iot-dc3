@@ -35,7 +35,7 @@ import java.util.List;
  * 驱动配置文件 driver 字段内容
  *
  * @author pnoker
- * @version 2025.2.2
+ * @version 2025.2.4
  * @since 2022.1.0
  */
 @Getter
@@ -121,7 +121,7 @@ public class DriverProperties {
      * 驱动配置文件 driver.schedule 字段内容
      *
      * @author pnoker
-     * @version 2025.2.2
+     * @version 2025.2.4
      * @since 2022.1.0
      */
     @Getter
@@ -142,7 +142,7 @@ public class DriverProperties {
          * 驱动调度任务配置
          *
          * @author pnoker
-         * @version 2025.2.2
+         * @version 2025.2.4
          * @since 2022.1.0
          */
         @Getter

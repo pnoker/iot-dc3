@@ -29,7 +29,7 @@ import java.nio.charset.Charset;
  * <p>Abstract BaseLocator class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.2
+ * @version 2025.2.4
  */
 abstract public class BaseLocator<T> {
     //

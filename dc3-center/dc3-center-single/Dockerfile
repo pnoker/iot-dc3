@@ -14,6 +14,21 @@
 # limitations under the License.
 #
 
+# builder
+FROM pnoker/dc3-jdk:2025.2 AS builder
+LABEL dc3.author=pnoker
+LABEL dc3.author.email=pnokers.icloud.com
+
+ARG PROFILE=dev
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+WORKDIR /build
+
+COPY ./ ./
+
+RUN mvn -U -e -B clean package -DskipTests -P $PROFILE
+
 # runtime
 FROM pnoker/dc3-jre:2025.2 AS runtime
 LABEL dc3.author=pnoker
@@ -22,8 +37,8 @@ LABEL dc3.author.email=pnokers.icloud.com
 # default env
 ENV PARAMS=''
 ENV NODE_ENV=dev
-ENV SERVER_PORT=8300
-ENV GRPC_PORT=9300
+ENV SERVER_PORT=8100
+ENV GRPC_PORT=9100
 
 # default jvm & gc env
 ENV JAVA_OPS="-server \
@@ -31,17 +46,17 @@ ENV JAVA_OPS="-server \
               -Xmx1024m \
               -Djava.security.egd=file:/dev/./urandom \
               -XX:+UseG1GC"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/auth/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
+ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/single/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && mkdir -p /dc3-center/dc3-center-auth/dc3/logs/center/auth/gc
+    && mkdir -p /dc3-center/dc3-center-single/dc3/logs/center/single/gc
 
-WORKDIR /dc3-center/dc3-center-auth
+WORKDIR /dc3-center/dc3-center-single
 
-ADD ./target/dc3-center-auth.jar ./
+COPY --from=builder /build/dc3-center/dc3-center-single/target/dc3-center-single.jar ./
 
 EXPOSE ${SERVER_PORT}
 EXPOSE ${GRPC_PORT}
-VOLUME /dc3-center/dc3-center-auth/dc3/logs
+VOLUME /dc3-center/dc3-center-single/dc3/logs
 
-CMD java ${JAVA_OPS} ${GC_LOG} -jar dc3-center-auth.jar ${PARAMS}
+CMD java ${JAVA_OPS} ${GC_LOG} -jar dc3-center-single.jar ${PARAMS}
