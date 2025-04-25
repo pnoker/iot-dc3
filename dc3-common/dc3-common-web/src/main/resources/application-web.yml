@@ -36,3 +36,9 @@ server:
       enabled: true
       prefix: ${spring.application.name}.
       pattern: '%h %l %u %t "%r" %s %b %Dms'
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
