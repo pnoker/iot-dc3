@@ -41,10 +41,10 @@ jobs:
           echo "docker_registry_default=pnoker" >> $GITHUB_OUTPUT
           echo "docker_registry_aliyun=registry.cn-beijing.aliyuncs.com/dc3" >> $GITHUB_OUTPUT
           echo "service_version=2025.2.5" >> $GITHUB_OUTPUT
-          echo "service_name=dc3-driver-modbus-tcp" >> $GITHUB_OUTPUT
-          echo "service_path=dc3-center/dc3-driver-modbus-tcp" >> $GITHUB_OUTPUT
+          echo "service_name_driver_modbus_tcp=dc3-driver-modbus-tcp" >> $GITHUB_OUTPUT
+          echo "service_path_driver_modbus_tcp=dc3-driver/dc3-driver-modbus-tcp" >> $GITHUB_OUTPUT
 
-      - name: Build and Push To Default Registry
+      - name: Build and Push For Driver Modbus Tcp
         uses: docker/build-push-action@v6
         with:
           push: true
@@ -52,25 +52,14 @@ jobs:
             PROFILE=pro
           context: "{{defaultContext}}:/"
           platforms: linux/arm64,linux/amd64
-          file: ${{ steps.varsiables.outputs.service_path }}/Dockerfile
-          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name }}:buildcache
-          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name }}:buildcache,mode=max
+          file: ${{ steps.varsiables.outputs.service_path_driver_modbus_tcp }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:buildcache,mode=max
           tags: |
-            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name }}:latest
-            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name }}:${{ steps.varsiables.outputs.service_version }}
-            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:${{ steps.version.outputs.version }}
 
-      - name: Build and Push To Aliyun Registry
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          build-args: |
-            PROFILE=pro
-          context: "{{defaultContext}}:/"
-          platforms: linux/arm64,linux/amd64
-          file: ${{ steps.varsiables.outputs.service_path }}/Dockerfile
-          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name }}:buildcache
-          tags: |
-            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name }}:latest
-            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name }}:${{ steps.varsiables.outputs.service_version }}
-            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name }}:${{ steps.version.outputs.version }}

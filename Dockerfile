@@ -14,8 +14,7 @@
 # limitations under the License.
 #
 
-# builder
-FROM pnoker/dc3-jdk:2025.2 AS builder
+FROM pnoker/dc3-jdk:2025.2
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 
