@@ -19,7 +19,7 @@ services:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-grafana:2025.2
     restart: always
     ports:
-      - '3000:3000'
+      - "3000:3000"
     environment:
       - GF_SERVER_ROOT_URL=http://dc3-grafana:3000
     container_name: dc3-grafana
@@ -29,8 +29,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '10M'
-        max-file: '20'
+        max-size: "10M"
+        max-file: "20"
     networks:
       dc3net:
         aliases:
@@ -42,15 +42,15 @@ services:
     container_name: dc3-prometheus
     hostname: dc3-prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.retention.time=7d'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=7d"
     volumes:
       - prometheus:/prometheus
     logging:
       driver: json-file
       options:
-        max-size: '10M'
-        max-file: '20'
+        max-size: "10M"
+        max-file: "20"
     networks:
       dc3net:
         aliases:
@@ -64,8 +64,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '10M'
-        max-file: '20'
+        max-size: "10M"
+        max-file: "20"
     networks:
       dc3net:
         aliases:
@@ -79,8 +79,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '10M'
-        max-file: '20'
+        max-size: "10M"
+        max-file: "20"
     networks:
       dc3net:
         aliases:
@@ -90,8 +90,6 @@ volumes:
   prometheus:
   grafana:
 
-
 networks:
   dc3net:
     driver: bridge
-...

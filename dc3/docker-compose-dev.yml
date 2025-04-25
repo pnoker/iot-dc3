@@ -19,7 +19,7 @@ services:
     image: pnoker/dc3-postgres:2025.2
     restart: always
     ports:
-      - '35432:5432'
+      - "35432:5432"
     container_name: dc3-postgres
     hostname: dc3-postgres
     volumes:
@@ -27,8 +27,8 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '10M'
-        max-file: '20'
+        max-size: "10M"
+        max-file: "20"
     networks:
       dc3net:
         aliases:
@@ -38,9 +38,9 @@ services:
     image: pnoker/dc3-rabbitmq:2025.2
     restart: always
     ports:
-      - '5671:5671'
-      - '5672:5672'
-      - '15672:15672'
+      - "35671:5671"
+      - "35672:5672"
+      - "15672:15672"
     container_name: dc3-rabbitmq
     hostname: dc3-rabbitmq
     volumes:
@@ -48,45 +48,17 @@ services:
     logging:
       driver: json-file
       options:
-        max-size: '10M'
-        max-file: '20'
+        max-size: "10M"
+        max-file: "20"
     networks:
       dc3net:
         aliases:
           - dc3-rabbitmq
 
-emqx:
-    image: pnoker/dc3-emqx:2025.2
-    restart: always
-    ports:
-      - '8083:8083'
-      - '8084:8084'
-      - '1883:1883'
-      - '8883:8883'
-      - '18083:18083'
-    container_name: dc3-emqx
-    hostname: dc3-emqx
-    volumes:
-      - emqx_data:/opt/emqx/data
-      - emqx_log:/opt/emqx/log
-    logging:
-      driver: json-file
-      options:
-        max-size: '10M'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-emqx
-
 volumes:
   postgres:
-  redis:
   rabbitmq:
-  emqx_data:
-  emqx_log:
 
 networks:
   dc3net:
     driver: bridge
-...
