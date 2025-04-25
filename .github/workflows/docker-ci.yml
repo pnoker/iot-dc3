@@ -15,12 +15,10 @@ jobs:
         run: |
           VERSION=${GITHUB_REF#refs/tags/dc3.release.}
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
-          echo "docker_registry_default=pnoker" >> $GITHUB_OUTPUT
-          echo "docker_registry_aliyun=registry.cn-beijing.aliyuncs.com/dc3" >> $GITHUB_OUTPUT
-          echo "service_version=2025.2.5" >> $GITHUB_OUTPUT
-          echo "service_name=dc3" >> $GITHUB_OUTPUT
-          echo "service_path=." >> $GITHUB_OUTPUT
           echo "profile=pro" >> $GITHUB_OUTPUT
+          echo "service_path=." >> $GITHUB_OUTPUT
+          echo "service_name=dc3" >> $GITHUB_OUTPUT
+          echo "service_version=2025.2.5" >> $GITHUB_OUTPUT
           echo "service_name_centen_auth=dc3-center-auth" >> $GITHUB_OUTPUT
           echo "service_path_centen_auth=dc3-center/dc3-center-auth" >> $GITHUB_OUTPUT
           echo "service_name_center_data=dc3-center-data" >> $GITHUB_OUTPUT
@@ -45,14 +43,15 @@ jobs:
           echo "service_path_driver_plcs7=dc3-driver/dc3-driver-plcs7" >> $GITHUB_OUTPUT
           echo "service_name_driver_virtual=dc3-driver-virtual" >> $GITHUB_OUTPUT
           echo "service_path_driver_virtual=dc3-driver/dc3-driver-virtual" >> $GITHUB_OUTPUT
+          echo "docker_registry_default=pnoker" >> $GITHUB_OUTPUT
+          echo "docker_registry_aliyun=registry.cn-beijing.aliyuncs.com/dc3" >> $GITHUB_OUTPUT
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
         with:
-          path: ~/.m2/repository
-          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-${{ runner.os }}-
+          distribution: "temurin"
+          java-version: "21"
+          cache: "maven"
 
       - name: Build with Maven
         run: mvn -U -e -B clean package -DskipTests -P ${{ steps.varsiables.outputs.profile }}
