@@ -23,7 +23,7 @@ import java.io.Writer;
  * <p>NullWriter class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 public class NullWriter extends Writer {
     @Override

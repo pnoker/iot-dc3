@@ -27,4 +27,4 @@ WORKDIR /build
 
 COPY ./ ./
 
-RUN mvn -U -e -B clean package -DskipTests -P $PROFILE
+RUN mvn -U -e -B clean package -DskipTests -P ${PROFILE}

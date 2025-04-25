@@ -42,7 +42,7 @@ import java.util.Arrays;
  * <p>TcpMaster class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 public class TcpMaster extends ModbusMaster {
 

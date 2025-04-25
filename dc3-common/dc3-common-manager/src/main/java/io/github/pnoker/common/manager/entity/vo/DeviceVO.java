@@ -34,7 +34,7 @@ import java.util.Set;
  * 设备 VO
  *
  * @author pnoker
- * @version 2025.2.4
+ * @version 2025.2.5
  * @since 2022.1.0
  */
 @Getter

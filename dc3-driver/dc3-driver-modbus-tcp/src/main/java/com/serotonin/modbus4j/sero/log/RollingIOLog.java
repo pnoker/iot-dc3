@@ -30,7 +30,7 @@ import java.nio.file.StandardCopyOption;
  * Class to Log IO with the option to keep historical files
  *
  * @author Terry Packer
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 public class RollingIOLog extends BaseIOLog {
 

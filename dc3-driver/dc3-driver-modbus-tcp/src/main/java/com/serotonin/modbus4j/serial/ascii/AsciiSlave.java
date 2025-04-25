@@ -26,7 +26,7 @@ import java.io.IOException;
  * <p>AsciiSlave class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 public class AsciiSlave extends SerialSlave {
     private MessageControl conn;

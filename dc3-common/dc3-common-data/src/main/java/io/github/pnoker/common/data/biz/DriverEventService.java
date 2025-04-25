@@ -22,7 +22,7 @@ import io.github.pnoker.common.entity.dto.DriverEventDTO;
  * 驱动事件相关接口
  *
  * @author pnoker
- * @version 2025.2.4
+ * @version 2025.2.5
  * @since 2022.1.0
  */
 public interface DriverEventService {

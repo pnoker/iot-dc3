@@ -1,34 +1,76 @@
 name: Docker Image For Driver Modbus Tcp
 on:
-    push:
-        tags:
-            - 'dc3.release.*'
+  push:
+    tags:
+      - "dc3.release.*"
 jobs:
-    build-push:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Login Docker
-              uses: docker/login-action@v3
-              with:
-                  username: ${{ vars.DOCKERHUB_USERNAME }}
-                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-            - name: Set QEMU
-              uses: docker/setup-qemu-action@v3
+      - name: Set QEMU
+        uses: docker/setup-qemu-action@v3
 
-            - name: Set Docker Buildx
-              uses: docker/setup-buildx-action@v3
-              with:
-                  platforms: linux/arm64,linux/amd64
+      - name: Login Docker Default Registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            - name: Build and Push
-              uses: docker/build-push-action@v6
-              with:
-                  push: true
-                  file: dc3-driver/dc3-driver-modbus-tcp/Dockerfile
-                  context: '{{defaultContext}}:/'
-                  platforms: linux/arm64,linux/amd64
-                  tags: pnoker/dc3-driver-modbus-tcp:2025.2.4
+      - name: Login Docker Aliyun Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.cn-beijing.aliyuncs.com
+          username: ${{ vars.ALIYUN_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.ALIYUN_DOCKERHUB_TOKEN }}
+
+      - name: Extract Version
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/dc3.release.}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Extract Variables
+        id: varsiables
+        run: |
+          echo "docker_registry_default=pnoker" >> $GITHUB_OUTPUT
+          echo "docker_registry_aliyun=registry.cn-beijing.aliyuncs.com/dc3" >> $GITHUB_OUTPUT
+          echo "service_version=2025.2.5" >> $GITHUB_OUTPUT
+          echo "service_name=dc3-driver-modbus-tcp" >> $GITHUB_OUTPUT
+          echo "service_path=dc3-center/dc3-driver-modbus-tcp" >> $GITHUB_OUTPUT
+
+      - name: Build and Push To Default Registry
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push To Aliyun Registry
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name }}:buildcache
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name }}:${{ steps.version.outputs.version }}

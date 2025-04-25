@@ -20,7 +20,7 @@ package com.serotonin.modbus4j.sero.messaging;
  * <p>IncomingMessage interface.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 public interface IncomingMessage {
     // A marker interface

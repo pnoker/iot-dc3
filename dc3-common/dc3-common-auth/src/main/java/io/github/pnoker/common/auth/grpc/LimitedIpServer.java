@@ -32,7 +32,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
  * LimitedIp Api
  *
  * @author pnoker
- * @version 2025.2.4
+ * @version 2025.2.5
  * @since 2022.1.0
  */
 @Slf4j

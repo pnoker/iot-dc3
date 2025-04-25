@@ -31,7 +31,7 @@ import java.util.Objects;
  * DeviceService Impl
  *
  * @author pnoker
- * @version 2025.2.4
+ * @version 2025.2.5
  * @since 2022.1.0
  */
 @Slf4j
