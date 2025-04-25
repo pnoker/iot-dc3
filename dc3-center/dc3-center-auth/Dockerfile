@@ -14,9 +14,6 @@
 # limitations under the License.
 #
 
-# builder
-FROM pnoker/dc3:2025.2.5 AS builder
-
 # runtime
 FROM pnoker/dc3-jre:2025.2 AS runtime
 LABEL dc3.author=pnoker
@@ -41,7 +38,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-center/dc3-center-auth
 
-COPY --from=builder /build/dc3-center/dc3-center-auth/target/dc3-center-auth.jar ./
+COPY dc3-center/dc3-center-auth/target/dc3-center-auth.jar ./
 
 EXPOSE ${SERVER_PORT}
 EXPOSE ${GRPC_PORT}
