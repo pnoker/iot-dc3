@@ -1,0 +1,311 @@
+name: Docker Image
+on:
+  push:
+    tags:
+      - "dc3.release.*"
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Login Docker Default Registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login Docker Aliyun Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.cn-beijing.aliyuncs.com
+          username: ${{ vars.ALIYUN_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.ALIYUN_DOCKERHUB_TOKEN }}
+
+      - name: Extract Version
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/dc3.release.}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Extract Variables
+        id: varsiables
+        run: |
+          echo "docker_registry_default=pnoker" >> $GITHUB_OUTPUT
+          echo "docker_registry_aliyun=registry.cn-beijing.aliyuncs.com/dc3" >> $GITHUB_OUTPUT
+          echo "service_version=2025.2.5" >> $GITHUB_OUTPUT
+          echo "service_name=dc3" >> $GITHUB_OUTPUT
+          echo "service_path=." >> $GITHUB_OUTPUT
+          echo "service_name_centen_auth=dc3-center-auth" >> $GITHUB_OUTPUT
+          echo "service_path_centen_auth=dc3-center/dc3-center-auth" >> $GITHUB_OUTPUT
+          echo "service_name_center_data=dc3-center-data" >> $GITHUB_OUTPUT
+          echo "service_path_center_data=dc3-center/dc3-center-data" >> $GITHUB_OUTPUT
+          echo "service_name_center_manager=dc3-center-manager" >> $GITHUB_OUTPUT
+          echo "service_path_center_manager=dc3-center/dc3-center-manager" >> $GITHUB_OUTPUT
+          echo "service_name_center_single=dc3-center-single" >> $GITHUB_OUTPUT
+          echo "service_path_center_single=dc3-center/dc3-center-single" >> $GITHUB_OUTPUT
+          echo "service_name_gateway=dc3-gateway" >> $GITHUB_OUTPUT
+          echo "service_path_gateway=dc3-gateway" >> $GITHUB_OUTPUT
+          echo "service_name_driver_listening_virtual=dc3-driver-listening-virtual" >> $GITHUB_OUTPUT
+          echo "service_path_driver_listening_virtual=dc3-driver/dc3-driver-listening-virtual" >> $GITHUB_OUTPUT
+          echo "service_name_driver_modbus_tcp=dc3-driver-modbus-tcp" >> $GITHUB_OUTPUT
+          echo "service_path_driver_modbus_tcp=dc3-driver/dc3-driver-modbus-tcp" >> $GITHUB_OUTPUT
+          echo "service_name_driver_mqtt=dc3-driver-mqtt" >> $GITHUB_OUTPUT
+          echo "service_path_driver_mqtt=dc3-driver/dc3-driver-mqtt" >> $GITHUB_OUTPUT
+          echo "service_name_driver_opc_da=dc3-driver-opc-da" >> $GITHUB_OUTPUT
+          echo "service_path_driver_opc_da=dc3-driver/dc3-driver-opc-da" >> $GITHUB_OUTPUT
+          echo "service_name_driver_opc_ua=dc3-driver-opc-ua" >> $GITHUB_OUTPUT
+          echo "service_path_driver_opc_ua=dc3-driver/dc3-driver-opc-ua" >> $GITHUB_OUTPUT
+          echo "service_name_driver_plcs7=dc3-driver-plcs7" >> $GITHUB_OUTPUT
+          echo "service_path_driver_plcs7=dc3-driver/dc3-driver-plcs7" >> $GITHUB_OUTPUT
+          echo "service_name_driver_virtual=dc3-driver-virtual" >> $GITHUB_OUTPUT
+          echo "service_path_driver_virtual=dc3-driver/dc3-driver-virtual" >> $GITHUB_OUTPUT
+
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name }}:${{ steps.varsiables.outputs.service_version }}
+
+      - name: Build and Push For Gateway
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_gateway }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_gateway }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_gateway }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_gateway }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_gateway }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_gateway }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_gateway }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_gateway }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_gateway }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Center Auth
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_centen_auth }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_centen_auth }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_centen_auth }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_centen_auth }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_centen_auth }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_centen_auth }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_centen_auth }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_centen_auth }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_centen_auth }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Center Data
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_center_data }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_center_data }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_center_data }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_center_data }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_center_data }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_center_data }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_center_data }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_center_data }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_center_data }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Center Manager
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_center_manager }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_center_manager }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_center_manager }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_center_manager }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_center_manager }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_center_manager }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_center_manager }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_center_manager }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_center_manager }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Center Single
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_center_single }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_center_single }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_center_single }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_center_single }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_center_single }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_center_single }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_center_single }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_center_single }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_center_single }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Driver Listening Virtual
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_driver_listening_virtual }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_listening_virtual }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_listening_virtual }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_listening_virtual }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_listening_virtual }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_listening_virtual }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_listening_virtual }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_listening_virtual }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_listening_virtual }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Driver Modbus Tcp
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_driver_modbus_tcp }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_modbus_tcp }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Driver Mqtt
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_driver_mqtt }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_mqtt }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_mqtt }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_mqtt }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_mqtt }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_mqtt }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_mqtt }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_mqtt }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_mqtt }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Driver Opc Da
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_driver_opc_da }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_opc_da }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_opc_da }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_opc_da }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_opc_da }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_opc_da }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_opc_da }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_opc_da }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_opc_da }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Driver Opc Ua
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_driver_opc_ua }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_opc_ua }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_opc_ua }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_opc_ua }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_opc_ua }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_opc_ua }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_opc_ua }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_opc_ua }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_opc_ua }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Driver Plcs7
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_driver_plcs7 }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_plcs7 }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_plcs7 }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_plcs7 }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_plcs7 }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_plcs7 }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_plcs7 }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_plcs7 }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_plcs7 }}:${{ steps.version.outputs.version }}
+
+      - name: Build and Push For Driver Virtual
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          build-args: |
+            PROFILE=pro
+          context: "{{defaultContext}}:/"
+          platforms: linux/arm64,linux/amd64
+          file: ${{ steps.varsiables.outputs.service_path_driver_virtual }}/Dockerfile
+          cache-from: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_virtual }}:buildcache
+          cache-to: type=registry,ref=pnoker/${{ steps.varsiables.outputs.service_name_driver_virtual }}:buildcache,mode=max
+          tags: |
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_virtual }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_virtual }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_default }}/${{ steps.varsiables.outputs.service_name_driver_virtual }}:${{ steps.version.outputs.version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_virtual }}:latest
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_virtual }}:${{ steps.varsiables.outputs.service_version }}
+            ${{ steps.varsiables.outputs.docker_registry_aliyun }}/${{ steps.varsiables.outputs.service_name_driver_virtual }}:${{ steps.version.outputs.version }}
