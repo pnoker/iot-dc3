@@ -19,7 +19,7 @@ package com.serotonin.modbus4j.exception;
  * <p>ModbusIdException class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 public class ModbusIdException extends RuntimeException {
     private static final long serialVersionUID = -1;

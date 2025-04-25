@@ -23,7 +23,7 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
  * <p>ReadInputRegistersRequest class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 public class ReadInputRegistersRequest extends ReadNumericRequest {
     /**

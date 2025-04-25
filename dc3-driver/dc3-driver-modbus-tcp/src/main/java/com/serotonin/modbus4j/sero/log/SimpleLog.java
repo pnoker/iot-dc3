@@ -24,7 +24,7 @@ import java.util.Date;
  * <p>SimpleLog class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 public class SimpleLog {
     private final PrintWriter out;

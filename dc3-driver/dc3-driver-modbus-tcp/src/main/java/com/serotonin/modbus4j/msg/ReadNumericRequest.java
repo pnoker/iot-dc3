@@ -25,7 +25,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>Abstract ReadNumericRequest class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 abstract public class ReadNumericRequest extends ModbusRequest {
     private int startOffset;

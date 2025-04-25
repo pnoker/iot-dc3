@@ -22,7 +22,7 @@ import cn.hutool.core.text.CharSequenceUtil;
  * 自定义 未支持 异常
  *
  * @author pnoker
- * @version 2025.2.4
+ * @version 2025.2.5
  * @since 2022.1.0
  */
 public class UnSupportException extends RuntimeException {

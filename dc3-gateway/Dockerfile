@@ -27,7 +27,7 @@ WORKDIR /build
 
 COPY ./ ./
 
-RUN mvn -U -e -B clean package -DskipTests -P $PROFILE
+RUN mvn -U -e -B clean package -DskipTests -P ${PROFILE}
 
 # runtime
 FROM pnoker/dc3-jre:2025.2 AS runtime

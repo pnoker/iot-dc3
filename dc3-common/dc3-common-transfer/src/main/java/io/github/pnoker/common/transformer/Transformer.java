@@ -26,7 +26,7 @@ import java.lang.annotation.Annotation;
  * 支持自定义注解
  *
  * @author pnoker
- * @version 2025.2.4
+ * @version 2025.2.5
  * @since 2022.1.0
  */
 public interface Transformer<T, A extends Annotation> {

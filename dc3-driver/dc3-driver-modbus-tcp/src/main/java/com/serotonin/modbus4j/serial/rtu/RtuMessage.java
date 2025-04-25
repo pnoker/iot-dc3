@@ -24,7 +24,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * Convenience superclass primarily for calculating CRC values.
  *
  * @author mlohbihler
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 public class RtuMessage extends SerialMessage {
     /**

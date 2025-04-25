@@ -22,7 +22,7 @@ import java.io.IOException;
  * <p>DataConsumer interface.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.4
+ * @version 2025.2.5
  */
 public interface DataConsumer {
     /**
