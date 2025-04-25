@@ -15,15 +15,20 @@
 #
 
 services:
-  postgres:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-postgres:2025.2
+  emqx:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-emqx:2025.2
     restart: always
     ports:
-      - "35432:5432"
-    container_name: dc3-postgres
-    hostname: dc3-postgres
+      - "38083:8083"
+      - "38084:8084"
+      - "31883:1883"
+      - "38883:8883"
+      - "18083:18083"
+    container_name: dc3-emqx
+    hostname: dc3-emqx
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
     logging:
       driver: json-file
       options:
@@ -32,32 +37,11 @@ services:
     networks:
       dc3net:
         aliases:
-          - dc3-postgres
-
-  rabbitmq:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2025.2
-    restart: always
-    ports:
-      - "35671:5671"
-      - "35672:5672"
-      - "15672:15672"
-    container_name: dc3-rabbitmq
-    hostname: dc3-rabbitmq
-    volumes:
-      - rabbitmq:/var/lib/rabbitmq
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
-    networks:
-      dc3net:
-        aliases:
-          - dc3-rabbitmq
+          - dc3-emqx
 
 volumes:
-  postgres:
-  rabbitmq:
+  emqx_data:
+  emqx_log:
 
 networks:
   dc3net:
