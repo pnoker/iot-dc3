@@ -14,9 +14,6 @@
 # limitations under the License.
 #
 
-# builder
-FROM pnoker/dc3:2025.2.5 AS builder
-
 # runtime
 FROM pnoker/dc3-jre:2025.2 AS runtime
 LABEL dc3.author=pnoker
@@ -41,7 +38,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-driver/dc3-driver-listening-virtual
 
-COPY --from=builder /build/dc3-driver/dc3-driver-listening-virtual/target/dc3-driver-listening-virtual.jar ./
+COPY dc3-driver/dc3-driver-listening-virtual/target/dc3-driver-listening-virtual.jar ./
 
 EXPOSE ${TCP_PORT}
 EXPOSE ${UDP_PORT}
