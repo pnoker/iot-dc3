@@ -27,7 +27,7 @@
     <artifactId>dc3-center-data</artifactId>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 平台数据中心, 包含 Amqp, Websocket, Mqtt 等通用消息中间件, 根据消息订阅方式收集设备组信息。
+    <description>IoT DC3 Platform Data Center - Integrates common messaging middleware including AMQP, WebSocket, and MQTT for collecting device group information through message subscription mechanisms.
     </description>
 
     <dependencies>

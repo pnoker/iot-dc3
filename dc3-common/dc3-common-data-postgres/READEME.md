@@ -1,1 +1,0 @@
-IoT DC3 平台 公共的 PostgreSQL 配置。
