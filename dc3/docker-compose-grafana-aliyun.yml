@@ -71,6 +71,21 @@ services:
         aliases:
           - dc3-postgres-exporter
 
+  redis-exporter:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis-exporter:2025.2
+    restart: always
+    container_name: dc3-redis-exporter
+    hostname: dc3-redis-exporter
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "20"
+    networks:
+      dc3net:
+        aliases:
+          - dc3-redis-exporter
+
   nginx-exporter:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-nginx-exporter:2025.2
     restart: always
