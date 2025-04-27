@@ -96,7 +96,6 @@
         <dc3.common.redis.version>2025.2.5</dc3.common.redis.version>
         <dc3.common.register.version>2025.2.5</dc3.common.register.version>
         <dc3.common.repository.version>2025.2.5</dc3.common.repository.version>
-        <dc3.common.tdengine.version>2025.2.5</dc3.common.tdengine.version>
         <dc3.common.thread.version>2025.2.5</dc3.common.thread.version>
         <dc3.common.transfer.version>2025.2.5</dc3.common.transfer.version>
         <dc3.common.web.version>2025.2.5</dc3.common.web.version>
@@ -279,11 +278,6 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-repository</artifactId>
                 <version>${dc3.common.repository.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-tdengine</artifactId>
-                <version>${dc3.common.tdengine.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>

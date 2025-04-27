@@ -53,6 +53,11 @@ jobs:
       - name: Build with Maven
         run: mvn -U -e -B clean package -DskipTests -P ${{ steps.variables.outputs.profile }}
 
+      - name: List Workspace
+        run: |
+          echo "Current workspace:"
+          ls -R ${{ github.workspace }}
+
       - name: Set Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -78,7 +83,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_gateway }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}
@@ -93,7 +98,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_centen_auth }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_centen_auth }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_centen_auth }}:${{ steps.variables.outputs.service_version }}
@@ -108,7 +113,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_data }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}
@@ -123,7 +128,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_manager }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}
@@ -138,7 +143,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_single }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}
@@ -153,7 +158,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_listening_virtual }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}
@@ -168,7 +173,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_modbus_tcp }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}
@@ -183,7 +188,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_mqtt }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}
@@ -198,7 +203,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_da }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}
@@ -213,7 +218,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_ua }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}
@@ -228,7 +233,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_plcs7 }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}
@@ -243,7 +248,7 @@ jobs:
           push: true
           context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_virtual }}
           platforms: linux/arm64,linux/amd64
-          file: Dockerfile
+          file: ./Dockerfile
           tags: |
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:latest
             ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}
