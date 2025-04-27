@@ -38,7 +38,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-driver/dc3-driver-listening-virtual
 
-COPY dc3-driver/dc3-driver-listening-virtual/target/dc3-driver-listening-virtual.jar ./
+COPY target/dc3-driver-listening-virtual.jar ./
 
 EXPOSE ${TCP_PORT}
 EXPOSE ${UDP_PORT}

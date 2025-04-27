@@ -37,7 +37,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-gateway
 
-COPY dc3-gateway/target/dc3-gateway.jar ./
+COPY target/dc3-gateway.jar ./
 
 EXPOSE ${SERVER_PORT}
 VOLUME /dc3-gateway/dc3/logs
