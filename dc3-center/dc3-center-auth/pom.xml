@@ -27,7 +27,7 @@
     <artifactId>dc3-center-auth</artifactId>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 平台 权限服务。</description>
+    <description>IoT DC3 Platform Authorization Service - Provides authentication and authorization management for the entire platform.</description>
 
     <dependencies>
 

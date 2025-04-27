@@ -27,7 +27,7 @@
     <artifactId>dc3-center-single</artifactId>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 平台 权限, 数据, 管理, 接口服务合集。</description>
+    <description>IoT DC3 Platform Integrated Service - A comprehensive collection of authorization, data, management, and API services combined into a single module.</description>
 
     <dependencies>
 
