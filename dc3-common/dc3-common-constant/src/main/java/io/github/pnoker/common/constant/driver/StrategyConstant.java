@@ -41,13 +41,13 @@ public class StrategyConstant {
      */
     public static class Storage {
 
-        public static final String REPOSITORY_PREFIX = "storage" + SymbolConstant.COLON;
+        public static final String REPOSITORY_PREFIX = "repository" + SymbolConstant.COLON;
         public static final String POSTGRES = "postgres";
-        public static final String MONGODB = "mongodb";
         public static final String INFLUXDB = "influxdb";
         public static final String TDENGINE = "tdengine";
-        public static final String STRATEGY_OPENTSDB = "opentsdb";
-        public static final String STRATEGY_ELASTICSEARCH = "elasticsearch";
+        public static final String OPENTSDB = "opentsdb";
+        public static final String MONGODB = "mongodb";
+        public static final String ELASTICSEARCH = "elasticsearch";
 
         private Storage() {
             throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);

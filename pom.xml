@@ -32,7 +32,7 @@
     <inceptionYear>2016-2022</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IoT DC3 is a 100% open-source, distributed Internet of Things (IoT) platform built on Spring Cloud.
+        IoT DC3 is a fully open-source, distributed Internet of Things (IoT) platform built on Spring Cloud.
         It accelerates IoT project development and simplifies IoT device management, offering a comprehensive solution for building robust IoT systems.
         All components and code are fully open-source, ensuring transparency, flexibility, and community-driven innovation.
     </description>
@@ -196,6 +196,16 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-data-mongo</artifactId>
+                <version>${dc3.common.mongo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-data-postgres</artifactId>
+                <version>${dc3.common.postgres.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-driver</artifactId>
                 <version>${dc3.common.driver.version}</version>
             </dependency>
@@ -233,11 +243,6 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-model</artifactId>
                 <version>${dc3.common.model.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mongo</artifactId>
-                <version>${dc3.common.mongo.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>

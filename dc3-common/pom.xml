@@ -84,7 +84,6 @@
         <dc3.common.driver.version>2025.2.5</dc3.common.driver.version>
         <dc3.common.exception.version>2025.2.5</dc3.common.exception.version>
         <dc3.common.gateway.version>2025.2.5</dc3.common.gateway.version>
-        <dc3.common.influx.version>2025.2.5</dc3.common.influx.version>
         <dc3.common.job.version>2025.2.5</dc3.common.job.version>
         <dc3.common.log.version>2025.2.5</dc3.common.log.version>
         <dc3.common.manager.version>2025.2.5</dc3.common.manager.version>
@@ -109,15 +108,15 @@
         <module>dc3-common-constant</module>
         <module>dc3-common-dal</module>
         <module>dc3-common-data</module>
+        <module>dc3-common-data-mongo</module>
+        <module>dc3-common-data-postgres</module>
         <module>dc3-common-driver</module>
         <module>dc3-common-exception</module>
         <module>dc3-common-gateway</module>
-        <module>dc3-common-influx</module>
         <module>dc3-common-job</module>
         <module>dc3-common-log</module>
         <module>dc3-common-manager</module>
         <module>dc3-common-model</module>
-        <module>dc3-common-mongo</module>
         <module>dc3-common-mqtt</module>
         <module>dc3-common-postgres</module>
         <module>dc3-common-public</module>
@@ -241,6 +240,16 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-data-mongo</artifactId>
+                <version>${dc3.common.mongo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-data-postgres</artifactId>
+                <version>${dc3.common.postgres.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-driver</artifactId>
                 <version>${dc3.common.driver.version}</version>
             </dependency>
@@ -253,11 +262,6 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-gateway</artifactId>
                 <version>${dc3.common.gateway.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-influx</artifactId>
-                <version>${dc3.common.influx.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
@@ -278,11 +282,6 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-model</artifactId>
                 <version>${dc3.common.model.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-mongo</artifactId>
-                <version>${dc3.common.mongo.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
