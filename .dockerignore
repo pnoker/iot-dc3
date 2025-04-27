@@ -2,10 +2,8 @@
 **/.idea
 **/.mvn
 **/*.iml
-**/Dockerfile
 
 **/*logs
-**/*target
 
 **/.vs
 **/.vscode
