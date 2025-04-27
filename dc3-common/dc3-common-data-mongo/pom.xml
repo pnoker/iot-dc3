@@ -28,14 +28,14 @@
     </parent>
 
     <name>${project.artifactId}</name>
-    <artifactId>dc3-common-influx</artifactId>
+    <artifactId>dc3-common-data-mongo</artifactId>
     <version>2025.2.5</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2016-2022</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IoT DC3 平台 公共的 Influx 配置。
+        IoT DC3 平台 公共的 Mongo 配置。
     </description>
 
     <developers>
@@ -67,16 +67,10 @@
 
     <dependencies>
 
-        <!-- Influxdb -->
-        <dependency>
-            <groupId>com.influxdb</groupId>
-            <artifactId>influxdb-client-java</artifactId>
-        </dependency>
-
-        <!-- Spring Boot -->
+        <!-- Spring MongoDB-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot</artifactId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
         <!-- DC3 Common 相关 -->
