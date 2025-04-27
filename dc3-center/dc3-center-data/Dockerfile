@@ -38,7 +38,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-center/dc3-center-data
 
-COPY dc3-center/dc3-center-data/target/dc3-center-data.jar ./
+COPY target/dc3-center-data.jar ./
 
 EXPOSE ${SERVER_PORT}
 EXPOSE ${GRPC_PORT}

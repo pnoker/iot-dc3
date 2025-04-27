@@ -36,7 +36,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-driver/dc3-driver-modbus-tcp
 
-COPY dc3-driver/dc3-driver-modbus-tcp/target/dc3-driver-modbus-tcp.jar ./
+COPY target/dc3-driver-modbus-tcp.jar ./
 
 VOLUME /dc3-driver/dc3-driver-modbus-tcp/dc3/logs
 

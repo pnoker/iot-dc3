@@ -36,7 +36,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-driver/dc3-driver-virtual
 
-COPY dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar ./
+COPY target/dc3-driver-virtual.jar ./
 
 VOLUME /dc3-driver/dc3-driver-virtual/dc3/logs
 
