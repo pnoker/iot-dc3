@@ -36,7 +36,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 WORKDIR /dc3-driver/dc3-driver-mqtt
 
-target/dc3-driver-mqtt.jar ./
+COPY target/dc3-driver-mqtt.jar ./
 
 VOLUME /dc3-driver/dc3-driver-mqtt/dc3/logs
 
