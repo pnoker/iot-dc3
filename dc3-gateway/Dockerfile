@@ -32,10 +32,10 @@ ENV JAVA_OPS="-server \
               -XX:+UseG1GC"
 ENV GC_LOG="-Xlog:gc*:file=dc3/logs/gateway/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
+WORKDIR /dc3-gateway
+
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-gateway/dc3/logs/gateway/gc
-
-WORKDIR /dc3-gateway
 
 COPY target/dc3-gateway.jar ./
 
