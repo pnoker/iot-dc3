@@ -16,6 +16,15 @@ jobs:
           distribution: liberica
           java-version: 21
           cache: maven
+          cache-dependency-path: "**/pom.xml"
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
 
       - name: Extract Variables
         id: variables
@@ -51,7 +60,7 @@ jobs:
           echo "docker_registry_aliyun=registry.cn-beijing.aliyuncs.com/dc3" >> $GITHUB_OUTPUT
 
       - name: Build with Maven
-        run: mvn -U -e -B clean package -DskipTests -P ${{ steps.variables.outputs.profile }}
+        run: mvn -U -e -B clean package -DskipTests -P ${{ steps.variables.outputs.profile }} --no-transfer-progress
 
       - name: List Workspace
         run: |
