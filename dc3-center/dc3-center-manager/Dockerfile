@@ -31,7 +31,6 @@ ENV JAVA_OPS="-server \
               -Xmx1024m \
               -Djava.security.egd=file:/dev/./urandom \
               -XX:+UseG1GC"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/manager/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
 WORKDIR /dc3-center/dc3-center-manager
 
@@ -44,4 +43,4 @@ EXPOSE ${SERVER_PORT}
 EXPOSE ${GRPC_PORT}
 VOLUME /dc3-center/dc3-center-manager/dc3/logs
 
-CMD java ${JAVA_OPS} ${GC_LOG} -jar dc3-center-manager.jar ${PARAMS}
+CMD java ${JAVA_OPS} -jar dc3-center-manager.jar ${PARAMS}

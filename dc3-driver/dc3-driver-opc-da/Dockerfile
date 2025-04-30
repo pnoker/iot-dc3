@@ -29,7 +29,6 @@ ENV JAVA_OPS="-server \
               -Xmx1024m \
               -Djava.security.egd=file:/dev/./urandom \
               -XX:+UseG1GC"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/opcda/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
 WORKDIR /dc3-driver/dc3-driver-opc-da
 
@@ -40,4 +39,4 @@ COPY target/dc3-driver-opc-da.jar ./
 
 VOLUME /dc3-driver/dc3-driver-opc-da/dc3/logs
 
-CMD java ${JAVA_OPS} ${GC_LOG} -jar dc3-driver-opc-da.jar ${PARAMS}
+CMD java ${JAVA_OPS} -jar dc3-driver-opc-da.jar ${PARAMS}
