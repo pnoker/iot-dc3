@@ -30,7 +30,6 @@ ENV JAVA_OPS="-server \
               -Xmx1024m \
               -Djava.security.egd=file:/dev/./urandom \
               -XX:+UseG1GC"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/gateway/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
 WORKDIR /dc3-gateway
 
@@ -42,4 +41,4 @@ COPY target/dc3-gateway.jar ./
 EXPOSE ${SERVER_PORT}
 VOLUME /dc3-gateway/dc3/logs
 
-CMD java ${JAVA_OPS} ${GC_LOG} -jar dc3-gateway.jar ${PARAMS}
+CMD java ${JAVA_OPS} -jar dc3-gateway.jar ${PARAMS}

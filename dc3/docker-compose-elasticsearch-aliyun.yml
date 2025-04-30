@@ -15,28 +15,11 @@
 #
 
 services:
-  kibana:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-kibana:2025.2
-    restart: always
-    ports:
-      - "5601:5601"
-    container_name: dc3-kibana
-    hostname: dc3-kibana
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
-    networks:
-      dc3net:
-        aliases:
-          - dc3-kibana
-
   elasticsearch:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-elasticsearch:2025.2
     restart: always
     environment:
-      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     container_name: dc3-elasticsearch
     hostname: dc3-elasticsearch
     volumes:
@@ -54,6 +37,10 @@ services:
   logstash:
     image: registry.cn-beijing.aliyuncs.com/dc3/dc3-logstash:2025.2
     restart: always
+    depends_on:
+      - elasticsearch
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
     container_name: dc3-logstash
     hostname: dc3-logstash
     volumes:
@@ -67,6 +54,25 @@ services:
       dc3net:
         aliases:
           - dc3-logstash
+
+  kibana:
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-kibana:2025.2
+    restart: always
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+    container_name: dc3-kibana
+    hostname: dc3-kibana
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "20"
+    networks:
+      dc3net:
+        aliases:
+          - dc3-kibana
 
 volumes:
   logs:
