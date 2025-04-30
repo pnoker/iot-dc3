@@ -32,7 +32,8 @@
     <inceptionYear>2016-2022</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IoT DC3 Platform Comprehensive Management Center Collection, including: Service Registration and Discovery Center, Service Monitoring Center, IoT Data Collection Center, Authorization and Permission Management Center.
+        IoT DC3 Platform Comprehensive Management Center Collection, including: Service Registration and Discovery Center, Service Monitoring Center, IoT Data Collection Center,
+        Authorization and Permission Management Center.
     </description>
 
     <developers>

@@ -27,7 +27,9 @@
     <artifactId>dc3-center-manager</artifactId>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 Platform Device Management Service - Provides comprehensive management for all device collections, including device group registration, permission management, and device administration.</description>
+    <description>IoT DC3 Platform Device Management Service - Provides comprehensive management for all device collections, including device group registration, permission
+        management, and device administration.
+    </description>
 
     <dependencies>
 
