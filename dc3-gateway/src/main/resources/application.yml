@@ -16,6 +16,11 @@
 
 server:
   port: 8000
+  servlet:
+    context-path: /
+  undertow:
+    accesslog:
+      dir: dc3/logs/gateway/undertow
 
 spring:
   application:
