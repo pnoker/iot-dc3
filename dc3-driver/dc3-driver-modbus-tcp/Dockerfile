@@ -31,10 +31,10 @@ ENV JAVA_OPS="-server \
               -XX:+UseG1GC"
 ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/modbus-tcp/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
+WORKDIR /dc3-driver/dc3-driver-modbus-tcp
+
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-driver/dc3-driver-modbus-tcp/dc3/logs/driver/modbus-tcp/gc
-
-WORKDIR /dc3-driver/dc3-driver-modbus-tcp
 
 COPY target/dc3-driver-modbus-tcp.jar ./
 

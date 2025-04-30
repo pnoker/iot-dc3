@@ -33,10 +33,10 @@ ENV JAVA_OPS="-server \
               -XX:+UseG1GC"
 ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/manager/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
+WORKDIR /dc3-center/dc3-center-manager
+
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-center/dc3-center-manager/dc3/logs/center/manager/gc
-
-WORKDIR /dc3-center/dc3-center-manager
 
 COPY target/dc3-center-manager.jar ./
 

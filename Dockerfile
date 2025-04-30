@@ -20,9 +20,9 @@ LABEL dc3.author.email=pnokers.icloud.com
 
 ARG PROFILE=dev
 
-RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-
 WORKDIR /build
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 COPY ./ ./
 
