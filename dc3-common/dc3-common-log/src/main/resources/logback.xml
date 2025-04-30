@@ -22,13 +22,55 @@
               value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} [%clr(%4line){magenta}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"/>
     <property name="FILE_LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] [%4line] %-40.40logger{39} : %m%n%wEx"/>
-    <property name="LOGBACK_ROLLINGPOLICY_MAX_HISTORY" value="30"/>
     <property name="LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START" value="false"/>
     <property name="LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE" value="200MB"/>
     <property name="LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP" value="20GB"/>
+    <property name="LOGBACK_ROLLINGPOLICY_MAX_HISTORY" value="30"/>
 
     <!-- 引入 base.xml -->
-    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${FILE_LOG_THRESHOLD}</level>
+        </filter>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>${FILE_LOG_CHARSET}</charset>
+        </encoder>
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN:-${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz}</fileNamePattern>
+            <cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+            <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE:-10MB}</maxFileSize>
+            <totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP:-0}</totalSizeCap>
+            <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY:-7}</maxHistory>
+        </rollingPolicy>
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <fieldName>timestamp</fieldName>
+                    <timeZone>Asia/Shanghai</timeZone>
+                </timestamp>
+                <version>
+                    <fieldName>version</fieldName>
+                </version>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <logLevel/>
+                <logLevelValue/>
+                <mdc/>
+                <contextName/>
+            </providers>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
 
     <!-- 关闭状态日志 -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>

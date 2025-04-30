@@ -65,6 +65,10 @@
         <developerConnection>https://github.com/pnoker/iot-dc3.git</developerConnection>
     </scm>
 
+    <properties>
+        <logstash.logback.version>8.1</logstash.logback.version>
+    </properties>
+
     <dependencies>
 
         <!-- Spring Context -->
@@ -77,6 +81,13 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
+        </dependency>
+
+        <!-- Logstash Logback -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash.logback.version}</version>
         </dependency>
 
     </dependencies>
