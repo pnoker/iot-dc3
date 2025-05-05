@@ -44,7 +44,8 @@ services:
     container_name: dc3-logstash
     hostname: dc3-logstash
     volumes:
-      - logs:/usr/share/logstash/data
+      - logs:/usr/share/logstash/dc3/logs
+      - logstash:/usr/share/logstash/data
     logging:
       driver: json-file
       options:
@@ -77,6 +78,7 @@ services:
 volumes:
   logs:
   elasticsearch:
+  logstash:
 
 networks:
   dc3net:

@@ -15,25 +15,6 @@
 #
 
 services:
-  redis:
-    image: pnoker/dc3-redis:2025.2
-    restart: always
-    ports:
-      - '36379:6379'
-    container_name: dc3-redis
-    hostname: dc3-redis
-    volumes:
-      - redis:/data
-    logging:
-      driver: json-file
-      options:
-        max-size: '10M'
-        max-file: '20'
-    networks:
-      dc3net:
-        aliases:
-          - dc3-redis
-
   emqx:
     image: pnoker/dc3-emqx:2025.2
     restart: always
@@ -59,7 +40,6 @@ services:
           - dc3-emqx
 
 volumes:
-  redis:
   emqx_data:
   emqx_log:
 

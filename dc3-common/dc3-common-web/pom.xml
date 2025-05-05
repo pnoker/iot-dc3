@@ -101,6 +101,12 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
+        <!-- Micrometer Tracing Bridge -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+
         <!-- DC3 Common 相关 -->
         <dependency>
             <groupId>io.github.pnoker</groupId>

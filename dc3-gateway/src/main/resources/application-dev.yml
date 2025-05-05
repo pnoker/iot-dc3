@@ -16,6 +16,16 @@
 
 # Development environment configuration will overwrite the content configured in application-*.yml
 spring:
+  env: dev
+  group: ${user.name}
+  data:
+    redis:
+      host: ${REDIS_HOST:dc3-redis}
+      port: ${REDIS_PORT:36379}
+      password: ${REDIS_PASSWORD:dc3dc3dc3}
+  cache:
+    redis:
+      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:5S}
   cloud:
     gateway:
       routes:
