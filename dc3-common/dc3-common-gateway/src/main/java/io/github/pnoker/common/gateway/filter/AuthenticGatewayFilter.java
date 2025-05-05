@@ -16,21 +16,17 @@
 
 package io.github.pnoker.common.gateway.filter;
 
-import cn.hutool.core.text.CharSequenceUtil;
-import io.github.pnoker.api.center.auth.*;
+import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
+import io.github.pnoker.api.center.auth.GrpcRUserLoginDTO;
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.common.utils.RequestUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -41,25 +37,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
+/**
+ * 自定义 Request Header 校验过滤器逻辑类
+ *
+ * @author pnoker
+ * @version 2025.2.1
+ * @since 2022.1.0
+ */
 @Slf4j
 @Component
-public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
+public class AuthenticGatewayFilter implements GatewayFilter {
 
-    @GrpcClient(AuthConstant.SERVICE_NAME)
-    private UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub;
-    @GrpcClient(AuthConstant.SERVICE_NAME)
-    private UserApiGrpc.UserApiBlockingStub userApiBlockingStub;
-    @GrpcClient(AuthConstant.SERVICE_NAME)
-    private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
-    @GrpcClient(AuthConstant.SERVICE_NAME)
-    private TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
-
-    @Override
-    public int getOrder() {
-        return 0;
-    }
+    @Resource
+    private FilterService filterService;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -67,15 +57,15 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
 
         try {
             // Tenant, Login
-            GrpcRTenantDTO rTenantDTO = getTenantDTO(request);
-            GrpcRUserLoginDTO rUserLoginDTO = getLoginDTO(request);
+            GrpcRTenantDTO rTenantDTO = filterService.getTenantDTO(request);
+            GrpcRUserLoginDTO rUserLoginDTO = filterService.getLoginDTO(request);
 
             // Check Token Valid
-            checkValid(request, rTenantDTO, rUserLoginDTO);
+            filterService.checkValid(request, rTenantDTO, rUserLoginDTO);
 
             // Header
             ServerHttpRequest build = request.mutate().headers(headers -> {
-                RequestHeader.UserHeader entityBO = getUserDTO(rUserLoginDTO, rTenantDTO);
+                RequestHeader.UserHeader entityBO = filterService.getUserDTO(rUserLoginDTO, rTenantDTO);
                 headers.set(RequestConstant.Header.X_AUTH_USER, JsonUtil.toJsonString(entityBO));
             }).build();
 
@@ -87,60 +77,6 @@ public class AuthenticGatewayFilter implements GatewayFilter, Ordered {
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(e.getMessage())));
             return response.writeWith(Mono.just(dataBuffer));
-        }
-    }
-
-    private GrpcRTenantDTO getTenantDTO(ServerHttpRequest request) {
-        String tenant = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
-        if (CharSequenceUtil.isEmpty(tenant)) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-
-        GrpcRTenantDTO entityDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(tenant).build());
-        if (!entityDTO.getResult().getOk() || EnableFlagEnum.ENABLE.getIndex() != entityDTO.getData().getEnableFlag()) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-        return entityDTO;
-    }
-
-    private GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request) {
-        String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
-        if (CharSequenceUtil.isEmpty(user)) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-
-        GrpcRUserLoginDTO entityDTO = userLoginApiBlockingStub.selectByName(GrpcNameQuery.newBuilder().setName(user).build());
-        if (!entityDTO.getResult().getOk() || EnableFlagEnum.ENABLE.getIndex() != entityDTO.getData().getEnableFlag()) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-        return entityDTO;
-    }
-
-    private RequestHeader.UserHeader getUserDTO(GrpcRUserLoginDTO rUserLoginDTO, GrpcRTenantDTO rTenantDTO) {
-        GrpcRUserDTO entityDTO = userApiBlockingStub.selectById(GrpcIdQuery.newBuilder().setId(rUserLoginDTO.getData().getBase().getId()).build());
-        if (!entityDTO.getResult().getOk()) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-
-        RequestHeader.UserHeader entityBO = new RequestHeader.UserHeader();
-        entityBO.setUserId(entityDTO.getData().getBase().getId());
-        entityBO.setNickName(entityDTO.getData().getNickName());
-        entityBO.setUserName(entityDTO.getData().getUserName());
-        entityBO.setTenantId(rTenantDTO.getData().getBase().getId());
-        return entityBO;
-    }
-
-    private void checkValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO) {
-        String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
-        RequestHeader.TokenHeader entityBO = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
-        if (Objects.isNull(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-
-        GrpcLoginQuery login = GrpcLoginQuery.newBuilder().setTenant(rTenantDTO.getData().getTenantCode()).setName(rUserLoginDTO.getData().getLoginName()).setSalt(entityBO.getSalt()).setToken(entityBO.getToken()).build();
-        GrpcRTokenDTO entityDTO = tokenApiBlockingStub.checkValid(login);
-        if (!entityDTO.getResult().getOk()) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
     }
 }
