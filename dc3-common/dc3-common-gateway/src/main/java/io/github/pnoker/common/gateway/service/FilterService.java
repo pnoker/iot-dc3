@@ -16,10 +16,22 @@
 
 package io.github.pnoker.common.gateway.service;
 
+import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
+import io.github.pnoker.api.center.auth.GrpcRUserLoginDTO;
+import io.github.pnoker.common.entity.common.RequestHeader;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+
 /**
  * @author pnoker
  * @version 2025.2.5
  * @since 2022.1.0
  */
 public interface FilterService {
+    GrpcRTenantDTO getTenantDTO(ServerHttpRequest request);
+
+    GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request);
+
+    RequestHeader.UserHeader getUserDTO(GrpcRUserLoginDTO rUserLoginDTO, GrpcRTenantDTO rTenantDTO);
+
+    void checkValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO);
 }

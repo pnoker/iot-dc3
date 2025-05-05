@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.gateway.filter.factory;
+package io.github.pnoker.common.gateway.filter;
 
-import io.github.pnoker.common.gateway.filter.AuthenticGatewayFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -24,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * 自定义 Request Header 校验过滤器工厂
+ * 自定义 Request Header 校验过滤器工厂类
  *
  * @author pnoker
  * @version 2025.2.5
