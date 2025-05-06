@@ -22,6 +22,7 @@ services:
       - "8000:8000"
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -44,6 +45,7 @@ services:
       - "9300:9300"
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
@@ -66,6 +68,7 @@ services:
       - "9400:9400"
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
@@ -88,6 +91,7 @@ services:
       - "9500:9500"
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
@@ -110,6 +114,7 @@ services:
       - "6271:6271"
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
     volumes:
@@ -129,6 +134,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
@@ -148,6 +154,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
@@ -167,6 +174,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
     volumes:
@@ -186,6 +194,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
     volumes:
@@ -205,6 +214,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-driver-plcs7
     hostname: dc3-driver-plcs7
     volumes:
@@ -224,6 +234,7 @@ services:
     restart: always
     environment:
       - NODE_ENV=test
+      - APM_AGENT_ENABLE=false
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
     volumes:

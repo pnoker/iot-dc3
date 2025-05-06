@@ -22,6 +22,10 @@ LABEL dc3.author.email=pnokers.icloud.com
 # default env
 ENV PARAMS=''
 ENV NODE_ENV=test
+ENV SERVER_NAME=dc3-driver-listening-virtual
+ENV SERVER_PACKAGES=io.github.pnoker
+ENV APM_AGENT_ENABLE=false
+ENV APM_SERVICE=http://dc3-apm:8200
 ENV TCP_PORT 6270
 ENV UDP_PORT 6271
 
