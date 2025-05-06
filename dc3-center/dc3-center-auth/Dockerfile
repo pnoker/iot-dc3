@@ -39,8 +39,12 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 COPY target/dc3-center-auth.jar ./
 
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+
 EXPOSE ${SERVER_PORT}
 EXPOSE ${GRPC_PORT}
 VOLUME /dc3-center/dc3-center-auth/dc3/logs
 
-CMD java ${JAVA_OPS} -jar dc3-center-auth.jar ${PARAMS}
+ENTRYPOINT ["entrypoint.sh"]
+
+CMD ["dc3-center-auth.jar", "${PARAMS}"]

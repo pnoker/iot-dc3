@@ -38,7 +38,11 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 COPY target/dc3-gateway.jar ./
 
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+
 EXPOSE ${SERVER_PORT}
 VOLUME /dc3-gateway/dc3/logs
 
-CMD java ${JAVA_OPS} -jar dc3-gateway.jar ${PARAMS}
+ENTRYPOINT ["entrypoint.sh"]
+
+CMD ["dc3-gateway.jar", "${PARAMS}"]
