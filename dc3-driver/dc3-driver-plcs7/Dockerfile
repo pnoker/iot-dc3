@@ -21,7 +21,7 @@ LABEL dc3.author.email=pnokers.icloud.com
 
 # default env
 ENV PARAMS=''
-ENV NODE_ENV=dev
+ENV NODE_ENV=test
 
 # default jvm & gc env
 ENV JAVA_OPS="-server \
