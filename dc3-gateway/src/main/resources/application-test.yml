@@ -29,35 +29,28 @@ spring:
       routes:
         # token
         - id: auth_route_token
-          uri: http://dc3-center-auth:8300/
+          uri: http://${CENTER_AUTH_HOST:dc3-center-auth}:8300/
           predicates:
             - Path=/api/v3/auth/token/**
         # auth
         - id: auth_route
-          uri: http://dc3-center-auth:8300
+          uri: http://${CENTER_AUTH_HOST:dc3-center-auth}:8300
           predicates:
             - Path=/api/v3/auth/user/**,/api/v3/auth/limited_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
           filters:
             - Authentic
         # manager
         - id: manager_route
-          uri: http://dc3-center-manager:8400
+          uri: http://${CENTER_MANAGER_HOST:dc3-center-manager}:8400
           predicates:
             - Path=/api/v3/manager/**
           filters:
             - Authentic
         # data
         - id: data_route
-          uri: http://dc3-center-data:8500
+          uri: http://${CENTER_DATA_HOST:dc3-center-data}:8500
           predicates:
             - Path=/api/v3/data/**
-          filters:
-            - Authentic
-        # ekuiper
-        - id: ekuiper_route
-          uri: http://dc3-center-ekuiper:8600
-          predicates:
-            - Path=/api/v3/ekuiper/**
           filters:
             - Authentic
 
