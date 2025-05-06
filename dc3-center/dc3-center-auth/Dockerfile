@@ -45,6 +45,6 @@ EXPOSE ${SERVER_PORT}
 EXPOSE ${GRPC_PORT}
 VOLUME /dc3-center/dc3-center-auth/dc3/logs
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
 
 CMD ["dc3-center-auth.jar", "${PARAMS}"]

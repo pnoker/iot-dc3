@@ -41,6 +41,6 @@ RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 
 VOLUME /dc3-driver/dc3-driver-modbus-tcp/dc3/logs
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
 
 CMD ["dc3-driver-modbus-tcp.jar", "${PARAMS}"]

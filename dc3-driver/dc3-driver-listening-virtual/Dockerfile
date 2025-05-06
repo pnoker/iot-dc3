@@ -45,6 +45,6 @@ EXPOSE ${TCP_PORT}
 EXPOSE ${UDP_PORT}
 VOLUME /dc3-driver/dc3-driver-listening-virtual/dc3/logs
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
 
 CMD ["dc3-driver-listening-virtual.jar", "${PARAMS}"]
