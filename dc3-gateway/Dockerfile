@@ -43,6 +43,6 @@ RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 EXPOSE ${SERVER_PORT}
 VOLUME /dc3-gateway/dc3/logs
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
 
 CMD ["dc3-gateway.jar", "${PARAMS}"]
