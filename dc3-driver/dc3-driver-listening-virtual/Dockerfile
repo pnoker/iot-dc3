@@ -39,8 +39,12 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 COPY target/dc3-driver-listening-virtual.jar ./
 
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+
 EXPOSE ${TCP_PORT}
 EXPOSE ${UDP_PORT}
 VOLUME /dc3-driver/dc3-driver-listening-virtual/dc3/logs
 
-CMD java ${JAVA_OPS} -jar dc3-driver-listening-virtual.jar ${PARAMS}
+ENTRYPOINT ["entrypoint.sh"]
+
+CMD ["dc3-driver-listening-virtual.jar", "${PARAMS}"]

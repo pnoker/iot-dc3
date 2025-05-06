@@ -37,6 +37,10 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 COPY target/dc3-driver-mqtt.jar ./
 
+RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
+
 VOLUME /dc3-driver/dc3-driver-mqtt/dc3/logs
 
-CMD java ${JAVA_OPS} -jar dc3-driver-mqtt.jar ${PARAMS}
+ENTRYPOINT ["entrypoint.sh"]
+
+CMD ["dc3-driver-mqtt.jar", "${PARAMS}"]
