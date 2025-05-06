@@ -27,7 +27,7 @@ ENV SERVER_PORT=8000
 # default jvm & gc env
 ENV JAVA_OPS="-server \
               -Xms256m \
-              -Xmx1024m \
+              -Xmx512m \
               -Djava.security.egd=file:/dev/./urandom \
               -XX:+UseG1GC"
 
