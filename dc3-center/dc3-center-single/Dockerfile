@@ -23,6 +23,10 @@ LABEL dc3.author.email=pnokers.icloud.com
 ENV PARAMS=''
 ENV NODE_ENV=test
 ENV SERVER_PORT=8100
+ENV SERVER_NAME=dc3-center-single
+ENV SERVER_PACKAGES=io.github.pnoker
+ENV APM_AGENT_ENABLE=false
+ENV APM_SERVICE=http://dc3-apm:8200
 ENV GRPC_PORT=9100
 
 # default jvm & gc env

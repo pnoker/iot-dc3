@@ -75,6 +75,25 @@ services:
         aliases:
           - dc3-kibana
 
+  apm:
+    image: pnoker/dc3-apm:2025.2
+    restart: always
+    depends_on:
+      - elasticsearch
+    ports:
+      - "8200:8200"
+    container_name: dc3-apm
+    hostname: dc3-apm
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "20"
+    networks:
+      dc3net:
+        aliases:
+          - dc3-apm
+
 volumes:
   logs:
   elasticsearch:

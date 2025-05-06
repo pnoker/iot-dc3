@@ -22,6 +22,10 @@ LABEL dc3.author.email=pnokers.icloud.com
 # default env
 ENV PARAMS=''
 ENV NODE_ENV=test
+ENV SERVER_NAME=dc3-driver-plcs7
+ENV SERVER_PACKAGES=io.github.pnoker
+ENV APM_AGENT_ENABLE=false
+ENV APM_SERVICE=http://dc3-apm:8200
 
 # default jvm & gc env
 ENV JAVA_OPS="-server \
