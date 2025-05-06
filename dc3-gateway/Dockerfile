@@ -45,4 +45,4 @@ VOLUME /dc3-gateway/dc3/logs
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-CMD ["dc3-gateway.jar", "${PARAMS}"]
+CMD ["dc3-gateway.jar"]

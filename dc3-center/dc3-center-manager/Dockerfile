@@ -47,4 +47,4 @@ VOLUME /dc3-center/dc3-center-manager/dc3/logs
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-CMD ["dc3-center-manager.jar", "${PARAMS}"]
+CMD ["dc3-center-manager.jar"]

@@ -43,4 +43,4 @@ VOLUME /dc3-driver/dc3-driver-modbus-tcp/dc3/logs
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-CMD ["dc3-driver-modbus-tcp.jar", "${PARAMS}"]
+CMD ["dc3-driver-modbus-tcp.jar"]
