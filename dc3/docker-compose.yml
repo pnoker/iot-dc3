@@ -21,7 +21,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:
@@ -43,7 +43,7 @@ services:
       - "8300:8300"
       - "9300:9300"
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-center-auth
     hostname: dc3-center-auth
     volumes:
@@ -65,7 +65,7 @@ services:
       - "8400:8400"
       - "9400:9400"
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-center-manager
     hostname: dc3-center-manager
     volumes:
@@ -87,7 +87,7 @@ services:
       - "8500:8500"
       - "9500:9500"
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-center-data
     hostname: dc3-center-data
     volumes:
@@ -109,7 +109,7 @@ services:
       - "6270:6270"
       - "6271:6271"
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
     volumes:
@@ -128,7 +128,7 @@ services:
     image: pnoker/dc3-driver-modbus-tcp:2025.2.5
     restart: always
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
@@ -147,7 +147,7 @@ services:
     image: pnoker/dc3-driver-mqtt:2025.2.5
     restart: always
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
@@ -166,7 +166,7 @@ services:
     image: pnoker/dc3-driver-opc-da:2025.2.5
     restart: always
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
     volumes:
@@ -185,7 +185,7 @@ services:
     image: pnoker/dc3-driver-opc-ua:2025.2.5
     restart: always
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
     volumes:
@@ -204,7 +204,7 @@ services:
     image: pnoker/dc3-driver-plcs7:2025.2.5
     restart: always
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-plcs7
     hostname: dc3-driver-plcs7
     volumes:
@@ -223,7 +223,7 @@ services:
     image: pnoker/dc3-driver-virtual:2025.2.5
     restart: always
     environment:
-      - NODE_ENV=dev
+      - NODE_ENV=test
     container_name: dc3-driver-virtual
     hostname: dc3-driver-virtual
     volumes:

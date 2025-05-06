@@ -21,7 +21,7 @@ LABEL dc3.author.email=pnokers.icloud.com
 
 # default env
 ENV PARAMS=''
-ENV NODE_ENV=dev
+ENV NODE_ENV=test
 ENV TCP_PORT 6270
 ENV UDP_PORT 6271
 

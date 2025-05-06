@@ -21,7 +21,7 @@ LABEL dc3.author.email=pnokers.icloud.com
 
 # default env
 ENV PARAMS=''
-ENV NODE_ENV=dev
+ENV NODE_ENV=test
 ENV SERVER_PORT=8400
 ENV GRPC_PORT=9400
 
