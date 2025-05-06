@@ -47,4 +47,4 @@ VOLUME /dc3-center/dc3-center-auth/dc3/logs
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-CMD ["dc3-center-auth.jar", "${PARAMS}"]
+CMD ["dc3-center-auth.jar"]

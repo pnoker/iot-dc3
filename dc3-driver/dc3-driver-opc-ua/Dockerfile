@@ -43,4 +43,4 @@ VOLUME /dc3-driver/dc3-driver-opc-ua/dc3/logs
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-CMD ["dc3-driver-opc-ua.jar", "${PARAMS}"]
+CMD ["dc3-driver-opc-ua.jar"]

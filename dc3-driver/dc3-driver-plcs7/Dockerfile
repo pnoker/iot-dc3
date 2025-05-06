@@ -43,4 +43,4 @@ VOLUME /dc3-driver/dc3-driver-plcs7/dc3/logs
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-CMD ["dc3-driver-plcs7.jar", "${PARAMS}"]
+CMD ["dc3-driver-plcs7.jar"]

@@ -47,4 +47,4 @@ VOLUME /dc3-center/dc3-center-single/dc3/logs
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-CMD ["dc3-center-single.jar", "${PARAMS}"]
+CMD ["dc3-center-single.jar"]
