@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 编码生成工具类，提供唯一编码生成功能
+ * 编码生成工具类, 提供唯一编码生成功能
  *
  * @author pnoker
  * @version 2025.2.5

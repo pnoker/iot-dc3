@@ -31,3 +31,4 @@ import io.github.pnoker.common.dal.entity.model.LabelDO;
 public interface LabelMapper extends BaseMapper<LabelDO> {
 
 }
+

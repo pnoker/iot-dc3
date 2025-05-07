@@ -31,3 +31,4 @@ import io.github.pnoker.common.auth.entity.model.LimitedIpDO;
 public interface LimitedIpMapper extends BaseMapper<LimitedIpDO> {
 
 }
+

@@ -31,3 +31,4 @@ import io.github.pnoker.common.auth.entity.model.UserDO;
 public interface UserMapper extends BaseMapper<UserDO> {
 
 }
+

@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * 监听虚拟驱动应用启动类
  *
- * <p>该类是Spring Boot应用的入口类，用于启动监听虚拟驱动应用。</p>
+ * <p>该类是Spring Boot应用的入口类, 用于启动监听虚拟驱动应用。</p>
  *
  * @author pnoker
  * @version 2025.2.5
@@ -32,7 +32,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ListeningVirtualDriverApplication {
 
     /**
-     * 主方法，启动Spring Boot应用
+     * 主方法, 启动Spring Boot应用
      *
      * @param args 命令行参数
      */

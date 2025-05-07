@@ -31,3 +31,4 @@ import io.github.pnoker.common.auth.entity.model.RoleResourceBindDO;
 public interface RoleResourceBindMapper extends BaseMapper<RoleResourceBindDO> {
 
 }
+

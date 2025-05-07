@@ -21,22 +21,22 @@ import io.github.pnoker.common.constant.common.TimeConstant;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 /**
- * 时间(不时区, 默认上海时区) 相关工具类
+ * 时间(带时区, 默认上海时区) 相关工具类
  *
  * @author pnoker
  * @version 2025.2.5
  * @since 2022.1.0
  */
 @Slf4j
-public class LocalDateTimeUtil {
+public class ZoneDateTimeUtil {
 
-    private LocalDateTimeUtil() {
+    private ZoneDateTimeUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
@@ -65,22 +65,22 @@ public class LocalDateTimeUtil {
     /**
      * 获取毫秒
      *
-     * @param localDateTime {@link LocalDateTime}
+     * @param zonedDateTime {@link ZonedDateTime}
      * @return 毫秒
      */
-    public static long milliSeconds(LocalDateTime localDateTime) {
-        return localDateTime.atZone(TimeConstant.DEFAULT_ZONEID).toInstant().toEpochMilli();
+    public static long milliSeconds(ZonedDateTime zonedDateTime) {
+        return zonedDateTime.toInstant().toEpochMilli();
     }
 
     /**
      * 获取 DateTime
      *
      * @param milliSeconds 毫秒
-     * @return LocalDateTime {@link LocalDateTime}
+     * @return ZonedDateTime {@link ZonedDateTime}
      */
-    public static LocalDateTime dateTime(long milliSeconds) {
+    public static ZonedDateTime dateTime(long milliSeconds) {
         Instant instant = Instant.ofEpochMilli(milliSeconds);
-        return LocalDateTime.ofInstant(instant, TimeConstant.DEFAULT_ZONEID);
+        return ZonedDateTime.ofInstant(instant, TimeConstant.DEFAULT_ZONEID);
     }
 
     /**
@@ -90,31 +90,31 @@ public class LocalDateTimeUtil {
      * @param field  ChronoUnit field : {@link ChronoUnit ChronoUnit.HOUR/MINUTE/...}
      * @return Date
      */
-    public static LocalDateTime expireTime(int amount, ChronoUnit field) {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        return localDateTime.plus(amount, field);
+    public static ZonedDateTime expireTime(int amount, ChronoUnit field) {
+        ZonedDateTime zonedDateTime = ZonedDateTime.now(TimeConstant.DEFAULT_ZONEID);
+        return zonedDateTime.plus(amount, field);
     }
 
     /**
      * 使用 yyyy-MM-dd HH:mm:ss 格式化时间
      *
-     * @param localDateTime {@link LocalDateTime}
+     * @param zonedDateTime {@link ZonedDateTime}
      * @return R of String
      */
-    public static String defaultFormat(LocalDateTime localDateTime) {
+    public static String defaultFormat(ZonedDateTime zonedDateTime) {
         DateTimeFormatter formatter = getDefaultDateTimeFormatter();
-        return localDateTime.format(formatter);
+        return zonedDateTime.format(formatter);
     }
 
     /**
      * 使用 yyyy-MM-dd HH:mm:ss.SSS 格式化时间
      *
-     * @param localDateTime {@link LocalDateTime}
+     * @param zonedDateTime {@link ZonedDateTime}
      * @return R of String
      */
-    public static String completeFormat(LocalDateTime localDateTime) {
+    public static String completeFormat(ZonedDateTime zonedDateTime) {
         DateTimeFormatter formatter = getCompleteDateTimeFormatter();
-        return localDateTime.format(formatter);
+        return zonedDateTime.format(formatter);
     }
 
     /**
@@ -123,10 +123,10 @@ public class LocalDateTimeUtil {
      * @param dateString yyyy-MM-dd HH:mm:ss
      * @return Date
      */
-    public static LocalDateTime defaultDate(String dateString) {
+    public static ZonedDateTime defaultDate(String dateString) {
         try {
             DateTimeFormatter formatter = getDefaultDateTimeFormatter();
-            return LocalDateTime.parse(dateString, formatter);
+            return ZonedDateTime.parse(dateString, formatter);
         } catch (DateTimeParseException e) {
             return null;
         }
@@ -138,10 +138,10 @@ public class LocalDateTimeUtil {
      * @param dateString Date String
      * @return Date
      */
-    public static LocalDateTime completeDate(String dateString) {
+    public static ZonedDateTime completeDate(String dateString) {
         try {
             DateTimeFormatter formatter = getCompleteDateTimeFormatter();
-            return LocalDateTime.parse(dateString, formatter);
+            return ZonedDateTime.parse(dateString, formatter);
         } catch (DateTimeParseException e) {
             return null;
         }

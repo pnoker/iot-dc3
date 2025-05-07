@@ -105,10 +105,10 @@ public class GrpcBuilderUtil {
         StringOptional.ofNullable(entityGrpc.getRemark()).ifPresent(entityBO::setRemark);
         LongOptional.ofNullable(entityGrpc.getCreatorId()).ifPresent(entityBO::setCreatorId);
         StringOptional.ofNullable(entityGrpc.getCreatorName()).ifPresent(entityBO::setCreatorName);
-        LongOptional.ofNullable(entityGrpc.getCreateTime()).ifPresent(value -> entityBO.setCreateTime(LocalDateTimeUtil.localDateTime(value)));
+        LongOptional.ofNullable(entityGrpc.getCreateTime()).ifPresent(value -> entityBO.setCreateTime(LocalDateTimeUtil.dateTime(value)));
         LongOptional.ofNullable(entityGrpc.getOperatorId()).ifPresent(entityBO::setOperatorId);
         StringOptional.ofNullable(entityGrpc.getOperatorName()).ifPresent(entityBO::setOperatorName);
-        LongOptional.ofNullable(entityGrpc.getOperateTime()).ifPresent(value -> entityBO.setOperateTime(LocalDateTimeUtil.localDateTime(value)));
+        LongOptional.ofNullable(entityGrpc.getOperateTime()).ifPresent(value -> entityBO.setOperateTime(LocalDateTimeUtil.dateTime(value)));
     }
 
     /**
@@ -151,10 +151,10 @@ public class GrpcBuilderUtil {
         StringOptional.ofNullable(entityGrpc.getRemark()).ifPresent(entityDTO::setRemark);
         LongOptional.ofNullable(entityGrpc.getCreatorId()).ifPresent(entityDTO::setCreatorId);
         StringOptional.ofNullable(entityGrpc.getCreatorName()).ifPresent(entityDTO::setCreatorName);
-        LongOptional.ofNullable(entityGrpc.getCreateTime()).ifPresent(value -> entityDTO.setCreateTime(LocalDateTimeUtil.localDateTime(value)));
+        LongOptional.ofNullable(entityGrpc.getCreateTime()).ifPresent(value -> entityDTO.setCreateTime(LocalDateTimeUtil.dateTime(value)));
         LongOptional.ofNullable(entityGrpc.getOperatorId()).ifPresent(entityDTO::setOperatorId);
         StringOptional.ofNullable(entityGrpc.getOperatorName()).ifPresent(entityDTO::setOperatorName);
-        LongOptional.ofNullable(entityGrpc.getOperateTime()).ifPresent(value -> entityDTO.setOperateTime(LocalDateTimeUtil.localDateTime(value)));
+        LongOptional.ofNullable(entityGrpc.getOperateTime()).ifPresent(value -> entityDTO.setOperateTime(LocalDateTimeUtil.dateTime(value)));
     }
 
 }

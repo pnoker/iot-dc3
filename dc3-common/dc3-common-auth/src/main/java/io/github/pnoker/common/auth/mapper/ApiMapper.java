@@ -31,3 +31,4 @@ import io.github.pnoker.common.auth.entity.model.ApiDO;
 public interface ApiMapper extends BaseMapper<ApiDO> {
 
 }
+

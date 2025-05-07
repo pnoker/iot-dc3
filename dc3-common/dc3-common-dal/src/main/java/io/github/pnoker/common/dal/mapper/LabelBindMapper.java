@@ -31,3 +31,4 @@ import io.github.pnoker.common.dal.entity.model.LabelBindDO;
 public interface LabelBindMapper extends BaseMapper<LabelBindDO> {
 
 }
+

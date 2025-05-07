@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -37,6 +38,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@ToString
 @TableName("dc3_point_attribute_config")
 public class PointAttributeConfigDO implements Serializable {
 
@@ -148,7 +150,7 @@ public class PointAttributeConfigDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableField("deleted")
     @TableLogic
+    @TableField("deleted")
     private Byte deleted;
 }

@@ -31,3 +31,4 @@ import io.github.pnoker.common.auth.entity.model.MenuDO;
 public interface MenuMapper extends BaseMapper<MenuDO> {
 
 }
+
