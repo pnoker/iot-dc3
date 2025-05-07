@@ -22,7 +22,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * <p>
@@ -96,7 +96,7 @@ public class DriverRunDO implements Serializable {
      * 创建时间
      */
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private ZonedDateTime createTime;
 
     /**
      * 操作者ID
@@ -114,7 +114,7 @@ public class DriverRunDO implements Serializable {
      * 操作时间
      */
     @TableField("operate_time")
-    private LocalDateTime operateTime;
+    private ZonedDateTime operateTime;
 
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
