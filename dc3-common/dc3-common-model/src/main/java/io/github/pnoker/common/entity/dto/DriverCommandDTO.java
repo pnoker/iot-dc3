@@ -21,7 +21,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * 驱动指令
@@ -54,5 +54,5 @@ public class DriverCommandDTO implements Serializable {
     /**
      * 创建时间
      */
-    private LocalDateTime createTime;
+    private ZonedDateTime createTime;
 }

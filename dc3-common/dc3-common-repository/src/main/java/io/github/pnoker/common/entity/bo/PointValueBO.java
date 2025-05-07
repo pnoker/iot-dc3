@@ -20,7 +20,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * 位号值
@@ -68,15 +68,15 @@ public class PointValueBO implements Serializable {
     /**
      * 原始时间
      */
-    private LocalDateTime originTime;
+    private ZonedDateTime originTime;
 
     /**
      * 创建时间
      */
-    private LocalDateTime createTime;
+    private ZonedDateTime createTime;
 
     /**
      * 操作时间
      */
-    private LocalDateTime operateTime;
+    private ZonedDateTime operateTime;
 }
