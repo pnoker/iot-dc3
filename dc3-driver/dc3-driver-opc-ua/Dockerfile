@@ -33,11 +33,12 @@ ENV JAVA_OPS="-server \
               -Xmx512m \
               -XX:+UseG1GC \
               -Djava.security.egd=file:/dev/./urandom"
+ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/opc-ua/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
 WORKDIR /dc3-driver/dc3-driver-opc-ua
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && mkdir -p /dc3-driver/dc3-driver-opc-ua/dc3/logs/driver/opcua/gc
+    && mkdir -p /dc3-driver/dc3-driver-opc-ua/dc3/logs/driver/opc-ua/gc
 
 COPY target/dc3-driver-opc-ua.jar ./
 

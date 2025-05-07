@@ -65,4 +65,4 @@ spring:
 
 logging:
   file:
-    name: dc3/logs/driver/opcua/${spring.application.name}.log
+    name: dc3/logs/driver/opc-ua/${spring.application.name}.log
