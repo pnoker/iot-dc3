@@ -26,7 +26,7 @@ ENV SERVER_PORT=8300
 ENV SERVER_NAME=dc3-center-auth
 ENV SERVER_PACKAGES=io.github.pnoker
 ENV APM_AGENT_ENABLE=false
-ENV APM_SERVICE=http://dc3-apm:8200
+ENV APM_SERVICE=http://dc3-apm:9300
 ENV GRPC_PORT=9300
 
 # default jvm & gc env
