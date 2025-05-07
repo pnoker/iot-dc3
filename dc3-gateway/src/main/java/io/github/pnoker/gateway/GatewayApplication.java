@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * 网关中心服务启动入口
  * <p>
- * 该类是网关中心服务的启动类，负责初始化并启动Spring Boot应用。
+ * 该类是网关中心服务的启动类, 负责初始化并启动Spring Boot应用。
  *
  * @author pnoker
  * @version 2025.2.5
@@ -32,7 +32,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class GatewayApplication {
 
     /**
-     * 主方法，启动Spring Boot应用
+     * 主方法, 启动Spring Boot应用
      *
      * @param args 命令行参数
      */

@@ -39,7 +39,7 @@ public class MybatisGenerator {
 
     public static void generator() {
         String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-dal/src/main";
-        MybatisUtil.defaultGenerator("localhost", "35432", "dc3", "dc3_auth", "dc3", "dc3dc3dc3")
+        MybatisUtil.defaultGenerator("dc3-postgres", "35432", "dc3", "dc3_auth", "dc3", "dc3dc3dc3")
                 .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
                 .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
                 .packageConfig(builder -> builder

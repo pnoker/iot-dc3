@@ -75,8 +75,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 驱动初始化逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
-         * 驱动启动时会自动执行该方法，您可以在此处执行特定的初始化操作。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * 驱动启动时会自动执行该方法, 您可以在此处执行特定的初始化操作。
          *
          */
         connectMap = new ConcurrentHashMap<>(16);
@@ -87,8 +87,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 设备状态上传逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
-         * 设备状态的上传可以根据具体需求灵活实现，以下是一些常见的实现方式：
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * 设备状态的上传可以根据具体需求灵活实现, 以下是一些常见的实现方式：
          * - 在 `read` 方法中根据读取的数据判断设备状态；
          * - 在自定义的定时任务中定期检查设备状态；
          * - 根据特定的业务逻辑或事件触发设备状态的判断。
@@ -100,7 +100,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          * - MAINTAIN: 设备维护中
          * - FAULT: 设备故障
          *
-         * 在以下示例中，所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}，并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
+         * 在以下示例中, 所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}, 并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
          */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
@@ -108,12 +108,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动、设备、位号元数据的新增、更新、删除事件。
+         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
          *
          * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
          * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -136,7 +136,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 读取 OPC UA 点位值
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          * 1. 通过设备ID和驱动配置获取 OPC UA 客户端连接。
          * 2. 使用点位配置读取 OPC UA 节点的值。
          * 3. 将读取到的值封装为 RValue 对象返回。
@@ -150,7 +150,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 写入 OPC UA 点位值
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          * 1. 通过设备ID和驱动配置获取 OPC UA 客户端连接。
          * 2. 使用点位配置和写入值将数据写入 OPC UA 节点。
          * 3. 返回写入操作是否成功。
@@ -162,10 +162,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * 获取 OPC UA 客户端连接
      *
-     * @param deviceId     设备ID，用于标识唯一的设备连接
-     * @param driverConfig 驱动配置信息，包含连接 OPC UA 服务器所需的参数
+     * @param deviceId     设备ID, 用于标识唯一的设备连接
+     * @param driverConfig 驱动配置信息, 包含连接 OPC UA 服务器所需的参数
      * @return OpcUaClient 返回与指定设备关联的 OPC UA 客户端实例
-     * @throws ConnectorException 如果连接 OPC UA 服务器失败，抛出此异常
+     * @throws ConnectorException 如果连接 OPC UA 服务器失败, 抛出此异常
      */
     private OpcUaClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("OPC UA server connection info: {}", JsonUtil.toJsonString(driverConfig));
@@ -197,7 +197,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * 根据点位配置获取 OPC UA 节点
      *
-     * @param pointConfig 点位配置信息，包含命名空间和标签
+     * @param pointConfig 点位配置信息, 包含命名空间和标签
      * @return OPC UA 节点标识
      */
     private NodeId getNode(Map<String, AttributeBO> pointConfig) {
@@ -212,7 +212,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param client      OPC UA 客户端实例
      * @param pointConfig 点位配置信息
      * @return 读取到的节点值
-     * @throws ReadPointException 如果读取操作失败，抛出此异常
+     * @throws ReadPointException 如果读取操作失败, 抛出此异常
      */
     private String readValue(OpcUaClient client, Map<String, AttributeBO> pointConfig) {
         try {
@@ -238,7 +238,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * @param pointConfig 点位配置信息
      * @param wValue      写入值
      * @return 写入操作是否成功
-     * @throws WritePointException 如果写入操作失败，抛出此异常
+     * @throws WritePointException 如果写入操作失败, 抛出此异常
      */
     private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WValue wValue) {
         try {

@@ -21,10 +21,10 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@ToString
 @TableName("dc3_point")
 public class PointDO implements Serializable {
 
@@ -78,13 +79,13 @@ public class PointDO implements Serializable {
      * 基础值
      */
     @TableField("base_value")
-    private BigDecimal baseValue;
+    private Double baseValue;
 
     /**
      * 比例系数
      */
     @TableField("multiple")
-    private BigDecimal multiple;
+    private Double multiple;
 
     /**
      * 数据精度
@@ -179,7 +180,7 @@ public class PointDO implements Serializable {
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除
      */
-    @TableField("deleted")
     @TableLogic
+    @TableField("deleted")
     private Byte deleted;
 }

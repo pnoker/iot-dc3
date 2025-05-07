@@ -37,3 +37,4 @@ public interface PointMapper extends BaseMapper<PointDO> {
     Page<PointDO> selectPageWithDevice(Page<PointDO> page, @Param(Constants.WRAPPER) Wrapper<PointDO> wrapper, @Param("deviceId") Long deviceId);
 
 }
+

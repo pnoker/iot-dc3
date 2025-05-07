@@ -31,3 +31,4 @@ import io.github.pnoker.common.data.entity.model.NotifyDO;
 public interface NotifyMapper extends BaseMapper<NotifyDO> {
 
 }
+

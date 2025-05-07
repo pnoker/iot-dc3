@@ -61,8 +61,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 驱动初始化逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
-         * 驱动启动时会自动执行该方法，您可以在此处执行特定的初始化操作。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * 驱动启动时会自动执行该方法, 您可以在此处执行特定的初始化操作。
          *
          */
     }
@@ -72,8 +72,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 设备状态上传逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
-         * 设备状态的上传可以根据具体需求灵活实现，以下是一些常见的实现方式：
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * 设备状态的上传可以根据具体需求灵活实现, 以下是一些常见的实现方式：
          * - 在 `read` 方法中根据读取的数据判断设备状态；
          * - 在自定义的定时任务中定期检查设备状态；
          * - 根据特定的业务逻辑或事件触发设备状态的判断。
@@ -85,7 +85,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          * - MAINTAIN: 设备维护中
          * - FAULT: 设备故障
          *
-         * 在以下示例中，所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}，并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
+         * 在以下示例中, 所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}, 并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
          */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
@@ -93,12 +93,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动、设备、位号元数据的新增、更新、删除事件。
+         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
          *
          * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
          * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -116,7 +116,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          *
-         * 由于 MQTT 的数据来源是被动接收的，因此无需在此实现 `read` 方法。
+         * 由于 MQTT 的数据来源是被动接收的, 因此无需在此实现 `read` 方法。
          * 接收数据的处理逻辑已在 {@link io.github.pnoker.common.mqtt.handler.MqttReceiveHandler#handlerValue} 中实现。
          */
         return null;
@@ -125,10 +125,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue values) {
         /*
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          *
          * 该方法是用于将数据写入到 MQTT 主题中。首先从 `pointConfig` 中获取命令主题 `commandTopic` 和要发送的值 `value`。
-         * 如果配置中指定了 QoS 等级 `commandQos`，则尝试使用指定的 QoS 发送消息；如果未指定或发生异常，则使用默认的 QoS 发送消息。
+         * 如果配置中指定了 QoS 等级 `commandQos`, 则尝试使用指定的 QoS 发送消息；如果未指定或发生异常, 则使用默认的 QoS 发送消息。
          * 最终返回 `true` 表示写入操作成功。
          */
         String commandTopic = pointConfig.get("commandTopic").getValue(String.class);

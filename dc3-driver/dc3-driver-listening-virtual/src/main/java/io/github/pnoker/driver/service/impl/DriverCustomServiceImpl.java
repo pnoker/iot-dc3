@@ -74,10 +74,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 驱动初始化逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
-         * 驱动启动时会自动执行该方法，您可以在此处执行特定的初始化操作。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * 驱动启动时会自动执行该方法, 您可以在此处执行特定的初始化操作。
          *
-         * 例如: 启动 TCP 和 UDP 监听服务，分别监听指定的端口，用于接收外部数据。
+         * 例如: 启动 TCP 和 UDP 监听服务, 分别监听指定的端口, 用于接收外部数据。
          */
         threadPoolExecutor.execute(() -> {
             log.debug("Virtual Listening Driver Starting(TCP::{}) incoming data listener", tcpPort);
@@ -94,8 +94,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 设备状态上传逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
-         * 设备状态的上传可以根据具体需求灵活实现，以下是一些常见的实现方式：
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * 设备状态的上传可以根据具体需求灵活实现, 以下是一些常见的实现方式：
          * - 在 `read` 方法中根据读取的数据判断设备状态；
          * - 在自定义的定时任务中定期检查设备状态；
          * - 根据特定的业务逻辑或事件触发设备状态的判断。
@@ -107,7 +107,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          * - MAINTAIN: 设备维护中
          * - FAULT: 设备故障
          *
-         * 在以下示例中，所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}，并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
+         * 在以下示例中, 所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}, 并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
          */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
@@ -115,12 +115,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动、设备、位号元数据的新增、更新、删除事件。
+         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
          *
          * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
          * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -136,9 +136,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
-         * 重要提示: 以下逻辑仅供参考，请根据实际应用场景进行调整。
+         * 重要提示: 以下逻辑仅供参考, 请根据实际应用场景进行调整。
          *
-         * 由于 Listening Virtual 的数据来源是被动接收的，因此无需在此实现 `read` 方法。
+         * 由于 Listening Virtual 的数据来源是被动接收的, 因此无需在此实现 `read` 方法。
          * 数据接收处理逻辑已在以下类中实现：
          * - {@link io.github.pnoker.driver.service.netty.tcp.NettyTcpServerHandler#channelRead}
          * - {@link io.github.pnoker.driver.service.netty.udp.NettyUdpServerHandler#channelRead0}
@@ -149,12 +149,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
-         * 重要提示: 以下逻辑仅供参考，请根据实际应用场景进行调整。
+         * 重要提示: 以下逻辑仅供参考, 请根据实际应用场景进行调整。
          *
-         * 该方法的实现依赖于 Netty TCP 服务器的设备通道映射表。如果设备对应的通道存在，
+         * 该方法的实现依赖于 Netty TCP 服务器的设备通道映射表。如果设备对应的通道存在,
          * 则将写入的值转换为字节并发送到该通道。
          *
-         * 返回值始终为 true，表示写入操作已成功处理。
+         * 返回值始终为 true, 表示写入操作已成功处理。
          */
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);

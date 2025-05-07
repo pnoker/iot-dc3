@@ -58,8 +58,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 驱动初始化逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
-         * 驱动启动时会自动执行该方法，您可以在此处执行特定的初始化操作。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * 驱动启动时会自动执行该方法, 您可以在此处执行特定的初始化操作。
          *
          */
     }
@@ -69,8 +69,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 设备状态上传逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
-         * 设备状态的上传可以根据具体需求灵活实现，以下是一些常见的实现方式：
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * 设备状态的上传可以根据具体需求灵活实现, 以下是一些常见的实现方式：
          * - 在 `read` 方法中根据读取的数据判断设备状态；
          * - 在自定义的定时任务中定期检查设备状态；
          * - 根据特定的业务逻辑或事件触发设备状态的判断。
@@ -82,7 +82,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          * - MAINTAIN: 设备维护中
          * - FAULT: 设备故障
          *
-         * 在以下示例中，所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}，并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
+         * 在以下示例中, 所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}, 并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
          */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
@@ -90,12 +90,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动、设备、位号元数据的新增、更新、删除事件。
+         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
          *
          * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
          * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -113,11 +113,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 读取设备点位数据逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          * 根据点位类型生成随机数据：
-         * - 如果点位类型为字符串类型，生成一个长度为8的随机字符串；
-         * - 如果点位类型为布尔类型，生成一个随机的布尔值；
-         * - 其他情况下，生成一个0到100之间的随机浮点数。
+         * - 如果点位类型为字符串类型, 生成一个长度为8的随机字符串；
+         * - 如果点位类型为布尔类型, 生成一个随机的布尔值；
+         * - 其他情况下, 生成一个0到100之间的随机浮点数。
          */
         if (PointTypeFlagEnum.STRING.equals(point.getPointTypeFlag())) {
             return new RValue(device, point, RandomUtil.randomString(8));
@@ -134,9 +134,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 写入设备点位数据逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          * 您可以根据具体的业务需求实现点位数据的写入逻辑。
-         * 默认情况下，该方法返回 false，表示写入操作未执行或失败。
+         * 默认情况下, 该方法返回 false, 表示写入操作未执行或失败。
          */
         return false;
     }

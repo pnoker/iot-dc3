@@ -31,3 +31,4 @@ import io.github.pnoker.common.data.entity.model.RuleDO;
 public interface RuleMapper extends BaseMapper<RuleDO> {
 
 }
+

@@ -31,3 +31,4 @@ import io.github.pnoker.common.data.entity.model.MessageDO;
 public interface MessageMapper extends BaseMapper<MessageDO> {
 
 }
+

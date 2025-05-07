@@ -79,8 +79,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 驱动初始化逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
-         * 驱动启动时会自动执行该方法，您可以在此处执行特定的初始化操作。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * 驱动启动时会自动执行该方法, 您可以在此处执行特定的初始化操作。
          *
          */
         connectMap = new ConcurrentHashMap<>(16);
@@ -91,8 +91,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * 设备状态上传逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
-         * 设备状态的上传可以根据具体需求灵活实现，以下是一些常见的实现方式：
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * 设备状态的上传可以根据具体需求灵活实现, 以下是一些常见的实现方式：
          * - 在 `read` 方法中根据读取的数据判断设备状态；
          * - 在自定义的定时任务中定期检查设备状态；
          * - 根据特定的业务逻辑或事件触发设备状态的判断。
@@ -104,7 +104,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          * - MAINTAIN: 设备维护中
          * - FAULT: 设备故障
          *
-         * 在以下示例中，所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}，并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
+         * 在以下示例中, 所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}, 并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
          */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
@@ -112,12 +112,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动、设备、位号元数据的新增、更新、删除事件。
+         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
          *
          * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
          * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -141,13 +141,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * PLC S7 数据读取逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          * 该方法用于从 PLC S7 设备中读取指定点位的数据。
          * 1. 获取设备的 S7 连接器。
          * 2. 加锁以确保线程安全。
          * 3. 使用 S7 序列化器读取点位数据。
          * 4. 将读取到的数据封装为 RValue 对象返回。
-         * 5. 捕获并记录异常，确保锁在 finally 块中释放。
+         * 5. 捕获并记录异常, 确保锁在 finally 块中释放。
          */
         log.debug("Plc S7 Read, device: {}, point: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(point));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverConfig);
@@ -170,13 +170,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         /*
          * PLC S7 数据写入逻辑
          *
-         * 提示: 此处逻辑仅供参考，请务必结合实际应用场景进行修改。
+         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
          * 该方法用于向 PLC S7 设备写入指定点位的数据。
          * 1. 获取设备的 S7 连接器。
          * 2. 加锁以确保线程安全。
          * 3. 使用 S7 序列化器写入点位数据。
-         * 4. 捕获并记录异常，确保锁在 finally 块中释放。
-         * 5. 返回写入操作的结果（成功或失败）。
+         * 4. 捕获并记录异常, 确保锁在 finally 块中释放。
+         * 5. 返回写入操作的结果(成功或失败)。
          */
         log.debug("Plc S7 Write, device: {}, value: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(wValue));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverConfig);
@@ -198,16 +198,16 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * 获取 PLC S7 连接器
      * <p>
-     * 该方法用于从缓存中获取指定设备的 S7 连接器。如果缓存中不存在该设备的连接器，
-     * 则会根据驱动配置信息创建一个新的连接器，并将其缓存以供后续使用。
+     * 该方法用于从缓存中获取指定设备的 S7 连接器。如果缓存中不存在该设备的连接器,
+     * 则会根据驱动配置信息创建一个新的连接器, 并将其缓存以供后续使用。
      * <p>
-     * 连接器创建过程中，会从驱动配置中获取主机地址和端口号，并初始化读写锁以确保线程安全。
-     * 如果连接器创建失败，将抛出 {@link ServiceException} 异常。
+     * 连接器创建过程中, 会从驱动配置中获取主机地址和端口号, 并初始化读写锁以确保线程安全。
+     * 如果连接器创建失败, 将抛出 {@link ServiceException} 异常。
      *
-     * @param deviceId     设备ID，用于标识唯一的设备连接器
-     * @param driverConfig 驱动配置信息，包含连接 PLC 所需的主机地址和端口号等参数
-     * @return 返回与设备ID对应的 {@link MyS7Connector} 对象，包含 S7 连接器和读写锁
-     * @throws ServiceException 如果连接器创建失败，抛出此异常
+     * @param deviceId     设备ID, 用于标识唯一的设备连接器
+     * @param driverConfig 驱动配置信息, 包含连接 PLC 所需的主机地址和端口号等参数
+     * @return 返回与设备ID对应的 {@link MyS7Connector} 对象, 包含 S7 连接器和读写锁
+     * @throws ServiceException 如果连接器创建失败, 抛出此异常
      */
     private MyS7Connector getS7Connector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         MyS7Connector myS7Connector = connectMap.get(deviceId);
@@ -233,7 +233,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * 获取 PLC S7 点位变量信息
      * <p>
-     * 该方法用于从点位配置中提取 PLC S7 点位变量信息，并封装为 {@link PlcS7PointVariable} 对象。
+     * 该方法用于从点位配置中提取 PLC S7 点位变量信息, 并封装为 {@link PlcS7PointVariable} 对象。
      * 点位配置中应包含以下关键属性：
      * - dbNum: 数据块编号
      * - byteOffset: 字节偏移量
@@ -241,12 +241,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * - blockSize: 数据块大小
      * - type: 点位数据类型
      * <p>
-     * 如果点位配置中缺少上述任一属性，将抛出 {@link NullPointerException} 异常。
+     * 如果点位配置中缺少上述任一属性, 将抛出 {@link NullPointerException} 异常。
      *
-     * @param pointConfig 点位配置信息，包含点位变量的相关属性
-     * @param type        点位数据类型，用于标识点位数据的类型
-     * @return 返回封装好的 {@link PlcS7PointVariable} 对象，包含点位变量的详细信息
-     * @throws NullPointerException 如果点位配置中缺少必要的属性，抛出此异常
+     * @param pointConfig 点位配置信息, 包含点位变量的相关属性
+     * @param type        点位数据类型, 用于标识点位数据的类型
+     * @return 返回封装好的 {@link PlcS7PointVariable} 对象, 包含点位变量的详细信息
+     * @throws NullPointerException 如果点位配置中缺少必要的属性, 抛出此异常
      */
     private PlcS7PointVariable getPointVariable(Map<String, AttributeBO> pointConfig, String type) {
         log.debug("Plc S7 Point Attribute Config {}", JsonUtil.toJsonString(pointConfig));
@@ -263,7 +263,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * <p>
      * 该方法用于将指定类型的数据写入到 PLC S7 的指定点位。
      * 1. 根据类型字符串获取对应的 {@link AttributeTypeFlagEnum} 枚举值。
-     * 2. 如果类型不支持，抛出 {@link UnSupportException} 异常。
+     * 2. 如果类型不支持, 抛出 {@link UnSupportException} 异常。
      * 3. 根据类型将字符串值转换为相应的 Java 类型。
      * 4. 使用 {@link S7Serializer} 将数据写入到 PLC S7 的指定数据块和字节偏移量位置。
      * <p>
@@ -275,11 +275,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * - BOOLEAN: 布尔型
      * - STRING: 字符串
      *
-     * @param serializer         S7 序列化器，用于与 PLC S7 进行数据交互
-     * @param plcS7PointVariable PLC S7 点位变量信息，包含数据块编号、字节偏移量等
-     * @param type               数据类型字符串，用于标识要写入的数据类型
+     * @param serializer         S7 序列化器, 用于与 PLC S7 进行数据交互
+     * @param plcS7PointVariable PLC S7 点位变量信息, 包含数据块编号, 字节偏移量等
+     * @param type               数据类型字符串, 用于标识要写入的数据类型
      * @param value              要写入的字符串形式的数据值
-     * @throws UnSupportException 如果数据类型不支持，抛出此异常
+     * @throws UnSupportException 如果数据类型不支持, 抛出此异常
      */
     private void store(S7Serializer serializer, PlcS7PointVariable plcS7PointVariable, String type, String value) {
         AttributeTypeFlagEnum valueType = AttributeTypeFlagEnum.ofCode(type);
@@ -320,11 +320,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     /**
      * MyS7Connector 内部类
      * <p>
-     * 该类用于封装与 PLC S7 连接相关的信息，包括读写锁和 S7 连接器。
+     * 该类用于封装与 PLC S7 连接相关的信息, 包括读写锁和 S7 连接器。
      * 读写锁 {@link ReentrantReadWriteLock} 用于确保在多线程环境下对 S7 连接器的操作是线程安全的。
      * S7 连接器 {@link S7Connector} 用于与 PLC S7 设备进行通信。
      * <p>
-     * 该类提供了无参构造函数和全参构造函数，并使用了 Lombok 注解自动生成 getter 和 setter 方法。
+     * 该类提供了无参构造函数和全参构造函数, 并使用了 Lombok 注解自动生成 getter 和 setter 方法。
      */
     @Getter
     @Setter

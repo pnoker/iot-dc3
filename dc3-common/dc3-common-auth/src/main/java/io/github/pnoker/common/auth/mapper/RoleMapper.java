@@ -31,3 +31,4 @@ import io.github.pnoker.common.auth.entity.model.RoleDO;
 public interface RoleMapper extends BaseMapper<RoleDO> {
 
 }
+

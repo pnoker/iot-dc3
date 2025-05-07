@@ -31,3 +31,4 @@ import io.github.pnoker.common.manager.entity.model.DriverAttributeDO;
 public interface DriverAttributeMapper extends BaseMapper<DriverAttributeDO> {
 
 }
+
