@@ -25,7 +25,7 @@ ENV NODE_ENV=test
 ENV SERVER_NAME=dc3-driver-modbus-tcp
 ENV SERVER_PACKAGES=io.github.pnoker
 ENV APM_AGENT_ENABLE=false
-ENV APM_SERVICE=http://dc3-apm:8200
+ENV APM_SERVICE=http://dc3-apm:9300
 
 # default jvm & gc env
 ENV JAVA_OPS="-server \
