@@ -34,6 +34,7 @@ ENV JAVA_OPS="-server \
               -Xmx512m \
               -XX:+UseG1GC \
               -Djava.security.egd=file:/dev/./urandom"
+ENV GC_LOG="-Xlog:gc*:file=dc3/logs/gateway/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
 WORKDIR /dc3-gateway
 

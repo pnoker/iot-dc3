@@ -43,5 +43,5 @@ schedule:
 
 ## 接口测试
 
-> dc3/api/dc3-driver-opcua.http
+> dc3/api/dc3-driver-opc-ua.http
 
