@@ -31,8 +31,8 @@ ENV APM_SERVICE=http://dc3-apm:8200
 ENV JAVA_OPS="-server \
               -Xms256m \
               -Xmx512m \
-              -Djava.security.egd=file:/dev/./urandom \
-              -XX:+UseG1GC"
+              -XX:+UseG1GC \
+              -Djava.security.egd=file:/dev/./urandom"
 
 WORKDIR /dc3-driver/dc3-driver-virtual
 
