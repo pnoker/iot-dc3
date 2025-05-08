@@ -23,7 +23,6 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,7 +56,7 @@ public class DeviceEventDTO implements Serializable {
     /**
      * 创建时间
      */
-    private ZonedDateTime createTime;
+    private LocalDateTime createTime;
 
     public DeviceEventDTO(DeviceEventTypeEnum type, String content) {
         this.type = type;
@@ -106,7 +105,7 @@ public class DeviceEventDTO implements Serializable {
         /**
          * 创建时间
          */
-        private ZonedDateTime createTime;
+        private LocalDateTime createTime;
 
         public DeviceStatus(Long deviceId, DeviceStatusEnum status) {
             this.deviceId = deviceId;

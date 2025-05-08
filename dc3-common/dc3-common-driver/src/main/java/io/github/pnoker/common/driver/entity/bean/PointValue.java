@@ -22,7 +22,6 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 /**
  * MongoDB 位号数据
@@ -66,12 +65,12 @@ public class PointValue implements Serializable {
     /**
      * 原始时间
      */
-    private ZonedDateTime originTime;
+    private LocalDateTime originTime;
 
     /**
      * 创建时间
      */
-    private ZonedDateTime createTime;
+    private LocalDateTime createTime;
 
     public PointValue(RValue calValue) {
         this.deviceId = calValue.getDevice().getId();

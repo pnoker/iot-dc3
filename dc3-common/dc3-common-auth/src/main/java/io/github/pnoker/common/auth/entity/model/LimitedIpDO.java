@@ -23,7 +23,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -89,7 +89,7 @@ public class LimitedIpDO implements Serializable {
      * 创建时间
      */
     @TableField("create_time")
-    private ZonedDateTime createTime;
+    private LocalDateTime createTime;
 
     /**
      * 操作者ID
@@ -107,7 +107,7 @@ public class LimitedIpDO implements Serializable {
      * 操作时间
      */
     @TableField("operate_time")
-    private ZonedDateTime operateTime;
+    private LocalDateTime operateTime;
 
     /**
      * 逻辑删除标识, 0:未删除, 1:已删除

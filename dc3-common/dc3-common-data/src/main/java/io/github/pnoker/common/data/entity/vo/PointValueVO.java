@@ -22,7 +22,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 /**
  * PointValue VO
@@ -70,17 +70,17 @@ public class PointValueVO implements Serializable {
      * 原始时间
      */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
-    private ZonedDateTime originTime;
+    private LocalDateTime originTime;
 
     /**
      * 创建时间
      */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
-    private ZonedDateTime createTime;
+    private LocalDateTime createTime;
 
     /**
      * 操作时间
      */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
-    private ZonedDateTime operateTime;
+    private LocalDateTime operateTime;
 }

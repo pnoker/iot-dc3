@@ -25,7 +25,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 /**
  * Base VO
@@ -71,7 +71,7 @@ public class BaseVO implements Serializable {
      * 创建时间
      */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
-    private ZonedDateTime createTime;
+    private LocalDateTime createTime;
 
     /**
      * 操作者ID
@@ -87,5 +87,5 @@ public class BaseVO implements Serializable {
      * 操作时间
      */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
-    private ZonedDateTime operateTime;
+    private LocalDateTime operateTime;
 }
