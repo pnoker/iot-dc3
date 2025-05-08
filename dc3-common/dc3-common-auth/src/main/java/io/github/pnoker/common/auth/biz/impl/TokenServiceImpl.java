@@ -44,7 +44,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
@@ -172,7 +171,7 @@ public class TokenServiceImpl implements TokenService {
         if (Objects.isNull(limit) || limit.getTimes() < 5) {
             return;
         }
-        boolean isAfter = limit.getExpireTime().isAfter(LocalDateTime.now());
+        boolean isAfter = limit.getExpireTime().isAfter(LocalDateTimeUtil.now());
         if (isAfter) {
             throw new ServiceException("访问受限, 请在 {} 之后再重试", LocalDateTimeUtil.completeFormat(limit.getExpireTime()));
         }
@@ -188,7 +187,7 @@ public class TokenServiceImpl implements TokenService {
     private UserLimit updateUserLimit(String loginName, String tenantCode) {
         String redisKey = PrefixConstant.USER + SuffixConstant.LIMIT + SymbolConstant.COLON + loginName + SymbolConstant.HASHTAG + tenantCode;
         UserLimit userLimit = redisService.getKey(redisKey);
-        UserLimit limit = Optional.ofNullable(userLimit).orElse(new UserLimit(0, LocalDateTime.now()));
+        UserLimit limit = Optional.ofNullable(userLimit).orElse(new UserLimit(0, LocalDateTimeUtil.now()));
         limit.setTimes(limit.getTimes() + 1);
         limit.setExpireTime(LocalDateTimeUtil.expireTime(limit.getTimes() * TimeoutConstant.USER_LIMIT_TIMEOUT, ChronoUnit.MINUTES));
         redisService.setKey(redisKey, limit, 7, TimeUnit.DAYS);

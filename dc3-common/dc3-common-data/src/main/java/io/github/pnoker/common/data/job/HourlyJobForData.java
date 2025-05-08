@@ -16,13 +16,12 @@
 
 package io.github.pnoker.common.data.job;
 
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 /**
  * 通用: 每小时执行任务
@@ -45,6 +44,6 @@ public class HourlyJobForData extends QuartzJobBean {
      */
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        log.info("hourlyJobHandler: {}", LocalDateTime.now());
+        log.info("hourlyJobHandler: {}", LocalDateTimeUtil.now());
     }
 }

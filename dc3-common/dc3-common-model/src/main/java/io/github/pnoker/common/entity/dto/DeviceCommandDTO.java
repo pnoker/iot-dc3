@@ -17,6 +17,7 @@
 package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.enums.DeviceCommandTypeEnum;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.*;
 
 import java.io.Serial;
@@ -59,7 +60,7 @@ public class DeviceCommandDTO implements Serializable {
     public DeviceCommandDTO(DeviceCommandTypeEnum type, String content) {
         this.type = type;
         this.content = content;
-        this.createTime = LocalDateTime.now();
+        this.createTime = LocalDateTimeUtil.now();
     }
 
     /**
@@ -96,7 +97,7 @@ public class DeviceCommandDTO implements Serializable {
         public DeviceRead(Long deviceId, Long pointId) {
             this.deviceId = deviceId;
             this.pointId = pointId;
-            this.createTime = LocalDateTime.now();
+            this.createTime = LocalDateTimeUtil.now();
         }
     }
 
@@ -139,7 +140,7 @@ public class DeviceCommandDTO implements Serializable {
             this.deviceId = deviceId;
             this.pointId = pointId;
             this.value = value;
-            this.createTime = LocalDateTime.now();
+            this.createTime = LocalDateTimeUtil.now();
         }
     }
 }

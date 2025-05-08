@@ -35,13 +35,13 @@ import io.github.pnoker.common.exception.RepositoryException;
 import io.github.pnoker.common.redis.service.RedisRepositoryService;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -70,7 +70,7 @@ public class PointValueServiceImpl implements PointValueService {
             return;
         }
 
-        pointValueBO.setCreateTime(LocalDateTime.now());
+        pointValueBO.setCreateTime(LocalDateTimeUtil.now());
         savePointValueToRepository(pointValueBO);
     }
 
@@ -82,7 +82,7 @@ public class PointValueServiceImpl implements PointValueService {
 
         final Map<Long, List<PointValueBO>> group = pointValueBOList.stream()
                 .map(pointValue -> {
-                    pointValue.setCreateTime(LocalDateTime.now());
+                    pointValue.setCreateTime(LocalDateTimeUtil.now());
                     return pointValue;
                 })
                 .collect(Collectors.groupingBy(PointValueBO::getDeviceId));

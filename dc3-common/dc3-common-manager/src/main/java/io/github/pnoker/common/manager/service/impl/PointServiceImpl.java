@@ -44,6 +44,7 @@ import io.github.pnoker.common.manager.mapper.PointMapper;
 import io.github.pnoker.common.manager.service.PointService;
 import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.utils.FieldUtil;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -225,7 +226,7 @@ public class PointServiceImpl implements PointService {
     @Override
     public List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds) {
         List<PointDataVolumeRunBO> list = new ArrayList<>();
-        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(7);
+        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTimeUtil.now().toLocalDate(), LocalTime.MIN).minusDays(7);
         if (Objects.isNull(deviceIds)) {
             return list;
         }
@@ -303,7 +304,7 @@ public class PointServiceImpl implements PointService {
     @Override
     public List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds) {
         List<DeviceDataVolumeRunBO> list = new ArrayList<>();
-        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(7);
+        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTimeUtil.now().toLocalDate(), LocalTime.MIN).minusDays(7);
         if (Objects.isNull(pointIds)) {
             return list;
         }
@@ -363,7 +364,7 @@ public class PointServiceImpl implements PointService {
         result.setDriverName(driverDO.getDriverName());
         List<Long> zero = Collections.nCopies(7, 0L);
         ArrayList<Long> zeroList = new ArrayList<>(zero);
-        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.MIN).minusDays(6);
+        LocalDateTime sevenDaysAgo = LocalDateTime.of(LocalDateTimeUtil.now().toLocalDate(), LocalTime.MIN).minusDays(6);
         QueryWrapper<PointDataVolumeRunDO> wrapper = new QueryWrapper<>();
         wrapper.select("sum(total) as total");
         List<PointDataVolumeRunDO> pointDataVolumeRunDOList = pointDataVolumeRunManager.list(wrapper.lambda()
