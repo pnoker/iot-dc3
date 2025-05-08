@@ -63,6 +63,15 @@ public class LocalDateTimeUtil {
     }
 
     /**
+     * 获取当前时间
+     *
+     * @return LocalDateTime {@link LocalDateTime}
+     */
+    public static LocalDateTime now() {
+        return LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
+    }
+
+    /**
      * 获取毫秒
      *
      * @param localDateTime {@link LocalDateTime}
@@ -91,7 +100,7 @@ public class LocalDateTimeUtil {
      * @return Date
      */
     public static LocalDateTime expireTime(int amount, ChronoUnit field) {
-        LocalDateTime localDateTime = LocalDateTime.now();
+        LocalDateTime localDateTime = LocalDateTimeUtil.now();
         return localDateTime.plus(amount, field);
     }
 

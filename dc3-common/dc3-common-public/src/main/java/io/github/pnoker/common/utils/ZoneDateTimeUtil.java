@@ -63,6 +63,15 @@ public class ZoneDateTimeUtil {
     }
 
     /**
+     * 获取当前时间
+     *
+     * @return ZonedDateTime {@link ZonedDateTime}
+     */
+    public static ZonedDateTime now() {
+        return ZonedDateTime.now(TimeConstant.DEFAULT_ZONEID);
+    }
+
+    /**
      * 获取毫秒
      *
      * @param zonedDateTime {@link ZonedDateTime}
@@ -91,7 +100,7 @@ public class ZoneDateTimeUtil {
      * @return Date
      */
     public static ZonedDateTime expireTime(int amount, ChronoUnit field) {
-        ZonedDateTime zonedDateTime = ZonedDateTime.now(TimeConstant.DEFAULT_ZONEID);
+        ZonedDateTime zonedDateTime = ZoneDateTimeUtil.now();
         return zonedDateTime.plus(amount, field);
     }
 

@@ -21,11 +21,11 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -45,7 +45,7 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         // do something to process your mqtt messages
         log.info(JsonUtil.toJsonString(mqttMessage));
         PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
-        pointValue.setOriginTime(LocalDateTime.now());
+        pointValue.setOriginTime(LocalDateTimeUtil.now());
         driverSenderService.pointValueSender(pointValue);
     }
 
@@ -56,7 +56,7 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         List<PointValue> pointValues = mqttMessageList.stream()
                 .map(mqttMessage -> {
                     PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
-                    pointValue.setOriginTime(LocalDateTime.now());
+                    pointValue.setOriginTime(LocalDateTimeUtil.now());
                     return pointValue;
                 }).toList();
         driverSenderService.pointValueSender(pointValues);

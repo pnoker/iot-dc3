@@ -18,12 +18,12 @@ package io.github.pnoker.common.mongo.entity.builder;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.mongo.entity.model.MgPointValueDO;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -46,7 +46,7 @@ public interface MgPointValueBuilder {
 
     @AfterMapping
     default void afterProcess(PointValueBO entityBO, @MappingTarget MgPointValueDO entityDO) {
-        entityDO.setOperateTime(LocalDateTime.now());
+        entityDO.setOperateTime(LocalDateTimeUtil.now());
     }
 
     /**

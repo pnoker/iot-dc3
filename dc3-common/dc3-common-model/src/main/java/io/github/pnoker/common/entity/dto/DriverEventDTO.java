@@ -18,6 +18,7 @@ package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.enums.DriverEventTypeEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.*;
 
 import java.io.Serial;
@@ -60,7 +61,7 @@ public class DriverEventDTO implements Serializable {
     public DriverEventDTO(DriverEventTypeEnum type, String content) {
         this.type = type;
         this.content = content;
-        this.createTime = LocalDateTime.now();
+        this.createTime = LocalDateTimeUtil.now();
     }
 
     /**
@@ -96,7 +97,7 @@ public class DriverEventDTO implements Serializable {
         public DriverStatus(Long driverId, DriverStatusEnum status) {
             this.driverId = driverId;
             this.status = status;
-            this.createTime = LocalDateTime.now();
+            this.createTime = LocalDateTimeUtil.now();
         }
     }
 }

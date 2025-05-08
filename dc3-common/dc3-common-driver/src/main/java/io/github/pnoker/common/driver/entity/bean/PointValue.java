@@ -17,6 +17,7 @@
 package io.github.pnoker.common.driver.entity.bean;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.*;
 
 import java.io.Serial;
@@ -77,6 +78,6 @@ public class PointValue implements Serializable {
         this.pointId = calValue.getPoint().getId();
         this.rawValue = calValue.getValue();
         this.calValue = calValue.getFinalValue();
-        this.originTime = LocalDateTime.now();
+        this.originTime = LocalDateTimeUtil.now();
     }
 }

@@ -18,6 +18,7 @@ package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.enums.DeviceEventTypeEnum;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import lombok.*;
 
 import java.io.Serial;
@@ -61,7 +62,7 @@ public class DeviceEventDTO implements Serializable {
     public DeviceEventDTO(DeviceEventTypeEnum type, String content) {
         this.type = type;
         this.content = content;
-        this.createTime = LocalDateTime.now();
+        this.createTime = LocalDateTimeUtil.now();
     }
 
     /**
@@ -110,7 +111,7 @@ public class DeviceEventDTO implements Serializable {
         public DeviceStatus(Long deviceId, DeviceStatusEnum status) {
             this.deviceId = deviceId;
             this.status = status;
-            this.createTime = LocalDateTime.now();
+            this.createTime = LocalDateTimeUtil.now();
         }
 
         public DeviceStatus(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
@@ -118,7 +119,7 @@ public class DeviceEventDTO implements Serializable {
             this.status = status;
             this.timeOut = timeOut;
             this.timeUnit = timeUnit;
-            this.createTime = LocalDateTime.now();
+            this.createTime = LocalDateTimeUtil.now();
         }
     }
 }
