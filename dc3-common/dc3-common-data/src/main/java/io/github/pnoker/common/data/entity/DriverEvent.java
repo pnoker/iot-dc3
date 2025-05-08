@@ -27,7 +27,6 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -74,12 +73,12 @@ public class DriverEvent implements Serializable {
     /**
      * 创建时间
      */
-    private ZonedDateTime createTime;
+    private LocalDateTime createTime;
 
     /**
      * 操作时间
      */
-    private ZonedDateTime operateTime;
+    private LocalDateTime operateTime;
 
     /**
      * 确认时间

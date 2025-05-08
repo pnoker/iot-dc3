@@ -22,7 +22,6 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 /**
  * 设备指令
@@ -55,7 +54,7 @@ public class DeviceCommandDTO implements Serializable {
     /**
      * 创建时间
      */
-    private ZonedDateTime createTime;
+    private LocalDateTime createTime;
 
     public DeviceCommandDTO(DeviceCommandTypeEnum type, String content) {
         this.type = type;
@@ -92,7 +91,7 @@ public class DeviceCommandDTO implements Serializable {
         /**
          * 创建时间
          */
-        private ZonedDateTime createTime;
+        private LocalDateTime createTime;
 
         public DeviceRead(Long deviceId, Long pointId) {
             this.deviceId = deviceId;
@@ -134,7 +133,7 @@ public class DeviceCommandDTO implements Serializable {
         /**
          * 创建时间
          */
-        private ZonedDateTime createTime;
+        private LocalDateTime createTime;
 
         public DeviceWrite(Long deviceId, Long pointId, String value) {
             this.deviceId = deviceId;

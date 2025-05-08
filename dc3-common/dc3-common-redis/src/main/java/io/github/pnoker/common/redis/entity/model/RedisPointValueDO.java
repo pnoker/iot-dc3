@@ -22,7 +22,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 /**
  * MongoDB 位号数据
@@ -67,15 +67,15 @@ public class RedisPointValueDO implements Serializable {
     /**
      * 原始时间
      */
-    private ZonedDateTime originTime;
+    private LocalDateTime originTime;
 
     /**
      * 创建时间
      */
-    private ZonedDateTime createTime;
+    private LocalDateTime createTime;
 
     /**
      * 操作时间
      */
-    private ZonedDateTime operateTime;
+    private LocalDateTime operateTime;
 }

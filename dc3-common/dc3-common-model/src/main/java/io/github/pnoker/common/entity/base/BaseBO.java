@@ -20,7 +20,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 /**
  * Base BO
@@ -62,7 +62,7 @@ public class BaseBO implements Serializable {
     /**
      * 创建时间
      */
-    private ZonedDateTime createTime;
+    private LocalDateTime createTime;
 
     /**
      * 操作者ID
@@ -77,5 +77,5 @@ public class BaseBO implements Serializable {
     /**
      * 操作时间
      */
-    private ZonedDateTime operateTime;
+    private LocalDateTime operateTime;
 }

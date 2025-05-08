@@ -34,9 +34,9 @@ import java.time.temporal.ChronoUnit;
  * @since 2022.1.0
  */
 @Slf4j
-public class ZonedDateTimeUtil {
+public class ZoneDateTimeUtil {
 
-    private ZonedDateTimeUtil() {
+    private ZoneDateTimeUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
