@@ -68,23 +68,4 @@ public class DictionaryForAuthController implements BaseController {
         }
     }
 
-    /**
-     * 查询限制IP字典列表
-     *
-     * @return 字典列表
-     */
-    @GetMapping("/limited_ip")
-    public Mono<R<List<DictionaryVO>>> limitedIpDictionary() {
-        return getTenantId().flatMap(tenantId -> {
-            try {
-                List<DictionaryBO> entityBOList = dictionaryForAuthService.limitedIpDictionary(tenantId);
-                List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
-                return Mono.just(R.ok(entityVOList));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                return Mono.just(R.fail(e.getMessage()));
-            }
-        });
-    }
-
 }

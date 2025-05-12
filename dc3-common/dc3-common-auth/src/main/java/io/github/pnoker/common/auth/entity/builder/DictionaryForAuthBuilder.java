@@ -17,7 +17,6 @@
 package io.github.pnoker.common.auth.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.auth.entity.bo.LimitedIpBO;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
 import io.github.pnoker.common.auth.entity.bo.UserLoginBO;
 import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
@@ -87,31 +86,5 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
     @Mapping(target = "optimizeCountSql", ignore = true)
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByUserLoginBOPage(Page<UserLoginBO> entityPageBO);
-
-    // 租户相关
-
-    /**
-     * BO to VO
-     *
-     * @param entityBO EntityBO
-     * @return EntityVO
-     */
-    default DictionaryBO buildVOByLimitedIpBO(LimitedIpBO entityBO) {
-        return DictionaryBO.builder().label(entityBO.getIp()).value(entityBO.getId().toString()).build();
-    }
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    @Mapping(target = "orders", ignore = true)
-    @Mapping(target = "countId", ignore = true)
-    @Mapping(target = "maxLimit", ignore = true)
-    @Mapping(target = "searchCount", ignore = true)
-    @Mapping(target = "optimizeCountSql", ignore = true)
-    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
-    Page<DictionaryBO> buildVOPageByLimitedIpBOPage(Page<LimitedIpBO> entityPageBO);
 
 }

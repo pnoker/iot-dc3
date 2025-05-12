@@ -34,7 +34,6 @@ public class AuthConstant {
     public static final String USER_URL_PREFIX = "/user";
     public static final String TENANT_URL_PREFIX = "/tenant";
     public static final String TOKEN_URL_PREFIX = "/token";
-    public static final String LIMITED_IP_URL_PREFIX = "/limited_ip";
     public static final String DICTIONARY_URL_PREFIX = "/dictionary";
 
     private AuthConstant() {

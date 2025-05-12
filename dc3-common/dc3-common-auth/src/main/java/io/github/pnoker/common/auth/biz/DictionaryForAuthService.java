@@ -36,12 +36,4 @@ public interface DictionaryForAuthService {
      */
     List<DictionaryBO> tenantDictionary();
 
-    /**
-     * 获取限制IP字典
-     *
-     * @param tenantId 租户ID
-     * @return Dictionary Array
-     */
-    List<DictionaryBO> limitedIpDictionary(Long tenantId);
-
 }
