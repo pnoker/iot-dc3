@@ -34,8 +34,8 @@ jobs:
           echo "service_version=2025.2.5" >> $GITHUB_OUTPUT
           echo "service_name_gateway=dc3-gateway" >> $GITHUB_OUTPUT
           echo "service_path_gateway=dc3-gateway" >> $GITHUB_OUTPUT
-          echo "service_name_centen_auth=dc3-center-auth" >> $GITHUB_OUTPUT
-          echo "service_path_centen_auth=dc3-center/dc3-center-auth" >> $GITHUB_OUTPUT
+          echo "service_name_center_auth=dc3-center-auth" >> $GITHUB_OUTPUT
+          echo "service_path_center_auth=dc3-center/dc3-center-auth" >> $GITHUB_OUTPUT
           echo "service_name_center_data=dc3-center-data" >> $GITHUB_OUTPUT
           echo "service_path_center_data=dc3-center/dc3-center-data" >> $GITHUB_OUTPUT
           echo "service_name_center_manager=dc3-center-manager" >> $GITHUB_OUTPUT
@@ -105,16 +105,16 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_centen_auth }}
+          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_auth }}
           platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_centen_auth }}/Dockerfile
+          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_auth }}/Dockerfile
           tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_centen_auth }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_centen_auth }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_centen_auth }}:${{ steps.variables.outputs.version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_centen_auth }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_centen_auth }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_centen_auth }}:${{ steps.variables.outputs.version }}
+            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:latest
+            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}
+            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.version }}
+            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:latest
+            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}
+            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.version }}
 
       - name: Build and Push For Center Data
         uses: docker/build-push-action@v6
