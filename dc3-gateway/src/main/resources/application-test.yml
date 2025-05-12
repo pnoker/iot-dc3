@@ -28,7 +28,7 @@ spring:
         - id: auth_route
           uri: http://${CENTER_AUTH_HOST:dc3-center-auth}:8300
           predicates:
-            - Path=/api/v3/auth/user/**,/api/v3/auth/limited_ip/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
+            - Path=/api/v3/auth/user/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
           filters:
             - Authentic
         # manager

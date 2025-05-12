@@ -19,9 +19,7 @@ package io.github.pnoker.common.auth.biz.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.auth.biz.DictionaryForAuthService;
-import io.github.pnoker.common.auth.dal.LimitedIpManager;
 import io.github.pnoker.common.auth.dal.TenantManager;
-import io.github.pnoker.common.auth.entity.model.LimitedIpDO;
 import io.github.pnoker.common.auth.entity.model.TenantDO;
 import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -42,8 +40,6 @@ public class DictionaryForAuthServiceImpl implements DictionaryForAuthService {
 
     @Resource
     private TenantManager tenantManager;
-    @Resource
-    private LimitedIpManager limitedIpManager;
 
     @Override
     public List<DictionaryBO> tenantDictionary() {
@@ -54,21 +50,6 @@ public class DictionaryForAuthServiceImpl implements DictionaryForAuthService {
         return entityDOList.stream().map(entityDO -> {
             DictionaryBO driverDictionary = new DictionaryBO();
             driverDictionary.setLabel(entityDO.getTenantName());
-            driverDictionary.setValue(entityDO.getId().toString());
-            return driverDictionary;
-        }).toList();
-    }
-
-    @Override
-    public List<DictionaryBO> limitedIpDictionary(Long tenantId) {
-        LambdaQueryWrapper<LimitedIpDO> wrapper = Wrappers.<LimitedIpDO>query().lambda();
-        wrapper.eq(LimitedIpDO::getTenantId, tenantId);
-        wrapper.eq(LimitedIpDO::getEnableFlag, EnableFlagEnum.ENABLE);
-        List<LimitedIpDO> entityDOList = limitedIpManager.list(wrapper);
-
-        return entityDOList.stream().map(entityDO -> {
-            DictionaryBO driverDictionary = new DictionaryBO();
-            driverDictionary.setLabel(entityDO.getIp());
             driverDictionary.setValue(entityDO.getId().toString());
             return driverDictionary;
         }).toList();
