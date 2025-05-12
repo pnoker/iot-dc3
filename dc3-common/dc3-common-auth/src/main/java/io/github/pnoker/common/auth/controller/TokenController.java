@@ -98,14 +98,4 @@ public class TokenController implements BaseController {
         return Mono.just(R.ok(valid, message));
     }
 
-    /**
-     * 注销用户的Token令牌
-     *
-     * @param entityVO 注销令牌请求体 {@link TokenQuery}
-     * @return 是否注销成功
-     */
-    @PostMapping("/cancel")
-    public Mono<R<Boolean>> cancelToken(@Validated @RequestBody TokenQuery entityVO) {
-        return Boolean.TRUE.equals(tokenService.cancelToken(entityVO.getName(), entityVO.getTenant())) ? Mono.just(R.ok()) : Mono.just(R.fail());
-    }
 }

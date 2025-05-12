@@ -57,12 +57,4 @@ public interface TokenService {
      */
     TokenValid checkValid(String loginName, String salt, String token, String tenantCode);
 
-    /**
-     * 注销令牌
-     *
-     * @param loginName  登录名称
-     * @param tenantCode 租户编号
-     * @return 是否注销
-     */
-    Boolean cancelToken(String loginName, String tenantCode);
 }
