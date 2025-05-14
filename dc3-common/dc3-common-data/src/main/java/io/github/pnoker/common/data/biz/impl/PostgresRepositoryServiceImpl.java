@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.postgres.repository;
+package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
@@ -36,7 +36,6 @@ import java.util.List;
 @Slf4j
 @Service("postgresRepositoryService")
 public class PostgresRepositoryServiceImpl implements RepositoryService, InitializingBean {
-
 
     @Override
     public String getRepositoryName() {

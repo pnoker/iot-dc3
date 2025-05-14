@@ -195,11 +195,6 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-data-postgres</artifactId>
-                <version>${dc3.common.postgres.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-driver</artifactId>
                 <version>${dc3.common.driver.version}</version>
             </dependency>

@@ -107,7 +107,6 @@
         <module>dc3-common-constant</module>
         <module>dc3-common-dal</module>
         <module>dc3-common-data</module>
-        <module>dc3-common-data-postgres</module>
         <module>dc3-common-driver</module>
         <module>dc3-common-exception</module>
         <module>dc3-common-gateway</module>
@@ -235,11 +234,6 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-data</artifactId>
                 <version>${dc3.common.data.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-data-postgres</artifactId>
-                <version>${dc3.common.postgres.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
