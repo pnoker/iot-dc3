@@ -22,14 +22,18 @@ spring:
     init:
       encoding: utf-8
   datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      max-lifetime: 1800000
-      idle-timeout: 600000
-      connection-timeout: 30000
-      maximum-pool-size: 64
-      minimum-idle: 4
+    dynamic:
+      primary: master
+      datasource:
+        master:
+          type: com.zaxxer.hikari.HikariDataSource
+          driver-class-name: org.postgresql.Driver
+      hikari:
+        max-lifetime: 1800000
+        idle-timeout: 600000
+        connection-timeout: 30000
+        maximum-pool-size: 64
+        minimum-idle: 4
 
 mybatis-plus:
   configuration:
