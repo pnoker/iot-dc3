@@ -16,35 +16,17 @@
 
 package io.github.pnoker.common.postgres.repository;
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.constant.common.SuffixConstant;
-import io.github.pnoker.common.constant.driver.StorageConstant;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
-import io.github.pnoker.common.postgres.entity.builder.MgPointValueBuilder;
-import io.github.pnoker.common.postgres.entity.model.MgPointValueDO;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
-import io.github.pnoker.common.utils.FieldUtil;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.*;
-import org.springframework.data.mongodb.core.index.Index;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author pnoker
@@ -75,15 +57,18 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     @Override
-    public PointValueBO selectLatestPointValue(Long deviceId, Long pointId) {return null;
+    public PointValueBO selectLatestPointValue(Long deviceId, Long pointId) {
+        return null;
     }
 
     @Override
-    public List<PointValueBO> selectLatestPointValue(Long deviceId, List<Long> pointIds) {return null;
+    public List<PointValueBO> selectLatestPointValue(Long deviceId, List<Long> pointIds) {
+        return null;
     }
 
     @Override
-    public Page<PointValueBO> selectPagePointValue(PointValueQuery entityQuery) {return null;
+    public Page<PointValueBO> selectPagePointValue(PointValueQuery entityQuery) {
+        return null;
     }
 
     @Override
