@@ -67,12 +67,6 @@
 
     <dependencies>
 
-        <!-- Spring Data MongoDB -->
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-mongodb</artifactId>
-        </dependency>
-
         <!-- Mybatis Plus Extension -->
         <dependency>
             <groupId>com.baomidou</groupId>

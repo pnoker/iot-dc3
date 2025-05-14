@@ -57,9 +57,11 @@ public class MybatisGenerator {
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder
                         .addInclude(
+                                "dc3_driver_event",
+                                "dc3_device_event"/*,
                                 "dc3_message",
                                 "dc3_notify",
-                                "dc3_rule"
+                                "dc3_rule"*/
                         )
                 ).execute();
     }

@@ -19,10 +19,7 @@ package io.github.pnoker.common.data.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -36,7 +33,6 @@ import java.util.concurrent.TimeUnit;
  */
 @Getter
 @Setter
-@Document
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DriverEvent implements Serializable {
 
@@ -46,8 +42,7 @@ public class DriverEvent implements Serializable {
     /**
      * MongoDB Object ID
      */
-    @MongoId
-    private ObjectId id;
+    private Long id;
 
     /**
      * 驱动服务名称
