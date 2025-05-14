@@ -14,28 +14,20 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.init;
+package io.github.pnoker.common.postgres.dal;
 
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
+import com.baomidou.mybatisplus.extension.service.IService;
+import io.github.pnoker.common.postgres.entity.model.PointValueDecimalDO;
 
 /**
- * Mongo initialization runner
+ * <p>
+ * 设备位号历史数据表(Decimal类型) 服务类
+ * </p>
  *
  * @author pnoker
  * @version 2025.2.5
  * @since 2022.1.0
  */
-@Component
-@ComponentScan(basePackages = {
-        "io.github.pnoker.common.mongo.*"
-})
-public class MongoInitRunner implements ApplicationRunner {
+public interface PointValueDecimalManager extends IService<PointValueDecimalDO> {
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        // nothing to do
-    }
 }

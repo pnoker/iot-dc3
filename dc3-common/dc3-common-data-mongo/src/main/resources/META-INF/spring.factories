@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.pnoker.common.config.MongoConfig,\
-  io.github.pnoker.common.init.MongoInitRunner
+  io.github.pnoker.common.config.PostgresConfig,\
+  io.github.pnoker.common.init.PostgresInitRunner
 org.springframework.boot.env.EnvironmentPostProcessor=\
-  io.github.pnoker.common.config.ActiveMongoProfileConfig
+  io.github.pnoker.common.config.ActivePostgresProfileConfig

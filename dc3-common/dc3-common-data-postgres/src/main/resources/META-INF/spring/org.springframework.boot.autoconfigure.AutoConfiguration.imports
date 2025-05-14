@@ -14,5 +14,5 @@
 # limitations under the License.
 #
 
-io.github.pnoker.common.config.MongoConfig
-io.github.pnoker.common.init.MongoInitRunner
+io.github.pnoker.common.config.PostgresConfig
+io.github.pnoker.common.init.PostgresInitRunner
