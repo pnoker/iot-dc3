@@ -17,7 +17,7 @@
 package io.github.pnoker.common.postgres.dal;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import io.github.pnoker.common.postgres.entity.model.PointValueStringDO;
+import io.github.pnoker.common.postgres.entity.model.PointValueDO;
 
 /**
  * <p>
@@ -28,6 +28,6 @@ import io.github.pnoker.common.postgres.entity.model.PointValueStringDO;
  * @version 2025.2.5
  * @since 2022.1.0
  */
-public interface PointValueStringManager extends IService<PointValueStringDO> {
+public interface PointValueManager extends IService<PointValueDO> {
 
 }
