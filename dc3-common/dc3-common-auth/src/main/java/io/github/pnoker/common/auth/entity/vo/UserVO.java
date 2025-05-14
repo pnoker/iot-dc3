@@ -87,4 +87,10 @@ public class UserVO extends BaseVO {
      * 身份相关拓展信息
      */
     private UserIdentityExt identityExt;
+
+    /**
+     * 使能标识, 0:启用, 1:禁用
+     */
+    private Byte enableFlag;
+
 }
