@@ -14,30 +14,28 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.config;
+package io.github.pnoker.common.init;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.env.EnvironmentPostProcessor;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
 
 /**
- * Environment Config
+ * Postgres initialization runner
  *
  * @author pnoker
  * @version 2025.2.5
  * @since 2022.1.0
  */
-@Slf4j
-@Configuration
-@Order(Ordered.HIGHEST_PRECEDENCE)
-public class ActiveMongoProfileConfig implements EnvironmentPostProcessor {
+@Component
+@ComponentScan(basePackages = {
+        "io.github.pnoker.common.postgres.*"
+})
+public class PostgresInitRunner implements ApplicationRunner {
 
     @Override
-    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        environment.addActiveProfile("mongodb");
+    public void run(ApplicationArguments args) throws Exception {
+        // nothing to do
     }
 }

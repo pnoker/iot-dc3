@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.mongo.entity.model;
+package io.github.pnoker.common.postgres.entity.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * MongoDB 位号数据
+ * <p>
+ * 设备位号历史数据表(Double类型)
+ * </p>
  *
  * @author pnoker
  * @version 2025.2.5
@@ -36,47 +38,69 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@Document
-public class MgPointValueDO implements Serializable {
+@TableName("dc3_point_value_double")
+public class PointValueDoubleDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @MongoId
-    private String id;
-
     /**
      * 设备ID
      */
+    @TableField("device_id")
     private Long deviceId;
 
     /**
      * 位号ID
      */
+    @TableField("point_id")
     private Long pointId;
 
     /**
      * 原始值
      */
-    private String rawValue;
+    @TableField("raw_value")
+    private Double rawValue;
 
     /**
-     * 处理值
+     * 计算值
      */
-    private String calValue;
+    @TableField("cal_value")
+    private Double calValue;
+
+    /**
+     * 数据信息
+     */
+    @TableField("value_ext")
+    private Object valueExt;
+
+    /**
+     * 驱动ID
+     */
+    @TableField("driver_id")
+    private Long driverId;
+
+    /**
+     * 租户ID
+     */
+    @TableField("tenant_id")
+    private Long tenantId;
 
     /**
      * 原始时间
      */
+    @TableField("origin_time")
     private LocalDateTime originTime;
 
     /**
      * 创建时间
      */
+    @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
      * 操作时间
      */
+    @TableField("operate_time")
     private LocalDateTime operateTime;
 }
