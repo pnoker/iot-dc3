@@ -88,7 +88,6 @@
         <dc3.common.log.version>2025.2.5</dc3.common.log.version>
         <dc3.common.manager.version>2025.2.5</dc3.common.manager.version>
         <dc3.common.model.version>2025.2.5</dc3.common.model.version>
-        <dc3.common.mongo.version>2025.2.5</dc3.common.mongo.version>
         <dc3.common.mqtt.version>2025.2.5</dc3.common.mqtt.version>
         <dc3.common.postgres.version>2025.2.5</dc3.common.postgres.version>
         <dc3.common.public.version>2025.2.5</dc3.common.public.version>
@@ -108,7 +107,6 @@
         <module>dc3-common-constant</module>
         <module>dc3-common-dal</module>
         <module>dc3-common-data</module>
-        <module>dc3-common-data-mongo</module>
         <module>dc3-common-data-postgres</module>
         <module>dc3-common-driver</module>
         <module>dc3-common-exception</module>
@@ -237,11 +235,6 @@
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-data</artifactId>
                 <version>${dc3.common.data.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-data-mongo</artifactId>
-                <version>${dc3.common.mongo.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
