@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.postgres.entity.model;
+package io.github.pnoker.common.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 设备位号历史数据表(Double类型)
+ * 设备位号历史数据表(默认数据表, String类型)
  * </p>
  *
  * @author pnoker
@@ -38,8 +38,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_point_value_double")
-public class PointValueDoubleDO implements Serializable {
+@TableName("dc3_point_value")
+public class PointValueDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -60,13 +60,13 @@ public class PointValueDoubleDO implements Serializable {
      * 原始值
      */
     @TableField("raw_value")
-    private Double rawValue;
+    private String rawValue;
 
     /**
      * 计算值
      */
     @TableField("cal_value")
-    private Double calValue;
+    private String calValue;
 
     /**
      * 数据信息

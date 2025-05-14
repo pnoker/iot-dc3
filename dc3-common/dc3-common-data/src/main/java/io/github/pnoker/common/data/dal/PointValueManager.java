@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.postgres.dal;
+package io.github.pnoker.common.data.dal;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import io.github.pnoker.common.postgres.entity.model.PointValueDecimalDO;
+import io.github.pnoker.common.data.entity.model.PointValueDO;
 
 /**
  * <p>
- * 设备位号历史数据表(Decimal类型) 服务类
+ * 设备位号历史数据表(默认数据表, String类型) 服务类
  * </p>
  *
  * @author pnoker
  * @version 2025.2.5
  * @since 2022.1.0
  */
-public interface PointValueDecimalManager extends IService<PointValueDecimalDO> {
+public interface PointValueManager extends IService<PointValueDO> {
 
 }

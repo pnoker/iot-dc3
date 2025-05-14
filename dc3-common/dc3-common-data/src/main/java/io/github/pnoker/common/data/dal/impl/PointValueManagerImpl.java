@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.postgres.mapper;
+package io.github.pnoker.common.data.dal.impl;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.pnoker.common.postgres.entity.model.PointValueFloatDO;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.pnoker.common.data.dal.PointValueManager;
+import io.github.pnoker.common.data.entity.model.PointValueDO;
+import io.github.pnoker.common.data.mapper.PointValueMapper;
+import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 设备位号历史数据表(Float类型) Mapper 接口
+ * 设备位号历史数据表(默认数据表, String类型) 服务实现类
  * </p>
  *
  * @author pnoker
  * @version 2025.2.5
  * @since 2022.1.0
  */
-public interface PointValueFloatMapper extends BaseMapper<PointValueFloatDO> {
+@Service
+public class PointValueManagerImpl extends ServiceImpl<PointValueMapper, PointValueDO> implements PointValueManager {
 
 }
-
