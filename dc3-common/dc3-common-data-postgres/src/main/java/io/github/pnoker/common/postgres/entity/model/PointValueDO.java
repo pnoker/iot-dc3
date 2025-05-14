@@ -39,7 +39,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @TableName("dc3_point_value_string")
-public class PointValueStringDO implements Serializable {
+public class PointValueDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
