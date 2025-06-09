@@ -44,7 +44,7 @@ import java.util.List;
  * 基于 Jackson 实现
  *
  * @author pnoker
- * @version 2025.2.5
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 public final class JsonUtil {

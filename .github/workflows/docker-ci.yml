@@ -31,7 +31,7 @@ jobs:
         run: |
           echo "profile=pro" >> $GITHUB_OUTPUT
           echo "version=${GITHUB_REF#refs/tags/dc3.develop.}" >> $GITHUB_OUTPUT
-          echo "service_version=2025.2.5" >> $GITHUB_OUTPUT
+          echo "service_version=2025.6.0" >> $GITHUB_OUTPUT
           echo "service_name_gateway=dc3-gateway" >> $GITHUB_OUTPUT
           echo "service_path_gateway=dc3-gateway" >> $GITHUB_OUTPUT
           echo "service_name_center_auth=dc3-center-auth" >> $GITHUB_OUTPUT

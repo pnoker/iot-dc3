@@ -37,7 +37,7 @@ import java.net.*;
  * <p>UdpMaster class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.5
+ * @version 2025.6.0
  */
 public class UdpMaster extends ModbusMaster {
     private static final int MESSAGE_LENGTH = 1024;

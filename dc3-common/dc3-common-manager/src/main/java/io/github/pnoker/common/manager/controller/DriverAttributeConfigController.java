@@ -41,7 +41,7 @@ import java.util.Objects;
  * 驱动属性配置信息 Controller
  *
  * @author pnoker
- * @version 2025.2.5
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j

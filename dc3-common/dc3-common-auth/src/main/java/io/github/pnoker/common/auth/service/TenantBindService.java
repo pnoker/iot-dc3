@@ -24,7 +24,7 @@ import io.github.pnoker.common.base.service.BaseService;
  * TenantBind Interface
  *
  * @author pnoker
- * @version 2025.2.5
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 public interface TenantBindService extends BaseService<TenantBindBO, TenantBindQuery> {

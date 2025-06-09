@@ -45,7 +45,7 @@ import java.util.Map;
  * <p>Abstract ModbusMaster class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.2.5
+ * @version 2025.6.0
  */
 abstract public class ModbusMaster extends Modbus {
     private final Map<Integer, SlaveProfile> slaveProfiles = new HashMap<>();

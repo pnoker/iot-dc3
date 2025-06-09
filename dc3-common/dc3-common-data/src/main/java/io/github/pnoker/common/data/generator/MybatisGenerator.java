@@ -29,7 +29,7 @@ import io.github.pnoker.common.utils.MybatisUtil;
  * 当前配置仅用于 dc3-common-data 服务模块, 如果需要用于其他模块请重新配置 path 参数。
  *
  * @author pnoker
- * @version 2025.2.5
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 public class MybatisGenerator {
@@ -58,10 +58,11 @@ public class MybatisGenerator {
                 .strategyConfig(builder -> builder
                         .addInclude(
                                 "dc3_driver_event",
-                                "dc3_device_event"/*,
+                                "dc3_device_event",
+                                "dc3_point_value",
                                 "dc3_message",
                                 "dc3_notify",
-                                "dc3_rule"*/
+                                "dc3_rule"
                         )
                 ).execute();
     }
