@@ -75,12 +75,6 @@ public class PointValueDO implements Serializable {
     private Long driverId;
 
     /**
-     * 原始时间
-     */
-    @TableField("origin_time")
-    private LocalDateTime originTime;
-
-    /**
      * 创建时间
      */
     @TableField("create_time")
