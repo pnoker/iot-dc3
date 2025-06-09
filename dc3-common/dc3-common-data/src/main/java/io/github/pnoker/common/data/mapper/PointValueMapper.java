@@ -31,4 +31,3 @@ import io.github.pnoker.common.data.entity.model.PointValueDO;
 public interface PointValueMapper extends BaseMapper<PointValueDO> {
 
 }
-

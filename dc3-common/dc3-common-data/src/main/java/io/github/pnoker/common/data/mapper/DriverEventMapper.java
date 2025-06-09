@@ -31,4 +31,3 @@ import io.github.pnoker.common.data.entity.model.DriverEventDO;
 public interface DriverEventMapper extends BaseMapper<DriverEventDO> {
 
 }
-

@@ -69,22 +69,10 @@ public class PointValueDO implements Serializable {
     private String calValue;
 
     /**
-     * 数据信息
-     */
-    @TableField("value_ext")
-    private Object valueExt;
-
-    /**
      * 驱动ID
      */
     @TableField("driver_id")
     private Long driverId;
-
-    /**
-     * 租户ID
-     */
-    @TableField("tenant_id")
-    private Long tenantId;
 
     /**
      * 原始时间
