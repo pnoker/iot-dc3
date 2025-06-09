@@ -31,4 +31,3 @@ import io.github.pnoker.common.data.entity.model.DeviceEventDO;
 public interface DeviceEventMapper extends BaseMapper<DeviceEventDO> {
 
 }
-
