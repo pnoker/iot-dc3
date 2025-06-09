@@ -70,7 +70,7 @@
     <!-- 关闭状态日志 -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
-    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
+    <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook"/>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>
@@ -81,6 +81,8 @@
 
     <!-- 自定义 -->
     <logger name="org.mybatis.spring.mapper.ClassPathMapperScanner" level="ERROR"/>
+    <logger name="com.baomidou.mybatisplus.core.metadata.TableInfoHelper" level="ERROR"/>
+    <logger name="com.baomidou.mybatisplus.core.injector.DefaultSqlInjector" level="ERROR"/>
 
     <!-- 系统 -->
     <logger name="org.springframework.boot.autoconfigure.thymeleaf" level="WARN"/>
