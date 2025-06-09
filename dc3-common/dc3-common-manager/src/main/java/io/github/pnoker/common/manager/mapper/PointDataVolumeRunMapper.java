@@ -25,7 +25,7 @@ import io.github.pnoker.common.manager.entity.model.PointDataVolumeRunDO;
  * </p>
  *
  * @author fukq
- * @version 2025.2.5
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 public interface PointDataVolumeRunMapper extends BaseMapper<PointDataVolumeRunDO> {
