@@ -27,7 +27,7 @@ import java.util.Optional;
  * 通用模板共享类型标识枚举
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.6.1
  * @since 2022.1.0
  */
 @Getter

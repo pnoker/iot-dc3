@@ -25,7 +25,7 @@ import io.github.pnoker.common.auth.entity.model.MenuDO;
  * </p>
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.6.1
  * @since 2022.1.0
  */
 public interface MenuManager extends IService<MenuDO> {

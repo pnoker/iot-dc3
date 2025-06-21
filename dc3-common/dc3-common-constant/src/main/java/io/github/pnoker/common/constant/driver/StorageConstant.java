@@ -25,7 +25,7 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
  * 存储 相关常量
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.6.1
  * @since 2022.1.0
  */
 public class StorageConstant {

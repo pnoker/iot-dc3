@@ -23,7 +23,7 @@ import com.serotonin.modbus4j.sero.messaging.OutgoingResponseMessage;
  * <p>IpMessageResponse interface.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.6.1
  */
 public interface IpMessageResponse extends OutgoingResponseMessage, IncomingResponseMessage {
     /**

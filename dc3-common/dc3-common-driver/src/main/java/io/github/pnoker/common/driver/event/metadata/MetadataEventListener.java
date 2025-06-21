@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * 元数据事件 Listener
  *
  * @author zhangzi
- * @version 2025.6.0
+ * @version 2025.6.1
  * @since 2022.1.0
  */
 @Slf4j

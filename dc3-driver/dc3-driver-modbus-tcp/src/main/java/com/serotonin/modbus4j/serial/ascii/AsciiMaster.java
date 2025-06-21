@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>AsciiMaster class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.6.1
  */
 public class AsciiMaster extends SerialMaster {
     private final Log LOG = LogFactory.getLog(SerialMaster.class);

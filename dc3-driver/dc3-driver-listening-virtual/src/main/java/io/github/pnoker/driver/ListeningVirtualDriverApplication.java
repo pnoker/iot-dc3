@@ -25,7 +25,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * <p>该类是Spring Boot应用的入口类, 用于启动监听虚拟驱动应用。</p>
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.6.1
  * @since 2022.1.0
  */
 @SpringBootApplication

@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>Abstract SerialSlave class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.6.1
  */
 abstract public class SerialSlave extends ModbusSlaveSet {
 

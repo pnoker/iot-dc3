@@ -41,7 +41,7 @@ import java.util.Objects;
  * 用户密码服务接口实现类
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.6.1
  * @since 2022.1.0
  */
 @Slf4j
