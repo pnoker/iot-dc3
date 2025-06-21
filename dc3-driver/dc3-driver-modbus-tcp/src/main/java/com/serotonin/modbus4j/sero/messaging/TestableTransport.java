@@ -25,7 +25,7 @@ import java.io.OutputStream;
  * Provides synchronization on the input stream read by wrapping it.
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.6.1
  */
 public class TestableTransport extends StreamTransport {
     /**

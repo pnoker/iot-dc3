@@ -21,7 +21,7 @@ import com.serotonin.modbus4j.code.ExceptionCode;
  * <p>ExceptionResult class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.6.1
  */
 public class ExceptionResult {
     private final byte exceptionCode;

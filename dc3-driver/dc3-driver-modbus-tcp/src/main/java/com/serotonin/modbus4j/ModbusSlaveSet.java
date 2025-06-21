@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <p>Abstract ModbusSlaveSet class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.6.1
  */
 abstract public class ModbusSlaveSet extends Modbus {
 

@@ -23,7 +23,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>XaMessageParser class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.6.1
  */
 public class XaMessageParser extends BaseMessageParser {
     /**

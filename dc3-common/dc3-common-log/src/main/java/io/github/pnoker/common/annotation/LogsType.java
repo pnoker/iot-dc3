@@ -20,7 +20,7 @@ package io.github.pnoker.common.annotation;
  * 日志类型
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.6.1
  * @since 2022.1.0
  */
 public enum LogsType {

@@ -26,7 +26,7 @@ import com.serotonin.modbus4j.sero.messaging.RequestHandler;
  * <p>Abstract BaseRequestHandler class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.6.1
  */
 abstract public class BaseRequestHandler implements RequestHandler {
     protected ModbusSlaveSet slave;

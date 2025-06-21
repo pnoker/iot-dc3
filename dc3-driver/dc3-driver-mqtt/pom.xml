@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-driver</artifactId>
-        <version>2025.6.0</version>
+        <version>2025.6.1</version>
     </parent>
 
     <artifactId>dc3-driver-mqtt</artifactId>

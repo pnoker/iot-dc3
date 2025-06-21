@@ -26,7 +26,7 @@ import com.serotonin.modbus4j.sero.messaging.OutgoingResponseMessage;
  * <p>XaRequestHandler class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.6.1
  */
 public class XaRequestHandler extends BaseRequestHandler {
     /**
