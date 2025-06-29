@@ -38,6 +38,8 @@ public class ActiveGatewayProfileConfig implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        // Add gateway profile to active profiles
+        // This will enable gateway-specific configurations when the application starts
         environment.addActiveProfile("gateway");
     }
 }

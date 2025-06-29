@@ -53,28 +53,38 @@ public class AuthenticGatewayFilter implements GatewayFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // Get the HTTP request from the exchange
         ServerHttpRequest request = exchange.getRequest();
 
         try {
+            // Get tenant and login information from the request
             // Tenant, Login
             GrpcRTenantDTO rTenantDTO = filterService.getTenantDTO(request);
             GrpcRUserLoginDTO rUserLoginDTO = filterService.getLoginDTO(request);
 
+            // Validate the authentication token
             // Check Token Valid
             filterService.checkValid(request, rTenantDTO, rUserLoginDTO);
 
+            // Build a new request with modified headers containing user authentication info
             // Header
             ServerHttpRequest build = request.mutate().headers(headers -> {
                 RequestHeader.UserHeader entityBO = filterService.getUserDTO(rUserLoginDTO, rTenantDTO);
                 headers.set(RequestConstant.Header.X_AUTH_USER, JsonUtil.toJsonString(entityBO));
             }).build();
 
+            // Continue the filter chain with the modified request
             return chain.filter(exchange.mutate().request(build).build());
         } catch (Exception e) {
+            // Log the authentication error
             log.error("AuthenticGatewayFilter error: {}, Url: {}", e.getMessage(), request.getURI(), e);
+            
+            // Prepare error response
             ServerHttpResponse response = exchange.getResponse();
             response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            
+            // Create response data buffer with error message
             DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(e.getMessage())));
             return response.writeWith(Mono.just(dataBuffer));
         }

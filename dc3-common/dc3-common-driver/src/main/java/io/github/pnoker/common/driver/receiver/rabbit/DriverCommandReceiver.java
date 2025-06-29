@@ -35,13 +35,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class DriverCommandReceiver {
 
+    /**
+     * Receive and process driver commands from RabbitMQ queue
+     *
+     * @param channel           RabbitMQ channel
+     * @param message          RabbitMQ message
+     * @param driverCommandDTO Driver command data transfer object
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{driverCommandQueue.name}")
     public void driverCommandReceive(Channel channel, Message message, DriverCommandDTO driverCommandDTO) {
         try {
+            // Acknowledge the message receipt to RabbitMQ
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+            // Log the received driver command
             log.info("driver command: {}", driverCommandDTO);
         } catch (Exception e) {
+            // Log any errors that occur during message processing
             log.error(e.getMessage(), e);
         }
     }

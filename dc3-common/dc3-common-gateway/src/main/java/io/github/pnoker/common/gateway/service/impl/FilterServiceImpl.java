@@ -53,11 +53,13 @@ public class FilterServiceImpl implements FilterService {
 
     @Override
     public GrpcRTenantDTO getTenantDTO(ServerHttpRequest request) {
+        // Get tenant code from request header
         String tenant = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
         if (CharSequenceUtil.isEmpty(tenant)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
+        // Query tenant info by tenant code
         GrpcRTenantDTO entityDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(tenant).build());
         if (!entityDTO.getResult().getOk() || EnableFlagEnum.ENABLE.getIndex() != entityDTO.getData().getEnableFlag()) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
@@ -67,11 +69,13 @@ public class FilterServiceImpl implements FilterService {
 
     @Override
     public GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request) {
+        // Get user login name from request header
         String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
         if (CharSequenceUtil.isEmpty(user)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
+        // Query user login info by login name
         GrpcRUserLoginDTO entityDTO = userLoginApiBlockingStub.selectByName(GrpcNameQuery.newBuilder().setName(user).build());
         if (!entityDTO.getResult().getOk() || EnableFlagEnum.ENABLE.getIndex() != entityDTO.getData().getEnableFlag()) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
@@ -81,11 +85,13 @@ public class FilterServiceImpl implements FilterService {
 
     @Override
     public RequestHeader.UserHeader getUserDTO(GrpcRUserLoginDTO rUserLoginDTO, GrpcRTenantDTO rTenantDTO) {
+        // Query user info by user id
         GrpcRUserDTO entityDTO = userApiBlockingStub.selectById(GrpcIdQuery.newBuilder().setId(rUserLoginDTO.getData().getBase().getId()).build());
         if (!entityDTO.getResult().getOk()) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
+        // Build user header info
         RequestHeader.UserHeader entityBO = new RequestHeader.UserHeader();
         entityBO.setUserId(entityDTO.getData().getBase().getId());
         entityBO.setNickName(entityDTO.getData().getNickName());
@@ -96,13 +102,20 @@ public class FilterServiceImpl implements FilterService {
 
     @Override
     public void checkValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO) {
+        // Get token from request header and parse it
         String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
         RequestHeader.TokenHeader entityBO = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
         if (Objects.isNull(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        GrpcLoginQuery login = GrpcLoginQuery.newBuilder().setTenant(rTenantDTO.getData().getTenantCode()).setName(rUserLoginDTO.getData().getLoginName()).setSalt(entityBO.getSalt()).setToken(entityBO.getToken()).build();
+        // Build login query and validate token
+        GrpcLoginQuery login = GrpcLoginQuery.newBuilder()
+                .setTenant(rTenantDTO.getData().getTenantCode())
+                .setName(rUserLoginDTO.getData().getLoginName())
+                .setSalt(entityBO.getSalt())
+                .setToken(entityBO.getToken())
+                .build();
         GrpcRTokenDTO entityDTO = tokenApiBlockingStub.checkValid(login);
         if (!entityDTO.getResult().getOk()) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);

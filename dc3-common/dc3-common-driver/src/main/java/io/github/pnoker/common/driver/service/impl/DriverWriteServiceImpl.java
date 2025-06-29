@@ -57,23 +57,28 @@ public class DriverWriteServiceImpl implements DriverWriteService {
     @Override
     public void write(Long deviceId, Long pointId, String value) {
         try {
+            // Get device from metadata cache
             DeviceBO device = deviceMetadata.getCache(deviceId);
             if (Objects.isNull(device)) {
                 throw new ReadPointException("Failed to write point value, device[{}] is null", deviceId);
             }
 
+            // Check if device contains the specified point
             if (!device.getPointIds().contains(pointId)) {
                 throw new ReadPointException("Failed to write point value, device[{}] not contained point[{}]", deviceId, pointId);
             }
 
+            // Get driver and point configurations
             Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
             Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
 
+            // Get point from metadata cache
             PointBO point = pointMetadata.getCache(pointId);
             if (Objects.isNull(point)) {
                 throw new ReadPointException("Failed to write point value, point[{}] is null" + deviceId);
             }
 
+            // Write value to device through custom driver service
             driverCustomService.write(driverConfig, pointConfig, device, point, new WValue(value, point.getPointTypeFlag()));
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
@@ -82,13 +87,17 @@ public class DriverWriteServiceImpl implements DriverWriteService {
 
     @Override
     public void write(DeviceCommandDTO commandDTO) {
+        // Parse device write command from DTO content
         DeviceCommandDTO.DeviceWrite deviceWrite = JsonUtil.parseObject(commandDTO.getContent(), DeviceCommandDTO.DeviceWrite.class);
         if (Objects.isNull(deviceWrite)) {
             return;
         }
 
+        // Log command execution start
         log.info("Start command of write: {}", JsonUtil.toJsonString(commandDTO));
+        // Execute write operation
         write(deviceWrite.getDeviceId(), deviceWrite.getPointId(), deviceWrite.getValue());
+        // Log command execution end
         log.info("End command of write: write");
     }
 

@@ -56,40 +56,52 @@ public class DriverReadServiceImpl implements DriverReadService {
 
     @Override
     public void read(Long deviceId, Long pointId) {
+        // Get device from metadata cache
         DeviceBO device = deviceMetadata.getCache(deviceId);
         if (Objects.isNull(device)) {
             throw new ReadPointException("Failed to read point value, device[{}] is null", deviceId);
         }
 
+        // Check if device contains the specified point
         if (!device.getPointIds().contains(pointId)) {
             throw new ReadPointException("Failed to read point value, device[{}] not contained point[{}]", deviceId, pointId);
         }
 
+        // Get driver and point configurations
         Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
         Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
 
+        // Get point from metadata cache
         PointBO point = pointMetadata.getCache(pointId);
         if (Objects.isNull(point)) {
             throw new ReadPointException("Failed to read point value, point[{}] is null" + deviceId);
         }
 
+        // Read point value using custom driver service
         RValue rValue = driverCustomService.read(driverConfig, pointConfig, device, point);
         if (Objects.isNull(rValue)) {
             throw new ReadPointException("Failed to read point value, point value is null");
         }
 
+        // Send point value to message queue
         driverSenderService.pointValueSender(new PointValue(rValue));
     }
 
     @Override
     public void read(DeviceCommandDTO commandDTO) {
+        // Parse device read command from command DTO
+        // Deserialize the command content into DeviceRead object
         DeviceCommandDTO.DeviceRead deviceRead = JsonUtil.parseObject(commandDTO.getContent(), DeviceCommandDTO.DeviceRead.class);
         if (Objects.isNull(deviceRead)) {
             return;
         }
 
+        // Execute read command and log the process
+        // Log the start of command execution with command details
         log.info("Start command of read: {}", JsonUtil.toJsonString(commandDTO));
+        // Call the read method with device and point IDs
         read(deviceRead.getDeviceId(), deviceRead.getPointId());
+        // Log the completion of command execution
         log.info("End command of read");
     }
 
