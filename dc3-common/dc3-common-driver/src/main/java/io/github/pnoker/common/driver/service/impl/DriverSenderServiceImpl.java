@@ -50,6 +50,10 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         this.rabbitTemplate = rabbitTemplate;
     }
 
+    /**
+     * Send driver event to message queue
+     * @param entityDTO Driver event data transfer object
+     */
     @Override
     public void driverEventSender(DriverEventDTO entityDTO) {
         if (Objects.isNull(entityDTO)) {
@@ -63,6 +67,10 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         );
     }
 
+    /**
+     * Send device event to message queue
+     * @param entityDTO Device event data transfer object
+     */
     @Override
     public void deviceEventSender(DeviceEventDTO entityDTO) {
         if (!Objects.nonNull(entityDTO)) {
@@ -76,16 +84,32 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         );
     }
 
+    /**
+     * Send device status with default timeout (15 minutes)
+     * @param deviceId Device ID
+     * @param status Device status enum
+     */
     @Override
     public void deviceStatusSender(Long deviceId, DeviceStatusEnum status) {
         sendDeviceStatus(deviceId, status, 15, TimeUnit.MINUTES);
     }
 
+    /**
+     * Send device status with custom timeout
+     * @param deviceId Device ID
+     * @param status Device status enum
+     * @param timeOut Timeout value
+     * @param timeUnit Time unit for timeout
+     */
     @Override
     public void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
         sendDeviceStatus(deviceId, status, timeOut, timeUnit);
     }
 
+    /**
+     * Send single point value to message queue
+     * @param entityDTO Point value data transfer object
+     */
     @Override
     public void pointValueSender(PointValue entityDTO) {
         if (Objects.nonNull(entityDTO)) {
@@ -98,6 +122,10 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
     }
 
+    /**
+     * Send multiple point values to message queue
+     * @param entityDTOList List of point value data transfer objects
+     */
     @Override
     public void pointValueSender(List<PointValue> entityDTOList) {
         if (Objects.nonNull(entityDTOList)) {
@@ -105,6 +133,13 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
     }
 
+    /**
+     * Helper method to send device status event
+     * @param deviceId Device ID
+     * @param status Device status enum
+     * @param timeOut Timeout value
+     * @param timeUnit Time unit for timeout
+     */
     private void sendDeviceStatus(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
         DeviceEventDTO.DeviceStatus deviceStatus = new DeviceEventDTO.DeviceStatus(deviceId, status, timeOut, timeUnit);
         DeviceEventDTO deviceEventDTO = new DeviceEventDTO(DeviceEventTypeEnum.HEARTBEAT, JsonUtil.toJsonString(deviceStatus));

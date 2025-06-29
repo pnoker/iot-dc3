@@ -62,12 +62,12 @@ public class DriverClient {
     private GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
     /**
-     * 根据 位号ID 获取位号元数据
+     * Register driver with metadata
      *
-     * @param entityBO DriverRegisterBO
+     * @param entityBO DriverRegisterBO containing driver registration information
      */
     public void driverRegister(RegisterBO entityBO) {
-        // 构造驱动注册信息
+        // Build driver registration information
         GrpcDriverRegisterDTO.Builder builder = GrpcDriverRegisterDTO.newBuilder();
         GrpcDriverDTO grpcDriverDTO = driverBuilder.buildGrpcDTOByDTO(entityBO.getDriver());
         builder.setTenant(entityBO.getTenant())
@@ -85,7 +85,7 @@ public class DriverClient {
                 }
         );
 
-        // 发起驱动注册
+        // Initiate driver registration
         GrpcRDriverRegisterDTO rDriverRegisterDTO = driverApiBlockingStub.driverRegister(builder.build());
         if (!rDriverRegisterDTO.getResult().getOk()) {
             throw new RegisterException(rDriverRegisterDTO.getResult().getMessage());

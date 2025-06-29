@@ -46,10 +46,14 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     @Override
     public void initial() {
         try {
+            // Build driver registration information from properties
             RegisterBO entityBO = buildRegisterBOByProperty();
+            // Log driver information for debugging
             log.info("The driver information is: {}", JsonUtil.toJsonString(entityBO));
+            // Register driver with the driver client
             driverClient.driverRegister(entityBO);
         } catch (Exception e) {
+            // Log error and exit if initialization fails
             log.error("Driver initialization failed: {}", e.getMessage(), e);
             System.exit(1);
         }
@@ -57,10 +61,12 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
 
     /**
      * 构建驱动注册信息
+     * Build driver registration information from properties
      *
-     * @return DriverRegisterBO
+     * @return DriverRegisterBO Driver registration business object
      */
     private RegisterBO buildRegisterBOByProperty() {
+        // Create and populate driver business object with properties
         DriverBO driverBO = new DriverBO();
         driverBO.setDriverName(driverProperties.getName());
         driverBO.setDriverCode(driverProperties.getCode());
@@ -69,6 +75,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         driverBO.setDriverTypeFlag(driverProperties.getType());
         driverBO.setRemark(driverProperties.getRemark());
 
+        // Create and populate registration business object
         RegisterBO entityBO = new RegisterBO();
         entityBO.setDriver(driverBO);
         entityBO.setTenant(driverProperties.getTenant());

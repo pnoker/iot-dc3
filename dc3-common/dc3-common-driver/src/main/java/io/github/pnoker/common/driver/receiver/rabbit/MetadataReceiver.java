@@ -55,12 +55,22 @@ public class MetadataReceiver {
     @Resource
     private MetadataEventPublisher metadataEventPublisher;
 
+    /**
+     * Receive and process metadata events from RabbitMQ queue
+     *
+     * @param channel   RabbitMQ channel
+     * @param message   RabbitMQ message
+     * @param entityDTO Metadata event data transfer object
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{metadataQueue.name}")
     public void metadataReceive(Channel channel, Message message, MetadataEventDTO entityDTO) {
         try {
+            // Acknowledge message receipt
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             log.info("Receive driver metadata: {}", JsonUtil.toJsonString(entityDTO));
+
+            // Validate metadata event
             if (Objects.isNull(entityDTO)
                     || Objects.isNull(entityDTO.getMetadataType())
                     || Objects.isNull(entityDTO.getOperateType())) {
@@ -68,6 +78,7 @@ public class MetadataReceiver {
                 return;
             }
 
+            // Handle device metadata events
             if (MetadataTypeEnum.DEVICE.equals(entityDTO.getMetadataType())) {
                 if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType()) || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
                     log.info("Upsert device: {}", entityDTO.getId());
@@ -79,9 +90,11 @@ public class MetadataReceiver {
                     driverMetadata.getDeviceIds().remove(entityDTO.getId());
                 }
 
-                // publish device metadata event
+                // Publish device metadata event
                 metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.DEVICE, entityDTO.getOperateType()));
-            } else if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
+            } 
+            // Handle point metadata events
+            else if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
                 if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType()) || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
                     log.info("Upsert point: {}", entityDTO.getId());
                     pointMetadata.loadCache(entityDTO.getId());
@@ -90,7 +103,7 @@ public class MetadataReceiver {
                     pointMetadata.removeCache(entityDTO.getId());
                 }
 
-                // publish point metadata event
+                // Publish point metadata event
                 metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.POINT, entityDTO.getOperateType()));
             }
         } catch (Exception e) {

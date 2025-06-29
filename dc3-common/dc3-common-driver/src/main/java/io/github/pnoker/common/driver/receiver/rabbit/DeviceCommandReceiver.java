@@ -47,13 +47,22 @@ public class DeviceCommandReceiver {
     @Resource
     private DriverWriteService driverWriteService;
 
-
+    /**
+     * Receive and process device commands from RabbitMQ queue
+     *
+     * @param channel   RabbitMQ channel for message acknowledgment
+     * @param message   Raw RabbitMQ message containing delivery information
+     * @param entityDTO Device command data transfer object containing command details
+     */
     @RabbitHandler
     @RabbitListener(queues = "#{deviceCommandQueue.name}")
     public void deviceCommandReceive(Channel channel, Message message, DeviceCommandDTO entityDTO) {
         try {
+            // Acknowledge message receipt
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
             log.info("Receive device command: {}", JsonUtil.toJsonString(entityDTO));
+
+            // Validate command data
             if (Objects.isNull(entityDTO)
                     || Objects.isNull(entityDTO.getType())
                     || CharSequenceUtil.isEmpty(entityDTO.getContent())) {
@@ -61,11 +70,14 @@ public class DeviceCommandReceiver {
                 return;
             }
 
+            // Process command based on type
             switch (entityDTO.getType()) {
                 case READ:
+                    // Execute read operation
                     driverReadService.read(entityDTO);
                     break;
                 case WRITE:
+                    // Execute write operation
                     driverWriteService.write(entityDTO);
                     break;
                 case CONFIG:
