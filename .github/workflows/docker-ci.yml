@@ -314,6 +314,8 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
           echo "### 📦 Usage" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
+          echo "> Taking \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}\` as an example" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
           echo "#### 🚀 Quick Start" >> $GITHUB_OUTPUT
           echo "\`\`\`bash" >> $GITHUB_OUTPUT
           echo "# Pull image from Docker Hub" >> $GITHUB_OUTPUT
