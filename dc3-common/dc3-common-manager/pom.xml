@@ -21,12 +21,12 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-common</artifactId>
-        <version>2025.6.4</version>
+        <version>2025.6.5</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-common-manager</artifactId>
-    <version>2025.6.4</version>
+    <version>2025.6.5</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2016-2022</inceptionYear>
