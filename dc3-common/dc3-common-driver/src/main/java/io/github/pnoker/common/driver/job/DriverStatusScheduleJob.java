@@ -23,7 +23,6 @@ import io.github.pnoker.common.enums.DriverEventTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
@@ -32,7 +31,7 @@ import org.springframework.stereotype.Component;
  * 自定义调度任务
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -46,7 +45,7 @@ public class DriverStatusScheduleJob extends QuartzJobBean {
     private DriverSenderService driverSenderService;
 
     @Override
-    protected void executeInternal(@NotNull JobExecutionContext jobExecutionContext) {
+    protected void executeInternal(JobExecutionContext jobExecutionContext) {
         DriverEventDTO.DriverStatus driverStatus = new DriverEventDTO.DriverStatus(driverMetadata.getDriver().getId(), driverMetadata.getDriverStatus());
         DriverEventDTO driverEventDTO = new DriverEventDTO(DriverEventTypeEnum.HEARTBEAT, JsonUtil.toJsonString(driverStatus));
         log.info("Report driver event: {}, event content: {}", driverEventDTO.getType().getCode(), JsonUtil.toJsonString(driverEventDTO));

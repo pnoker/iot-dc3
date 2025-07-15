@@ -25,7 +25,7 @@ import io.github.pnoker.common.auth.entity.model.TenantBindDO;
  * </p>
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 public interface TenantBindManager extends IService<TenantBindDO> {

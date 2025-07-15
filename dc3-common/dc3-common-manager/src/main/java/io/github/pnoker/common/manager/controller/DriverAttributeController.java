@@ -43,7 +43,7 @@ import java.util.Objects;
  * 驱动连接配置信息 Controller
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j

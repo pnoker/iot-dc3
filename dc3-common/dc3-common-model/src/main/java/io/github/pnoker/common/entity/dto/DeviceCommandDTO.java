@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
  * 设备指令
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Getter
@@ -67,7 +67,7 @@ public class DeviceCommandDTO implements Serializable {
      * 设备读指令
      *
      * @author pnoker
-     * @version 2025.6.1
+     * @version 2025.6.0
      * @since 2022.1.0
      */
     @Getter
@@ -105,7 +105,7 @@ public class DeviceCommandDTO implements Serializable {
      * 设备写指令
      *
      * @author pnoker
-     * @version 2025.6.1
+     * @version 2025.6.0
      * @since 2022.1.0
      */
     @Getter

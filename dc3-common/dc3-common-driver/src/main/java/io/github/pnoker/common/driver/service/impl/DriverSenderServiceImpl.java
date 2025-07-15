@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -52,6 +52,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
 
     /**
      * Send driver event to message queue
+     *
      * @param entityDTO Driver event data transfer object
      */
     @Override
@@ -69,6 +70,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
 
     /**
      * Send device event to message queue
+     *
      * @param entityDTO Device event data transfer object
      */
     @Override
@@ -86,8 +88,9 @@ public class DriverSenderServiceImpl implements DriverSenderService {
 
     /**
      * Send device status with default timeout (15 minutes)
+     *
      * @param deviceId Device ID
-     * @param status Device status enum
+     * @param status   Device status enum
      */
     @Override
     public void deviceStatusSender(Long deviceId, DeviceStatusEnum status) {
@@ -96,9 +99,10 @@ public class DriverSenderServiceImpl implements DriverSenderService {
 
     /**
      * Send device status with custom timeout
+     *
      * @param deviceId Device ID
-     * @param status Device status enum
-     * @param timeOut Timeout value
+     * @param status   Device status enum
+     * @param timeOut  Timeout value
      * @param timeUnit Time unit for timeout
      */
     @Override
@@ -108,6 +112,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
 
     /**
      * Send single point value to message queue
+     *
      * @param entityDTO Point value data transfer object
      */
     @Override
@@ -124,6 +129,7 @@ public class DriverSenderServiceImpl implements DriverSenderService {
 
     /**
      * Send multiple point values to message queue
+     *
      * @param entityDTOList List of point value data transfer objects
      */
     @Override
@@ -135,9 +141,10 @@ public class DriverSenderServiceImpl implements DriverSenderService {
 
     /**
      * Helper method to send device status event
+     *
      * @param deviceId Device ID
-     * @param status Device status enum
-     * @param timeOut Timeout value
+     * @param status   Device status enum
+     * @param timeOut  Timeout value
      * @param timeUnit Time unit for timeout
      */
     private void sendDeviceStatus(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {

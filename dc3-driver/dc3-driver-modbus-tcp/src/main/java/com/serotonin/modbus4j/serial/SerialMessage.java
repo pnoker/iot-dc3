@@ -22,7 +22,7 @@ import com.serotonin.modbus4j.msg.ModbusMessage;
  * <p>Abstract SerialMessage class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.1
+ * @version 2025.6.0
  */
 abstract public class SerialMessage {
     protected final ModbusMessage modbusMessage;

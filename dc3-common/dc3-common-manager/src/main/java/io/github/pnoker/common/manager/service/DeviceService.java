@@ -28,7 +28,7 @@ import java.util.List;
  * 设备 Interface
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {

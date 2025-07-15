@@ -25,7 +25,7 @@ import java.util.function.LongConsumer;
  * 自定义 Long Optional
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 public final class LongOptional {

@@ -24,7 +24,7 @@ import io.github.pnoker.common.data.entity.query.MessageQuery;
  * AlarmMessageProfile Interface
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 public interface MessageService extends BaseService<MessageBO, MessageQuery> {
