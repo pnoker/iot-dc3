@@ -18,7 +18,6 @@ package io.github.pnoker.common.driver.job;
 
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
@@ -27,7 +26,7 @@ import org.springframework.stereotype.Component;
  * 自定义调度任务
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -41,7 +40,7 @@ public class DriverCustomScheduleJob extends QuartzJobBean {
     }
 
     @Override
-    protected void executeInternal(@NotNull JobExecutionContext jobExecutionContext) {
+    protected void executeInternal(JobExecutionContext jobExecutionContext) {
         try {
             driverCustomService.schedule();
         } catch (Exception e) {

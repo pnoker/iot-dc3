@@ -23,7 +23,7 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
  * <p>ReadCoilsRequest class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.1
+ * @version 2025.6.0
  */
 public class ReadCoilsRequest extends ReadBinaryRequest {
     /**

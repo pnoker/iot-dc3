@@ -19,7 +19,7 @@ package com.serotonin.modbus4j.exception;
  * <p>IllegalFunctionException class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.1
+ * @version 2025.6.0
  */
 public class IllegalFunctionException extends ModbusTransportException {
     private static final long serialVersionUID = -1;

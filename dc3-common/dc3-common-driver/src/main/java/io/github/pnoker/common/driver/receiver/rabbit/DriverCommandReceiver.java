@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * 接收驱动指令
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -38,7 +38,7 @@ public class DriverCommandReceiver {
     /**
      * Receive and process driver commands from RabbitMQ queue
      *
-     * @param channel           RabbitMQ channel
+     * @param channel          RabbitMQ channel
      * @param message          RabbitMQ message
      * @param driverCommandDTO Driver command data transfer object
      */

@@ -25,7 +25,6 @@ import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
@@ -39,7 +38,7 @@ import java.util.Set;
  * 系统内置定时任务
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -54,7 +53,7 @@ public class DriverReadScheduleJob extends QuartzJobBean {
     private DriverReadService driverReadService;
 
     @Override
-    protected void executeInternal(@NotNull JobExecutionContext jobExecutionContext) {
+    protected void executeInternal(JobExecutionContext jobExecutionContext) {
         Set<Long> deviceIds = driverMetadata.getDeviceIds();
         if (CollUtil.isEmpty(deviceIds)) {
             return;

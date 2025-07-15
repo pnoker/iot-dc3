@@ -33,7 +33,7 @@ import java.util.Objects;
 
 /**
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -58,10 +58,10 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
 
         try {
             // Create and schedule the driver status monitoring job
-            quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP, 
-                ScheduleConstant.DRIVER_STATUS_SCHEDULE_JOB, 
-                ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON, 
-                DriverStatusScheduleJob.class);
+            quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                    ScheduleConstant.DRIVER_STATUS_SCHEDULE_JOB,
+                    ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON,
+                    DriverStatusScheduleJob.class);
 
             // Create and schedule the read job if enabled
             if (Boolean.TRUE.equals(property.getRead().getEnable())) {
@@ -70,9 +70,9 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
                     throw new CronException("Read schedule cron expression is invalid");
                 }
                 quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-                    ScheduleConstant.DRIVER_READ_SCHEDULE_JOB,
-                    property.getRead().getCron(),
-                    DriverReadScheduleJob.class);
+                        ScheduleConstant.DRIVER_READ_SCHEDULE_JOB,
+                        property.getRead().getCron(),
+                        DriverReadScheduleJob.class);
             }
 
             // Create and schedule the custom job if enabled
@@ -82,9 +82,9 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
                     throw new CronException("Custom schedule cron expression is invalid");
                 }
                 quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-                    ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB,
-                    property.getCustom().getCron(),
-                    DriverCustomScheduleJob.class);
+                        ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB,
+                        property.getCustom().getCron(),
+                        DriverCustomScheduleJob.class);
             }
 
             // Start the scheduler after all jobs are configured

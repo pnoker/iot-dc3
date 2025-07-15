@@ -25,7 +25,6 @@ import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
@@ -37,7 +36,7 @@ import java.util.List;
  * 元数据事件 Listener
  *
  * @author zhangzi
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -52,7 +51,7 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
 
     @Async
     @Override
-    public void onApplicationEvent(@NotNull MetadataEvent metadataEvent) {
+    public void onApplicationEvent(MetadataEvent metadataEvent) {
         log.info("Metadata event listener received: {}", JsonUtil.toJsonString(metadataEvent));
         try {
             Long id = metadataEvent.getId();

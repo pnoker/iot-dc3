@@ -37,7 +37,6 @@ import io.github.pnoker.common.redis.service.RedisService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -47,7 +46,7 @@ import java.util.stream.Collectors;
  * DriverService Impl
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -162,7 +161,6 @@ public class DriverStatusServiceImpl implements DriverStatusService {
      * @param driverId
      * @return
      */
-    @Nullable
     private List<String> getList(Long driverId) {
         GrpcDriverQuery query = GrpcDriverQuery.newBuilder()
                 .setDriverId(driverId)

@@ -39,7 +39,7 @@ import java.util.Objects;
  * 接收驱动元数据
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -92,7 +92,7 @@ public class MetadataReceiver {
 
                 // Publish device metadata event
                 metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.DEVICE, entityDTO.getOperateType()));
-            } 
+            }
             // Handle point metadata events
             else if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
                 if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType()) || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {

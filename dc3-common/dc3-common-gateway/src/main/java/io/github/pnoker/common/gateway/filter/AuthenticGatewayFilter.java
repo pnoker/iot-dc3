@@ -78,12 +78,12 @@ public class AuthenticGatewayFilter implements GatewayFilter {
         } catch (Exception e) {
             // Log the authentication error
             log.error("AuthenticGatewayFilter error: {}, Url: {}", e.getMessage(), request.getURI(), e);
-            
+
             // Prepare error response
             ServerHttpResponse response = exchange.getResponse();
             response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
-            
+
             // Create response data buffer with error message
             DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(e.getMessage())));
             return response.writeWith(Mono.just(dataBuffer));

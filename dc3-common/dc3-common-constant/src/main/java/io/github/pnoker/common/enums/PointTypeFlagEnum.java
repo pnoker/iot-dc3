@@ -27,7 +27,7 @@ import java.util.Optional;
  * 通用位号类型标识枚举
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Getter

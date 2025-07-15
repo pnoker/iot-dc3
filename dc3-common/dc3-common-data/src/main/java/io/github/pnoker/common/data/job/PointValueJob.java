@@ -19,7 +19,6 @@ package io.github.pnoker.common.data.job;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +33,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -83,7 +82,7 @@ public class PointValueJob extends QuartzJobBean {
     }
 
     @Override
-    protected void executeInternal(@NotNull JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         // Statistical point value receive rate
         long speed = VALUE_COUNT.getAndSet(0);
         VALUE_SPEED.set(speed);

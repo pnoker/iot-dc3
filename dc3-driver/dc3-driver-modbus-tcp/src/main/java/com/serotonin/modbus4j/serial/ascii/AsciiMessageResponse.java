@@ -26,7 +26,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>AsciiMessageResponse class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.1
+ * @version 2025.6.0
  */
 public class AsciiMessageResponse extends AsciiMessage implements OutgoingResponseMessage, IncomingResponseMessage {
     /**

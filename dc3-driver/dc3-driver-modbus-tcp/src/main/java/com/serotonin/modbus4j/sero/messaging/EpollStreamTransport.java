@@ -29,7 +29,7 @@ import java.io.OutputStream;
  * control).
  *
  * @author Matthew Lohbihler
- * @version 2025.6.1
+ * @version 2025.6.0
  */
 public class EpollStreamTransport implements Transport {
     private final OutputStream out;

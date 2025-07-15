@@ -24,7 +24,7 @@ import lombok.*;
  * UserLogin BO
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Getter

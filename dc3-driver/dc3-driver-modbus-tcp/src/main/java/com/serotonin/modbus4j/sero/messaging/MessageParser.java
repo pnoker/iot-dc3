@@ -22,7 +22,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * Interface defining methods that are called when data arrives in the connection.
  *
  * @author Matthew Lohbihler
- * @version 2025.6.1
+ * @version 2025.6.0
  */
 public interface MessageParser {
     /**

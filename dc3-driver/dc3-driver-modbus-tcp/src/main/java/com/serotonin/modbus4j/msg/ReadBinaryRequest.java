@@ -25,7 +25,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>Abstract ReadBinaryRequest class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.1
+ * @version 2025.6.0
  */
 abstract public class ReadBinaryRequest extends ModbusRequest {
     private int startOffset;

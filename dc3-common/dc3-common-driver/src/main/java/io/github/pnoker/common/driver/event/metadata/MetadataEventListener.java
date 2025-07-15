@@ -22,7 +22,6 @@ import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +29,7 @@ import org.springframework.stereotype.Component;
  * 元数据事件 Listener
  *
  * @author zhangzi
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 @Slf4j
@@ -44,7 +43,7 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
     }
 
     @Override
-    public void onApplicationEvent(@NotNull MetadataEvent metadataEvent) {
+    public void onApplicationEvent(MetadataEvent metadataEvent) {
         log.info("Metadata event listener received: {}", JsonUtil.toJsonString(metadataEvent));
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {

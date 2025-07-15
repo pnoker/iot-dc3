@@ -21,7 +21,7 @@ import java.io.InputStream;
  * <p>InputStreamEPollWrapper interface.</p>
  *
  * @author Terry Packer
- * @version 2025.6.1
+ * @version 2025.6.0
  */
 public interface InputStreamEPollWrapper {
 

@@ -22,7 +22,7 @@ import cn.hutool.core.text.CharSequenceUtil;
  * 自定义 写入位号值 异常
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 public class WritePointException extends RuntimeException {

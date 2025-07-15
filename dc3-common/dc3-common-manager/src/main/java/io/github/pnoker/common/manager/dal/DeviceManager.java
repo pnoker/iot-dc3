@@ -26,7 +26,7 @@ import io.github.pnoker.common.manager.entity.model.DeviceDO;
  * </p>
  *
  * @author pnoker
- * @version 2025.6.1
+ * @version 2025.6.0
  * @since 2022.1.0
  */
 public interface DeviceManager extends IService<DeviceDO> {
