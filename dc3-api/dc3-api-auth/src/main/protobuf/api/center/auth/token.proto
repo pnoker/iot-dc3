@@ -30,27 +30,35 @@ option java_multiple_files = true;
 
 /*
 Api
+服务接口，定义了令牌（Token）相关的RPC调用
 */
 service TokenApi {
+  // 校验令牌有效性
   rpc CheckValid (GrpcLoginQuery) returns (GrpcRTokenDTO);
 }
 
 // checkValid Query
+// 校验登录信息的请求结构体
 message GrpcLoginQuery {
-  string tenant = 1; // 租户
+  string tenant = 1; // 租户，标识所属租户
   string name = 2; // 登录名称
-  string salt = 3; // 盐值
+  string salt = 3; // 盐值，用于密码加密
   string password = 4; // 登录密码
   string token = 5; // 令牌
 }
 
 // R of Token DTO
+// 返回令牌校验结果的响应结构体
 message GrpcRTokenDTO {
   /*
   R
+  通用返回结果，包含状态码、消息等
   */
   GrpcR result = 1;
 
-  /*数据, 返回过期时间*/
+  /*
+  Data
+  返回的数据，通常为令牌或过期时间等
+  */
   string data = 2;
 }

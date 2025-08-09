@@ -28,40 +28,48 @@ option java_multiple_files = true;
 
 /*
 驱动ID Query
+驱动查询结构体，用于根据驱动ID查询驱动信息
 */
 message GrpcDriverQuery {
   /*
   驱动ID
+  标识具体的驱动实例
   */
   int64 driver_id = 1;
 }
 
 /*
 Profile ID Query
+配置模板查询结构体，用于根据配置模板ID查询模板信息
 */
 message GrpcProfileQuery {
   /*
   Profile ID
+  配置模板ID，标识具体的配置模板
   */
   int64 profile_id = 1;
 }
 
 /*
 Point ID Query
+点位查询结构体，用于根据点位ID查询点位信息
 */
 message GrpcPointQuery {
   /*
   Point ID
+  点位ID，标识具体的点位
   */
   int64 point_id = 1;
 }
 
 /*
 Device ID Query
+设备查询结构体，用于根据设备ID查询设备信息
 */
 message GrpcDeviceQuery {
   /*
   Device ID
+  设备ID，标识具体的设备
   */
   int64 device_id = 1;
 }

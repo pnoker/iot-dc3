@@ -32,34 +32,42 @@ option java_multiple_files = true;
 
 /*
 Api
+服务接口，定义了驱动相关的RPC调用
 */
 service DriverApi {
+  // 驱动注册，用于驱动服务向平台注册自身信息
   rpc DriverRegister (GrpcDriverRegisterDTO) returns (GrpcRDriverRegisterDTO);
 }
 
+// 驱动注册响应结构体
 message GrpcRDriverRegisterDTO {
   /*
   R
+  通用返回结果，包含状态码、消息等
   */
   GrpcR result = 1;
 
   /*
   驱动
+  驱动基本信息
   */
   GrpcDriverDTO driver = 2;
 
   /*
   设备ID集合
+  该驱动管理的设备ID列表
   */
   repeated int64 device_ids = 3;
 
   /*
   驱动属性集合
+  驱动支持的属性配置列表
   */
   repeated GrpcDriverAttributeDTO driver_attributes = 4;
 
   /*
   位号属性集合
+  驱动支持的点位属性配置列表
   */
   repeated GrpcPointAttributeDTO point_attributes = 5;
 

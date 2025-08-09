@@ -23,11 +23,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
- * 编码工具类
- *
- * @author pnoker
- * @version 2025.6.0
- * @since 2022.1.0
+ * Utility class providing various utility methods for encoding, decoding,
+ * and byte manipulation operations including Base64, BCD, Hex, and ASCII conversions.
  */
 @Slf4j
 public class CodecUtil {
@@ -37,10 +34,12 @@ public class CodecUtil {
     }
 
     /**
-     * Base 64 解码
+     * Encodes the provided string into a Base64 encoded string.
      *
-     * @param content string
-     * @return string
+     * @param content The input string to be Base64 encoded.
+     * @return The Base64 encoded representation of the``` inputjava string
+    .
+    /**
      */
     public static String base64Encode(String content) {
         byte[] bytes = DecodeUtil.stringToByte(content);
@@ -48,10 +47,10 @@ public class CodecUtil {
     }
 
     /**
-     * Base 64 编码
+     * Decodes a Base64 encoded string into its original form.
      *
-     * @param content string
-     * @return string
+     * @param content The Base64 encoded string to decode.
+     * @return The decoded string in its original form.
      */
     public static String base64Decode(String content) {
         byte[] bytes = DecodeUtil.stringToByte(content);
@@ -59,10 +58,7 @@ public class CodecUtil {
     }
 
     /**
-     * 将 BCD byte[] 转成十进制字符串
      *
-     * @param bytes Byte Array
-     * @return R of String
      */
     public static String bcdBytesToString(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);
@@ -74,10 +70,7 @@ public class CodecUtil {
     }
 
     /**
-     * 将十进制字符串转成 BCD byte[]
      *
-     * @param decimalString decimal string
-     * @return byte array
      */
     public static byte[] strToBcdBytes(String decimalString) {
         int length = decimalString.length();
@@ -114,10 +107,7 @@ public class CodecUtil {
     }
 
     /**
-     * 将byte[]转成十六进制字符串
      *
-     * @param bytes Byte Array
-     * @return R of String
      */
     public static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();

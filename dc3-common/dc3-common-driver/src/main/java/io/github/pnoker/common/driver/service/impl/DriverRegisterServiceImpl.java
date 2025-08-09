@@ -27,11 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * 驱动注册相关接口实现
- *
- * @author pnoker
- * @version 2025.6.0
- * @since 2022.1.0
+ * Implementation class responsible for driver registration services.
+ * This service facilitates the initialization and registration of a driver
+ * with the platform using the driver properties and the driver client.
  */
 @Slf4j
 @Service

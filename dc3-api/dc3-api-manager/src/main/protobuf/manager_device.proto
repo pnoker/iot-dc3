@@ -34,70 +34,87 @@ option java_multiple_files = true;
 
 /*
 Api
+服务接口，定义了设备管理相关的RPC调用
 */
 service DeviceApi {
+  // 分页查询设备信息
   rpc SelectByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
+  // 根据配置模板ID查询设备列表
   rpc SelectByProfileId (GrpcProfileQuery) returns (GrpcRDeviceListDTO);
+  // 根据驱动ID查询设备列表
   rpc SelectByDriverId (GrpcDriverQuery) returns (GrpcRDeviceListDTO);
+  // 根据设备ID查询单个设备信息
   rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
 }
 
 /*
 Device R Page
+设备分页查询的响应结构体
 */
 message GrpcRPageDeviceDTO {
   /*
   R
+  通用返回结果，包含状态码、消息等
   */
   GrpcR result = 1;
 
   /*
   Data
+  返回的分页设备数据
   */
   GrpcPageDeviceDTO data = 2;
 }
 
 /*
 Device Page
+设备分页数据结构体
 */
 message GrpcPageDeviceDTO {
   /*
   Page
+  分页信息，包含页码、页大小、总数等
   */
   GrpcPage page = 1;
 
   /*
   Data
+  设备数据列表
   */
   repeated GrpcDeviceDTO data = 2;
 }
 
 /*
 Device R 集合
+设备列表查询的响应结构体
 */
 message GrpcRDeviceListDTO {
   /*
   R
+  通用返回结果，包含状态码、消息等
   */
   GrpcR result = 1;
 
   /*
   Data
+  返回的设备列表数据
   */
   repeated GrpcDeviceDTO data = 2;
 }
 
 /*
 Device R
+单个设备查询的响应结构体
 */
 message GrpcRDeviceDTO {
   /*
   R
+  通用返回结果，包含状态码、消息等
   */
   GrpcR result = 1;
 
   /*
   Data
+  返回的单个设备数据
   */
   GrpcDeviceDTO data = 2;
 }

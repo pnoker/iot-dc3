@@ -29,87 +29,101 @@ option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
 /*PageDriverQuery*/
+// 驱动分页查询结构体，用于分页查询驱动信息
 message GrpcPageDriverQuery {
   /*
   Page
+  分页信息，包含页码、页大小、总数等
   */
   GrpcPage page = 1;
 
   /*
   租户ID
+  标识所属租户
   */
   int64 tenant_id = 2;
 
   /*
   查询字段
+  用于驱动信息查询的过滤条件
    */
-  string driver_name = 3;
-  string driver_code = 4; // 驱动编号
-  string service_name = 5; // 驱动服务名称
-  string service_host = 6; // 服务主机
-  int32 driver_type_flag = 7; // 驱动类型标识
-  int32 enable_flag = 8; // 使能标识
-  int32 version = 9; // 版本
+  string driver_name = 3; // 驱动名称，用于模糊查询
+  string driver_code = 4; // 驱动编号，唯一标识
+  string service_name = 5; // 驱动服务名称，标识服务类型
+  string service_host = 6; // 服务主机，标识服务部署位置
+  int32 driver_type_flag = 7; // 驱动类型标识，区分不同类型的驱动
+  int32 enable_flag = 8; // 启用标识，1为启用，0为禁用
+  int32 version = 9; // 版本号，用于版本管理
 }
 
 /*PagePointQuery*/
+// 点位分页查询结构体，用于分页查询点位信息
 message GrpcPagePointQuery {
   /*
   Page
+  分页信息，包含页码、页大小、总数等
   */
   GrpcPage page = 1;
 
   /*
   租户ID
+  标识所属租户
   */
   int64 tenant_id = 2;
 
   /*
   查询字段
+  用于点位信息查询的过滤条件
    */
-  string point_name = 3; // 位号名称
-  string point_code = 4; // 位号编号
-  int32 point_type_flag = 5; // 位号类型标识
-  int32 rw_flag = 6; // 读写标识
-  int64 profile_id = 7; // 模板ID
-  int64 group_id = 8; // 分组ID
-  int32 enable_flag = 9; // 使能标识
-  int32 version = 10; // 版本
+  string point_name = 3; // 点位名称，用于模糊查询
+  string point_code = 4; // 点位编号，唯一标识
+  int32 point_type_flag = 5; // 点位类型标识，区分不同类型的点位
+  int32 rw_flag = 6; // 读写标识，标识点位的读写权限
+  int64 profile_id = 7; // 配置模板ID，关联配置模板
+  int64 group_id = 8; // 分组ID，用于点位分组管理
+  int32 enable_flag = 9; // 启用标识，1为启用，0为禁用
+  int32 version = 10; // 版本号，用于版本管理
 
   /*
   附加字段
+  额外的查询条件
    */
-  int64 device_id = 11; // 设备ID
+  int64 device_id = 11; // 设备ID，用于查询特定设备下的点位
 }
 
 /*
 Device Page Query
+设备分页查询结构体，用于分页查询设备信息
 */
 message GrpcPageDeviceQuery {
   /*
   Page
+  分页信息，包含页码、页大小、总数等
   */
   GrpcPage page = 1;
 
   /*
   租户ID
+  标识所属租户
   */
   int64 tenant_id = 2;
 
   /*
   查询字段
+  用于设备信息查询的过滤条件
    */
-  string device_name = 3; // 位号名称
-  string device_code = 4; // 位号编号
-  int64 driver_id = 5; // 驱动ID
-  int64 group_id = 6; // 分组ID
-  int32 enable_flag = 7; // 使能标识
-  int32 version = 8; // 版本
+  string device_name = 3; // 设备名称，用于模糊查询
+  string device_code = 4; // 设备编号，唯一标识
+  int64 driver_id = 5; // 驱动ID，关联设备所属的驱动
+  int64 group_id = 6; // 分组ID，用于设备分组管理
+  int32 enable_flag = 7; // 启用标识，1为启用，0为禁用
+  int32 version = 8; // 版本号，用于版本管理
 
   /*
   附加字段
+  额外的查询条件
    */
-  int64 profile_id = 9; // 位号ID
+  int64 profile_id = 9; // 配置模板ID，用于查询特定模板下的设备
 }
 
 

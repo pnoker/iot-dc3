@@ -31,40 +31,48 @@ option java_multiple_files = true;
 
 /*
 Api
+服务接口，定义了用户相关的RPC调用
 */
 service UserApi {
+  // 通过用户ID查询用户信息
   rpc SelectById (GrpcIdQuery) returns (GrpcRUserDTO);
 }
 
 // selectById Query
+// 查询用户ID的请求结构体
 message GrpcIdQuery {
-  int64 id = 1;
+  int64 id = 1; // 用户ID，唯一标识一个用户
 }
 
 // R of User DTO
+// 返回用户信息的响应结构体
 message GrpcRUserDTO {
   /*
   R
+  通用返回结果，包含状态码、消息等
   */
   GrpcR result = 1;
 
   /*
   Data
+  返回的用户数据
   */
   GrpcUserDTO data = 2;
 }
 
 // User DTO
+// 用户数据结构体，包含用户的基本信息
 message GrpcUserDTO {
   /*
   Base
+  通用基础字段（如ID、创建时间等）
   */
   GrpcBase base = 1;
 
   string nick_name = 2; // 用户昵称
-  string user_name = 3; // 用户名称
+  string user_name = 3; // 用户名
   string phone = 4; // 手机号
   string email = 5; // 邮箱
-  string social_ext = 6; // 社交相关拓展信息, 加密存储
-  string identity_ext = 7; // 身份相关拓展信息, 加密存储
+  string social_ext = 6; // 社交相关扩展信息，加密存储
+  string identity_ext = 7; // 身份相关扩展信息，加密存储
 }

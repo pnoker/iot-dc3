@@ -28,11 +28,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
- * Driver initialization runner
- *
- * @author pnoker
- * @version 2025.6.0
- * @since 2022.1.0
+ * DriverInitRunner is a Spring Boot application runner component responsible for
+ * initializing and configuring driver-related services during application startup.
+ * It performs the following tasks:
+ * <p>
+ * - Registers the driver information with the platform through the DriverRegisterService.
+ * - Executes custom initialization logic for the driver via the DriverCustomService.
+ * - Sets up driver scheduling tasks, including driver status, read tasks, and custom tasks
+ * using the DriverScheduleService.
+ * <p>
+ * This class ensures that driver-related functionalities are properly initialized
+ * and ready to use as part of the application lifecycle.
  */
 @Component
 @ComponentScan(basePackages = {

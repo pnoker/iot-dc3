@@ -25,11 +25,14 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Environment Config
- *
- * @author pnoker
- * @version 2025.6.0
- * @since 2022.1.0
+ * Configuration class that adds the "driver" profile to the active profiles list
+ * in the Spring environment during application startup.
+ * <p>
+ * This class is executed with the highest precedence order to ensure the "driver"
+ * profile is activated before other configurations are processed.
+ * <p>
+ * Implements the {@link EnvironmentPostProcessor} interface to modify the environment
+ * prior to the application context being refreshed.
  */
 @Slf4j
 @Configuration
