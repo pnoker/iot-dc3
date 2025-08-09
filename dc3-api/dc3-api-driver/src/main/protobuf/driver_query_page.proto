@@ -30,60 +30,72 @@ option java_multiple_files = true;
 
 /*
 Page Device Query
+设备分页查询结构体，用于分页查询设备信息
 */
 message GrpcPageDeviceQuery {
   /*
   Page
+  分页信息，包含页码、页大小、总数等
   */
   GrpcPage page = 1;
 
   /*
   租户ID
+  标识所属租户
   */
   int64 tenant_id = 2;
 
   /*
   驱动ID
+  标识设备所属的驱动
   */
   int64 driver_id = 3;
 
   /*
   Device ID
+  设备ID，用于精确查询特定设备
   */
   int64 device_id = 4;
 }
 
 /*
 Page Point Query
+点位分页查询结构体，用于分页查询点位信息
 */
 message GrpcPagePointQuery {
   /*
   Page
+  分页信息，包含页码、页大小、总数等
   */
   GrpcPage page = 1;
 
   /*
   租户ID
+  标识所属租户
   */
   int64 tenant_id = 2;
 
   /*
   驱动ID
+  标识点位所属的驱动
   */
   int64 driver_id = 3;
 
   /*
   Device ID
+  设备ID，用于查询特定设备下的点位
   */
   int64 device_id = 4;
 
   /*
   Profile ID
+  配置模板ID，用于查询特定模板下的点位
   */
   int64 profile_id = 5;
 
   /*
   Point ID
+  点位ID，用于精确查询特定点位
   */
   int64 point_id = 6;
 }

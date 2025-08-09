@@ -29,10 +29,12 @@ option java_multiple_files = true;
 /*
 Device Query
 在驱动中获取设备信息仅需要限制该设备是否属于该驱动即可
+驱动查询结构体，用于查询驱动相关信息
 */
 message GrpcDriverQuery {
   /*
   驱动ID
+  标识具体的驱动实例
   */
   int64 driver_id = 1;
 }
@@ -40,15 +42,18 @@ message GrpcDriverQuery {
 /*
 Device Query
 在驱动中获取设备信息仅需要限制该设备是否属于该驱动即可
+设备查询结构体，用于查询设备相关信息
 */
 message GrpcDeviceQuery {
   /*
   驱动ID
+  标识设备所属的驱动
   */
   int64 driver_id = 1;
 
   /*
   Device ID
+  设备ID，标识具体设备
   */
   int64 device_id = 2;
 }
@@ -56,15 +61,18 @@ message GrpcDeviceQuery {
 /*
 Point Query
 在驱动中获取位号信息仅需要限制该位号是否属于该驱动即可
+点位查询结构体，用于查询点位相关信息
 */
 message GrpcPointQuery {
   /*
   驱动ID
+  标识点位所属的驱动
   */
   int64 driver_id = 1;
 
   /*
   Point ID
+  点位ID，标识具体点位
   */
   int64 point_id = 2;
 }

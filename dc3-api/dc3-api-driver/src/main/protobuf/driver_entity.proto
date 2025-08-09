@@ -30,32 +30,38 @@ option java_multiple_files = true;
 
 /*
 驱动注册信息
+驱动向平台注册时传递的完整信息结构体
 */
 message GrpcDriverRegisterDTO {
   /*
   Tenant name
   租户编号
+  标识驱动所属的租户
   */
   string tenant = 1;
 
   /*
   Driver client name
   驱动服务+随机节点编号
+  驱动服务的唯一标识，通常包含服务名和节点编号
   */
   string client = 2;
 
   /*
   Driver property
+  驱动的基本属性信息
   */
   GrpcDriverDTO driver = 3;
 
   /*
   Driver attribute list
+  驱动属性列表，定义驱动支持的配置参数
   */
   repeated GrpcDriverAttributeDTO driver_attributes = 4;
 
   /*
   Point attribute list
+  点位属性列表，定义驱动支持的点位配置参数
   */
   repeated GrpcPointAttributeDTO point_attributes = 5;
 }

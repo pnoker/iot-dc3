@@ -26,14 +26,10 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import java.util.Map;
 
 /**
- * 自定义驱动服务接口
- * <p>
- * 开发自定义驱动时, 至少需要实现 {@link #read} 和 {@link #write} 方法。
- * 可以参考已提供的驱动模块实现方式。
+ * DriverCustomService 接口定义
  *
- * @author pnoker
- * @version 2025.6.0
- * @since 2022.1.0
+ * 用于描述驱动的核心自定义行为逻辑, 包括初始化、调度、自定义事件、读写操作的相关功能。
+ * 实现该接口的类需要具体实现这些方法, 覆盖驱动的特定逻辑。
  */
 public interface DriverCustomService {
     /**

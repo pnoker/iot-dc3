@@ -30,41 +30,47 @@ option java_multiple_files = true;
 
 /*
 Api
+服务接口，定义了点位值相关的RPC调用
 */
 service PointValueApi {
+  // 查询设备点位的最后采集值
   rpc LastValue (GrpcPointValueQuery) returns (GrpcRPointValueDTO);
 }
 
+// 查询点位值的请求结构体
 message GrpcPointValueQuery {
-  int64 device_id = 1; // 设备ID
-  int64 point_id = 2; //点位ID
+  int64 device_id = 1; // 设备ID，标识具体设备
+  int64 point_id = 2; // 点位ID，标识具体点位
 
   /*
   租户ID
+  标识所属租户
   */
   int64 tenant_id = 3;
 }
 
-
+// 返回点位值的响应结构体
 message GrpcRPointValueDTO {
   /*
   R
+  通用返回结果，包含状态码、消息等
   */
   GrpcR result = 1;
 
   /*
   Data
+  返回的点位值数据
   */
   GrpcPointValueDTO data = 2;
 }
 
-
+// 点位值数据结构体，包含点位的采集数据信息
 message GrpcPointValueDTO {
-  int64 id = 1;
-  int64 device_id = 2;//设备ID
-  int64 point_id = 3;//位号ID
-  string value = 4;//处理值
-  string raw_value = 5;//原始值
-  int64 origin_time = 6;//采集时间
-  int64 create_time = 7;//入库时间
+  int64 id = 1; // 点位值记录ID
+  int64 device_id = 2; // 设备ID，标识数据来源设备
+  int64 point_id = 3; // 点位ID，标识具体点位
+  string value = 4; // 处理后的值，经过数据转换和格式化
+  string raw_value = 5; // 原始值，从设备直接采集的原始数据
+  int64 origin_time = 6; // 采集时间，数据从设备采集的时间戳
+  int64 create_time = 7; // 入库时间，数据存储到数据库的时间戳
 }

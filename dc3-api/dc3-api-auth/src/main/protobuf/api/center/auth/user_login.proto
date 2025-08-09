@@ -31,38 +31,46 @@ option java_multiple_files = true;
 
 /*
 Api
+服务接口，定义了用户登录相关的RPC调用
 */
 service UserLoginApi {
+  // 通过登录名称查询用户登录信息
   rpc SelectByName (GrpcNameQuery) returns (GrpcRUserLoginDTO);
 }
 
 // selectByName Query
+// 通过名称查询的请求结构体
 message GrpcNameQuery {
-  string name = 1;
+  string name = 1; // 登录名称，用于查询用户登录信息
 }
 
 // R of UserLogin DTO
+// 返回用户登录信息的响应结构体
 message GrpcRUserLoginDTO {
   /*
   R
+  通用返回结果，包含状态码、消息等
   */
   GrpcR result = 1;
 
   /*
   Data
+  返回的用户登录数据
   */
   GrpcUserLoginDTO data = 2;
 }
 
 // UserLogin DTO
+// 用户登录数据结构体，包含用户登录的基本信息
 message GrpcUserLoginDTO {
   /*
   Base
+  通用基础字段（如ID、创建时间等）
   */
   GrpcBase base = 1;
 
-  string login_name = 2; // 登录名称
-  int64 user_id = 3; // 用户ID
-  int64 user_password_id = 4; // 用户密码ID
-  int32 enable_flag = 5; // 使能标识
+  string login_name = 2; // 登录名称，用户登录时使用的用户名
+  int64 user_id = 3; // 用户ID，关联到具体用户
+  int64 user_password_id = 4; // 用户密码ID，关联到密码表
+  int32 enable_flag = 5; // 启用标识，1为启用，0为禁用
 }

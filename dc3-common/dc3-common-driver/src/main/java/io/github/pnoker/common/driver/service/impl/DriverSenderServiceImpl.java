@@ -34,9 +34,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author pnoker
- * @version 2025.6.0
- * @since 2022.1.0
+ * Implementation of the {@code DriverSenderService} interface.
+ * Provides methods to send various events and data related to drivers and devices to a message queue.
  */
 @Slf4j
 @Service

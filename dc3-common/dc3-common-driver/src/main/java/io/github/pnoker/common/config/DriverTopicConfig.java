@@ -31,11 +31,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Topic Config
- *
- * @author pnoker
- * @version 2025.6.0
- * @since 2022.1.0
+ * DriverTopicConfig is a configuration class that provides queue and binding
+ * configurations for metadata, driver command, and device command messages
+ * within a message broker. It is conditional on the presence of the ExchangeConfig class.
+ * <p>
+ * The queues and bindings are used to facilitate communication between
+ * components in the driver service by leveraging message exchanges.
  */
 @Slf4j
 @Configuration

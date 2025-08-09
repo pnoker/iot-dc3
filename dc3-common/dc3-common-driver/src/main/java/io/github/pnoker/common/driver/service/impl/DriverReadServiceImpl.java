@@ -37,9 +37,9 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author pnoker
- * @version 2025.6.0
- * @since 2022.1.0
+ * Implementation of the {@link DriverReadService} interface for handling driver read operations.
+ * Provides functionality to read point values from a device using metadata, validates data, and sends
+ * point values to a message queue.
  */
 @Slf4j
 @Service

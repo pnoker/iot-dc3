@@ -34,11 +34,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Environment Config
- *
- * @author pnoker
- * @version 2025.6.0
- * @since 2022.1.0
+ * Configuration class for initializing the driver-specific environment properties during application startup.
+ * This class implements the EnvironmentPostProcessor interface to manipulate environment properties before the
+ * Spring application context is refreshed.
+ * <p>
+ * On execution, the class performs the following:
+ * - Retrieves the driver node identifier from environment properties or generates a new one if not available.
+ * - Constructs driver-specific properties such as client identifier and service name.
+ * - Adds these environment properties to the application's property sources at the highest precedence.
+ * <p>
+ * Annotations:
+ * - {@code @Slf4j}: Provides a logger instance for the class.
+ * - {@code @Configuration}: Marks the class as a source of bean definitions.
+ * - {@code @Order}: Specifies the precedence of this configuration relative to others, ensuring it is
+ * executed at a specific point in the application's lifecycle.
+ * <p>
+ * The following environment properties are processed or generated:
+ * - {@code driver.node}: Identifier for the driver node (retrieved or generated).
+ * - {@code driver.tenant}: Name of the tenant for the driver.
+ * - {@code spring.application.name}: Name of the application.
+ * - {@code driver.service}: Constructed service name combining tenant and application name.
+ * - {@code driver.client}: Constructed client identifier using tenant, application name, and driver node.
+ * - {@code driver.host}: Host address of the application obtained via utility methods.
+ * <p>
+ * This configuration ensures that essential driver-specific properties are readily available across
+ * the application lifecycle by injecting them into the environment property sources.
  */
 @Slf4j
 @Configuration

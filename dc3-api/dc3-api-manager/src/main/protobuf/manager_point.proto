@@ -33,37 +33,45 @@ option java_multiple_files = true;
 
 /*
 Api
+服务接口，定义了点位管理相关的RPC调用
 */
 service PointApi {
+  // 分页查询点位信息
   rpc SelectByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
 }
 
 /*
 Point R Page
+点位分页查询的响应结构体
 */
 message GrpcRPagePointDTO {
   /*
   R
+  通用返回结果，包含状态码、消息等
   */
   GrpcR result = 1;
 
   /*
   Data
+  返回的分页点位数据
   */
   GrpcPagePointDTO data = 2;
 }
 
 /*
 Point Page
+点位分页数据结构体
 */
 message GrpcPagePointDTO {
   /*
   Page
+  分页信息，包含页码、页大小、总数等
   */
   GrpcPage page = 1;
 
   /*
   Data
+  点位数据列表
   */
   repeated GrpcPointDTO data = 2;
 }

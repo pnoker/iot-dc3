@@ -31,37 +31,45 @@ option java_multiple_files = true;
 
 /*
 Api
+服务接口，定义了租户相关的RPC调用
 */
 service TenantApi {
+  // 通过租户编码查询租户信息
   rpc SelectByCode (GrpcCodeQuery) returns (GrpcRTenantDTO);
 }
 
 // SelectByCode Query
+// 查询租户编码的请求结构体
 message GrpcCodeQuery {
-  string code = 1;
+  string code = 1; // 租户编码，唯一标识一个租户
 }
 
 // R of Tenant DTO
+// 返回租户信息的响应结构体
 message GrpcRTenantDTO {
   /*
   R
+  通用返回结果，包含状态码、消息等
   */
   GrpcR result = 1;
 
   /*
   Data
+  返回的租户数据
   */
   GrpcTenantDTO data = 2;
 }
 
 // Tenant DTO
+// 租户数据结构体，包含租户的基本信息
 message GrpcTenantDTO {
   /*
   Base
+  通用基础字段（如ID、创建时间等）
   */
   GrpcBase base = 1;
 
   string tenant_name = 2; // 租户名称
-  string tenant_code = 3; // 租户编号
-  int32 enable_flag = 4; // 使能标识
+  string tenant_code = 3; // 租户编码，唯一标识
+  int32 enable_flag = 4; // 启用标识，1为启用，0为禁用
 }
