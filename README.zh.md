@@ -1,3 +1,7 @@
+<p align="right">
+  <a href="./README.md">🇬🇧 English</a> | <a href="./README.zh.md">🇨🇳 中文</a>
+</p>
+
 <p align="center">
 	<img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3 Logo">
 <br>
