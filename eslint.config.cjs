@@ -105,5 +105,6 @@ module.exports = {
         'no-console': 'off',
         'no-redeclare': 'off',
         'prettier/prettier': 'error'
-    }
+    },
+    ignores: ['node_modules/**', 'dist/**', 'public/**', 'src/assets/**', 'src-tauri/**', '.github/**', '.vscode/**', '.idea/**', 'dc3/**']
 }
