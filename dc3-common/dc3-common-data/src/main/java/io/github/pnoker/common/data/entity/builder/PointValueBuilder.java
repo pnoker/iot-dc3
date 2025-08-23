@@ -102,6 +102,20 @@ public interface PointValueBuilder {
     List<PointValueVO> buildVOListByBOList(List<PointValueBO> entityBOList);
 
     /**
+     * DOPage to BOPage
+     *
+     * @param entityPageDO EntityDO Page
+     * @return EntityBO Page
+     */
+    @Mapping(target = "orders", ignore = true)
+    @Mapping(target = "countId", ignore = true)
+    @Mapping(target = "maxLimit", ignore = true)
+    @Mapping(target = "searchCount", ignore = true)
+    @Mapping(target = "optimizeCountSql", ignore = true)
+    @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
+    Page<PointValueBO> buildBOPageByDOPage(Page<PointValueDO> entityPageDO);
+
+    /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page

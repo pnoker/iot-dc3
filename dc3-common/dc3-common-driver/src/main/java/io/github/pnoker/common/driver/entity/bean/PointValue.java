@@ -64,11 +64,6 @@ public class PointValue implements Serializable {
     private String calValue;
 
     /**
-     * 原始时间
-     */
-    private LocalDateTime originTime;
-
-    /**
      * 创建时间
      */
     private LocalDateTime createTime;
@@ -78,6 +73,6 @@ public class PointValue implements Serializable {
         this.pointId = calValue.getPoint().getId();
         this.rawValue = calValue.getValue();
         this.calValue = calValue.getFinalValue();
-        this.originTime = LocalDateTimeUtil.now();
+        this.createTime = LocalDateTimeUtil.now();
     }
 }

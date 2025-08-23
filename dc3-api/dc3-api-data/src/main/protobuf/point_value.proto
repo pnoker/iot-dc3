@@ -71,6 +71,5 @@ message GrpcPointValueDTO {
   int64 point_id = 3; // 点位ID，标识具体点位
   string value = 4; // 处理后的值，经过数据转换和格式化
   string raw_value = 5; // 原始值，从设备直接采集的原始数据
-  int64 origin_time = 6; // 采集时间，数据从设备采集的时间戳
-  int64 create_time = 7; // 入库时间，数据存储到数据库的时间戳
+  int64 create_time = 6; // 入库时间，数据存储到数据库的时间戳
 }
