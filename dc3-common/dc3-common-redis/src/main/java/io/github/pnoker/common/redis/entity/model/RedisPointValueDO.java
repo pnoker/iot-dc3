@@ -65,6 +65,11 @@ public class RedisPointValueDO implements Serializable {
     private String calValue;
 
     /**
+     * 驱动ID
+     */
+    private Long driverId;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;
