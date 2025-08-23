@@ -19,19 +19,22 @@ spring:
   env: dev
   group: ${user.name}
   cloud:
-    gateway:
+    gateway.server.webflux:
       routes:
         # token
         - id: auth_route_token
           uri: http://${CENTER_AUTH_HOST:dc3-center-auth}:8300/
           predicates:
             - Path=/api/v3/auth/token/**
+          filters:
+            - StripPrefix=2
         # auth
         - id: auth_route
           uri: http://${CENTER_AUTH_HOST:dc3-center-auth}:8300
           predicates:
             - Path=/api/v3/auth/user/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**
           filters:
+            - StripPrefix=2
             - Authentic
         # manager
         - id: manager_route
@@ -39,6 +42,7 @@ spring:
           predicates:
             - Path=/api/v3/manager/**
           filters:
+            - StripPrefix=2
             - Authentic
         # data
         - id: data_route
@@ -46,6 +50,7 @@ spring:
           predicates:
             - Path=/api/v3/data/**
           filters:
+            - StripPrefix=2
             - Authentic
 
 grpc:

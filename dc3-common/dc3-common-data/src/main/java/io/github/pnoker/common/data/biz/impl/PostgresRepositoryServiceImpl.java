@@ -18,10 +18,15 @@ package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.driver.StrategyConstant;
+import io.github.pnoker.common.data.dal.PointValueManager;
+import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
+import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
+import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
@@ -37,6 +42,12 @@ import java.util.List;
 @Service("postgresRepositoryService")
 public class PostgresRepositoryServiceImpl implements RepositoryService, InitializingBean {
 
+    @Resource
+    private PointValueBuilder pointValueBuilder;
+
+    @Resource
+    private PointValueManager pointValueManager;
+
     @Override
     public String getRepositoryName() {
         return StrategyConstant.Storage.POSTGRES;
@@ -44,10 +55,18 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
 
     @Override
     public void savePointValue(PointValueBO entityBO) {
+        PointValueDO entityDO = pointValueBuilder.buildDOByBO(entityBO);
+        if (!pointValueManager.save(entityDO)) {
+            throw new AddException("Failed to create point value");
+        }
     }
 
     @Override
-    public void savePointValue(Long deviceId, List<PointValueBO> entityBOList) {
+    public void savePointValues(List<PointValueBO> entityBOList) {
+        List<PointValueDO> entityDOList = pointValueBuilder.buildDOListByBOList(entityBOList);
+        if (!pointValueManager.saveBatch(entityDOList)) {
+            throw new AddException("Failed to create point value list");
+        }
     }
 
     @Override
@@ -61,7 +80,7 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     @Override
-    public List<PointValueBO> selectLatestPointValue(Long deviceId, List<Long> pointIds) {
+    public List<PointValueBO> selectLatestPointValues(Long deviceId, List<Long> pointIds) {
         return null;
     }
 

@@ -17,6 +17,7 @@
 package io.github.pnoker.common.data.entity.builder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.data.entity.vo.PointValueVO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.utils.MapStructUtil;
@@ -51,6 +52,38 @@ public interface PointValueBuilder {
      * @return EntityBO Array
      */
     List<PointValueBO> buildBOListByVOList(List<PointValueVO> entityVOList);
+
+    /**
+     * BO to DO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDO
+     */
+    PointValueDO buildDOByBO(PointValueBO entityBO);
+
+    /**
+     * BOList to DOList
+     *
+     * @param entityBOList EntityBO Array
+     * @return EntityDO Array
+     */
+    List<PointValueDO> buildDOListByBOList(List<PointValueBO> entityBOList);
+
+    /**
+     * DO to BO
+     *
+     * @param entityDO EntityDO
+     * @return EntityBO
+     */
+    PointValueBO buildBOByDO(PointValueDO entityDO);
+
+    /**
+     * DOList to BOList
+     *
+     * @param entityDOList EntityDO Array
+     * @return EntityBO Array
+     */
+    List<PointValueBO> buildBOListByDOList(List<PointValueDO> entityDOList);
 
     /**
      * BO to VO
