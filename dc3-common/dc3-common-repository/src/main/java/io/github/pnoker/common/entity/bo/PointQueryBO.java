@@ -20,10 +20,9 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
- * 位号值
+ * 位号查询
  *
  * @author pnoker
  * @version 2025.6.0
@@ -35,7 +34,7 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PointValueBO implements Serializable {
+public class PointQueryBO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -49,29 +48,4 @@ public class PointValueBO implements Serializable {
      * 位号ID
      */
     private Long pointId;
-
-    /**
-     * 原始值
-     */
-    private String rawValue;
-
-    /**
-     * 处理值
-     */
-    private String calValue;
-
-    /**
-     * 驱动ID
-     */
-    private Long driverId;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
-    /**
-     * 操作时间
-     */
-    private LocalDateTime operateTime;
 }

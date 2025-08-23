@@ -37,9 +37,7 @@ public class CodecUtil {
      * Encodes the provided string into a Base64 encoded string.
      *
      * @param content The input string to be Base64 encoded.
-     * @return The Base64 encoded representation of the``` inputjava string
-    .
-    /**
+     * @return The Base64 encoded representation of the``` inputjava string.
      */
     public static String base64Encode(String content) {
         byte[] bytes = DecodeUtil.stringToByte(content);

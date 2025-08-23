@@ -42,11 +42,6 @@ public class PointValueVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * ID
-     */
-    private String id;
-
-    /**
      * 设备ID
      */
     private Long deviceId;
@@ -67,10 +62,9 @@ public class PointValueVO implements Serializable {
     private String calValue;
 
     /**
-     * 原始时间
+     * 驱动ID
      */
-    @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
-    private LocalDateTime originTime;
+    private Long driverId;
 
     /**
      * 创建时间

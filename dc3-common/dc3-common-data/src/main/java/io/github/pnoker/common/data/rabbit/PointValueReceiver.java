@@ -55,7 +55,7 @@ public class PointValueReceiver {
     private PointValueService pointValueService;
 
     @RabbitHandler
-    @RabbitListener(queues = "#{pointValueQueue.name}", containerFactory = "")
+    @RabbitListener(queues = "#{pointValueQueue.name}")
     public void pointValueReceive(Channel channel, Message message, PointValueBO pointValueBO) {
         try {
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);

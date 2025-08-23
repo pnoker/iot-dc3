@@ -83,7 +83,7 @@ public interface RuleBuilder {
             entityDO.setRuleCode(CodeUtil.getCode());
         }
 
-// Json Ext
+        // Json Ext
         RuleExt entityExt = entityBO.getRuleExt();
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {

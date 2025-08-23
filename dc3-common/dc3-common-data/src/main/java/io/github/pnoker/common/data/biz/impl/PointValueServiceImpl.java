@@ -43,7 +43,6 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -60,9 +59,6 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Resource
     private RedisRepositoryService redisRepositoryService;
-
-    @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
     public void save(PointValueBO pointValueBO) {
@@ -186,8 +182,8 @@ public class PointValueServiceImpl implements PointValueService {
     /**
      * 保存 PointValues 到指定存储服务
      *
-     * @param deviceId                   设备ID
-     * @param pointValueBOListPointValue Array
+     * @param deviceId         设备ID
+     * @param pointValueBOList Array
      */
     private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOList) {
         try {
@@ -198,7 +194,7 @@ public class PointValueServiceImpl implements PointValueService {
             RepositoryService repositoryService = getFirstRepositoryService();
             List<List<PointValueBO>> splitPointValueBOList = ListUtil.split(pointValueBOList, 100);
             for (List<PointValueBO> splitPointValueBO : splitPointValueBOList) {
-                repositoryService.savePointValue(deviceId, splitPointValueBO);
+                repositoryService.savePointValues(splitPointValueBO);
             }
         } catch (Exception e) {
             log.error("Save point values to error {}", e.getMessage());
@@ -217,7 +213,7 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         Optional<RepositoryService> first = repositoryServices.stream().findFirst();
-        if (!first.isPresent()) {
+        if (first.isEmpty()) {
             throw new RepositoryException("Save point values to repository error: Please configure at least one repository.");
         }
 
