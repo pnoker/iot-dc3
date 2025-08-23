@@ -1,9 +1,0 @@
-dc3
-dist
-public
-src-tauri
-node_modules
-
-.github
-.vscode
-.idea
