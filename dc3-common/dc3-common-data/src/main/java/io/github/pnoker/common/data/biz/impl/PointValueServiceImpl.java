@@ -66,7 +66,7 @@ public class PointValueServiceImpl implements PointValueService {
             return;
         }
 
-        pointValueBO.setCreateTime(LocalDateTimeUtil.now());
+        pointValueBO.setOperateTime(pointValueBO.getCreateTime());
         savePointValueToRepository(pointValueBO);
     }
 

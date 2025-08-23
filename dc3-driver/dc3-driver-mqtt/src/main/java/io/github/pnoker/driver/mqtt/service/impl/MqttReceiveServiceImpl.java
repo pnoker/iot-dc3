@@ -45,7 +45,7 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         // do something to process your mqtt messages
         log.info(JsonUtil.toJsonString(mqttMessage));
         PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
-        pointValue.setOriginTime(LocalDateTimeUtil.now());
+        pointValue.setCreateTime(LocalDateTimeUtil.now());
         driverSenderService.pointValueSender(pointValue);
     }
 
@@ -56,7 +56,7 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         List<PointValue> pointValues = mqttMessageList.stream()
                 .map(mqttMessage -> {
                     PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
-                    pointValue.setOriginTime(LocalDateTimeUtil.now());
+                    pointValue.setCreateTime(LocalDateTimeUtil.now());
                     return pointValue;
                 }).toList();
         driverSenderService.pointValueSender(pointValues);

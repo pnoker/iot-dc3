@@ -16,6 +16,7 @@
 
 package io.github.pnoker.common.data.dal;
 
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.pnoker.common.data.entity.model.PointValueDoubleDO;
 
@@ -28,6 +29,7 @@ import io.github.pnoker.common.data.entity.model.PointValueDoubleDO;
  * @version 2025.6.0
  * @since 2022.1.0
  */
+@DS("history")
 public interface PointValueDoubleManager extends IService<PointValueDoubleDO> {
 
 }
