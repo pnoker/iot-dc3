@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-	<img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3 Logo">
+	<img src="dc3/images/logo-blue.zh.png" width="400" alt="IoT DC3 Logo">
 <br>
 <a href='https://gitee.com/pnoker/iot-dc3/stargazers'>
     <img src='https://gitee.com/pnoker/iot-dc3/badge/star.svg?theme=gvp' alt='star'/>
