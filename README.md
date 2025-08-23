@@ -1,3 +1,7 @@
+<p align="right">
+  <a href="./README.md">🇬🇧 English</a> | <a href="./README.zh.md">🇨🇳 中文</a>
+</p>
+
 <p align="center">
 	<img src="dc3/images/logo-blue.png" width="400" alt="IoT DC3 Logo">
 <br>
@@ -17,7 +21,7 @@ All components and code are open-source, ensuring transparency, flexibility, and
 
 ---
 
-![iot-dc3-architecture](dc3/images/architecture.png)
+![iot-dc3-architecture](dc3/images/architecture-en.png)
 
 # 1 Architecture
 
@@ -48,9 +52,7 @@ All components and code are open-source, ensuring transparency, flexibility, and
 - **Branch Creation**: Start by creating a new branch from the `main` branch. Ensure that the `main` branch is up-to-date before branching out;
 - **Branch Naming**: Follow the naming convention for the new branch: `feature/your_name/feature_description`. For example: `feature/pnoker/mqtt_driver`;
 - **Code and Documentation**: Make your changes to the code or documentation on the new branch. Once done, commit your changes;
-- **Pull Request**: Submit a `Pull Request` (PR) to merge your changes into the `develop` branch. Your PR will be reviewed and merged by the maintainers;
-- **Acknowledgement**: After your changes are merged, your UserID will be added to the [Contributor](https://doc.dc3.site/contributor) list as a token of appreciation for your
-  contribution.
+- **Pull Request**: Submit a `Pull Request` (PR) to merge your changes into the `develop` branch. Your PR will be reviewed and merged by the maintainers.
 
 # 4 License
 
