@@ -73,7 +73,7 @@
 
     // 定义响应式数据
     const tenant = store.getters['auth/getTenant'] || 'default'
-    const name = store.getters['auth/getName'] || 'pnoker'
+    const name = store.getters['auth/getName'] || 'dc3'
     const reactiveData = reactive({
         isHide: 'View',
         passwordType: 'password',

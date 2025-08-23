@@ -41,7 +41,7 @@
                     <div class="things-card-body-content">
                         <div class="things-card-body-content-column">
                             <div class="things-card-body-content-value">
-                                <span class="nowrap-item value" title="处理值, 点击复制" @click="copyValue(data)">{{ data.value }} {{ unit }}</span>
+                                <span class="nowrap-item value" title="处理值, 点击复制" @click="copyValue(data)">{{ data.calValue }} {{ unit }}</span>
                             </div>
                             <ul>
                                 <li class="nowrap-item">
@@ -66,7 +66,7 @@
                                     <el-icon>
                                         <Edit />
                                     </el-icon>
-                                    采集日期: {{ timestamp(data.originTime) }}
+                                    采集日期: {{ timestamp(data.createTime) }}
                                 </li>
                                 <li class="nowrap-item">
                                     <el-icon>
@@ -77,9 +77,7 @@
                             </ul>
                         </div>
                     </div>
-                    <div v-if="embedded != ''" class="things-card-body-content-time">
-                        <div :id="data.pointId"></div>
-                    </div>
+                    <div v-if="embedded != ''" :id="data.pointId" class="things-card-body-content-time"></div>
                 </div>
                 <div v-if="embedded == ''" class="things-card__footer">
                     <div class="things-card-footer-operation">
@@ -145,7 +143,8 @@
         const content = {
             deviceId: data.deviceId,
             pointId: data.pointId,
-            value: data.value
+            calValue: data.calValue,
+            rawValue: data.rawValue
         }
         copy(JSON.stringify(content, null, 2), '位号值')
     }
@@ -184,31 +183,25 @@
         window.dispatchEvent(new Event('resize'))
 
         if (props.embedded != '') {
-            tinyArea = new TinyArea(props.data.pointId, {
-                height: 60,
-                data: [],
+            tinyArea = new Chart({
+                container: props.data.pointId,
                 autoFit: true,
-                smooth: true,
-                annotations: [
-                    {
-                        type: 'line',
-                        start: ['min', 'mean'],
-                        end: ['max', 'mean'],
-                        text: {
-                            content: 'AVG',
-                            offsetY: -5,
-                            style: {
-                                textAlign: 'left',
-                                fontSize: 10,
-                                fill: 'rgba(44, 53, 66, 0.45)',
-                                textBaseline: 'bottom'
-                            }
-                        },
-                        style: {
-                            stroke: 'rgba(0, 0, 0, 0.25)'
-                        }
-                    }
-                ]
+                height: 80
+            })
+
+            tinyArea
+                .area()
+                .encode('x', (_, i) => i)
+                .encode('y', v => v)
+                .encode('shape', 'smooth')
+                .scale('y', { zero: true })
+                .style('fill', 'linear-gradient(-90deg, white 0%, darkgreen 100%)')
+                .style('fillOpacity', 0.6)
+                .animate('enter', { type: 'fadeIn' })
+                .axis(false)
+
+            tinyArea.interaction('tooltip', {
+                render: (e, { title, items }) => `${items[0].value} ${props.unit}`
             })
 
             tinyArea.render()

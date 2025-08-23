@@ -96,6 +96,9 @@ export default (configEnv: ConfigEnv) => {
                 resolvers: [ElementPlusResolver()]
             })
         ],
+        optimizeDeps: {
+            include: ['vue', 'vue-router', 'element-plus', 'echarts']
+        },
         css: {
             preprocessorOptions: {
                 scss: {

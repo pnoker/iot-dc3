@@ -29,7 +29,7 @@ const auth = {
     namespaced: true,
     state: {
         tenant: 'default',
-        name: 'pnoker'
+        name: 'dc3'
     },
     getters: {
         getTenant: () => {

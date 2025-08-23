@@ -136,8 +136,8 @@
     const loadPointValueList = res => {
         reactiveData.listData = res.data.records.map(record => {
             const tempDate1 = new Date(record.createTime)
-            const tempDate2 = new Date(record.originTime)
-            record.interval = tempDate1.getTime() - tempDate2.getTime()
+            const tempDate2 = new Date(record.operateTime)
+            record.interval = tempDate2.getTime() - tempDate1.getTime()
             return record
         })
         reactiveData.page.total = res.data.total

@@ -55,7 +55,7 @@
                                 <el-icon>
                                     <Sunset />
                                 </el-icon>
-                                创建日期: {{ timestamp(reactiveData.data.operateTime) }}
+                                创建日期: {{ timestamp(reactiveData.data.createTime) }}
                             </li>
                         </ul>
                     </detail-card>
