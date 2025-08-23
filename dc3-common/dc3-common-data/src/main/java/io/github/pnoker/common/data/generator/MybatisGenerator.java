@@ -39,7 +39,7 @@ public class MybatisGenerator {
 
     public static void generator() {
         String path = System.getProperty("user.dir") + "/dc3-common/dc3-common-data/src/main";
-        MybatisUtil.defaultGenerator("dc3-postgres", "35432", "dc3", "dc3_data", "dc3", "dc3dc3dc3")
+        MybatisUtil.defaultGenerator("localhost", "35432", "dc3", "dc3_history", "dc3", "dc3dc3dc3")
                 .globalConfig(builder -> MybatisUtil.defaultGlobalConfig(builder, path))
                 .dataSourceConfig(MybatisUtil::defaultDataSourceConfig)
                 .packageConfig(builder -> builder
@@ -57,12 +57,13 @@ public class MybatisGenerator {
                 .strategyConfig(MybatisUtil::defaultStrategyConfig)
                 .strategyConfig(builder -> builder
                         .addInclude(
-                                "dc3_driver_event",
-                                "dc3_device_event",
-                                "dc3_point_value",
-                                "dc3_message",
-                                "dc3_notify",
-                                "dc3_rule"
+                                "dc3_point_value_bool",
+                                "dc3_point_value_double",
+                                "dc3_point_value_float",
+                                "dc3_point_value_int",
+                                "dc3_point_value_long",
+                                "dc3_point_value_json",
+                                "dc3_point_value"
                         )
                 ).execute();
     }
