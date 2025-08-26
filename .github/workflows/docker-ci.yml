@@ -2,7 +2,7 @@ name: Docker Image
 on:
   push:
     tags:
-      - dc3.develop.*
+      - dc3.release.*
 jobs:
   build-push:
     runs-on: ubuntu-latest
