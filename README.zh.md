@@ -53,5 +53,5 @@ IoT DC3 是一个基于 Spring Cloud 构建的完全开源分布式物联网 (Io
 
 # 4 开源协议
 
-`IoT DC3` 开源平台基于 [Apache 2.0 License](./LICENSE) 协议。  
+`IoT DC3` 开源平台基于 [AGPL 3.0 License](./LICENSE-AGPL.txt) 协议。  
 该协议允许商业使用，但要求保留作者与版权信息。  
