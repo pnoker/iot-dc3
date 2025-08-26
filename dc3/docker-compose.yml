@@ -17,7 +17,7 @@
 
 services:
   gateway:
-    image: pnoker/dc3-gateway:2025.6.5
+    image: pnoker/dc3-gateway:2025.6.6
     restart: always
     ports:
       - "8000:8000"
@@ -39,7 +39,7 @@ services:
           - dc3-gateway
 
   auth:
-    image: pnoker/dc3-center-auth:2025.6.5
+    image: pnoker/dc3-center-auth:2025.6.6
     restart: always
     ports:
       - "8300:8300"
@@ -62,7 +62,7 @@ services:
           - dc3-center-auth
 
   manager:
-    image: pnoker/dc3-center-manager:2025.6.5
+    image: pnoker/dc3-center-manager:2025.6.6
     restart: always
     ports:
       - "8400:8400"
@@ -85,7 +85,7 @@ services:
           - dc3-center-manager
 
   data:
-    image: pnoker/dc3-center-data:2025.6.5
+    image: pnoker/dc3-center-data:2025.6.6
     restart: always
     ports:
       - "8500:8500"
@@ -108,7 +108,7 @@ services:
           - dc3-center-data
 
   listening-virtual:
-    image: pnoker/dc3-driver-listening-virtual:2025.6.5
+    image: pnoker/dc3-driver-listening-virtual:2025.6.6
     restart: always
     ports:
       - "6270:6270"
@@ -131,7 +131,7 @@ services:
           - dc3-driver-listening-virtual
 
   modbus-tcp:
-    image: pnoker/dc3-driver-modbus-tcp:2025.6.5
+    image: pnoker/dc3-driver-modbus-tcp:2025.6.6
     restart: always
     environment:
       - NODE_ENV=test
@@ -151,7 +151,7 @@ services:
           - dc3-driver-modbus-tcp
 
   mqtt:
-    image: pnoker/dc3-driver-mqtt:2025.6.5
+    image: pnoker/dc3-driver-mqtt:2025.6.6
     restart: always
     environment:
       - NODE_ENV=test
@@ -171,7 +171,7 @@ services:
           - dc3-driver-mqtt
 
   opc-da:
-    image: pnoker/dc3-driver-opc-da:2025.6.5
+    image: pnoker/dc3-driver-opc-da:2025.6.6
     restart: always
     environment:
       - NODE_ENV=test
@@ -191,7 +191,7 @@ services:
           - dc3-driver-opc-da
 
   opc-ua:
-    image: pnoker/dc3-driver-opc-ua:2025.6.5
+    image: pnoker/dc3-driver-opc-ua:2025.6.6
     restart: always
     environment:
       - NODE_ENV=test
@@ -211,7 +211,7 @@ services:
           - dc3-driver-opc-ua
 
   plcs7:
-    image: pnoker/dc3-driver-plcs7:2025.6.5
+    image: pnoker/dc3-driver-plcs7:2025.6.6
     restart: always
     environment:
       - NODE_ENV=test
@@ -231,7 +231,7 @@ services:
           - dc3-driver-plcs7
 
   virtual:
-    image: pnoker/dc3-driver-virtual:2025.6.5
+    image: pnoker/dc3-driver-virtual:2025.6.6
     restart: always
     environment:
       - NODE_ENV=test
