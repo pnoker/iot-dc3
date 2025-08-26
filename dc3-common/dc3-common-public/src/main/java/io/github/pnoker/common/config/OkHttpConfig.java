@@ -23,6 +23,7 @@ import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,10 +43,10 @@ public class OkHttpConfig {
         return new OkHttpClient.Builder()
                 .retryOnConnectionFailure(true)
                 .connectionPool(pool)
-                .callTimeout(15, TimeUnit.SECONDS)
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS)
+                .callTimeout(Duration.ofSeconds(15))
+                .connectTimeout(Duration.ofSeconds(15))
+                .readTimeout(Duration.ofSeconds(15))
+                .writeTimeout(Duration.ofSeconds(15))
                 .build();
     }
 }
