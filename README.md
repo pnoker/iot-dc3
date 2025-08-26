@@ -56,5 +56,5 @@ All components and code are open-source, ensuring transparency, flexibility, and
 
 # 4 License
 
-The `IoT DC3` open-source platform is licensed under the [Apache 2.0 License](./LICENSE). This license allows for commercial use while
+The `IoT DC3` open-source platform is licensed under the [AGPL 3.0 License](./LICENSE-AGPL.txt). This license allows for commercial use while
 mandating the retention of author and copyright information.
