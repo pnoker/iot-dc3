@@ -22,7 +22,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-driver</artifactId>
-        <version>2025.6.5</version>
+        <version>2025.6.6</version>
     </parent>
 
     <artifactId>dc3-driver-opc-da</artifactId>
