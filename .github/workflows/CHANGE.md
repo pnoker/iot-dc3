@@ -1,4 +1,4 @@
-## 🔄 What's Changed
+## ✨ What's Changed
 
 ### 2025.6.6
 
