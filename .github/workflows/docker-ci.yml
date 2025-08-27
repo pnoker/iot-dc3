@@ -279,38 +279,7 @@ jobs:
           # 创建release notes
           echo "release_notes<<EOF" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          echo "### What's Changed" >> $GITHUB_OUTPUT
-          echo "$CHANGES" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "### 🐳 Docker Images" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "#### Docker Hub Registry" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "#### Aliyun Container Registry" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
+          cat CHANGE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           cat USAGE.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
