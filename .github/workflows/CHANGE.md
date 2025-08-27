@@ -7,9 +7,12 @@
 - System reliability enhancements
 - Core components optimization
 
-### 2025.6.5
+<details>
+<summary>历史版本说明</summary>
+<h3>2025.6.5</h3>
 
 - Updated dependencies to latest versions
 - Fixed stability issues
 - Performance optimizations
 - Security patches applied
+</details>
