@@ -8,7 +8,7 @@
 - Core components optimization
 
 <details>
-<summary>历史版本说明</summary>
+​<summary>Historical Version Description, Click to Expand</summary>​
 <h3>2025.6.5</h3>
 
 - Updated dependencies to latest versions
