@@ -7,7 +7,7 @@ contributions you can make, the standards for each type of contribution, the ove
 
 While one of the most common ways to contribute to open source software is through code, there are many other ways to participate in the community development and maintenance of
 IoT DC3. In addition to code pull requests, you can contribute through bug reports, documentation fixes, feature requests, labeling templates, storage backends, and machine
-learning examples. You can also participate in the IoT DC3 community Slack by engaging with the rest of the community and answering questions. No contribution is too small!
+learning examples. You can also participate in the IoT DC3 community by engaging with the rest of the community and answering questions. No contribution is too small!
 
 ### Docs Update
 
