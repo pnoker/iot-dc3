@@ -279,77 +279,9 @@ jobs:
           # 创建release notes
           echo "release_notes<<EOF" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          echo "### What's Changed" >> $GITHUB_OUTPUT
-          echo "$CHANGES" >> $GITHUB_OUTPUT
+          cat CHANGE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          echo "### 🐳 Docker Images" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "#### Docker Hub Registry" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "#### Aliyun Container Registry" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}\`" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "### 📦 Usage" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "> Taking \`${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}\` as an example" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "#### 🚀 Quick Start" >> $GITHUB_OUTPUT
-          echo "\`\`\`bash" >> $GITHUB_OUTPUT
-          echo "# Pull image from Docker Hub" >> $GITHUB_OUTPUT
-          echo "docker pull ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "# Or pull from Aliyun Container Registry (faster in China)" >> $GITHUB_OUTPUT
-          echo "docker pull ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}" >> $GITHUB_OUTPUT
-          echo "\`\`\`" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "#### 🏗️ Platform Support" >> $GITHUB_OUTPUT
-          echo "All images are built for multiple platforms:" >> $GITHUB_OUTPUT
-          echo "- \`linux/amd64\` - For Intel/AMD 64-bit systems" >> $GITHUB_OUTPUT
-          echo "- \`linux/arm64\` - For ARM 64-bit systems (Apple Silicon, ARM servers)" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "#### 🏷️ Version Tags" >> $GITHUB_OUTPUT
-          echo "- \`${{ steps.variables.outputs.service_version }}\` - Specific version (recommended for production)" >> $GITHUB_OUTPUT
-          echo "- \`latest\` - Latest stable version (may change)" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "#### 🌐 Registry Selection" >> $GITHUB_OUTPUT
-          echo "- **Docker Hub**: Global access, standard Docker registry" >> $GITHUB_OUTPUT
-          echo "- **Aliyun Container Registry**: Optimized for users in China mainland" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "#### 🔧 Docker Compose Example" >> $GITHUB_OUTPUT
-          echo "\`\`\`yaml" >> $GITHUB_OUTPUT
-          echo "version: '3.8'" >> $GITHUB_OUTPUT
-          echo "services:" >> $GITHUB_OUTPUT
-          echo "  dc3-gateway:" >> $GITHUB_OUTPUT
-          echo "    image: ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}" >> $GITHUB_OUTPUT
-          echo "    ports:" >> $GITHUB_OUTPUT
-          echo "      - \"8000:8000\"" >> $GITHUB_OUTPUT
-          echo "    environment:" >> $GITHUB_OUTPUT
-          echo "      - SPRING_PROFILES_ACTIVE=pro" >> $GITHUB_OUTPUT
-          echo "\`\`\`" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
+          cat USAGE.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           echo "✅ Release notes generated successfully"
 
