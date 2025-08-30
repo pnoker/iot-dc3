@@ -282,7 +282,7 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
           cat ${{ github.workspace }}/dc3/doc/CHANGE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          cat USAGE.md >> $GITHUB_OUTPUT
+          cat ${{ github.workspace }}/dc3/doc/USAGE.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           echo "✅ Release notes generated successfully"
 
