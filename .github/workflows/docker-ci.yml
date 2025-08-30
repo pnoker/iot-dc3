@@ -276,8 +276,9 @@ jobs:
           fi
           
           echo "📄 Creating release notes content..."
+          
           echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
+          echo "<details><summary>English</summary>" >> $GITHUB_OUTPUT
           export SERVICE_VERSION=${{ steps.variables.outputs.service_version }}
           export SERVICE_WORKSPACE=${{ github.workspace }}
           envsubst < ${{ github.workspace }}/dc3/doc/TITLE.md >> $GITHUB_OUTPUT
@@ -285,6 +286,16 @@ jobs:
           envsubst < ${{ github.workspace }}/dc3/doc/CHANGE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           envsubst < ${{ github.workspace }}/dc3/doc/USAGE.md >> $GITHUB_OUTPUT
+          echo "</details>" >> $GITHUB_OUTPUT
+          
+          echo "<details><summary>中文</summary>" >> $GITHUB_OUTPUT
+          envsubst < ${{ github.workspace }}/dc3/doc/TITLE.zh.md >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          envsubst < ${{ github.workspace }}/dc3/doc/CHANGE.zh.md >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          envsubst < ${{ github.workspace }}/dc3/doc/USAGE.zh.md >> $GITHUB_OUTPUT
+          echo "</details>" >> $GITHUB_OUTPUT
+          
           echo "EOF" >> $GITHUB_OUTPUT
           echo "✅ Release notes generated successfully"
 
@@ -293,47 +304,6 @@ jobs:
         with:
           name: ${{ steps.variables.outputs.service_version }}
           body: ${{ steps.release_notes.outputs.release_notes }}
-          tag_name: ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate release notes zh
-        id: release_notes_zh
-        run: |
-          echo "📝 Generating release notes zh..."
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
-          echo "🔍 Previous tag: ${PREVIOUS_TAG:-"No previous tag found"}"
-          echo "🏷️ Current tag: ${{ github.ref_name }}"
-          
-          if [ -n "$PREVIOUS_TAG" ]; then
-            echo "📊 Collecting changes since $PREVIOUS_TAG..."
-            CHANGES=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD | head -20)
-          else
-            echo "📊 Collecting all changes (no previous tag)..."
-            CHANGES=$(git log --pretty=format:"- %s" --reverse | head -20)
-          fi
-          
-          echo "📄 Creating release notes zh content..."
-          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          export SERVICE_VERSION=${{ steps.variables.outputs.service_version }}
-          export SERVICE_WORKSPACE=${{ github.workspace }}
-          envsubst < ${{ github.workspace }}/dc3/doc/TITLE.zh.md >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          envsubst < ${{ github.workspace }}/dc3/doc/CHANGE.zh.md >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          envsubst < ${{ github.workspace }}/dc3/doc/USAGE.zh.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "✅ Release notes zh generated successfully"
-
-      - name: Create GitHub Release Zh
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ steps.variables.outputs.service_version }}
-          body: ${{ steps.release_notes_zh.outputs.release_notes }}
           tag_name: ${{ github.ref_name }}
           draft: false
           prerelease: false
