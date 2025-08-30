@@ -278,7 +278,8 @@ jobs:
           echo "📄 Creating release notes content..."
           echo "release_notes<<EOF" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          cat ${{ github.workspace }}/dc3/doc/TITLE.md >> $GITHUB_OUTPUT
+          export SERVICE_VERSION=${{ steps.variables.outputs.service_version }}
+          envsubst < ${{ github.workspace }}/dc3/doc/TITLE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           cat ${{ github.workspace }}/dc3/doc/CHANGE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
