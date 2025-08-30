@@ -6,4 +6,4 @@ IoT DC3 是一个基于 Spring Cloud 构建的完全开源分布式物联网平�
 
 作为一个社区驱动、完全开源的平台，IoT DC3 在代码和架构上都保持透明与灵活，支持持续创新，并已广泛应用于智能工厂、能源监测、智慧农业和智慧城市等场景。
 
-![iot-dc3-architecture](dc3/images/architecture-en.png)
+![iot-dc3-architecture](dc3/images/architecture-cn.png)

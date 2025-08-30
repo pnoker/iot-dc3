@@ -278,7 +278,7 @@ jobs:
           echo "📄 Creating release notes content..."
           
           echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-          echo "<details><summary>English</summary>" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
           export SERVICE_VERSION=${{ steps.variables.outputs.service_version }}
           export SERVICE_WORKSPACE=${{ github.workspace }}
           envsubst < ${{ github.workspace }}/dc3/doc/TITLE.md >> $GITHUB_OUTPUT
@@ -286,9 +286,9 @@ jobs:
           envsubst < ${{ github.workspace }}/dc3/doc/CHANGE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           envsubst < ${{ github.workspace }}/dc3/doc/USAGE.md >> $GITHUB_OUTPUT
-          echo "</details>" >> $GITHUB_OUTPUT
-          
+          echo "---" >> $GITHUB_OUTPUT
           echo "<details><summary>中文</summary>" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
           envsubst < ${{ github.workspace }}/dc3/doc/TITLE.zh.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           envsubst < ${{ github.workspace }}/dc3/doc/CHANGE.zh.md >> $GITHUB_OUTPUT
