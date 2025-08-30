@@ -102,162 +102,162 @@ jobs:
           registry: registry.cn-beijing.aliyuncs.com
           username: ${{ vars.ALIYUN_DOCKERHUB_USERNAME }}
           password: ${{ secrets.ALIYUN_DOCKERHUB_TOKEN }}
-
-      - name: Build and Push For Gateway
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_gateway }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_gateway }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Center Auth
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_auth }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_auth }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Center Data
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_data }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_data }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_data }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Center Manager
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_manager }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_manager }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_manager }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Center Single
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_single }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_single }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_single }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Listening Virtual
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_listening_virtual }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_listening_virtual }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Modbus Tcp
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_modbus_tcp }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_modbus_tcp }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Mqtt
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_mqtt }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_mqtt }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Opc Da
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_da }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_da }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Opc Ua
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_ua }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_ua }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Plcs7
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_plcs7 }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_plcs7 }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Virtual
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_virtual }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_virtual }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_virtual }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Gateway
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_gateway }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_gateway }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Center Auth
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_auth }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_auth }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Center Data
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_data }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_data }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_data }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Center Manager
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_manager }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_manager }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_manager }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Center Single
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_single }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_single }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_single }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Driver Listening Virtual
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_listening_virtual }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_listening_virtual }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Driver Modbus Tcp
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_modbus_tcp }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_modbus_tcp }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Driver Mqtt
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_mqtt }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_mqtt }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Driver Opc Da
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_da }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_da }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Driver Opc Ua
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_ua }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_ua }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Driver Plcs7
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_plcs7 }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_plcs7 }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}
+#
+#      - name: Build and Push For Driver Virtual
+#        uses: docker/build-push-action@v6
+#        with:
+#          push: true
+#          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_virtual }}
+#          platforms: linux/arm64,linux/amd64
+#          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_virtual }}/Dockerfile
+#          tags: |
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:latest
+#            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_virtual }}:latest
+#            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}
 
       - name: Generate release notes
         id: release_notes
@@ -276,10 +276,9 @@ jobs:
           fi
           
           echo "📄 Creating release notes content..."
-          # 创建release notes
           echo "release_notes<<EOF" >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          cat CHANGE.md >> $GITHUB_OUTPUT
+          cat ${{ github.workspace }}/.github/CHANGE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           cat USAGE.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
