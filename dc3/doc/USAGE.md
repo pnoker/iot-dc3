@@ -1,6 +1,6 @@
 ## 📦 Usage
 
-### 🎮 Requirements
+### 🍭 Requirements
 
 > These are the core requirements needed to build and run the application. Make sure to have these tools installed and properly configured in your development environment.
 
@@ -8,7 +8,7 @@
 - **Maven**: Build automation and dependency management tool
 - **Docker**: Container platform for building and running applications
 
-### 🚀 Quick Start
+### 🍻 Quick Start
 
 > Choose one of the following container registries:
 
@@ -41,25 +41,25 @@ All images are built for multiple platforms:
 - `linux/amd64` - For Intel/AMD 64-bit systems
 - `linux/arm64` - For ARM 64-bit systems (Apple Silicon, ARM servers)
 
-### 🏷️ Version Tags
+### 🚥 Version Tags
 
-- `${{ steps.variables.outputs.service_version }}` - Specific version (recommended for production)
+- `${SERVICE_VERSION}` - Specific version (recommended for production)
 - `latest` - Latest stable version (may change)
 
-### 🛞 Images
+### 🍉 Images
 
 | Docker Hub                                                                                                                                                                   | Aliyun Container Registry                                                                                                                                                   |
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}`                  | `${{ steps.variables.outputsdocker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}`                   |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}`              | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}`              |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}`              | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}`              |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}`           | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}`           |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}`            | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}`            |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}` | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}` |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}`        | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}`        |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}`              | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}`              |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}`            | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}`            |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}`            | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}`            |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}`             | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}`             |
-| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}`           | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}`           |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${SERVICE_VERSION}`                  | `${{ steps.variables.outputsdocker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:${SERVICE_VERSION}`                   |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:${SERVICE_VERSION}`              | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:${SERVICE_VERSION}`              |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:${SERVICE_VERSION}`              | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_data }}:${SERVICE_VERSION}`              |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:${SERVICE_VERSION}`           | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_manager }}:${SERVICE_VERSION}`           |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:${SERVICE_VERSION}`            | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_single }}:${SERVICE_VERSION}`            |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${SERVICE_VERSION}` | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${SERVICE_VERSION}` |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${SERVICE_VERSION}`        | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${SERVICE_VERSION}`        |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${SERVICE_VERSION}`              | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${SERVICE_VERSION}`              |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${SERVICE_VERSION}`            | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${SERVICE_VERSION}`            |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${SERVICE_VERSION}`            | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${SERVICE_VERSION}`            |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${SERVICE_VERSION}`             | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${SERVICE_VERSION}`             |
+| `${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${SERVICE_VERSION}`           | `${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${SERVICE_VERSION}`           |
 |                                                                                                                                                                              |                                                                                                                                                                             |
