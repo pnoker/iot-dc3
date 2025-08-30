@@ -8,11 +8,12 @@
 - Core components optimization
 
 <details>
-​<summary>Historical Version Description, Click to Expand</summary>​
+<summary>Historical Version Description, Click to Expand</summary>
 <h3>2025.6.5</h3>
 
 - Updated dependencies to latest versions
 - Fixed stability issues
 - Performance optimizations
 - Security patches applied
+
 </details>
