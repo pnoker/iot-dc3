@@ -282,9 +282,9 @@ jobs:
           export SERVICE_WORKSPACE=${{ github.workspace }}
           envsubst < ${{ github.workspace }}/dc3/doc/TITLE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          cat ${{ github.workspace }}/dc3/doc/CHANGE.md >> $GITHUB_OUTPUT
+          envsubst < ${{ github.workspace }}/dc3/doc/CHANGE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
-          cat ${{ github.workspace }}/dc3/doc/USAGE.md >> $GITHUB_OUTPUT
+          envsubst < ${{ github.workspace }}/dc3/doc/USAGE.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           echo "✅ Release notes generated successfully"
 
