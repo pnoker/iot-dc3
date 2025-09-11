@@ -16,7 +16,7 @@
 #
 
 # runtime
-FROM pnoker/dc3-jre:2025.2 AS runtime
+FROM pnoker/dc3-jre:2025.9 AS runtime
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 

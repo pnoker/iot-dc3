@@ -17,7 +17,7 @@
 
 services:
   elasticsearch:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-elasticsearch:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-elasticsearch:2025.9
     restart: always
     environment:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -36,7 +36,7 @@ services:
           - dc3-elasticsearch
 
   logstash:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-logstash:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-logstash:2025.9
     restart: always
     depends_on:
       - elasticsearch
@@ -58,7 +58,7 @@ services:
           - dc3-logstash
 
   apm:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-apm:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-apm:2025.9
     restart: always
     depends_on:
       - elasticsearch
@@ -75,7 +75,7 @@ services:
           - dc3-apm
 
   kibana:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-kibana:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-kibana:2025.9
     restart: always
     depends_on:
       - elasticsearch

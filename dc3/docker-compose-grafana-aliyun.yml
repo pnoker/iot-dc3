@@ -17,7 +17,7 @@
 
 services:
   grafana:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-grafana:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-grafana:2025.9
     restart: always
     ports:
       - "3000:3000"
@@ -38,7 +38,7 @@ services:
           - dc3-grafana
 
   prometheus:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-prometheus:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-prometheus:2025.9
     restart: always
     container_name: dc3-prometheus
     hostname: dc3-prometheus
@@ -58,7 +58,7 @@ services:
           - dc3-prometheus
 
   postgres-exporter:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-postgres-exporter:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-postgres-exporter:2025.9
     restart: always
     container_name: dc3-postgres-exporter
     hostname: dc3-postgres-exporter
@@ -73,7 +73,7 @@ services:
           - dc3-postgres-exporter
 
   redis-exporter:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis-exporter:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-redis-exporter:2025.9
     restart: always
     container_name: dc3-redis-exporter
     hostname: dc3-redis-exporter
@@ -88,7 +88,7 @@ services:
           - dc3-redis-exporter
 
   nginx-exporter:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-nginx-exporter:2025.2
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-nginx-exporter:2025.9
     restart: always
     container_name: dc3-nginx-exporter
     hostname: dc3-nginx-exporter

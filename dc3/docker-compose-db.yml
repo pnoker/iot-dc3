@@ -17,7 +17,7 @@
 
 services:
   redis:
-    image: pnoker/dc3-redis:2025.2
+    image: pnoker/dc3-redis:2025.9
     restart: always
     ports:
       - '36379:6379'
@@ -36,7 +36,7 @@ services:
           - dc3-redis
 
   postgres:
-    image: pnoker/dc3-postgres:2025.2
+    image: pnoker/dc3-postgres:2025.9
     restart: always
     ports:
       - "35432:5432"
@@ -55,7 +55,7 @@ services:
           - dc3-postgres
 
   rabbitmq:
-    image: pnoker/dc3-rabbitmq:2025.2
+    image: pnoker/dc3-rabbitmq:2025.9
     restart: always
     ports:
       - "35671:5671"
