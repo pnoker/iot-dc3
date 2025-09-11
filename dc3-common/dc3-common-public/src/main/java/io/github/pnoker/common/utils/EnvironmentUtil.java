@@ -17,11 +17,12 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.UUID;
 
 /**
  * 环境相关的工具类集合
@@ -43,7 +44,7 @@ public class EnvironmentUtil {
      * @return R of String Suffix
      */
     public static String getNodeId() {
-        return RandomUtil.randomString(8).toLowerCase();
+        return UUID.randomUUID().toString();
     }
 
     /**

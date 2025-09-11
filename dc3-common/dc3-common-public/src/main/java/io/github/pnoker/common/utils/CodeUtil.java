@@ -17,9 +17,10 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.util.IdUtil;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.UUID;
 
 /**
  * 编码生成工具类, 提供唯一编码生成功能
@@ -42,6 +43,6 @@ public class CodeUtil {
      * @return 返回一个简化的UUID字符串
      */
     public static String getCode() {
-        return IdUtil.fastSimpleUUID();
+        return UUID.randomUUID().toString();
     }
 }

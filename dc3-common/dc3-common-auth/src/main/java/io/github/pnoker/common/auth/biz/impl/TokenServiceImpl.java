@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.auth.biz.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.auth.biz.TokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
@@ -36,9 +34,11 @@ import io.github.pnoker.common.utils.KeyUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * 令牌服务接口实现类
@@ -66,7 +66,7 @@ public class TokenServiceImpl implements TokenService {
         if (Objects.isNull(tenantBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
-        return RandomUtil.randomString(16);
+        return UUID.randomUUID().toString();
     }
 
     @Override
@@ -87,7 +87,7 @@ public class TokenServiceImpl implements TokenService {
         if (Objects.isNull(userPasswordBO)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
-        if (CharSequenceUtil.isEmpty(salt)) {
+        if (StringUtils.isEmpty(salt)) {
             throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
         }
         String md5Password = DecodeUtil.md5(userPasswordBO.getLoginPassword(), salt);
@@ -105,7 +105,7 @@ public class TokenServiceImpl implements TokenService {
         }
 
         TokenValid tokenValid = new TokenValid(false, null);
-        if (CharSequenceUtil.isBlank(token)) {
+        if (StringUtils.isBlank(token)) {
             return tokenValid;
         }
 

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.redis.service;
 
-import cn.hutool.core.collection.CollUtil;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.entity.bo.PointValueBO;
@@ -25,6 +24,7 @@ import io.github.pnoker.common.redis.entity.builder.RedisPointValueBuilder;
 import io.github.pnoker.common.redis.entity.model.RedisPointValueDO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -73,7 +73,7 @@ public class RedisRepositoryService {
     }
 
     public Map<Long, PointValueBO> selectLatestPointValue(Long deviceId, List<Long> pointIds) {
-        if (CollUtil.isEmpty(pointIds)) {
+        if (CollectionUtils.isEmpty(pointIds)) {
             return Collections.emptyMap();
         }
 

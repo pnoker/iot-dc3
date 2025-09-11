@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -34,6 +33,7 @@ import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -119,7 +119,7 @@ public class NotifyServiceImpl implements NotifyService {
      */
     private LambdaQueryWrapper<NotifyDO> fuzzyQuery(NotifyQuery entityQuery) {
         LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAlarmNotifyName()), NotifyDO::getNotifyName, entityQuery.getAlarmNotifyName());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmNotifyName()), NotifyDO::getNotifyName, entityQuery.getAlarmNotifyName());
         wrapper.eq(NotifyDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

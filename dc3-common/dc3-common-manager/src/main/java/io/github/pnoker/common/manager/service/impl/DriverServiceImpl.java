@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.manager.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -40,6 +38,8 @@ import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -121,7 +121,7 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public List<DriverBO> selectByIds(Set<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
+        if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
         List<DriverDO> entityDOList = driverManager.listByIds(ids);
@@ -141,14 +141,14 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public List<DriverBO> selectByProfileId(Long profileId) {
         List<Long> ids = profileBindService.selectDeviceIdsByProfileId(profileId);
-        if (CollUtil.isEmpty(ids)) {
+        if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
 
         List<DeviceDO> deviceDOList = deviceManager.listByIds(ids);
         Set<Long> driverIds = deviceDOList.stream().map(DeviceDO::getDriverId).collect(Collectors.toSet());
         List<DriverBO> entityDOList = selectByIds(driverIds);
-        if (CollUtil.isEmpty(entityDOList)) {
+        if (CollectionUtils.isEmpty(entityDOList)) {
             return Collections.emptyList();
         }
 
@@ -175,10 +175,10 @@ public class DriverServiceImpl implements DriverService {
      */
     private LambdaQueryWrapper<DriverDO> fuzzyQuery(DriverQuery entityQuery) {
         LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getDriverName()), DriverDO::getDriverName, entityQuery.getDriverName());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getDriverCode()), DriverDO::getDriverCode, entityQuery.getDriverCode());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getServiceName()), DriverDO::getServiceName, entityQuery.getServiceName());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getServiceHost()), DriverDO::getServiceHost, entityQuery.getServiceHost());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getDriverName()), DriverDO::getDriverName, entityQuery.getDriverName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getDriverCode()), DriverDO::getDriverCode, entityQuery.getDriverCode());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceName()), DriverDO::getServiceName, entityQuery.getServiceName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceHost()), DriverDO::getServiceHost, entityQuery.getServiceHost());
         wrapper.eq(Objects.nonNull(entityQuery.getDriverTypeFlag()), DriverDO::getDriverTypeFlag, entityQuery.getDriverTypeFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverDO::getEnableFlag, entityQuery.getEnableFlag());
         wrapper.eq(DriverDO::getTenantId, entityQuery.getTenantId());

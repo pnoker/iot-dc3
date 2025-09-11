@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.optional;
 
-import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.json.JSONUtil;
+import io.github.pnoker.common.utils.JsonUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Consumer;
 
@@ -42,13 +42,13 @@ public final class JsonOptional {
     }
 
     public void ifPresent(Consumer<String> action) {
-        if (CharSequenceUtil.isNotEmpty(value) && JSONUtil.isTypeJSON(value)) {
+        if (StringUtils.isNotEmpty(value) && JsonUtil.isJson(value)) {
             action.accept(value);
         }
     }
 
     public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {
-        if (CharSequenceUtil.isNotEmpty(value) && JSONUtil.isTypeJSON(value)) {
+        if (StringUtils.isNotEmpty(value) && JsonUtil.isJson(value)) {
             action.accept(value);
         } else {
             emptyAction.run();

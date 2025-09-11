@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.mqtt.handler;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.mqtt.entity.MessageHeader;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.mqtt.service.job.MqttScheduleJob;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -63,7 +63,7 @@ public class MqttReceiveHandler {
             try {
                 MessageHeader messageHeader = new MessageHeader(message.getHeaders());
                 String payload = message.getPayload().toString();
-                if (CharSequenceUtil.isEmpty(payload)) {
+                if (StringUtils.isEmpty(payload)) {
                     log.error("Invalid mqtt inbound, From: {}, Qos: {}, Payload: null", messageHeader.getMqttReceivedTopic(), messageHeader.getMqttReceivedQos());
                     return;
                 }

@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import java.text.MessageFormat;
 
 /**
  * 自定义 超出范围 异常
@@ -35,11 +35,7 @@ public class OutRangeException extends RuntimeException {
         super(cause);
     }
 
-    public OutRangeException(CharSequence template, Object... params) {
-        super(getOutRangeMessage(template, params));
-    }
-
-    private static String getOutRangeMessage(CharSequence template, Object... params) {
-        return CharSequenceUtil.format(template, params);
+    public OutRangeException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
     }
 }

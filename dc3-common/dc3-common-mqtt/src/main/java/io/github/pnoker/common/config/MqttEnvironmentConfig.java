@@ -17,10 +17,10 @@
 
 package io.github.pnoker.common.config;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import io.github.pnoker.common.utils.EnvironmentUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +29,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,17 +48,17 @@ public class MqttEnvironmentConfig implements EnvironmentPostProcessor {
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         String node = environment.getProperty(EnvironmentConstant.DRIVER_NODE, String.class);
-        if (CharSequenceUtil.isEmpty(node)) {
+        if (StringUtils.isEmpty(node)) {
             node = EnvironmentUtil.getNodeId();
         }
 
         String tenant = environment.getProperty(EnvironmentConstant.DRIVER_TENANT, String.class);
         String name = environment.getProperty(EnvironmentConstant.SPRING_APPLICATION_NAME, String.class);
-        String client = CharSequenceUtil.format("{}/{}_{}", tenant, name, node);
+        String client = MessageFormat.format("{0}/{1}_{2}", tenant, name, node);
 
         String prefix = environment.getProperty(EnvironmentConstant.MQTT_PREFIX, String.class);
-        if (CharSequenceUtil.isEmpty(node)) {
-            prefix = CharSequenceUtil.format("dc3/{}/{}/", tenant, name);
+        if (StringUtils.isEmpty(node)) {
+            prefix = MessageFormat.format("dc3/{0}/{1}/", tenant, name);
         }
 
         Map<String, Object> source = new HashMap<>(2);

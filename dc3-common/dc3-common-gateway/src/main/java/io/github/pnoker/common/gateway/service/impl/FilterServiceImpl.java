@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.gateway.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.AuthConstant;
@@ -29,6 +28,7 @@ import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RequestUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +56,7 @@ public class FilterServiceImpl implements FilterService {
     public GrpcRTenantDTO getTenantDTO(ServerHttpRequest request) {
         // Get tenant code from request header
         String tenant = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
-        if (CharSequenceUtil.isEmpty(tenant)) {
+        if (StringUtils.isEmpty(tenant)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
@@ -72,7 +72,7 @@ public class FilterServiceImpl implements FilterService {
     public GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request) {
         // Get user login name from request header
         String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
-        if (CharSequenceUtil.isEmpty(user)) {
+        if (StringUtils.isEmpty(user)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
@@ -106,7 +106,7 @@ public class FilterServiceImpl implements FilterService {
         // Get token from request header and parse it
         String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
         RequestHeader.TokenHeader entityBO = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
-        if (Objects.isNull(entityBO) || !CharSequenceUtil.isAllNotEmpty(entityBO.getSalt(), entityBO.getToken())) {
+        if (Objects.isNull(entityBO) || StringUtils.isAnyEmpty(entityBO.getSalt(), entityBO.getToken())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 

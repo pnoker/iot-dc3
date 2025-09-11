@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.manager.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -49,6 +47,8 @@ import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -152,7 +152,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public List<PointBO> selectByIds(Set<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
+        if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
         List<PointDO> entityDOList = pointManager.listByIds(ids);
@@ -176,7 +176,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public List<PointBO> selectByProfileIds(List<Long> profileIds) {
-        if (CollUtil.isEmpty(profileIds)) {
+        if (CollectionUtils.isEmpty(profileIds)) {
             return Collections.emptyList();
         }
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().in(PointDO::getProfileId, profileIds);
@@ -195,7 +195,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public Map<Long, String> unit(Set<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
+        if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyMap();
         }
         List<PointDO> pointDOList = pointManager.listByIds(ids);
@@ -393,8 +393,8 @@ public class PointServiceImpl implements PointService {
     private LambdaQueryWrapper<PointDO> fuzzyQuery(PointQuery entityQuery) {
         QueryWrapper<PointDO> wrapper = Wrappers.query();
         wrapper.eq("dp.deleted", 0);
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getPointName()), "dp.point_name", entityQuery.getPointName());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getPointCode()), "dp.point_code", entityQuery.getPointCode());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getPointName()), "dp.point_name", entityQuery.getPointName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getPointCode()), "dp.point_code", entityQuery.getPointCode());
         wrapper.eq(Objects.nonNull(entityQuery.getPointTypeFlag()), "dp.point_type_flag", entityQuery.getPointTypeFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getRwFlag()), "dp.rw_flag", entityQuery.getRwFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), "dp.profile_id", entityQuery.getProfileId());

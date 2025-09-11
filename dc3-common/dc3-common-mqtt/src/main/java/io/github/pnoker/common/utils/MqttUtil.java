@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
 /**
@@ -38,10 +38,10 @@ public class MqttUtil {
 
         // username & password
         if (MqttProperties.AuthTypeEnum.USERNAME.equals(mqttProperties.getAuthType()) || MqttProperties.AuthTypeEnum.X509.equals(mqttProperties.getAuthType())) {
-            if (CharSequenceUtil.isNotEmpty(mqttProperties.getUsername())) {
+            if (StringUtils.isNotEmpty(mqttProperties.getUsername())) {
                 mqttConnectOptions.setUserName(mqttProperties.getUsername());
             }
-            if (CharSequenceUtil.isNotEmpty(mqttProperties.getPassword())) {
+            if (StringUtils.isNotEmpty(mqttProperties.getPassword())) {
                 mqttConnectOptions.setPassword(mqttProperties.getPassword().toCharArray());
             }
         }
@@ -52,7 +52,7 @@ public class MqttUtil {
                     mqttProperties.getCaCrt(),
                     mqttProperties.getClientCrt(),
                     mqttProperties.getClientKey(),
-                    CharSequenceUtil.isEmpty(mqttProperties.getClientKeyPass()) ? CharSequenceUtil.EMPTY : mqttProperties.getClientKeyPass()
+                    StringUtils.isEmpty(mqttProperties.getClientKeyPass()) ? StringUtils.EMPTY : mqttProperties.getClientKeyPass()
             ));
 
         }

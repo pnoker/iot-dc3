@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import java.text.MessageFormat;
 
 /**
  * 自定义 配置 异常
@@ -35,7 +35,7 @@ public class ConfigException extends RuntimeException {
         super(cause);
     }
 
-    public ConfigException(CharSequence template, Object... params) {
-        super(CharSequenceUtil.format(template, params));
+    public ConfigException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
     }
 }

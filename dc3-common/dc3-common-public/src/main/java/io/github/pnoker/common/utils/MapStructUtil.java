@@ -17,10 +17,9 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.NumberUtil;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Condition;
 
 /**
@@ -39,11 +38,16 @@ public class MapStructUtil {
 
     @Condition
     public static boolean isNotEmpty(String value) {
-        return !CharSequenceUtil.isNullOrUndefined(value);
+        return StringUtils.isNotEmpty(value);
     }
 
     @Condition
     public static boolean isValidNumber(Number value) {
-        return NumberUtil.isValidNumber(value);
+        return switch (value) {
+            case null -> false;
+            case Double d -> !Double.isNaN(d) && !Double.isInfinite(d);
+            case Float f -> !Float.isNaN(f) && !Float.isInfinite(f);
+            default -> true;
+        };
     }
 }

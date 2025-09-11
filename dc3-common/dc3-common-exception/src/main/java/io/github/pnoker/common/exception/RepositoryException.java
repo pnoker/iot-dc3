@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import java.text.MessageFormat;
 
 /**
  * 数据存储异常
@@ -35,7 +35,7 @@ public class RepositoryException extends RuntimeException {
         super(cause);
     }
 
-    public RepositoryException(CharSequence template, Object... params) {
-        super(CharSequenceUtil.format(template, params));
+    public RepositoryException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
     }
 }

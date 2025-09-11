@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -34,6 +33,7 @@ import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -123,8 +123,8 @@ public class RoleServiceImpl implements RoleService {
      */
     private LambdaQueryWrapper<RoleDO> fuzzyQuery(RoleQuery entityQuery) {
         LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getRoleName()), RoleDO::getRoleName, entityQuery.getRoleName());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getRoleCode()), RoleDO::getRoleCode, entityQuery.getRoleCode());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getRoleName()), RoleDO::getRoleName, entityQuery.getRoleName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getRoleCode()), RoleDO::getRoleCode, entityQuery.getRoleCode());
         wrapper.eq(RoleDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

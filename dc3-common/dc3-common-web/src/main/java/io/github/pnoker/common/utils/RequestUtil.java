@@ -17,10 +17,9 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.net.NetUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
@@ -41,6 +40,18 @@ public class RequestUtil {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
+    public static String getMultistageReverseProxyIp(String ip) {
+        if (ip == null) return null;
+        String[] ips = ip.split(",");
+        for (String s : ips) {
+            s = s.trim();
+            if (!s.isEmpty() && !"unknown".equalsIgnoreCase(s)) {
+                return s;
+            }
+        }
+        return null;
+    }
+
     /**
      * 获取远程客户端 IP
      *
@@ -48,19 +59,19 @@ public class RequestUtil {
      * @return Remote Ip
      */
     public static String getRemoteIp(ServerHttpRequest request) {
-        String ip = CharSequenceUtil.EMPTY;
+        String ip = StringUtils.EMPTY;
         String[] headers = {"X-Original-Forwarded-For", "X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
         for (String header : headers) {
             ip = request.getHeaders().getFirst(header);
-            if (!NetUtil.isUnknown(ip)) {
-                return NetUtil.getMultistageReverseProxyIp(ip);
+            if (!(ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip))) {
+                return getMultistageReverseProxyIp(ip);
             }
         }
         InetSocketAddress remoteAddress = request.getRemoteAddress();
         if (Objects.nonNull(remoteAddress)) {
             ip = remoteAddress.getHostString();
         }
-        return NetUtil.getMultistageReverseProxyIp(ip);
+        return getMultistageReverseProxyIp(ip);
     }
 
     /**
@@ -83,6 +94,6 @@ public class RequestUtil {
      */
     public static String getRequestCookie(ServerHttpRequest request, String key) {
         HttpCookie cookie = request.getCookies().getFirst(key);
-        return Objects.isNull(cookie) ? CharSequenceUtil.EMPTY : cookie.getValue();
+        return Objects.isNull(cookie) ? StringUtils.EMPTY : cookie.getValue();
     }
 }

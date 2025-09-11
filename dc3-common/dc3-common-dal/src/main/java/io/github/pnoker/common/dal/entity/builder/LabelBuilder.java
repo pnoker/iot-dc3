@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.dal.entity.builder;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.dal.entity.bo.LabelBO;
 import io.github.pnoker.common.dal.entity.model.LabelDO;
@@ -26,6 +25,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -120,7 +120,7 @@ public interface LabelBuilder {
     @AfterMapping
     default void afterProcess(LabelBO entityBO, @MappingTarget LabelDO entityDO) {
         // Code
-        if (CharSequenceUtil.isEmpty(entityBO.getLabelCode())) {
+        if (StringUtils.isEmpty(entityBO.getLabelCode())) {
             entityDO.setLabelCode(CodeUtil.getCode());
         }
 

@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import java.text.MessageFormat;
 
 /**
  * 自定义 Cron 异常
@@ -35,7 +35,7 @@ public class CronException extends RuntimeException {
         super(cause);
     }
 
-    public CronException(CharSequence template, Object... params) {
-        super(CharSequenceUtil.format(template, params));
+    public CronException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
     }
 }

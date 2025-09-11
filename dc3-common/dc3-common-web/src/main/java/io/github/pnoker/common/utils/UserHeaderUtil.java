@@ -17,12 +17,12 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -94,7 +94,7 @@ public class UserHeaderUtil {
     public static Mono<String> getNickName() {
         return getUserHeader().flatMap(userHeader -> {
             String nickName = userHeader.getNickName();
-            if (CharSequenceUtil.isEmpty(nickName)) {
+            if (StringUtils.isEmpty(nickName)) {
                 return Mono.error(new UnAuthorizedException("Unable to get nick name of user header"));
             }
             return Mono.just(nickName);
@@ -109,7 +109,7 @@ public class UserHeaderUtil {
     public static Mono<String> getUserName() {
         return getUserHeader().flatMap(userHeader -> {
             String userName = userHeader.getUserName();
-            if (CharSequenceUtil.isEmpty(userName)) {
+            if (StringUtils.isEmpty(userName)) {
                 return Mono.error(new UnAuthorizedException("Unable to get user name of user header"));
             }
             return Mono.just(userName);

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ApiBO;
 import io.github.pnoker.common.auth.entity.model.ApiDO;
@@ -29,6 +28,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -80,7 +80,7 @@ public interface ApiBuilder {
     @AfterMapping
     default void afterProcess(ApiBO entityBO, @MappingTarget ApiDO entityDO) {
         // Code
-        if (CharSequenceUtil.isEmpty(entityBO.getApiCode())) {
+        if (StringUtils.isEmpty(entityBO.getApiCode())) {
             entityDO.setApiCode(CodeUtil.getCode());
         }
 

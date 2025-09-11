@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.crypto.digest.MD5;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -70,8 +70,7 @@ public class DecodeUtil {
      * @return MD5 字符串
      */
     public static String md5(String content) {
-        MD5 md5 = MD5.create();
-        return md5.digestHex(content, StandardCharsets.UTF_8);
+        return DigestUtils.md5Hex(content);
     }
 
     /**

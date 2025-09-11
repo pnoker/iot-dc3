@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.MenuBO;
 import io.github.pnoker.common.auth.entity.model.MenuDO;
@@ -30,6 +29,7 @@ import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -82,7 +82,7 @@ public interface MenuBuilder {
     @AfterMapping
     default void afterProcess(MenuBO entityBO, @MappingTarget MenuDO entityDO) {
         // Code
-        if (CharSequenceUtil.isEmpty(entityBO.getMenuCode())) {
+        if (StringUtils.isEmpty(entityBO.getMenuCode())) {
             entityDO.setMenuCode(CodeUtil.getCode());
         }
 
