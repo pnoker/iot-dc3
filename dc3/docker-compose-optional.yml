@@ -17,7 +17,7 @@
 
 services:
   emqx:
-    image: pnoker/dc3-emqx:2025.2
+    image: pnoker/dc3-emqx:2025.9
     restart: always
     ports:
       - "38083:8083"

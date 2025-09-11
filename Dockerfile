@@ -15,7 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-FROM pnoker/dc3-jdk:2025.2
+FROM pnoker/dc3-jdk:2025.9
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 

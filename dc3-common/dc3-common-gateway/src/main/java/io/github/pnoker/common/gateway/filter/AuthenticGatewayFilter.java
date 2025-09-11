@@ -42,7 +42,7 @@ import reactor.core.publisher.Mono;
  * 自定义 Request Header 校验过滤器逻辑类
  *
  * @author pnoker
- * @version 2025.2.1
+ * @version 2025.9.1
  * @since 2022.1.0
  */
 @Slf4j
