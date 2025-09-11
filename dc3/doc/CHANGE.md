@@ -1,15 +1,22 @@
 ## ✨ What's Changed
 
-### 📌 2025.9.1
+### 📌 2025.9.2
+
+- Dependency upgrades
+- Stability improvements
+- Remove Hutool
+
+<details>
+<summary>📝 Historical Version Description, Click to Expand</summary>
+
+### 2025.6.6
 
 - Dependency upgrades for enhanced performance
 - Stability improvements and bug fixes
 - System reliability enhancements
 - Core components optimization
 
-<details>
-<summary>📝 Historical Version Description, Click to Expand</summary>
-<h3>2025.6.5</h3>
+### 2025.6.5
 
 - Updated dependencies to latest versions
 - Fixed stability issues
