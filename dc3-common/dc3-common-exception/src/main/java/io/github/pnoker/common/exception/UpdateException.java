@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import java.text.MessageFormat;
 
 /**
  * 自定义更新异常
@@ -35,7 +35,7 @@ public class UpdateException extends RuntimeException {
         super(cause);
     }
 
-    public UpdateException(CharSequence template, Object... params) {
-        super(CharSequenceUtil.format(template, params));
+    public UpdateException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
     }
 }

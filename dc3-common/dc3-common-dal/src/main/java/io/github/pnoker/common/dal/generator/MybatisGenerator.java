@@ -19,8 +19,9 @@ package io.github.pnoker.common.dal.generator;
 
 import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
-import com.google.common.collect.ImmutableMap;
 import io.github.pnoker.common.utils.MybatisUtil;
+
+import java.util.Map;
 
 /**
  * 自动代码生成工具
@@ -49,7 +50,7 @@ public class MybatisGenerator {
                         .service("dal")
                         .serviceImpl("dal.impl")
                         .mapper("mapper")
-                        .pathInfo(ImmutableMap.of(
+                        .pathInfo(Map.of(
                                 OutputFile.service, path + "/java/io/github/pnoker/common/dal/dal",
                                 OutputFile.serviceImpl, path + "/java/io/github/pnoker/common/dal/dal/impl",
                                 OutputFile.xml, path + "/resources/mapping"))

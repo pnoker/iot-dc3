@@ -17,9 +17,11 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.text.MessageFormat;
 
 /**
  * 异常 相关工具类
@@ -43,8 +45,8 @@ public class ExceptionUtil {
      * @return 错误信息
      */
     public static String getNotAvailableServiceMessage(String service, String message) {
-        if (CharSequenceUtil.isEmpty(message)) {
-            message = CharSequenceUtil.format("{}: {}", ExceptionConstant.NO_AVAILABLE_SERVER, service);
+        if (StringUtils.isEmpty(message)) {
+            message = MessageFormat.format("{0}: {1}", ExceptionConstant.NO_AVAILABLE_SERVER, service);
         }
         return message;
     }

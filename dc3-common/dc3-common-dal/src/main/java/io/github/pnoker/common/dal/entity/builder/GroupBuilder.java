@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.dal.entity.builder;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.dal.entity.bo.GroupBO;
 import io.github.pnoker.common.dal.entity.model.GroupDO;
@@ -26,6 +25,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.GroupTypeFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -120,7 +120,7 @@ public interface GroupBuilder {
     @AfterMapping
     default void afterProcess(GroupBO entityBO, @MappingTarget GroupDO entityDO) {
         // Code
-        if (CharSequenceUtil.isEmpty(entityBO.getGroupCode())) {
+        if (StringUtils.isEmpty(entityBO.getGroupCode())) {
             entityDO.setGroupCode(CodeUtil.getCode());
         }
 

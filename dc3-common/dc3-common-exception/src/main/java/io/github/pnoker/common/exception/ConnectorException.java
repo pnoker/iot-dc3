@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import java.text.MessageFormat;
 
 /**
  * 自定义连接异常
@@ -35,7 +35,7 @@ public class ConnectorException extends RuntimeException {
         super(cause);
     }
 
-    public ConnectorException(CharSequence template, Object... params) {
-        super(CharSequenceUtil.format(template, params));
+    public ConnectorException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
     }
 }

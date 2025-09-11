@@ -17,12 +17,12 @@
 
 package io.github.pnoker.common.data.rabbit;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.data.biz.DeviceEventService;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -56,7 +56,7 @@ public class DeviceEventReceiver {
             log.debug("Receive device event: {}", JsonUtil.toJsonString(entityDTO));
             if (Objects.isNull(entityDTO)
                     || Objects.isNull(entityDTO.getType())
-                    || CharSequenceUtil.isEmpty(entityDTO.getContent())) {
+                    || StringUtils.isEmpty(entityDTO.getContent())) {
                 log.error("Invalid device event: {}", entityDTO);
                 return;
             }

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.ProfileExt;
@@ -30,6 +29,7 @@ import io.github.pnoker.common.manager.entity.vo.ProfileVO;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -82,7 +82,7 @@ public interface ProfileBuilder {
     @AfterMapping
     default void afterProcess(ProfileBO entityBO, @MappingTarget ProfileDO entityDO) {
         // Code
-        if (CharSequenceUtil.isEmpty(entityBO.getProfileCode())) {
+        if (StringUtils.isEmpty(entityBO.getProfileCode())) {
             entityDO.setProfileCode(CodeUtil.getCode());
         }
 

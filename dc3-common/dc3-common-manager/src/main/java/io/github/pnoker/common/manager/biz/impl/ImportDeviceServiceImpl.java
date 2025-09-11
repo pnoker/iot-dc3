@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.manager.biz.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.exception.ImportException;
 import io.github.pnoker.common.manager.biz.ImportDeviceService;
@@ -32,6 +30,8 @@ import io.github.pnoker.common.manager.service.ProfileBindService;
 import io.github.pnoker.common.utils.PoiUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,7 +65,7 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
     @Transactional
     public DeviceBO importDevice(DeviceBO deviceBO, List<PointBO> pointBOList, List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, Sheet sheet, int row) {
         String deviceName = PoiUtil.getCellStringValue(sheet, row, 0);
-        if (CharSequenceUtil.isEmpty(deviceName)) {
+        if (StringUtils.isEmpty(deviceName)) {
             throw new ImportException("The device name in line {} of the import file is empty", row + 1);
         }
 
@@ -100,7 +100,7 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
      * @param profileIds 模版ID集合
      */
     private void importProfileBind(DeviceBO deviceBO, List<Long> profileIds) {
-        if (CollUtil.isEmpty(profileIds)) {
+        if (CollectionUtils.isEmpty(profileIds)) {
             return;
         }
 

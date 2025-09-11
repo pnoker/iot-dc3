@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
@@ -30,6 +29,7 @@ import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -82,7 +82,7 @@ public interface ResourceBuilder {
     @AfterMapping
     default void afterProcess(ResourceBO entityBO, @MappingTarget ResourceDO entityDO) {
         // Code
-        if (CharSequenceUtil.isEmpty(entityBO.getResourceCode())) {
+        if (StringUtils.isEmpty(entityBO.getResourceCode())) {
             entityDO.setResourceCode(CodeUtil.getCode());
         }
 

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -39,6 +38,7 @@ import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -119,7 +119,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
         wrapper.eq(RoleResourceBindDO::getRoleId, roleId);
         List<RoleResourceBindDO> entityDOList = roleResourceBindManager.list(wrapper);
-        if (CollUtil.isNotEmpty(entityDOList)) {
+        if (CollectionUtils.isNotEmpty(entityDOList)) {
             List<ResourceDO> resourceDOList = resourceManager.listByIds(entityDOList.stream()
                     .map(RoleResourceBindDO::getResourceId).toList());
             List<ResourceDO> collect = resourceDOList.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))

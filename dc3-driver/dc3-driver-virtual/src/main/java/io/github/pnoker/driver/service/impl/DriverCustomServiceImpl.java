@@ -17,7 +17,6 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
 import io.github.pnoker.common.driver.entity.bean.RValue;
 import io.github.pnoker.common.driver.entity.bean.WValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -36,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -121,13 +121,17 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          * - 其他情况下, 生成一个0到100之间的随机浮点数。
          */
         if (PointTypeFlagEnum.STRING.equals(point.getPointTypeFlag())) {
-            return new RValue(device, point, RandomUtil.randomString(8));
+            return new RValue(device, point, "abcd1234");
         }
         if (PointTypeFlagEnum.BOOLEAN.equals(point.getPointTypeFlag())) {
-            return new RValue(device, point, String.valueOf(RandomUtil.randomBoolean()));
+            Random random = new Random();
+            boolean b = random.nextBoolean();
+            return new RValue(device, point, String.valueOf(b));
         }
 
-        return new RValue(device, point, String.valueOf(RandomUtil.randomDouble(100)));
+        Random random = new Random();
+        double value = random.nextDouble() * 100;
+        return new RValue(device, point, String.valueOf(value));
     }
 
     @Override

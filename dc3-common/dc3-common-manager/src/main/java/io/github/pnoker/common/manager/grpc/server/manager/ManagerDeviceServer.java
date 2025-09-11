@@ -18,7 +18,6 @@
 package io.github.pnoker.common.manager.grpc.server.manager;
 
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
@@ -33,6 +32,7 @@ import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -96,7 +96,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         List<DeviceBO> entityBOList = deviceService.selectByDriverId(driver.getDriverId());
-        if (CollUtil.isEmpty(entityBOList)) {
+        if (CollectionUtils.isEmpty(entityBOList)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
@@ -121,7 +121,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         List<DeviceBO> entityBOList = deviceService.selectByProfileId(request.getProfileId());
-        if (CollUtil.isEmpty(entityBOList)) {
+        if (CollectionUtils.isEmpty(entityBOList)) {
             rBuilder.setOk(false);
             rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
             rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());

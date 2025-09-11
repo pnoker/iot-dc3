@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -33,6 +32,7 @@ import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -111,8 +111,8 @@ public class ResourceServiceImpl implements ResourceService {
      */
     private LambdaQueryWrapper<ResourceDO> fuzzyQuery(ResourceQuery entityQuery) {
         LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getResourceName()), ResourceDO::getResourceName, entityQuery.getResourceName());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getResourceCode()), ResourceDO::getResourceCode, entityQuery.getResourceCode());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getResourceName()), ResourceDO::getResourceName, entityQuery.getResourceName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getResourceCode()), ResourceDO::getResourceCode, entityQuery.getResourceCode());
         wrapper.eq(Objects.nonNull(entityQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, entityQuery.getResourceTypeFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag, entityQuery.getEnableFlag());
         wrapper.eq(ResourceDO::getTenantId, entityQuery.getTenantId());

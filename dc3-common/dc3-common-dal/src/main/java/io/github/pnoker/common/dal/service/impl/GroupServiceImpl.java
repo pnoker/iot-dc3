@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.dal.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -34,6 +33,7 @@ import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -119,7 +119,7 @@ public class GroupServiceImpl implements GroupService {
      */
     private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupQuery entityQuery) {
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getGroupName()), GroupDO::getGroupName, entityQuery.getGroupName());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getGroupName()), GroupDO::getGroupName, entityQuery.getGroupName());
         wrapper.eq(GroupDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import java.text.MessageFormat;
 
 /**
  * 自定义 未支持 异常
@@ -35,7 +35,7 @@ public class UnSupportException extends RuntimeException {
         super(cause);
     }
 
-    public UnSupportException(CharSequence template, Object... params) {
-        super(CharSequenceUtil.format(template, params));
+    public UnSupportException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
     }
 }

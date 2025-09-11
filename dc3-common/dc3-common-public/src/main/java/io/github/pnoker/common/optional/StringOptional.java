@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.optional;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Consumer;
 
@@ -41,13 +41,13 @@ public final class StringOptional {
     }
 
     public void ifPresent(Consumer<String> action) {
-        if (CharSequenceUtil.isNotEmpty(value)) {
+        if (StringUtils.isNotEmpty(value)) {
             action.accept(value);
         }
     }
 
     public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {
-        if (CharSequenceUtil.isNotEmpty(value)) {
+        if (StringUtils.isNotEmpty(value)) {
             action.accept(value);
         } else {
             emptyAction.run();

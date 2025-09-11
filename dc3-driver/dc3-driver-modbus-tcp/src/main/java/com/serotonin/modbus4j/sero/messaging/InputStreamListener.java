@@ -18,8 +18,6 @@
 package com.serotonin.modbus4j.sero.messaging;
 
 
-import cn.hutool.core.text.CharSequenceUtil;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -121,9 +119,9 @@ public class InputStreamListener implements Runnable {
                     consumer.data(buf, readcount);
                 } catch (IOException e) {
                     consumer.handleIOException(e);
-                    if (CharSequenceUtil.equals(e.getMessage(), "Stream closed."))
+                    if (e.getMessage().equals("Stream closed."))
                         break;
-                    if (CharSequenceUtil.contains(e.getMessage(), "nativeavailable"))
+                    if (e.getMessage().contains("nativeavailable"))
                         break;
                 }
             }

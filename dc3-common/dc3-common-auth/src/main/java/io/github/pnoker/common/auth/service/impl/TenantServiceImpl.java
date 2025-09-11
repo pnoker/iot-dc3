@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -34,6 +33,7 @@ import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -120,7 +120,7 @@ public class TenantServiceImpl implements TenantService {
      */
     private LambdaQueryWrapper<TenantDO> fuzzyQuery(TenantQuery entityQuery) {
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getTenantName()), TenantDO::getTenantName, entityQuery.getTenantName());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getTenantName()), TenantDO::getTenantName, entityQuery.getTenantName());
         return wrapper;
     }
 

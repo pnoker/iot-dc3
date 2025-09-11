@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.DriverExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
@@ -29,6 +28,7 @@ import io.github.pnoker.common.manager.entity.vo.DriverVO;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -80,7 +80,7 @@ public interface DriverBuilder {
     @AfterMapping
     default void afterProcess(DriverBO entityBO, @MappingTarget DriverDO entityDO) {
         // Code
-        if (CharSequenceUtil.isEmpty(entityBO.getDriverCode())) {
+        if (StringUtils.isEmpty(entityBO.getDriverCode())) {
             entityDO.setDriverCode(CodeUtil.getCode());
         }
 

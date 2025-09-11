@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -35,6 +34,7 @@ import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -134,8 +134,8 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
      */
     private LambdaQueryWrapper<DriverAttributeDO> fuzzyQuery(DriverAttributeQuery entityQuery) {
         LambdaQueryWrapper<DriverAttributeDO> wrapper = Wrappers.<DriverAttributeDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeCode()), DriverAttributeDO::getAttributeCode, entityQuery.getAttributeCode());
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName, entityQuery.getAttributeName());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeCode()), DriverAttributeDO::getAttributeCode, entityQuery.getAttributeCode());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
         wrapper.eq(DriverAttributeDO::getTenantId, entityQuery.getTenantId());

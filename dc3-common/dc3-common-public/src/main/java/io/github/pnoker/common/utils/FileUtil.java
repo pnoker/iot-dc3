@@ -17,10 +17,15 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.util.IdUtil;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.FolderConstant;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 /**
  * 文件 相关工具类
@@ -43,8 +48,13 @@ public class FileUtil {
      */
     public static String getTempPath() {
         String path = FolderConstant.TEMP_FILE_PATH;
-        if (!cn.hutool.core.io.FileUtil.exist(path) || !cn.hutool.core.io.FileUtil.isDirectory(path)) {
-            cn.hutool.core.io.FileUtil.mkdir(path);
+        Path dir = Paths.get(path);
+        if (Files.notExists(dir) || !Files.isDirectory(dir)) {
+            try {
+                Files.createDirectories(dir);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
         }
         return path;
     }
@@ -55,6 +65,6 @@ public class FileUtil {
      * @return xlsx文件名
      */
     public static String getRandomXlsxName() {
-        return IdUtil.fastSimpleUUID() + ".xlsx";
+        return UUID.randomUUID().toString() + ".xlsx";
     }
 }

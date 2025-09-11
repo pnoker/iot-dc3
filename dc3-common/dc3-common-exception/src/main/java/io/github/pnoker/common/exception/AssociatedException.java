@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import java.text.MessageFormat;
 
 /**
  * 自定义关联异常
@@ -35,7 +35,7 @@ public class AssociatedException extends RuntimeException {
         super(cause);
     }
 
-    public AssociatedException(CharSequence template, Object... params) {
-        super(CharSequenceUtil.format(template, params));
+    public AssociatedException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
     }
 }

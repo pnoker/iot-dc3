@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import cn.hutool.core.map.MapUtil;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcPage;
@@ -75,7 +74,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.selectByPage(query.build());
 
         if (!rPageDeviceDTO.getResult().getOk()) {
-            return MapUtil.empty();
+            return Map.of();
         }
 
         List<GrpcDeviceDTO> devices = rPageDeviceDTO.getData().getDataList();
@@ -87,7 +86,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         GrpcProfileQuery query = GrpcProfileQuery.newBuilder().setProfileId(profileId).build();
         GrpcRDeviceListDTO rDeviceListDTO = deviceApiBlockingStub.selectByProfileId(query);
         if (!rDeviceListDTO.getResult().getOk()) {
-            return MapUtil.empty();
+            return Map.of();
         }
 
         List<GrpcDeviceDTO> devices = rDeviceListDTO.getDataList();

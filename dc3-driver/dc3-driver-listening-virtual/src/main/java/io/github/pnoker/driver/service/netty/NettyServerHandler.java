@@ -17,8 +17,6 @@
 
 package io.github.pnoker.driver.service.netty;
 
-import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.CharsetUtil;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bean.RValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -33,11 +31,14 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author pnoker
@@ -60,7 +61,7 @@ public class NettyServerHandler {
      */
     public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
         log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
-        String deviceName = byteBuf.toString(0, 22, CharsetUtil.CHARSET_ISO_8859_1);
+        String deviceName = byteBuf.toString(0, 22, StandardCharsets.UTF_8);
         long deviceId = Long.parseLong(deviceName);
         DeviceBO device = deviceMetadata.getCache(deviceId);
 
@@ -76,18 +77,18 @@ public class NettyServerHandler {
             int start = infoMap.get("start").getValue(Integer.class);
             int end = infoMap.get("end").getValue(Integer.class);
 
-            if (infoMap.get("key").getValue().equals(hexKey)) {
+            if (infoMap.get("key").getValue().equals(hexKey) && Objects.nonNull(point)) {
                 String value = switch (point.getPointName()) {
                     case "海拔" -> String.valueOf(byteBuf.getFloat(start));
                     case "速度" -> String.valueOf(byteBuf.getDouble(start));
                     case "液位" -> String.valueOf(byteBuf.getLong(start));
                     case "方向" -> String.valueOf(byteBuf.getInt(start));
                     case "锁定" -> String.valueOf(byteBuf.getBoolean(start));
-                    case "经纬" -> byteBuf.toString(start, end, CharsetUtil.CHARSET_ISO_8859_1).trim();
-                    default -> CharSequenceUtil.EMPTY;
+                    case "经纬" -> byteBuf.toString(start, end, StandardCharsets.UTF_8).trim();
+                    default -> StringUtils.EMPTY;
                 };
 
-                if (CharSequenceUtil.isNotEmpty(value)) {
+                if (StringUtils.isNotEmpty(value)) {
                     pointValues.add(new PointValue(new RValue(device, point, value)));
                 }
             }

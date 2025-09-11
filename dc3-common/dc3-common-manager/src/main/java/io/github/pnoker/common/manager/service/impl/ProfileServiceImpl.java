@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.manager.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -42,6 +40,8 @@ import io.github.pnoker.common.manager.service.ProfileService;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -137,7 +137,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<ProfileBO> selectByIds(Set<Long> ids) {
-        if (CollUtil.isEmpty(ids)) {
+        if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
         List<ProfileDO> entityDOList = profileManager.listByIds(ids);
@@ -170,8 +170,8 @@ public class ProfileServiceImpl implements ProfileService {
     private LambdaQueryWrapper<ProfileDO> fuzzyQuery(ProfileQuery entityQuery) {
         QueryWrapper<ProfileDO> wrapper = Wrappers.query();
         wrapper.eq("dp.deleted", 0);
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getProfileName()), "dp.profile_name", entityQuery.getProfileName());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getProfileCode()), "dp.profile_code", entityQuery.getProfileCode());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getProfileName()), "dp.profile_name", entityQuery.getProfileName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getProfileCode()), "dp.profile_code", entityQuery.getProfileCode());
         wrapper.eq(Objects.nonNull(entityQuery.getProfileShareFlag()), "dp.profile_share_flag", entityQuery.getProfileShareFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
         wrapper.eq("dp.tenant_id", entityQuery.getTenantId());

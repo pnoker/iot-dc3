@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.driver.job;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
@@ -26,6 +24,8 @@ import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
@@ -56,7 +56,7 @@ public class DriverReadScheduleJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
         Set<Long> deviceIds = driverMetadata.getDeviceIds();
-        if (CollUtil.isEmpty(deviceIds)) {
+        if (CollectionUtils.isEmpty(deviceIds)) {
             return;
         }
 
@@ -64,10 +64,10 @@ public class DriverReadScheduleJob extends QuartzJobBean {
             DeviceBO entityBO = deviceMetadata.getCache(deviceId);
             if (Objects.nonNull(entityBO)
                     && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
-                    && CollUtil.isNotEmpty(entityBO.getProfileIds())
-                    && CollUtil.isNotEmpty(entityBO.getPointIds())
-                    && MapUtil.isNotEmpty(entityBO.getDriverAttributeConfigIdMap())
-                    && MapUtil.isNotEmpty(entityBO.getPointAttributeConfigIdMap())
+                    && CollectionUtils.isNotEmpty(entityBO.getProfileIds())
+                    && CollectionUtils.isNotEmpty(entityBO.getPointIds())
+                    && MapUtils.isNotEmpty(entityBO.getDriverAttributeConfigIdMap())
+                    && MapUtils.isNotEmpty(entityBO.getPointAttributeConfigIdMap())
             ) {
                 Set<Long> pointIds = entityBO.getPointIds();
                 for (Long pointId : pointIds) {

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
 import io.github.pnoker.common.auth.entity.model.TenantDO;
@@ -28,6 +27,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -77,7 +77,7 @@ public interface TenantBuilder {
     @AfterMapping
     default void afterProcess(TenantBO entityBO, @MappingTarget TenantDO entityDO) {
         // Code
-        if (CharSequenceUtil.isEmpty(entityBO.getTenantCode())) {
+        if (StringUtils.isEmpty(entityBO.getTenantCode())) {
             entityDO.setTenantCode(CodeUtil.getCode());
         }
 

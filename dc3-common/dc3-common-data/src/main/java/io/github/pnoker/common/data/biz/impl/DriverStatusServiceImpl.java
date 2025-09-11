@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import cn.hutool.core.map.MapUtil;
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
@@ -79,7 +78,7 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         GrpcRPageDriverDTO rPageDriverDTO = driverApiBlockingStub.selectByPage(query.build());
 
         if (!rPageDriverDTO.getResult().getOk()) {
-            return MapUtil.empty();
+            return Map.of();
         }
 
         List<GrpcDriverDTO> drivers = rPageDriverDTO.getData().getDataList();

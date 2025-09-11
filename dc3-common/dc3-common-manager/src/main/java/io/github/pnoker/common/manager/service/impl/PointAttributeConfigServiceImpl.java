@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -41,6 +40,7 @@ import io.github.pnoker.common.utils.FieldUtil;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -162,7 +162,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     public List<PointAttributeConfigBO> selectByDeviceId(Long deviceId) {
         List<PointBO> pointBOList = pointService.selectByDeviceId(deviceId);
         Set<Long> pointIds = pointBOList.stream().map(PointBO::getId).collect(Collectors.toSet());
-        if (CollUtil.isEmpty(pointIds)) {
+        if (CollectionUtils.isEmpty(pointIds)) {
             return Collections.emptyList();
         }
 

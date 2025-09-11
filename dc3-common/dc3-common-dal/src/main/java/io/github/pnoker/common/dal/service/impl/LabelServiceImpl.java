@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.dal.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,6 +34,7 @@ import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -121,9 +121,9 @@ public class LabelServiceImpl implements LabelService {
      */
     private LambdaQueryWrapper<LabelDO> fuzzyQuery(LabelQuery entityQuery) {
         LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getLabelName()), LabelDO::getLabelName, entityQuery.getLabelName());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getLabelName()), LabelDO::getLabelName, entityQuery.getLabelName());
         wrapper.eq(Objects.nonNull(entityQuery.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, entityQuery.getEntityTypeFlag());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityQuery.getColor()), LabelDO::getLabelColor, entityQuery.getColor());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getColor()), LabelDO::getLabelColor, entityQuery.getColor());
         wrapper.eq(LabelDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }

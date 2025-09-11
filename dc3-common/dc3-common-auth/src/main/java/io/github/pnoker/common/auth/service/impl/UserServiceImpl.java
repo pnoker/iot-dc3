@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.service.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -34,6 +33,7 @@ import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         checkDuplicate(entityBO, false, true);
 
         // 判断手机号是否存在, 如果有手机号不为空, 检查该手机号是否被占用
-        if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
+        if (StringUtils.isNotEmpty(entityBO.getPhone())) {
             UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
             if (Objects.nonNull(selectByPhone)) {
                 throw new DuplicateException("The user already exists with phone: {}", entityBO.getPhone());
@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 判断邮箱是否存在, 如果有邮箱不为空, 检查该邮箱是否被占用
-        if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
+        if (StringUtils.isNotEmpty(entityBO.getEmail())) {
             UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
             if (Objects.nonNull(selectByEmail)) {
                 throw new DuplicateException("The user already exists with email: {}", entityBO.getEmail());
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
         checkDuplicate(entityBO, true, true);
 
         // 判断手机号是否更新
-        if (CharSequenceUtil.isNotEmpty(entityBO.getPhone())) {
+        if (StringUtils.isNotEmpty(entityBO.getPhone())) {
             if (!entityBO.getPhone().equals(selectById.getPhone())) {
                 UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
                 if (Objects.nonNull(selectByPhone)) {
@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 判断邮箱是否更新
-        if (CharSequenceUtil.isNotEmpty(entityBO.getEmail())) {
+        if (StringUtils.isNotEmpty(entityBO.getEmail())) {
             if (!entityBO.getEmail().equals(selectById.getEmail())) {
                 UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
                 if (Objects.nonNull(selectByEmail)) {
@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserBO selectByUserName(String userName, boolean throwException) {
-        if (CharSequenceUtil.isEmpty(userName)) {
+        if (StringUtils.isEmpty(userName)) {
             if (throwException) {
                 throw new EmptyException("The name is empty");
             }
@@ -142,7 +142,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserBO selectByPhone(String phone, boolean throwException) {
-        if (CharSequenceUtil.isEmpty(phone)) {
+        if (StringUtils.isEmpty(phone)) {
             if (throwException) {
                 throw new EmptyException("The phone is empty");
             }
@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserBO selectByEmail(String email, boolean throwException) {
-        if (CharSequenceUtil.isEmpty(email)) {
+        if (StringUtils.isEmpty(email)) {
             if (throwException) {
                 throw new EmptyException("The phone is empty");
             }
@@ -181,10 +181,10 @@ public class UserServiceImpl implements UserService {
      */
     private LambdaQueryWrapper<UserDO> fuzzyQuery(UserQuery entityQuery) {
         LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getNickName()), UserDO::getNickName, entityQuery.getNickName());
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getUserName()), UserDO::getUserName, entityQuery.getUserName());
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getPhone()), UserDO::getPhone, entityQuery.getPhone());
-        wrapper.like(CharSequenceUtil.isNotEmpty(entityQuery.getEmail()), UserDO::getEmail, entityQuery.getEmail());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getNickName()), UserDO::getNickName, entityQuery.getNickName());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getUserName()), UserDO::getUserName, entityQuery.getUserName());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getPhone()), UserDO::getPhone, entityQuery.getPhone());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getEmail()), UserDO::getEmail, entityQuery.getEmail());
         return wrapper;
     }
 

@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.optional;
 
-import cn.hutool.core.collection.CollUtil;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -42,13 +42,13 @@ public final class CollectionOptional<T> {
     }
 
     public void ifPresent(Consumer<Collection<T>> action) {
-        if (CollUtil.isNotEmpty(value)) {
+        if (CollectionUtils.isNotEmpty(value)) {
             action.accept(value);
         }
     }
 
     public void ifPresentOrElse(Consumer<Collection<?>> action, Runnable emptyAction) {
-        if (CollUtil.isNotEmpty(value)) {
+        if (CollectionUtils.isNotEmpty(value)) {
             action.accept(value);
         } else {
             emptyAction.run();

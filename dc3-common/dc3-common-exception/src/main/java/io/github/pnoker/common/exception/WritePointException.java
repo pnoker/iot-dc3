@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import java.text.MessageFormat;
 
 /**
  * 自定义 写入位号值 异常
@@ -35,7 +35,7 @@ public class WritePointException extends RuntimeException {
         super(cause);
     }
 
-    public WritePointException(CharSequence template, Object... params) {
-        super(CharSequenceUtil.format(template, params));
+    public WritePointException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
     }
 }

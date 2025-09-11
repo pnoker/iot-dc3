@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.dal.impl;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -27,6 +26,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.manager.dal.DeviceManager;
 import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.github.pnoker.common.manager.mapper.DeviceMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -47,7 +47,7 @@ public class DeviceManagerImpl extends ServiceImpl<DeviceMapper, DeviceDO> imple
     public boolean checkDuplicate(DeviceDO entityDO, boolean isUpdate) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
         wrapper.eq(DeviceDO::getDeviceName, entityDO.getDeviceName());
-        wrapper.eq(CharSequenceUtil.isNotEmpty(entityDO.getDeviceCode()), DeviceDO::getDeviceCode, entityDO.getDeviceCode());
+        wrapper.eq(StringUtils.isNotEmpty(entityDO.getDeviceCode()), DeviceDO::getDeviceCode, entityDO.getDeviceCode());
         wrapper.eq(DeviceDO::getTenantId, entityDO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         DeviceDO one = getOne(wrapper);

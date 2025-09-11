@@ -17,8 +17,8 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.util.ReUtil;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 
@@ -42,10 +42,11 @@ public class RegexUtil {
      * @return boolean
      */
     public static boolean isNumeric(String content) {
-        String regex = "-?[0-9]+(\\.[0-9]+)?";
+        if (StringUtils.isEmpty(content)) return false;
         try {
-            return ReUtil.isMatch(regex, new BigDecimal(content).toString());
-        } catch (Exception e) {
+            new BigDecimal(content);
+            return true;
+        } catch (NumberFormatException e) {
             return false;
         }
     }
@@ -58,7 +59,7 @@ public class RegexUtil {
      */
     public static boolean isName(String name) {
         String regex = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$";
-        return ReUtil.isMatch(regex, name);
+        return name.matches(regex);
     }
 
     /**
@@ -69,7 +70,7 @@ public class RegexUtil {
      */
     public static boolean isPhone(String phone) {
         String regex = "^1([3-9])\\d{9}$";
-        return ReUtil.isMatch(regex, phone);
+        return phone.matches(regex);
     }
 
     /**
@@ -80,7 +81,7 @@ public class RegexUtil {
      */
     public static boolean isMail(String mail) {
         String regex = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$";
-        return ReUtil.isMatch(regex, mail);
+        return mail.matches(regex);
     }
 
     /**
@@ -91,7 +92,7 @@ public class RegexUtil {
      */
     public static boolean isPassword(String password) {
         String regex = "^[a-zA-Z]\\w{7,15}$";
-        return ReUtil.isMatch(regex, password);
+        return password.matches(regex);
     }
 
     /**
@@ -102,7 +103,7 @@ public class RegexUtil {
      */
     public static boolean isHost(String host) {
         String regex = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$";
-        return ReUtil.isMatch(regex, host);
+        return host.matches(regex);
     }
 
     /**
@@ -112,7 +113,6 @@ public class RegexUtil {
      * @return boolean
      */
     public static boolean isDriverPort(int port) {
-        String regex = "^8[6-7]\\d{2}$";
-        return ReUtil.isMatch(regex, String.valueOf(port));
+        return port >= 8600 && port <= 8799;
     }
 }

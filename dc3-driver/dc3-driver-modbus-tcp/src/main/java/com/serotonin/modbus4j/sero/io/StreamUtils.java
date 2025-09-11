@@ -21,7 +21,7 @@
 package com.serotonin.modbus4j.sero.io;
 
 
-import cn.hutool.core.text.CharSequenceUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -448,7 +448,7 @@ public class StreamUtils {
     public static String dumpHex(byte[] b, int pos, int len) {
         StringBuilder sb = new StringBuilder();
         for (int i = pos; i < len; i++)
-            sb.append(CharSequenceUtil.padPre(Integer.toHexString(b[i] & 0xff), 2, '0'));
+            sb.append(StringUtils.leftPad(Integer.toHexString(b[i] & 0xff), 2, '0'));
         return sb.toString();
     }
 
@@ -575,7 +575,7 @@ public class StreamUtils {
     public static String toHex(byte[] bs) {
         StringBuilder sb = new StringBuilder(bs.length * 2);
         for (byte b : bs)
-            sb.append(CharSequenceUtil.padPre(Integer.toHexString(b & 0xff), 2, '0'));
+            sb.append(StringUtils.leftPad(Integer.toHexString(b & 0xff), 2, '0'));
         return sb.toString();
     }
 
@@ -586,7 +586,7 @@ public class StreamUtils {
      * @return a {@link String} object.
      */
     public static String toHex(byte b) {
-        return CharSequenceUtil.padPre(Integer.toHexString(b & 0xff), 2, '0');
+        return StringUtils.leftPad(Integer.toHexString(b & 0xff), 2, '0');
     }
 
     /**
@@ -596,7 +596,7 @@ public class StreamUtils {
      * @return a {@link String} object.
      */
     public static String toHex(short s) {
-        return CharSequenceUtil.padPre(Integer.toHexString(s & 0xffff), 4, '0');
+        return StringUtils.leftPad(Integer.toHexString(s & 0xffff), 4, '0');
     }
 
     /**
@@ -606,7 +606,7 @@ public class StreamUtils {
      * @return a {@link String} object.
      */
     public static String toHex(int i) {
-        return CharSequenceUtil.padPre(Integer.toHexString(i), 8, '0');
+        return StringUtils.leftPad(Integer.toHexString(i), 8, '0');
     }
 
     /**
@@ -616,7 +616,7 @@ public class StreamUtils {
      * @return a {@link String} object.
      */
     public static String toHex(long l) {
-        return CharSequenceUtil.padPre(Long.toHexString(l), 16, '0');
+        return StringUtils.leftPad(Long.toHexString(l), 16, '0');
     }
 
     /**

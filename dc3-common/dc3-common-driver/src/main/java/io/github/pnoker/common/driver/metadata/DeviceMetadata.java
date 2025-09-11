@@ -18,7 +18,6 @@
 package io.github.pnoker.common.driver.metadata;
 
 
-import cn.hutool.core.map.MapUtil;
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -32,6 +31,7 @@ import io.github.pnoker.common.exception.ConfigException;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -129,8 +129,8 @@ public final class DeviceMetadata {
      */
     public Map<String, AttributeBO> getDriverConfig(long deviceId) {
         Map<Long, DriverAttributeDTO> attributeMap = driverMetadata.getDriverAttributeIdMap();
-        if (MapUtil.isEmpty(attributeMap)) {
-            return MapUtil.empty();
+        if (MapUtils.isEmpty(attributeMap)) {
+            return Map.of();
         }
 
         DeviceBO device = getCache(deviceId);
@@ -139,7 +139,7 @@ public final class DeviceMetadata {
         }
 
         Map<Long, DriverAttributeConfigDTO> attributeConfigMap = device.getDriverAttributeConfigIdMap();
-        if (MapUtil.isEmpty(attributeConfigMap)) {
+        if (MapUtils.isEmpty(attributeConfigMap)) {
             throw new ConfigException("Failed to get driver config, the driver attribute config is empty");
         }
         if (!attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
@@ -168,8 +168,8 @@ public final class DeviceMetadata {
      */
     public Map<Long, Map<String, AttributeBO>> getPointConfig(long deviceId) {
         Map<Long, PointAttributeDTO> attributeMap = driverMetadata.getPointAttributeIdMap();
-        if (MapUtil.isEmpty(attributeMap)) {
-            return MapUtil.empty();
+        if (MapUtils.isEmpty(attributeMap)) {
+            return Map.of();
         }
 
         DeviceBO device = getCache(deviceId);
@@ -183,7 +183,7 @@ public final class DeviceMetadata {
         }
 
         return pointAttributeConfigMap.entrySet().stream()
-                .filter(entry -> MapUtil.isEmpty(entry.getValue()) && entry.getValue().keySet().containsAll(attributeMap.keySet()))
+                .filter(entry -> MapUtils.isEmpty(entry.getValue()) && entry.getValue().keySet().containsAll(attributeMap.keySet()))
                 .collect(Collectors.toMap(Map.Entry::getKey, entryMap -> attributeMap.entrySet().stream().collect(Collectors.toMap(
                                 entry -> entry.getValue().getAttributeCode(),
                                 entry -> AttributeBO.builder()
@@ -207,8 +207,8 @@ public final class DeviceMetadata {
      */
     public Map<String, AttributeBO> getPointConfig(long deviceId, long pointId) {
         Map<Long, PointAttributeDTO> attributeMap = driverMetadata.getPointAttributeIdMap();
-        if (MapUtil.isEmpty(attributeMap)) {
-            return MapUtil.empty();
+        if (MapUtils.isEmpty(attributeMap)) {
+            return Map.of();
         }
 
         DeviceBO device = getCache(deviceId);
@@ -222,7 +222,7 @@ public final class DeviceMetadata {
         }
 
         Map<Long, PointAttributeConfigDTO> attributeConfigMap = pointAttributeConfigMap.get(pointId);
-        if (MapUtil.isEmpty(attributeConfigMap)) {
+        if (MapUtils.isEmpty(attributeConfigMap)) {
             throw new ConfigException("Failed to get point config[{}:{}], the point attribute config is empty", deviceId, pointId);
         }
         if (!attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {

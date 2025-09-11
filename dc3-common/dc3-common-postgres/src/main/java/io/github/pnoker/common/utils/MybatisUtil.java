@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.generator.FastAutoGenerator;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
@@ -28,6 +27,7 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.TimeConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Types;
 
@@ -60,27 +60,27 @@ public class MybatisUtil {
      */
     public static FastAutoGenerator defaultGenerator(String defaultHost, String defaultPort, String defaultDb, String defaultSchema, String defaultUsername, String defaultPassword) {
         String host = System.getenv("POSTGRES_HOST");
-        if (CharSequenceUtil.isEmpty(host)) {
+        if (StringUtils.isEmpty(host)) {
             host = defaultHost;
         }
         String port = System.getenv("POSTGRES_PORT");
-        if (CharSequenceUtil.isEmpty(port)) {
+        if (StringUtils.isEmpty(port)) {
             port = defaultPort;
         }
         String db = System.getenv("POSTGRES_DB");
-        if (CharSequenceUtil.isEmpty(db)) {
+        if (StringUtils.isEmpty(db)) {
             db = defaultDb;
         }
         String schema = System.getenv("POSTGRES_SCHEMA");
-        if (CharSequenceUtil.isEmpty(schema)) {
+        if (StringUtils.isEmpty(schema)) {
             schema = defaultSchema;
         }
         String username = System.getenv("POSTGRES_USERNAME");
-        if (CharSequenceUtil.isEmpty(username)) {
+        if (StringUtils.isEmpty(username)) {
             username = defaultUsername;
         }
         String password = System.getenv("POSTGRES_PASSWORD");
-        if (CharSequenceUtil.isEmpty(password)) {
+        if (StringUtils.isEmpty(password)) {
             password = defaultPassword;
         }
 

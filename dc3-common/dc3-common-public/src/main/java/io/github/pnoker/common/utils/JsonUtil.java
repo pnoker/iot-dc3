@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.utils;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -31,6 +30,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.JsonException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.DataInput;
 import java.io.File;
@@ -87,7 +87,7 @@ public final class JsonUtil {
      */
     public static <T> T parseObject(String text, Class<T> valueType) {
         try {
-            if (CharSequenceUtil.isEmpty(text)) {
+            if (StringUtils.isEmpty(text)) {
                 return null;
             }
 
@@ -402,6 +402,22 @@ public final class JsonUtil {
             return DecodeUtil.stringToByte(JSON_MAPPER.writeValueAsString(type));
         } catch (Exception e) {
             throw new JsonException(e);
+        }
+    }
+
+    /**
+     * 判断是否是 Json 类型
+     *
+     * @param text Json String
+     * @return 是否是 Json 类型
+     */
+    public static boolean isJson(String text) {
+        if (text == null || text.isEmpty()) return false;
+        try {
+            JSON_MAPPER.readTree(text);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }

@@ -17,13 +17,13 @@
 
 package io.github.pnoker.common.config;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RequestUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,7 +78,7 @@ public class WebFilterConfig {
             ServerHttpRequest request = exchange.getRequest();
             String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_USER);
 
-            if (CharSequenceUtil.isNotEmpty(user)) {
+            if (StringUtils.isNotEmpty(user)) {
                 try {
                     RequestHeader.UserHeader userHeader = JsonUtil.parseObject(user, RequestHeader.UserHeader.class);
 

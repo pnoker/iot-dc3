@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.model.RuleDO;
@@ -29,6 +28,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -80,7 +80,7 @@ public interface RuleBuilder {
     @AfterMapping
     default void afterProcess(RuleBO entityBO, @MappingTarget RuleDO entityDO) {
         // Code
-        if (CharSequenceUtil.isEmpty(entityBO.getRuleCode())) {
+        if (StringUtils.isEmpty(entityBO.getRuleCode())) {
             entityDO.setRuleCode(CodeUtil.getCode());
         }
 

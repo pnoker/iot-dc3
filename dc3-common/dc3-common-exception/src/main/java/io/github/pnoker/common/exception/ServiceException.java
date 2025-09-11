@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.exception;
 
-import cn.hutool.core.text.CharSequenceUtil;
+import java.text.MessageFormat;
 
 /**
  * 自定义 服务 异常
@@ -35,7 +35,7 @@ public class ServiceException extends RuntimeException {
         super(cause);
     }
 
-    public ServiceException(CharSequence template, Object... params) {
-        super(CharSequenceUtil.format(template, params));
+    public ServiceException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
     }
 }

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.DeviceExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
@@ -30,6 +29,7 @@ import io.github.pnoker.common.manager.entity.vo.DeviceVO;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -80,7 +80,7 @@ public interface DeviceBuilder {
     @AfterMapping
     default void afterProcess(DeviceBO entityBO, @MappingTarget DeviceDO entityDO) {
         // Code
-        if (CharSequenceUtil.isEmpty(entityBO.getDeviceCode())) {
+        if (StringUtils.isEmpty(entityBO.getDeviceCode())) {
             entityDO.setDeviceCode(CodeUtil.getCode());
         }
 

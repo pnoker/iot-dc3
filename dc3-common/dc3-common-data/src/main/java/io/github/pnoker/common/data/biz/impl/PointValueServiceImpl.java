@@ -17,9 +17,6 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
-import cn.hutool.core.text.CharSequenceUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
 import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
@@ -41,6 +38,9 @@ import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -73,7 +73,7 @@ public class PointValueServiceImpl implements PointValueService {
 
     @Override
     public void save(List<PointValueBO> pointValueBOList) {
-        if (CollUtil.isEmpty(pointValueBOList)) {
+        if (CollectionUtils.isEmpty(pointValueBOList)) {
             return;
         }
 
@@ -117,7 +117,7 @@ public class PointValueServiceImpl implements PointValueService {
                 .setCurrent(entityQuery.getPage().getCurrent());
         GrpcPagePointQuery.Builder query = GrpcPagePointQuery.newBuilder()
                 .setPage(entityPageGrpcDTO);
-        if (CharSequenceUtil.isNotEmpty(entityQuery.getPointName())) {
+        if (StringUtils.isNotEmpty(entityQuery.getPointName())) {
             query.setPointName(entityQuery.getPointName());
         }
         query.setPointTypeFlag(DefaultConstant.NULL_INT);
@@ -193,7 +193,7 @@ public class PointValueServiceImpl implements PointValueService {
 
             // other repository
             RepositoryService repositoryService = getFirstRepositoryService();
-            List<List<PointValueBO>> splitPointValueBOList = ListUtil.split(pointValueBOList, 100);
+            List<List<PointValueBO>> splitPointValueBOList = ListUtils.partition(pointValueBOList, 100);
             for (List<PointValueBO> splitPointValueBO : splitPointValueBOList) {
                 repositoryService.savePointValues(splitPointValueBO);
             }
