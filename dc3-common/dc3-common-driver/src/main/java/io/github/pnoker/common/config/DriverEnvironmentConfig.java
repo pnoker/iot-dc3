@@ -76,7 +76,7 @@ public class DriverEnvironmentConfig implements EnvironmentPostProcessor {
 
         String tenant = environment.getProperty(EnvironmentConstant.DRIVER_TENANT, String.class);
         String name = environment.getProperty(EnvironmentConstant.SPRING_APPLICATION_NAME, String.class);
-        String client = MessageFormat.format("{0}/{1}_{2}", tenant, name, node);
+        String client = MessageFormat.format("{0}/{1}/{2}", tenant, name, node);
         String service = MessageFormat.format("{0}/{1}", tenant, name);
 
         Map<String, Object> source = new HashMap<>(4);
