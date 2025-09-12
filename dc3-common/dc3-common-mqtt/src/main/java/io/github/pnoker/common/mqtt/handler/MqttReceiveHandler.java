@@ -30,7 +30,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author pnoker
@@ -47,7 +47,7 @@ public class MqttReceiveHandler {
     @Resource
     private MqttReceiveService mqttReceiveService;
     @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
+    private ExecutorService virtualThreadExecutor;
 
     /**
      * 此处用于接收 MQTT 发送过来的数据, 订阅的主题为 application.yml 中 mqtt.receive-topics 配置的 Topic 列表
@@ -73,7 +73,7 @@ public class MqttReceiveHandler {
 
                 // Judge whether to process data in batch according to the data transmission speed
                 if (MqttScheduleJob.messageSpeed.get() < batchSpeed) {
-                    threadPoolExecutor.execute(() ->
+                    virtualThreadExecutor.execute(() ->
                             // Receive single mqtt message
                             mqttReceiveService.receiveValue(mqttMessage)
                     );

@@ -50,7 +50,7 @@ public class ThreadPoolConfig {
      *
      * @return ThreadPoolExecutor
      */
-    @Bean
+    @Bean(destroyMethod = "shutdown")
     public ThreadPoolExecutor threadPoolExecutor() {
         return new ThreadPoolExecutor(
                 thread.getCorePoolSize(),
@@ -63,15 +63,29 @@ public class ThreadPoolConfig {
     }
 
     /**
+     * Virtual thread pool: One virtual thread per task
+     *
+     * @return ExecutorService
+     */
+    @Bean(destroyMethod = "shutdown")
+    public ExecutorService virtualThreadExecutor() {
+        ThreadFactory factory = Thread.ofVirtual()
+                .name("[VT]" + thread.getPrefix(), 0)
+                .factory();
+
+        return Executors.newThreadPerTaskExecutor(factory);
+    }
+
+    /**
      * ScheduledThreadPoolExecutor ThreadPoolExecutor
      *
      * @return ScheduledThreadPoolExecutor
      */
-    @Bean
+    @Bean(destroyMethod = "shutdown")
     public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
         return new ScheduledThreadPoolExecutor(
                 thread.getCorePoolSize(),
-                r -> new Thread(r, "[S]" + thread.getPrefix() + scheduledThreadPoolAtomic.getAndIncrement()),
+                r -> new Thread(r, "[ST]" + thread.getPrefix() + scheduledThreadPoolAtomic.getAndIncrement()),
                 (r, e) -> new BlockingRejectedExecutionHandler());
     }
 
@@ -96,5 +110,4 @@ public class ThreadPoolConfig {
             }
         }
     }
-
 }

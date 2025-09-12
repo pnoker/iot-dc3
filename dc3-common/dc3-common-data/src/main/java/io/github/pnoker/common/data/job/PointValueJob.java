@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.job;
 
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -45,17 +46,16 @@ public class PointValueJob extends QuartzJobBean {
     public static final AtomicLong VALUE_COUNT = new AtomicLong(0);
     public static final AtomicLong VALUE_SPEED = new AtomicLong(0);
     private static final List<PointValueBO> POINT_VALUE_LIST = new ArrayList<>();
-    private final PointValueService pointValueService;
-    private final ThreadPoolExecutor threadPoolExecutor;
+
     @Value("${data.point.batch.speed}")
     private Integer batchSpeed;
     @Value("${data.point.batch.interval}")
     private Integer interval;
 
-    public PointValueJob(PointValueService pointValueService, ThreadPoolExecutor threadPoolExecutor) {
-        this.pointValueService = pointValueService;
-        this.threadPoolExecutor = threadPoolExecutor;
-    }
+    @Resource
+    private PointValueService pointValueService;
+    @Resource
+    private ExecutorService virtualThreadExecutor;
 
     /**
      * 获取 PointValue 长度
@@ -92,8 +92,8 @@ public class PointValueJob extends QuartzJobBean {
             log.debug("Point value receiver speed: {} /s, value size: {}, interval: {}", speed, getPointValuesSize(), interval);
         }
 
-        // Save point value array to Redis & MongoDB
-        threadPoolExecutor.execute(() -> {
+        // Save point value array to Redis & PostgreSQL
+        virtualThreadExecutor.execute(() -> {
             VALUE_LOCK.writeLock().lock();
             if (!POINT_VALUE_LIST.isEmpty()) {
                 pointValueService.save(POINT_VALUE_LIST);

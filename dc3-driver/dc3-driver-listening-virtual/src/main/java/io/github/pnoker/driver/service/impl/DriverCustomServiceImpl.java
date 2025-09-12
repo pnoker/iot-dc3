@@ -62,7 +62,6 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private Integer udpPort;
     @Resource
     private DriverSenderService driverSenderService;
-
     @Resource
     private NettyTcpServer nettyTcpServer;
     @Resource

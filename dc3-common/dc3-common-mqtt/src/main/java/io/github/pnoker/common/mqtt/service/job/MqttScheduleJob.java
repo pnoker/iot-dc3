@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -46,14 +46,16 @@ public class MqttScheduleJob extends QuartzJobBean {
     public static final AtomicLong messageCount = new AtomicLong(0);
     public static final AtomicLong messageSpeed = new AtomicLong(0);
     private static final List<MqttMessage> mqttMessages = new ArrayList<>();
+
     @Value("${driver.mqtt.batch.speed}")
     private Integer batchSpeed;
     @Value("${driver.mqtt.batch.interval}")
     private Integer interval;
+
     @Resource
     private MqttReceiveService mqttReceiveService;
     @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
+    private ExecutorService virtualThreadExecutor;
 
     /**
      * 获取 MqttMessage 长度
@@ -91,7 +93,7 @@ public class MqttScheduleJob extends QuartzJobBean {
         }
 
         // Receive batch mqtt message
-        threadPoolExecutor.execute(() -> {
+        virtualThreadExecutor.execute(() -> {
             messageLock.writeLock().lock();
             if (!mqttMessages.isEmpty()) {
                 mqttReceiveService.receiveValues(mqttMessages);

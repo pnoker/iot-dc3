@@ -33,6 +33,8 @@ ENV JAVA_OPS="-server \
               -Xms256m \
               -Xmx512m \
               -XX:+UseG1GC \
+              -XX:+AlwaysPreTouch \
+              -XX:+UseContainerSupport \
               -Djava.security.egd=file:/dev/./urandom"
 ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/opc-da/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
 

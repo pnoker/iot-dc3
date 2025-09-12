@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * 接收驱动发送过来的数据
@@ -50,8 +50,7 @@ public class PointValueReceiver {
     private Integer batchSpeed;
 
     @Resource
-    private ThreadPoolExecutor threadPoolExecutor;
-
+    private ExecutorService virtualThreadExecutor;
     @Resource
     private PointValueService pointValueService;
 
@@ -69,8 +68,8 @@ public class PointValueReceiver {
 
             // Judge whether to process data in batch according to the data transmission speed
             if (PointValueJob.VALUE_SPEED.get() < batchSpeed) {
-                threadPoolExecutor.execute(() ->
-                        // Save point value to Redis & MongoDB
+                virtualThreadExecutor.execute(() ->
+                        // Save point value to Redis & PostgreSQL
                         pointValueService.save(pointValueBO)
                 );
             } else {

@@ -27,17 +27,6 @@ spring:
     resources:
       add-mappings: false
 
-server:
-  undertow:
-    threads:
-      io: 4
-      worker: 64
-    buffer-size: 16364
-    accesslog:
-      enabled: true
-      prefix: ${spring.application.name}.
-      pattern: '%h %l %u %t "%r" %s %b %Dms'
-
 management:
   endpoints:
     web:
