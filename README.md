@@ -47,13 +47,63 @@ All components and code are open-source, ensuring transparency, flexibility, and
 - **Cloud-Native**: Optimized for Kubernetes, ensuring smooth integration with modern cloud infrastructures;
 - **Containerization**: Fully containerized with Docker, simplifying deployment and management.
 
-# 3 Contribution
+# 3 Development
+
+## 3.1 Startup Dependencies
+
+> Choose one
+
+```bash
+# Global access with standard Docker registry service
+docker-compose -f dc3/docker-compose-db.yml up -d
+
+# Optimized registry service for users in mainland China
+docker-compose -f dc3/docker-compose-db-aliyun.yml up -d
+```
+
+## 3.2 Preparation
+
+```bash
+source dc3/env/dev.env.sh
+mvn clean package
+```
+
+## 3.3 Start Services
+
+> Start in order
+
+```bash
+# Gateway
+java -jar dc3-gateway/target/dc3-gateway.jar
+
+# Auth Center
+java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar
+
+# Data Center
+java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
+
+# Manager Center
+java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+
+# Virtual Driver
+java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
+
+# Other driver: Listening Virtual Driver, Modbus TCP Driver, MQTT Driver, OPC DA Driver, OPC UA Driver, Siemens S7 Driver
+```
+
+# 4 Technology Stack
+
+- [Java 21](https://www.java.com)
+- [Spring Boot 3.5.5](https://spring.io/projects/spring-boot)
+- [Spring Cloud 2025.0.0](https://spring.io/projects/spring-cloud)
+
+# 5 Contribution
 
 - **Branch Creation**: Start by creating a new branch from the `main` branch. Ensure that the `main` branch is up-to-date before branching out;
 - **Branch Naming**: Follow the naming convention for the new branch: `feature/your_name/feature_description`. For example: `feature/pnoker/mqtt_driver`;
 - **Code and Documentation**: Make your changes to the code or documentation on the new branch. Once done, commit your changes;
 - **Pull Request**: Submit a `Pull Request` (PR) to merge your changes into the `develop` branch. Your PR will be reviewed and merged by the maintainers.
 
-# 4 License
+# 6 License
 
 The `IoT DC3` open-source platform is licensed under the [AGPL 3.0 License](./LICENSE-AGPL.txt). 

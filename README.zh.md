@@ -44,13 +44,63 @@ IoT DC3 是一个基于 Spring Cloud 构建的完全开源分布式物联网 (Io
 - **云原生**：对 Kubernetes 优化，完美适配现代云基础设施；
 - **容器化**：基于 Docker 完全容器化，简化部署与运维。
 
-# 3 贡献
+# 3 开发
+
+## 3.1 启动依赖
+
+> 二选一
+
+```bash
+# 全球可访问的标准 Docker 镜像仓库服务
+docker-compose -f dc3/docker-compose-db.yml up -d
+
+# 针对中国大陆用户优化的镜像仓库服务
+docker-compose -f dc3/docker-compose-db-aliyun.yml up -d
+```
+
+## 3.2 准备工作
+
+```bash
+source dc3/env/dev.env.sh
+mvn clean package
+```
+
+## 3.3 启动服务
+
+> 依次启动
+
+```bash
+# 网关服务
+java -jar dc3-gateway/target/dc3-gateway.jar
+
+# 认证中心
+java -jar dc3-center/dc3-center-auth/target/dc3-center-auth.jar
+
+# 数据中心
+java -jar dc3-center/dc3-center-data/target/dc3-center-data.jar
+
+# 管理中心
+java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+
+# 虚拟驱动
+java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
+
+# 启动其他驱动：监听虚拟驱动、Modbus TCP 驱动、MQTT 驱动、OPC DA 驱动、OPC UA 驱动、Siemens S7 驱动
+```
+
+# 4 技术栈
+
+- [Java 21](https://www.java.com)
+- [Spring Boot 3.5.5](https://spring.io/projects/spring-boot)
+- [Spring Cloud 2025.0.0](https://spring.io/projects/spring-cloud)
+
+# 5 贡献
 
 - **创建分支**：请先从 `main` 分支创建新分支，确保 `main` 分支是最新的；
 - **分支命名**：遵循命名规范：`feature/your_name/feature_description`。例如：`feature/pnoker/mqtt_driver`；
 - **代码与文档**：在新分支上修改代码或文档，并提交变更；
 - **提交 PR**：发起 `Pull Request`，将修改合并到 `develop` 分支。PR 会由维护者审核并合并。
 
-# 4 开源协议
+# 6 开源协议
 
 `IoT DC3` 开源平台基于 [AGPL 3.0 License](./LICENSE-AGPL.txt) 协议。 
