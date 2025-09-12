@@ -52,6 +52,7 @@ All components and code are open-source, ensuring transparency, flexibility, and
 ## 3.1 Startup Dependencies
 
 > Choose one
+> If you need a database SQL script, connect directly to the started database in the container for export
 
 ```bash
 # Global access with standard Docker registry service
