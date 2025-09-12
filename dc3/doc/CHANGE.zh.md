@@ -5,6 +5,8 @@
 - 升级依赖
 - 稳定性改进
 - 移除 Hutool
+- 移除 Undertow
+- 更新容器镜像依赖
 
 <details>
 <summary>📝 历史版本说明，点击展开</summary>

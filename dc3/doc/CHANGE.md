@@ -5,6 +5,8 @@
 - Dependency upgrades
 - Stability improvements
 - Remove Hutool
+- Remove Undertow
+- Update container image dependencies
 
 <details>
 <summary>📝 Historical Version Description, Click to Expand</summary>
