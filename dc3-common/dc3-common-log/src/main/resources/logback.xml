@@ -63,6 +63,7 @@
             </providers>
         </encoder>
     </appender>
+
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
@@ -82,12 +83,12 @@
 
     <!-- 自定义 -->
     <logger name="org.mybatis.spring.mapper.ClassPathMapperScanner" level="ERROR"/>
+    <logger name="com.baomidou.mybatisplus.extension.spring" level="ERROR"/>
     <logger name="com.baomidou.mybatisplus.core.metadata.TableInfoHelper" level="ERROR"/>
     <logger name="com.baomidou.mybatisplus.core.injector.DefaultSqlInjector" level="ERROR"/>
 
     <!-- 系统 -->
     <logger name="org.springframework.boot.autoconfigure.thymeleaf" level="WARN"/>
-    <logger name="org.springframework.boot.web.embedded.undertow" level="WARN"/>
     <logger name="org.springframework.cloud.netflix.eureka" level="WARN"/>
     <logger name="org.springframework.cloud.gateway.route" level="WARN"/>
     <logger name="org.springframework.cloud.commons.util" level="WARN"/>
@@ -119,7 +120,6 @@
     <logger name="com.sun.jersey" level="WARN"/>
     <logger name="org.openscada" level="WARN"/>
     <logger name="org.jinterop" level="WARN"/>
-    <logger name="io.undertow" level="WARN"/>
     <logger name="com.netflix" level="WARN"/>
     <logger name="org.quartz" level="WARN"/>
     <logger name="org.jboss" level="WARN"/>

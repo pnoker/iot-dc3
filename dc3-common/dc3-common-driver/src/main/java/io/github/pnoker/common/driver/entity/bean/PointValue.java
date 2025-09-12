@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * MongoDB 位号数据
+ * 位号数据
  *
  * @author pnoker
  * @version 2025.6.0
