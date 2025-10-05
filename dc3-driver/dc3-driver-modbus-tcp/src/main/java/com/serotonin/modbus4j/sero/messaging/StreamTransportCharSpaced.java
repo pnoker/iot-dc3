@@ -24,7 +24,7 @@ import java.io.OutputStream;
  * <p>StreamTransportCharSpaced class.</p>
  *
  * @author Terry Packer
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public class StreamTransportCharSpaced extends StreamTransport {
 

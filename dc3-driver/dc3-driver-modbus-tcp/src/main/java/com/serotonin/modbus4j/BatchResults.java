@@ -23,7 +23,7 @@ import java.util.Map;
  * <p>BatchResults class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public class BatchResults<K> {
     private final Map<K, Object> data = new HashMap<>();

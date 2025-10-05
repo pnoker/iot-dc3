@@ -26,7 +26,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 该类是网关中心服务的启动类, 负责初始化并启动Spring Boot应用。
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.9.0
  * @since 2022.1.0
  */
 @SpringBootApplication

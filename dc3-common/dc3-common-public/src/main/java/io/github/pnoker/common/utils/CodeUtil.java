@@ -26,7 +26,7 @@ import java.util.UUID;
  * 编码生成工具类, 提供唯一编码生成功能
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.9.0
  * @since 2022.1.0
  */
 @Slf4j

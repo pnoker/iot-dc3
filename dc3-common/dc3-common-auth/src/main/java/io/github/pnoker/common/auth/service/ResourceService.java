@@ -25,7 +25,7 @@ import io.github.pnoker.common.base.service.BaseService;
  * Resource Interface
  *
  * @author linys
- * @version 2025.6.0
+ * @version 2025.9.0
  * @since 2022.1.0
  */
 public interface ResourceService extends BaseService<ResourceBO, ResourceQuery> {

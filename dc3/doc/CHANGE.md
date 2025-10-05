@@ -1,6 +1,6 @@
 ## ✨ What's Changed
 
-### 📌 2025.9.2
+### 📌 2025.9.3
 
 - Dependency upgrades
 - Stability improvements

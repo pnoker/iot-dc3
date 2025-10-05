@@ -22,7 +22,7 @@ import com.serotonin.modbus4j.sero.util.ProgressiveTaskListener;
  * <p>NodeScanListener interface.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public interface NodeScanListener extends ProgressiveTaskListener {
     /**

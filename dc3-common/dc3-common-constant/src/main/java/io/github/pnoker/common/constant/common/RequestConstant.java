@@ -21,7 +21,7 @@ package io.github.pnoker.common.constant.common;
  * 请求 相关常量
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.9.0
  * @since 2022.1.0
  */
 public class RequestConstant {
@@ -39,7 +39,7 @@ public class RequestConstant {
      * 自定义请求 Header 相关常量
      *
      * @author pnoker
-     * @version 2025.6.0
+     * @version 2025.9.0
      * @since 2022.1.0
      */
     public static class Header {
@@ -78,7 +78,7 @@ public class RequestConstant {
      * 自定义请求 Message 相关常量
      *
      * @author pnoker
-     * @version 2025.6.0
+     * @version 2025.9.0
      * @since 2022.1.0
      */
     public static class Message {
@@ -97,7 +97,7 @@ public class RequestConstant {
      * 自定义请求 Key 相关常量
      *
      * @author pnoker
-     * @version 2025.6.0
+     * @version 2025.9.0
      * @since 2022.1.0
      */
     public static class Key {

@@ -35,7 +35,7 @@ import java.util.Map;
  * <p>BasicProcessImage class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public class BasicProcessImage implements ProcessImage {
     private final int slaveId;

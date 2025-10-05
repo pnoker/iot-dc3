@@ -21,7 +21,7 @@ package com.serotonin.modbus4j.base;
  * featured, and then we note function failures so that we know how requests should subsequently be sent.
  *
  * @author mlohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public class SlaveProfile {
     private boolean writeMaskRegister = true;

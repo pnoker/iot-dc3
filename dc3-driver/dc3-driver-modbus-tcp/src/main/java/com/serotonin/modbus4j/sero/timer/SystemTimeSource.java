@@ -21,7 +21,7 @@ package com.serotonin.modbus4j.sero.timer;
  * An implementation of TimeSource that returns the host time via System.
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public class SystemTimeSource implements TimeSource {
     /**

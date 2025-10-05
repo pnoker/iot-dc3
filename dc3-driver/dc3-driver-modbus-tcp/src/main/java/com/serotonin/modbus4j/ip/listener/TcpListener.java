@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * <p>TcpListener class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public class TcpListener extends ModbusMaster {
     // Configuration fields.
