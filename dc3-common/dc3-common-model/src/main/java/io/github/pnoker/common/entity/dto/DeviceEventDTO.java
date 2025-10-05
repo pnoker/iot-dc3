@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * 设备事件
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.9.0
  * @since 2022.1.0
  */
 @Getter
@@ -70,7 +70,7 @@ public class DeviceEventDTO implements Serializable {
      * 设备状态
      *
      * @author pnoker
-     * @version 2025.6.0
+     * @version 2025.9.0
      * @since 2022.1.0
      */
     @Getter

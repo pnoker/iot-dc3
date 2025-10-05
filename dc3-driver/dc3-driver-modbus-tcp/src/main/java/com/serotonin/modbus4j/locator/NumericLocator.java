@@ -30,7 +30,7 @@ import java.util.Arrays;
  * <p>NumericLocator class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public class NumericLocator extends BaseLocator<Number> {
     private static final int[] DATA_TYPES = { //

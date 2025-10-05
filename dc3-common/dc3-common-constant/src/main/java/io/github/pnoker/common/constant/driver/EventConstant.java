@@ -23,7 +23,7 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
  * 事件 相关常量
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.9.0
  * @since 2022.1.0
  */
 public class EventConstant {
@@ -36,7 +36,7 @@ public class EventConstant {
      * 驱动事件 相关常量
      *
      * @author pnoker
-     * @version 2025.6.0
+     * @version 2025.9.0
      * @since 2022.1.0
      */
     public static class Driver {
@@ -61,7 +61,7 @@ public class EventConstant {
      * 设备事件 相关常量
      *
      * @author pnoker
-     * @version 2025.6.0
+     * @version 2025.9.0
      * @since 2022.1.0
      */
     public static class Device {

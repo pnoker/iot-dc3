@@ -26,7 +26,7 @@ import io.github.pnoker.common.manager.entity.model.PointAttributeConfigDO;
  * </p>
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.9.0
  * @since 2022.1.0
  */
 public interface PointAttributeConfigMapper extends BaseMapper<PointAttributeConfigDO> {

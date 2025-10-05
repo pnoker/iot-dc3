@@ -31,7 +31,7 @@ import java.util.Map;
  * 当前配置仅用于 dc3-common-dal 服务模块, 如果需要用于其他模块请重新配置 path 参数。
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.9.0
  * @since 2022.1.0
  */
 public class MybatisGenerator {

@@ -26,7 +26,7 @@ import io.github.pnoker.common.data.entity.model.DriverRunHistoryDO;
  * </p>
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.9.0
  * @since 2022.1.0
  */
 public interface DriverRunHistoryManager extends IService<DriverRunHistoryDO> {

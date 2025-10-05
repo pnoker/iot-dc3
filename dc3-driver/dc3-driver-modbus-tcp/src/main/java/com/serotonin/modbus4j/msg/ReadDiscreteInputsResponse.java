@@ -23,7 +23,7 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
  * <p>ReadDiscreteInputsResponse class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public class ReadDiscreteInputsResponse extends ReadResponse {
     ReadDiscreteInputsResponse(int slaveId, byte[] data) throws ModbusTransportException {

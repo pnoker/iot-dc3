@@ -24,7 +24,7 @@ import com.serotonin.modbus4j.exception.ModbusTransportException;
  * <p>ReadHoldingRegistersRequest class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public class ReadHoldingRegistersRequest extends ReadNumericRequest {
     /**

@@ -39,7 +39,7 @@ import java.util.concurrent.ExecutorService;
  * 200万条SinglePointValue会产生: 60M的索引数据以及400M的数据
  *
  * @author pnoker
- * @version 2025.6.0
+ * @version 2025.9.0
  * @since 2022.1.0
  */
 @Slf4j

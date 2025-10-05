@@ -25,7 +25,7 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * <p>Abstract AsciiMessage class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 abstract public class AsciiMessage extends SerialMessage {
     private static final byte START = ':';

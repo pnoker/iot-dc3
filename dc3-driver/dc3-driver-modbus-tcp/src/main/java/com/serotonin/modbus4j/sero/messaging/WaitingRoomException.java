@@ -24,7 +24,7 @@ import java.io.Serial;
  * <p>WaitingRoomException class.</p>
  *
  * @author Matthew Lohbihler
- * @version 2025.6.0
+ * @version 2025.9.0
  */
 public class WaitingRoomException extends IOException {
 
