@@ -286,15 +286,6 @@ jobs:
           envsubst < ${{ github.workspace }}/dc3/doc/CHANGE.md >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           envsubst < ${{ github.workspace }}/dc3/doc/USAGE.md >> $GITHUB_OUTPUT
-          echo "---" >> $GITHUB_OUTPUT
-          echo "<details><summary>中文</summary>" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          envsubst < ${{ github.workspace }}/dc3/doc/TITLE.zh.md >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          envsubst < ${{ github.workspace }}/dc3/doc/CHANGE.zh.md >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          envsubst < ${{ github.workspace }}/dc3/doc/USAGE.zh.md >> $GITHUB_OUTPUT
-          echo "</details>" >> $GITHUB_OUTPUT
           
           echo "EOF" >> $GITHUB_OUTPUT
           echo "✅ Release notes generated successfully"

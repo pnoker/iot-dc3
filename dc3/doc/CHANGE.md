@@ -3,13 +3,18 @@
 ### 📌 2025.9.3
 
 - Dependency upgrades
+- Add Japanese and Vietnamese introductions
+
+<details>
+<summary>📝 Historical Version Description, Click to Expand</summary>
+
+### 2025.9.2
+
+- Dependency upgrades
 - Stability improvements
 - Remove Hutool
 - Remove Undertow
 - Update container image dependencies
-
-<details>
-<summary>📝 Historical Version Description, Click to Expand</summary>
 
 ### 2025.6.6
 
