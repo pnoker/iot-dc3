@@ -1,5 +1,5 @@
 <p align="right">
-  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a>
+  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
 </p>
 
 <p align="center">
@@ -49,7 +49,7 @@ IoT DC3 是一个基于 Spring Cloud 构建的完全开源分布式物联网 (Io
 ## 3.1 启动依赖
 
 > 二选一
-> 
+>
 > 如果需要数据库 SQL 脚本，请直接连接到容器中已启动的数据库进行导出
 
 ```bash
