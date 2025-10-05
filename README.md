@@ -1,5 +1,5 @@
 <p align="right">
-  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a>
+  <a href="./README.md">English</a> | <a href="./README.zh.md">中文</a> | <a href="./README.ja.md">日本語</a> | <a href="./README.vi.md">Tiếng Việt</a>
 </p>
 
 <p align="center">
@@ -52,7 +52,7 @@ All components and code are open-source, ensuring transparency, flexibility, and
 ## 3.1 Startup Dependencies
 
 > Choose one
-> 
+>
 > If you need a database SQL script, connect directly to the started database in the container for export
 
 ```bash
