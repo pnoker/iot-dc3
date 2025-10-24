@@ -28,7 +28,10 @@
     <artifactId>dc3-driver-listening-virtual</artifactId>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 平台 ListeningVirtual驱动, 监听模式, 提供 Tcp 和 Udp 两种模式, 仅用于测试用途。</description>
+    <description>
+        The ListeningVirtual driver of the IoT DC3 platform, featuring listening mode with both TCP and UDP options, is
+        intended for testing purposes only.
+    </description>
 
     <dependencies>
 

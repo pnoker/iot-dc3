@@ -35,87 +35,87 @@ option java_multiple_files = true;
 
 /*
 Api
-服务接口，定义了设备管理相关的RPC调用
+Service interfaces defining RPC calls related to device management
 */
 service DeviceApi {
-  // 分页查询设备信息
+  // Paginated query for device information
   rpc SelectByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
-  // 根据配置模板ID查询设备列表
+  // Query device list by Profile ID
   rpc SelectByProfileId (GrpcProfileQuery) returns (GrpcRDeviceListDTO);
-  // 根据驱动ID查询设备列表
+  // Query device list by Driver ID
   rpc SelectByDriverId (GrpcDriverQuery) returns (GrpcRDeviceListDTO);
-  // 根据设备ID查询单个设备信息
+  // Query single device information by Device ID
   rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
 }
 
 /*
 Device R Page
-设备分页查询的响应结构体
+Response structure for paginated device query
 */
 message GrpcRPageDeviceDTO {
   /*
   R
-  通用返回结果，包含状态码、消息等
+  Generic return result containing status code, message, etc.
   */
   GrpcR result = 1;
 
   /*
   Data
-  返回的分页设备数据
+  Returned paginated device data
   */
   GrpcPageDeviceDTO data = 2;
 }
 
 /*
 Device Page
-设备分页数据结构体
+Device page data structure
 */
 message GrpcPageDeviceDTO {
   /*
   Page
-  分页信息，包含页码、页大小、总数等
+  Pagination info, including page number, page size, total, etc.
   */
   GrpcPage page = 1;
 
   /*
   Data
-  设备数据列表
+  List of device data
   */
   repeated GrpcDeviceDTO data = 2;
 }
 
 /*
-Device R 集合
-设备列表查询的响应结构体
+Device R List
+Response structure for device list query
 */
 message GrpcRDeviceListDTO {
   /*
   R
-  通用返回结果，包含状态码、消息等
+  Generic return result containing status code, message, etc.
   */
   GrpcR result = 1;
 
   /*
   Data
-  返回的设备列表数据
+  Returned device list data
   */
   repeated GrpcDeviceDTO data = 2;
 }
 
 /*
 Device R
-单个设备查询的响应结构体
+Response structure for single device query
 */
 message GrpcRDeviceDTO {
   /*
   R
-  通用返回结果，包含状态码、消息等
+  Generic return result containing status code, message, etc.
   */
   GrpcR result = 1;
 
   /*
   Data
-  返回的单个设备数据
+  Returned single device data
   */
   GrpcDeviceDTO data = 2;
 }

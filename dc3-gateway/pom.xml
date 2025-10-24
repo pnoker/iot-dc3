@@ -36,7 +36,8 @@
     <inceptionYear>2016-2022</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        IoT DC3 平台网关, 用于限流, 权限验证, 服务转发, 方向代理 等。
+        The IoT DC3 platform gateway, designed for rate limiting, authentication, service forwarding, and reverse proxy
+        functions.
     </description>
 
     <developers>

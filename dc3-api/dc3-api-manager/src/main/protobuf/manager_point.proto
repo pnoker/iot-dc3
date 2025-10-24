@@ -34,21 +34,21 @@ option java_multiple_files = true;
 
 /*
 Api
-服务接口，定义了点位管理相关的RPC调用
+Service interfaces defining RPC calls related to point management
 */
 service PointApi {
-  // 分页查询点位信息
+  // Paginated query for point information
   rpc SelectByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
 }
 
 /*
 Point R Page
-点位分页查询的响应结构体
+Response structure for paginated point query
 */
 message GrpcRPagePointDTO {
   /*
   R
-  通用返回结果，包含状态码、消息等
+  Generic return result containing status code, message, etc.
   */
   GrpcR result = 1;
 
