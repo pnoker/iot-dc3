@@ -19,58 +19,47 @@ syntax = "proto3";
 
 package api.common.auth;
 
-import "api/common/base.proto";
 import "api/common/r.proto";
 
 /*
 Config
 */
 option java_package = "io.github.pnoker.api.center.auth";
-option java_outer_classname = "TenantProto";
+option java_outer_classname = "TokenProto";
 option objc_class_prefix = "Auth";
 option java_multiple_files = true;
 
 /*
 Api
-服务接口，定义了租户相关的RPC调用
+Service interface defining token-related RPC calls
 */
-service TenantApi {
-  // 通过租户编码查询租户信息
-  rpc SelectByCode (GrpcCodeQuery) returns (GrpcRTenantDTO);
+service TokenApi {
+  // Validate token
+  rpc CheckValid (GrpcLoginQuery) returns (GrpcRTokenDTO);
 }
 
-// SelectByCode Query
-// 查询租户编码的请求结构体
-message GrpcCodeQuery {
-  string code = 1; // 租户编码，唯一标识一个租户
+// checkValid Query
+// Request message for validating login information
+message GrpcLoginQuery {
+  string tenant = 1; // Tenant, identifies the owning tenant
+  string name = 2; // Login name
+  string salt = 3; // Salt used for password encryption
+  string password = 4; // Login password
+  string token = 5; // Token
 }
 
-// R of Tenant DTO
-// 返回租户信息的响应结构体
-message GrpcRTenantDTO {
+// R of Token DTO
+// Response wrapper for token validation result
+message GrpcRTokenDTO {
   /*
   R
-  通用返回结果，包含状态码、消息等
+  Common result wrapper with status code, message, etc.
   */
   GrpcR result = 1;
 
   /*
   Data
-  返回的租户数据
+  Returned data, typically a token or expiration time, etc.
   */
-  GrpcTenantDTO data = 2;
-}
-
-// Tenant DTO
-// 租户数据结构体，包含租户的基本信息
-message GrpcTenantDTO {
-  /*
-  Base
-  通用基础字段（如ID、创建时间等）
-  */
-  GrpcBase base = 1;
-
-  string tenant_name = 2; // 租户名称
-  string tenant_code = 3; // 租户编码，唯一标识
-  int32 enable_flag = 4; // 启用标识，1为启用，0为禁用
+  string data = 2;
 }
