@@ -116,7 +116,7 @@
             <artifactId>commons-io</artifactId>
         </dependency>
 
-        <!-- Jackson 相关 -->
+        <!-- Jackson Related -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -146,7 +146,7 @@
             <artifactId>jackson-module-parameter-names</artifactId>
         </dependency>
 
-        <!-- Bouncy Castle 相关 -->
+        <!-- Bouncy Castle Related -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
@@ -162,7 +162,7 @@
             <artifactId>hibernate-validator-cdi</artifactId>
         </dependency>
 
-        <!-- DC3 Common 相关 -->
+        <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-constant</artifactId>
