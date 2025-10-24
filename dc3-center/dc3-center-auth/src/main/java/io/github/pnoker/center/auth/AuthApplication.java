@@ -21,7 +21,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * 权限中心服务启动入口
+ * Auth Center Service Startup Portal
  *
  * @author pnoker
  * @version 2025.9.0

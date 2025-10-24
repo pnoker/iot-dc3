@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Condition;
 
 /**
- * MapStruct 工具类集合
+ * MapStruct  Util
  *
  * @author pnoker
  * @version 2025.9.0

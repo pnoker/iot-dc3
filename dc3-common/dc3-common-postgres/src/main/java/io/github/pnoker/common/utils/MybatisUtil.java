@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Types;
 
 /**
- * Mybatis 工具类集合
+ * Mybatis  Util
  *
  * @author pnoker
  * @version 2025.9.0
