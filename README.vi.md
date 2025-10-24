@@ -25,22 +25,31 @@ Tất cả các thành phần và mã nguồn đều là mã nguồn mở, đả
 
 # 1 Kiến trúc
 
-- **Tầng Driver**: Cung cấp SDK để tạo điều kiện kết nối liền mạch với các thiết bị vật lý bằng cả giao thức tiêu chuẩn và độc quyền. Tầng này chịu trách nhiệm thu thập dữ liệu và
+- **Tầng Driver**: Cung cấp SDK để tạo điều kiện kết nối liền mạch với các thiết bị vật lý bằng cả giao thức tiêu chuẩn
+  và độc quyền. Tầng này chịu trách nhiệm thu thập dữ liệu và
   thực thi lệnh theo hướng nam, cho phép phát triển driver nhanh chóng thông qua SDK toàn diện của nó;
-- **Tầng Dữ liệu**: Quản lý việc thu thập, lưu trữ và truy xuất dữ liệu thiết bị, cung cấp dịch vụ giao diện quản lý dữ liệu mạnh mẽ để đảm bảo xử lý dữ liệu hiệu quả;
-- **Tầng Quản lý**: Hoạt động như trung tâm cốt lõi cho các tương tác microservice, cung cấp các dịch vụ thiết yếu như đăng ký microservice, giao diện lệnh thiết bị, đăng ký và
-  ghép nối thiết bị, và hệ thống quản lý dữ liệu tập trung. Nó giám sát các dữ liệu cấu hình khác nhau và cung cấp dịch vụ giao diện bên ngoài để tích hợp liền mạch;
-- **Tầng Ứng dụng**: Cung cấp các chức năng nâng cao bao gồm tính mở của dữ liệu, lập lịch nhiệm vụ, thông báo cảnh báo và tin nhắn, quản lý nhật ký, và khả năng tích hợp với các
+- **Tầng Dữ liệu**: Quản lý việc thu thập, lưu trữ và truy xuất dữ liệu thiết bị, cung cấp dịch vụ giao diện quản lý dữ
+  liệu mạnh mẽ để đảm bảo xử lý dữ liệu hiệu quả;
+- **Tầng Quản lý**: Hoạt động như trung tâm cốt lõi cho các tương tác microservice, cung cấp các dịch vụ thiết yếu như
+  đăng ký microservice, giao diện lệnh thiết bị, đăng ký và
+  ghép nối thiết bị, và hệ thống quản lý dữ liệu tập trung. Nó giám sát các dữ liệu cấu hình khác nhau và cung cấp dịch
+  vụ giao diện bên ngoài để tích hợp liền mạch;
+- **Tầng Ứng dụng**: Cung cấp các chức năng nâng cao bao gồm tính mở của dữ liệu, lập lịch nhiệm vụ, thông báo cảnh báo
+  và tin nhắn, quản lý nhật ký, và khả năng tích hợp với các
   nền tảng bên thứ ba, nâng cao tính đa dụng và khả năng sử dụng của nền tảng.
 
 # 2 Mục tiêu
 
-- **Khả năng mở rộng**: Được thiết kế để mở rộng theo chiều ngang, tận dụng sức mạnh của Spring Cloud, một công nghệ mã nguồn mở hàng đầu;
+- **Khả năng mở rộng**: Được thiết kế để mở rộng theo chiều ngang, tận dụng sức mạnh của Spring Cloud, một công nghệ mã
+  nguồn mở hàng đầu;
 - **Khả năng chịu lỗi**: Đảm bảo không có điểm lỗi đơn lẻ, với mỗi nút cụm giống nhau và có thể thay thế lẫn nhau;
-- **Hiệu suất**: Có khả năng xử lý hàng trăm nghìn thiết bị trên một nút máy chủ đơn, tùy thuộc vào trường hợp sử dụng cụ thể;
+- **Hiệu suất**: Có khả năng xử lý hàng trăm nghìn thiết bị trên một nút máy chủ đơn, tùy thuộc vào trường hợp sử dụng
+  cụ thể;
 - **Khả năng tùy chỉnh**: Dễ dàng tích hợp các giao thức thiết bị mới và đăng ký chúng trong trung tâm dịch vụ;
-- **Tương thích đa nền tảng**: Hoàn toàn tương thích với môi trường Java, cho phép triển khai phân tán liền mạch trên nhiều nền tảng;
-- **Linh hoạt trong triển khai**: Hỗ trợ triển khai đám mây riêng, đám mây công cộng và edge, cung cấp quyền kiểm soát đầy đủ đối với cơ sở hạ tầng của bạn;
+- **Tương thích đa nền tảng**: Hoàn toàn tương thích với môi trường Java, cho phép triển khai phân tán liền mạch trên
+  nhiều nền tảng;
+- **Linh hoạt trong triển khai**: Hỗ trợ triển khai đám mây riêng, đám mây công cộng và edge, cung cấp quyền kiểm soát
+  đầy đủ đối với cơ sở hạ tầng của bạn;
 - **Hiệu quả**: Hợp lý hóa quy trình đưa thiết bị vào hệ thống, đăng ký và xác thực quyền;
 - **Bảo mật**: Đảm bảo việc truyền dữ liệu được mã hóa, bảo vệ thông tin nhạy cảm;
 - **Đa người thuê**: Hỗ trợ không gian tên và đa người thuê, làm cho nó lý tưởng cho các môi trường người dùng đa dạng;
@@ -53,7 +62,8 @@ Tất cả các thành phần và mã nguồn đều là mã nguồn mở, đả
 
 > Chọn một
 >
-> Nếu bạn cần một tập lệnh SQL cơ sở dữ liệu, hãy kết nối trực tiếp với cơ sở dữ liệu đã khởi động trong container để xuất
+> Nếu bạn cần một tập lệnh SQL cơ sở dữ liệu, hãy kết nối trực tiếp với cơ sở dữ liệu đã khởi động trong container để
+> xuất
 
 ```bash
 # Truy cập toàn cầu với dịch vụ đăng ký Docker tiêu chuẩn
@@ -101,10 +111,14 @@ java -jar dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual.jar
 
 # 5 Đóng góp
 
-- **Tạo nhánh**: Bắt đầu bằng cách tạo một nhánh mới từ nhánh `main`. Đảm bảo rằng nhánh `main` được cập nhật trước khi tạo nhánh mới;
-- **Đặt tên nhánh**: Tuân theo quy ước đặt tên cho nhánh mới: `feature/your_name/feature_description`. Ví dụ: `feature/pnoker/mqtt_driver`;
-- **Mã và Tài liệu**: Thực hiện các thay đổi của bạn đối với mã hoặc tài liệu trên nhánh mới. Sau khi hoàn thành, commit các thay đổi của bạn;
-- **Pull Request**: Gửi một `Pull Request` (PR) để hợp nhất các thay đổi của bạn vào nhánh `develop`. PR của bạn sẽ được xem xét và hợp nhất bởi người bảo trì.
+- **Tạo nhánh**: Bắt đầu bằng cách tạo một nhánh mới từ nhánh `main`. Đảm bảo rằng nhánh `main` được cập nhật trước khi
+  tạo nhánh mới;
+- **Đặt tên nhánh**: Tuân theo quy ước đặt tên cho nhánh mới: `feature/your_name/feature_description`. Ví dụ:
+  `feature/pnoker/mqtt_driver`;
+- **Mã và Tài liệu**: Thực hiện các thay đổi của bạn đối với mã hoặc tài liệu trên nhánh mới. Sau khi hoàn thành, commit
+  các thay đổi của bạn;
+- **Pull Request**: Gửi một `Pull Request` (PR) để hợp nhất các thay đổi của bạn vào nhánh `develop`. PR của bạn sẽ được
+  xem xét và hợp nhất bởi người bảo trì.
 
 # 6 Giấy phép
 

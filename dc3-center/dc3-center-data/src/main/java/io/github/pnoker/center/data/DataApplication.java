@@ -21,7 +21,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * 数据中心服务启动入口
+ * Data Center Service Startup Portal
  *
  * @author pnoker
  * @version 2025.9.0

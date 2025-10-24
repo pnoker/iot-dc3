@@ -2,7 +2,8 @@
 
 ### 🍭 Requirements
 
-> These are the core requirements needed to build and run the application. Make sure to have these tools installed and properly configured in your development environment.
+> These are the core requirements needed to build and run the application. Make sure to have these tools installed and
+> properly configured in your development environment.
 
 - **JDK 21**: Java Development Kit version 21 or higher
 - **Maven**: Build automation and dependency management tool

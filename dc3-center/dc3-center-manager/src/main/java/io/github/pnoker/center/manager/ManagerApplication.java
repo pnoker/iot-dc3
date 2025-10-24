@@ -21,7 +21,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * 管理中心服务启动入口
+ * Manager Center Service Launch Portal
  *
  * @author pnoker
  * @version 2025.9.0
