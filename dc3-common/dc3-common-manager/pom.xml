@@ -44,7 +44,7 @@
             <artifactId>grpc-spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- DC3 Api 相关 -->
+        <!-- DC3 Api Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-auth</artifactId>
@@ -62,7 +62,7 @@
             <artifactId>dc3-api-manager</artifactId>
         </dependency>
 
-        <!-- DC3 Common 相关 -->
+        <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-dal</artifactId>

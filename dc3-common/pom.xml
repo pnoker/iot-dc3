@@ -70,13 +70,13 @@
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
 
-        <!-- DC3 Api 相关 -->
+        <!-- DC3 Api Related -->
         <dc3.api.auth.version>2025.9.3</dc3.api.auth.version>
         <dc3.api.data.version>2025.9.3</dc3.api.data.version>
         <dc3.api.driver.version>2025.9.3</dc3.api.driver.version>
         <dc3.api.manager.version>2025.9.3</dc3.api.manager.version>
 
-        <!-- DC3 Common 相关 -->
+        <!-- DC3 Common Related -->
         <dc3.common.api.version>2025.9.3</dc3.common.api.version>
         <dc3.common.auth.version>2025.9.3</dc3.common.auth.version>
         <dc3.common.constant.version>2025.9.3</dc3.common.constant.version>
@@ -185,7 +185,7 @@
     <dependencyManagement>
         <dependencies>
 
-            <!-- DC3 Api 相关 -->
+            <!-- DC3 Api Related -->
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-api-auth</artifactId>
@@ -211,7 +211,7 @@
                 <scope>compile</scope>
             </dependency>
 
-            <!-- DC3 Common 相关 -->
+            <!-- DC3 Common Related -->
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-api</artifactId>

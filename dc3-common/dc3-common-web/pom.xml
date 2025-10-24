@@ -92,7 +92,7 @@
             <artifactId>micrometer-tracing-bridge-brave</artifactId>
         </dependency>
 
-        <!-- DC3 Common 相关 -->
+        <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-exception</artifactId>
