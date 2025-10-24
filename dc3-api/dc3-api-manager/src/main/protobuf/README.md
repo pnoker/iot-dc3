@@ -1,7 +1,7 @@
-# 使用规范
+# Usage Guidelines
 
-> 请务必遵循以下规范
+> Please strictly follow these guidelines
 
-- entity 放实体类定义
-- query 放查询参数定义
-- query_page 放分页查询参数定义
+- entity: for entity class definitions
+- query: for query parameter definitions
+- query_page: for paginated query parameter definitions

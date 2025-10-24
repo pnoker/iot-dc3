@@ -19,47 +19,58 @@ syntax = "proto3";
 
 package api.common.auth;
 
+import "api/common/base.proto";
 import "api/common/r.proto";
 
 /*
 Config
 */
 option java_package = "io.github.pnoker.api.center.auth";
-option java_outer_classname = "TokenProto";
+option java_outer_classname = "TenantProto";
 option objc_class_prefix = "Auth";
 option java_multiple_files = true;
 
 /*
 Api
-服务接口，定义了令牌（Token）相关的RPC调用
+Service interface defining tenant-related RPC calls
 */
-service TokenApi {
-  // 校验令牌有效性
-  rpc CheckValid (GrpcLoginQuery) returns (GrpcRTokenDTO);
+service TenantApi {
+  // Query tenant information by tenant code
+  rpc SelectByCode (GrpcCodeQuery) returns (GrpcRTenantDTO);
 }
 
-// checkValid Query
-// 校验登录信息的请求结构体
-message GrpcLoginQuery {
-  string tenant = 1; // 租户，标识所属租户
-  string name = 2; // 登录名称
-  string salt = 3; // 盐值，用于密码加密
-  string password = 4; // 登录密码
-  string token = 5; // 令牌
+// SelectByCode Query
+// Request message for querying by tenant code
+message GrpcCodeQuery {
+  string code = 1; // Tenant code, unique identifier of a tenant
 }
 
-// R of Token DTO
-// 返回令牌校验结果的响应结构体
-message GrpcRTokenDTO {
+// R of Tenant DTO
+// Response wrapper for tenant information
+message GrpcRTenantDTO {
   /*
   R
-  通用返回结果，包含状态码、消息等
+  Common result wrapper with status code, message, etc.
   */
   GrpcR result = 1;
 
   /*
   Data
-  返回的数据，通常为令牌或过期时间等
+  Returned tenant data
   */
-  string data = 2;
+  GrpcTenantDTO data = 2;
+}
+
+// Tenant DTO
+// Tenant data structure with basic information
+message GrpcTenantDTO {
+  /*
+  Base
+  Common base fields (e.g., ID, creation time, etc.)
+  */
+  GrpcBase base = 1;
+
+  string tenant_name = 2; // Tenant name
+  string tenant_code = 3; // Tenant code, unique
+  int32 enable_flag = 4; // Enable flag: 1 enabled, 0 disabled
 }

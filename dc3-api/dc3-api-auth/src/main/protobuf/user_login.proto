@@ -26,54 +26,52 @@ import "api/common/r.proto";
 Config
 */
 option java_package = "io.github.pnoker.api.center.auth";
-option java_outer_classname = "UserProto";
+option java_outer_classname = "UserLoginProto";
 option objc_class_prefix = "Auth";
 option java_multiple_files = true;
 
 /*
 Api
-服务接口，定义了用户相关的RPC调用
+Service interface defining user login-related RPC calls
 */
-service UserApi {
-  // 通过用户ID查询用户信息
-  rpc SelectById (GrpcIdQuery) returns (GrpcRUserDTO);
+service UserLoginApi {
+  // Query user login information by login name
+  rpc SelectByName (GrpcNameQuery) returns (GrpcRUserLoginDTO);
 }
 
-// selectById Query
-// 查询用户ID的请求结构体
-message GrpcIdQuery {
-  int64 id = 1; // 用户ID，唯一标识一个用户
+// selectByName Query
+// Request message for querying by name
+message GrpcNameQuery {
+  string name = 1; // Login name used to query user login info
 }
 
-// R of User DTO
-// 返回用户信息的响应结构体
-message GrpcRUserDTO {
+// R of UserLogin DTO
+// Response wrapper for user login information
+message GrpcRUserLoginDTO {
   /*
   R
-  通用返回结果，包含状态码、消息等
+  Common result wrapper with status code, message, etc.
   */
   GrpcR result = 1;
 
   /*
   Data
-  返回的用户数据
+  Returned user login data
   */
-  GrpcUserDTO data = 2;
+  GrpcUserLoginDTO data = 2;
 }
 
-// User DTO
-// 用户数据结构体，包含用户的基本信息
-message GrpcUserDTO {
+// UserLogin DTO
+// User login data structure with basic information
+message GrpcUserLoginDTO {
   /*
   Base
-  通用基础字段（如ID、创建时间等）
+  Common base fields (e.g., ID, creation time, etc.)
   */
   GrpcBase base = 1;
 
-  string nick_name = 2; // 用户昵称
-  string user_name = 3; // 用户名
-  string phone = 4; // 手机号
-  string email = 5; // 邮箱
-  string social_ext = 6; // 社交相关扩展信息，加密存储
-  string identity_ext = 7; // 身份相关扩展信息，加密存储
+  string login_name = 2; // Login name, the username used to sign in
+  int64 user_id = 3; // User ID, references the specific user
+  int64 user_password_id = 4; // User password ID, references the password record
+  int32 enable_flag = 5; // Enable flag: 1 enabled, 0 disabled
 }
