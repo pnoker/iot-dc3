@@ -28,7 +28,7 @@
     <artifactId>dc3-driver-opc-ua</artifactId>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 平台 Opc Ua 驱动。</description>
+    <description>The Opc Ua driver for the IoT DC3 platform.</description>
 
     <dependencies>
 

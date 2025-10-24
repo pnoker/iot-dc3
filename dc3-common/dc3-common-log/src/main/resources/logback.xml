@@ -18,7 +18,7 @@
 
 <!DOCTYPE configuration>
 <configuration scan="true">
-    <!-- 覆盖 base.xml 中的参数配置 -->
+    <!-- Override the parameter configurations in base.xml. -->
     <property name="CONSOLE_LOG_PATTERN"
               value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){magenta} [%clr(%4line){magenta}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"/>
     <property name="FILE_LOG_PATTERN"
@@ -28,7 +28,7 @@
     <property name="LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP" value="20GB"/>
     <property name="LOGBACK_ROLLINGPOLICY_MAX_HISTORY" value="30"/>
 
-    <!-- 引入 base.xml -->
+    <!-- Include base.xml -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
@@ -42,7 +42,8 @@
         </encoder>
         <file>${LOG_FILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN:-${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz}</fileNamePattern>
+            <fileNamePattern>${LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN:-${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz}
+            </fileNamePattern>
             <cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
             <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE:-10MB}</maxFileSize>
             <totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP:-0}</totalSizeCap>
@@ -69,7 +70,7 @@
         <appender-ref ref="FILE"/>
     </root>
 
-    <!-- 关闭状态日志 -->
+    <!-- Nop Status Listener -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
     <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook"/>
@@ -78,16 +79,16 @@
         <resetJUL>true</resetJUL>
     </contextListener>
 
-    <!-- 用户 -->
+    <!-- User configuration -->
     <logger name="io.github.pnoker.center.manager.receiver.rabbit" level="WARN"/>
 
-    <!-- 自定义 -->
+    <!-- Customized configuration -->
     <logger name="org.mybatis.spring.mapper.ClassPathMapperScanner" level="ERROR"/>
     <logger name="com.baomidou.mybatisplus.extension.spring" level="ERROR"/>
     <logger name="com.baomidou.mybatisplus.core.metadata.TableInfoHelper" level="ERROR"/>
     <logger name="com.baomidou.mybatisplus.core.injector.DefaultSqlInjector" level="ERROR"/>
 
-    <!-- 系统 -->
+    <!-- System configuration -->
     <logger name="org.springframework.boot.autoconfigure.thymeleaf" level="WARN"/>
     <logger name="org.springframework.cloud.netflix.eureka" level="WARN"/>
     <logger name="org.springframework.cloud.gateway.route" level="WARN"/>

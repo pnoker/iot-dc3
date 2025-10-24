@@ -35,67 +35,67 @@ option java_multiple_files = true;
 
 /*
 Api
-服务接口，定义了驱动管理相关的RPC调用
+Service interfaces defining RPC calls related to driver management
 */
 service DriverApi {
-  // 分页查询驱动信息
+  // Paginated query for driver information
   rpc SelectByPage (GrpcPageDriverQuery) returns (GrpcRPageDriverDTO);
-  // 根据驱动ID查询驱动信息
+  // Query driver information by Driver ID
   rpc SelectByDriverId (GrpcDriverQuery) returns (GrpcRDriverDTO);
-  // 根据设备ID查询关联的驱动信息
+  // Query associated driver information by Device ID
   rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDriverDTO);
 }
 
 /*
 Driver R Page
-驱动分页查询的响应结构体
+Response structure for paginated driver query
 */
 message GrpcRPageDriverDTO {
   /*
   R
-  通用返回结果，包含状态码、消息等
+  Generic return result containing status code, message, etc.
   */
   GrpcR result = 1;
 
   /*
   Data
-  返回的分页驱动数据
+  Returned paginated driver data
   */
   GrpcPageDriverDTO data = 2;
 }
 
 /*
 Driver Page
-驱动分页数据结构体
+Driver page data structure
 */
 message GrpcPageDriverDTO {
   /*
   Page
-  分页信息，包含页码、页大小、总数等
+  Pagination info, including page number, page size, total, etc.
   */
   GrpcPage page = 1;
 
   /*
   Data
-  驱动数据列表
+  List of driver data
   */
   repeated GrpcDriverDTO data = 2;
 }
 
 /*
 Driver R
-单个驱动查询的响应结构体
+Response structure for single driver query
 */
 message GrpcRDriverDTO {
   /*
   R
-  通用返回结果，包含状态码、消息等
+  Generic return result containing status code, message, etc.
   */
   GrpcR result = 1;
 
   /*
   Data
-  返回的单个驱动数据
+  Returned single driver data
   */
   GrpcDriverDTO data = 2;
 }

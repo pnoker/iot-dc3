@@ -30,7 +30,7 @@
     <version>2025.9.3</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 平台 Auth Service gRpc API。</description>
+    <description>The Auth Service gRPC API of the IoT DC3 platform.</description>
 
     <developers>
         <developer>

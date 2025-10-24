@@ -30,7 +30,7 @@
     <version>2025.9.3</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 平台 Api 通用 gRpc Proto。</description>
+    <description>The Common gRPC API of the IoT DC3 platform.</description>
 
     <developers>
         <developer>
@@ -60,15 +60,6 @@
     </scm>
 
     <dependencies>
-
-        <!--
-        Javax Annotation Api
-        注意: 需要替换为jakarta.annotation-api, 但grpc官方暂时还没有响应但解决方案, 只能暂时添加这个兼容包
-        -->
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-        </dependency>
 
         <!-- gRpc -->
         <dependency>
@@ -112,7 +103,7 @@
 
     <build>
         <extensions>
-            <!-- OS 插件 -->
+            <!-- OS Plugin -->
             <extension>
                 <groupId>kr.motd.maven</groupId>
                 <artifactId>os-maven-plugin</artifactId>

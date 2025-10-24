@@ -28,7 +28,9 @@
     <artifactId>dc3-driver</artifactId>
     <packaging>pom</packaging>
 
-    <description>IoT DC3 平台 设备协议驱动集合。</description>
+    <description>
+        The collection of device protocol drivers on the IoT DC3 platform.
+    </description>
 
     <modules>
         <module>dc3-driver-listening-virtual</module>
