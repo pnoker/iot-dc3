@@ -54,25 +54,25 @@ message GrpcRPagePointDTO {
 
   /*
   Data
-  返回的分页点位数据
+  Returned paginated point data
   */
   GrpcPagePointDTO data = 2;
 }
 
 /*
 Point Page
-点位分页数据结构体
+Point pagination data structure
 */
 message GrpcPagePointDTO {
   /*
   Page
-  分页信息，包含页码、页大小、总数等
+  Pagination information including page number, page size, total count etc.
   */
   GrpcPage page = 1;
 
   /*
   Data
-  点位数据列表
+  List of point data
   */
   repeated GrpcPointDTO data = 2;
 }

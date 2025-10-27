@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 模板-设备关联表 服务实现类
+ * Point Bind Manager Service implementation class
  * </p>
  *
  * @author pnoker

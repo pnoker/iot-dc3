@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.model.GroupBindDO;
 
 /**
  * <p>
- * 分组与实体的绑定表 服务类
+ * Group Bind Manager Service implementation class
  * </p>
  *
  * @author pnoker

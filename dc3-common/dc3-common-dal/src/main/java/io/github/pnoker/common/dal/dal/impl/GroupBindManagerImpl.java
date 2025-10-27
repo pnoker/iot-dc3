@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 分组与实体的绑定表 服务实现类
+ * Group Bind Manager Service implementation class
  * </p>
  *
  * @author pnoker

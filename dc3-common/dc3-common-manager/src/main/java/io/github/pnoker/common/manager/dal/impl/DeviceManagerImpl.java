@@ -33,7 +33,7 @@ import java.util.Objects;
 
 /**
  * <p>
- * 设备表 服务实现类
+ * Device Manager Service implementation class
  * </p>
  *
  * @author pnoker

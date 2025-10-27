@@ -28,49 +28,49 @@ option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
 /*
-驱动ID Query
-驱动查询结构体，用于根据驱动ID查询驱动信息
+Driver ID Query
+Driver query structure for querying driver information by driver ID
 */
 message GrpcDriverQuery {
   /*
-  驱动ID
-  标识具体的驱动实例
+  Driver ID
+  Identifies specific driver instance
   */
   int64 driver_id = 1;
 }
 
 /*
 Profile ID Query
-配置模板查询结构体，用于根据配置模板ID查询模板信息
+Profile template query structure for querying template information by profile ID
 */
 message GrpcProfileQuery {
   /*
   Profile ID
-  配置模板ID，标识具体的配置模板
+  Profile template ID that identifies specific configuration template
   */
   int64 profile_id = 1;
 }
 
 /*
 Point ID Query
-点位查询结构体，用于根据点位ID查询点位信息
+Point query structure for querying point information by point ID
 */
 message GrpcPointQuery {
   /*
   Point ID
-  点位ID，标识具体的点位
+  Point ID that identifies specific point
   */
   int64 point_id = 1;
 }
 
 /*
 Device ID Query
-设备查询结构体，用于根据设备ID查询设备信息
+Device query structure for querying device information by device ID
 */
 message GrpcDeviceQuery {
   /*
   Device ID
-  设备ID，标识具体的设备
+  Device ID that identifies specific device
   */
   int64 device_id = 1;
 }

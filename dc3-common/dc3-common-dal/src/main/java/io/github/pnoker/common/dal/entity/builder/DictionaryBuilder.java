@@ -47,8 +47,8 @@ public interface DictionaryBuilder {
     /**
      * VOList to BOList
      *
-     * @param entityVOList EntityVO 集合
-     * @return EntityBO 集合
+     * @param entityVOList EntityVO collection
+     * @return EntityBO collection
      */
     List<DictionaryBO> buildBOListByVOList(List<DictionaryVO> entityVOList);
 
@@ -63,8 +63,8 @@ public interface DictionaryBuilder {
     /**
      * BOList to VOList
      *
-     * @param entityBOList EntityBO 集合
-     * @return EntityVO 集合
+     * @param entityBOList EntityBO collection
+     * @return EntityVO collection
      */
     List<DictionaryVO> buildVOListByBOList(List<DictionaryBO> entityBOList);
 

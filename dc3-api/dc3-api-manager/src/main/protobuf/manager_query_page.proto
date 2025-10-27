@@ -30,101 +30,101 @@ option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
 /*PageDriverQuery*/
-// 驱动分页查询结构体，用于分页查询驱动信息
+// Driver pagination query structure, used for paginated query of driver information
 message GrpcPageDriverQuery {
   /*
   Page
-  分页信息，包含页码、页大小、总数等
+  Pagination information, including page number, page size, total count, etc.
   */
   GrpcPage page = 1;
 
   /*
-  租户ID
-  标识所属租户
+  Tenant ID
+  Identifies the tenant
   */
   int64 tenant_id = 2;
 
   /*
-  查询字段
-  用于驱动信息查询的过滤条件
+  Query fields
+  Filter conditions for driver information query
    */
-  string driver_name = 3; // 驱动名称，用于模糊查询
-  string driver_code = 4; // 驱动编号，唯一标识
-  string service_name = 5; // 驱动服务名称，标识服务类型
-  string service_host = 6; // 服务主机，标识服务部署位置
-  int32 driver_type_flag = 7; // 驱动类型标识，区分不同类型的驱动
-  int32 enable_flag = 8; // 启用标识，1为启用，0为禁用
-  int32 version = 9; // 版本号，用于版本管理
+  string driver_name = 3; // Driver name for fuzzy query
+  string driver_code = 4; // Driver code, unique identifier
+  string service_name = 5; // Driver service name, identifies service type
+  string service_host = 6; // Service host, identifies service deployment location
+  int32 driver_type_flag = 7; // Driver type flag, distinguishes different types of drivers
+  int32 enable_flag = 8; // Enable flag, 1 for enabled, 0 for disabled
+  int32 version = 9; // Version number for version management
 }
 
 /*PagePointQuery*/
-// 点位分页查询结构体，用于分页查询点位信息
+// Point pagination query structure, used for paginated query of point information
 message GrpcPagePointQuery {
   /*
   Page
-  分页信息，包含页码、页大小、总数等
+  Pagination information, including page number, page size, total count, etc.
   */
   GrpcPage page = 1;
 
   /*
-  租户ID
-  标识所属租户
+  Tenant ID
+  Identifies the tenant
   */
   int64 tenant_id = 2;
 
   /*
-  查询字段
-  用于点位信息查询的过滤条件
+  Query fields
+  Filter conditions for point information query
    */
-  string point_name = 3; // 点位名称，用于模糊查询
-  string point_code = 4; // 点位编号，唯一标识
-  int32 point_type_flag = 5; // 点位类型标识，区分不同类型的点位
-  int32 rw_flag = 6; // 读写标识，标识点位的读写权限
-  int64 profile_id = 7; // 配置模板ID，关联配置模板
-  int64 group_id = 8; // 分组ID，用于点位分组管理
-  int32 enable_flag = 9; // 启用标识，1为启用，0为禁用
-  int32 version = 10; // 版本号，用于版本管理
+  string point_name = 3; // Point name for fuzzy query
+  string point_code = 4; // Point code, unique identifier
+  int32 point_type_flag = 5; // Point type flag, distinguishes different types of points
+  int32 rw_flag = 6; // Read/write flag, indicates point read/write permissions
+  int64 profile_id = 7; // Profile template ID, associates configuration template
+  int64 group_id = 8; // Group ID for point group management
+  int32 enable_flag = 9; // Enable flag, 1 for enabled, 0 for disabled
+  int32 version = 10; // Version number for version management
 
   /*
-  附加字段
-  额外的查询条件
+  Additional fields
+  Extra query conditions
    */
-  int64 device_id = 11; // 设备ID，用于查询特定设备下的点位
+  int64 device_id = 11; // Device ID for querying points under specific device
 }
 
 /*
 Device Page Query
-设备分页查询结构体，用于分页查询设备信息
+Device pagination query structure, used for paginated query of device information
 */
 message GrpcPageDeviceQuery {
   /*
   Page
-  分页信息，包含页码、页大小、总数等
+  Pagination information, including page number, page size, total count, etc.
   */
   GrpcPage page = 1;
 
   /*
-  租户ID
-  标识所属租户
+  Tenant ID
+  Identifies the tenant
   */
   int64 tenant_id = 2;
 
   /*
-  查询字段
-  用于设备信息查询的过滤条件
+  Query fields
+  Filter conditions for device information query
    */
-  string device_name = 3; // 设备名称，用于模糊查询
-  string device_code = 4; // 设备编号，唯一标识
-  int64 driver_id = 5; // 驱动ID，关联设备所属的驱动
-  int64 group_id = 6; // 分组ID，用于设备分组管理
-  int32 enable_flag = 7; // 启用标识，1为启用，0为禁用
-  int32 version = 8; // 版本号，用于版本管理
+  string device_name = 3; // Device name for fuzzy query
+  string device_code = 4; // Device code, unique identifier
+  int64 driver_id = 5; // Driver ID, associates device with driver
+  int64 group_id = 6; // Group ID for device group management
+  int32 enable_flag = 7; // Enable flag, 1 for enabled, 0 for disabled
+  int32 version = 8; // Version number for version management
 
   /*
-  附加字段
-  额外的查询条件
+  Additional fields
+  Extra query conditions
    */
-  int64 profile_id = 9; // 配置模板ID，用于查询特定模板下的设备
+  int64 profile_id = 9; // Profile template ID for querying devices under specific template
 }
 
 
