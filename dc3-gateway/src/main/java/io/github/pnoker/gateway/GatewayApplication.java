@@ -21,9 +21,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * 网关中心服务启动入口
+ * Gateway Service Application Entry
  * <p>
- * 该类是网关中心服务的启动类, 负责初始化并启动Spring Boot应用。
+ * This class serves as the entry point for the Gateway Service, responsible for initializing and launching the Spring Boot application.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,9 +33,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class GatewayApplication {
 
     /**
-     * 主方法, 启动Spring Boot应用
+     * Main method to launch Spring Boot application
      *
-     * @param args 命令行参数
+     * @param args Command line arguments
      */
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);

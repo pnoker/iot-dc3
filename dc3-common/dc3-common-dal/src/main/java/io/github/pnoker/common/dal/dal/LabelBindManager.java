@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.model.LabelBindDO;
 
 /**
  * <p>
- * 标签与实体的绑定表 服务类
+ * Label Bind Manager Service implementation class
  * </p>
  *
  * @author pnoker

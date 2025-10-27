@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 分组表 服务实现类
+ * Group Manager Service implementation class
  * </p>
  *
  * @author pnoker

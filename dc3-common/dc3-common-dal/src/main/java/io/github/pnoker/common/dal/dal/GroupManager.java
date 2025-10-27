@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.model.GroupDO;
 
 /**
  * <p>
- * 分组表 服务类
+ * Group Manager Service implementation class
  * </p>
  *
  * @author pnoker

@@ -56,8 +56,8 @@ public interface LabelBuilder {
     /**
      * VOList to BOList
      *
-     * @param entityVOList EntityVO 集合
-     * @return EntityBO 集合
+     * @param entityVOList EntityVO collection
+     * @return EntityBO collection
      */
     List<LabelBO> buildBOListByVOList(List<LabelVO> entityVOList);
 
@@ -72,8 +72,8 @@ public interface LabelBuilder {
     /**
      * BOList to VOList
      *
-     * @param entityBOList EntityBO 集合
-     * @return EntityVO 集合
+     * @param entityBOList EntityBO collection
+     * @return EntityVO collection
      */
     List<LabelVO> buildVOListByBOList(List<LabelBO> entityBOList);
 

@@ -56,8 +56,8 @@ public interface GroupBuilder {
     /**
      * VOList to BOList
      *
-     * @param entityVOList EntityVO 集合
-     * @return EntityBO 集合
+     * @param entityVOList EntityVO collection
+     * @return EntityBO collection
      */
     List<GroupBO> buildBOListByVOList(List<GroupVO> entityVOList);
 
@@ -72,8 +72,8 @@ public interface GroupBuilder {
     /**
      * BOList to VOList
      *
-     * @param entityBOList EntityBO 集合
-     * @return EntityVO 集合
+     * @param entityBOList EntityBO collection
+     * @return EntityVO collection
      */
     List<GroupVO> buildVOListByBOList(List<GroupBO> entityBOList);
 

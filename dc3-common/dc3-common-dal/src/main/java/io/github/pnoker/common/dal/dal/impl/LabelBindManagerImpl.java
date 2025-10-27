@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 标签与实体的绑定表 服务实现类
+ * Label Bind Manager Service implementation class
  * </p>
  *
  * @author pnoker

@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.model.LabelDO;
 
 /**
  * <p>
- * 标签表 服务类
+ * Label Manager Service implementation class
  * </p>
  *
  * @author pnoker

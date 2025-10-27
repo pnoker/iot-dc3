@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 驱动属性表 服务实现类
+ * Driver Attribute Manager Service implementation class
  * </p>
  *
  * @author pnoker

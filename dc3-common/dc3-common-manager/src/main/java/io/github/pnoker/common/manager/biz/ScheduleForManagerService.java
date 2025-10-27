@@ -24,7 +24,7 @@ package io.github.pnoker.common.manager.biz;
  */
 public interface ScheduleForManagerService {
     /**
-     * 初始化调度任务
+     * Initialize the scheduling task for manager
      */
     void initial();
 }
