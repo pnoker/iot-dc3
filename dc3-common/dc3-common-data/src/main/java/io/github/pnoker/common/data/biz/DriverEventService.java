@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.biz;
 import io.github.pnoker.common.entity.dto.DriverEventDTO;
 
 /**
- * 驱动事件相关接口
+ * Interface for driver-related events
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,7 +29,7 @@ import io.github.pnoker.common.entity.dto.DriverEventDTO;
 public interface DriverEventService {
 
     /**
-     * 驱动心跳事件
+     * Driver heartbeat event
      *
      * @param entityDTO DriverEventDTO
      */

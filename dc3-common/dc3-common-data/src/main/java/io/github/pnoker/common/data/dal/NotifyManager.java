@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.NotifyDO;
 
 /**
  * <p>
- * 通知表 服务类
+ * Notify table service class
  * </p>
  *
  * @author pnoker

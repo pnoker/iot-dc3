@@ -38,19 +38,45 @@ message GrpcDriverDTO {
   */
   GrpcBase base = 1;
 
-  /*驱动名称*/
+  /*
+  Driver name
+  */
   string driver_name = 2;
-  string driver_code = 3; // 驱动编号
-  string service_name = 4; // 驱动服务名称
-  string service_host = 5; // 服务主机
-  int32 driver_type_flag = 6; // 驱动类型标识
-  string driver_ext = 7; // 驱动拓展信息
-  int32 enable_flag = 8; // 使能标识
-  string signature = 9; // 签名
-  int32 version = 10; // 版本
+  /*
+  Driver code
+  */
+  string driver_code = 3;
+  /*
+  Driver service name
+  */
+  string service_name = 4;
+  /*
+  Service host
+  */
+  string service_host = 5;
+  /*
+  Driver type flag
+  */
+  int32 driver_type_flag = 6;
+  /*
+  Driver extension info
+  */
+  string driver_ext = 7;
+  /*
+  Enable flag
+  */
+  int32 enable_flag = 8;
+  /*
+  Signature
+  */
+  string signature = 9;
+  /*
+  Version
+  */
+  int32 version = 10;
 
   /*
-  租户ID
+  Tenant ID
   */
   int64 tenant_id = 11;
 }
@@ -64,21 +90,45 @@ message GrpcDeviceDTO {
   */
   GrpcBase base = 1;
 
-  string device_name = 2; // 位号名称
-  string device_code = 3; // 位号编号
-  int64 driver_id = 4; // 驱动ID
-  string device_ext = 5; // 设备拓展信息
-  int32 enable_flag = 6; // 使能标识
-  string signature = 7; // 签名
-  int32 version = 8; // 版本
-
   /*
-  附加字段
+  Device name
   */
-  repeated int64 profile_ids = 9; // 模版ID集
+  string device_name = 2;
+  /*
+  Device code
+  */
+  string device_code = 3;
+  /*
+  Driver ID
+  */
+  int64 driver_id = 4;
+  /*
+  Device extension info
+  */
+  string device_ext = 5;
+  /*
+  Enable flag
+  */
+  int32 enable_flag = 6;
+  /*
+  Signature
+  */
+  string signature = 7;
+  /*
+  Version
+  */
+  int32 version = 8;
 
   /*
-  租户ID
+  Additional fields
+  */
+  repeated int64 profile_ids = 9;
+  /*
+  Profile ID set
+  */
+
+  /*
+  Tenant ID
   */
   int64 tenant_id = 10;
 }
@@ -92,22 +142,61 @@ message GrpcPointDTO {
   */
   GrpcBase base = 1;
 
-  string point_name = 2; // 位号名称
-  string point_code = 3; // 位号编号
-  int32 point_type_flag = 4; // 位号类型标识
-  int32 rw_flag = 5; // 读写标识
-  double base_value = 6; // 基础值
-  double multiple = 7; // 比例系数
-  int32 value_decimal = 8; // 数据精度
-  string unit = 9; // 单位
-  int64 profile_id = 10; // 模板ID
-  string point_ext = 11; // 位号拓展信息
-  int32 enable_flag = 12; // 使能标识
-  string signature = 13; // 签名
-  int32 version = 14; // 版本
+  /*
+  Point name
+  */
+  string point_name = 2;
+  /*
+  Point code
+  */
+  string point_code = 3;
+  /*
+  Point type flag
+  */
+  int32 point_type_flag = 4;
+  /*
+  Read-write flag
+  */
+  int32 rw_flag = 5;
+  /*
+  Base value
+  */
+  double base_value = 6;
+  /*
+  Scale factor
+  */
+  double multiple = 7;
+  /*
+  Data precision
+  */
+  int32 value_decimal = 8;
+  /*
+  Unit
+  */
+  string unit = 9;
+  /*
+  Profile ID
+  */
+  int64 profile_id = 10;
+  /*
+  Point extension info
+  */
+  string point_ext = 11;
+  /*
+  Enable flag
+  */
+  int32 enable_flag = 12;
+  /*
+  Signature
+  */
+  string signature = 13;
+  /*
+  Version
+  */
+  int32 version = 14;
 
   /*
-  租户ID
+  Tenant ID
   */
   int64 tenant_id = 15;
 }
@@ -121,24 +210,51 @@ message GrpcDriverAttributeDTO {
   */
   GrpcBase base = 1;
 
-  string attribute_name = 2; // 属性名称
-  string attribute_code = 3; // 属性编号
-  int32 attribute_type_flag = 4; // 属性类型标识
-  string default_value = 5; // 默认值
-  int64 driver_id = 6; // 驱动ID
-  string attribute_ext = 7; // 驱动属性拓展信息
-  int32 enable_flag = 8; // 使能标识
-  string signature = 9; // 签名
-  int32 version = 10; // 版本
+  /*
+  Attribute name
+  */
+  string attribute_name = 2;
+  /*
+  Attribute code
+  */
+  string attribute_code = 3;
+  /*
+  Attribute type flag
+  */
+  int32 attribute_type_flag = 4;
+  /*
+  Default value
+  */
+  string default_value = 5;
+  /*
+  Driver ID
+  */
+  int64 driver_id = 6;
+  /*
+  Driver attribute extension info
+  */
+  string attribute_ext = 7;
+  /*
+  Enable flag
+  */
+  int32 enable_flag = 8;
+  /*
+  Signature
+  */
+  string signature = 9;
+  /*
+  Version
+  */
+  int32 version = 10;
 
   /*
-  租户ID
+  Tenant ID
   */
   int64 tenant_id = 11;
 }
 
 /*
-驱动属性配置
+Driver attribute config
 */
 message GrpcDriverAttributeConfigDTO {
   /*
@@ -146,15 +262,38 @@ message GrpcDriverAttributeConfigDTO {
   */
   GrpcBase base = 1;
 
-  int64 attribute_id = 2; // 驱动属性ID
-  string config_value = 3; // 驱动配置值
-  int64 device_id = 4; // 设备ID
-  int32 enable_flag = 5; // 使能标识
-  string signature = 6; // 签名
-  int32 version = 7; // 版本
+  /*
+  Driver attribute ID
+  */
+  int64 attribute_id = 2;
 
   /*
-  租户ID
+  Driver config value
+  */
+  string config_value = 3;
+
+  /*
+  Device ID
+  */
+  int64 device_id = 4;
+
+  /*
+  Enable flag
+  */
+  int32 enable_flag = 5;
+
+  /*
+  Signature
+  */
+  string signature = 6;
+
+  /*
+  Version
+  */
+  int32 version = 7;
+
+  /*
+  Tenant ID
   */
   int64 tenant_id = 8;
 }
@@ -168,24 +307,59 @@ message GrpcPointAttributeDTO {
   */
   GrpcBase base = 1;
 
-  string attribute_name = 2; // 属性名称
-  string attribute_code = 3; // 属性编号
-  int32 attribute_type_flag = 4; // 属性类型标识
-  string default_value = 5; // 默认值
-  int64 driver_id = 6; // 驱动ID
-  string attribute_ext = 7; // 驱动属性拓展信息
-  int32 enable_flag = 8; // 使能标识
-  string signature = 9; // 签名
-  int32 version = 10; // 版本
+  /*
+  Attribute name
+  */
+  string attribute_name = 2;
 
   /*
-  租户ID
+  Attribute code
+  */
+  string attribute_code = 3;
+
+  /*
+  Attribute type flag
+  */
+  int32 attribute_type_flag = 4;
+
+  /*
+  Default value
+  */
+  string default_value = 5;
+
+  /*
+  Driver ID
+  */
+  int64 driver_id = 6;
+
+  /*
+  Point attribute extension info
+  */
+  string attribute_ext = 7;
+
+  /*
+  Enable flag
+  */
+  int32 enable_flag = 8;
+
+  /*
+  Signature
+  */
+  string signature = 9;
+
+  /*
+  Version
+  */
+  int32 version = 10;
+
+  /*
+  Tenant ID
   */
   int64 tenant_id = 11;
 }
 
 /*
-位号属性配置
+Point attribute config
 */
 message GrpcPointAttributeConfigDTO {
   /*
@@ -193,16 +367,43 @@ message GrpcPointAttributeConfigDTO {
   */
   GrpcBase base = 1;
 
-  int64 attribute_id = 2; // 位号属性ID
-  string config_value = 3; // 位号配置值
-  int64 device_id = 4; // 设备ID
-  int64 point_id = 5; // 位号ID
-  int32 enable_flag = 6; // 使能标识
-  string signature = 7; // 签名
-  int32 version = 8; // 版本
+  /*
+  Point attribute ID
+  */
+  int64 attribute_id = 2;
 
   /*
-  租户ID
+  Point config value
+  */
+  string config_value = 3;
+
+  /*
+  Device ID
+  */
+  int64 device_id = 4;
+
+  /*
+  Point ID
+  */
+  int64 point_id = 5;
+
+  /*
+  Enable flag
+  */
+  int32 enable_flag = 6;
+
+  /*
+  Signature
+  */
+  string signature = 7;
+
+  /*
+  Version
+  */
+  int32 version = 8;
+
+  /*
+  Tenant ID
   */
   int64 tenant_id = 9;
 }

@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 设备位号历史数据表(Integer类型) 服务实现类
+ * Point value int table service class
  * </p>
  *
  * @author pnoker

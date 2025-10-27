@@ -53,7 +53,7 @@ public class RedisCacheConfig implements CachingConfigurer {
     private Duration timeToLive;
 
     /**
-     * 自定义缓存 Key 生成策略
+     * Custom cache key generator strategy
      *
      * @return KeyGenerator
      */
@@ -63,7 +63,7 @@ public class RedisCacheConfig implements CachingConfigurer {
     }
 
     /**
-     * 自定义缓存 Key 生成策略
+     * Custom cache key generator strategy
      *
      * @return KeyGenerator
      */
@@ -85,17 +85,17 @@ public class RedisCacheConfig implements CachingConfigurer {
     }
 
     /**
-     * 自定义 RedisCacheManager 类, 主要是设置序列化, 解决乱码问题
+     * Custom RedisCacheManager class, mainly for setting serialization to solve character encoding issues
      *
      * @return CacheManager
      */
     @Bean
     @Override
     public CacheManager cacheManager() {
-        // 配置 ObjectMapper
+        // Configure ObjectMapper
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(JsonUtil.getJsonMapper(), Object.class);
 
-        // 配置 Key & Value 序列化
+        // Configure Key & Value serialization
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))

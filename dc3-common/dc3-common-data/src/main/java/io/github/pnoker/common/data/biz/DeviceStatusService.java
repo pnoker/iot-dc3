@@ -23,7 +23,7 @@ import io.github.pnoker.common.data.entity.query.DeviceQuery;
 import java.util.Map;
 
 /**
- * 设备 Interface
+ * Interface for device status-related operations
  *
  * @author pnoker
  * @version 2025.9.0
@@ -32,18 +32,18 @@ import java.util.Map;
 public interface DeviceStatusService {
 
     /**
-     * 分页查询设备状态, 同设备分页查询配套使用
+     * Paged query of device status, used in conjunction with paged query of devices
      *
-     * @param deviceQuery 设备和分页参数
-     * @return Map String:String
+     * @param deviceQuery DeviceQuery, including pagination parameters
+     * @return Map Long:String, where Long is the device ID and String is the device status
      */
     Map<Long, String> selectByPage(DeviceQuery deviceQuery);
 
     /**
-     * 根据 模板ID 查询设备状态
+     * Query device status by profile ID
      *
-     * @param profileId 位号ID
-     * @return Map String:String
+     * @param profileId Profile ID
+     * @return Map Long:String, where Long is the device ID and String is the device status
      */
     Map<Long, String> selectByProfileId(Long profileId);
 

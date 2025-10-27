@@ -23,7 +23,7 @@ import io.github.pnoker.common.data.entity.model.PointValueDO;
 
 /**
  * <p>
- * 设备位号历史数据表(默认数据表, String类型) 服务类
+ * Point value table service class
  * </p>
  *
  * @author pnoker

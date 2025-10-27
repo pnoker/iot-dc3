@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 /**
- * 设备 Controller
+ * Device Status Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -53,7 +53,7 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * 查询设备状态
+     * Query device statuses
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
      * @param deviceQuery Device Dto
@@ -74,10 +74,10 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * 根据 驱动ID 查询设备状态
+     * Query device statuses by driver ID
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
-     * @param driverId 驱动ID
+     * @param driverId Driver ID
      * @return Map String:String
      */
     @GetMapping("/device/driver_id/{driverId}")
@@ -94,10 +94,10 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * 根据 模板ID 查询设备状态
+     * Query device statuses by profile ID
      * ONLINE, OFFLINE, MAINTAIN, FAULT
      *
-     * @param profileId 位号ID
+     * @param profileId Profile ID
      * @return Map String:String
      */
     @GetMapping("/device/profile_id/{profileId}")
@@ -112,10 +112,10 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * 查询 device 在线总时长
+     * Query device online total duration
      *
-     * @param deviceId
-     * @return
+     * @param deviceId Device ID
+     * @return DeviceRunVO
      */
     @GetMapping("/deviceOnline/{deviceId}")
     public Mono<R<DeviceRunVO>> selectOnlineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
@@ -130,10 +130,10 @@ public class DeviceStatusController implements BaseController {
     }
 
     /**
-     * 查询 device 离线总时长
+     * Query device offline total duration
      *
-     * @param deviceId
-     * @return
+     * @param deviceId Device ID
+     * @return DeviceRunVO
      */
     @GetMapping("/deviceOffline/{deviceId}")
     public Mono<R<DeviceRunVO>> selectOfflineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {

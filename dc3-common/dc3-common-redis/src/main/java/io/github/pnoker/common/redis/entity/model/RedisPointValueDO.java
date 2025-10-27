@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Redis 位号数据
+ * Redis Point Value Entity
  *
  * @author pnoker
  * @version 2025.9.0
@@ -41,37 +41,37 @@ public class RedisPointValueDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 
     /**
-     * 位号ID
+     * Point ID
      */
     private Long pointId;
 
     /**
-     * 原始值
+     * Raw Value
      */
     private String rawValue;
 
     /**
-     * 处理值
+     * Calculated Value
      */
     private String calValue;
 
     /**
-     * 驱动ID
+     * Driver ID
      */
     private Long driverId;
 
     /**
-     * 创建时间
+     * Create Time
      */
     private LocalDateTime createTime;
 
     /**
-     * 操作时间
+     * Operate Time
      */
     private LocalDateTime operateTime;
 }

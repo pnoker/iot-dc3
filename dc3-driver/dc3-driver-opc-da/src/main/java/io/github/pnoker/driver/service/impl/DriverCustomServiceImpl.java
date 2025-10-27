@@ -77,10 +77,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         /*
-         * 驱动初始化逻辑
+         * Driver initialization logic
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 驱动启动时会自动执行该方法, 您可以在此处执行特定的初始化操作。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * This method is automatically executed when the driver starts, and you can perform specific initialization operations here.
          *
          */
         connectMap = new ConcurrentHashMap<>(16);
@@ -89,22 +89,22 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void schedule() {
         /*
-         * 设备状态上传逻辑
+         * Device status upload logic
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 设备状态的上传可以根据具体需求灵活实现, 以下是一些常见的实现方式：
-         * - 在 `read` 方法中根据读取的数据判断设备状态；
-         * - 在自定义的定时任务中定期检查设备状态；
-         * - 根据特定的业务逻辑或事件触发设备状态的判断。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * Device status upload can be flexibly implemented based on specific requirements. Here are some common approaches:
+         * - Determine device status based on read data in the `read` method;
+         * - Periodically check device status in a custom scheduled task;
+         * - Trigger device status judgment based on specific business logic or events.
          *
-         * 最终通过 {@link DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} 接口将设备状态提交给 SDK 管理。
-         * 设备状态枚举 {@link DeviceStatusEnum} 包含以下状态：
-         * - ONLINE: 设备在线
-         * - OFFLINE: 设备离线
-         * - MAINTAIN: 设备维护中
-         * - FAULT: 设备故障
+         * Finally, submit the device status to the SDK management through the {@link DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} interface.
+         * The device status enumeration {@link DeviceStatusEnum} includes the following states:
+         * - ONLINE: Device online
+         * - OFFLINE: Device offline
+         * - MAINTAIN: Device under maintenance
+         * - FAULT: Device fault
          *
-         * 在以下示例中, 所有设备的状态被设置为 {@link DeviceStatusEnum#ONLINE}, 并设置状态的有效期为 25 {@link TimeUnit#SECONDS}。
+         * In the following example, all devices are set to {@link DeviceStatusEnum#ONLINE}, with a status validity period of 25 {@link TimeUnit#SECONDS}.
          */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }

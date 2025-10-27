@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.RuleDO;
 
 /**
  * <p>
- * 规则表 服务类
+ * Rule table service class
  * </p>
  *
  * @author pnoker

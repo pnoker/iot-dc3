@@ -18,13 +18,15 @@
 package io.github.pnoker.common.data.biz;
 
 /**
+ * Interface for schedule for data-related operations
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
 public interface ScheduleForDataService {
     /**
-     * 初始化调度任务
+     * Initialize schedule tasks for data processing
      */
     void initial();
 }

@@ -148,10 +148,10 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     }
 
     /**
-     * 获取设备状态 Map
+     * Get a map of device statuses
      *
      * @param devices GrpcDeviceDTO Array
-     * @return 状态 Map
+     * @return Status Map
      */
     private Map<Long, String> getStatusMap(List<GrpcDeviceDTO> devices) {
         Map<Long, String> statusMap = new HashMap<>(16);

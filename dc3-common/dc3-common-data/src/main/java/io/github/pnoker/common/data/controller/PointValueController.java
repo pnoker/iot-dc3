@@ -55,10 +55,10 @@ public class PointValueController implements BaseController {
     }
 
     /**
-     * 分页查询 最新 PointValue
+     * Query the latest PointValue for each point in the device
      *
-     * @param entityQuery 位号值和分页参数
-     * @return 带分页的 {@link PointValueBO}
+     * @param entityQuery PointValueQuery, including pagination parameters
+     * @return Page of PointValueVO, where each PointValueVO contains the latest value for a point in the device
      */
     @PostMapping("/latest")
     public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
@@ -77,10 +77,10 @@ public class PointValueController implements BaseController {
     }
 
     /**
-     * 分页查询 历史 PointValue
+     * Query the historical PointValue for each point in the device
      *
-     * @param entityQuery 位号值和分页参数
-     * @return 带分页的 {@link PointValueBO}
+     * @param entityQuery PointValueQuery, including pagination parameters
+     * @return Page of PointValueVO, where each PointValueVO contains the historical value for a point in the device
      */
     @PostMapping("/list")
     public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
@@ -98,11 +98,11 @@ public class PointValueController implements BaseController {
     }
 
     /**
-     * 查询位号 PointValue 历史
+     * Query the historical PointValue for a specific point in the device
      *
-     * @param deviceId 设备ID
-     * @param pointId  位号ID
-     * @return 带分页的 {@link PointValueBO}
+     * @param deviceId Device ID
+     * @param pointId  Point ID
+     * @return List of String, where each String is the historical value for the point
      */
     @GetMapping("/history/device_id/{deviceId}/point_id/{pointId}")
     public Mono<R<List<String>>> history(

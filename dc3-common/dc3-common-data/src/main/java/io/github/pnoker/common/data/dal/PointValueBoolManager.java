@@ -23,7 +23,7 @@ import io.github.pnoker.common.data.entity.model.PointValueBoolDO;
 
 /**
  * <p>
- * 设备位号历史数据表(Boolean类型) 服务类
+ * Point value boolean table service class
  * </p>
  *
  * @author pnoker
