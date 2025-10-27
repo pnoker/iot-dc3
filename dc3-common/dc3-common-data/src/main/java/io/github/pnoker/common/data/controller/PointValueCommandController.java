@@ -50,7 +50,7 @@ public class PointValueCommandController implements BaseController {
     }
 
     /**
-     * 读指令
+     * Read instruction
      *
      * @param entityVO PointValueReadVO
      * @return PointValue
@@ -67,7 +67,7 @@ public class PointValueCommandController implements BaseController {
     }
 
     /**
-     * 写指令
+     * Write instruction
      *
      * @param entityVO PointValueWriteVO
      * @return PointValue

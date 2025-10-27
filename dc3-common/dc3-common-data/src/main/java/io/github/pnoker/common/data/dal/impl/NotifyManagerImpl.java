@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 通知表 服务实现类
+ * Notify table service class
  * </p>
  *
  * @author pnoker

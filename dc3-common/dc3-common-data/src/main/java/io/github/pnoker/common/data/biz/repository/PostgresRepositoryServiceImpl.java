@@ -114,7 +114,7 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     /**
-     * 构造模糊查询
+     * Construct a fuzzy query wrapper for point value retrieval
      *
      * @param entityQuery {@link PointValueQuery}
      * @return {@link LambdaQueryWrapper}

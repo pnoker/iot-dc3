@@ -23,7 +23,7 @@ import io.github.pnoker.common.data.entity.model.PointValueDoubleDO;
 
 /**
  * <p>
- * 设备位号历史数据表(Double类型) 服务类
+ * Point value double table service class
  * </p>
  *
  * @author pnoker

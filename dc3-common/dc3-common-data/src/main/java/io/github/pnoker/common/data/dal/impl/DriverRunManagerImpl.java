@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 驱动运行时长历史表 服务实现类
+ * Driver run history table service class
  * </p>
  *
  * @author pnoker

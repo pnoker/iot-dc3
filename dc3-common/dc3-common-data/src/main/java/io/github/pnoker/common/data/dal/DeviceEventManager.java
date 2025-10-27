@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.DeviceEventDO;
 
 /**
  * <p>
- * 设备事件表 服务类
+ * Device event table service class
  * </p>
  *
  * @author pnoker

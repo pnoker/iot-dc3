@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Redis  Util
+ * Redis Util
  *
  * @author pnoker
  * @version 2025.9.0
@@ -47,7 +47,7 @@ public class RedisService {
     private RedisTemplate redisTemplate;
 
     /**
-     * 添加 Key 缓存
+     * Add key cache
      *
      * @param key   String key
      * @param value Object
@@ -58,7 +58,7 @@ public class RedisService {
     }
 
     /**
-     * 添加 Key 缓存,并设置失效时间
+     * Add key cache with expiration time
      *
      * @param key   String key
      * @param value Object
@@ -70,9 +70,8 @@ public class RedisService {
         redisTemplate.opsForValue().set(key, value, time, unit);
     }
 
-
     /**
-     * 批量添加 Key 缓存
+     * Batch add key cache
      *
      * @param valuesMap Map String:Object
      * @param <T>       Value Type
@@ -82,7 +81,7 @@ public class RedisService {
     }
 
     /**
-     * 批量添加 Key 缓存,并设置失效时间
+     * Batch add key cache with expiration time
      *
      * @param valueMap     Map String:Object
      * @param expireMillis Map String:Long
@@ -94,7 +93,7 @@ public class RedisService {
     }
 
     /**
-     * 获取 Key 缓存
+     * Get key cache
      *
      * @param key String key
      * @param <T> Value Type
@@ -106,7 +105,7 @@ public class RedisService {
     }
 
     /**
-     * 批量获取 Key 缓存值
+     * Batch get key cache values
      *
      * @param keys String key array
      * @param <T>  Value Type
@@ -118,18 +117,17 @@ public class RedisService {
     }
 
     /**
-     * 判断 Key 是否存在
+     * Check if key exists
      *
      * @param key String key
      * @return boolean
      */
     public boolean hasKey(String key) {
-        Boolean hasKey = redisTemplate.hasKey(key);
-        return Boolean.TRUE.equals(hasKey);
+        return redisTemplate.hasKey(key);
     }
 
     /**
-     * 批量获取 Key 缓存
+     * Get keys by pattern
      *
      * @param pattern Key pattern
      * @return Key Set
@@ -139,7 +137,7 @@ public class RedisService {
     }
 
     /**
-     * 删除 Key 缓存
+     * Delete key cache
      *
      * @param key Key
      */
@@ -148,7 +146,7 @@ public class RedisService {
     }
 
     /**
-     * 批量删除 Key 缓存
+     * Batch delete key cache
      *
      * @param keys Key Array
      */
@@ -157,7 +155,7 @@ public class RedisService {
     }
 
     /**
-     * 指定键值失效时间
+     * Set key expiration time
      *
      * @param key  String key
      * @param time Time
@@ -170,7 +168,7 @@ public class RedisService {
     }
 
     /**
-     * 批量指定键值失效时间
+     * Batch set key expiration time
      *
      * @param expireMillis Map String:Long
      */
@@ -181,7 +179,7 @@ public class RedisService {
                 expireMillis.forEach((key, expire) -> {
                     byte[] serialize = stringRedisSerializer.serialize(key);
                     if (null != serialize) {
-                        connection.pExpire(serialize, expire);
+                        connection.commands().pExpire(serialize, expire);
                     }
                 });
                 return null;
@@ -190,7 +188,7 @@ public class RedisService {
     }
 
     /**
-     * 指定键值在指定时间失效
+     * Set key to expire at specific date
      *
      * @param key  String key
      * @param date Date
@@ -203,18 +201,13 @@ public class RedisService {
     }
 
     /**
-     * 获取 Key 失效时间
+     * Get key expiration time
      *
      * @param key  String key
      * @param unit TimeUnit
-     * @return 剩余失效时长
+     * @return Remaining expiration time
      */
     public long getExpire(String key, TimeUnit unit) {
-        Long expire = redisTemplate.getExpire(key, unit);
-        if (null != expire) {
-            return expire;
-        }
-        return 0L;
+        return redisTemplate.getExpire(key, unit);
     }
-
 }

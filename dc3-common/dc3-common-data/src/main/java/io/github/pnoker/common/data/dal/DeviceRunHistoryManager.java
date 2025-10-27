@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.DeviceRunHistoryDO;
 
 /**
  * <p>
- * 设备运行时长历史表 服务类
+ * Device run history table service class
  * </p>
  *
  * @author pnoker

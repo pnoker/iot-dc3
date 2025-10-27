@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * 数据存储策略服务接口
+ * Data Storage Strategy Service Interface
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,14 +35,14 @@ import java.util.List;
 public interface RepositoryService {
 
     /**
-     * 获取存储策略服务名称
+     * Get repository service name
      *
      * @return Repository Name
      */
     String getRepositoryName();
 
     /**
-     * 保存 PointValue
+     * Save PointValue
      *
      * @param entityBO PointValue
      * @throws IOException IOException
@@ -50,7 +50,7 @@ public interface RepositoryService {
     void savePointValue(PointValueBO entityBO) throws IOException;
 
     /**
-     * 保存 PointValue 集合
+     * Save PointValue list
      *
      * @param entityBOList PointValue Array
      * @throws IOException IOException
@@ -58,35 +58,35 @@ public interface RepositoryService {
     void savePointValues(List<PointValueBO> entityBOList) throws IOException;
 
     /**
-     * 获取历史 PointValue
+     * Get historical PointValue
      *
-     * @param deviceId 设备ID
-     * @param pointId  位号ID
-     * @param count    数量
+     * @param deviceId Device ID
+     * @param pointId  Point ID
+     * @param count    Count
      * @return History Value Array
      */
     List<String> selectHistoryPointValue(Long deviceId, Long pointId, int count);
 
     /**
-     * 查询最新 PointValue
+     * Query latest PointValue
      *
-     * @param deviceId 设备ID
-     * @param pointId  位号ID
+     * @param deviceId Device ID
+     * @param pointId  Point ID
      * @return PointValueBO Array
      */
     PointValueBO selectLatestPointValue(Long deviceId, Long pointId);
 
     /**
-     * 查询最新 PointValue
+     * Query latest PointValue list
      *
-     * @param deviceId 设备ID
-     * @param pointIds 位号ID集
+     * @param deviceId Device ID
+     * @param pointIds Point ID list
      * @return PointValueBO Array
      */
     List<PointValueBO> selectLatestPointValues(Long deviceId, List<Long> pointIds);
 
     /**
-     * 分页查询 PointValue
+     * Page query PointValue
      *
      * @param entityQuery Entry of Query
      * @return Entity of BO Page

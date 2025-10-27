@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.DriverEventDO;
 
 /**
  * <p>
- * 驱动事件表 服务类
+ * Driver event table service class
  * </p>
  *
  * @author pnoker

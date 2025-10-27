@@ -24,7 +24,7 @@ import io.github.pnoker.common.data.entity.query.DriverQuery;
 import java.util.Map;
 
 /**
- * 设备 Interface
+ * Interface for driver status-related operations
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,18 +33,42 @@ import java.util.Map;
 public interface DriverStatusService {
 
     /**
-     * 分页查询驱动状态, 同驱动分页查询配套使用
+     * Paged query of driver status, used in conjunction with paged query of drivers
      *
-     * @param driverQuery 驱动和分页参数
-     * @return Map String:String
+     * @param driverQuery DriverQuery, including pagination parameters
+     * @return Map Long:String, where Long is the driver ID and String is the driver status
      */
     Map<Long, String> selectByPage(DriverQuery driverQuery);
 
+    /**
+     * Query driver status by driver ID
+     *
+     * @param driverId Driver ID
+     * @return DriverRunBO, including driver status
+     */
     DriverRunBO selectOnlineByDriverId(Long driverId);
 
+    /**
+     * Query driver status by driver ID
+     *
+     * @param driverId Driver ID
+     * @return DriverRunBO, including driver status
+     */
     DriverRunBO selectOfflineByDriverId(Long driverId);
 
+    /**
+     * Query device status by driver ID
+     *
+     * @param driverId Driver ID
+     * @return String, device status
+     */
     String getDeviceOnlineByDriverId(Long driverId);
 
+    /**
+     * Query device status by driver ID
+     *
+     * @param driverId Driver ID
+     * @return String, device status
+     */
     String getDeviceOfflineByDriverId(Long driverId);
 }

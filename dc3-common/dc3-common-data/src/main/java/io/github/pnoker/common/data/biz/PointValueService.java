@@ -24,6 +24,8 @@ import io.github.pnoker.common.entity.query.PointValueQuery;
 import java.util.List;
 
 /**
+ * Interface for point value-related operations
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -31,31 +33,31 @@ import java.util.List;
 public interface PointValueService {
 
     /**
-     * 新增 PointValue
+     * Save point value
      *
      * @param pointValueBO PointValue
      */
     void save(PointValueBO pointValueBO);
 
     /**
-     * 批量新增 PointValue
+     * Batch save point values
      *
      * @param pointValueBOList Array
      */
     void save(List<PointValueBO> pointValueBOList);
 
     /**
-     * 获取历史 PointValue
+     * Get historical point values
      *
-     * @param deviceId 设备ID
-     * @param pointId  位号ID
-     * @param count    数量
+     * @param deviceId Device ID
+     * @param pointId  Point ID
+     * @param count    Number of values to retrieve
      * @return History Value Array
      */
     List<String> history(Long deviceId, Long pointId, int count);
 
     /**
-     * 获取带分页, 排序 最新 PointValue
+     * Get latest point values with pagination and sorting
      *
      * @param pointValueQuery Entry of Query
      * @return Entity of BO Page
@@ -63,7 +65,7 @@ public interface PointValueService {
     Page<PointValueBO> latest(PointValueQuery pointValueQuery);
 
     /**
-     * 获取带分页, 排序 历史 PointValue
+     * Get point values with pagination and sorting
      *
      * @param pointValueQuery Entry of Query
      * @return Entity of BO Page

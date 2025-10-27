@@ -35,7 +35,9 @@ Api
 Service interface defining tenant-related RPC calls
 */
 service TenantApi {
-  // Query tenant information by tenant code
+  /*
+  Query tenant information by tenant code
+  */
   rpc SelectByCode (GrpcCodeQuery) returns (GrpcRTenantDTO);
 }
 

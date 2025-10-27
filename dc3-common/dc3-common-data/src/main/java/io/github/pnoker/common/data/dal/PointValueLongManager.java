@@ -23,7 +23,7 @@ import io.github.pnoker.common.data.entity.model.PointValueLongDO;
 
 /**
  * <p>
- * 设备位号历史数据表(Long类型) 服务类
+ * Point value long table service class
  * </p>
  *
  * @author pnoker

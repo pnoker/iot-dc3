@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.DeviceStatusHistoryDO;
 
 /**
  * <p>
- * 设备状态历史表 服务类
+ * Device status history table service class
  * </p>
  *
  * @author pnoker

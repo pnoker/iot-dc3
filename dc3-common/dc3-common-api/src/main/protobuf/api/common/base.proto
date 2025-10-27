@@ -27,29 +27,47 @@ option java_outer_classname = "BaseProto";
 option objc_class_prefix = "Common";
 option java_multiple_files = true;
 
-/*Base DTO*/
+/*
+Base DTO
+*/
 message GrpcBase {
-  /*主键ID*/
+  /*
+  Primary key ID
+  */
   int64 id = 1;
 
-  /*描述*/
+  /*
+  Description
+  */
   string remark = 2;
 
-  /*创建者ID*/
+  /*
+  Creator ID
+  */
   int64 creator_id = 3;
 
-  /*创建者名称*/
+  /*
+  Creator name
+  */
   string creator_name = 4;
 
-  /*创建时间*/
+  /*
+  Creation time
+  */
   int64 create_time = 5;
 
-  /*操作者ID*/
+  /*
+  Operator ID
+  */
   int64 operator_id = 6;
 
-  /*操作者名称*/
+  /*
+  Operator name
+  */
   string operator_name = 7;
 
-  /*操作时间*/
+  /*
+  Operation time
+  */
   int64 operate_time = 8;
 }

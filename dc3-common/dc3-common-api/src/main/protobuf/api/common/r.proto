@@ -27,14 +27,22 @@ option java_outer_classname = "RProto";
 option objc_class_prefix = "Common";
 option java_multiple_files = true;
 
-/*R DTO*/
+/*
+R DTO
+*/
 message GrpcR {
-  /*是否成功*/
+  /*
+  Success flag
+  */
   bool ok = 1;
 
-  /*状态码*/
+  /*
+  Status code
+  */
   string code = 2;
 
-  /*消息*/
+  /*
+  Message
+  */
   string message = 3;
 }

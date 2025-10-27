@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.MessageDO;
 
 /**
  * <p>
- * 信息表 服务类
+ * Message table service class
  * </p>
  *
  * @author pnoker

@@ -23,7 +23,7 @@ import io.github.pnoker.common.data.entity.model.PointValueFloatDO;
 
 /**
  * <p>
- * 设备位号历史数据表(Float类型) 服务类
+ * Point value float table service class
  * </p>
  *
  * @author pnoker

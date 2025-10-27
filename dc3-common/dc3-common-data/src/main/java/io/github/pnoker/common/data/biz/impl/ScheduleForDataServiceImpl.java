@@ -30,6 +30,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
+ * ScheduleForDataServiceImpl
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -44,12 +46,15 @@ public class ScheduleForDataServiceImpl implements ScheduleForDataService {
     @Resource
     private QuartzService quartzService;
 
+    /**
+     * Initialize data scheduling
+     */
     @Override
     public void initial() {
         try {
             quartzService.createJobWithInterval(ScheduleConstant.DATA_SCHEDULE_GROUP, "data-point-value-schedule-job", interval, DateBuilder.IntervalUnit.SECOND, PointValueJob.class);
 
-            // 自定义调度
+            // Custom scheduling
             quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?", HourlyJobForData.class);
 
             quartzService.startScheduler();

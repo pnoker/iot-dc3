@@ -20,7 +20,7 @@ package io.github.pnoker.common.data.biz;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
 
 /**
- * 设备事件相关接口
+ * Interface for device-related events
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,9 +29,9 @@ import io.github.pnoker.common.entity.dto.DeviceEventDTO;
 public interface DeviceEventService {
 
     /**
-     * 设备心跳事件
+     * Device heartbeat event
      *
-     * @param entityDTO DriverEventDTO
+     * @param entityDTO DeviceEventDTO
      */
     void heartbeatEvent(DeviceEventDTO entityDTO);
 }

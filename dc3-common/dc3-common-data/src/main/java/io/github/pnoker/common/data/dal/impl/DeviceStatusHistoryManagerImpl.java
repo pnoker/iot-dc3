@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 设备状态历史表 服务实现类
+ * Device status history table service class
  * </p>
  *
  * @author pnoker

@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 设备 Controller
+ * Driver Status Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -54,10 +54,10 @@ public class DriverStatusController implements BaseController {
     }
 
     /**
-     * 查询驱动状态
+     * Query driver statuses
      * ONLINE, OFFLINE
      *
-     * @param entityQuery 驱动和分页参数
+     * @param entityQuery Driver and pagination parameters
      * @return Map String:String
      */
     @PostMapping("/driver")
@@ -76,10 +76,10 @@ public class DriverStatusController implements BaseController {
     }
 
     /**
-     * 查询 Driver 在线总时长
+     * Query driver online total duration
      *
-     * @param driverId
-     * @return
+     * @param driverId Driver ID
+     * @return DriverRunVO
      */
     @GetMapping("/driverOnline/{driverId}")
     public Mono<R<DriverRunVO>> selectOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
@@ -94,10 +94,10 @@ public class DriverStatusController implements BaseController {
     }
 
     /**
-     * 查询 Driver 离线总时长
+     * Query driver offline total duration
      *
-     * @param driverId
-     * @return
+     * @param driverId Driver ID
+     * @return DriverRunVO
      */
     @GetMapping("/driverOffline/{driverId}")
     public Mono<R<DriverRunVO>> selectOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
@@ -112,10 +112,10 @@ public class DriverStatusController implements BaseController {
     }
 
     /**
-     * 查询 Driver 下当前时刻在线设备数量
+     * Query the number of devices currently online under the Driver
      *
-     * @param driverId
-     * @return
+     * @param driverId Driver ID
+     * @return Number of devices currently online
      */
     @GetMapping("/getDeviceOnlineByDriverId/{driverId}")
     public Mono<R<String>> getDeviceOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
@@ -129,10 +129,10 @@ public class DriverStatusController implements BaseController {
     }
 
     /**
-     * 查询 Driver 下当前时刻离线设备数量
+     * Query the number of devices currently offline under the Driver
      *
-     * @param driverId
-     * @return
+     * @param driverId Driver ID
+     * @return Number of devices currently offline
      */
     @GetMapping("/getDeviceOfflineByDriverId/{driverId}")
     public Mono<R<String>> getDeviceOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {

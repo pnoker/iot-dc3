@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.DriverStatusHistoryDO;
 
 /**
  * <p>
- * 驱动状态历史表 服务类
+ * Driver status history table service class
  * </p>
  *
  * @author pnoker
