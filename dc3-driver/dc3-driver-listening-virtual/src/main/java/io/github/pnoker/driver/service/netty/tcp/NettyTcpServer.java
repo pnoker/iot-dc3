@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * TCP server based on Netty for handling device connections and data exchange
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -44,8 +46,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NettyTcpServer {
     /**
      * DeviceId:Channel
-     * 用于存放设备的 Netty Context Channel
-     * !!! 提示: 此处逻辑仅供参考, 请务必结合实际应用场景。!!!
+     * Used to store the Netty Context Channel for devices
+     * !!! Note: This logic is for reference only, please adapt to actual usage scenarios !!!
      */
     public static final Map<Long, Channel> deviceChannelMap = new ConcurrentHashMap<>(16);
 

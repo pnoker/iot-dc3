@@ -54,7 +54,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 /**
- * 驱动自定义服务实现类
+ * Drive custom service implementation classes
  *
  * @author pnoker
  * @version 2025.9.0
@@ -113,12 +113,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
+         * Receive metadata events for driver, device, and point creation, update, and deletion.
          *
-         * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
+         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
+         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -140,15 +140,15 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
-         * PLC S7 数据读取逻辑
+         * PLC S7 data reading logic
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 该方法用于从 PLC S7 设备中读取指定点位的数据。
-         * 1. 获取设备的 S7 连接器。
-         * 2. 加锁以确保线程安全。
-         * 3. 使用 S7 序列化器读取点位数据。
-         * 4. 将读取到的数据封装为 RValue 对象返回。
-         * 5. 捕获并记录异常, 确保锁在 finally 块中释放。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * This method is used to read data of the specified point from the PLC S7 device.
+         * 1. Obtain the S7 connector of the device.
+         * 2. Lock to ensure thread safety.
+         * 3. Use the S7 serializer to read the point data.
+         * 4. Package the read data as an RValue object and return it.
+         * 5. Catch and log exceptions, ensuring the lock is released in the finally block.
          */
         log.debug("Plc S7 Read, device: {}, point: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(point));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverConfig);
@@ -169,15 +169,15 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
-         * PLC S7 数据写入逻辑
+         * PLC S7 data write logic
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 该方法用于向 PLC S7 设备写入指定点位的数据。
-         * 1. 获取设备的 S7 连接器。
-         * 2. 加锁以确保线程安全。
-         * 3. 使用 S7 序列化器写入点位数据。
-         * 4. 捕获并记录异常, 确保锁在 finally 块中释放。
-         * 5. 返回写入操作的结果(成功或失败)。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * This method is used to write data of the specified point to the PLC S7 device.
+         * 1. Obtain the S7 connector of the device.
+         * 2. Lock to ensure thread safety.
+         * 3. Use the S7 serializer to write the point data.
+         * 4. Catch and log exceptions, ensuring the lock is released in the finally block.
+         * 5. Return the result of the write operation (success or failure).
          */
         log.debug("Plc S7 Write, device: {}, value: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(wValue));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverConfig);
@@ -197,18 +197,22 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 获取 PLC S7 连接器
+     * Get PLC S7 Connector
      * <p>
-     * 该方法用于从缓存中获取指定设备的 S7 连接器。如果缓存中不存在该设备的连接器,
-     * 则会根据驱动配置信息创建一个新的连接器, 并将其缓存以供后续使用。
+     * This method retrieves the S7 connector for the specified device from the cache. If the connector
+     * is not present in the cache, a new one is created based on the driver configuration and then
+     * cached for subsequent use.
      * <p>
-     * 连接器创建过程中, 会从驱动配置中获取主机地址和端口号, 并初始化读写锁以确保线程安全。
-     * 如果连接器创建失败, 将抛出 {@link ServiceException} 异常。
+     * During connector creation, the host address and port number are obtained from the driver
+     * configuration, and a read-write lock is initialized to ensure thread safety. If connector
+     * creation fails, a {@link ServiceException} is thrown.
      *
-     * @param deviceId     设备ID, 用于标识唯一的设备连接器
-     * @param driverConfig 驱动配置信息, 包含连接 PLC 所需的主机地址和端口号等参数
-     * @return 返回与设备ID对应的 {@link MyS7Connector} 对象, 包含 S7 连接器和读写锁
-     * @throws ServiceException 如果连接器创建失败, 抛出此异常
+     * @param deviceId     Device ID used to identify the unique device connector
+     * @param driverConfig Driver configuration containing parameters such as host address and port
+     *                     required to connect to the PLC
+     * @return The {@link MyS7Connector} object corresponding to the device ID, containing the S7
+     * connector and read-write lock
+     * @throws ServiceException Thrown if connector creation fails
      */
     private MyS7Connector getS7Connector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         MyS7Connector myS7Connector = connectMap.get(deviceId);
@@ -232,22 +236,24 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 获取 PLC S7 点位变量信息
+     * Get PLC S7 point variable information
      * <p>
-     * 该方法用于从点位配置中提取 PLC S7 点位变量信息, 并封装为 {@link PlcS7PointVariable} 对象。
-     * 点位配置中应包含以下关键属性：
-     * - dbNum: 数据块编号
-     * - byteOffset: 字节偏移量
-     * - bitOffset: 位偏移量
-     * - blockSize: 数据块大小
-     * - type: 点位数据类型
+     * This method extracts PLC S7 point variable information from the point configuration
+     * and encapsulates it into a {@link PlcS7PointVariable} object.
+     * The point configuration should contain the following key attributes:
+     * - dbNum: data block number
+     * - byteOffset: byte offset
+     * - bitOffset: bit offset
+     * - blockSize: data block size
+     * - type: point data type
      * <p>
-     * 如果点位配置中缺少上述任一属性, 将抛出 {@link NullPointerException} 异常。
+     * If any of the above attributes is missing in the point configuration,
+     * a {@link NullPointerException} will be thrown.
      *
-     * @param pointConfig 点位配置信息, 包含点位变量的相关属性
-     * @param type        点位数据类型, 用于标识点位数据的类型
-     * @return 返回封装好的 {@link PlcS7PointVariable} 对象, 包含点位变量的详细信息
-     * @throws NullPointerException 如果点位配置中缺少必要的属性, 抛出此异常
+     * @param pointConfig point configuration information, containing related attributes of the point variable
+     * @param type        point data type, used to identify the type of point data
+     * @return the encapsulated {@link PlcS7PointVariable} object, containing detailed information of the point variable
+     * @throws NullPointerException if any necessary attribute is missing in the point configuration
      */
     private PlcS7PointVariable getPointVariable(Map<String, AttributeBO> pointConfig, String type) {
         log.debug("Plc S7 Point Attribute Config {}", JsonUtil.toJsonString(pointConfig));
@@ -260,27 +266,27 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 向 PLC S7 写入数据
+     * Write data to PLC S7
      * <p>
-     * 该方法用于将指定类型的数据写入到 PLC S7 的指定点位。
-     * 1. 根据类型字符串获取对应的 {@link AttributeTypeFlagEnum} 枚举值。
-     * 2. 如果类型不支持, 抛出 {@link UnSupportException} 异常。
-     * 3. 根据类型将字符串值转换为相应的 Java 类型。
-     * 4. 使用 {@link S7Serializer} 将数据写入到 PLC S7 的指定数据块和字节偏移量位置。
+     * This method is used to write data of a specified type to a designated point on the PLC S7.
+     * 1. Obtain the corresponding {@link AttributeTypeFlagEnum} enum value based on the type string.
+     * 2. If the type is not supported, throw an {@link UnSupportException}.
+     * 3. Convert the string value to the corresponding Java type based on the type.
+     * 4. Use {@link S7Serializer} to write the data to the specified data block and byte offset on the PLC S7.
      * <p>
-     * 支持的数据类型包括：
-     * - INT: 整型
-     * - LONG: 长整型
-     * - FLOAT: 单精度浮点型
-     * - DOUBLE: 双精度浮点型
-     * - BOOLEAN: 布尔型
-     * - STRING: 字符串
+     * Supported data types include:
+     * - INT: integer
+     * - LONG: long integer
+     * - FLOAT: single-precision floating point
+     * - DOUBLE: double-precision floating point
+     * - BOOLEAN: boolean
+     * - STRING: string
      *
-     * @param serializer         S7 序列化器, 用于与 PLC S7 进行数据交互
-     * @param plcS7PointVariable PLC S7 点位变量信息, 包含数据块编号, 字节偏移量等
-     * @param type               数据类型字符串, 用于标识要写入的数据类型
-     * @param value              要写入的字符串形式的数据值
-     * @throws UnSupportException 如果数据类型不支持, 抛出此异常
+     * @param serializer         S7 serializer, used for data interaction with PLC S7
+     * @param plcS7PointVariable PLC S7 point variable information, including data block number, byte offset, etc.
+     * @param type               Data type string, used to identify the type of data to be written
+     * @param value              The data value in string format to be written
+     * @throws UnSupportException Thrown if the data type is not supported
      */
     private void store(S7Serializer serializer, PlcS7PointVariable plcS7PointVariable, String type, String value) {
         AttributeTypeFlagEnum valueType = AttributeTypeFlagEnum.ofCode(type);
@@ -319,13 +325,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * MyS7Connector 内部类
+     * MyS7Connector inner class
      * <p>
-     * 该类用于封装与 PLC S7 连接相关的信息, 包括读写锁和 S7 连接器。
-     * 读写锁 {@link ReentrantReadWriteLock} 用于确保在多线程环境下对 S7 连接器的操作是线程安全的。
-     * S7 连接器 {@link S7Connector} 用于与 PLC S7 设备进行通信。
+     * This class is used to encapsulate information related to the PLC S7 connection, including the read-write lock and the S7 connector.
+     * The read-write lock {@link ReentrantReadWriteLock} is used to ensure thread-safe operations on the S7 connector in a multi-threaded environment.
+     * The S7 connector {@link S7Connector} is used to communicate with the PLC S7 device.
      * <p>
-     * 该类提供了无参构造函数和全参构造函数, 并使用了 Lombok 注解自动生成 getter 和 setter 方法。
+     * This class provides a no-argument constructor and an all-argument constructor, and uses Lombok annotations to automatically generate getter and setter methods.
      */
     @Getter
     @Setter

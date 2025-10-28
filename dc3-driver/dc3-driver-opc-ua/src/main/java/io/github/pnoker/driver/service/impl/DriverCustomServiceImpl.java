@@ -54,7 +54,7 @@ import java.util.concurrent.*;
 
 
 /**
- * 驱动自定义服务实现类
+ * Drive custom service implementation classes
  *
  * @author pnoker
  * @version 2025.9.0
@@ -109,12 +109,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
+         * Receive metadata events for driver, device, and point creation, update, and deletion.
          *
-         * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
+         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
+         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -135,12 +135,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
-         * 读取 OPC UA 点位值
+         * Read OPC UA point value
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 1. 通过设备ID和驱动配置获取 OPC UA 客户端连接。
-         * 2. 使用点位配置读取 OPC UA 节点的值。
-         * 3. 将读取到的值封装为 RValue 对象返回。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * 1. Obtain the OPC UA client connection through device ID and driver configuration.
+         * 2. Read the OPC UA node value using point configuration.
+         * 3. Encapsulate the read value as an RValue object and return it.
          */
         return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
 
@@ -149,24 +149,24 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
-         * 写入 OPC UA 点位值
+         * Write OPC UA point value
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 1. 通过设备ID和驱动配置获取 OPC UA 客户端连接。
-         * 2. 使用点位配置和写入值将数据写入 OPC UA 节点。
-         * 3. 返回写入操作是否成功。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * 1. Obtain the OPC UA client connection through device ID and driver configuration.
+         * 2. Write data to the OPC UA node using point configuration and write value.
+         * 3. Return whether the write operation is successful.
          */
         OpcUaClient client = getConnector(device.getId(), driverConfig);
         return writeValue(client, pointConfig, wValue);
     }
 
     /**
-     * 获取 OPC UA 客户端连接
+     * Get OPC UA client connection
      *
-     * @param deviceId     设备ID, 用于标识唯一的设备连接
-     * @param driverConfig 驱动配置信息, 包含连接 OPC UA 服务器所需的参数
-     * @return OpcUaClient 返回与指定设备关联的 OPC UA 客户端实例
-     * @throws ConnectorException 如果连接 OPC UA 服务器失败, 抛出此异常
+     * @param deviceId     Device ID, used to identify a unique device connection
+     * @param driverConfig Driver configuration info, contains parameters required to connect to the OPC UA server
+     * @return OpcUaClient Returns the OPC UA client instance associated with the specified device
+     * @throws ConnectorException Thrown if connecting to the OPC UA server fails
      */
     private OpcUaClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("OPC UA server connection info: {}", JsonUtil.toJsonString(driverConfig));
@@ -181,8 +181,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                         url,
                         endpoints -> endpoints.stream().findFirst(),
                         configBuilder -> configBuilder
-                                .setIdentityProvider(new AnonymousProvider()) // 使用匿名身份验证
-                                .setRequestTimeout(Unsigned.uint(5000)) // 设置请求超时时间为 5000 毫秒
+                                // 使用匿名身份验证
+                                .setIdentityProvider(new AnonymousProvider())
+                                // 设置请求超时时间为 5000 毫秒
+                                .setRequestTimeout(Unsigned.uint(5000))
                                 .build()
                 );
                 connectMap.put(deviceId, opcUaClient);
@@ -196,10 +198,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 根据点位配置获取 OPC UA 节点
+     * Get OPC UA node from point configuration
      *
-     * @param pointConfig 点位配置信息, 包含命名空间和标签
-     * @return OPC UA 节点标识
+     * @param pointConfig point configuration, contains namespace and tag
+     * @return OPC UA node identifier
      */
     private NodeId getNode(Map<String, AttributeBO> pointConfig) {
         int namespace = pointConfig.get("namespace").getValue(Integer.class);
@@ -208,12 +210,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 读取 OPC UA 节点的值
+     * Read the value of an OPC UA node
      *
-     * @param client      OPC UA 客户端实例
-     * @param pointConfig 点位配置信息
-     * @return 读取到的节点值
-     * @throws ReadPointException 如果读取操作失败, 抛出此异常
+     * @param client      OPC UA client instance
+     * @param pointConfig Point configuration info
+     * @return The read node value
+     * @throws ReadPointException Thrown if the read operation fails
      */
     private String readValue(OpcUaClient client, Map<String, AttributeBO> pointConfig) {
         try {
@@ -233,13 +235,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 写入 OPC UA 节点的值
+     * Write the value to an OPC UA node
      *
-     * @param client      OPC UA 客户端实例
-     * @param pointConfig 点位配置信息
-     * @param wValue      写入值
-     * @return 写入操作是否成功
-     * @throws WritePointException 如果写入操作失败, 抛出此异常
+     * @param client      OPC UA client instance
+     * @param pointConfig point configuration info
+     * @param wValue      value to write
+     * @return whether the write operation is successful
+     * @throws WritePointException thrown if the write operation fails
      */
     private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WValue wValue) {
         try {
@@ -257,14 +259,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 将值写入 OPC UA 节点
+     * Write value to OPC UA node
      *
-     * @param client OPC UA 客户端实例
-     * @param nodeId OPC UA 节点标识
-     * @param wValue 待写入的值
-     * @return 写入操作是否成功
-     * @throws ExecutionException   写入操作失败时抛出
-     * @throws InterruptedException 写入操作被中断时抛出
+     * @param client OPC UA client instance
+     * @param nodeId OPC UA node identifier
+     * @param wValue value to be written
+     * @return whether the write operation is successful
+     * @throws ExecutionException   thrown when the write operation fails
+     * @throws InterruptedException thrown when the write operation is interrupted
      */
     private boolean writeNode(OpcUaClient client, NodeId nodeId, WValue wValue) throws ExecutionException, InterruptedException {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());

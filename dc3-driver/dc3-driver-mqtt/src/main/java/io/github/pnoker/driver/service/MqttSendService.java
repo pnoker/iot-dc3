@@ -29,33 +29,33 @@ import org.springframework.messaging.handler.annotation.Header;
 @MessagingGateway(defaultRequestChannel = "mqttOutboundChannel")
 public interface MqttSendService {
     /**
-     * 使用 Default Topic 和 Default Qos 发送数据
+     * Send data using the default topic and default QoS
      *
      * @param data string
      */
     void sendToMqtt(String data);
 
     /**
-     * 使用 Default Topic 和 自定义 Qos 发送数据
+     * Send data using the default topic and a custom QoS
      *
-     * @param qos  自定义 Qos
+     * @param qos  Custom QoS
      * @param data string
      */
     void sendToMqtt(@Header(MqttHeaders.QOS) Integer qos, String data);
 
     /**
-     * 使用 自定义 Topic 和 Default Qos 发送数据
+     * Send data using a custom topic and the default QoS
      *
-     * @param topic 自定义 Topic
+     * @param topic Custom topic
      * @param data  string
      */
     void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, String data);
 
     /**
-     * 使用 自定义 Topic 和 自定义 Qos 发送数据
+     * Send data using a custom topic and a custom QoS
      *
-     * @param topic 自定义 Topic
-     * @param qos   自定义 Qos
+     * @param topic Custom topic
+     * @param qos   Custom QoS
      * @param data  string
      */
     void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, @Header(MqttHeaders.QOS) Integer qos, String data);

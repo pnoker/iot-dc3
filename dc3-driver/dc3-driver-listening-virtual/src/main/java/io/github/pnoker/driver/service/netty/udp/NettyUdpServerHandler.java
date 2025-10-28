@@ -29,8 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * 报文处理, 需要视具体情况开发
- * 本驱动中使用报文(设备名称[22]+关键字[1]+海拔[4]+速度[8]+液位[8]+方向[4]+锁定[1]+经纬[21])进行测试使用
+ * Message processing, needs to be developed according to the specific situation.
+ * This driver uses a message (device name[22] + keyword[1] + altitude[4] + speed[8] + liquid level[8] + direction[4] + lock[1] + latitude and longitude[21]) for testing.
  * 4C 69 73 74 65 6E 69 6E 67 56 69 72 74 75 61 6C 44 65 76 69 63 65
  * 62
  * 44 C3 E7 5C
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
  * 01
  * 31 33 31 2E 32 33 31 34 35 36 2C 30 32 31 2E 35 36 38 32 31 31
  * <p>
- * 使用 sokit 发送以下报文
+ * Send the following message using sokit:
  * lg:[4C 69 73 74 65 6E 69 6E 67 56 69 72 74 75 61 6C 44 65 76 69 63 65 62 44 C3 E7 5C 40 46 D5 C2 8F 5C 28 F6 00 00 00 00 00 00 00 0C 00 00 00 2D 01 31 33 31 2E 32 33 31 34 35 36 2C 30 32 31 2E 35 36 38 32 31 31]
  *
  * @author pnoker

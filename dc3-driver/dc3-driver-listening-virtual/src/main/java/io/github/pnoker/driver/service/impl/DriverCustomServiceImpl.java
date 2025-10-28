@@ -44,7 +44,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 驱动自定义服务实现类
+ * Drive custom service implementation classes
  *
  * @author pnoker
  * @version 2025.9.0
@@ -72,12 +72,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         /*
-         * 驱动初始化逻辑
+         * Driver initialization logic
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 驱动启动时会自动执行该方法, 您可以在此处执行特定的初始化操作。
+         * Note: The logic here is for reference only. Please modify it according to the actual application scenario.
+         * This method will be automatically executed when the driver starts. You can perform specific initialization operations here.
          *
-         * 例如: 启动 TCP 和 UDP 监听服务, 分别监听指定的端口, 用于接收外部数据。
+         * For example: Start TCP and UDP listening services to monitor specified ports for receiving external data.
          */
         threadPoolExecutor.execute(() -> {
             log.debug("Virtual Listening Driver Starting(TCP::{}) incoming data listener", tcpPort);
@@ -115,12 +115,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
+         * Receive metadata addition, update, and deletion events for drivers, devices, and points.
          *
-         * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
+         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
+         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * Note: The logic here is for reference only. Please modify it according to your actual application scenario.
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -136,10 +136,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
-         * 重要提示: 以下逻辑仅供参考, 请根据实际应用场景进行调整。
+         * Important: The following logic is for reference only; please adjust it according to your actual application scenario.
          *
-         * 由于 Listening Virtual 的数据来源是被动接收的, 因此无需在此实现 `read` 方法。
-         * 数据接收处理逻辑已在以下类中实现：
+         * Since the Listening Virtual driver passively receives data, there is no need to implement the `read` method here.
+         * Data reception and processing are already handled in:
          * - {@link io.github.pnoker.driver.service.netty.tcp.NettyTcpServerHandler#channelRead}
          * - {@link io.github.pnoker.driver.service.netty.udp.NettyUdpServerHandler#channelRead0}
          */
@@ -149,12 +149,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
-         * 重要提示: 以下逻辑仅供参考, 请根据实际应用场景进行调整。
+         * Important: The following logic is for reference only; please adjust it according to your actual application scenario.
          *
-         * 该方法的实现依赖于 Netty TCP 服务器的设备通道映射表。如果设备对应的通道存在,
-         * 则将写入的值转换为字节并发送到该通道。
+         * The implementation of this method relies on the device channel mapping table of the Netty TCP server. If the channel corresponding to the device exists,
+         * the value to be written is converted to bytes and sent to that channel.
          *
-         * 返回值始终为 true, 表示写入操作已成功处理。
+         * The return value is always true, indicating that the write operation has been successfully processed.
          */
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);

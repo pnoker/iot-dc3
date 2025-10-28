@@ -1,4 +1,6 @@
 name: Docker Image
+permissions:
+  contents: write
 on:
   push:
     tags:
