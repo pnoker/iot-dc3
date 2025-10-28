@@ -18,7 +18,7 @@
 # Development environment configuration will overwrite the content configured in application-*.yml
 driver:
   schedule:
-    # 定时读数据
+    # Read data regularly
     read:
       cron: '0/5 * * * * ?'
   mqtt:
@@ -32,7 +32,7 @@ driver:
         name: data
 
 spring:
-  # 当开启env和group时, 需要本地启动auth, manager和data服务
+  # When enabling env and group, auth, manager and data services need to be started locally
   env: dev
   group: ${user.name}
   rabbitmq:
