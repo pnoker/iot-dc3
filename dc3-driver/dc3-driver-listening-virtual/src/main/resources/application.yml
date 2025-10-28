@@ -27,7 +27,7 @@ driver:
     udp:
       port: ${UDP_PORT:6271}
   schedule:
-    # 定时读数据
+    # Read data regularly
     read:
       enable: false
       cron: '0/30 * * * * ?'

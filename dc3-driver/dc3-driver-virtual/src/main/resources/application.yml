@@ -22,7 +22,7 @@ driver:
   type: DRIVER_CLIENT
   remark: @project.description@
   schedule:
-    # 定时读数据
+    # Read data regularly
     read:
       enable: true
       cron: '0/30 * * * * ?'
