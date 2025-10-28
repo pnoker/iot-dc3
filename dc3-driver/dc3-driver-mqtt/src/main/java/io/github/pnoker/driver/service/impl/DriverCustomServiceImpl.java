@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * 驱动自定义服务实现类
+ * Drive custom service implementation classes
  *
  * @author pnoker
  * @version 2025.9.0
@@ -94,12 +94,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
+         * Receive metadata events for driver, device, and point creation, update, and deletion.
          *
-         * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
+         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
+         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -115,10 +115,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
          *
-         * 由于 MQTT 的数据来源是被动接收的, 因此无需在此实现 `read` 方法。
-         * 接收数据的处理逻辑已在 {@link io.github.pnoker.common.mqtt.handler.MqttReceiveHandler#handlerValue} 中实现。
+         * Since MQTT data is passively received, there is no need to implement the `read` method here.
+         * The processing logic for receiving data has been implemented in {@link io.github.pnoker.common.mqtt.handler.MqttReceiveHandler#handlerValue}.
          */
         return null;
     }
@@ -126,11 +126,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue values) {
         /*
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
          *
-         * 该方法是用于将数据写入到 MQTT 主题中。首先从 `pointConfig` 中获取命令主题 `commandTopic` 和要发送的值 `value`。
-         * 如果配置中指定了 QoS 等级 `commandQos`, 则尝试使用指定的 QoS 发送消息；如果未指定或发生异常, 则使用默认的 QoS 发送消息。
-         * 最终返回 `true` 表示写入操作成功。
+         * This method is used to write data to an MQTT topic. First, retrieve the command topic `commandTopic` and the value to be sent `value` from `pointConfig`.
+         * If the configuration specifies a QoS level `commandQos`, attempt to send the message with the specified QoS; if not specified or an exception occurs, send the message with the default QoS.
+         * Finally, return `true` to indicate a successful write operation.
          */
         String commandTopic = pointConfig.get("commandTopic").getValue(String.class);
         String value = values.getValue();

@@ -39,7 +39,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 驱动自定义服务实现类
+ * Drive custom service implementation classes
  *
  * @author pnoker
  * @version 2025.9.0
@@ -91,12 +91,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
+         * Receive metadata events for driver, device, and point creation, update, and deletion.
          *
-         * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
+         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
+         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -112,13 +112,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
-         * 读取设备点位数据逻辑
+         * Read device point data logic
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 根据点位类型生成随机数据：
-         * - 如果点位类型为字符串类型, 生成一个长度为8的随机字符串；
-         * - 如果点位类型为布尔类型, 生成一个随机的布尔值；
-         * - 其他情况下, 生成一个0到100之间的随机浮点数。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * Generate random data based on point type:
+         * - If the point type is STRING, generate a random string of length 8;
+         * - If the point type is BOOLEAN, generate a random boolean value;
+         * - Otherwise, generate a random float between 0 and 100.
          */
         if (PointTypeFlagEnum.STRING.equals(point.getPointTypeFlag())) {
             return new RValue(device, point, "abcd1234");
@@ -137,11 +137,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
-         * 写入设备点位数据逻辑
+         * Write device point data logic
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 您可以根据具体的业务需求实现点位数据的写入逻辑。
-         * 默认情况下, 该方法返回 false, 表示写入操作未执行或失败。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * You can implement the point data write logic based on specific business requirements.
+         * By default, this method returns false, indicating that the write operation was not executed or failed.
          */
         return false;
     }

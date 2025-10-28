@@ -57,7 +57,14 @@ public class NettyServerHandler {
     private DriverSenderService driverSenderService;
 
     /**
-     * 例子, 仅供参考, 请结合自己的实际数据格式进行解析
+     * Example, for reference only. Please parse the actual data format according to your own needs.
+     * <p>
+     * This method is used to handle incoming messages from clients.
+     * It logs the received message, extracts the device name and ID, and then processes the point values based on the device configuration.
+     * Finally, it sends the processed point values to the driver sender service.
+     *
+     * @param context The channel handler context for the current connection.
+     * @param byteBuf The byte buffer containing the incoming message.
      */
     public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
         log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));
@@ -79,12 +86,12 @@ public class NettyServerHandler {
 
             if (infoMap.get("key").getValue().equals(hexKey) && Objects.nonNull(point)) {
                 String value = switch (point.getPointName()) {
-                    case "海拔" -> String.valueOf(byteBuf.getFloat(start));
-                    case "速度" -> String.valueOf(byteBuf.getDouble(start));
-                    case "液位" -> String.valueOf(byteBuf.getLong(start));
-                    case "方向" -> String.valueOf(byteBuf.getInt(start));
-                    case "锁定" -> String.valueOf(byteBuf.getBoolean(start));
-                    case "经纬" -> byteBuf.toString(start, end, StandardCharsets.UTF_8).trim();
+                    case "altitude" -> String.valueOf(byteBuf.getFloat(start));
+                    case "speed" -> String.valueOf(byteBuf.getDouble(start));
+                    case "level" -> String.valueOf(byteBuf.getLong(start));
+                    case "direction" -> String.valueOf(byteBuf.getInt(start));
+                    case "locked" -> String.valueOf(byteBuf.getBoolean(start));
+                    case "coordinate" -> byteBuf.toString(start, end, StandardCharsets.UTF_8).trim();
                     default -> StringUtils.EMPTY;
                 };
 

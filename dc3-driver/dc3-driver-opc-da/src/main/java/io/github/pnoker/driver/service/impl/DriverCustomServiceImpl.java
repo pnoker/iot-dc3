@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * 驱动自定义服务实现类
+ * Drive custom service implementation classes
  *
  * @author pnoker
  * @version 2025.9.0
@@ -112,12 +112,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
+         * Receive metadata events for driver, device, and point creation, update, and deletion.
          *
-         * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
+         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
+         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -138,12 +138,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
-         * 读取位号值逻辑
+         * Read point value logic
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 1. 通过设备ID和驱动配置获取Opc Da Server连接。
-         * 2. 根据位号配置读取对应的位号值。
-         * 3. 将读取到的值封装为RValue对象并返回。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * 1. Obtain the Opc Da Server connection via device ID and driver configuration.
+         * 2. Read the corresponding point value according to the point configuration.
+         * 3. Wrap the read value into an RValue object and return it.
          */
         return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
     }
@@ -151,26 +151,28 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
-         * 写入位号值逻辑
+         * Write point value logic
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 1. 通过设备ID和驱动配置获取Opc Da Server连接。
-         * 2. 根据位号配置和写入值, 将值写入对应的位号。
-         * 3. 返回写入操作是否成功。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * 1. Obtain the Opc Da Server connection via device ID and driver configuration.
+         * 2. According to the point configuration and write value, write the value to the corresponding point.
+         * 3. Return whether the write operation is successful.
          */
         Server server = getConnector(device.getId(), driverConfig);
         return writeValue(server, pointConfig, wValue);
     }
 
     /**
-     * 获取 OPC DA 服务器连接
+     * Get OPC DA Server Connection
      * <p>
-     * 根据设备ID和驱动配置获取对应的 OPC DA 服务器连接。如果连接不存在, 则创建新的连接并缓存。
+     * Obtain the corresponding OPC DA server connection based on the device ID and driver configuration.
+     * If the connection does not exist, create a new connection and cache it.
      *
-     * @param deviceId     设备ID, 用于标识设备对应的 OPC DA 服务器连接
-     * @param driverConfig 驱动配置, 包含 OPC DA 服务器的连接信息(如主机地址, CLSID, 用户名, 密码等)
-     * @return Server 返回与设备ID对应的 OPC DA 服务器连接
-     * @throws ConnectorException 如果连接 OPC DA 服务器时发生异常, 则抛出此异常
+     * @param deviceId     Device ID, used to identify the OPC DA server connection corresponding to the device
+     * @param driverConfig Driver configuration, including connection information of the OPC DA server
+     *                     (such as host address, CLSID, username, password, etc.)
+     * @return Server      Returns the OPC DA server connection corresponding to the device ID
+     * @throws ConnectorException If an exception occurs when connecting to the OPC DA server, this exception is thrown
      */
     private Server getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("Opc Da Server Connection Info {}", JsonUtil.toJsonString(driverConfig));
@@ -195,19 +197,20 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 获取 OPC DA 服务器中的 Item 对象
+     * Get the Item object from the OPC DA server
      * <p>
-     * 根据位号配置中的组名和标签名, 从指定的 OPC DA 服务器中获取对应的 Item 对象。
-     * 如果组不存在, 则创建新的组；如果组已存在, 则直接使用该组。
+     * According to the group name and tag name in the point configuration, obtain the corresponding Item object
+     * from the specified OPC DA server. If the group does not exist, a new group will be created;
+     * if the group already exists, it will be used directly.
      *
-     * @param server      已连接的 OPC DA 服务器实例
-     * @param pointConfig 位号配置, 包含组名和标签名等信息
-     * @return Item       返回与位号配置对应的 Item 对象
-     * @throws NotConnectedException   如果 OPC DA 服务器未连接, 则抛出此异常
-     * @throws JIException             如果与 OPC DA 服务器通信时发生错误, 则抛出此异常
-     * @throws UnknownHostException    如果无法解析 OPC DA 服务器的主机地址, 则抛出此异常
-     * @throws DuplicateGroupException 如果尝试添加已存在的组, 则抛出此异常
-     * @throws AddFailedException      如果添加组或 Item 失败, 则抛出此异常
+     * @param server      Connected OPC DA server instance
+     * @param pointConfig Point configuration, including group name and tag name, etc.
+     * @return Item       Returns the Item object corresponding to the point configuration
+     * @throws NotConnectedException   If the OPC DA server is not connected, this exception will be thrown
+     * @throws JIException             If an error occurs when communicating with the OPC DA server, this exception will be thrown
+     * @throws UnknownHostException    If the host address of the OPC DA server cannot be resolved, this exception will be thrown
+     * @throws DuplicateGroupException If trying to add an existing group, this exception will be thrown
+     * @throws AddFailedException      If adding a group or Item fails, this exception will be thrown
      */
     public Item getItem(Server server, Map<String, AttributeBO> pointConfig) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException, AddFailedException {
         Group group;
@@ -221,15 +224,16 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 从 OPC DA 服务器读取位号值
+     * Read tag value from OPC DA server
      * <p>
-     * 该方法通过给定的 OPC DA 服务器和位号配置, 获取对应的 Item 对象, 并读取其值。
-     * 如果在读取过程中发生异常, 将断开服务器连接并抛出 {@link ReadPointException}。
+     * This method obtains the corresponding Item object through the given OPC DA server and tag configuration,
+     * and reads its value.
+     * If an exception occurs during the reading process, the server connection will be disconnected and {@link ReadPointException} will be thrown.
      *
-     * @param server      已连接的 OPC DA 服务器实例
-     * @param pointConfig 位号配置, 包含组名和标签名等信息
-     * @return String     返回读取到的位号值
-     * @throws ReadPointException 如果读取位号值时发生异常, 则抛出此异常
+     * @param server      Connected OPC DA server instance
+     * @param pointConfig Tag configuration, including group name and tag name, etc.
+     * @return String     Returns the read tag value
+     * @throws ReadPointException If an exception occurs when reading the tag value, this exception will be thrown
      */
     private String readValue(Server server, Map<String, AttributeBO> pointConfig) {
         try {
@@ -244,15 +248,15 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 读取 OPC DA 位号值
+     * Read OPC DA tag value
      * <p>
-     * 该方法通过给定的 OPC DA Item 对象, 读取其值并根据数据类型进行转换。
-     * 支持的数据类型包括：短整型 (VT_I2), 整型 (VT_I4), 长整型 (VT_I8), 浮点型 (VT_R4), 双精度浮点型 (VT_R8), 布尔型 (VT_BOOL), 字符串型 (VT_BSTR)。
-     * 如果数据类型不在上述范围内, 则返回对象的字符串表示。
+     * This method reads the value from the given OPC DA Item object and converts it according to its data type.
+     * Supported data types: short (VT_I2), int (VT_I4), long (VT_I8), float (VT_R4), double (VT_R8), boolean (VT_BOOL), string (VT_BSTR).
+     * If the data type is not in the above list, the string representation of the object is returned.
      *
-     * @param item OPC DA Item 对象, 包含要读取的位号值
-     * @return String 返回读取到的位号值的字符串表示
-     * @throws JIException 如果与 OPC DA 服务器通信时发生错误, 则抛出此异常
+     * @param item OPC DA Item object containing the tag value to be read
+     * @return String string representation of the read tag value
+     * @throws JIException thrown when communication with the OPC DA server fails
      */
     public String readItem(Item item) throws JIException {
         JIVariant jiVariant = item.read(false).getValue();
@@ -283,16 +287,17 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 向 OPC DA 服务器写入位号值
+     * Write value to OPC DA Server
      * <p>
-     * 该方法通过给定的 OPC DA 服务器, 位号配置和写入值, 获取对应的 Item 对象, 并将值写入该 Item。
-     * 如果在写入过程中发生异常, 将断开服务器连接并抛出 {@link WritePointException}。
+     * This method obtains the corresponding Item object through the given OPC DA server, point configuration and write value,
+     * and writes the value into the Item.
+     * If an exception occurs during the writing process, the server connection will be disconnected and {@link WritePointException} will be thrown.
      *
-     * @param server      已连接的 OPC DA 服务器实例
-     * @param pointConfig 位号配置, 包含组名和标签名等信息
-     * @param wValue      写入值, 包含要写入的数据类型和值
-     * @return boolean    返回写入操作是否成功
-     * @throws WritePointException 如果写入位号值时发生异常, 则抛出此异常
+     * @param server      Connected OPC DA server instance
+     * @param pointConfig Point configuration, including group name, tag name, etc.
+     * @param wValue      Write value, including data type and value to be written
+     * @return boolean    Returns whether the write operation is successful
+     * @throws WritePointException If an exception occurs when writing the point value, this exception will be thrown
      */
     private boolean writeValue(Server server, Map<String, AttributeBO> pointConfig, WValue wValue) {
         try {
@@ -307,17 +312,17 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 向 OPC DA Item 写入值
+     * Write value to OPC DA Item
      * <p>
-     * 该方法根据写入值的数据类型, 将值转换为相应的 JIVariant 对象, 并写入到指定的 OPC DA Item 中。
-     * 支持的数据类型包括：短整型 (SHORT), 整型 (INT), 长整型 (LONG), 浮点型 (FLOAT), 双精度浮点型 (DOUBLE), 布尔型 (BOOLEAN), 字符串型 (STRING)。
-     * 如果数据类型不支持, 将抛出 {@link UnSupportException} 异常。
+     * According to the data type of the write value, convert it to the corresponding JIVariant object and write it into the specified OPC DA Item.
+     * Supported data types: SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING.
+     * If the data type is not supported, an {@link UnSupportException} will be thrown.
      *
-     * @param item   OPC DA Item 对象, 表示要写入的目标位号
-     * @param wValue 写入值对象, 包含要写入的数据类型和值
-     * @return boolean 返回写入操作是否成功, 成功返回 true, 失败返回 false
-     * @throws JIException        如果与 OPC DA 服务器通信时发生错误, 则抛出此异常
-     * @throws UnSupportException 如果写入值的数据类型不支持, 则抛出此异常
+     * @param item   OPC DA Item object, representing the target point to be written
+     * @param wValue write value object, containing the data type and value to be written
+     * @return boolean returns whether the write operation is successful, true for success, false for failure
+     * @throws JIException        if an error occurs while communicating with the OPC DA server, this exception will be thrown
+     * @throws UnSupportException if the data type of the write value is not supported, this exception will be thrown
      */
     private boolean writeItem(Item item, WValue wValue) throws JIException {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());

@@ -21,9 +21,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * 监听虚拟驱动应用启动类
+ * Entry point for the Listening Virtual Driver Application
  *
- * <p>该类是Spring Boot应用的入口类, 用于启动监听虚拟驱动应用。</p>
+ * <p>This class serves as the main entry point for the Spring Boot application,
+ * used to start the listening virtual driver application.</p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,9 +34,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ListeningVirtualDriverApplication {
 
     /**
-     * 主方法, 启动Spring Boot应用
+     * Main method to start the Spring Boot application
      *
-     * @param args 命令行参数
+     * @param args Command line arguments
      */
     public static void main(String[] args) {
         SpringApplication.run(ListeningVirtualDriverApplication.class, args);

@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * 驱动自定义服务实现类
+ * Drive custom service implementation classes
  *
  * @author pnoker
  * @version 2025.9.0
@@ -116,12 +116,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
-         * 接收驱动, 设备, 位号元数据的新增, 更新, 删除事件。
+         * Receive metadata events for driver, device, and point creation, update, and deletion.
          *
-         * 元数据类型: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * 元数据操作类型: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
+         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
+         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -142,11 +142,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
-         * 读取设备点位数据
+         * Read device point data
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 通过 Modbus 连接器读取指定设备的点位数据, 并返回 RValue 对象。
-         * RValue 对象包含设备信息, 点位信息以及读取到的值。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * Read the specified device point data through the Modbus connector and return an RValue object.
+         * The RValue object contains device information, point information, and the read value.
          */
         return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig, point.getPointTypeFlag().getCode()));
     }
@@ -154,26 +154,26 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
-         * 写入设备点位数据
+         * Write device point data
          *
-         * 提示: 此处逻辑仅供参考, 请务必结合实际应用场景进行修改。
-         * 通过 Modbus 连接器将指定值写入设备的点位, 并返回写入结果。
+         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
+         * Write the specified value to the device point through the Modbus connector and return the write result.
          */
         ModbusMaster modbusMaster = getConnector(device.getId(), driverConfig);
         return writeValue(modbusMaster, pointConfig, wValue);
     }
 
     /**
-     * 获取 Modbus Master 连接器
+     * Get Modbus Master connector
      * <p>
-     * 该方法用于根据设备ID和驱动配置获取或创建 Modbus Master 连接器。
-     * 如果连接器已存在, 则直接返回；否则, 根据配置创建新的连接器并初始化。
-     * 初始化失败时, 会移除连接器并抛出异常。
+     * This method is used to obtain or create a Modbus Master connector based on the device ID and driver configuration.
+     * If the connector already exists, it will be returned directly; otherwise, a new connector will be created and initialized according to the configuration.
+     * If initialization fails, the connector will be removed and an exception will be thrown.
      *
-     * @param deviceId     设备ID, 用于标识唯一的设备连接
-     * @param driverConfig 驱动配置, 包含连接 Modbus 设备所需的主机地址和端口号
-     * @return ModbusMaster 返回与设备关联的 Modbus Master 连接器
-     * @throws ConnectorException 如果连接器初始化失败, 抛出此异常
+     * @param deviceId     Device ID, used to identify a unique device connection
+     * @param driverConfig Driver configuration, including the host address and port number required to connect to the Modbus device
+     * @return ModbusMaster Returns the Modbus Master connector associated with the device
+     * @throws ConnectorException If the connector initialization fails, this exception will be thrown
      */
     private ModbusMaster getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("Modbus Tcp Connection Info: {}", JsonUtil.toJsonString(driverConfig));
@@ -196,19 +196,19 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 读取 Modbus 设备点位值
+     * Read Modbus device point value
      * <p>
-     * 根据点位配置中的功能码(functionCode)和偏移量(offset), 从 Modbus 设备中读取相应类型的值。
-     * 支持的功能码包括：
-     * - 1: 读取线圈状态(Coil Status)
-     * - 2: 读取输入状态(Input Status)
-     * - 3: 读取保持寄存器(Holding Register)
-     * - 4: 读取输入寄存器(Input Register)
+     * According to the function code(functionCode) and offset in the point configuration, read the corresponding type of value from the Modbus device.
+     * Supported function codes include:
+     * - 1: Read Coil Status
+     * - 2: Read Input Status
+     * - 3: Read Holding Register
+     * - 4: Read Input Register
      *
-     * @param modbusMaster ModbusMaster 连接器, 用于与设备通信
-     * @param pointConfig  点位配置, 包含从站ID(slaveId), 功能码(functionCode), 偏移量(offset)等信息
-     * @param type         点位值类型, 用于确定寄存器中数据的解析方式
-     * @return String 返回读取到的点位值, 以字符串形式表示。如果功能码不支持, 则返回 "0"。
+     * @param modbusMaster ModbusMaster connector for communication with the device
+     * @param pointConfig  Point configuration, including slaveId, functionCode, offset, etc.
+     * @param type         Point value type, used to determine how to parse data in the register
+     * @return String Returns the read point value as a string. If the function code is not supported, returns "0".
      */
     private String readValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, String type) {
         int slaveId = pointConfig.get("slaveId").getValue(Integer.class);
@@ -237,17 +237,17 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 从 ModbusMaster 连接器中读取指定点位的数据
+     * Read data of a specified point from the ModbusMaster connector
      * <p>
-     * 该方法通过给定的 {@link BaseLocator} 从 ModbusMaster 连接器中读取数据。
-     * 如果读取过程中发生 {@link ModbusTransportException} 或 {@link ErrorResponseException} 异常,
-     * 将记录错误日志并抛出 {@link ReadPointException} 异常。
+     * This method reads data from the ModbusMaster connector via the given {@link BaseLocator}.
+     * If a {@link ModbusTransportException} or {@link ErrorResponseException} occurs during reading,
+     * an error log is recorded and a {@link ReadPointException} is thrown.
      *
-     * @param modbusMaster ModbusMaster 连接器, 用于与设备通信
-     * @param locator      点位定位器, 包含从站ID, 功能码, 偏移量等信息
-     * @param <T>          返回值类型, 根据点位的数据类型确定
-     * @return T 返回读取到的点位数据
-     * @throws ReadPointException 如果读取过程中发生异常, 抛出此异常
+     * @param modbusMaster ModbusMaster connector for communication with the device
+     * @param locator      Point locator, containing slave ID, function code, offset, etc.
+     * @param <T>          Return value type, determined by the point data type
+     * @return T           The read point data
+     * @throws ReadPointException Thrown if an exception occurs during reading
      */
     private <T> T getMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator) {
         try {
@@ -259,21 +259,21 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 向 Modbus 设备写入点位值
+     * Write point value to Modbus device
      * <p>
-     * 根据点位配置中的功能码(functionCode)和偏移量(offset), 将指定值写入 Modbus 设备的相应点位。
-     * 支持的功能码包括：
-     * - 1: 写入线圈状态(Coil Status)
-     * - 3: 写入保持寄存器(Holding Register)
+     * According to the function code and offset in the point configuration, write the specified value to the corresponding point of the Modbus device.
+     * Supported function codes include:
+     * - 1: Write Coil Status
+     * - 3: Write Holding Register
      * <p>
-     * 对于功能码 1, 写入布尔值到线圈状态, 并返回写入结果。
-     * 对于功能码 3, 写入数值到保持寄存器, 并返回写入成功状态。
-     * 其他功能码暂不支持, 返回 false。
+     * For function code 1, write a boolean value to the coil status and return the write result.
+     * For function code 3, write a numeric value to the holding register and return the write success status.
+     * Other function codes are not supported and return false.
      *
-     * @param modbusMaster ModbusMaster 连接器, 用于与设备通信
-     * @param pointConfig  点位配置, 包含从站ID(slaveId), 功能码(functionCode), 偏移量(offset)等信息
-     * @param wValue       待写入的值, 包含值类型和具体数值
-     * @return boolean 返回写入结果, true 表示写入成功, false 表示写入失败或不支持的功能码
+     * @param modbusMaster ModbusMaster connector for communication with the device
+     * @param pointConfig  Point configuration, including slave ID, function code, offset, etc.
+     * @param wValue       Value to be written, including value type and specific value
+     * @return boolean Write result, true indicates successful write, false indicates failed write or unsupported function code
      */
     private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, WValue wValue) {
         int slaveId = pointConfig.get("slaveId").getValue(Integer.class);
@@ -293,20 +293,20 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 获取 Modbus 数据类型
+     * Get Modbus data type
      * <p>
-     * 根据点位值类型(type)返回对应的 Modbus 数据类型。
-     * 支持的点位值类型包括：
-     * - {@link PointTypeFlagEnum#LONG}: 返回 4 字节有符号整数({@link DataType#FOUR_BYTE_INT_SIGNED})
-     * - {@link PointTypeFlagEnum#FLOAT}: 返回 4 字节浮点数({@link DataType#FOUR_BYTE_FLOAT})
-     * - {@link PointTypeFlagEnum#DOUBLE}: 返回 8 字节浮点数({@link DataType#EIGHT_BYTE_FLOAT})
-     * - 其他类型: 返回 2 字节有符号整数({@link DataType#TWO_BYTE_INT_SIGNED})
+     * Return the corresponding Modbus data type based on the point value type.
+     * Supported point value types include:
+     * - {@link PointTypeFlagEnum#LONG}: returns 4-byte signed integer ({@link DataType#FOUR_BYTE_INT_SIGNED})
+     * - {@link PointTypeFlagEnum#FLOAT}: returns 4-byte float ({@link DataType#FOUR_BYTE_FLOAT})
+     * - {@link PointTypeFlagEnum#DOUBLE}: returns 8-byte float ({@link DataType#EIGHT_BYTE_FLOAT})
+     * - Other types: return 2-byte signed integer ({@link DataType#TWO_BYTE_INT_SIGNED})
      * <p>
-     * 提示: 该方法可根据实际项目需求进行扩展, 例如支持字节交换, 大端/小端模式等。
+     * Hint: This method can be extended according to actual project requirements, such as supporting byte swapping, big/little-endian mode, etc.
      *
-     * @param type 点位值类型, 用于确定 Modbus 数据类型
-     * @return int 返回对应的 Modbus 数据类型
-     * @throws UnSupportException 如果点位值类型不支持, 抛出此异常
+     * @param type Point value type, used to determine the Modbus data type
+     * @return int Returns the corresponding Modbus data type
+     * @throws UnSupportException If the point value type is not supported, this exception is thrown
      */
     private int getValueType(String type) {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(type);
@@ -327,17 +327,17 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 向 Modbus 设备写入线圈状态值
+     * Write coil status value to Modbus device
      * <p>
-     * 该方法通过 ModbusMaster 连接器向指定从站(slaveId)的线圈(offset)写入布尔值。
-     * 如果写入过程中发生 {@link ModbusTransportException} 异常, 将记录错误日志并抛出 {@link WritePointException} 异常。
+     * This method writes a boolean value to the coil (offset) of the specified slave (slaveId) via the ModbusMaster connector.
+     * If a {@link ModbusTransportException} occurs during the write process, an error log is recorded and a {@link WritePointException} is thrown.
      *
-     * @param modbusMaster ModbusMaster 连接器, 用于与设备通信
-     * @param slaveId      从站ID, 标识目标设备
-     * @param offset       线圈偏移量, 标识目标线圈
-     * @param wValue       待写入的值, 包含布尔值
-     * @return WriteCoilResponse 返回写入操作的响应结果
-     * @throws WritePointException 如果写入过程中发生异常, 抛出此异常
+     * @param modbusMaster ModbusMaster connector for communication with the device
+     * @param slaveId      Slave ID, identifying the target device
+     * @param offset       Coil offset, identifying the target coil
+     * @param wValue       Value to be written, containing the boolean value
+     * @return WriteCoilResponse Returns the response result of the write operation
+     * @throws WritePointException Thrown if an exception occurs during the write process
      */
     private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, WValue wValue) {
         try {
@@ -350,19 +350,20 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * 向 Modbus 设备写入指定类型的值
+     * Write a value of the specified type to the Modbus device
      * <p>
-     * 该方法通过 ModbusMaster 连接器向指定点位写入值。点位信息由 {@link BaseLocator} 定义,
-     * 写入的值类型由 {@link WValue} 指定。支持写入浮点数类型的数据。
+     * This method writes a value to a designated point via the ModbusMaster connector. The point information
+     * is defined by {@link BaseLocator}, and the value type to be written is specified by {@link WValue}.
+     * It supports writing floating-point data.
      * <p>
-     * 如果写入过程中发生 {@link ModbusTransportException} 或 {@link ErrorResponseException} 异常,
-     * 将记录错误日志并抛出 {@link WritePointException} 异常。
+     * If a {@link ModbusTransportException} or {@link ErrorResponseException} occurs during the write process,
+     * an error log is recorded and a {@link WritePointException} is thrown.
      *
-     * @param modbusMaster ModbusMaster 连接器, 用于与设备通信
-     * @param locator      点位定位器, 包含从站ID, 功能码, 偏移量等信息
-     * @param wValue       待写入的值, 包含值类型和具体数值
-     * @param <T>          返回值类型, 根据点位的数据类型确定
-     * @throws WritePointException 如果写入过程中发生异常, 抛出此异常
+     * @param modbusMaster ModbusMaster connector used to communicate with the device
+     * @param locator      Point locator containing slave ID, function code, offset, etc.
+     * @param wValue       Value to be written, including value type and specific numeric value
+     * @param <T>          Return value type determined by the point's data type
+     * @throws WritePointException Thrown if an exception occurs during the write process
      */
     private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, WValue wValue) {
         try {
