@@ -23,18 +23,14 @@ import "api/common/r.proto";
 import "api/common/entity.proto";
 import "driver_entity.proto";
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.common.driver";
 option java_outer_classname = "DriverProto";
 option objc_class_prefix = "Driver";
 option java_multiple_files = true;
 
-/*
-Api
-Service interfaces defining RPC calls related to drivers
-*/
+// Api
+// Service interfaces defining RPC calls related to drivers
 service DriverApi {
   // Driver registration, used by the driver service to register itself with the platform
   rpc DriverRegister (GrpcDriverRegisterDTO) returns (GrpcRDriverRegisterDTO);
@@ -42,34 +38,24 @@ service DriverApi {
 
 // Driver registration response structure
 message GrpcRDriverRegisterDTO {
-  /*
-  R
-  Common result, includes status code and message
-  */
+  // R
+  // Common result, includes status code and message
   GrpcR result = 1;
 
-  /*
-  Driver
-  Basic driver information
-  */
+  // Driver
+  // Basic driver information
   GrpcDriverDTO driver = 2;
 
-  /*
-  Device ID list
-  List of device IDs managed by the driver
-  */
+  // Device ID list
+  // List of device IDs managed by the driver
   repeated int64 device_ids = 3;
 
-  /*
-  Driver attribute list
-  List of driver attribute configurations
-  */
+  // Driver attribute list
+  // List of driver attribute configurations
   repeated GrpcDriverAttributeDTO driver_attributes = 4;
 
-  /*
-  Point attribute list
-  List of point attribute configurations supported by the driver
-  */
+  // Point attribute list
+  // List of point attribute configurations supported by the driver
   repeated GrpcPointAttributeDTO point_attributes = 5;
 
 }

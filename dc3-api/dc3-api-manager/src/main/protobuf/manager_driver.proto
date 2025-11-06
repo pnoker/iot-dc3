@@ -25,18 +25,14 @@ import "api/common/entity.proto";
 import "manager_query.proto";
 import "manager_query_page.proto";
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "DriverProto";
 option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
-/*
-Api
-Service interfaces defining RPC calls related to driver management
-*/
+// Api
+// Service interfaces defining RPC calls related to driver management
 service DriverApi {
   // Paginated query for driver information
   rpc SelectByPage (GrpcPageDriverQuery) returns (GrpcRPageDriverDTO);
@@ -46,56 +42,38 @@ service DriverApi {
   rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDriverDTO);
 }
 
-/*
-Driver R Page
-Response structure for paginated driver query
-*/
+// Driver R Page
+// Response structure for paginated driver query
 message GrpcRPageDriverDTO {
-  /*
-  R
-  Generic return result containing status code, message, etc.
-  */
+  // R
+  // Generic return result containing status code, message, etc.
   GrpcR result = 1;
 
-  /*
-  Data
-  Returned paginated driver data
-  */
+  // Data
+  // Returned paginated driver data
   GrpcPageDriverDTO data = 2;
 }
 
-/*
-Driver Page
-Driver page data structure
-*/
+// Driver Page
+// Driver page data structure
 message GrpcPageDriverDTO {
-  /*
-  Page
-  Pagination info, including page number, page size, total, etc.
-  */
+  // Page
+  // Pagination info, including page number, page size, total, etc.
   GrpcPage page = 1;
 
-  /*
-  Data
-  List of driver data
-  */
+  // Data
+  // List of driver data
   repeated GrpcDriverDTO data = 2;
 }
 
-/*
-Driver R
-Response structure for single driver query
-*/
+// Driver R
+// Response structure for single driver query
 message GrpcRDriverDTO {
-  /*
-  R
-  Generic return result containing status code, message, etc.
-  */
+  // R
+  // Generic return result containing status code, message, etc.
   GrpcR result = 1;
 
-  /*
-  Data
-  Returned single driver data
-  */
+  // Data
+  // Returned single driver data
   GrpcDriverDTO data = 2;
 }

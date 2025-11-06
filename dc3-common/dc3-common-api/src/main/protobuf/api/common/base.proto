@@ -19,55 +19,35 @@ syntax = "proto3";
 
 package api.common;
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.common";
 option java_outer_classname = "BaseProto";
 option objc_class_prefix = "Common";
 option java_multiple_files = true;
 
-/*
-Base DTO
-*/
+// Base DTO
 message GrpcBase {
-  /*
-  Primary key ID
-  */
+  // Primary key ID
   int64 id = 1;
 
-  /*
-  Description
-  */
+  // Description
   string remark = 2;
 
-  /*
-  Creator ID
-  */
+  // Creator ID
   int64 creator_id = 3;
 
-  /*
-  Creator name
-  */
+  // Creator name
   string creator_name = 4;
 
-  /*
-  Creation time
-  */
+  // Creation time
   int64 create_time = 5;
 
-  /*
-  Operator ID
-  */
+  // Operator ID
   int64 operator_id = 6;
 
-  /*
-  Operator name
-  */
+  // Operator name
   string operator_name = 7;
 
-  /*
-  Operation time
-  */
+  // Operation time
   int64 operate_time = 8;
 }

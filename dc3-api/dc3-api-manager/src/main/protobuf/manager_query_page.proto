@@ -21,110 +21,125 @@ package api.common.manager;
 
 import "api/common/page.proto";
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "QueryPageProto";
 option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
-/*PageDriverQuery*/
+// PageDriverQuery
 // Driver pagination query structure, used for paginated query of driver information
 message GrpcPageDriverQuery {
-  /*
-  Page
-  Pagination information, including page number, page size, total count, etc.
-  */
+  // Page
+  // Pagination information, including page number, page size, total count, etc.
   GrpcPage page = 1;
 
-  /*
-  Tenant ID
-  Identifies the tenant
-  */
+  // Tenant ID
+  // Identifies the tenant
   int64 tenant_id = 2;
 
-  /*
-  Query fields
-  Filter conditions for driver information query
-   */
-  string driver_name = 3; // Driver name for fuzzy query
-  string driver_code = 4; // Driver code, unique identifier
-  string service_name = 5; // Driver service name, identifies service type
-  string service_host = 6; // Service host, identifies service deployment location
-  int32 driver_type_flag = 7; // Driver type flag, distinguishes different types of drivers
-  int32 enable_flag = 8; // Enable flag, 1 for enabled, 0 for disabled
-  int32 version = 9; // Version number for version management
+  // Query fields
+  // Filter conditions for driver information query
+  // Driver name for fuzzy query
+  string driver_name = 3;
+
+  // Driver code, unique identifier
+  string driver_code = 4;
+
+  // Driver service name, identifies service type
+  string service_name = 5;
+
+  // Service host, identifies service deployment location
+  string service_host = 6;
+
+  // Driver type flag, distinguishes different types of drivers
+  int32 driver_type_flag = 7;
+
+  // Enable flag, 1 for enabled, 0 for disabled
+  int32 enable_flag = 8;
+
+  // Version number for version management
+  int32 version = 9;
 }
 
-/*PagePointQuery*/
+// PagePointQuery
 // Point pagination query structure, used for paginated query of point information
 message GrpcPagePointQuery {
-  /*
-  Page
-  Pagination information, including page number, page size, total count, etc.
-  */
+  // Page
+  // Pagination information, including page number, page size, total count, etc.
   GrpcPage page = 1;
 
-  /*
-  Tenant ID
-  Identifies the tenant
-  */
+  // Tenant ID
+  // Identifies the tenant
   int64 tenant_id = 2;
 
-  /*
-  Query fields
-  Filter conditions for point information query
-   */
-  string point_name = 3; // Point name for fuzzy query
-  string point_code = 4; // Point code, unique identifier
-  int32 point_type_flag = 5; // Point type flag, distinguishes different types of points
-  int32 rw_flag = 6; // Read/write flag, indicates point read/write permissions
-  int64 profile_id = 7; // Profile template ID, associates configuration template
-  int64 group_id = 8; // Group ID for point group management
-  int32 enable_flag = 9; // Enable flag, 1 for enabled, 0 for disabled
-  int32 version = 10; // Version number for version management
+  // Query fields
+  // Filter conditions for point information query
+  // Point name for fuzzy query
+  string point_name = 3;
 
-  /*
-  Additional fields
-  Extra query conditions
-   */
-  int64 device_id = 11; // Device ID for querying points under specific device
+  // Point code, unique identifier
+  string point_code = 4;
+
+  // Point type flag, distinguishes different types of points
+  int32 point_type_flag = 5;
+
+  // Read/write flag, indicates point read/write permissions
+  int32 rw_flag = 6;
+
+  // Profile template ID, associates configuration template
+  int64 profile_id = 7;
+
+  // Group ID for point group management
+  int64 group_id = 8;
+
+  // Enable flag, 1 for enabled, 0 for disabled
+  int32 enable_flag = 9;
+
+  // Version number for version management
+  int32 version = 10;
+
+  // Additional fields
+  // Extra query conditions
+  // Device ID for querying points under specific device
+  int64 device_id = 11;
 }
 
-/*
-Device Page Query
-Device pagination query structure, used for paginated query of device information
-*/
+// Device Page Query
+// Device pagination query structure, used for paginated query of device information
 message GrpcPageDeviceQuery {
-  /*
-  Page
-  Pagination information, including page number, page size, total count, etc.
-  */
+  // Page
+  // Pagination information, including page number, page size, total count, etc.
   GrpcPage page = 1;
 
-  /*
-  Tenant ID
-  Identifies the tenant
-  */
+  // Tenant ID
+  // Identifies the tenant
   int64 tenant_id = 2;
 
-  /*
-  Query fields
-  Filter conditions for device information query
-   */
-  string device_name = 3; // Device name for fuzzy query
-  string device_code = 4; // Device code, unique identifier
-  int64 driver_id = 5; // Driver ID, associates device with driver
-  int64 group_id = 6; // Group ID for device group management
-  int32 enable_flag = 7; // Enable flag, 1 for enabled, 0 for disabled
-  int32 version = 8; // Version number for version management
+  // Query fields
+  // Filter conditions for device information query
+  // Device name for fuzzy query
+  string device_name = 3;
 
-  /*
-  Additional fields
-  Extra query conditions
-   */
-  int64 profile_id = 9; // Profile template ID for querying devices under specific template
+  // Device code, unique identifier
+  string device_code = 4;
+
+  // Driver ID, associates device with driver
+  int64 driver_id = 5;
+
+  // Group ID for device group management
+  int64 group_id = 6;
+
+  // Enable flag, 1 for enabled, 0 for disabled
+  int32 enable_flag = 7;
+
+  // Version number for version management
+  int32 version = 8;
+
+  // Additional fields
+  // Extra query conditions
+  // Profile template ID for querying devices under specific template
+  int64 profile_id = 9;
 }
 
 

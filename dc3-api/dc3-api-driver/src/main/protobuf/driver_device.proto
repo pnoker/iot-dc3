@@ -25,18 +25,14 @@ import "api/common/entity.proto";
 import "driver_query.proto";
 import "driver_query_page.proto";
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.common.driver";
 option java_outer_classname = "DeviceProto";
 option objc_class_prefix = "Driver";
 option java_multiple_files = true;
 
-/*
-Api
-Service interfaces defining RPC calls related to driver devices
-*/
+// Api
+// Service interfaces defining RPC calls related to driver devices
 service DeviceApi {
   // Query devices with pagination
   rpc SelectByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
@@ -44,86 +40,58 @@ service DeviceApi {
   rpc SelectById (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
 }
 
-/*
-Device R Page
-Response wrapper for paged device query
-*/
+// Device R Page
+// Response wrapper for paged device query
 message GrpcRPageDeviceDTO {
-  /*
-  R
-  Common result, includes status code and message
-  */
+  // R
+  // Common result, includes status code and message
   GrpcR result = 1;
 
-  /*
-  Data
-  Paged device data
-  */
+  // Data
+  // Paged device data
   GrpcPageDeviceDTO data = 2;
 }
 
-/*
-Device Page
-Paged device data structure
-*/
+// Device Page
+// Paged device data structure
 message GrpcPageDeviceDTO {
-  /*
-  Page
-  Pagination info such as page number, size, and total
-  */
+  // Page
+  // Pagination info such as page number, size, and total
   GrpcPage page = 1;
 
-  /*
-  Data
-  List of devices with attachments
-  */
+  // Data
+  // List of devices with attachments
   repeated GrpcRDeviceAttachDTO data = 2;
 }
 
-/*
-  Device
-  Response wrapper for single device query
-  */
+// Device
+// Response wrapper for single device query
 message GrpcRDeviceDTO {
-  /*
-  R
-  Common result, includes status code and message
-  */
+  // R
+  // Common result, includes status code and message
   GrpcR result = 1;
 
-  /*
-  Device Attach
-  Returned device attachment info
-  */
+  // Device Attach
+  // Returned device attachment info
   GrpcRDeviceAttachDTO data = 2;
 }
 
-/*
-  Device Attach
-  Device attachment structure, including the device and its related configurations
-  */
+// Device Attach
+// Device attachment structure, including the device and its related configurations
 message GrpcRDeviceAttachDTO {
-  /*
-  Device
-  Basic device information
-  */
+  // Device
+  // Basic device information
   GrpcDeviceDTO device = 1;
 
-  /*
-  Point ID list
-  List of point IDs associated with the device
-  */
+  // Point ID list
+  // List of point IDs associated with the device
   repeated int64 point_ids = 2;
 
-  /*
-  DriverAttributeConfig List
-  Driver attribute configuration list
-  */
+  // DriverAttributeConfig List
+  // Driver attribute configuration list
   repeated GrpcDriverAttributeConfigDTO driverConfigs = 3;
 
-  /*
-  PointAttributeConfig List
-  Point attribute configuration list
-  */
+  // PointAttributeConfig List
+  // Point attribute configuration list
   repeated GrpcPointAttributeConfigDTO pointConfigs = 4;
 }

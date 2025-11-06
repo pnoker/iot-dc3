@@ -21,83 +21,57 @@ package api.common.driver;
 
 import "api/common/page.proto";
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.common.driver";
 option java_outer_classname = "QueryPageProto";
 option objc_class_prefix = "Driver";
 option java_multiple_files = true;
 
-/*
-Page Device Query
-Structure for paginated device queries
-*/
+// Page Device Query
+// Structure for paginated device queries
 message GrpcPageDeviceQuery {
-  /*
-  Page
-  Pagination information, including page number, page size, and total count
-  */
+  // Page
+  // Pagination information, including page number, page size, and total count
   GrpcPage page = 1;
 
-  /*
-  Tenant ID
-  Identifier of the tenant
-  */
+  // Tenant ID
+  // Identifier of the tenant
   int64 tenant_id = 2;
 
-  /*
-  Driver ID
-  Identifier of the driver to which the device belongs
-  */
+  // Driver ID 
+  // Identifier of the driver to which the device belongs
   int64 driver_id = 3;
 
-  /*
-  Device ID
-  Identifier for querying a specific device
-  */
+  // Device ID
+  // Identifier for querying a specific device
   int64 device_id = 4;
 }
 
-/*
-Page Point Query
-Structure for paginated point queries
-*/
+// Page Point Query
+// Structure for paginated point queries
 message GrpcPagePointQuery {
-  /*
-  Page
-  Pagination information, including page number, page size, and total count
-  */
+  // Page
+  // Pagination information, including page number, page size, and total count
   GrpcPage page = 1;
 
-  /*
-  Tenant ID
-  Identifier of the tenant
-  */
+  // Tenant ID
+  // Identifier of the tenant
   int64 tenant_id = 2;
 
-  /*
-  Driver ID
-  Identifier of the driver to which the point belongs
-  */
+  // Driver ID
+  // Identifier of the driver to which the point belongs
   int64 driver_id = 3;
 
-  /*
-  Device ID
-  Identifier used to query points under a specific device
-  */
+  // Device ID
+  // Identifier used to query points under a specific device
   int64 device_id = 4;
 
-  /*
-  Profile ID
-  Configuration template ID used to query points under a specific profile
-  */
+  // Profile ID
+  // Configuration template ID used to query points under a specific profile
   int64 profile_id = 5;
 
-  /*
-  Point ID
-  Identifier for querying a specific point
-  */
+  // Point ID
+  // Identifier for querying a specific point
   int64 point_id = 6;
 }
 
