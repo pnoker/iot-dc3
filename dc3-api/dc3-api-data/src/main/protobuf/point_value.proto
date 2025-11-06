@@ -21,18 +21,14 @@ package api.common.data;
 
 import "api/common/r.proto";
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.center.data";
 option java_outer_classname = "PointValueProto";
 option objc_class_prefix = "Data";
 option java_multiple_files = true;
 
-/*
-Api
-Service interface defining RPC calls related to point values
-*/
+// Api
+// Service interface defining RPC calls related to point values
 service PointValueApi {
   // Query the latest collected value of a device point
   rpc LastValue (GrpcPointValueQuery) returns (GrpcRPointValueDTO);
@@ -43,34 +39,39 @@ message GrpcPointValueQuery {
   int64 device_id = 1; // Device ID, identifies the specific device
   int64 point_id = 2; // Point ID, identifies the specific point
 
-  /*
-  Tenant ID
-  Identifies the tenant to which the data belongs
-  */
+  // Tenant ID
+  // Identifies the tenant to which the data belongs
   int64 tenant_id = 3;
 }
 
 // Response structure for returning point value
 message GrpcRPointValueDTO {
-  /*
-  R
-  Common result wrapper containing status code, message, etc.
-  */
+  // R
+  // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  /*
-  Data
-  Returned point value data
-  */
+  // Data
+  // Returned point value data
   GrpcPointValueDTO data = 2;
 }
 
 // Point value data structure containing collected data for a point
 message GrpcPointValueDTO {
-  int64 id = 1; // Point value record ID
-  int64 device_id = 2; // Device ID, identifies the source device
-  int64 point_id = 3; // Point ID, identifies the specific point
-  string value = 4; // Processed value, after data conversion and formatting
-  string raw_value = 5; // Raw value, directly collected from the device
-  int64 create_time = 6; // Storage time, the timestamp when the data is stored in the database
+  // Point value record ID
+  int64 id = 1;
+
+  // Device ID, identifies the source device
+  int64 device_id = 2;
+
+  // Point ID, identifies the specific point
+  int64 point_id = 3;
+
+  // Processed value, after data conversion and formatting
+  string value = 4;
+
+  // Raw value, directly collected from the device
+  string raw_value = 5;
+
+  // Storage time, the timestamp when the data is stored in the database
+  int64 create_time = 6;
 }

@@ -21,45 +21,37 @@ package api.common.auth;
 
 import "api/common/r.proto";
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.center.auth";
 option java_outer_classname = "TokenProto";
 option objc_class_prefix = "Auth";
 option java_multiple_files = true;
 
-/*
-Api
-Service interface defining token-related RPC calls
-*/
+// Api
+// Service interface defining token-related RPC calls
 service TokenApi {
   // Validate token
   rpc CheckValid (GrpcLoginQuery) returns (GrpcRTokenDTO);
 }
 
-// checkValid Query
+// CheckValid Query
 // Request message for validating login information
 message GrpcLoginQuery {
-  string tenant = 1; // Tenant, identifies the owning tenant
-  string name = 2; // Login name
-  string salt = 3; // Salt used for password encryption
+  string tenant = 1;   // Tenant, identifies the owning tenant
+  string name = 2;     // Login name
+  string salt = 3;     // Salt used for password encryption
   string password = 4; // Login password
-  string token = 5; // Token
+  string token = 5;    // Token
 }
 
 // R of Token DTO
 // Response wrapper for token validation result
 message GrpcRTokenDTO {
-  /*
-  R
-  Common result wrapper with status code, message, etc.
-  */
+  // R
+  // Common result wrapper with status code, message, etc.
   GrpcR result = 1;
 
-  /*
-  Data
-  Returned data, typically a token or expiration time, etc.
-  */
+  // Data
+  // Returned data, typically a token or expiration time, etc.
   string data = 2;
 }
