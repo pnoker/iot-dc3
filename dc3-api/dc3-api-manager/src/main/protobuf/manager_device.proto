@@ -25,18 +25,14 @@ import "api/common/entity.proto";
 import "manager_query.proto";
 import "manager_query_page.proto";
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "DeviceProto";
 option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
-/*
-Api
-Service interfaces defining RPC calls related to device management
-*/
+// Api
+// Service interfaces defining RPC calls related to device management
 service DeviceApi {
   // Paginated query for device information
   rpc SelectByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
@@ -48,74 +44,50 @@ service DeviceApi {
   rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
 }
 
-/*
-Device R Page
-Response structure for paginated device query
-*/
+// Device R Page
+// Response structure for paginated device query
 message GrpcRPageDeviceDTO {
-  /*
-  R
-  Generic return result containing status code, message, etc.
-  */
+  // R
+  // Generic return result containing status code, message, etc.
   GrpcR result = 1;
 
-  /*
-  Data
-  Returned paginated device data
-  */
+  // Data
+  // Returned paginated device data
   GrpcPageDeviceDTO data = 2;
 }
 
-/*
-Device Page
-Device page data structure
-*/
+// Device Page
+// Device page data structure
 message GrpcPageDeviceDTO {
-  /*
-  Page
-  Pagination info, including page number, page size, total, etc.
-  */
+  // Page
+  // Pagination info, including page number, page size, total, etc.
   GrpcPage page = 1;
 
-  /*
-  Data
-  List of device data
-  */
+  // Data
+  // List of device data
   repeated GrpcDeviceDTO data = 2;
 }
 
-/*
-Device R List
-Response structure for device list query
-*/
+// Device R List
+// Response structure for device list query
 message GrpcRDeviceListDTO {
-  /*
-  R
-  Generic return result containing status code, message, etc.
-  */
+  // R
+  // Generic return result containing status code, message, etc.
   GrpcR result = 1;
 
-  /*
-  Data
-  Returned device list data
-  */
+  // Data
+  // Returned device list data
   repeated GrpcDeviceDTO data = 2;
 }
 
-/*
-Device R
-Response structure for single device query
-*/
+// Device R
+// Response structure for single device query
 message GrpcRDeviceDTO {
-  /*
-  R
-  Generic return result containing status code, message, etc.
-  */
+  // R
+  // Generic return result containing status code, message, etc.
   GrpcR result = 1;
 
-  /*
-  Data
-  Returned single device data
-  */
+  // Data
+  // Returned single device data
   GrpcDeviceDTO data = 2;
 }

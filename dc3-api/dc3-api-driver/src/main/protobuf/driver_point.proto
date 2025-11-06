@@ -25,18 +25,14 @@ import "api/common/entity.proto";
 import "driver_query.proto";
 import "driver_query_page.proto";
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.common.driver";
 option java_outer_classname = "PointProto";
 option objc_class_prefix = "Driver";
 option java_multiple_files = true;
 
-/*
-Api
-Service interfaces defining RPC calls related to driver points
-*/
+// Api
+// Service interfaces defining RPC calls related to driver points
 service PointApi {
   // Query points with pagination
   rpc SelectByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
@@ -44,56 +40,38 @@ service PointApi {
   rpc SelectById (GrpcPointQuery) returns (GrpcRPointDTO);
 }
 
-/*
-Point R Page
-Response wrapper for paged point query
-*/
+// Point R Page
+// Response wrapper for paged point query
 message GrpcRPagePointDTO {
-  /*
-  R
-  Common result, includes status code and message
-  */
+  // R
+  // Common result, includes status code and message
   GrpcR result = 1;
 
-  /*
-  Data
-  Paged point data
-  */
+  // Data
+  // Paged point data
   GrpcPagePointDTO data = 2;
 }
 
-/*
-Point Page
-Paged point data structure
-*/
+// Point Page
+// Paged point data structure
 message GrpcPagePointDTO {
-  /*
-  Page
-  Pagination info such as page number, size, and total
-  */
+  // Page
+  // Pagination info such as page number, size, and total
   GrpcPage page = 1;
 
-  /*
-  Data
-  List of points
-  */
+  // Data
+  // List of points
   repeated GrpcPointDTO data = 2;
 }
 
-/*
-Point
-Response wrapper for single point query
-*/
+// Point
+// Response wrapper for single point query
 message GrpcRPointDTO {
-  /*
-  R
-  Common result, includes status code and message
-  */
+  // R
+  // Common result, includes status code and message
   GrpcR result = 1;
 
-  /*
-  Data
-  Single point data
-  */
+  // Data
+  // Single point data
   GrpcPointDTO data = 2;
 }

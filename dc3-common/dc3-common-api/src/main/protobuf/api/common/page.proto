@@ -19,35 +19,23 @@ syntax = "proto3";
 
 package api.common;
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.common";
 option java_outer_classname = "PageProto";
 option objc_class_prefix = "Common";
 option java_multiple_files = true;
 
-/*
-Page DTO
-*/
+// Page DTO
 message GrpcPage {
-  /*
-  Total count
-  */
+  // Total count
   int64 total = 1;
 
-  /*
-  Number of items per page
-  */
+  // Number of items per page
   int64 size = 2;
 
-  /*
-  Current page number
-  */
+  // Current page number
   int64 current = 3;
 
-  /*
-  Total number of pages
-  */
+  // Total number of pages
   int64 pages = 4;
 }

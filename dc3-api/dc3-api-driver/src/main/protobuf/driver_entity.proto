@@ -21,47 +21,33 @@ package api.common.driver;
 
 import "api/common/entity.proto";
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.common.driver";
 option java_outer_classname = "EntityProto";
 option objc_class_prefix = "Driver";
 option java_multiple_files = true;
 
-/*
-Driver registration info
-The complete information structure submitted when a driver registers to the platform
-*/
+// Driver registration info
+// The complete information structure submitted when a driver registers to the platform
 message GrpcDriverRegisterDTO {
-  /*
-  Tenant name
-  Identifier for the tenant the driver belongs to
-  */
+  // Tenant name
+  // Identifier for the tenant the driver belongs to
   string tenant = 1;
 
-  /*
-  Driver client name
-  Unique identifier for the driver service instance (service name + random node ID)
-  */
+  // Driver client name
+  // Unique identifier for the driver service instance (service name + random node ID)
   string client = 2;
 
-  /*
-  Driver property
-  Basic driver property information
-  */
+  // Driver property
+  // Basic driver property information
   GrpcDriverDTO driver = 3;
 
-  /*
-  Driver attribute list
-  List of driver-supported configuration parameters
-  */
+  // Driver attribute list
+  // List of driver-supported configuration parameters
   repeated GrpcDriverAttributeDTO driver_attributes = 4;
 
-  /*
-  Point attribute list
-  List of point (tag) configuration parameters supported by the driver
-  */
+  // Point attribute list
+  // List of point (tag) configuration parameters supported by the driver
   repeated GrpcPointAttributeDTO point_attributes = 5;
 }
 
