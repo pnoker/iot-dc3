@@ -98,7 +98,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          * - Periodically check device status in a custom scheduled task;
          * - Trigger device status judgment based on specific business logic or events.
          *
-         * Finally, submit the device status to the SDK management through the {@link DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} interface.
+         * Finally, submit the device status to the SDK management through the {@link DriverSenderService#deviceStatusSender} interface.
          * The device status enumeration {@link DeviceStatusEnum} includes the following states:
          * - ONLINE: Device online
          * - OFFLINE: Device offline
