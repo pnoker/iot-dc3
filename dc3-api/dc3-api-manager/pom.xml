@@ -22,12 +22,12 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-api</artifactId>
-        <version>2025.9.3</version>
+        <version>2025.11.1</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-api-manager</artifactId>
-    <version>2025.9.3</version>
+    <version>2025.11.1</version>
     <packaging>jar</packaging>
 
     <description>The Manager Service gRPC API of the IoT DC3 platform.</description>
