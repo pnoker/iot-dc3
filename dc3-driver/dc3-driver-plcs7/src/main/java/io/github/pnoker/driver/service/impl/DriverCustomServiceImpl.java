@@ -70,8 +70,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private DriverSenderService driverSenderService;
 
     /**
-     * Plc Connector Map
-     * 仅供参考
+     * PLC connector map
+     * For reference only
      */
     private Map<Long, MyS7Connector> connectMap;
 

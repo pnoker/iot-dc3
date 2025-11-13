@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * 驱动同步相关接口实现
+ * Driver synchronization interface implementation
  *
  * @author pnoker
  * @version 2025.9.0
@@ -77,27 +77,27 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
         entityDO.setRemark(deviceRemark);
         entityDO.setTenantId(deviceBO.getTenantId());
 
-        // 导入设备
+        // Import device
         entityDO = deviceManager.innerSave(entityDO);
         DeviceBO entityBO = deviceBuilder.buildBOByDO(entityDO);
 
-        //导入设备模版绑定配置
+        // Import device profile binding configuration
         importProfileBind(entityBO, deviceBO.getProfileIds());
 
-        // 导入驱动属性配置
+        // Import driver attribute configuration
         importDriverAttributeConfig(entityBO, driverAttributeBOList, sheet, row);
 
-        // 导入位号属性配置
+        // Import point attribute configuration
         importPointAttributeConfig(entityBO, pointBOList, driverAttributeBOList, pointAttributeBOList, sheet, row);
 
         return entityBO;
     }
 
     /**
-     * 导入设备模版绑定配置
+     * Import device profile binding configuration
      *
      * @param deviceBO   Device
-     * @param profileIds 模版ID集合
+     * @param profileIds Profile ID list
      */
     private void importProfileBind(DeviceBO deviceBO, List<Long> profileIds) {
         if (CollectionUtils.isEmpty(profileIds)) {
@@ -119,7 +119,7 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
     }
 
     /**
-     * 导入驱动属性配置
+     * Import driver attribute configuration
      *
      * @param deviceBO              Device
      * @param driverAttributeBOList DriverAttributeBO Array
@@ -141,7 +141,7 @@ public class ImportDeviceServiceImpl implements ImportDeviceService {
     }
 
     /**
-     * 导入位号属性配置
+     * Import point attribute configuration
      *
      * @param deviceBO              Device
      * @param driverAttributeBOList DriverAttributeBO Array

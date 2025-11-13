@@ -29,7 +29,7 @@ import java.net.Socket;
 /**
  * TCP_Connection to a S7 PLC
  * <p>
- * 参考: <a href="http://libnodave.sourceforge.net/">http://libnodave.sourceforge.net</a>
+ * Reference: <a href="http://libnodave.sourceforge.net/">http://libnodave.sourceforge.net</a>
  *
  * @author Thomas Rudin
  */

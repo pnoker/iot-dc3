@@ -50,9 +50,9 @@ public class MqttReceiveHandler {
     private ExecutorService virtualThreadExecutor;
 
     /**
-     * 此处用于接收 MQTT 发送过来的数据, 订阅的主题为 application.yml 中 mqtt.receive-topics 配置的 Topic 列表
-     * +(加号): 可以(只能)匹配一个单词
-     * #(井号): 可以匹配多个单词(或者零个)
+     * Receive data from MQTT; subscribed topics are defined in application.yml under mqtt.receive-topics
+     * + (plus): matches exactly one word
+     * # (hash): matches multiple words (or none)
      *
      * @return MessageHandler
      */

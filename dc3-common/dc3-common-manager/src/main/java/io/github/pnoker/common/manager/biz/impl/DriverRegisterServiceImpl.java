@@ -47,7 +47,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 驱动同步相关接口实现
+ * Driver synchronization interface implementation
  *
  * @author pnoker
  * @version 2025.9.0

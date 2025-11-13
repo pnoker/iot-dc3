@@ -181,9 +181,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
                         url,
                         endpoints -> endpoints.stream().findFirst(),
                         configBuilder -> configBuilder
-                                // 使用匿名身份验证
+                                // Use anonymous authentication
                                 .setIdentityProvider(new AnonymousProvider())
-                                // 设置请求超时时间为 5000 毫秒
+                                // Set request timeout to 5000 ms
                                 .setRequestTimeout(Unsigned.uint(5000))
                                 .build()
                 );
