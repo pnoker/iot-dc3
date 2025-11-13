@@ -30,22 +30,22 @@ import java.util.List;
 public interface MqttReceiveService {
 
     /**
-     * 务必实现, 单点逻辑
+     * Must implement single-point processing logic
      * <p>
-     * 将解析之后的数据封装 io.github.pnoker.common.bean.point.PointValue
-     * 然后调用 driverService.pointValueSender(pointValue) 进行数据推送
-     * Tip:  可参考 dc3-driver-listening-virtual 驱动
+     * Parse incoming data into io.github.pnoker.common.bean.point.PointValue
+     * then call driverService.pointValueSender(pointValue) to publish data
+     * Tip: Refer to the dc3-driver-listening-virtual driver for examples
      *
      * @param mqttMessage MqttMessage
      */
     void receiveValue(MqttMessage mqttMessage);
 
     /**
-     * 务必实现, 批量逻辑
+     * Must implement batch processing logic
      * <p>
-     * 将解析之后的数据封装 io.github.pnoker.common.bean.point.PointValue
-     * 然后调用 driverService.pointValueSender(pointValue) 进行数据推送
-     * Tip:  可参考 dc3-driver-listening-virtual 驱动
+     * Parse incoming data into io.github.pnoker.common.bean.point.PointValue
+     * then call driverService.pointValueSender(pointValue) to publish data
+     * Tip: Refer to the dc3-driver-listening-virtual driver for examples
      *
      * @param mqttMessageList String Array List
      */

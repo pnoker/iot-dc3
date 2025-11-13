@@ -24,7 +24,7 @@ package io.github.pnoker.common.mqtt.service;
  */
 public interface MqttScheduleService {
     /**
-     * 初始化调度任务
+     * Initialize scheduling tasks
      */
     void initial();
 }

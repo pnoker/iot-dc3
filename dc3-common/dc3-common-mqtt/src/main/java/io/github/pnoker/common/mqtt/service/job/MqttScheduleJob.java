@@ -58,23 +58,23 @@ public class MqttScheduleJob extends QuartzJobBean {
     private ExecutorService virtualThreadExecutor;
 
     /**
-     * 获取 MqttMessage 长度
+     * Get MqttMessage list size
      *
-     * @return 消息长度
+     * @return message size
      */
     public static int getMqttMessagesSize() {
         return mqttMessages.size();
     }
 
     /**
-     * 清空 MqttMessage
+     * Clear MqttMessage list
      */
     public static void clearMqttMessages() {
         mqttMessages.clear();
     }
 
     /**
-     * 添加 MqttMessage
+     * Add MqttMessage to list
      *
      * @param mqttMessage MqttMessage
      */
