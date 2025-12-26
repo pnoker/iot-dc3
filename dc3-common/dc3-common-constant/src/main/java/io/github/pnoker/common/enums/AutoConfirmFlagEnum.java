@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用报警类型类型枚举
+ * Common auto-confirm flag enumeration
  *
  * @author pnoker
  * @version 2025.9.0

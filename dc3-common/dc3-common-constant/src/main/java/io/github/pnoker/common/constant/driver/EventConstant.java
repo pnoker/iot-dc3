@@ -20,7 +20,7 @@ package io.github.pnoker.common.constant.driver;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 
 /**
- * 事件 相关常量
+ * Event related constants
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,7 +33,7 @@ public class EventConstant {
     }
 
     /**
-     * 驱动事件 相关常量
+     * Driver event related constants
      *
      * @author pnoker
      * @version 2025.9.0
@@ -42,11 +42,11 @@ public class EventConstant {
     public static class Driver {
 
         /**
-         * 驱动状态事件, 该事件用于向 dc3-center-manager 发送驱动的当前状态
+         * Driver status event, used to send the current status of the driver to dc3-center-manager
          */
         public static final String STATUS = "driver_status";
         /**
-         * 驱动注册事件, 该事件用于向 dc3-center-manager 注册驱动配置信息
+         * Driver registration event, used to register driver configuration information to dc3-center-manager
          */
         public static final String REGISTER = "driver_register";
         public static final String REGISTER_BACK = "driver_register_back";
@@ -58,7 +58,7 @@ public class EventConstant {
     }
 
     /**
-     * 设备事件 相关常量
+     * Device event related constants
      *
      * @author pnoker
      * @version 2025.9.0
@@ -67,11 +67,11 @@ public class EventConstant {
     public static class Device {
 
         /**
-         * 设备状态事件
+         * Device status event
          */
         public static final String STATUS = "device_status";
         /**
-         * 用于记录错误事件类型
+         * Used to record error event type
          */
         public static final String ERROR = "device_error";
 

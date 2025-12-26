@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用失效类型枚举
+ * Common expiration type enum
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,66 +35,66 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum ExpireFlagEnum {
     /**
-     * 永久
+     * Permanent
      */
-    PERMANENT((byte) 0, "permanent", "永久"),
+    PERMANENT((byte) 0, "permanent", "Permanent"),
 
     /**
-     * 一天
+     * One day
      */
-    ONE_DAY((byte) 1, "one_day", "一天"),
+    ONE_DAY((byte) 1, "one_day", "One day"),
 
     /**
-     * 一周
+     * One week
      */
-    ONE_WEEK((byte) 2, "one_week", "一周"),
+    ONE_WEEK((byte) 2, "one_week", "One week"),
 
     /**
-     * 一月
+     * One month
      */
-    ONE_MONTH((byte) 3, "one_month", "一月"),
+    ONE_MONTH((byte) 3, "one_month", "One month"),
 
     /**
-     * 三月
+     * Three months
      */
-    THREE_MONTHS((byte) 4, "three_months", "三月"),
+    THREE_MONTHS((byte) 4, "three_months", "Three months"),
 
     /**
-     * 半年
+     * Half year
      */
-    HALF_YEAR((byte) 5, "half_year", "半年"),
+    HALF_YEAR((byte) 5, "half_year", "Half year"),
 
     /**
-     * 一年
+     * One year
      */
-    ONE_YEAR((byte) 6, "one_year", "一年"),
+    ONE_YEAR((byte) 6, "one_year", "One year"),
 
     /**
-     * 自定义
+     * Custom
      */
-    CUSTOM((byte) 7, "custom", "自定义"),
+    CUSTOM((byte) 7, "custom", "Custom"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link ExpireFlagEnum}
      */
     public static ExpireFlagEnum ofIndex(Byte index) {
@@ -103,9 +103,9 @@ public enum ExpireFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link ExpireFlagEnum}
      */
     public static ExpireFlagEnum ofCode(String code) {
@@ -114,9 +114,9 @@ public enum ExpireFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Enum name
      * @return {@link ExpireFlagEnum}
      */
     public static ExpireFlagEnum ofName(String name) {

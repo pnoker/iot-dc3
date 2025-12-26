@@ -18,7 +18,7 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- * 前缀 相关常量
+ * Prefix related constants
  *
  * @author pnoker
  * @version 2025.9.0

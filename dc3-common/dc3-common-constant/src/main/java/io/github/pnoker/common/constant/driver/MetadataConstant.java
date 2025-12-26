@@ -22,7 +22,7 @@ import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 
 /**
- * 元数据 相关常量
+ * Metadata related constants
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,7 +35,7 @@ public class MetadataConstant {
     }
 
     /**
-     * 模板元数据 相关常量
+     * Profile metadata related constants
      *
      * @author pnoker
      * @version 2025.9.0
@@ -53,7 +53,7 @@ public class MetadataConstant {
     }
 
     /**
-     * 模板元数据 相关常量
+     * Point metadata related constants
      *
      * @author pnoker
      * @version 2025.9.0
@@ -71,7 +71,7 @@ public class MetadataConstant {
     }
 
     /**
-     * 设备元数据 相关常量
+     * Device metadata related constants
      *
      * @author pnoker
      * @version 2025.9.0
@@ -89,7 +89,7 @@ public class MetadataConstant {
     }
 
     /**
-     * 驱动信息元数据 相关常量
+     * Driver configuration metadata related constants
      *
      * @author pnoker
      * @version 2025.9.0
@@ -107,7 +107,7 @@ public class MetadataConstant {
     }
 
     /**
-     * 位号信息元数据 相关常量
+     * Point configuration metadata related constants
      *
      * @author pnoker
      * @version 2025.9.0

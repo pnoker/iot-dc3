@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用读写标识枚举
+ * Common read/write flag enumeration
  *
  * @author pnoker
  * @version 2025.9.0

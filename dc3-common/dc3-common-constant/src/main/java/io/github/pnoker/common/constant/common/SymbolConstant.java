@@ -18,7 +18,7 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- * 符号 相关常量
+ * Symbol related constants
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,39 +27,39 @@ package io.github.pnoker.common.constant.common;
 public class SymbolConstant {
 
     /**
-     * 点
+     * Dot
      */
     public static final String DOT = ".";
     /**
-     * 下划线
+     * Underscore
      */
     public static final String UNDERSCORE = "_";
     /**
-     * 连接线
+     * Hyphen
      */
     public static final String HYPHEN = "-";
     /**
-     * 星号
+     * Asterisk
      */
     public static final String ASTERISK = "*";
     /**
-     * 井号
+     * Hashtag
      */
     public static final String HASHTAG = "#";
     /**
-     * 冒号
+     * Colon
      */
     public static final String COLON = ":";
     /**
-     * 双冒号
+     * Double colon
      */
     public static final String DOUBLE_COLON = "::";
     /**
-     * 斜线
+     * Slash
      */
     public static final String SLASH = "/";
     /**
-     * 双斜线
+     * Double slash
      */
     public static final String DOUBLE_SLASH = "//";
 

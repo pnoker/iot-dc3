@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用驱动事件枚举
+ * Common driver event type enumeration
  *
  * @author pnoker
  * @version 2025.9.0

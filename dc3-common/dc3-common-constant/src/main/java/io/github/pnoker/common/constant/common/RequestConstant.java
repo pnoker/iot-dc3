@@ -18,7 +18,7 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- * 请求 相关常量
+ * Constants related to requests
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,7 +27,7 @@ package io.github.pnoker.common.constant.common;
 public class RequestConstant {
 
     /**
-     * 最大请求次数限制
+     * Maximum request size limit
      */
     public static final int DEFAULT_MAX_REQUEST_SIZE = 100;
 
@@ -36,7 +36,7 @@ public class RequestConstant {
     }
 
     /**
-     * 自定义请求 Header 相关常量
+     * Constants related to custom request headers
      *
      * @author pnoker
      * @version 2025.9.0
@@ -45,26 +45,26 @@ public class RequestConstant {
     public static class Header {
 
         /**
-         * 自定义 租户编号 请求头
-         * 用于前端请求头
+         * Custom tenant ID header
+         * Used in frontend request headers
          */
         public static final String X_AUTH_TENANT = "X-Auth-Tenant";
 
         /**
-         * 自定义 用户登陆名称 请求头
-         * 用于前端请求头
+         * Custom user login name header
+         * Used in frontend request headers
          */
         public static final String X_AUTH_LOGIN = "X-Auth-Login";
 
         /**
-         * 自定义 Token 请求头
-         * 用于前端请求头
+         * Custom token header
+         * Used in frontend request headers
          */
         public static final String X_AUTH_TOKEN = "X-Auth-Token";
 
         /**
-         * 自定义 用户 请求头
-         * 用于向其他服务传递用户信息, 其中包括: 租户ID, 用户ID, 用户昵称, 用户名称
+         * Custom user header
+         * Used to pass user information to other services, including: tenant ID, user ID, user nickname, user name
          */
         public static final String X_AUTH_USER = "X-Auth-User";
 
@@ -75,7 +75,7 @@ public class RequestConstant {
     }
 
     /**
-     * 自定义请求 Message 相关常量
+     * Constants related to custom request messages
      *
      * @author pnoker
      * @version 2025.9.0
@@ -84,7 +84,7 @@ public class RequestConstant {
     public static class Message {
 
         /**
-         * 无效的权限请求头
+         * Invalid authorization request header
          */
         public static final String INVALID_REQUEST = "Invalid request auth header";
 
@@ -94,7 +94,7 @@ public class RequestConstant {
     }
 
     /**
-     * 自定义请求 Key 相关常量
+     * Constants related to custom request keys
      *
      * @author pnoker
      * @version 2025.9.0
@@ -103,7 +103,7 @@ public class RequestConstant {
     public static class Key {
 
         /**
-         * 用户请求头关键字
+         * User header key
          */
         public static final String USER_HEADER = "USER_HEADER_KEY";
 

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用权限类型枚举
+ * Common resource type enumeration
  *
  * @author pnoker
  * @version 2025.9.0
