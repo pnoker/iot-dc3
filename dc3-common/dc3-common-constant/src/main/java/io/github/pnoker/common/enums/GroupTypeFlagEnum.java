@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用实体分组标识枚举
+ * Common entity group flag enumeration
  *
  * @author pnoker
  * @version 2025.9.0
@@ -37,25 +37,25 @@ public enum GroupTypeFlagEnum {
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index index
      * @return {@link GroupTypeFlagEnum}
      */
     public static GroupTypeFlagEnum ofIndex(Byte index) {
@@ -64,9 +64,9 @@ public enum GroupTypeFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code code
      * @return {@link GroupTypeFlagEnum}
      */
     public static GroupTypeFlagEnum ofCode(String code) {
@@ -75,9 +75,9 @@ public enum GroupTypeFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name enum name
      * @return {@link GroupTypeFlagEnum}
      */
     public static GroupTypeFlagEnum ofName(String name) {

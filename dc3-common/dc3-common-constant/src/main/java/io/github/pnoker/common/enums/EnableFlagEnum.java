@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用使能标识 枚举
+ * Common enable flag enumeration
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,36 +35,36 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum EnableFlagEnum {
     /**
-     * 启用
+     * Enable
      */
-    ENABLE((byte) 0, "enable", "启用"),
+    ENABLE((byte) 0, "enable", "Enable"),
 
     /**
-     * 禁用
+     * Disable
      */
-    DISABLE((byte) 1, "disable", "禁用"),
+    DISABLE((byte) 1, "disable", "Disable"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link EnableFlagEnum}
      */
     public static EnableFlagEnum ofIndex(Byte index) {
@@ -73,9 +73,9 @@ public enum EnableFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link EnableFlagEnum}
      */
     public static EnableFlagEnum ofCode(String code) {
@@ -84,9 +84,9 @@ public enum EnableFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Enum name
      * @return {@link EnableFlagEnum}
      */
     public static EnableFlagEnum ofName(String name) {

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用报警等级类型枚举
+ * Common alarm level enumeration
  *
  * @author pnoker
  * @version 2025.9.0

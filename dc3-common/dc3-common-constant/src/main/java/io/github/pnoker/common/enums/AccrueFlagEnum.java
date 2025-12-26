@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用累计类型枚举
+ * Common accrual type enumeration
  *
  * @author pnoker
  * @version 2025.9.0

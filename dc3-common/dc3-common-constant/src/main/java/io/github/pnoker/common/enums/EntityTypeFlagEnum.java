@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用实体类型标识枚举
+ * Common entity type flag enumeration
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,61 +35,61 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum EntityTypeFlagEnum {
     /**
-     * 系统
+     * System
      */
-    SYSTEM((byte) 0, "system", "系统"),
+    SYSTEM((byte) 0, "system", "System"),
 
     /**
-     * 用户
+     * User
      */
-    USER((byte) 1, "user", "用户"),
+    USER((byte) 1, "user", "User"),
 
     /**
-     * 分组
+     * Group
      */
-    GROUP((byte) 2, "group", "分组"),
+    GROUP((byte) 2, "group", "Group"),
 
     /**
-     * 驱动
+     * Driver
      */
-    DRIVER((byte) 3, "driver", "驱动"),
+    DRIVER((byte) 3, "driver", "Driver"),
 
     /**
-     * 模版
+     * Profile
      */
-    PROFILE((byte) 4, "profile", "模版"),
+    PROFILE((byte) 4, "profile", "Profile"),
 
     /**
-     * 位号
+     * Point
      */
-    POINT((byte) 5, "point", "位号"),
+    POINT((byte) 5, "point", "Point"),
 
     /**
-     * 设备
+     * Device
      */
-    DEVICE((byte) 6, "device", "设备"),
+    DEVICE((byte) 6, "device", "Device"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link EntityTypeFlagEnum}
      */
     public static EntityTypeFlagEnum ofIndex(Byte index) {
@@ -98,9 +98,9 @@ public enum EntityTypeFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link EntityTypeFlagEnum}
      */
     public static EntityTypeFlagEnum ofCode(String code) {
@@ -109,9 +109,9 @@ public enum EntityTypeFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Enum name
      * @return {@link EntityTypeFlagEnum}
      */
     public static EntityTypeFlagEnum ofName(String name) {

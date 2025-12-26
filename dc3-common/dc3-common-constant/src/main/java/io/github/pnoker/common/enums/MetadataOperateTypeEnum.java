@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用元数据操作类型枚举
+ * Common metadata operation type enumeration
  *
  * @author pnoker
  * @version 2025.9.0

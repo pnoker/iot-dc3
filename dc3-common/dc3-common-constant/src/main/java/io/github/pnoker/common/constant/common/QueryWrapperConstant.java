@@ -18,7 +18,7 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- * 查询 相关常量
+ * Query related constants
  *
  * @author pnoker
  * @version 2025.9.0

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用位号类型标识枚举
+ * Common point type flag enumeration
  *
  * @author pnoker
  * @version 2025.9.0

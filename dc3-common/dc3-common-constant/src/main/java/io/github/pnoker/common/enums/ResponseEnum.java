@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用返回结果枚举
+ * Common response enumeration
  *
  * @author pnoker
  * @version 2025.9.0

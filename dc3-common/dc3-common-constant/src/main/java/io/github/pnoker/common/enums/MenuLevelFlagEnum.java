@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用报警等级类型枚举
+ * Common menu level flag enum
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,51 +35,51 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum MenuLevelFlagEnum {
     /**
-     * 根菜单
+     * Root menu
      */
-    ROOT((byte) 0, "root", "根菜单"),
+    ROOT((byte) 0, "root", "Root menu"),
 
     /**
-     * 一级子菜单
+     * First-level submenu
      */
-    C1((byte) 1, "c1", "一级子菜单"),
+    C1((byte) 1, "c1", "First-level submenu"),
 
     /**
-     * 二级子菜单
+     * Second-level submenu
      */
-    C2((byte) 2, "c2", "二级子菜单"),
+    C2((byte) 2, "c2", "Second-level submenu"),
 
     /**
-     * 三级子菜单
+     * Third-level submenu
      */
-    C3((byte) 3, "c3", "三级子菜单"),
+    C3((byte) 3, "c3", "Third-level submenu"),
 
     /**
-     * 四级子菜单
+     * Fourth-level submenu
      */
-    C4((byte) 4, "c4", "四级子菜单"),
+    C4((byte) 4, "c4", "Fourth-level submenu"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link MenuLevelFlagEnum}
      */
     public static MenuLevelFlagEnum ofIndex(Byte index) {
@@ -88,9 +88,9 @@ public enum MenuLevelFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link MenuLevelFlagEnum}
      */
     public static MenuLevelFlagEnum ofCode(String code) {
@@ -99,9 +99,9 @@ public enum MenuLevelFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Enum name
      * @return {@link MenuLevelFlagEnum}
      */
     public static MenuLevelFlagEnum ofName(String name) {
