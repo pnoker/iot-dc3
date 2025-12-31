@@ -25,14 +25,13 @@ import "api/common/entity.proto";
 import "manager_query.proto";
 import "manager_query_page.proto";
 
-// Config
+// Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "DriverProto";
 option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
-// Api
-// Service interfaces defining RPC calls related to driver management
+// Service interface defining RPC calls related to driver management
 service DriverApi {
   // Paginated query for driver information
   rpc SelectByPage (GrpcPageDriverQuery) returns (GrpcRPageDriverDTO);
@@ -42,38 +41,29 @@ service DriverApi {
   rpc SelectByDeviceId (GrpcDeviceQuery) returns (GrpcRDriverDTO);
 }
 
-// Driver R Page
-// Response structure for paginated driver query
+// Response wrapper for paginated driver query
 message GrpcRPageDriverDTO {
-  // R
-  // Generic return result containing status code, message, etc.
+  // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  // Data
   // Returned paginated driver data
   GrpcPageDriverDTO data = 2;
 }
 
-// Driver Page
 // Driver page data structure
 message GrpcPageDriverDTO {
-  // Page
-  // Pagination info, including page number, page size, total, etc.
+  // Pagination information including page number, page size, and total count
   GrpcPage page = 1;
 
-  // Data
   // List of driver data
   repeated GrpcDriverDTO data = 2;
 }
 
-// Driver R
-// Response structure for single driver query
+// Response wrapper for single driver query
 message GrpcRDriverDTO {
-  // R
-  // Generic return result containing status code, message, etc.
+  // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  // Data
   // Returned single driver data
   GrpcDriverDTO data = 2;
 }

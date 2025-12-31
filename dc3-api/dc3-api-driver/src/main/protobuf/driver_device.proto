@@ -25,14 +25,13 @@ import "api/common/entity.proto";
 import "driver_query.proto";
 import "driver_query_page.proto";
 
-// Config
+// Configuration options for code generation
 option java_package = "io.github.pnoker.api.common.driver";
 option java_outer_classname = "DeviceProto";
 option objc_class_prefix = "Driver";
 option java_multiple_files = true;
 
-// Api
-// Service interfaces defining RPC calls related to driver devices
+// Service interface defining RPC calls related to driver devices
 service DeviceApi {
   // Query devices with pagination
   rpc SelectByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
@@ -40,58 +39,44 @@ service DeviceApi {
   rpc SelectById (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
 }
 
-// Device R Page
 // Response wrapper for paged device query
 message GrpcRPageDeviceDTO {
-  // R
-  // Common result, includes status code and message
+  // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  // Data
   // Paged device data
   GrpcPageDeviceDTO data = 2;
 }
 
-// Device Page
 // Paged device data structure
 message GrpcPageDeviceDTO {
-  // Page
-  // Pagination info such as page number, size, and total
+  // Pagination information including page number, page size, and total count
   GrpcPage page = 1;
 
-  // Data
   // List of devices with attachments
   repeated GrpcRDeviceAttachDTO data = 2;
 }
 
-// Device
 // Response wrapper for single device query
 message GrpcRDeviceDTO {
-  // R
-  // Common result, includes status code and message
+  // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  // Device Attach
   // Returned device attachment info
   GrpcRDeviceAttachDTO data = 2;
 }
 
-// Device Attach
 // Device attachment structure, including the device and its related configurations
 message GrpcRDeviceAttachDTO {
-  // Device
   // Basic device information
   GrpcDeviceDTO device = 1;
 
-  // Point ID list
   // List of point IDs associated with the device
   repeated int64 point_ids = 2;
 
-  // DriverAttributeConfig List
   // Driver attribute configuration list
   repeated GrpcDriverAttributeConfigDTO driverConfigs = 3;
 
-  // PointAttributeConfig List
   // Point attribute configuration list
   repeated GrpcPointAttributeConfigDTO pointConfigs = 4;
 }

@@ -22,7 +22,7 @@ package api.common.auth;
 import "api/common/base.proto";
 import "api/common/r.proto";
 
-// Config options for Java code generation
+// Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.auth";
 option java_outer_classname = "TenantProto";
 option objc_class_prefix = "Auth";
@@ -49,17 +49,17 @@ message GrpcRTenantDTO {
   GrpcTenantDTO data = 2;
 }
 
-// Tenant DTO
 // Tenant data structure with basic information
 message GrpcTenantDTO {
-  // Base
-  // Common base fields (e.g., ID, creation time, etc.) 
+  // Common base fields (e.g., ID, creation time, etc.)
   GrpcBase base = 1;
 
   // Tenant name
   string tenant_name = 2;
-  // Tenant code, unique 
+  
+  // Tenant code, unique identifier
   string tenant_code = 3;
+  
   // Enable flag: 1 enabled, 0 disabled
   int32 enable_flag = 4;
 }
