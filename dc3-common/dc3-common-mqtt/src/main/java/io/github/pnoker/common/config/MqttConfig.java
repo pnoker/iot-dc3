@@ -39,7 +39,7 @@ import java.util.Objects;
 
 
 /**
- * Mqtt 配置
+ * MQTT configuration
  *
  * @author pnoker
  * @version 2025.9.0

@@ -31,7 +31,7 @@ import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
 public interface DictionaryForManagerService {
 
     /**
-     * 获取驱动字典带分页的列表
+     * Get driver dictionary list with pagination
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return DictionaryBO Page
@@ -39,7 +39,7 @@ public interface DictionaryForManagerService {
     Page<DictionaryBO> driverDictionary(DictionaryQuery entityQuery);
 
     /**
-     * 获取模版字典带分页的列表
+     * Get profile dictionary list with pagination
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return DictionaryBO Page
@@ -47,7 +47,7 @@ public interface DictionaryForManagerService {
     Page<DictionaryBO> profileDictionary(DictionaryQuery entityQuery);
 
     /**
-     * 获取模版下位号字典带分页的列表
+     * Get point dictionary under profile with pagination
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return DictionaryBO Page
@@ -55,7 +55,7 @@ public interface DictionaryForManagerService {
     Page<DictionaryBO> pointDictionaryForProfile(DictionaryQuery entityQuery);
 
     /**
-     * 获取设备下位号字典带分页的列表
+     * Get point dictionary under device with pagination
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return DictionaryBO Page
@@ -63,7 +63,7 @@ public interface DictionaryForManagerService {
     Page<DictionaryBO> pointDictionaryForDevice(DictionaryQuery entityQuery);
 
     /**
-     * 获取设备字典带分页的列表
+     * Get device dictionary list with pagination
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return DictionaryBO Page
@@ -71,7 +71,7 @@ public interface DictionaryForManagerService {
     Page<DictionaryBO> deviceDictionary(DictionaryQuery entityQuery);
 
     /**
-     * 获取驱动下设备字典带分页的列表
+     * Get device dictionary under driver with pagination
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return DictionaryBO Page

@@ -26,7 +26,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.util.List;
 
 /**
- * 导入相关接口
+ * Import-related interfaces
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,12 +35,12 @@ import java.util.List;
 public interface ImportDeviceService {
 
     /**
-     * 导入设备
+     * Import device
      *
-     * @param deviceBO              设备
-     * @param pointBOList           位号集合
-     * @param driverAttributeBOList 驱动属性配置集合
-     * @param pointAttributeBOList  驱动属性配置集合
+     * @param deviceBO              Device
+     * @param pointBOList           Point list
+     * @param driverAttributeBOList Driver attribute config list
+     * @param pointAttributeBOList  Point attribute config list
      * @param sheet                 Sheet
      * @param row                   Row Index
      */
