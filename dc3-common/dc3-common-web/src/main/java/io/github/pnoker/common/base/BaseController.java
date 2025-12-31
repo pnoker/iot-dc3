@@ -22,7 +22,11 @@ import io.github.pnoker.common.utils.UserHeaderUtil;
 import reactor.core.publisher.Mono;
 
 /**
- * 基础 Controller 类接口
+ * Base Controller Interface
+ * <p>
+ * Provides default methods for common controller operations such as
+ * extracting user information from request headers in reactive applications.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -30,48 +34,46 @@ import reactor.core.publisher.Mono;
  */
 public interface BaseController {
 
-    // 默认方法
-
     /**
-     * 获取租户ID
+     * Get user header information from request context
      *
-     * @return 租户ID
+     * @return User header information as Mono
      */
     default Mono<RequestHeader.UserHeader> getUserHeader() {
         return UserHeaderUtil.getUserHeader();
     }
 
     /**
-     * 获取租户ID
+     * Get tenant ID from user header
      *
-     * @return 租户ID
+     * @return Tenant ID as Mono
      */
     default Mono<Long> getTenantId() {
         return UserHeaderUtil.getTenantId();
     }
 
     /**
-     * 获取用户ID
+     * Get user ID from user header
      *
-     * @return User ID
+     * @return User ID as Mono
      */
     default Mono<Long> getUserId() {
         return UserHeaderUtil.getUserId();
     }
 
     /**
-     * 获取用户昵称
+     * Get user nickname from user header
      *
-     * @return Nick Name
+     * @return User nickname as Mono
      */
     default Mono<String> getNickName() {
         return UserHeaderUtil.getNickName();
     }
 
     /**
-     * 获取用户名
+     * Get username from user header
      *
-     * @return User Name
+     * @return Username as Mono
      */
     default Mono<String> getUserName() {
         return UserHeaderUtil.getUserName();
