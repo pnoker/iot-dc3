@@ -34,7 +34,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * WebFilter 配置
+ * Web Filter Configuration Class
+ * <p>
+ * Configuration class for custom web filters in reactive applications.
+ * Configures context path filter and user header interceptor for request processing.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -48,9 +52,9 @@ public class WebFilterConfig {
     private ServerProperties serverProperties;
 
     /**
-     * 自定义过滤器
+     * Custom context path filter
      *
-     * @return WebFilter
+     * @return WebFilter for handling context path
      */
     @Bean
     public WebFilter contextPathWebFilter() {
@@ -68,9 +72,9 @@ public class WebFilterConfig {
     }
 
     /**
-     * 自定义拦截器
+     * Custom user header interceptor filter
      *
-     * @return WebFilter
+     * @return WebFilter for intercepting and processing user headers
      */
     @Bean
     public WebFilter interceptor() {

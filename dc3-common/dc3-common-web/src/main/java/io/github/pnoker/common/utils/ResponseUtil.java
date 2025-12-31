@@ -30,7 +30,11 @@ import org.springframework.http.ResponseEntity;
 import java.nio.file.Path;
 
 /**
- * 响应 相关工具类
+ * HTTP Response Utility Class
+ * <p>
+ * Utility class for handling HTTP response operations.
+ * Provides methods to create file download responses with proper headers and error handling.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -44,10 +48,10 @@ public class ResponseUtil {
     }
 
     /**
-     * 返回下载文件
+     * Create file download response
      *
-     * @param path 文件 Path
-     * @return Resource
+     * @param path File path to download
+     * @return ResponseEntity containing the file resource with proper headers
      */
     public static ResponseEntity<Resource> responseFile(Path path) {
         try {
