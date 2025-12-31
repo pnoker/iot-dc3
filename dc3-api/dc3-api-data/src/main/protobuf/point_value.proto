@@ -21,13 +21,12 @@ package api.common.data;
 
 import "api/common/r.proto";
 
-// Config
+// Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.data";
 option java_outer_classname = "PointValueProto";
 option objc_class_prefix = "Data";
 option java_multiple_files = true;
 
-// Api
 // Service interface defining RPC calls related to point values
 service PointValueApi {
   // Query the latest collected value of a device point
@@ -36,21 +35,21 @@ service PointValueApi {
 
 // Request structure for querying point values
 message GrpcPointValueQuery {
-  int64 device_id = 1; // Device ID, identifies the specific device
-  int64 point_id = 2; // Point ID, identifies the specific point
+  // Device ID, identifies the specific device
+  int64 device_id = 1;
+  
+  // Point ID, identifies the specific point
+  int64 point_id = 2;
 
-  // Tenant ID
   // Identifies the tenant to which the data belongs
   int64 tenant_id = 3;
 }
 
-// Response structure for returning point value
+// Response wrapper for point value query
 message GrpcRPointValueDTO {
-  // R
   // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  // Data
   // Returned point value data
   GrpcPointValueDTO data = 2;
 }

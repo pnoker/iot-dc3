@@ -21,24 +21,20 @@ package api.common.manager;
 
 import "api/common/page.proto";
 
-// Config
+// Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "QueryPageProto";
 option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
-// PageDriverQuery
 // Driver pagination query structure, used for paginated query of driver information
 message GrpcPageDriverQuery {
-  // Page
-  // Pagination information, including page number, page size, total count, etc.
+  // Pagination information including page number, page size, and total count
   GrpcPage page = 1;
 
-  // Tenant ID
   // Identifies the tenant
   int64 tenant_id = 2;
 
-  // Query fields
   // Filter conditions for driver information query
   // Driver name for fuzzy query
   string driver_name = 3;
@@ -62,18 +58,14 @@ message GrpcPageDriverQuery {
   int32 version = 9;
 }
 
-// PagePointQuery
 // Point pagination query structure, used for paginated query of point information
 message GrpcPagePointQuery {
-  // Page
-  // Pagination information, including page number, page size, total count, etc.
+  // Pagination information including page number, page size, and total count
   GrpcPage page = 1;
 
-  // Tenant ID
   // Identifies the tenant
   int64 tenant_id = 2;
 
-  // Query fields
   // Filter conditions for point information query
   // Point name for fuzzy query
   string point_name = 3;
@@ -99,24 +91,19 @@ message GrpcPagePointQuery {
   // Version number for version management
   int32 version = 10;
 
-  // Additional fields
   // Extra query conditions
   // Device ID for querying points under specific device
   int64 device_id = 11;
 }
 
-// Device Page Query
 // Device pagination query structure, used for paginated query of device information
 message GrpcPageDeviceQuery {
-  // Page
-  // Pagination information, including page number, page size, total count, etc.
+  // Pagination information including page number, page size, and total count
   GrpcPage page = 1;
 
-  // Tenant ID
   // Identifies the tenant
   int64 tenant_id = 2;
 
-  // Query fields
   // Filter conditions for device information query
   // Device name for fuzzy query
   string device_name = 3;
@@ -136,7 +123,6 @@ message GrpcPageDeviceQuery {
   // Version number for version management
   int32 version = 8;
 
-  // Additional fields
   // Extra query conditions
   // Profile template ID for querying devices under specific template
   int64 profile_id = 9;
