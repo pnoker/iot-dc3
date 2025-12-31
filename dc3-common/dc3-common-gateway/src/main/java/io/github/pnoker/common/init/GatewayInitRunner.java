@@ -23,7 +23,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
- * Gateway initialization runner
+ * Gateway Initialization Runner for DC3 IoT Platform.
+ * This class handles gateway initialization tasks during application startup,
+ * configuring component scanning for gateway-related classes.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -37,6 +39,7 @@ public class GatewayInitRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        // nothing to do
+        // Currently no initialization tasks are required
+        // This method can be extended to add future gateway initialization logic
     }
 }
