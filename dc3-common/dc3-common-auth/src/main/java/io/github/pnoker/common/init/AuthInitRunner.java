@@ -25,7 +25,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
- * Auth initialization runner
+ * Authentication Initialization Runner for DC3 IoT Platform.
+ * This class handles authentication initialization tasks during application startup,
+ * configuring component scanning for authentication-related classes and MyBatis mappers.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -43,6 +45,7 @@ public class AuthInitRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        // nothing to do
+        // Currently no initialization tasks are required
+        // This method can be extended to add future authentication initialization logic
     }
 }

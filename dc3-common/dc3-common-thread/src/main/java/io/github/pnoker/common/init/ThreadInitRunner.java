@@ -25,7 +25,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
- * Thread initialization runner
+ * Thread Initialization Runner for DC3 IoT Platform.
+ * This component handles thread initialization tasks during application startup.
+ * It scans and initializes thread-related components in the specified package.
  *
  * @author pnoker
  * @version 2025.9.0
