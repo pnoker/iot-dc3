@@ -57,7 +57,7 @@ public class MessageHeader implements Serializable {
     }
 
     /**
-     * 获取消息头
+     * Get message header
      *
      * @param messageHeaders MessageHeaders
      * @param key            Header Key

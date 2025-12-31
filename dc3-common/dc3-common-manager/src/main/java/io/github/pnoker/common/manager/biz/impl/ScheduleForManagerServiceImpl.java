@@ -41,7 +41,7 @@ public class ScheduleForManagerServiceImpl implements ScheduleForManagerService 
     @Override
     public void initial() {
         try {
-            // 自定义调度
+            // Custom schedule
             quartzService.createJobWithCron(ScheduleConstant.MANAGER_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?", HourlyJobForManager.class);
 
             quartzService.startScheduler();

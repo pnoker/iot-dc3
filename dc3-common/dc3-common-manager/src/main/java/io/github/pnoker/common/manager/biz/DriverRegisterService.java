@@ -25,7 +25,7 @@ import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import java.util.List;
 
 /**
- * 驱动注册相关接口
+ * Driver registration interfaces
  *
  * @author pnoker
  * @version 2025.9.0
@@ -34,14 +34,14 @@ import java.util.List;
 public interface DriverRegisterService {
 
     /**
-     * 注册驱动
+     * Register driver
      *
      * @param entityGrpc GrpcDriverRegisterDTO
      */
     DriverBO registerDriver(GrpcDriverRegisterDTO entityGrpc);
 
     /**
-     * 注册驱动属性
+     * Register driver attributes
      *
      * @param entityGrpc GrpcDriverRegisterDTO
      * @param entityBO   DriverBO
@@ -49,7 +49,7 @@ public interface DriverRegisterService {
     List<DriverAttributeBO> registerDriverAttribute(GrpcDriverRegisterDTO entityGrpc, DriverBO entityBO);
 
     /**
-     * 注册位号属性
+     * Register point attributes
      *
      * @param entityGrpc GrpcDriverRegisterDTO
      * @param entityBO   DriverBO

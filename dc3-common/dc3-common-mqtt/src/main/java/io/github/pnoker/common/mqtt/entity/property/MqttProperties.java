@@ -71,7 +71,7 @@ public class MqttProperties {
 
 
     /**
-     * Mqtt 权限认证类型枚举
+     * MQTT authentication type enum
      */
     @NoArgsConstructor
     public enum AuthTypeEnum {
