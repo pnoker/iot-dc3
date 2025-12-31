@@ -26,7 +26,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 /**
- * 命令行工具类集合
+ * Command Line Utility Class Collection
+ * <p>
+ * Utility class for command line operations and process management.
+ * Provides methods to safely terminate processes with exit commands.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -40,10 +44,11 @@ public class CmdUtil {
     }
 
     /**
-     * Destroy Process With Command
+     * Destroy process with exit command
+     * Writes the command to process output stream and forcibly destroys the process
      *
-     * @param process Process
-     * @param cmd     Exit Command
+     * @param process Process to destroy
+     * @param cmd     Exit command to send before destroying
      */
     public static void destroyProcessWithCmd(Process process, String cmd) {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));

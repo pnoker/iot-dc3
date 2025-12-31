@@ -20,21 +20,39 @@ package io.github.pnoker.common.exception;
 import java.text.MessageFormat;
 
 /**
- * 自定义 服务 异常
+ * Service Layer Exception
+ * <p>
+ * Custom exception for Service layer operations.
+ * Provides unified handling and wrapping of Service layer exceptions.
+ * </p>
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 1.0.0
  */
 public class ServiceException extends RuntimeException {
+    /**
+     * Constructs a ServiceException with no detail message.
+     */
     public ServiceException() {
         this(null);
     }
 
+    /**
+     * Constructs a ServiceException with the specified cause.
+     *
+     * @param cause the cause of the exception
+     */
     public ServiceException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructs a ServiceException with the specified template message and parameters.
+     * The template will be formatted using MessageFormat with the provided parameters.
+     *
+     * @param template the message template
+     * @param params   the parameters to format the template
+     */
     public ServiceException(String template, Object... params) {
         super(MessageFormat.format(template, params));
     }
