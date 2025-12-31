@@ -26,7 +26,11 @@ import java.util.Base64;
 import java.util.HexFormat;
 
 /**
- * 编码 相关工具类
+ * Encoding and Decoding Utility Class
+ * <p>
+ * Utility class for various encoding and decoding operations.
+ * Provides methods for string/bytes conversion, MD5 hashing, Base64 encoding/decoding, and hexadecimal conversion.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -40,105 +44,104 @@ public class DecodeUtil {
     }
 
     /**
-     * 字节转字符串
-     * <p>
-     * UTF-8
+     * Convert byte array to string using UTF-8 encoding
      *
-     * @param bytes 字节数组
-     * @return 字符串
+     * @param bytes Byte array to convert
+     * @return String representation of byte array
      */
     public static String byteToString(byte[] bytes) {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
     /**
-     * 字符串转字节
-     * <p>
-     * UTF-8
+     * Convert string to byte array using UTF-8 encoding
      *
-     * @param content 字符串
-     * @return 字节数组
+     * @param content String to convert
+     * @return Byte array representation of string
      */
     public static byte[] stringToByte(String content) {
         return content.getBytes(StandardCharsets.UTF_8);
     }
 
     /**
-     * 获取 MD5 编码
+     * Generate MD5 hash of content
      *
-     * @param content 字符串
-     * @return MD5 字符串
+     * @param content String to hash
+     * @return MD5 hash string
      */
     public static String md5(String content) {
         return DigestUtils.md5Hex(content);
     }
 
     /**
-     * 获取 MD5 编码
+     * Generate MD5 hash of content with salt
      *
-     * @param content 字符串
-     * @param salt    盐值
-     * @return MD5 字符串
+     * @param content String to hash
+     * @param salt    Salt value for additional security
+     * @return MD5 hash string
      */
     public static String md5(String content, String salt) {
         return md5(content + salt);
     }
 
     /**
-     * 将字节流进行Base64编码
+     * Encode byte array using Base64 encoding
      *
-     * @param bytes Byte Array
-     * @return Byte Array
+     * @param bytes Byte array to encode
+     * @return Base64 encoded byte array
      */
     public static byte[] encode(byte[] bytes) {
         return Base64.getEncoder().encode(bytes);
     }
 
     /**
-     * 将字符串进行Base64编码
+     * Encode string using Base64 encoding
      *
-     * @param content 字符串
-     * @return Byte Array
+     * @param content String to encode
+     * @return Base64 encoded byte array
      */
     public static byte[] encode(String content) {
         return encode(stringToByte(content));
     }
 
     /**
-     * 必须配合encode使用, 用于encode编码之后解码
+     * Decode Base64 encoded byte array
+     * Must be used with encode method
      *
-     * @param bytes Byte Array
-     * @return Byte Array
+     * @param bytes Base64 encoded byte array
+     * @return Decoded byte array
      */
     public static byte[] decode(byte[] bytes) {
         return Base64.getDecoder().decode(bytes);
     }
 
     /**
-     * 必须配合encode使用, 用于encode编码之后解码
+     * Decode Base64 encoded string
+     * Must be used with encode method
      *
-     * @param content 字符串
-     * @return Byte Array
+     * @param content Base64 encoded string
+     * @return Decoded byte array
      */
     public static byte[] decode(String content) {
         return decode(stringToByte(content));
     }
 
     /**
-     * 将字符串进行16进制编码
+     * Encode string to hexadecimal representation
      *
-     * @param content 字符串
-     * @return String
+     * @param content String to encode
+     * @return Hexadecimal string representation
      */
     public static String enHexCode(String content) {
         return HexFormat.of().formatHex((stringToByte(content)));
     }
 
     /**
-     * 必须配合enHexCode使用, 用于enHexCode编码之后解码
+     * Decode hexadecimal string to byte array
+     * Must be used with enHexCode method
      *
-     * @param content 字符串
-     * @return Byte Array
+     * @param content Hexadecimal string to decode
+     * @return Decoded byte array
      */
     public static byte[] deHexCode(String content) {
         return HexFormat.of().parseHex(content);
