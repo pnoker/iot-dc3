@@ -21,7 +21,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Data Center Service Startup Portal
+ * Data Center Service Application
+ * <p>
+ * Main entry point for Data Center Service.
+ * This service handles data collection, storage, and processing for IoT devices.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,6 +33,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class DataApplication {
+
+    /**
+     * Main entry point for the Data Center Service.
+     * 
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(DataApplication.class, args);
     }
