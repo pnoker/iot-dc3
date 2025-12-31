@@ -22,6 +22,11 @@ import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 
 /**
+ * Service for sending messages to MQTT topics.
+ * This interface provides methods for publishing messages to MQTT brokers
+ * with support for custom topics and Quality of Service (QoS) levels.
+ * It is implemented as a Spring Integration messaging gateway.
+ * 
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0

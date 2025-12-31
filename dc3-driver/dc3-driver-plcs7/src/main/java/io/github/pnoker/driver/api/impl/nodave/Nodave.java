@@ -17,7 +17,14 @@
 package io.github.pnoker.driver.api.impl.nodave;
 
 /**
+ * Utility class for communication with Siemens S7 PLCs.
+ * This class provides methods for data conversion, protocol constants,
+ * and error handling for S7 PLC communication.
+ * Based on the libnodave library for PLC communication.
+ * 
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public final class Nodave {
     public final static int MAX_RAW_LEN = 2048;

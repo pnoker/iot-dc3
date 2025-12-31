@@ -32,6 +32,11 @@ import java.security.cert.X509Certificate;
 import java.util.regex.Pattern;
 
 /**
+ * Certificate and key loader for OPC-UA client authentication.
+ * This class handles loading and generation of X.509 certificates and key pairs
+ * for secure OPC-UA communication. It creates self-signed certificates if they
+ * don't exist and manages the PKCS12 keystore for the client.
+ * 
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0

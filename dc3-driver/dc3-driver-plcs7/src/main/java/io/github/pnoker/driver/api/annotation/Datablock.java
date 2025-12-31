@@ -19,9 +19,13 @@ package io.github.pnoker.driver.api.annotation;
 import java.lang.annotation.*;
 
 /**
- * Annotation for a datablock
- *
+ * Annotation for marking classes as S7 PLC data blocks.
+ * This annotation is used to identify Java classes that represent S7 PLC
+ * data blocks (DBs) for serialization and deserialization purposes.
+ * 
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Target(value = {ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
