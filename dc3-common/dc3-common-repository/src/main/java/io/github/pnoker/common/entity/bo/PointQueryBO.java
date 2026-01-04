@@ -23,7 +23,12 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 位号查询
+ * Point Query Business Object
+ * <p>
+ * Business object for point queries in IoT DC3 platform.
+ * Contains device ID and point ID for querying specific point data.
+ * Used for retrieving point information from the repository layer.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -41,12 +46,12 @@ public class PointQueryBO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 设备ID
+     * Device ID for querying point data
      */
     private Long deviceId;
 
     /**
-     * 位号ID
+     * Point ID for querying specific point
      */
     private Long pointId;
 }

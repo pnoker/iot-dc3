@@ -40,6 +40,12 @@ import org.springframework.stereotype.Component;
 @EnableConfigurationProperties({ThreadProperties.class})
 public class ThreadInitRunner implements ApplicationRunner {
 
+    /**
+     * Initialize thread components during application startup
+     *
+     * @param args Application arguments passed to the application
+     * @throws Exception if initialization fails
+     */
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // nothing to do
