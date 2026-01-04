@@ -26,7 +26,12 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 通用线程池配置
+ * Thread Pool Configuration Class
+ * <p>
+ * Configuration class for creating and managing thread pools in Spring Boot applications.
+ * Provides three types of thread pools: standard ThreadPoolExecutor, virtual thread pool,
+ * and ScheduledThreadPoolExecutor with custom rejection policies.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -46,9 +51,9 @@ public class ThreadPoolConfig {
     }
 
     /**
-     * LinkedBlockingQueue ThreadPoolExecutor
+     * Create ThreadPoolExecutor with LinkedBlockingQueue
      *
-     * @return ThreadPoolExecutor
+     * @return Configured ThreadPoolExecutor bean
      */
     @Bean(destroyMethod = "shutdown")
     public ThreadPoolExecutor threadPoolExecutor() {
@@ -63,9 +68,10 @@ public class ThreadPoolConfig {
     }
 
     /**
-     * Virtual thread pool: One virtual thread per task
+     * Create virtual thread executor service
+     * Creates one virtual thread per task for improved resource utilization
      *
-     * @return ExecutorService
+     * @return Virtual thread ExecutorService bean
      */
     @Bean(destroyMethod = "shutdown")
     public ExecutorService virtualThreadExecutor() {
@@ -77,9 +83,9 @@ public class ThreadPoolConfig {
     }
 
     /**
-     * ScheduledThreadPoolExecutor ThreadPoolExecutor
+     * Create ScheduledThreadPoolExecutor for scheduled tasks
      *
-     * @return ScheduledThreadPoolExecutor
+     * @return Configured ScheduledThreadPoolExecutor bean
      */
     @Bean(destroyMethod = "shutdown")
     public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
@@ -90,13 +96,23 @@ public class ThreadPoolConfig {
     }
 
     /**
-     * 自定义 RejectedExecutionHandler
+     * Custom RejectedExecutionHandler for blocking rejected tasks
+     * <p>
+     * Instead of rejecting tasks when the thread pool is full,
+     * this handler attempts to execute them in the calling thread.
+     * </p>
      *
      * @author pnoker
      * @version 2025.9.0
      * @since 2022.1.0
      */
     private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {
+        /**
+         * Handle rejected execution by attempting to run task in calling thread
+         *
+         * @param runnable  The runnable task requested to be executed
+         * @param executor The executor attempting to execute this task
+         */
         @Override
         public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
             try {
