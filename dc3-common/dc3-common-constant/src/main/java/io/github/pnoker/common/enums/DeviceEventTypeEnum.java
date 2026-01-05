@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用驱动事件枚举
+ * Common device event type enumeration.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,37 +35,37 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum DeviceEventTypeEnum {
     /**
-     * 心跳事件
+     * Heartbeat event.
      */
-    HEARTBEAT((byte) 0, "heartbeat", "心跳事件"),
+    HEARTBEAT((byte) 0, "heartbeat", "heartbeat event"),
 
     /**
-     * 报警事件
+     * Alarm event.
      */
-    ALARM((byte) 1, "alarm", "报警事件"),
+    ALARM((byte) 1, "alarm", "alarm event"),
     ;
 
     /**
-     * 索引
+     * Index value stored in database.
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code string.
      */
     private final String code;
 
     /**
-     * 内容
+     * Human-readable description.
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index value.
      *
-     * @param index 索引
-     * @return {@link DeviceEventTypeEnum}
+     * @param index index value
+     * @return {@link DeviceEventTypeEnum} or {@code null} if not found
      */
     public static DeviceEventTypeEnum ofIndex(Byte index) {
         Optional<DeviceEventTypeEnum> any = Arrays.stream(DeviceEventTypeEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
@@ -73,10 +73,10 @@ public enum DeviceEventTypeEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code string.
      *
-     * @param code 编码
-     * @return {@link DeviceEventTypeEnum}
+     * @param code code string
+     * @return {@link DeviceEventTypeEnum} or {@code null} if not found
      */
     public static DeviceEventTypeEnum ofCode(String code) {
         Optional<DeviceEventTypeEnum> any = Arrays.stream(DeviceEventTypeEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
@@ -84,10 +84,10 @@ public enum DeviceEventTypeEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by enum name.
      *
-     * @param name 枚举内容
-     * @return {@link DeviceEventTypeEnum}
+     * @param name enum name
+     * @return {@link DeviceEventTypeEnum} or {@code null} if parsing fails
      */
     public static DeviceEventTypeEnum ofName(String name) {
         try {

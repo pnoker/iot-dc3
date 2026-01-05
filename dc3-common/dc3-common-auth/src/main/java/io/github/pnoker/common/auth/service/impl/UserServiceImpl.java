@@ -39,7 +39,9 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * 用户服务接口实现类
+ * User service implementation.
+ *
+ * <p>Provides CRUD operations and lookup utilities for user entities.</p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -59,7 +61,7 @@ public class UserServiceImpl implements UserService {
     public void save(UserBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
-        // 判断手机号是否存在, 如果有手机号不为空, 检查该手机号是否被占用
+        // When phone number is present, check whether it is already occupied.
         if (StringUtils.isNotEmpty(entityBO.getPhone())) {
             UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
             if (Objects.nonNull(selectByPhone)) {
@@ -67,7 +69,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // 判断邮箱是否存在, 如果有邮箱不为空, 检查该邮箱是否被占用
+        // When email is present, check whether it is already occupied.
         if (StringUtils.isNotEmpty(entityBO.getEmail())) {
             UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
             if (Objects.nonNull(selectByEmail)) {
@@ -96,7 +98,7 @@ public class UserServiceImpl implements UserService {
 
         checkDuplicate(entityBO, true, true);
 
-        // 判断手机号是否更新
+        // Check whether phone number is updated.
         if (StringUtils.isNotEmpty(entityBO.getPhone())) {
             if (!entityBO.getPhone().equals(selectById.getPhone())) {
                 UserBO selectByPhone = selectByPhone(entityBO.getPhone(), false);
@@ -106,7 +108,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        // 判断邮箱是否更新
+        // Check whether email is updated.
         if (StringUtils.isNotEmpty(entityBO.getEmail())) {
             if (!entityBO.getEmail().equals(selectById.getEmail())) {
                 UserBO selectByEmail = selectByEmail(entityBO.getEmail(), false);
@@ -174,10 +176,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 构造模糊查询
+     * Build fuzzy query wrapper for user search.
      *
-     * @param entityQuery {@link UserQuery}
-     * @return {@link LambdaQueryWrapper}
+     * @param entityQuery {@link UserQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link UserDO}
      */
     private LambdaQueryWrapper<UserDO> fuzzyQuery(UserQuery entityQuery) {
         LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
@@ -203,12 +205,12 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 重复性校验
+     * Check whether a user is duplicated by username.
      *
-     * @param entityBO       {@link UserBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param entityBO       {@link UserBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(UserBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<UserDO> wrapper = Wrappers.<UserDO>query().lambda();
@@ -226,11 +228,11 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Get user data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException 是否抛异常
-     * @return {@link UserDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link UserDO} if found, otherwise {@code null} when {@code throwException} is false
      */
     private UserDO getDOById(Long id, boolean throwException) {
         UserDO entityDO = userManager.getById(id);

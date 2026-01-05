@@ -72,7 +72,7 @@ public class LabelServiceImpl implements LabelService {
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 删除标签之前需要检查该标签是否存在关联
+        // Before deleting a label, check whether it is already bound to any entity.
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
         wrapper.eq(LabelBindDO::getLabelId, id);
         long count = labelBindManager.count(wrapper);
@@ -114,10 +114,10 @@ public class LabelServiceImpl implements LabelService {
     }
 
     /**
-     * 构造模糊查询
+     * Build fuzzy query wrapper for label search.
      *
-     * @param entityQuery {@link LabelQuery}
-     * @return {@link LambdaQueryWrapper}
+     * @param entityQuery {@link LabelQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link LabelDO}
      */
     private LambdaQueryWrapper<LabelDO> fuzzyQuery(LabelQuery entityQuery) {
         LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
@@ -129,12 +129,12 @@ public class LabelServiceImpl implements LabelService {
     }
 
     /**
-     * 重复性校验
+     * Check whether a label is duplicated under the same tenant and entity type.
      *
-     * @param entityBO       {@link LabelBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param entityBO       {@link LabelBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(LabelBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<LabelDO> wrapper = Wrappers.<LabelDO>query().lambda();
@@ -154,11 +154,11 @@ public class LabelServiceImpl implements LabelService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Get label data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException 是否抛异常
-     * @return {@link LabelDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link LabelDO} if found, otherwise {@code null} when {@code throwException} is false
      */
     private LabelDO getDOById(Long id, boolean throwException) {
         LabelDO entityDO = labelManager.getById(id);

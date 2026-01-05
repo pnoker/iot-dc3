@@ -44,19 +44,19 @@ public class LabelBindQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID.
      */
     private Long tenantId;
 
-    // 查询字段
+    // Query fields
 
     /**
-     * 标签ID
+     * Label ID.
      */
     private Long labelId;
 
     /**
-     * 实体ID
+     * Entity ID.
      */
     private Long entityId;
 }
