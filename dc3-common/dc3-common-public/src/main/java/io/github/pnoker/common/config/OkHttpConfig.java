@@ -27,7 +27,12 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
- * OkHttp Configuration
+ * OkHttp Configuration Class
+ * <p>
+ * Configuration class for OkHttp client in Spring Boot applications.
+ * Configures connection pool, timeouts, and retry settings
+ * for robust HTTP client operations.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -37,6 +42,11 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class OkHttpConfig {
 
+    /**
+     * Configure OkHttpClient bean with optimized settings
+     *
+     * @return Configured OkHttpClient instance
+     */
     @Bean
     public OkHttpClient okHttpClient() {
         ConnectionPool pool = new ConnectionPool(16, 5, TimeUnit.SECONDS);

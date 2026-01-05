@@ -23,7 +23,12 @@ import java.util.Objects;
 import java.util.function.IntConsumer;
 
 /**
- * 自定义 Integer Optional
+ * Custom Integer Optional Class
+ * <p>
+ * Optional wrapper class for integer operations.
+ * Provides utility methods for null safety and empty checks
+ * with consumer-based conditional operations.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

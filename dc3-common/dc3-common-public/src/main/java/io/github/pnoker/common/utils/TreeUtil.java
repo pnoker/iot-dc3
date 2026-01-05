@@ -24,7 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 树 相关工具类集合
+ * Tree Utility Class
+ * <p>
+ * Utility class for tree structure operations in IoT DC3 platform.
+ * Provides methods for building tree structures from flat lists
+ * and converting trees back to lists.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

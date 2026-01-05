@@ -26,7 +26,12 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Response
+ * Unified Response Wrapper Class
+ * <p>
+ * Generic response wrapper class for API responses in IoT DC3 platform.
+ * Provides standardized response format with status, code, message, and data fields.
+ * Supports both success and failure response scenarios.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,68 +47,68 @@ public class R<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 响应状态
+     * Response status flag
      */
     private boolean ok = false;
 
     /**
-     * 响应编码
+     * Response status code
      */
     private String code = ResponseEnum.OK.getCode();
 
     /**
-     * 响应信息
+     * Response message
      */
     private String message = ResponseEnum.OK.getText();
 
     /**
-     * 响应数据
+     * Response data payload
      */
     @SuppressWarnings("all")
     private T data;
 
     /**
-     * 构造函数
+     * Private default constructor
      */
     private R() {
     }
 
     /**
-     * 构造函数
+     * Private constructor with data
      *
-     * @param data 数据
+     * @param data Response data payload
      */
     private R(T data) {
         this.data = data;
     }
 
     /**
-     * 成功
+     * Create success response with default settings
      *
-     * @param <T> Object
-     * @return Response
+     * @param <T>     Response data type
+     * @return Response with success status
      */
     public static <T> R<T> ok() {
         return new R<T>().success();
     }
 
     /**
-     * 成功 自定义提示信息
+     * Create success response with custom message
      *
-     * @param <T>     Object
-     * @param message 成功信息
-     * @return Response
+     * @param <T>     Response data type
+     * @param message Custom success message
+     * @return Response with success status and custom message
      */
     public static <T> R<T> ok(String message) {
         return new R<T>().success(message);
     }
 
     /**
-     * 成功 自定义 Code 和 提示信息ff
+     * Create success response with custom code and message
      *
-     * @param <T>  Object
-     * @param code {@link ResponseEnum}
-     * @return Response
+     * @param <T>     Response data type
+     * @param code    {@link ResponseEnum} custom response code
+     * @return Response with success status and custom code/message
      */
     public static <T> R<T> ok(ResponseEnum code) {
         return new R<T>().success(code.getCode(), code.getText());

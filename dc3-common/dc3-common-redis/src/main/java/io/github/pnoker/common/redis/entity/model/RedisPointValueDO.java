@@ -26,7 +26,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * Redis Point Value Entity
+ * Redis Point Value Data Object
+ * <p>
+ * Data object representing point values stored in Redis.
+ * Contains device ID, point ID, raw and calculated values,
+ * driver ID, and timestamps for time-series data storage.
+ * Used for Redis persistence of IoT device point values.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -41,37 +47,37 @@ public class RedisPointValueDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Device ID
+     * Device ID associated with the point value
      */
     private Long deviceId;
 
     /**
-     * Point ID
+     * Point ID associated with the value
      */
     private Long pointId;
 
     /**
-     * Raw Value
+     * Raw value as received from the device
      */
     private String rawValue;
 
     /**
-     * Calculated Value
+     * Calculated/processed value after transformations
      */
     private String calValue;
 
     /**
-     * Driver ID
+     * Driver ID that collected the data
      */
     private Long driverId;
 
     /**
-     * Create Time
+     * Timestamp when the value was created
      */
     private LocalDateTime createTime;
 
     /**
-     * Operate Time
+     * Timestamp when the value was last operated on
      */
     private LocalDateTime operateTime;
 }

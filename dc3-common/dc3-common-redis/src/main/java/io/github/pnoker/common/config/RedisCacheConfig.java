@@ -36,7 +36,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 
 /**
- * Redis Cache
+ * Redis Cache Configuration Class
+ * <p>
+ * Configuration class for Redis caching in Spring Boot applications.
+ * Configures cache manager, key generators, and serialization strategies
+ * to resolve character encoding issues and support custom cache policies.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

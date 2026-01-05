@@ -28,7 +28,12 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
 import java.util.Objects;
 
 /**
- * 字段名称 相关工具类
+ * Field Name Utility Class
+ * <p>
+ * Utility class for field name operations and lambda expressions.
+ * Provides methods to extract field names from lambda functions
+ * and convert property names for database operations.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

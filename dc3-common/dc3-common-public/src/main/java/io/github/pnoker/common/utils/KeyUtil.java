@@ -41,7 +41,12 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * AES, RSA, JWT 相关工具类
+ * Cryptographic Utility Class
+ * <p>
+ * Utility class for encryption and decryption operations in IoT DC3 platform.
+ * Provides methods for AES/RSA key generation, encryption, decryption,
+ * and JWT token creation and validation.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
