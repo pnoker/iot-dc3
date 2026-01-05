@@ -25,7 +25,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * MybatisPlus配置
+ * MyBatis-Plus Configuration Class
+ * <p>
+ * Configuration class for MyBatis-Plus framework integration.
+ * Configures pagination interceptors and enables transaction management
+ * for PostgreSQL database operations in IoT DC3 platform.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -36,9 +41,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class MybatisPlusConfig {
 
     /**
-     * 分页插件
+     * Pagination interceptor bean configuration
      *
-     * @return MybatisPlusInterceptor
+     * @return Configured MybatisPlusInterceptor with PostgreSQL pagination support
      */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {

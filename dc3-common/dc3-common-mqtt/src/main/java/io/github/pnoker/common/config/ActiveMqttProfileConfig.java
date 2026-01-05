@@ -26,7 +26,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Environment Config
+ * Active MQTT Profile Configuration
+ * <p>
+ * Environment post processor configuration that automatically activates
+ * the MQTT profile for Spring Boot applications. This ensures
+ * MQTT-specific configurations are loaded with highest precedence.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,6 +43,12 @@ import org.springframework.core.env.ConfigurableEnvironment;
 public class ActiveMqttProfileConfig implements EnvironmentPostProcessor {
 
     @Override
+    /**
+     * Post-process Spring environment to activate MQTT profile
+     *
+     * @param environment ConfigurableEnvironment to modify
+     * @param application SpringApplication instance
+     */
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         environment.addActiveProfile("mqtt");
     }

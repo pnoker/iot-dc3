@@ -39,7 +39,12 @@ import java.util.Objects;
 
 
 /**
- * MQTT configuration
+ * MQTT Configuration Class
+ * <p>
+ * Configuration class for MQTT integration in IoT DC3 platform.
+ * Configures MQTT client factory, inbound/outbound channels,
+ * message handlers, and topic subscriptions.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -51,20 +56,40 @@ public class MqttConfig {
 
     private final MqttProperties mqttProperties;
 
+    /**
+     * Constructor for MQTT configuration
+     *
+     * @param mqttProperties MQTT configuration properties
+     */
     public MqttConfig(MqttProperties mqttProperties) {
         this.mqttProperties = mqttProperties;
     }
 
+    /**
+     * MQTT inbound message channel bean
+     *
+     * @return DirectChannel for inbound MQTT messages
+     */
     @Bean
     public MessageChannel mqttInboundChannel() {
         return new DirectChannel();
     }
 
+    /**
+     * MQTT outbound message channel bean
+     *
+     * @return DirectChannel for outbound MQTT messages
+     */
     @Bean
     public MessageChannel mqttOutboundChannel() {
         return new DirectChannel();
     }
 
+    /**
+     * MQTT client factory bean configuration
+     *
+     * @return Configured MqttPahoClientFactory with connection options
+     */
     @Bean
     public MqttPahoClientFactory mqttClientFactory() {
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
@@ -72,6 +97,12 @@ public class MqttConfig {
         return factory;
     }
 
+    /**
+     * MQTT inbound message producer bean configuration
+     *
+     * @param mqttClientFactory MQTT client factory
+     * @return Configured MessageProducer for MQTT inbound processing
+     */
     @Bean
     public MessageProducer mqttInbound(MqttPahoClientFactory mqttClientFactory) {
         if (Objects.isNull(mqttProperties.getReceiveTopics())) {
@@ -92,6 +123,12 @@ public class MqttConfig {
         return adapter;
     }
 
+    /**
+     * MQTT outbound message handler bean configuration
+     *
+     * @param mqttClientFactory MQTT client factory
+     * @return Configured MessageHandler for MQTT outbound processing
+     */
     @Bean
     @ServiceActivator(inputChannel = "mqttOutboundChannel")
     public MessageHandler mqttOutbound(MqttPahoClientFactory mqttClientFactory) {

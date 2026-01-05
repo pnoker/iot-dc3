@@ -28,6 +28,13 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 /**
+ * MQTT Properties Configuration Class
+ * <p>
+ * Configuration properties for MQTT connections in IoT DC3 platform.
+ * Includes authentication settings, topic configurations, SSL certificates,
+ * and connection parameters with validation constraints.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
