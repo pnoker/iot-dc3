@@ -24,7 +24,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Aes/Rsa 加密密钥
+ * Encryption Keys Configuration Class
+ * <p>
+ * Configuration class for AES/RSA encryption key management
+ * in IoT DC3 platform. Contains static inner classes
+ * for different encryption algorithm key pairs.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -37,7 +42,7 @@ public class Keys {
     }
 
     /**
-     * Aes 密钥
+     * AES private key for symmetric encryption
      */
     @Getter
     @Setter
@@ -48,7 +53,7 @@ public class Keys {
     }
 
     /**
-     * RSA 密钥对
+     * RSA key pair for asymmetric encryption
      */
     @Getter
     @Setter

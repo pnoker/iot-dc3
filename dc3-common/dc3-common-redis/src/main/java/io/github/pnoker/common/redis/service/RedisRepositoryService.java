@@ -35,6 +35,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
+ * Redis Repository Service Implementation
+ * <p>
+ * Service implementation for storing and retrieving point values in Redis.
+ * Provides operations for saving single or multiple point values and
+ * querying latest values by device and point IDs.
+ * Uses Redis key prefixes for organized data storage.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -49,6 +57,11 @@ public class RedisRepositoryService {
     @Resource
     private RedisService redisService;
 
+    /**
+     * Save a single point value to Redis
+     *
+     * @param entityBO Point value business object to save
+     */
     public void savePointValue(PointValueBO entityBO) {
         if (Objects.isNull(entityBO.getDeviceId()) || Objects.isNull(entityBO.getPointId())) {
             return;
@@ -59,6 +72,12 @@ public class RedisRepositoryService {
         redisService.setKey(prefix + entityBO.getPointId(), entityDO);
     }
 
+    /**
+     * Save multiple point values for a device to Redis
+     *
+     * @param deviceId   Device ID for the point values
+     * @param entityBOList List of point value business objects to save
+     */
     public void savePointValue(Long deviceId, List<PointValueBO> entityBOList) {
         if (Objects.isNull(deviceId)) {
             return;
@@ -72,6 +91,13 @@ public class RedisRepositoryService {
         redisService.setKey(entityDOMap);
     }
 
+    /**
+     * Select latest point values by device ID and point IDs
+     *
+     * @param deviceId Device ID to query
+     * @param pointIds List of point IDs to retrieve
+     * @return Map of point ID to point value business object
+     */
     public Map<Long, PointValueBO> selectLatestPointValue(Long deviceId, List<Long> pointIds) {
         if (CollectionUtils.isEmpty(pointIds)) {
             return Collections.emptyMap();

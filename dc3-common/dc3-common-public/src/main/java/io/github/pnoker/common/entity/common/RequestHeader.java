@@ -24,7 +24,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Request Header
+ * Request Header Configuration Class
+ * <p>
+ * Configuration class for HTTP request headers in IoT DC3 platform.
+ * Contains static inner classes for token and user headers
+ * with authentication and user identification information.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -44,12 +49,12 @@ public class RequestHeader {
     @AllArgsConstructor
     public static class TokenHeader {
         /**
-         * 盐值
+         * Salt value for token encryption
          */
         private String salt;
 
         /**
-         * JWT Token
+         * JWT token string
          */
         private String token;
     }
@@ -61,22 +66,22 @@ public class RequestHeader {
     public static class UserHeader {
 
         /**
-         * 用户 ID
+         * User ID for identification
          */
         private Long userId;
 
         /**
-         * 用户别名
+         * User nickname or alias
          */
         private String nickName;
 
         /**
-         * 用户名称
+         * User account name
          */
         private String userName;
 
         /**
-         * 租户ID
+         * Tenant ID for multi-tenant isolation
          */
         private Long tenantId;
     }

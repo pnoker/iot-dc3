@@ -24,7 +24,11 @@ import java.net.*;
 import java.util.*;
 
 /**
- * Host 相关工具类
+ * Host Utility Class
+ * <p>
+ * Utility class for host and network operations in IoT DC3 platform.
+ * Provides methods for getting IP addresses, hostnames, and network information.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

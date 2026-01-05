@@ -23,7 +23,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Condition;
 
 /**
- * MapStruct  Util
+ * MapStruct Utility Class
+ * <p>
+ * Utility class for MapStruct mapping conditions.
+ * Provides conditional mapping methods to handle null values
+ * and invalid numbers during object mapping.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

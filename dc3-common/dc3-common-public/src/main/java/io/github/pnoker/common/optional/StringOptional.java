@@ -22,7 +22,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.function.Consumer;
 
 /**
- * 自定义 String Optional
+ * Custom String Optional Class
+ * <p>
+ * Optional wrapper class for string operations.
+ * Provides utility methods for null safety and empty checks
+ * with consumer-based conditional operations.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

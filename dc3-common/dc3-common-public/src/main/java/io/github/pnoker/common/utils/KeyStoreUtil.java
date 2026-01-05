@@ -35,7 +35,12 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 
 /**
- * 证书导入工具类
+ * KeyStore Certificate Import Utility Class
+ * <p>
+ * Utility class for importing certificates into KeyStore.
+ * Provides methods to load certificates from resources
+ * and manage SSL/TLS certificate stores.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

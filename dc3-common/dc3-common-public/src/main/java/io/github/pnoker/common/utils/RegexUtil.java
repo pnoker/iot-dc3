@@ -23,7 +23,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.math.BigDecimal;
 
 /**
- * 常用正则工具类
+ * Regular Expression Utility Class
+ * <p>
+ * Utility class for common regular expression operations.
+ * Provides methods for number validation, email validation,
+ * and various string format checks using regex patterns.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -36,10 +41,10 @@ public class RegexUtil {
     }
 
     /**
-     * 判断字符串是否为 数字格式
+     * Check if string is in numeric format
      *
-     * @param content 字符串
-     * @return boolean
+     * @param content String to check
+     * @return true if numeric, false otherwise
      */
     public static boolean isNumeric(String content) {
         if (StringUtils.isEmpty(content)) return false;
@@ -52,10 +57,10 @@ public class RegexUtil {
     }
 
     /**
-     * 判断字符串是否为 名称格式(2-32)
+     * Check if string is in name format (2-32 characters)
      *
-     * @param name String
-     * @return boolean
+     * @param name String to check
+     * @return true if valid name format, false otherwise
      */
     public static boolean isName(String name) {
         String regex = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$";
@@ -63,10 +68,10 @@ public class RegexUtil {
     }
 
     /**
-     * 判断字符串是否为 手机号码格式
+     * Check if string is in mobile phone format
      *
-     * @param phone String
-     * @return boolean
+     * @param phone Phone number string to check
+     * @return true if valid mobile format, false otherwise
      */
     public static boolean isPhone(String phone) {
         String regex = "^1([3-9])\\d{9}$";
@@ -74,10 +79,10 @@ public class RegexUtil {
     }
 
     /**
-     * 判断字符串是否为 邮箱地址格式
+     * Check if string is in email address format
      *
-     * @param mail String
-     * @return boolean
+     * @param mail Email address to check
+     * @return true if valid email format, false otherwise
      */
     public static boolean isMail(String mail) {
         String regex = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$";
@@ -85,10 +90,10 @@ public class RegexUtil {
     }
 
     /**
-     * 判断字符串是否为 密码格式(8-16)
+     * Check if string is in password format (8-16 characters)
      *
-     * @param password String
-     * @return boolean
+     * @param password Password string to check
+     * @return true if valid password format, false otherwise
      */
     public static boolean isPassword(String password) {
         String regex = "^[a-zA-Z]\\w{7,15}$";
@@ -96,10 +101,10 @@ public class RegexUtil {
     }
 
     /**
-     * 判断字符串是否为 Host格式
+     * Check if string is in host format
      *
-     * @param host String
-     * @return boolean
+     * @param host Host string to check
+     * @return true if valid host format, false otherwise
      */
     public static boolean isHost(String host) {
         String regex = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$";
@@ -107,10 +112,10 @@ public class RegexUtil {
     }
 
     /**
-     * 判断字符串是否为 驱动端口格式
+     * Check if port is in valid driver port range
      *
-     * @param port Integer
-     * @return boolean
+     * @param port Port number to check
+     * @return true if valid driver port (8600-8799), false otherwise
      */
     public static boolean isDriverPort(int port) {
         return port >= 8600 && port <= 8799;

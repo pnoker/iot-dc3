@@ -23,7 +23,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * 提供精确的浮点数运算, 包括加减乘除和四舍五入
+ * Arithmetic Utility Class
+ * <p>
+ * Utility class for precise floating-point arithmetic operations.
+ * Provides accurate addition, subtraction, multiplication, division,
+ * and rounding operations using BigDecimal.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

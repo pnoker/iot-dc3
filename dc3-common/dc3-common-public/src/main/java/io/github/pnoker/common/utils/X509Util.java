@@ -41,6 +41,13 @@ import java.security.cert.X509Certificate;
 import java.util.Objects;
 
 /**
+ * X509 Certificate Utility Class
+ * <p>
+ * Utility class for X509 certificate and SSL/TLS operations.
+ * Provides methods for loading certificates, creating SSL socket factories,
+ * and managing keystore/truststore configurations.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -52,7 +59,16 @@ public class X509Util {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
-    // TODO: 2023.10.16 此处有问题, 目前为不可用状态
+    // TODO: 2023.10.16 There are issues here, currently in unavailable state
+    /**
+     * Create SSL socket factory with custom certificates
+     *
+     * @param caCrtFile CA certificate file path
+     * @param crtFile Client certificate file path
+     * @param keyFile Client private key file path
+     * @param password Private key password
+     * @return Configured SSL socket factory
+     */
     public static SSLSocketFactory getSSLSocketFactory(final String caCrtFile, final String crtFile, final String keyFile, final String password) {
         try {
             Security.addProvider(new BouncyCastleProvider());

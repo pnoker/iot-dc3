@@ -117,12 +117,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象
+     * Deserialize JSON string to Java object using JsonParser
      *
-     * @param jsonParser Json Parser
-     * @param valueType  Java 对象
-     * @param <T>        Java 对象类型
-     * @return Java 对象
+     * @param jsonParser JsonParser instance for parsing
+     * @param valueType Java object type
+     * @param <T>        Java object type
+     * @return Java object
      */
     public static <T> T parseObject(JsonParser jsonParser, Class<T> valueType) {
         try {
@@ -133,12 +133,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象
+     * Deserialize JSON string to Java object using DataInput
      *
-     * @param dataInput Json DataInput
-     * @param valueType Java 对象
-     * @param <T>       Java 对象类型
-     * @return Java 对象
+     * @param dataInput DataInput instance for parsing
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object
      */
     public static <T> T parseObject(DataInput dataInput, Class<T> valueType) {
         try {

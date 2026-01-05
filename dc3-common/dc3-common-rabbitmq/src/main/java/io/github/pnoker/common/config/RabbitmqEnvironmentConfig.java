@@ -28,7 +28,13 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Environment Config
+ * RabbitMQ Environment Configuration
+ * <p>
+ * Environment post processor for configuring RabbitMQ constants based on
+ * development environment and group tags. Used for multi-developer scenarios
+ * where different exchanges, queues, and topics need to be isolated
+ * by environment and group identifiers.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -39,34 +45,41 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Configuration
 public class RabbitmqEnvironmentConfig implements EnvironmentPostProcessor {
 
+    /**
+     * Post-process environment to configure RabbitMQ constants
+     *
+     * @param environment ConfigurableEnvironment to modify
+     * @param application SpringApplication instance
+     */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        // 此处配置用于开发环境下多人开发, 根据 env 和 group 标识区分不同对 exchange, queue, topic
+        // This configuration is used for multi-developer scenarios,
+        // distinguishing different exchanges, queues, and topics based on env and group identifiers
         String env = environment.getProperty(EnvironmentConstant.SPRING_ENV, String.class);
         String group = environment.getProperty(EnvironmentConstant.SPRING_GROUP, String.class);
 
         String tag = EnvironmentUtil.getTag(env, group);
 
-        // Sync
+        // Sync registration related constants
         RabbitConstant.TOPIC_EXCHANGE_REGISTER = tag + RabbitConstant.TOPIC_EXCHANGE_REGISTER;
         RabbitConstant.QUEUE_REGISTER_UP = tag + RabbitConstant.QUEUE_REGISTER_UP;
         RabbitConstant.QUEUE_REGISTER_DOWN_PREFIX = tag + RabbitConstant.QUEUE_REGISTER_DOWN_PREFIX;
 
-        // Event
+        // Event related constants
         RabbitConstant.TOPIC_EXCHANGE_EVENT = tag + RabbitConstant.TOPIC_EXCHANGE_EVENT;
         RabbitConstant.QUEUE_DRIVER_EVENT = tag + RabbitConstant.QUEUE_DRIVER_EVENT;
         RabbitConstant.QUEUE_DEVICE_EVENT = tag + RabbitConstant.QUEUE_DEVICE_EVENT;
 
-        // Metadata
+        // Metadata related constants
         RabbitConstant.TOPIC_EXCHANGE_METADATA = tag + RabbitConstant.TOPIC_EXCHANGE_METADATA;
         RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX = tag + RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX;
 
-        // Command
+        // Command related constants
         RabbitConstant.TOPIC_EXCHANGE_COMMAND = tag + RabbitConstant.TOPIC_EXCHANGE_COMMAND;
         RabbitConstant.QUEUE_DRIVER_COMMAND_PREFIX = tag + RabbitConstant.QUEUE_DRIVER_COMMAND_PREFIX;
         RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX = tag + RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX;
 
-        // Point Value
+        // Point Value related constants
         RabbitConstant.TOPIC_EXCHANGE_VALUE = tag + RabbitConstant.TOPIC_EXCHANGE_VALUE;
         RabbitConstant.QUEUE_POINT_VALUE = tag + RabbitConstant.QUEUE_POINT_VALUE;
     }
