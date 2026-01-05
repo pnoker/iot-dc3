@@ -26,7 +26,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Environment Config
+ * Active PostgreSQL Profile Configuration
+ * <p>
+ * Environment post processor configuration that automatically activates
+ * the PostgreSQL profile for Spring Boot applications. This ensures
+ * PostgreSQL-specific configurations are loaded with highest precedence.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,6 +43,12 @@ import org.springframework.core.env.ConfigurableEnvironment;
 public class ActivePostgresProfileConfig implements EnvironmentPostProcessor {
 
     @Override
+    /**
+     * Post-process the Spring environment to activate PostgreSQL profile
+     *
+     * @param environment ConfigurableEnvironment to modify
+     * @param application SpringApplication instance
+     */
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         environment.addActiveProfile("postgres");
     }

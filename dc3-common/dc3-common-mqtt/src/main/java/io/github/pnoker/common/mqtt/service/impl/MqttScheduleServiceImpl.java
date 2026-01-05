@@ -28,6 +28,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
+ * MQTT Schedule Service Implementation
+ * <p>
+ * Implementation of MQTT schedule service for IoT DC3 platform.
+ * Manages scheduling of MQTT message processing tasks
+ * using Quartz framework with configurable intervals.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
