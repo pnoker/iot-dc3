@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用使能标识 枚举
+ * Common enable flag enumeration.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,37 +35,37 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum EnableFlagEnum {
     /**
-     * 启用
+     * Enabled.
      */
-    ENABLE((byte) 0, "enable", "启用"),
+    ENABLE((byte) 0, "enable", "enable"),
 
     /**
-     * 禁用
+     * Disabled.
      */
-    DISABLE((byte) 1, "disable", "禁用"),
+    DISABLE((byte) 1, "disable", "disable"),
     ;
 
     /**
-     * 索引
+     * Index value stored in database.
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code string.
      */
     private final String code;
 
     /**
-     * 内容
+     * Human-readable description.
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index value.
      *
-     * @param index 索引
-     * @return {@link EnableFlagEnum}
+     * @param index index value
+     * @return {@link EnableFlagEnum} or {@code null} if not found
      */
     public static EnableFlagEnum ofIndex(Byte index) {
         Optional<EnableFlagEnum> any = Arrays.stream(EnableFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
@@ -73,10 +73,10 @@ public enum EnableFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code string.
      *
-     * @param code 编码
-     * @return {@link EnableFlagEnum}
+     * @param code code string
+     * @return {@link EnableFlagEnum} or {@code null} if not found
      */
     public static EnableFlagEnum ofCode(String code) {
         Optional<EnableFlagEnum> any = Arrays.stream(EnableFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
@@ -84,10 +84,10 @@ public enum EnableFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by enum name.
      *
-     * @param name 枚举内容
-     * @return {@link EnableFlagEnum}
+     * @param name enum name
+     * @return {@link EnableFlagEnum} or {@code null} if parsing fails
      */
     public static EnableFlagEnum ofName(String name) {
         try {

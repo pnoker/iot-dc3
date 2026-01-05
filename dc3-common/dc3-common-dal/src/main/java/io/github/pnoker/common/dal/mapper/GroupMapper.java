@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.model.GroupDO;
 
 /**
  * <p>
- * 分组表 Mapper 接口
+ * Mapper interface for the group table.
  * </p>
  *
  * @author pnoker

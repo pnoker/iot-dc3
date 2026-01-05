@@ -31,29 +31,29 @@ import io.github.pnoker.common.base.service.BaseService;
 public interface UserService extends BaseService<UserBO, UserQuery> {
 
     /**
-     * 根据用户名称查询用户
+     * Get user by username.
      *
-     * @param userName       用户名称
-     * @param throwException Throw Exception
-     * @return User
+     * @param userName       username
+     * @param throwException whether to throw exception when user does not exist
+     * @return {@link UserBO} or {@code null} when not found and {@code throwException} is false
      */
     UserBO selectByUserName(String userName, boolean throwException);
 
     /**
-     * 根据手机号查询用户
+     * Get user by phone number.
      *
-     * @param phone          Phone
-     * @param throwException Throw Exception
-     * @return User
+     * @param phone          phone number
+     * @param throwException whether to throw exception when user does not exist
+     * @return {@link UserBO} or {@code null} when not found and {@code throwException} is false
      */
     UserBO selectByPhone(String phone, boolean throwException);
 
     /**
-     * 根据邮箱查询用户
+     * Get user by email.
      *
-     * @param email          Email
-     * @param throwException Throw Exception
-     * @return User
+     * @param email          email address
+     * @param throwException whether to throw exception when user does not exist
+     * @return {@link UserBO} or {@code null} when not found and {@code throwException} is false
      */
     UserBO selectByEmail(String email, boolean throwException);
 }

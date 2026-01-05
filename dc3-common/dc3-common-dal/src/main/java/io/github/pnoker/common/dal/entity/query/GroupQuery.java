@@ -46,34 +46,34 @@ public class GroupQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID.
      */
     private Long tenantId;
 
-    // 查询字段
+    // Query fields
 
     /**
-     * 分组名称
+     * Group name.
      */
     private String groupName;
 
     /**
-     * 父分组ID
+     * Parent group ID.
      */
     private String parentGroupId;
 
     /**
-     * 分组排序位置
+     * Group sort position.
      */
     private Integer position;
 
     /**
-     * 分组标识
+     * Group type flag.
      */
     private GroupTypeFlagEnum groupTypeFlag;
 
     /**
-     * 使能标识
+     * Enable status flag.
      */
     private EnableFlagEnum enableFlag;
 }

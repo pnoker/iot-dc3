@@ -20,7 +20,7 @@ package io.github.pnoker.common.constant.service;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 
 /**
- * 权限服务 相关常量
+ * Auth service related constants.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,7 +29,7 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 public class AuthConstant {
 
     /**
-     * 服务名
+     * Service name registered in service discovery.
      */
     public static final String SERVICE_NAME = "dc3-center-auth";
     public static final String USER_URL_PREFIX = "/user";

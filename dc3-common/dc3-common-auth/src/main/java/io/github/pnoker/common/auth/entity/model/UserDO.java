@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 用户表
+ * User data table entity.
  * </p>
  *
  * @author pnoker
@@ -47,97 +47,97 @@ public class UserDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * Primary key ID.
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
-     * 用户名
+     * Username.
      */
     @TableField("user_name")
     private String userName;
 
     /**
-     * 用户昵称
+     * User nickname.
      */
     @TableField("nick_name")
     private String nickName;
 
     /**
-     * 手机号
+     * Phone number.
      */
     @TableField("phone")
     private String phone;
 
     /**
-     * 邮箱
+     * Email address.
      */
     @TableField("email")
     private String email;
 
     /**
-     * 社交相关拓展信息
+     * Social-related extension information.
      */
     @TableField(value = "social_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt socialExt;
 
     /**
-     * 身份相关拓展信息
+     * Identity-related extension information.
      */
     @TableField(value = "identity_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt identityExt;
 
     /**
-     * 使能标识, 0:启用, 1:禁用
+     * Enable flag, {@code 0} for enabled, {@code 1} for disabled.
      */
     @TableField("enable_flag")
     private Byte enableFlag;
 
     /**
-     * 描述
+     * Remark or description.
      */
     @TableField("remark")
     private String remark;
 
     /**
-     * 创建者ID
+     * Creator ID.
      */
     @TableField("creator_id")
     private Long creatorId;
 
     /**
-     * 创建者名称
+     * Creator name.
      */
     @TableField("creator_name")
     private String creatorName;
 
     /**
-     * 创建时间
+     * Creation time.
      */
     @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
-     * 操作者ID
+     * Operator ID.
      */
     @TableField("operator_id")
     private Long operatorId;
 
     /**
-     * 操作者名称
+     * Operator name.
      */
     @TableField("operator_name")
     private String operatorName;
 
     /**
-     * 操作时间
+     * Operation time.
      */
     @TableField("operate_time")
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识, 0:未删除, 1:已删除
+     * Logical delete flag, {@code 0} for not deleted, {@code 1} for deleted.
      */
     @TableLogic
     @TableField("deleted")

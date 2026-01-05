@@ -22,7 +22,7 @@ import io.github.pnoker.common.enums.EntityTypeFlagEnum;
 import lombok.*;
 
 /**
- * LabelBind BO
+ * Label binding business object (BO) representing the association between labels and entities.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -36,22 +36,22 @@ import lombok.*;
 public class LabelBindBO extends BaseBO {
 
     /**
-     * 实体类型标识
+     * Entity type flag.
      */
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
-     * 标签ID
+     * Label ID.
      */
     private Long labelId;
 
     /**
-     * 实体ID
+     * Entity ID.
      */
     private Long entityId;
 
     /**
-     * 租户ID
+     * Tenant ID.
      */
     private Long tenantId;
 }

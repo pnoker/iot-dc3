@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 设备状态枚举
+ * Device status enumeration.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -34,33 +34,33 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum DeviceStatusEnum {
-    ONLINE((byte) 0, "ONLINE", "在线"),
-    OFFLINE((byte) 1, "OFFLINE", "离线"),
-    MAINTAIN((byte) 2, "MAINTAIN", "维护"),
-    FAULT((byte) 3, "FAULT", "故障"),
+    ONLINE((byte) 0, "ONLINE", "online"),
+    OFFLINE((byte) 1, "OFFLINE", "offline"),
+    MAINTAIN((byte) 2, "MAINTAIN", "maintenance"),
+    FAULT((byte) 3, "FAULT", "fault"),
     ;
 
     /**
-     * 索引
+     * Index value stored in database.
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 状态编码
+     * Status code string.
      */
     private final String code;
 
     /**
-     * 内容
+     * Human-readable description.
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index value.
      *
-     * @param index 索引
-     * @return {@link DeviceStatusEnum}
+     * @param index index value
+     * @return {@link DeviceStatusEnum} or {@code null} if not found
      */
     public static DeviceStatusEnum ofIndex(Byte index) {
         Optional<DeviceStatusEnum> any = Arrays.stream(DeviceStatusEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
@@ -68,10 +68,10 @@ public enum DeviceStatusEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code string.
      *
-     * @param code 编码
-     * @return {@link DeviceStatusEnum}
+     * @param code code string
+     * @return {@link DeviceStatusEnum} or {@code null} if not found
      */
     public static DeviceStatusEnum ofCode(String code) {
         Optional<DeviceStatusEnum> any = Arrays.stream(DeviceStatusEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
@@ -79,10 +79,10 @@ public enum DeviceStatusEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by enum name.
      *
-     * @param name 枚举内容
-     * @return {@link DriverStatusEnum}
+     * @param name enum name
+     * @return {@link DeviceStatusEnum} or {@code null} if parsing fails
      */
     public static DeviceStatusEnum ofName(String name) {
         try {

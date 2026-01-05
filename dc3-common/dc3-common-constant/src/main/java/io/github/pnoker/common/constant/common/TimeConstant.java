@@ -20,7 +20,7 @@ package io.github.pnoker.common.constant.common;
 import java.time.ZoneId;
 
 /**
- * 时间 相关常量
+ * Time related constants.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,15 +29,15 @@ import java.time.ZoneId;
 public class TimeConstant {
 
     /**
-     * 时区, 默认为 Asia/Shanghai
+     * Default time zone ID, default is {@code Asia/Shanghai}.
      */
     public static final String DEFAULT_TIMEZONE = "Asia/Shanghai";
     /**
-     * 时区ID, 默认为 Asia/Shanghai
+     * Default {@link ZoneId}, default is {@code Asia/Shanghai}.
      */
     public static final ZoneId DEFAULT_ZONEID = ZoneId.of(DEFAULT_TIMEZONE);
     /**
-     * 时间格式化
+     * Date and time format patterns.
      */
     public static final String DAY_DATE_FORMAT1 = "yyyy.MM.dd";
     public static final String DAY_DATE_FORMAT2 = "yyyy-MM-dd";

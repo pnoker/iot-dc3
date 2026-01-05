@@ -71,7 +71,7 @@ public class GroupServiceImpl implements GroupService {
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 删除分组之前需要检查该分组是否存在关联
+        // Before deleting a group, check whether it has any child groups associated.
         LambdaQueryChainWrapper<GroupDO> wrapper = groupManager.lambdaQuery().eq(GroupDO::getParentGroupId, id);
         long count = wrapper.count();
         if (count > 0) {
@@ -112,10 +112,10 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
-     * 构造模糊查询
+     * Build fuzzy query wrapper for group search.
      *
-     * @param entityQuery {@link GroupQuery}
-     * @return {@link LambdaQueryWrapper}
+     * @param entityQuery {@link GroupQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link GroupDO}
      */
     private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupQuery entityQuery) {
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
@@ -125,12 +125,12 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
-     * 重复性校验
+     * Check whether a group is duplicated under the same tenant and parent group.
      *
-     * @param entityBO       {@link GroupBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param entityBO       {@link GroupBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(GroupBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
@@ -151,11 +151,11 @@ public class GroupServiceImpl implements GroupService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Get group data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException 是否抛异常
-     * @return {@link GroupDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link GroupDO} if found, otherwise {@code null} when {@code throwException} is false
      */
     private GroupDO getDOById(Long id, boolean throwException) {
         GroupDO entityDO = groupManager.getById(id);

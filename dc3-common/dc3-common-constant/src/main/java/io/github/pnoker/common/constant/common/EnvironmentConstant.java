@@ -18,7 +18,11 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- * 环境变量, 配置变量 相关常量
+ * Environment variables and configuration variables related constants
+ * <p>
+ * Provides constants for environment types, Spring configuration properties, Eureka configuration,
+ * and driver-related configuration keys.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,71 +31,71 @@ package io.github.pnoker.common.constant.common;
 public class EnvironmentConstant {
 
     /**
-     * 开发环境
+     * Development environment: "dev"
      */
     public static final String ENV_DEV = "dev";
     /**
-     * 测试环境
+     * Test environment: "test"
      */
     public static final String ENV_TEST = "test";
     /**
-     * 预发布环境
+     * Pre-production environment: "pre"
      */
     public static final String ENV_PRE = "pre";
     /**
-     * 生产环境
+     * Production environment: "pro"
      */
     public static final String ENV_PRO = "pro";
     /**
-     * 服务是否开启 Https
+     * Eureka TLS enable configuration key: "eureka.client.tls.enabled"
      */
     public static final String EUREKA_TLS_ENABLE = "eureka.client.tls.enabled";
     /**
-     * Eureka 服务注册中心 Url
+     * Eureka service registry URL configuration key: "eureka.client.service-url.defaultZone"
      */
     public static final String EUREKA_SERVICE_URL = "eureka.client.service-url.defaultZone";
     /**
-     * 当前环境类型
+     * Current environment type configuration key: "spring.env"
      */
     public static final String SPRING_ENV = "spring.env";
     /**
-     * 当前分组
+     * Current group configuration key: "spring.group"
      */
     public static final String SPRING_GROUP = "spring.group";
     /**
-     * 应用名称
+     * Application name configuration key: "spring.application.name"
      */
     public static final String SPRING_APPLICATION_NAME = "spring.application.name";
     /**
-     * 驱动租户名称
+     * Driver tenant name configuration key: "driver.tenant"
      */
     public static final String DRIVER_TENANT = "driver.tenant";
     /**
-     * 驱动节点
+     * Driver node configuration key: "driver.node"
      */
     public static final String DRIVER_NODE = "driver.node";
     /**
-     * 驱动服务
+     * Driver service configuration key: "driver.service"
      */
     public static final String DRIVER_SERVICE = "driver.service";
     /**
-     * 驱动主机
+     * Driver host configuration key: "driver.host"
      */
     public static final String DRIVER_HOST = "driver.host";
     /**
-     * 驱动客户端名称
+     * Driver client name configuration key: "driver.client"
      */
     public static final String DRIVER_CLIENT = "driver.client";
     /**
-     * 驱动端口
+     * Driver port configuration key: "driver.port"
      */
     public static final String DRIVER_PORT = "driver.port";
     /**
-     * 驱动 Mqtt 客户端名称
+     * Driver MQTT client name configuration key: "driver.mqtt.client"
      */
     public static final String MQTT_CLIENT = "driver.mqtt.client";
     /**
-     * 驱动 Mqtt Topic 前缀
+     * Driver MQTT topic prefix configuration key: "driver.mqtt.topic-prefix"
      */
     public static final String MQTT_PREFIX = "driver.mqtt.topic-prefix";
 

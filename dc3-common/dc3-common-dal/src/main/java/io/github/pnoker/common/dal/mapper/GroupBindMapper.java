@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.model.GroupBindDO;
 
 /**
  * <p>
- * 分组与实体的绑定表 Mapper 接口
+ * Mapper interface for the group and entity binding table.
  * </p>
  *
  * @author pnoker
