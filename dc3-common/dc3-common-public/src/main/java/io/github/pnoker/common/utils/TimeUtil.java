@@ -133,7 +133,7 @@ public class TimeUtil {
     }
 
     /**
-     * 删除此线程局部变量的当前线程值
+     * Remove the current thread's values from the ThreadLocal variables.
      */
     public static void clean() {
         DEFAULT_DATE_FORMAT_THREAD_LOCAL.remove();

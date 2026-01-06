@@ -48,11 +48,11 @@ public class PageUtil {
     }
 
     /**
-     * 自定义 Pages 转 MyBatis Plus Page
+     * Convert custom {@link Pages} object to MyBatis-Plus {@link Page}.
      *
      * @param pages {@link Pages}
-     * @param <T>   T
-     * @return {@link Page}
+     * @param <T>   Entity type
+     * @return MyBatis-Plus {@link Page}
      */
     public static <T> Page<T> page(Pages pages) {
         Page<T> page = new Page<>();

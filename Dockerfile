@@ -15,16 +15,22 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+# Use JDK 2025.9 base image
 FROM pnoker/dc3-jdk:2025.9
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 
+# Build profile argument (default: dev)
 ARG PROFILE=dev
 
+# Set working directory
 WORKDIR /build
 
+# Set timezone to Asia/Shanghai
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
+# Copy project files
 COPY ./ ./
 
+# Build project with Maven (skip tests)
 RUN mvn -U -e -B clean package -DskipTests -P ${PROFILE}

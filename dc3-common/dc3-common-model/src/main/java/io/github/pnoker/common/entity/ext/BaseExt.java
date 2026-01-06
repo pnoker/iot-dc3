@@ -41,18 +41,18 @@ public class BaseExt implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 类型, 用于解析Json字符串
+     * Type, used to parse JSON strings.
      */
     private String type;
 
     /**
-     * 版本, 用于乐观锁
+     * Version, used for optimistic locking.
      */
     @Builder.Default
     private Integer version = 1;
 
     /**
-     * 描述
+     * Description.
      */
     private String remark;
 }

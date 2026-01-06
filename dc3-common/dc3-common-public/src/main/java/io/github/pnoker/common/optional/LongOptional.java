@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.function.LongConsumer;
 
 /**
- * 自定义 Long Optional
+ * Custom Long Optional.
  *
  * @author pnoker
  * @version 2025.9.0

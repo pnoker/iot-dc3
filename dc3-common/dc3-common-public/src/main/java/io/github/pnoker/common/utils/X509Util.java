@@ -59,7 +59,7 @@ public class X509Util {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
-    // TODO: 2023.10.16 There are issues here, currently in unavailable state
+    // TODO: 2023.10.16 There are issues here, currently in an unavailable state
     /**
      * Create SSL socket factory with custom certificates
      *
@@ -104,12 +104,12 @@ public class X509Util {
         }
     }
 
-    // TODO: 2023.10.16 此处有问题, 目前为不可用状态
+    // TODO: 2023.10.16 There are issues here, currently in an unavailable state
     private static <T> T loadCertificate(String caCrtFile) throws IOException {
         return loadCertificateWithPassword(caCrtFile, null);
     }
 
-    // TODO: 2023.10.16 此处有问题, 目前为不可用状态
+    // TODO: 2023.10.16 There are issues here, currently in an unavailable state
     @SuppressWarnings("unchecked")
     private static <T> T loadCertificateWithPassword(String caCrtFile, String password) throws IOException {
         PemReader reader = null;

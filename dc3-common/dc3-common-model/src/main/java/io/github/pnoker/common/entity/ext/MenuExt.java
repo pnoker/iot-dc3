@@ -25,7 +25,7 @@ import lombok.Setter;
 /**
  * Menu Ext
  * <p>
- * 菜单相关拓展信息
+ * Extended information related to menus.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,9 +38,9 @@ import lombok.Setter;
 public class MenuExt extends BaseExt {
 
     /**
-     * 拓展内容
+     * Extended content.
      * <p>
-     * 拓展内容可以根据 Type 和 Version 进行区分
+     * The content can be distinguished by Type and Version.
      */
     private Content content;
 
@@ -50,22 +50,22 @@ public class MenuExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
         /**
-         * 标题
+         * Title.
          */
         private String title;
 
         /**
-         * 图标
+         * Icon.
          */
         private String icon;
 
         /**
-         * 链接
+         * URL link.
          */
         private String url;
 
         /**
-         * 描述
+         * Description.
          */
         private String remark;
     }

@@ -44,10 +44,10 @@ public class PoiUtil {
     }
 
     /**
-     * 获取水平和垂直居中的 CellStyle
+     * Get a {@link CellStyle} with both horizontal and vertical alignment set to center.
      *
      * @param workbook Workbook
-     * @return CellStyle
+     * @return Centered CellStyle
      */
     public static CellStyle getCenterCellStyle(Workbook workbook) {
         CellStyle cellStyle = workbook.createCellStyle();
@@ -57,7 +57,7 @@ public class PoiUtil {
     }
 
     /**
-     * 合并单元格
+     * Merge a range of cells.
      *
      * @param sheet    Sheet
      * @param firstRow Index of first row
@@ -74,12 +74,12 @@ public class PoiUtil {
     }
 
     /**
-     * 获取指定 Cell 的 String 内容
+     * Get the string content of the specified cell.
      *
      * @param sheet     Sheet
-     * @param rowIndex  Row Index
-     * @param cellIndex Cell Index
-     * @return R of String Value
+     * @param rowIndex  Row index
+     * @param cellIndex Cell index
+     * @return String value of the cell, or an empty string if the cell is null
      */
     public static String getCellStringValue(Sheet sheet, int rowIndex, int cellIndex) {
         Row driverAttributesRow = sheet.getRow(rowIndex);
@@ -97,23 +97,23 @@ public class PoiUtil {
     }
 
     /**
-     * 创建一个 Cell
+     * Create a cell with the specified value.
      *
      * @param row       Row
-     * @param cellIndex Cell Index
-     * @param cellValue Cell Value
+     * @param cellIndex Cell index
+     * @param cellValue Cell value
      */
     public static void createCell(Row row, int cellIndex, String cellValue) {
         createCellWithStyle(row, cellIndex, cellValue, null);
     }
 
     /**
-     * 创建一个 Cell 并设置样式
+     * Create a cell with the specified value and style.
      *
      * @param row       Row
-     * @param cellIndex Cell Index
-     * @param cellValue Cell Value
-     * @param cellStyle Cell Style
+     * @param cellIndex Cell index
+     * @param cellValue Cell value
+     * @param cellStyle Cell style
      */
     public static void createCellWithStyle(Row row, int cellIndex, String cellValue, CellStyle cellStyle) {
         Cell deviceNameCell = row.createCell(cellIndex);
