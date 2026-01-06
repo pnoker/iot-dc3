@@ -149,12 +149,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象
+     * Deserialize JSON content from an {@link InputStream} into a Java object.
      *
      * @param inputStream Json InputStream
-     * @param valueType   Java 对象
-     * @param <T>         Java 对象类型
-     * @return Java 对象
+     * @param valueType   Java object type
+     * @param <T>         Java object type
+     * @return Java object
      */
     public static <T> T parseObject(InputStream inputStream, Class<T> valueType) {
         try {
@@ -165,12 +165,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象
+     * Deserialize JSON content from a {@link Reader} into a Java object.
      *
      * @param reader    Json Reader
-     * @param valueType Java 对象
-     * @param <T>       Java 对象类型
-     * @return Java 对象
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object
      */
     public static <T> T parseObject(Reader reader, Class<T> valueType) {
         try {
@@ -181,12 +181,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象
+     * Deserialize JSON content from a {@link File} into a Java object.
      *
-     * @param file      Json File
-     * @param valueType Java 对象
-     * @param <T>       Java 对象类型
-     * @return Java 对象
+     * @param file      Json file
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object
      */
     public static <T> T parseObject(File file, Class<T> valueType) {
         try {
@@ -197,12 +197,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将Json 字符串转化为指定对象,并将指定对象中的泛型转为指定的T类型
+     * Deserialize JSON string into a specified generic Java object.
      *
-     * @param text          Json String
-     * @param typeReference TypeReference, T 为指定要转化为的数据类型
-     * @param <T>           Java 对象类型
-     * @return Java 对象
+     * @param text          Json string
+     * @param typeReference TypeReference, T is the target data type
+     * @param <T>           Java object type
+     * @return Java object
      */
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
         try {
@@ -230,12 +230,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象集合
+     * Deserialize JSON byte array into a collection of Java objects.
      *
-     * @param bytes     Json Byte Array
-     * @param valueType Java 对象
-     * @param <T>       Java 对象类型
-     * @return Java 对象集合
+     * @param bytes     Json byte array
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object collection
      */
     public static <T> List<T> parseArray(byte[] bytes, Class<T> valueType) {
         try {
@@ -247,12 +247,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象集合
+     * Deserialize JSON content using {@link JsonParser} into a collection of Java objects.
      *
      * @param jsonParser Json JsonParser
-     * @param valueType  Java 对象
-     * @param <T>        Java 对象类型
-     * @return Java 对象集合
+     * @param valueType  Java object type
+     * @param <T>        Java object type
+     * @return Java object collection
      */
     public static <T> List<T> parseArray(JsonParser jsonParser, Class<T> valueType) {
         try {
@@ -264,12 +264,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象集合
+     * Deserialize JSON content using {@link DataInput} into a collection of Java objects.
      *
      * @param dataInput Json DataInput
-     * @param valueType Java 对象
-     * @param <T>       Java 对象类型
-     * @return Java 对象集合
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object collection
      */
     public static <T> List<T> parseArray(DataInput dataInput, Class<T> valueType) {
         try {
@@ -281,12 +281,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象集合
+     * Deserialize JSON content from an {@link InputStream} into a collection of Java objects.
      *
      * @param inputStream Json InputStream
-     * @param valueType   Java 对象
-     * @param <T>         Java 对象类型
-     * @return Java 对象集合
+     * @param valueType   Java object type
+     * @param <T>         Java object type
+     * @return Java object collection
      */
     public static <T> List<T> parseArray(InputStream inputStream, Class<T> valueType) {
         try {
@@ -298,12 +298,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象集合
+     * Deserialize JSON content from a {@link Reader} into a collection of Java objects.
      *
      * @param reader    Json Reader
-     * @param valueType Java 对象
-     * @param <T>       Java 对象类型
-     * @return Java 对象集合
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object collection
      */
     public static <T> List<T> parseArray(Reader reader, Class<T> valueType) {
         try {
@@ -315,12 +315,12 @@ public final class JsonUtil {
     }
 
     /**
-     * 反序列化, 将 Json 字符串解析为 Java 对象集合
+     * Deserialize JSON content from a {@link File} into a collection of Java objects.
      *
-     * @param file      Json File
-     * @param valueType Java 对象
-     * @param <T>       Java 对象类型
-     * @return Java 对象集合
+     * @param file      Json file
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object collection
      */
     public static <T> List<T> parseArray(File file, Class<T> valueType) {
         try {

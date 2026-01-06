@@ -18,10 +18,10 @@
 package io.github.pnoker.common.valid;
 
 /**
- * Update 校验分组
+ * Update validation group.
  * <p>
- * 在 {@link org.springframework.validation.annotation.Validated}
- * 注解后添加具体校验的分组名, 可实现不同场景的校验需求
+ * Used with {@link org.springframework.validation.annotation.Validated}
+ * to specify validation groups for different scenarios.
  *
  * @author pnoker
  * @version 2025.9.0

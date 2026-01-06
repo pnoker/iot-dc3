@@ -47,11 +47,11 @@ public class FieldUtil {
     }
 
     /**
-     * 获取字段映射
+     * Get the field name mapping from a lambda expression.
      *
-     * @param column 需要解析的 lambda 对象
-     * @param <T>    对象的类型
-     * @return Field Name
+     * @param column Lambda object to be parsed
+     * @param <T>    Object type
+     * @return Field name
      */
     public static <T> String getField(SFunction<T, ?> column) {
         LambdaMeta meta = LambdaUtils.extract(column);
@@ -59,20 +59,20 @@ public class FieldUtil {
     }
 
     /**
-     * 判断是否为有效的ID
+     * Determine whether the given ID field is valid.
      *
      * @param id ID
-     * @return 是否有效
+     * @return Whether the ID is valid
      */
     public static boolean isValidIdField(Long id) {
         return Objects.nonNull(id) && id > DefaultConstant.ZERO;
     }
 
     /**
-     * 判断是否为有效的枚举索引
+     * Determine whether the given enum index field is valid.
      *
      * @param id ID
-     * @return 是否有效
+     * @return Whether the enum index is valid
      */
     public static boolean isValidEnumIndexField(Byte id) {
         return Objects.nonNull(id) && id > DefaultConstant.ZERO;

@@ -60,7 +60,7 @@ public class KeyUtil {
     }
 
     /**
-     * 生成AES密钥
+     * Generate an AES key.
      *
      * @return Keys.Aes
      * @throws NoSuchAlgorithmException NoSuchAlgorithmException
@@ -73,11 +73,11 @@ public class KeyUtil {
     }
 
     /**
-     * 使用AES密钥加密
+     * Encrypt content using an AES key.
      *
      * @param content    String
-     * @param privateKey Private Key
-     * @return Encrypt Aes
+     * @param privateKey Private key in Base64 encoding
+     * @return Encrypted AES content
      * @throws NoSuchPaddingException    NoSuchPaddingException
      * @throws NoSuchAlgorithmException  NoSuchAlgorithmException
      * @throws InvalidKeyException       InvalidKeyException
@@ -86,21 +86,21 @@ public class KeyUtil {
      */
     public static String encryptAes(String content, String privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        //base64编码的私钥
+        // Base64-encoded private key
         byte[] keyBytes = DecodeUtil.decode(privateKey);
         Key key = new SecretKeySpec(keyBytes, AlgorithmConstant.ALGORITHM_AES);
-        //AES加密
+        // AES encryption
         Cipher cipher = Cipher.getInstance(AlgorithmConstant.ALGORITHM_AES);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return DecodeUtil.byteToString(DecodeUtil.encode(cipher.doFinal(DecodeUtil.stringToByte(content))));
     }
 
     /**
-     * 使用AES密钥解密
+     * Decrypt content using an AES key.
      *
      * @param content    String
-     * @param privateKey Private Key
-     * @return Decrypt Aes
+     * @param privateKey Private key in Base64 encoding
+     * @return Decrypted AES content
      * @throws NoSuchPaddingException    NoSuchPaddingException
      * @throws NoSuchAlgorithmException  NoSuchAlgorithmException
      * @throws InvalidKeyException       InvalidKeyException
@@ -109,19 +109,19 @@ public class KeyUtil {
      */
     public static String decryptAes(String content, String privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        //base64编码的私钥
+        // Base64-encoded private key
         byte[] keyBytes = DecodeUtil.decode(privateKey);
         Key key = new SecretKeySpec(keyBytes, AlgorithmConstant.ALGORITHM_AES);
-        //AES解密
+        // AES decryption
         Cipher cipher = Cipher.getInstance(AlgorithmConstant.ALGORITHM_AES);
         cipher.init(Cipher.DECRYPT_MODE, key);
-        //64位解码加密后的字符串
+        // Decode the encrypted string from Base64
         byte[] inputByte = DecodeUtil.decode(DecodeUtil.stringToByte(content));
         return DecodeUtil.byteToString(cipher.doFinal(inputByte));
     }
 
     /**
-     * 生成RSA密钥对
+     * Generate an RSA key pair.
      *
      * @return Keys.Rsa
      * @throws NoSuchAlgorithmException NoSuchAlgorithmException
@@ -138,11 +138,11 @@ public class KeyUtil {
     }
 
     /**
-     * 使用RSA公钥加密
+     * Encrypt content using an RSA public key.
      *
      * @param content   String
-     * @param publicKey Public Key
-     * @return Encrypt Rsa
+     * @param publicKey Public key in Base64 encoding
+     * @return Encrypted RSA content
      * @throws NoSuchAlgorithmException  NoSuchAlgorithmException
      * @throws NoSuchPaddingException    NoSuchPaddingException
      * @throws InvalidKeyException       InvalidKeyException
@@ -152,22 +152,22 @@ public class KeyUtil {
      */
     public static String encryptRsa(String content, String publicKey) throws NoSuchAlgorithmException, NoSuchPaddingException,
             InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
-        //base64编码的公钥
+        // Base64-encoded public key
         byte[] keyBytes = DecodeUtil.decode(publicKey);
         KeySpec keySpec = new X509EncodedKeySpec(keyBytes);
         RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(AlgorithmConstant.ALGORITHM_RSA).generatePublic(keySpec);
-        //RSA加密
+        // RSA encryption
         Cipher cipher = Cipher.getInstance(AlgorithmConstant.ALGORITHM_AES);
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
         return DecodeUtil.byteToString(DecodeUtil.encode(cipher.doFinal(DecodeUtil.stringToByte(content))));
     }
 
     /**
-     * 使用RSA密钥解密
+     * Decrypt content using an RSA private key.
      *
      * @param content    String
-     * @param privateKey Private Key
-     * @return Decrypt Rsa
+     * @param privateKey Private key in Base64 encoding
+     * @return Decrypted RSA content
      * @throws NoSuchAlgorithmException  NoSuchAlgorithmException
      * @throws NoSuchPaddingException    NoSuchPaddingException
      * @throws InvalidKeyException       InvalidKeyException
@@ -177,25 +177,25 @@ public class KeyUtil {
      */
     public static String decryptRsa(String content, String privateKey) throws NoSuchAlgorithmException, NoSuchPaddingException,
             InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
-        //base64编码的私钥
+        // Base64-encoded private key
         byte[] keyBytes = DecodeUtil.decode(privateKey);
         KeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(AlgorithmConstant.ALGORITHM_RSA).generatePrivate(keySpec);
-        //RSA解密
+        // RSA decryption
         Cipher cipher = Cipher.getInstance(AlgorithmConstant.ALGORITHM_RSA);
         cipher.init(Cipher.DECRYPT_MODE, priKey);
-        //64位解码加密后的字符串
+        // Decode the encrypted string from Base64
         byte[] inputByte = DecodeUtil.decode(DecodeUtil.stringToByte(content));
         return DecodeUtil.byteToString(cipher.doFinal(inputByte));
     }
 
     /**
-     * 生成Token令牌
+     * Generate a JWT token.
      *
-     * @param userName 用户名称
+     * @param userName User name
      * @param salt     Salt
-     * @param tenantId 租户ID
-     * @return Token String
+     * @param tenantId Tenant ID
+     * @return Token string
      */
     public static String generateToken(String userName, String salt, Long tenantId) {
         SecretKey key = io.jsonwebtoken.security.Keys.hmacShaKeyFor(DecodeUtil.stringToByte(AlgorithmConstant.DEFAULT_KEY + SymbolConstant.COLON + salt));
@@ -209,12 +209,12 @@ public class KeyUtil {
     }
 
     /**
-     * 解析Token令牌
+     * Parse and validate a JWT token.
      *
-     * @param userName 用户名称
+     * @param userName User name
      * @param salt     Salt
-     * @param token    Token
-     * @param tenantId 租户ID
+     * @param token    Token string
+     * @param tenantId Tenant ID
      * @return Claims
      */
     public static Claims parserToken(String userName, String salt, String token, Long tenantId) {

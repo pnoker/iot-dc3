@@ -15,12 +15,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# runtime
+# Runtime stage
 FROM pnoker/dc3-jre:2025.9 AS runtime
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 
-# default env
+# Default environment variables
 ENV PARAMS=''
 ENV NODE_ENV=test
 ENV SERVER_NAME=dc3-driver-listening-virtual
@@ -30,29 +30,35 @@ ENV APM_SERVICE=http://dc3-apm:9300
 ENV TCP_PORT 6270
 ENV UDP_PORT 6271
 
-# default jvm & gc env
-ENV JAVA_OPS="-server \
-              -Xms256m \
+# Default JVM and GC environment variables
+ENV JAVA_OPS="-Xms256m \
               -Xmx512m \
-              -XX:+UseG1GC \
-              -XX:+AlwaysPreTouch \
-              -XX:+UseContainerSupport \
-              -Djava.security.egd=file:/dev/./urandom"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/listening-virtual/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
+              -XX:+UseG1GC-XX:+AlwaysPreTouch \
+              -XX:+HeapDumpOnOutOfMemoryError \
+              -XX:HeapDumpPath=dc3/logs/driver/listening-virtual/gc/dump.hprof"
+ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/listening-virtual/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
+# Set working directory
 WORKDIR /dc3-driver/dc3-driver-listening-virtual
 
+# Set timezone to Asia/Shanghai and create log directory
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-driver/dc3-driver-listening-virtual/dc3/logs/driver/listening-virtual/gc
 
+# Copy application JAR file
 COPY target/dc3-driver-listening-virtual.jar ./
 
+# Copy entrypoint script
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 
+# Expose TCP and UDP ports
 EXPOSE ${TCP_PORT}
 EXPOSE ${UDP_PORT}
+# Mount logs volume
 VOLUME /dc3-driver/dc3-driver-listening-virtual/dc3/logs
 
+# Set entrypoint script
 ENTRYPOINT ["./entrypoint.sh"]
 
+# Default command
 CMD ["dc3-driver-listening-virtual.jar"]

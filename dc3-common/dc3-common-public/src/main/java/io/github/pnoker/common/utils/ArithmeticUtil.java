@@ -41,11 +41,11 @@ public class ArithmeticUtil {
     }
 
     /**
-     * 提供精确的加法运算
+     * Provide precise addition operation.
      *
-     * @param value1 被加数
-     * @param value2 加数
-     * @return 两个参数的和
+     * @param value1 Augend
+     * @param value2 Addend
+     * @return Sum of the two parameters
      */
     public static BigDecimal add(String value1, String value2) {
         BigDecimal bigDecimal1 = new BigDecimal(value1);
@@ -54,22 +54,22 @@ public class ArithmeticUtil {
     }
 
     /**
-     * 提供float加法运算
+     * Provide float addition operation.
      *
-     * @param value1 被加数
-     * @param value2 加数
-     * @return 两个参数的和
+     * @param value1 Augend
+     * @param value2 Addend
+     * @return Sum of the two parameters
      */
     public static float add(float value1, float value2) {
         return add(Float.toString(value1), Float.toString(value2)).floatValue();
     }
 
     /**
-     * 提供double加法运算
+     * Provide double addition operation.
      *
-     * @param value1 被加数
-     * @param value2 加数
-     * @return 两个参数的和
+     * @param value1 Augend
+     * @param value2 Addend
+     * @return Sum of the two parameters
      */
     public static double add(double value1, double value2) {
         return add(Double.toString(value1), Double.toString(value2)).doubleValue();
@@ -77,11 +77,11 @@ public class ArithmeticUtil {
 
 
     /**
-     * 提供精确的减法运算
+     * Provide precise subtraction operation.
      *
-     * @param value1 被减数
-     * @param value2 减数
-     * @return 两个参数的差
+     * @param value1 Minuend
+     * @param value2 Subtrahend
+     * @return Difference of the two parameters
      */
     public static BigDecimal subtract(String value1, String value2) {
         BigDecimal bigDecimal1 = new BigDecimal(value1);
@@ -90,33 +90,33 @@ public class ArithmeticUtil {
     }
 
     /**
-     * 提供float减法运算
+     * Provide float subtraction operation.
      *
-     * @param value1 被减数
-     * @param value2 减数
-     * @return 两个参数的差
+     * @param value1 Minuend
+     * @param value2 Subtrahend
+     * @return Difference of the two parameters
      */
     public static float subtract(float value1, float value2) {
         return subtract(Float.toString(value1), Float.toString(value2)).floatValue();
     }
 
     /**
-     * 提供double减法运算
+     * Provide double subtraction operation.
      *
-     * @param value1 被减数
-     * @param value2 减数
-     * @return 两个参数的差
+     * @param value1 Minuend
+     * @param value2 Subtrahend
+     * @return Difference of the two parameters
      */
     public static double subtract(double value1, double value2) {
         return subtract(Double.toString(value1), Double.toString(value2)).doubleValue();
     }
 
     /**
-     * 提供精确的乘法运算
+     * Provide precise multiplication operation.
      *
-     * @param value1 被乘数
-     * @param value2 乘数
-     * @return 两个参数的积
+     * @param value1 Multiplicand
+     * @param value2 Multiplier
+     * @return Product of the two parameters
      */
     public static BigDecimal multiply(String value1, String value2) {
         BigDecimal bigDecimal1 = new BigDecimal(value1);
@@ -125,36 +125,37 @@ public class ArithmeticUtil {
     }
 
     /**
-     * 提float乘法运算
+     * Provide float multiplication operation.
      *
-     * @param value1 被乘数
-     * @param value2 乘数
-     * @return 两个参数的积
+     * @param value1 Multiplicand
+     * @param value2 Multiplier
+     * @return Product of the two parameters
      */
     public static float multiply(float value1, float value2) {
         return multiply(Float.toString(value1), Float.toString(value2)).floatValue();
     }
 
     /**
-     * 提double乘法运算
+     * Provide double multiplication operation.
      *
-     * @param value1 被乘数
-     * @param value2 乘数
-     * @return 两个参数的积
+     * @param value1 Multiplicand
+     * @param value2 Multiplier
+     * @return Product of the two parameters
      */
     public static double multiply(double value1, double value2) {
         return multiply(Double.toString(value1), Double.toString(value2)).doubleValue();
     }
 
     /**
-     * 提供(相对)精确的除法运算
+     * Provide (relatively) precise division operation.
      * <p>
-     * 当发生除不尽的情况时, 由scale参数指定精度, 以后的数字四舍五入
+     * When an inexact division occurs, the {@code scale} parameter specifies the precision,
+     * and the result is rounded using the half-up rule.
      *
-     * @param value1 被除数
-     * @param value2 除数
-     * @param scale  表示表示需要精确到小数点以后几位
-     * @return 两个参数的商
+     * @param value1 Dividend
+     * @param value2 Divisor
+     * @param scale  Number of decimal places to keep
+     * @return Quotient of the two parameters
      */
     public static BigDecimal divide(String value1, String value2, int scale) {
         BigDecimal bigDecimal1 = new BigDecimal(value1);
@@ -163,14 +164,15 @@ public class ArithmeticUtil {
     }
 
     /**
-     * 提供float除法运算
+     * Provide float division operation.
      * <p>
-     * 当发生除不尽的情况时, 由scale参数指定精度, 以后的数字四舍五入
+     * When an inexact division occurs, the {@code scale} parameter specifies the precision,
+     * and the result is rounded using the half-up rule.
      *
-     * @param value1 被除数
-     * @param value2 除数
-     * @param scale  表示表示需要精确到小数点以后几位
-     * @return 两个参数的商
+     * @param value1 Dividend
+     * @param value2 Divisor
+     * @param scale  Number of decimal places to keep
+     * @return Quotient of the two parameters
      */
     public static float divide(float value1, float value2, int scale) {
         if (scale < 0 || scale > 7) {
@@ -181,14 +183,15 @@ public class ArithmeticUtil {
     }
 
     /**
-     * 提供double除法运算
+     * Provide double division operation.
      * <p>
-     * 当发生除不尽的情况时, 由scale参数指定精度, 以后的数字四舍五入
+     * When an inexact division occurs, the {@code scale} parameter specifies the precision,
+     * and the result is rounded using the half-up rule.
      *
-     * @param value1 被除数
-     * @param value2 除数
-     * @param scale  表示表示需要精确到小数点以后几位
-     * @return 两个参数的商
+     * @param value1 Dividend
+     * @param value2 Divisor
+     * @param scale  Number of decimal places to keep
+     * @return Quotient of the two parameters
      */
     public static double divide(double value1, double value2, int scale) {
         if (scale < 0 || scale > 16) {
@@ -199,11 +202,11 @@ public class ArithmeticUtil {
     }
 
     /**
-     * 提供精确的小数位四舍五入处理
+     * Provide precise decimal rounding operation.
      *
-     * @param value 需要四舍五入的数字
-     * @param scale 小数点后保留几位
-     * @return 四舍五入后的结果
+     * @param value Number to be rounded
+     * @param scale Number of decimal places to keep
+     * @return Rounded result
      */
     public static BigDecimal round(String value, int scale) {
         BigDecimal bigDecimal = new BigDecimal(value);
@@ -212,11 +215,11 @@ public class ArithmeticUtil {
     }
 
     /**
-     * 提供float小数位四舍五入处理
+     * Provide float decimal rounding operation.
      *
-     * @param value 需要四舍五入的数字
-     * @param scale 小数点后保留几位
-     * @return 四舍五入后的结果
+     * @param value Number to be rounded
+     * @param scale Number of decimal places to keep
+     * @return Rounded result
      */
     public static float round(float value, int scale) {
         if (scale < 0 || scale > 7) {
@@ -227,11 +230,11 @@ public class ArithmeticUtil {
     }
 
     /**
-     * 提供double小数位四舍五入处理
+     * Provide double decimal rounding operation.
      *
-     * @param value 需要四舍五入的数字
-     * @param scale 小数点后保留几位
-     * @return 四舍五入后的结果
+     * @param value Number to be rounded
+     * @param scale Number of decimal places to keep
+     * @return Rounded result
      */
     public static double round(double value, int scale) {
         if (scale < 0 || scale > 16) {

@@ -43,9 +43,9 @@ public class CodeUtil {
 
 
     /**
-     * 生成一个简化的UUID作为唯一编码
+     * Generate a simplified UUID as a unique code.
      *
-     * @return 返回一个简化的UUID字符串
+     * @return Simplified UUID string
      */
     public static String getCode() {
         return UUID.randomUUID().toString();

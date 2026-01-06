@@ -25,7 +25,7 @@ import lombok.Setter;
 /**
  * Point Attribute Ext
  * <p>
- * 位号属性相关拓展信息
+ * Extended information related to point attributes.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,9 +38,9 @@ import lombok.Setter;
 public class PointAttributeExt extends BaseExt {
 
     /**
-     * 拓展内容
+     * Extended content.
      * <p>
-     * 拓展内容可以根据 Type 和 Version 进行区分
+     * The content can be distinguished by Type and Version.
      */
     private Content content;
 

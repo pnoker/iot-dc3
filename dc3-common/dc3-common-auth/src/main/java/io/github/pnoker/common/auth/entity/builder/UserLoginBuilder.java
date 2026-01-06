@@ -78,7 +78,7 @@ public interface UserLoginBuilder {
      * BOList to DOList
      *
      * @param entityBOList EntityBO collection
-     * @return EntityDO 集合
+     * @return EntityDO collection
      */
     List<UserLoginDO> buildDOListByBOList(List<UserLoginBO> entityBOList);
 
@@ -101,7 +101,7 @@ public interface UserLoginBuilder {
     /**
      * DOList to BOList
      *
-     * @param entityDOList EntityDO 集合
+     * @param entityDOList EntityDO collection
      * @return EntityBO collection
      */
     List<UserLoginBO> buildBOListByDOList(List<UserLoginDO> entityDOList);
