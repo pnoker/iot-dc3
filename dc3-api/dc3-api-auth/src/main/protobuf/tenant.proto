@@ -56,10 +56,10 @@ message GrpcTenantDTO {
 
   // Tenant name
   string tenant_name = 2;
-  
+
   // Tenant code, unique identifier
   string tenant_code = 3;
-  
+
   // Enable flag: 1 enabled, 0 disabled
   int32 enable_flag = 4;
 }

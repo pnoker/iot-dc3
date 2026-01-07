@@ -85,7 +85,7 @@ public class R<T> implements Serializable {
     /**
      * Create success response with default settings
      *
-     * @param <T>     Response data type
+     * @param <T> Response data type
      * @return Response with success status
      */
     public static <T> R<T> ok() {
@@ -106,8 +106,8 @@ public class R<T> implements Serializable {
     /**
      * Create success response with custom code and message
      *
-     * @param <T>     Response data type
-     * @param code    {@link ResponseEnum} custom response code
+     * @param <T>  Response data type
+     * @param code {@link ResponseEnum} custom response code
      * @return Response with success status and custom code/message
      */
     public static <T> R<T> ok(ResponseEnum code) {

@@ -48,7 +48,7 @@ import java.util.Map;
  * communicate with Modbus slave devices over various transport mechanisms.
  * It includes methods for reading and writing values, batch operations,
  * and slave node discovery.
- * 
+ *
  * @author Matthew Lohbihler
  * @version 2025.9.0
  * @since 2022.1.0

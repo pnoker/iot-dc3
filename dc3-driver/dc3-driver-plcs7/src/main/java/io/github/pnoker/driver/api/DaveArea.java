@@ -21,7 +21,7 @@ package io.github.pnoker.driver.api;
  * Each enum value corresponds to a specific memory area with its associated code.
  * These areas are used for reading from and writing to different types of memory
  * in the PLC, such as data blocks (DB), inputs (I), outputs (Q), etc.
- * 
+ *
  * @author Thomas Rudin
  * @version 2025.9.0
  * @since 2022.1.0

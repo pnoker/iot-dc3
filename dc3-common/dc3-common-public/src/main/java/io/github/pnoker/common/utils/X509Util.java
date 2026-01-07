@@ -60,13 +60,14 @@ public class X509Util {
     }
 
     // TODO: 2023.10.16 There are issues here, currently in an unavailable state
+
     /**
      * Create SSL socket factory with custom certificates
      *
      * @param caCrtFile CA certificate file path
-     * @param crtFile Client certificate file path
-     * @param keyFile Client private key file path
-     * @param password Private key password
+     * @param crtFile   Client certificate file path
+     * @param keyFile   Client private key file path
+     * @param password  Private key password
      * @return Configured SSL socket factory
      */
     public static SSLSocketFactory getSSLSocketFactory(final String caCrtFile, final String crtFile, final String keyFile, final String password) {

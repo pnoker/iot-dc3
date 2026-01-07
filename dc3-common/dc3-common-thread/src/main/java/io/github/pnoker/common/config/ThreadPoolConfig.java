@@ -110,7 +110,7 @@ public class ThreadPoolConfig {
         /**
          * Handle rejected execution by attempting to run task in calling thread
          *
-         * @param runnable  The runnable task requested to be executed
+         * @param runnable The runnable task requested to be executed
          * @param executor The executor attempting to execute this task
          */
         @Override

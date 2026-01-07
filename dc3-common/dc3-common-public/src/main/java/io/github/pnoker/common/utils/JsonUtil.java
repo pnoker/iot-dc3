@@ -120,7 +120,7 @@ public final class JsonUtil {
      * Deserialize JSON string to Java object using JsonParser
      *
      * @param jsonParser JsonParser instance for parsing
-     * @param valueType Java object type
+     * @param valueType  Java object type
      * @param <T>        Java object type
      * @return Java object
      */
