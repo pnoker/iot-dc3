@@ -36,76 +36,76 @@ import java.util.Set;
 public interface PointService extends BaseService<PointBO, PointQuery> {
 
     /**
-     * 根据 模版ID 查询位号
+     * ID
      *
-     * @param profileId 位号ID
-     * @return Point 集合
+     * @param profileId Point ID
+     * @return Point
      */
     List<PointBO> selectByProfileId(Long profileId);
 
     /**
-     * 根据 设备ID 查询位号
+     * Device ID
      *
-     * @param deviceId 设备ID
-     * @return Point 集合
+     * @param deviceId Device ID
+     * @return Point
      */
     List<PointBO> selectByDeviceId(Long deviceId);
 
     /**
-     * 根据 模板ID 集查询位号
+     * ID
      *
-     * @param profileIds 模版ID集
-     * @return Point 集合
+     * @param profileIds ID
+     * @return Point
      */
     List<PointBO> selectByProfileIds(List<Long> profileIds);
 
     /**
-     * 根据 设备ID集合 查询设备
+     * Device ID
      *
-     * @param ids 位号ID集
-     * @return Point 集合
+     * @param ids Point ID
+     * @return Point
      */
     List<PointBO> selectByIds(Set<Long> ids);
 
     /**
-     * 查询 位号单位
      *
-     * @param pointIds 位号ID集
+     *
+     * @param pointIds Point ID
      * @return Map Long:Unit String
      */
     Map<Long, String> unit(Set<Long> pointIds);
 
     /**
-     * 位号被多少设备引用
-     * 选择点位统计设备信息
      *
-     * @param pointId 点位id
+     *
+     *
+     * @param pointId id
      * @return {@link Set}<{@link Long}>
      */
     DeviceByPointBO selectPointStatisticsWithDevice(Long pointId);
 
     /**
-     * 位号在不同设备下的数据量
-     * 按设备id统计位号数量
      *
-     * @param pointId   点位id
-     * @param deviceIds 设备id
+     * id
+     *
+     * @param pointId   id
+     * @param deviceIds id
      * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
      */
     List<PointDataVolumeRunBO> selectPointStatisticsByDeviceId(Long pointId, Set<Long> deviceIds);
 
 
     /**
-     * 当前位号下数据量
-     * 按位号id统计位号数据量
      *
-     * @param pointId 点位id
+     * id
+     *
+     * @param pointId id
      * @return {@link List}<{@link List}<{@link PointDataVolumeRunDO}>>
      */
     PointDataVolumeRunDO selectPointStatisticsByPointId(Long pointId);
 
     /**
-     * 设备下位号数量
+     *
      *
      * @param deviceId
      * @return
@@ -113,7 +113,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     Long selectPointByDeviceId(Long deviceId);
 
     /**
-     * 设备下位号数量 已配置
+     *
      *
      * @param deviceId
      * @return
@@ -121,7 +121,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     PointConfigByDeviceBO selectPointConfigByDeviceId(Long deviceId);
 
     /**
-     * 设备在不同位号下的数据量
+     *
      *
      * @param deviceId
      * @param pointIds
@@ -130,7 +130,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     List<DeviceDataVolumeRunBO> selectDeviceStatisticsByPointId(Long deviceId, Set<Long> pointIds);
 
     /**
-     * 驱动下位号数量
+     *
      *
      * @param driverId
      * @return
@@ -138,7 +138,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     PointDataVolumeRunDO selectPointDataByDriverId(Long driverId);
 
     /**
-     * 驱动下位号数量
+     *
      *
      * @param driverId
      * @return
@@ -146,7 +146,7 @@ public interface PointService extends BaseService<PointBO, PointQuery> {
     Long selectPointByDriverId(Long driverId);
 
     /**
-     * 统计7天驱动下位号数据量
+     * 7 days
      *
      * @param driverId
      * @return

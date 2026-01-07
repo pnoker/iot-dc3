@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.ApiDO;
 
 /**
  * <p>
- * 接口表 服务类
+ *
  * </p>
  *
  * @author pnoker

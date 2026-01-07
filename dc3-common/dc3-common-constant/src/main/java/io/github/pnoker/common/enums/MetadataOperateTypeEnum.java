@@ -35,41 +35,41 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum MetadataOperateTypeEnum {
     /**
-     * 新增
+     * Add
      */
-    ADD((byte) 0, "add", "新增"),
+    ADD((byte) 0, "add", "Add"),
 
     /**
-     * 删除
+     * Delete
      */
-    DELETE((byte) 1, "delete", "删除"),
+    DELETE((byte) 1, "delete", "Delete"),
 
     /**
-     * 更新
+     * Update
      */
-    UPDATE((byte) 2, "update", "更新"),
+    UPDATE((byte) 2, "update", "Update"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link MetadataOperateTypeEnum}
      */
     public static MetadataOperateTypeEnum ofIndex(Byte index) {
@@ -78,9 +78,9 @@ public enum MetadataOperateTypeEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link MetadataOperateTypeEnum}
      */
     public static MetadataOperateTypeEnum ofCode(String code) {
@@ -89,9 +89,9 @@ public enum MetadataOperateTypeEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link MetadataOperateTypeEnum}
      */
     public static MetadataOperateTypeEnum ofName(String name) {

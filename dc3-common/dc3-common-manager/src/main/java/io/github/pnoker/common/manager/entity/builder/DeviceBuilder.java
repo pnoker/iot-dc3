@@ -40,7 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * 设备 Builder
+ * Builder
  *
  * @author pnoker
  * @version 2025.9.0

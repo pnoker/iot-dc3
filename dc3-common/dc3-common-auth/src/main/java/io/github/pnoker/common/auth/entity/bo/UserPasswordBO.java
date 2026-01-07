@@ -35,7 +35,7 @@ import lombok.*;
 public class UserPasswordBO extends BaseBO {
 
     /**
-     * 登录密码
+     *
      */
     private String loginPassword;
 }

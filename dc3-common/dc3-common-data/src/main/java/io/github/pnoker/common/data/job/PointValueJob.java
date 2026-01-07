@@ -58,7 +58,7 @@ public class PointValueJob extends QuartzJobBean {
     private ExecutorService virtualThreadExecutor;
 
     /**
-     * 获取 PointValue 长度
+     * PointValue
      *
      * @return Point Value Size
      */
@@ -67,14 +67,14 @@ public class PointValueJob extends QuartzJobBean {
     }
 
     /**
-     * 清空 PointValue
+     * PointValue
      */
     public static void clearPointValues() {
         POINT_VALUE_LIST.clear();
     }
 
     /**
-     * 添加 PointValue
+     * PointValue
      *
      * @param pointValueBO PointValue
      */

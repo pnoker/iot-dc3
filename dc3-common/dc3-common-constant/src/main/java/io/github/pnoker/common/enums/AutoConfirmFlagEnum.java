@@ -35,36 +35,36 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum AutoConfirmFlagEnum {
     /**
-     * 自动
+     * Auto
      */
-    AUTO((byte) 0, "auto", "AUTO"),
+    AUTO((byte) 0, "auto", "Auto"),
 
     /**
-     * 手动
+     * Manual
      */
-    MANUAL((byte) 1, "manual", "手动"),
+    MANUAL((byte) 1, "manual", "Manual"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link AutoConfirmFlagEnum}
      */
     public static AutoConfirmFlagEnum ofIndex(Byte index) {
@@ -73,9 +73,9 @@ public enum AutoConfirmFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link AutoConfirmFlagEnum}
      */
     public static AutoConfirmFlagEnum ofCode(String code) {
@@ -84,9 +84,9 @@ public enum AutoConfirmFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link AutoConfirmFlagEnum}
      */
     public static AutoConfirmFlagEnum ofName(String name) {

@@ -18,7 +18,7 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- * 异常 相关常量
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,17 +27,17 @@ package io.github.pnoker.common.constant.common;
 public class ExceptionConstant {
 
     /**
-     * 公共类实例化错误提示
+     *
      */
     public static final String UTILITY_CLASS = "Utility class";
 
     /**
-     * 没有可用的服务
+     *
      */
     public static final String NO_AVAILABLE_SERVER = "No available server for client";
 
     /**
-     * 租户, 用户信息不匹配
+     * Tenant,
      */
     public static final String NO_AVAILABLE_AUTH = "Tenant, user information does not match";
 

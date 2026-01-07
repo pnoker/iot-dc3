@@ -91,7 +91,7 @@ public class ProfileServiceImpl implements ProfileService {
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 删除模版之前需要检查该模版是否存在关联
+        // 
         LambdaQueryChainWrapper<PointDO> wrapper = pointManager.lambdaQuery().eq(PointDO::getProfileId, id);
         long count = wrapper.count();
         if (count > 0) {
@@ -162,7 +162,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link ProfileQuery}
      * @return {@link LambdaQueryWrapper}
@@ -179,11 +179,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO {@link ProfileBO}
-     * @param isUpdate 是否为更新操作
-     * @return 是否重复
+     * @param isUpdate
+     * @return
      */
     private boolean checkDuplicate(ProfileBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<ProfileDO> wrapper = Wrappers.<ProfileDO>query().lambda();
@@ -200,10 +200,10 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link ProfileDO}
      */
     private ProfileDO getDOById(Long id, boolean throwException) {

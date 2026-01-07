@@ -26,7 +26,7 @@ import lombok.*;
 
 /**
  * <p>
- * 报警规则表
+ * Alarm rule
  * </p>
  *
  * @author pnoker
@@ -42,42 +42,42 @@ import lombok.*;
 public class RuleVO extends BaseVO {
 
     /**
-     * 实体类型标识
+     * Entity type flag
      */
     private AlarmTypeFlagEnum entityTypeFlag;
 
     /**
-     * 规则名称
+     * Rule name
      */
     private String ruleName;
 
     /**
-     * 规则编号
+     * Rule code
      */
     private String ruleCode;
 
     /**
-     * 实体ID
+     * Entity ID
      */
     private Long entityId;
 
     /**
-     * 报警通知模板ID
+     * Alarm notification template ID
      */
     private Long notifyId;
 
     /**
-     * 报警信息模板ID
+     * Alarm message template ID
      */
     private Long messageId;
 
     /**
-     * 报警规则
+     * Alarm rule
      */
     private RuleExt ruleExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

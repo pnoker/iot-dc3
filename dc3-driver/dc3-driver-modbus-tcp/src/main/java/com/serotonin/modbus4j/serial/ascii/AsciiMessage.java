@@ -27,7 +27,14 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
-abstract public class AsciiMessage extends SerialMessage {
+abstract /**
+ * Ascii Message
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+public class AsciiMessage extends SerialMessage {
     private static final byte START = ':';
     private static final byte[] END = {'\r', '\n'};
     private static byte[] lookupAscii = {0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x41, 0x42, 0x43,

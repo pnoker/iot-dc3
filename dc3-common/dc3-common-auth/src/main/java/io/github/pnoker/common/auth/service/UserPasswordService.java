@@ -31,7 +31,7 @@ import io.github.pnoker.common.base.service.BaseService;
 public interface UserPasswordService extends BaseService<UserPasswordBO, UserPasswordQuery> {
 
     /**
-     * 重置密码
+     *
      *
      * @param id ID
      */

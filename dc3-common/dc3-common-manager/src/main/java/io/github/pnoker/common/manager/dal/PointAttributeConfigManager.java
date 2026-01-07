@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.PointAttributeConfigDO;
 
 /**
  * <p>
- * 位号属性配置表 服务类
+ *
  * </p>
  *
  * @author pnoker

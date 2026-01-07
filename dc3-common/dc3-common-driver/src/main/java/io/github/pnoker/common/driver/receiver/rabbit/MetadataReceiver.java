@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- * 接收驱动元数据
+ *
  *
  * @author pnoker
  * @version 2025.9.0

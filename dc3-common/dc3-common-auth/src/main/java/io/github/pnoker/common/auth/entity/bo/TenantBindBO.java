@@ -35,12 +35,12 @@ import lombok.*;
 public class TenantBindBO extends BaseBO {
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
     /**
-     * 用户ID
+     * ID
      */
     private Long userId;
 }

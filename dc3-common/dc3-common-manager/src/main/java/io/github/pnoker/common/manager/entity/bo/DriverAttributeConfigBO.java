@@ -37,42 +37,42 @@ import lombok.*;
 public class DriverAttributeConfigBO extends BaseBO {
 
     /**
-     * 驱动属性ID
+     * ID
      */
     private Long attributeId;
 
     /**
-     * 驱动属性配置值
+     *
      */
     private String configValue;
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 
     /**
-     * 驱动配置信息
+     *
      */
     private JsonExt configExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

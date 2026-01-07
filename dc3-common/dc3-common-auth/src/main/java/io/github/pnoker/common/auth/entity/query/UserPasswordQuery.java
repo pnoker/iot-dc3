@@ -43,10 +43,10 @@ public class UserPasswordQuery implements Serializable {
 
     private Pages page;
 
-    // 查询字段
+    // 
 
     /**
-     * 登录密码
+     *
      */
     private String loginPassword;
 }

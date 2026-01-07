@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * 用户 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -58,7 +58,7 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * 新增租户
+     * Tenant
      *
      * @param entityVO {@link TenantVO}
      * @return R of String
@@ -76,7 +76,7 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除租户
+     * ID Tenant
      *
      * @param id ID
      * @return R of String
@@ -93,10 +93,10 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * 根据 ID 更新租户
+     * ID Tenant
      * <ol>
-     * <li>支持更新: Enable</li>
-     * <li>不支持更新: Name</li>
+     * <li>: Enable</li>
+     * <li>: Name</li>
      * </ol>
      *
      * @param entityVO {@link TenantVO}
@@ -115,7 +115,7 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询租户
+     * ID Tenant
      *
      * @param id ID
      * @return TenantVO {@link TenantVO}
@@ -133,9 +133,9 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * 根据 Code 查询租户
+     * Code Tenant
      *
-     * @param code 租户Code
+     * @param code TenantCode
      * @return {@link TenantBO}
      */
     @GetMapping("/code/{code}")
@@ -153,10 +153,10 @@ public class TenantController implements BaseController {
     }
 
     /**
-     * 分页查询租户
+     * Tenant
      *
-     * @param entityQuery 租户和分页参数
-     * @return 带分页的 {@link TenantBO}
+     * @param entityQuery Tenant
+     * @return {@link TenantBO}
      */
     @PostMapping("/list")
     public Mono<R<Page<TenantVO>>> list(@RequestBody(required = false) TenantQuery entityQuery) {

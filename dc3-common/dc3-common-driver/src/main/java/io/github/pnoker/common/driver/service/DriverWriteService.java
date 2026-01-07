@@ -20,7 +20,7 @@ package io.github.pnoker.common.driver.service;
 import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 
 /**
- * 驱动指令服务
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,16 +29,16 @@ import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 public interface DriverWriteService {
 
     /**
-     * 写取位号值
      *
-     * @param deviceId 设备ID
-     * @param pointId  位号ID
-     * @param value    位号值
+     *
+     * @param deviceId Device ID
+     * @param pointId  Point ID
+     * @param value
      */
     void write(Long deviceId, Long pointId, String value);
 
     /**
-     * 指令写取位号值
+     *
      *
      * @param commandDTO {@link DeviceCommandDTO}
      */

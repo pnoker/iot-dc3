@@ -20,7 +20,7 @@ package io.github.pnoker.common.exception;
 import java.text.MessageFormat;
 
 /**
- * 自定义 Request 异常
+ * Request
  *
  * @author pnoker
  * @version 2025.9.0

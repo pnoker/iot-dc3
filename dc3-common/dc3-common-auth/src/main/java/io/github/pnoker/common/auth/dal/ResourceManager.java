@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.ResourceDO;
 
 /**
  * <p>
- * 资源表 服务类
+ *
  * </p>
  *
  * @author pnoker

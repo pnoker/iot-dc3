@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 位号数据
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -45,27 +45,27 @@ public class PointValue implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 
     /**
-     * 位号ID
+     * Point ID
      */
     private Long pointId;
 
     /**
-     * 原始值
+     * Raw value
      */
     private String rawValue;
 
     /**
-     * 处理值
+     * Processed value
      */
     private String calValue;
 
     /**
-     * 创建时间
+     * Create Time
      */
     private LocalDateTime createTime;
 

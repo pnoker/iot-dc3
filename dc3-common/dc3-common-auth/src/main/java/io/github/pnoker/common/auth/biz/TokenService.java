@@ -28,32 +28,32 @@ import io.github.pnoker.common.auth.entity.bean.TokenValid;
  */
 public interface TokenService {
     /**
-     * 生成盐值
      *
-     * @param loginName  登录名称
-     * @param tenantCode 租户编号
+     *
+     * @param loginName  Name
+     * @param tenantCode TenantCode
      * @return R of String
      */
     String generateSalt(String loginName, String tenantCode);
 
     /**
-     * 生成令牌
      *
-     * @param loginName  登录名称
+     *
+     * @param loginName  Name
      * @param salt       User Salt
      * @param password   User Password
-     * @param tenantCode 租户编号
+     * @param tenantCode TenantCode
      * @return R of String
      */
     String generateToken(String loginName, String salt, String password, String tenantCode);
 
     /**
-     * 校验令牌
      *
-     * @param loginName  登录名称
-     * @param salt       盐值
+     *
+     * @param loginName  Name
+     * @param salt
      * @param token      Token
-     * @param tenantCode 租户编号
+     * @param tenantCode TenantCode
      * @return TokenValid
      */
     TokenValid checkValid(String loginName, String salt, String token, String tenantCode);

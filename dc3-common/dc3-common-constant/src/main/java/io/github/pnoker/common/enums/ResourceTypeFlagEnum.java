@@ -35,61 +35,61 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum ResourceTypeFlagEnum {
     /**
-     * 驱动
+     * Driver
      */
-    DRIVER((byte) 0, "driver", "驱动"),
+    DRIVER((byte) 0, "driver", "Driver"),
 
     /**
-     * 模版
+     * Profile
      */
-    PROFILE((byte) 1, "profile", "模版"),
+    PROFILE((byte) 1, "profile", "Profile"),
 
     /**
-     * 位号
+     * Point
      */
-    POINT((byte) 2, "point", "位号"),
+    POINT((byte) 2, "point", "Point"),
 
     /**
-     * 设备
+     * Device
      */
-    DEVICE((byte) 3, "device", "设备"),
+    DEVICE((byte) 3, "device", "Device"),
 
     /**
-     * 数据
+     * Data
      */
-    DATA((byte) 4, "data", "数据"),
+    DATA((byte) 4, "data", "Data"),
 
     /**
-     * 菜单
+     * Menu
      */
-    MENU((byte) 5, "menu", "菜单"),
+    MENU((byte) 5, "menu", "Menu"),
 
     /**
-     * 接口
+     * Api
      */
-    API((byte) 6, "api", "接口"),
+    API((byte) 6, "api", "Api"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Text
      */
     private final String text;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link ResourceTypeFlagEnum}
      */
     public static ResourceTypeFlagEnum ofIndex(Byte index) {
@@ -98,9 +98,9 @@ public enum ResourceTypeFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link ResourceTypeFlagEnum}
      */
     public static ResourceTypeFlagEnum ofCode(String code) {
@@ -109,9 +109,9 @@ public enum ResourceTypeFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link ResourceTypeFlagEnum}
      */
     public static ResourceTypeFlagEnum ofName(String name) {

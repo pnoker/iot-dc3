@@ -35,36 +35,36 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum MetadataTypeEnum {
     /**
-     * 设备类型元数据
+     * Device metadata
      */
-    DEVICE((byte) 0, "device", "设备类型元数据"),
+    DEVICE((byte) 0, "device", "Device metadata"),
 
     /**
-     * 位号类型元数据
+     * Point metadata
      */
-    POINT((byte) 1, "point", "位号类型元数据"),
+    POINT((byte) 1, "point", "Point metadata"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link MetadataTypeEnum}
      */
     public static MetadataTypeEnum ofIndex(Byte index) {
@@ -73,9 +73,9 @@ public enum MetadataTypeEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link MetadataTypeEnum}
      */
     public static MetadataTypeEnum ofCode(String code) {
@@ -84,9 +84,9 @@ public enum MetadataTypeEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link MetadataTypeEnum}
      */
     public static MetadataTypeEnum ofName(String name) {

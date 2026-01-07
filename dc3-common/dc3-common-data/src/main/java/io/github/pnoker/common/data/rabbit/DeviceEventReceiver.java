@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * 接收驱动发送过来的设备事件
+ * Device Event
  *
  * @author pnoker
  * @version 2025.9.0

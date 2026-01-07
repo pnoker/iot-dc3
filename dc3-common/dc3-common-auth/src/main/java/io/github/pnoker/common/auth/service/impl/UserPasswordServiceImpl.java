@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * 用户密码服务接口实现类
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -114,7 +114,7 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link UserPasswordQuery}
      * @return {@link LambdaQueryWrapper}
@@ -124,12 +124,12 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link UserPasswordBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(UserPasswordBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<UserPasswordDO> wrapper = Wrappers.<UserPasswordDO>query().lambda();
@@ -147,10 +147,10 @@ public class UserPasswordServiceImpl implements UserPasswordService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link UserPasswordDO}
      */
     private UserPasswordDO getDOById(Long id, boolean throwException) {

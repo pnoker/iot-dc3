@@ -44,7 +44,7 @@ import lombok.*;
 public class DriverVO extends BaseVO {
 
     /**
-     * 驱动名称
+     * Name
      */
     @NotBlank(message = "驱动名称不能为空",
             groups = {Add.class})
@@ -54,12 +54,12 @@ public class DriverVO extends BaseVO {
     private String driverName;
 
     /**
-     * 驱动编号
+     * Driver ID
      */
     private String driverCode;
 
     /**
-     * 驱动服务名称
+     * Driver service name
      */
     @NotBlank(message = "服务名称不能为空",
             groups = {Add.class})
@@ -69,7 +69,7 @@ public class DriverVO extends BaseVO {
     private String serviceName;
 
     /**
-     * 服务主机
+     *
      */
     @NotBlank(message = "服务主机不能为空",
             groups = {Add.class})
@@ -79,27 +79,27 @@ public class DriverVO extends BaseVO {
     private String serviceHost;
 
     /**
-     * 驱动类型标识
+     * Type
      */
     private DriverTypeFlagEnum driverTypeFlag;
 
     /**
-     * 驱动拓展信息
+     *
      */
     private DriverExt driverExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

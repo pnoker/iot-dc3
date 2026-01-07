@@ -35,17 +35,17 @@ import lombok.*;
 public class ProfileBindBO extends BaseBO {
 
     /**
-     * 模版ID
+     * ID
      */
     private Long profileId;
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 }

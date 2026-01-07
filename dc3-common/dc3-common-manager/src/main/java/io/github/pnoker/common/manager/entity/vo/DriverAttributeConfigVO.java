@@ -42,42 +42,42 @@ import lombok.*;
 public class DriverAttributeConfigVO extends BaseVO {
 
     /**
-     * 驱动属性ID
+     * ID
      */
     @NotNull(message = "驱动属性ID不能为空",
             groups = {Add.class, Update.class})
     private Long attributeId;
 
     /**
-     * 驱动属性配置值
+     *
      */
     @NotNull(message = "驱动属性配置值不能为空")
     private String configValue;
 
     /**
-     * 设备ID
+     * Device ID
      */
     @NotNull(message = "设备ID不能为空",
             groups = {Add.class, Update.class})
     private Long deviceId;
 
     /**
-     * 驱动配置信息
+     *
      */
     private JsonExt configExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

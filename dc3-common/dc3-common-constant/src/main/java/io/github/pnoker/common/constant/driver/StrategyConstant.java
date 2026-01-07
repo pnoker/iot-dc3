@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 
 /**
- * 策略工厂 相关常量
+ * Strategy factory constant
  *
  * @author pnoker
  * @version 2025.9.0
@@ -34,7 +34,7 @@ public class StrategyConstant {
     }
 
     /**
-     * 存储相关的策略工厂 相关常量
+     * Storage strategy constant
      *
      * @author pnoker
      * @version 2025.9.0

@@ -38,22 +38,22 @@ import lombok.*;
 public class UserLoginVO extends BaseVO {
 
     /**
-     * 登录名称
+     * Name
      */
     private String loginName;
 
     /**
-     * 用户ID
+     * ID
      */
     private Long userId;
 
     /**
-     * 用户密码ID
+     * ID
      */
     private String userPasswordId;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

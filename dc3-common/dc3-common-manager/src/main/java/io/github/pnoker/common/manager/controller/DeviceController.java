@@ -49,7 +49,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * 设备 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -69,7 +69,7 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 新增设备
+     *
      *
      * @param entityVO {@link DeviceVO}
      * @return R of String
@@ -90,7 +90,7 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除设备
+     * ID
      *
      * @param id ID
      * @return R of String
@@ -107,7 +107,7 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 更新设备
+     *
      *
      * @param entityVO {@link DeviceVO}
      * @return R of String
@@ -125,7 +125,7 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询 Device
+     * ID Device
      *
      * @param id ID
      * @return DeviceVO {@link DeviceVO}
@@ -143,9 +143,9 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 根据 ID 集合查询 Device
+     * ID Device
      *
-     * @param deviceIds 设备ID集
+     * @param deviceIds Device ID
      * @return Map(ID, DeviceVO)
      */
     @PostMapping("/ids")
@@ -161,9 +161,9 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 分页查询 Device
+     * Device
      *
-     * @param entityQuery 设备和分页参数
+     * @param entityQuery
      * @return R Of DeviceVO Page
      */
     @PostMapping("/list")
@@ -183,7 +183,7 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 导入 Device
+     * Device
      *
      * @param entityVO {@link DeviceVO}
      * @return R of String
@@ -210,10 +210,10 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 下载导入模板
+     *
      *
      * @param entityVO {@link DeviceVO}
-     * @return 模板文件流
+     * @return
      */
     @PostMapping("/export/import_template")
     public ResponseEntity<Resource> importTemplate(@Validated(Upload.class) @RequestBody DeviceVO entityVO) {
@@ -223,7 +223,7 @@ public class DeviceController implements BaseController {
     }
 
     /**
-     * 驱动下设备数量
+     *
      *
      * @param driverId
      * @return

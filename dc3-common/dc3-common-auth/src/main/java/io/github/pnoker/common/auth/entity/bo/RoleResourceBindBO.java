@@ -35,17 +35,17 @@ import lombok.*;
 public class RoleResourceBindBO extends BaseBO {
 
     /**
-     * 角色ID
+     * ID
      */
     private Long roleId;
 
     /**
-     * 权限资源ID
+     * ID
      */
     private Long resourceId;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 }

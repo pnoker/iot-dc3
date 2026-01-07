@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 驱动事件
+ * Driver Event
  *
  * @author pnoker
  * @version 2025.9.0
@@ -45,17 +45,17 @@ public class DriverEventDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 事件类型
+     * Type
      */
     private DriverEventTypeEnum type;
 
     /**
-     * 事件内容
+     *
      */
     private String content;
 
     /**
-     * 创建时间
+     * Create Time
      */
     private LocalDateTime createTime;
 
@@ -66,7 +66,7 @@ public class DriverEventDTO implements Serializable {
     }
 
     /**
-     * 驱动状态
+     * Status
      *
      * @author pnoker
      * @version 2025.9.0
@@ -81,17 +81,17 @@ public class DriverEventDTO implements Serializable {
         private static final long serialVersionUID = 1L;
 
         /**
-         * 驱动ID
+         * Driver ID
          */
         private Long driverId;
 
         /**
-         * 驱动状态
+         * Status
          */
         private DriverStatusEnum status;
 
         /**
-         * 创建时间
+         * Create Time
          */
         private LocalDateTime createTime;
 

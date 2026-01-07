@@ -33,7 +33,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 /**
- * 字典 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -53,9 +53,9 @@ public class DictionaryForAuthController implements BaseController {
     }
 
     /**
-     * 查询租户字典列表
+     * Tenant
      *
-     * @return 字典列表
+     * @return
      */
     @GetMapping("/tenant")
     public Mono<R<List<DictionaryVO>>> tenantDictionary() {

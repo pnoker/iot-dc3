@@ -46,29 +46,29 @@ public class DriverTokenQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 驱动编号
+     * Driver ID
      */
     private String driverCode;
 
     /**
-     * 驱动AppID
+     * AppID
      */
     private String driverAppId;
 
     /**
-     * 失效标识
+     *
      */
     private ExpireFlagEnum expireFlag;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

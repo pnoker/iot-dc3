@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.RoleDO;
 
 /**
  * <p>
- * 角色表 Mapper 接口
+ * Mapper
  * </p>
  *
  * @author pnoker

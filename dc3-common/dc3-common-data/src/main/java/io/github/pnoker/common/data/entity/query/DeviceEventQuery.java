@@ -44,19 +44,19 @@ public class DeviceEventQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 
     /**
-     * 位号ID
+     * Point ID
      */
     private Long pointId;
 }

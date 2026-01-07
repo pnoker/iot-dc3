@@ -44,7 +44,7 @@ import lombok.*;
 public class UserVO extends BaseVO {
 
     /**
-     * 用户昵称
+     *
      */
     @NotBlank(message = "Nick name can't be empty",
             groups = {Add.class, Auth.class})
@@ -54,7 +54,7 @@ public class UserVO extends BaseVO {
     private String nickName;
 
     /**
-     * 用户名称
+     * Name
      */
     @NotBlank(message = "User name can't be empty",
             groups = {Add.class, Auth.class})
@@ -64,7 +64,7 @@ public class UserVO extends BaseVO {
     private String userName;
 
     /**
-     * 手机号
+     *
      */
     @Pattern(regexp = "^1([3-9])\\d{9}$",
             message = "Invalid phone",
@@ -72,7 +72,7 @@ public class UserVO extends BaseVO {
     private String phone;
 
     /**
-     * 邮箱
+     *
      */
     @Pattern(regexp = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$",
             message = "Invalid email",
@@ -80,17 +80,17 @@ public class UserVO extends BaseVO {
     private String email;
 
     /**
-     * 社交相关拓展信息
+     *
      */
     private UserSocialExt socialExt;
 
     /**
-     * 身份相关拓展信息
+     *
      */
     private UserIdentityExt identityExt;
 
     /**
-     * 使能标识, 0:启用, 1:禁用
+     * Enable flag, 0:, 1:Disable
      */
     private Byte enableFlag;
 

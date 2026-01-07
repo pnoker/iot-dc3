@@ -21,6 +21,14 @@ import io.github.pnoker.driver.api.S7Type;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * Date And Time Converter
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 public final class DateAndTimeConverter extends ByteConverter {
 
     public static final int OFFSET_DAY = 2;

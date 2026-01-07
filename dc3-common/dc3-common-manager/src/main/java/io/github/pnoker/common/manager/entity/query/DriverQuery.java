@@ -46,44 +46,44 @@ public class DriverQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 驱动名称
+     * Name
      */
     private String driverName;
 
     /**
-     * 驱动编号
+     * Driver ID
      */
     private String driverCode;
 
     /**
-     * 驱动服务名称
+     * Driver service name
      */
     private String serviceName;
 
     /**
-     * 服务主机
+     *
      */
     private String serviceHost;
 
     /**
-     * 驱动类型标识
+     * Type
      */
     private DriverTypeFlagEnum driverTypeFlag;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用报警类型类型枚举
+ * Common alarm type enumeration
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,41 +35,41 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum AlarmTypeFlagEnum {
     /**
-     * 位号
+     * Point
      */
-    POINT((byte) 0, "point", "位号"),
+    POINT((byte) 0, "point", "Point"),
 
     /**
-     * 设备
+     * Device
      */
-    DEVICE((byte) 1, "device", "设备"),
+    DEVICE((byte) 1, "device", "Device"),
 
     /**
-     * 驱动
+     * Driver
      */
-    DRIVER((byte) 2, "driver", "驱动"),
+    DRIVER((byte) 2, "driver", "Driver"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link AlarmTypeFlagEnum}
      */
     public static AlarmTypeFlagEnum ofIndex(Byte index) {
@@ -78,9 +78,9 @@ public enum AlarmTypeFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link AlarmTypeFlagEnum}
      */
     public static AlarmTypeFlagEnum ofCode(String code) {
@@ -89,9 +89,9 @@ public enum AlarmTypeFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link AlarmTypeFlagEnum}
      */
     public static AlarmTypeFlagEnum ofName(String name) {

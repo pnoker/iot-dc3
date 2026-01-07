@@ -31,9 +31,9 @@ import io.github.pnoker.common.base.service.BaseService;
 public interface TenantBindService extends BaseService<TenantBindBO, TenantBindQuery> {
 
     /**
-     * 根据 租户ID 和 关联的用户ID 查询
+     * Tenant ID ID
      *
-     * @param tenantId 租户ID
+     * @param tenantId Tenant ID
      * @param userId   User ID
      * @return TenantBind
      */

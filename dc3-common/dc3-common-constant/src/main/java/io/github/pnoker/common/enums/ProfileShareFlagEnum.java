@@ -35,41 +35,41 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum ProfileShareFlagEnum {
     /**
-     * 租户下共享模板
+     * Shared profile under tenant
      */
-    TENANT((byte) 0, "tenant", "租户下共享模板"),
+    TENANT((byte) 0, "tenant", "Shared profile under tenant"),
 
     /**
-     * 驱动下共享模板
+     * Shared profile under driver
      */
-    DRIVER((byte) 1, "driver", "驱动下共享模板"),
+    DRIVER((byte) 1, "driver", "Shared profile under driver"),
 
     /**
-     * 用户下共享模板
+     * Shared profile under user
      */
-    USER((byte) 2, "user", "用户下共享模板"),
+    USER((byte) 2, "user", "Shared profile under user"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link ProfileShareFlagEnum}
      */
     public static ProfileShareFlagEnum ofIndex(Byte index) {
@@ -78,9 +78,9 @@ public enum ProfileShareFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link ProfileShareFlagEnum}
      */
     public static ProfileShareFlagEnum ofCode(String code) {
@@ -89,9 +89,9 @@ public enum ProfileShareFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link ProfileShareFlagEnum}
      */
     public static ProfileShareFlagEnum ofName(String name) {

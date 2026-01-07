@@ -71,7 +71,7 @@ public class NotifyServiceImpl implements NotifyService {
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 删除报警通知模板之前需要检查该报警通知模板是否存在关联
+        // Alarm notificationAlarm notification
         LambdaQueryChainWrapper<NotifyDO> wrapper = notifyManager.lambdaQuery().eq(NotifyDO::getTenantId, id);
         long count = wrapper.count();
         if (count > 0) {
@@ -112,7 +112,7 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link NotifyQuery}
      * @return {@link LambdaQueryWrapper}
@@ -125,12 +125,12 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link NotifyBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(NotifyBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
@@ -150,10 +150,10 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link NotifyDO}
      */
     private NotifyDO getDOById(Long id, boolean throwException) {

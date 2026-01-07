@@ -121,7 +121,7 @@ public class CodecUtil {
     }
 
     /**
-     * byte数组到int的转换(大端)
+     * byteint()
      *
      * @param bytes Byte Array
      * @return Integer
@@ -142,7 +142,7 @@ public class CodecUtil {
     }
 
     /**
-     * byte数组到int的转换(小端)
+     * byteint()
      *
      * @param bytes Byte Array
      * @return Integer
@@ -162,7 +162,7 @@ public class CodecUtil {
     }
 
     /**
-     * 将byte[]转成Ascii码
+     * byte[]Ascii
      *
      * @param bytes Byte Array
      * @return R of String
@@ -172,7 +172,7 @@ public class CodecUtil {
     }
 
     /**
-     * 将byte[]颠倒
+     * byte[]
      *
      * @param bytes Byte Array
      * @return Byte Array
@@ -187,7 +187,7 @@ public class CodecUtil {
     }
 
     /**
-     * 合并byte[]
+     * byte[]
      *
      * @param bytes Byte Array
      * @return Byte Array
@@ -207,7 +207,7 @@ public class CodecUtil {
     }
 
     /**
-     * 获取字节间的异或值
+     *
      *
      * @param bytes Byte Array
      * @return Byte
@@ -223,7 +223,7 @@ public class CodecUtil {
     }
 
     /**
-     * 获取字节间的累加值
+     *
      *
      * @param bytes Byte Array
      * @return Byte

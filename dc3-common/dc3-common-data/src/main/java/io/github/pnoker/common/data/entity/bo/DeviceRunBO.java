@@ -21,6 +21,14 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Device Run BO
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 @Getter
 @Setter
 @ToString
@@ -28,23 +36,23 @@ import java.util.List;
 @AllArgsConstructor
 public class DeviceRunBO {
     /**
-     * 设备名称
+     * Device Name
      */
     private String deviceName;
 
     /**
-     * 设备状态
+     * Device status
      */
     private String status;
 
     /**
-     * 设备在线时长 /分钟
+     * /
      */
     private List<Long> duration;
 
 
     /**
-     * 设备在线总时长 分钟
+     *
      */
     private Long totalDuration;
 }

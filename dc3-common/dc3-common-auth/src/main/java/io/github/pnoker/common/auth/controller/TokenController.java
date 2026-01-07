@@ -35,7 +35,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * 令牌 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -53,10 +53,10 @@ public class TokenController implements BaseController {
     }
 
     /**
-     * 生成用户随机盐值
      *
-     * @param entityVO 生成盐值请求体 {@link TokenQuery}
-     * @return 盐值
+     *
+     * @param entityVO {@link TokenQuery}
+     * @return
      */
     @PostMapping("/salt")
     public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
@@ -65,10 +65,10 @@ public class TokenController implements BaseController {
     }
 
     /**
-     * 生成用户 Token 令牌
+     * Token
      *
-     * @param entityVO 生成令牌请求体 {@link TokenQuery}
-     * @return Token 令牌
+     * @param entityVO {@link TokenQuery}
+     * @return Token
      */
     @PostMapping("/generate")
     public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO) {
@@ -77,10 +77,10 @@ public class TokenController implements BaseController {
     }
 
     /**
-     * 检测用户 Token 令牌是否有效
+     * Token
      *
-     * @param entityVO 校验令牌请求体 {@link TokenQuery}
-     * @return 是否有效, 并返回过期时间
+     * @param entityVO {@link TokenQuery}
+     * @return ,
      */
     @PostMapping("/check")
     public Mono<R<Boolean>> checkValid(@Validated @RequestBody TokenQuery entityVO) {

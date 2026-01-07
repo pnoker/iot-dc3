@@ -26,7 +26,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 位号属性Query
+ * Query
  *
  * @author pnoker
  * @version 2025.9.0
@@ -46,39 +46,39 @@ public class PointAttributeQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 属性名称
+     * Name
      */
     private String attributeName;
 
     /**
-     * 属性编号
+     * Code
      */
     private String attributeCode;
 
     /**
-     * 属性类型标识
+     * Type
      */
     private AttributeTypeFlagEnum attributeTypeFlag;
 
     /**
-     * 驱动ID
+     * Driver ID
      */
     private Long driverId;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

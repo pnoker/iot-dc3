@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.NotifyDO;
 
 /**
  * <p>
- * 通知表 Mapper 接口
+ * Mapper
  * </p>
  *
  * @author pnoker

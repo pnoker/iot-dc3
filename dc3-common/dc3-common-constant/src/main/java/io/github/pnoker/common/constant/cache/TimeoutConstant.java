@@ -20,7 +20,7 @@ package io.github.pnoker.common.constant.cache;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 
 /**
- * 超时 相关常量
+ * Timeout constant
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,15 +29,15 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 public class TimeoutConstant {
 
     /**
-     * salt 在 redis 中的失效时间, 分钟
+     * salt cache timeout, minutes
      */
     public static final int SALT_CACHE_TIMEOUT = 5;
     /**
-     * user 登陆限制失效时间, 分钟
+     * user login limit timeout, minutes
      */
     public static final int USER_LIMIT_TIMEOUT = 5;
     /**
-     * token 在 redis 中的失效时间, 小时
+     * token cache timeout, hours
      */
     public static final int TOKEN_CACHE_TIMEOUT = 12;
 

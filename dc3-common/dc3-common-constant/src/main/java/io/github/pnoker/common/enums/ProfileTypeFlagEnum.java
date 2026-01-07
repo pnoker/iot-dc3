@@ -35,41 +35,41 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum ProfileTypeFlagEnum {
     /**
-     * 系统创建
+     * System create
      */
-    SYSTEM((byte) 0, "system", "系统创建"),
+    SYSTEM((byte) 0, "system", "System create"),
 
     /**
-     * 驱动创建
+     * Driver create
      */
-    DRIVER((byte) 1, "driver", "驱动创建"),
+    DRIVER((byte) 1, "driver", "Driver create"),
 
     /**
-     * 用户创建
+     * User create
      */
-    USER((byte) 2, "user", "用户创建"),
+    USER((byte) 2, "user", "User create"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link ProfileTypeFlagEnum}
      */
     public static ProfileTypeFlagEnum ofIndex(Byte index) {
@@ -78,9 +78,9 @@ public enum ProfileTypeFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link ProfileTypeFlagEnum}
      */
     public static ProfileTypeFlagEnum ofCode(String code) {
@@ -89,9 +89,9 @@ public enum ProfileTypeFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link ProfileTypeFlagEnum}
      */
     public static ProfileTypeFlagEnum ofName(String name) {

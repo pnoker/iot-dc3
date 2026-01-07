@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 驱动状态枚举
+ * Driver status enumeration
  *
  * @author pnoker
  * @version 2025.9.0
@@ -34,32 +34,32 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum DriverStatusEnum {
-    ONLINE((byte) 0, "ONLINE", "在线"),
-    OFFLINE((byte) 1, "OFFLINE", "离线"),
-    MAINTAIN((byte) 2, "MAINTAIN", "维护"),
-    FAULT((byte) 3, "FAULT", "故障"),
+    ONLINE((byte) 0, "ONLINE", "Online"),
+    OFFLINE((byte) 1, "OFFLINE", "Offline"),
+    MAINTAIN((byte) 2, "MAINTAIN", "Maintain"),
+    FAULT((byte) 3, "FAULT", "Fault"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 状态编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link DriverStatusEnum}
      */
     public static DriverStatusEnum ofIndex(Byte index) {
@@ -68,9 +68,9 @@ public enum DriverStatusEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link DriverStatusEnum}
      */
     public static DriverStatusEnum ofCode(String code) {
@@ -79,9 +79,9 @@ public enum DriverStatusEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link DriverStatusEnum}
      */
     public static DriverStatusEnum ofName(String name) {

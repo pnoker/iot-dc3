@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * 字典 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -58,7 +58,7 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * 查询驱动 Dictionary
+     * Dictionary
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
@@ -80,7 +80,7 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * 查询模板 Dictionary
+     * Dictionary
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
@@ -102,7 +102,7 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * 查询位号 Dictionary
+     * Dictionary
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
@@ -124,7 +124,7 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * 查询位号 Dictionary
+     * Dictionary
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
@@ -146,7 +146,7 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * 查询设备 Dictionary
+     * Dictionary
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page
@@ -168,7 +168,7 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     /**
-     * 查询设备 Dictionary
+     * Dictionary
      *
      * @param entityQuery {@link DictionaryQuery}
      * @return R Of DictionaryVO Page

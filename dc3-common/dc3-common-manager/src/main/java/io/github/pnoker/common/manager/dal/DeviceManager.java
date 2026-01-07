@@ -23,7 +23,7 @@ import io.github.pnoker.common.manager.entity.model.DeviceDO;
 
 /**
  * <p>
- * 设备表 服务类
+ *
  * </p>
  *
  * @author pnoker
@@ -33,16 +33,16 @@ import io.github.pnoker.common.manager.entity.model.DeviceDO;
 public interface DeviceManager extends IService<DeviceDO> {
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityDO {@link DeviceDO}
-     * @param isUpdate 是否为更新操作
-     * @return 是否重复
+     * @param isUpdate
+     * @return
      */
     boolean checkDuplicate(DeviceDO entityDO, boolean isUpdate);
 
     /**
-     * 内部保存
+     *
      *
      * @param entityDO {@link DeviceBO}
      * @return {@link DeviceDO}

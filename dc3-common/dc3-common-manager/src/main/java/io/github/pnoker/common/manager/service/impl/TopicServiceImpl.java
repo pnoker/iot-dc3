@@ -32,6 +32,14 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Topic Service Impl
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 
 @Service
 public class TopicServiceImpl extends ServiceImpl<DeviceMapper, DeviceDO>

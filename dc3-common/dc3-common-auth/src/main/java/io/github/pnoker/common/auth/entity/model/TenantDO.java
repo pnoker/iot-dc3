@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 租户表
+ * Tenant
  * </p>
  *
  * @author pnoker
@@ -47,79 +47,79 @@ public class TenantDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * Primary key ID
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
-     * 租户名称
+     * TenantName
      */
     @TableField("tenant_name")
     private String tenantName;
 
     /**
-     * 租户编号
+     * TenantCode
      */
     @TableField("tenant_code")
     private String tenantCode;
 
     /**
-     * 租户拓展信息
+     * Tenant
      */
     @TableField(value = "tenant_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt tenantExt;
 
     /**
-     * 使能标识, 0:启用, 1:禁用
+     * Enable flag, 0:, 1:Disable
      */
     @TableField("enable_flag")
     private Byte enableFlag;
 
     /**
-     * 描述
+     * Description
      */
     @TableField("remark")
     private String remark;
 
     /**
-     * 创建者ID
+     * Creator ID
      */
     @TableField("creator_id")
     private Long creatorId;
 
     /**
-     * 创建者名称
+     * Creator Name
      */
     @TableField("creator_name")
     private String creatorName;
 
     /**
-     * 创建时间
+     * Create Time
      */
     @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
-     * 操作者ID
+     * Operator ID
      */
     @TableField("operator_id")
     private Long operatorId;
 
     /**
-     * 操作者名称
+     * Operator Name
      */
     @TableField("operator_name")
     private String operatorName;
 
     /**
-     * 操作时间
+     * Operate Time
      */
     @TableField("operate_time")
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识, 0:未删除, 1:已删除
+     * Logical delete flag, 0:not deleted, 1:deleted
      */
     @TableLogic
     @TableField("deleted")

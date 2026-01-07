@@ -31,7 +31,14 @@ import org.apache.commons.logging.LogFactory;
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
-abstract public class SerialMaster extends ModbusMaster {
+abstract /**
+ * Serial Master
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+public class SerialMaster extends ModbusMaster {
 
     private static final int RETRY_PAUSE_START = 50;
     private static final int RETRY_PAUSE_MAX = 1000;

@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * 用户服务接口实现类
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -133,7 +133,7 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link UserLoginQuery}
      * @return {@link LambdaQueryWrapper}
@@ -145,12 +145,12 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link UserLoginBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(UserLoginBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<UserLoginDO> wrapper = Wrappers.<UserLoginDO>query().lambda();
@@ -169,10 +169,10 @@ public class UserLoginServiceImpl implements UserLoginService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link UserLoginDO}
      */
     private UserLoginDO getDOById(Long id, boolean throwException) {

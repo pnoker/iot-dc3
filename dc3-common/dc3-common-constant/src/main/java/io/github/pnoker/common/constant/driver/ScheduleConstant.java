@@ -20,7 +20,7 @@ package io.github.pnoker.common.constant.driver;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 
 /**
- * 任务调度 相关常量
+ * Schedule constant
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,37 +29,37 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 public class ScheduleConstant {
 
     /**
-     * 驱动任务调度分组
+     * Driver schedule group
      */
     public static final String DRIVER_SCHEDULE_GROUP = "driver-schedule-group";
 
     /**
-     * 驱动读任务
+     * Driver read schedule job
      */
     public static final String DRIVER_READ_SCHEDULE_JOB = "read-schedule-job";
 
     /**
-     * 驱动自定义任务
+     * Driver custom schedule job
      */
     public static final String DRIVER_CUSTOM_SCHEDULE_JOB = "customs-chedule-job";
 
     /**
-     * 驱动状态任务
+     * Driver status schedule job
      */
     public static final String DRIVER_STATUS_SCHEDULE_JOB = "status-schedule-job";
 
     /**
-     * 驱动状态任务 Cron
+     * Driver status schedule cron
      */
     public static final String DRIVER_STATUS_SCHEDULE_CRON = "0/15 * * * * ?";
 
     /**
-     * 数据任务调度分组
+     * Data schedule group
      */
     public static final String DATA_SCHEDULE_GROUP = "data-schedule-group";
 
     /**
-     * 管理任务调度分组
+     * Manager schedule group
      */
     public static final String MANAGER_SCHEDULE_GROUP = "manager-schedule-group";
 

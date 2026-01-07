@@ -56,25 +56,25 @@ public enum ApiTypeFlagEnum {
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link ApiTypeFlagEnum}
      */
     public static ApiTypeFlagEnum ofIndex(Byte index) {
@@ -83,9 +83,9 @@ public enum ApiTypeFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link ApiTypeFlagEnum}
      */
     public static ApiTypeFlagEnum ofCode(String code) {
@@ -94,9 +94,9 @@ public enum ApiTypeFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link ApiTypeFlagEnum}
      */
     public static ApiTypeFlagEnum ofName(String name) {

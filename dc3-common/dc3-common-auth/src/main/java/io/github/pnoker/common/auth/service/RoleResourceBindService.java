@@ -34,10 +34,10 @@ import java.util.List;
 public interface RoleResourceBindService extends BaseService<RoleResourceBindBO, RoleResourceBindQuery> {
 
     /**
-     * 根据TenantId与UserId查询资源
+     * TenantIdUserId
      *
-     * @param roleId 角色id
-     * @return 资源列表
+     * @param roleId id
+     * @return
      */
     List<ResourceBO> listResourceByRoleId(Long roleId);
 }

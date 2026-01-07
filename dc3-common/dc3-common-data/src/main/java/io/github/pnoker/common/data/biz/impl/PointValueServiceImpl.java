@@ -163,7 +163,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     /**
-     * 保存 PointValue 到指定存储服务
+     * Save PointValue to the specified storage service
      *
      * @param pointValueBO PointValue
      */
@@ -181,9 +181,9 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     /**
-     * 保存 PointValues 到指定存储服务
+     * Save PointValues to the specified storage service
      *
-     * @param deviceId         设备ID
+     * @param deviceId         Device ID
      * @param pointValueBOList Array
      */
     private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOList) {
@@ -203,7 +203,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     /**
-     * 获取数据存储服务
+     * Get data storage service
      *
      * @return RepositoryService
      */

@@ -22,6 +22,14 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Device By Point BO
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 @Getter
 @Setter
 @ToString
@@ -30,12 +38,12 @@ import java.util.List;
 public class DeviceByPointBO {
 
     /**
-     * 数量
+     *
      */
     private Long count;
 
     /**
-     * 设备集合
+     *
      */
     private List<DeviceDO> devices;
 

@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 租户表 服务实现类
+ * Tenant
  * </p>
  *
  * @author pnoker

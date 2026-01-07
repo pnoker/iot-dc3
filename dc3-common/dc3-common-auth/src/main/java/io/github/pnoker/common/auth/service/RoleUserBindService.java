@@ -34,10 +34,10 @@ import java.util.List;
 public interface RoleUserBindService extends BaseService<RoleUserBindBO, RoleUserBindQuery> {
 
     /**
-     * 根据 租户id 和 用户id 查询
+     * Tenantid id
      *
-     * @param tenantId 租户id
-     * @param userId   用户id
+     * @param tenantId Tenantid
+     * @param userId   id
      * @return Role list
      */
     List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId);

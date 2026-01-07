@@ -23,7 +23,7 @@ import "api/common/base.proto";
 import "api/common/r.proto";
 
 // Configuration options for code generation
-option java_package = "io.github.pnoker.api.common.auth";
+option java_package = "io.github.pnoker.api.center.auth";
 option java_outer_classname = "UserProto";
 option objc_class_prefix = "Auth";
 option java_multiple_files = true;

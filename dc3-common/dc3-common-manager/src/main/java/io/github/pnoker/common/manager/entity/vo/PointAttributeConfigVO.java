@@ -42,49 +42,49 @@ import lombok.*;
 public class PointAttributeConfigVO extends BaseVO {
 
     /**
-     * 位号属性ID
+     * ID
      */
     @NotNull(message = "位号属性ID不能为空",
             groups = {Add.class, Update.class})
     private Long attributeId;
 
     /**
-     * 位号属性配置值
+     *
      */
     @NotNull(message = "位号属性配置值不能为空")
     private String configValue;
 
     /**
-     * 设备ID
+     * Device ID
      */
     @NotNull(message = "设备ID不能为空",
             groups = {Add.class, Update.class})
     private Long deviceId;
 
     /**
-     * 位号配置信息
+     *
      */
     private JsonExt configExt;
 
     /**
-     * 位号ID
+     * Point ID
      */
     @NotNull(message = "位号ID不能为空",
             groups = {Add.class, Update.class})
     private Long pointId;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

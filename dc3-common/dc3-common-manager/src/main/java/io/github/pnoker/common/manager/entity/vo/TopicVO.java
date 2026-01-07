@@ -19,6 +19,14 @@ package io.github.pnoker.common.manager.entity.vo;
 
 import lombok.Data;
 
+/**
+ * Topic VO
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 @Data
 public class TopicVO {
     private String topic;

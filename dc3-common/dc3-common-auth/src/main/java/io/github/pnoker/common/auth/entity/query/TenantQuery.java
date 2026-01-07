@@ -44,20 +44,20 @@ public class TenantQuery implements Serializable {
 
     private Pages page;
 
-    // 查询字段
+    // 
 
     /**
-     * 租户名称
+     * TenantName
      */
     private String tenantName;
 
     /**
-     * 租户编号
+     * TenantCode
      */
     private String tenantCode;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

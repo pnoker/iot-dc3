@@ -33,44 +33,44 @@ import java.util.List;
 public interface ProfileBindService extends BaseService<ProfileBindBO, ProfileBindQuery> {
 
     /**
-     * 根据 设备ID 删除关联的模版映射
+     * Device ID
      *
-     * @param deviceId 设备ID
-     * @return 是否删除
+     * @param deviceId Device ID
+     * @return
      */
     Boolean removeByDeviceId(Long deviceId);
 
     /**
-     * 根据 设备ID 和 模版ID 删除关联的模版映射
+     * Device ID ID
      *
-     * @param deviceId  设备ID
-     * @param profileId 位号ID
-     * @return 是否删除
+     * @param deviceId  Device ID
+     * @param profileId Point ID
+     * @return
      */
     Boolean removeByDeviceIdAndProfileId(Long deviceId, Long profileId);
 
     /**
-     * 根据 设备ID 和 模版ID 查询关联的模版映射
+     * Device ID ID
      *
-     * @param deviceId  设备ID
-     * @param profileId 位号ID
+     * @param deviceId  Device ID
+     * @param profileId Point ID
      * @return ProfileBind
      */
     ProfileBindBO selectByDeviceIdAndProfileId(Long deviceId, Long profileId);
 
     /**
-     * 根据 模版ID 查询关联的 设备ID 集合
+     * ID Device ID
      *
-     * @param profileId 位号ID
-     * @return 设备ID集
+     * @param profileId Point ID
+     * @return Device ID
      */
     List<Long> selectDeviceIdsByProfileId(Long profileId);
 
     /**
-     * 根据 设备ID 查询关联的 模版ID 集合
+     * Device ID ID
      *
-     * @param deviceId 设备ID
-     * @return 模版ID集
+     * @param deviceId Device ID
+     * @return ID
      */
     List<Long> selectProfileIdsByDeviceId(Long deviceId);
 

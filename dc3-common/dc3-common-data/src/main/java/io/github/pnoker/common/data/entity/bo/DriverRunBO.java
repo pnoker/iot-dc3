@@ -21,6 +21,14 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Driver Run BO
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 @Getter
 @Setter
 @ToString
@@ -28,21 +36,21 @@ import java.util.List;
 @AllArgsConstructor
 public class DriverRunBO {
     /**
-     * 驱动名称
+     * Name
      */
     private String driverName;
     /**
-     * 驱动状态
+     * Status
      */
     private String status;
 
     /**
-     * 驱动在线时长 /分钟
+     * /
      */
     private List<Long> duration;
 
     /**
-     * 驱动在线总时长 分钟
+     *
      */
     private Long totalDuration;
 }

@@ -71,7 +71,7 @@ public class RuleServiceImpl implements RuleService {
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 删除报警规则之前需要检查该报警规则是否存在关联
+        // Alarm ruleAlarm rule
         LambdaQueryChainWrapper<RuleDO> wrapper = ruleManager.lambdaQuery().eq(RuleDO::getEntityId, id);
         long count = wrapper.count();
         if (count > 0) {
@@ -112,7 +112,7 @@ public class RuleServiceImpl implements RuleService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link RuleQuery}
      * @return {@link LambdaQueryWrapper}
@@ -125,12 +125,12 @@ public class RuleServiceImpl implements RuleService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link RuleBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(RuleBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
@@ -151,10 +151,10 @@ public class RuleServiceImpl implements RuleService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link RuleDO}
      */
     private RuleDO getDOById(Long id, boolean throwException) {

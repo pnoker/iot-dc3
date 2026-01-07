@@ -37,32 +37,32 @@ import lombok.*;
 public class RoleBO extends BaseBO {
 
     /**
-     * 角色父级ID
+     * ID
      */
     private String parentRoleId;
 
     /**
-     * 角色名称
+     * Name
      */
     private String roleName;
 
     /**
-     * 角色编号
+     * Code
      */
     private String roleCode;
 
     /**
-     * 角色拓展信息
+     *
      */
     private RoleExt roleExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 }

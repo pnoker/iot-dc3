@@ -32,8 +32,8 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * 接收驱动发送过来的驱动事件数据
- * 其中包括: 驱动心跳事件, 在线, 离线, 故障等其他事件
+ * Driver Event
+ * : , , ,
  *
  * @author pnoker
  * @version 2025.9.0

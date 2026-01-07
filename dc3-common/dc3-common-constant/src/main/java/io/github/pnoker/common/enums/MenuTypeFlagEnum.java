@@ -36,36 +36,36 @@ import java.util.Optional;
 public enum MenuTypeFlagEnum {
 
     /**
-     * 标题菜单
+     * Title menu
      */
-    TITLE((byte) 0, "title", "标题菜单"),
+    TITLE((byte) 0, "title", "Title menu"),
 
     /**
-     * 通用菜单
+     * Common menu
      */
-    COMMON((byte) 1, "common", "通用菜单"),
+    COMMON((byte) 1, "common", "Common menu"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link MenuTypeFlagEnum}
      */
     public static MenuTypeFlagEnum ofIndex(Byte index) {
@@ -74,9 +74,9 @@ public enum MenuTypeFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link MenuTypeFlagEnum}
      */
     public static MenuTypeFlagEnum ofCode(String code) {
@@ -85,9 +85,9 @@ public enum MenuTypeFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link MenuTypeFlagEnum}
      */
     public static MenuTypeFlagEnum ofName(String name) {

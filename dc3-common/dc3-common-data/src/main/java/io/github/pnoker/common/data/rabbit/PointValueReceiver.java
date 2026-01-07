@@ -34,9 +34,9 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
 /**
- * 接收驱动发送过来的数据
+ *
  * <p>
- * 200万条SinglePointValue会产生: 60M的索引数据以及400M的数据
+ * 200SinglePointValue: 60M400M
  *
  * @author pnoker
  * @version 2025.9.0

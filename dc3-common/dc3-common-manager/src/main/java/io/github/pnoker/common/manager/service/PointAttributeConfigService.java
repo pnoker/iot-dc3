@@ -34,42 +34,42 @@ import java.util.List;
 public interface PointAttributeConfigService extends BaseService<PointAttributeConfigBO, PointAttributeConfigQuery> {
 
     /**
-     * 根据 设备ID 查询
+     * Device ID
      *
-     * @param deviceId 设备ID
-     * @return PointConfig 集合
+     * @param deviceId Device ID
+     * @return PointConfig
      */
     List<PointAttributeConfigBO> selectByDeviceId(Long deviceId);
 
     /**
-     * 根据 属性ID 查询
+     * ID
      *
-     * @param attributeId 属性ID
-     * @return PointConfig 集合
+     * @param attributeId ID
+     * @return PointConfig
      */
     List<PointAttributeConfigBO> selectByAttributeId(Long attributeId);
 
     /**
-     * 根据 设备ID 和 位号ID 查询
+     * Device ID Point ID
      *
-     * @param deviceId 设备ID
-     * @param pointId  位号ID
-     * @return PointConfig 集合
+     * @param deviceId Device ID
+     * @param pointId  Point ID
+     * @return PointConfig
      */
     List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId);
 
     /**
-     * 根据 属性ID 和 设备ID 和 位号ID 查询
+     * ID Device ID Point ID
      *
-     * @param attributeId 属性ID
-     * @param deviceId    设备ID
-     * @param pointId     位号ID
+     * @param attributeId ID
+     * @param deviceId    Device ID
+     * @param pointId     Point ID
      * @return PointConfig
      */
     PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId, Long pointId);
 
     /**
-     * 内部保存
+     *
      *
      * @param entityBO {@link PointAttributeConfigBO}
      * @return {@link DeviceBO}

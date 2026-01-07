@@ -29,7 +29,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * 属性配置
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -47,17 +47,17 @@ public class AttributeBO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 值, string, 需要根据type确定真实的数据类型
+     * , string, typeType
      */
     private String value;
 
     /**
-     * 类型, value type, 用于确定value的真实类型
+     * Type, value type, valueType
      */
     private AttributeTypeFlagEnum type;
 
     /**
-     * 根据类型转换数据
+     * Type
      *
      * @param clazz T Class
      * @param <T>   T

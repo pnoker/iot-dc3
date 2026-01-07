@@ -113,7 +113,7 @@ public class DeviceServiceImpl implements DeviceService {
 
         addProfileBind(entityDO, entityBO.getProfileIds());
 
-        // 通知驱动
+        // 
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
@@ -123,7 +123,7 @@ public class DeviceServiceImpl implements DeviceService {
     public void remove(Long id) {
         DeviceDO entityDO = getDOById(id, true);
 
-        // 删除设备之前需要检查该设备是否存在关联
+        //
         if (!profileBindService.removeByDeviceId(id)) {
             throw new DeleteException("Failed to remove profile bind");
         }
@@ -132,7 +132,7 @@ public class DeviceServiceImpl implements DeviceService {
             throw new DeleteException("Failed to remove device");
         }
 
-        // 通知驱动
+        //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
@@ -150,12 +150,12 @@ public class DeviceServiceImpl implements DeviceService {
         List<Long> newProfileIds = entityBO.getProfileIds();
         List<Long> oldProfileIds = profileBindService.selectProfileIdsByDeviceId(entityBO.getId());
 
-        // 新增的模版
+        //
         ArrayList<Long> addIds = new ArrayList<>(newProfileIds);
         addIds.removeAll(oldProfileIds);
         addProfileBind(entityDO, addIds);
 
-        // 删除的模版
+        //
         ArrayList<Long> deleteIds = new ArrayList<>(oldProfileIds);
         deleteIds.removeAll(newProfileIds);
         deleteIds.forEach(profileId -> profileBindService.removeByDeviceIdAndProfileId(entityBO.getId(), profileId));
@@ -170,7 +170,7 @@ public class DeviceServiceImpl implements DeviceService {
         deviceBO.setProfileIds(CollectionUtils.isEmpty(newProfileIds) ? oldProfileIds : newProfileIds);
         entityBO.setDeviceName(deviceBO.getDeviceName());
 
-        // 通知驱动
+        //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
@@ -269,7 +269,7 @@ public class DeviceServiceImpl implements DeviceService {
             throw new ImportException("The import template is formatted incorrectly");
         }
 
-        Sheet sheet = workbook.getSheet("设备导入");
+        Sheet sheet = workbook.getSheet("");
         for (int i = 4; i <= sheet.getLastRowNum(); i++) {
             DeviceBO importDeviceBO;
             try {
@@ -280,12 +280,12 @@ public class DeviceServiceImpl implements DeviceService {
                 continue;
             }
 
-            // 通知驱动
+            //
             MetadataEvent metadataEvent = new MetadataEvent(this, importDeviceBO.getId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD);
             metadataEventPublisher.publishEvent(metadataEvent);
         }
 
-        // 删除文件
+        //
         try {
             FileUtils.delete(file);
         } catch (IOException e) {
@@ -302,45 +302,45 @@ public class DeviceServiceImpl implements DeviceService {
         Workbook workbook = new XSSFWorkbook();
         CellStyle cellStyle = PoiUtil.getCenterCellStyle(workbook);
 
-        // 设置主工作表
-        Sheet mainSheet = workbook.createSheet("设备导入");
+        //
+        Sheet mainSheet = workbook.createSheet("");
         mainSheet.setDefaultColumnWidth(25);
 
-        // 设置配置工作表
+        //
         configConfigSheet(driverAttributeBOList, pointAttributeBOList, pointBOList, workbook);
 
-        // 设置说明
+        //
         Row remarkRow = mainSheet.createRow(0);
-        PoiUtil.createCell(remarkRow, 0, "说明: 请从第5行开始添加待导入的设备数据");
+        PoiUtil.createCell(remarkRow, 0, ": 5");
         PoiUtil.mergedRegion(mainSheet, 0, 0, 0, 2 + driverAttributeBOList.size() + pointAttributeBOList.size() * pointBOList.size() - 1);
 
-        // 设置设备列
+        //
         Row titleRow = mainSheet.createRow(1);
-        PoiUtil.createCellWithStyle(titleRow, 0, "设备名称", cellStyle);
-        PoiUtil.createCellWithStyle(titleRow, 1, "设备描述", cellStyle);
+        PoiUtil.createCellWithStyle(titleRow, 0, "Device Name", cellStyle);
+        PoiUtil.createCellWithStyle(titleRow, 1, "Description", cellStyle);
         PoiUtil.mergedRegion(mainSheet, 1, 3, 0, 0);
         PoiUtil.mergedRegion(mainSheet, 1, 3, 1, 1);
 
         Row attributeRow = mainSheet.createRow(3);
-        // 设置驱动属性配置列
+        //
         configAttributeCell(driverAttributeBOList, mainSheet, titleRow, attributeRow, cellStyle);
-        // 设置位号属性配置列
+        //
         configPointCell(driverAttributeBOList, pointAttributeBOList, pointBOList, mainSheet, titleRow, attributeRow, cellStyle);
 
-        // 生成设备导入模版
+        //
         return generateTemplate(workbook);
     }
 
     /**
-     * 判断配置数据是否一致
+     *
      *
      * @param workbook              Workbook
-     * @param driverAttributeBOList 驱动属性Array
-     * @param pointAttributeBOList  位号属性Array
-     * @param pointBOList           Point 集合
+     * @param driverAttributeBOList Array
+     * @param pointAttributeBOList  Array
+     * @param pointBOList           Point
      */
     private boolean configIsEqual(Workbook workbook, List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, List<PointBO> pointBOList) {
-        Sheet configSheet = workbook.getSheet("配置(忽略)");
+        Sheet configSheet = workbook.getSheet("()");
         String driverAttributesValueNew = JsonUtil.toJsonString(driverAttributeBOList);
         String driverAttributesValueOld = PoiUtil.getCellStringValue(configSheet, 0, 0);
         if (!driverAttributesValueNew.equals(driverAttributesValueOld)) {
@@ -360,9 +360,9 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * 设置驱动属性配置列
      *
-     * @param driverAttributeBOList 驱动属性Array
+     *
+     * @param driverAttributeBOList Array
      * @param mainSheet             Main Sheet
      * @param titleRow              Title Row
      * @param attributeRow          Attribute Row
@@ -372,7 +372,7 @@ public class DeviceServiceImpl implements DeviceService {
             return;
         }
 
-        PoiUtil.createCellWithStyle(titleRow, 2, "驱动属性配置", cellStyle);
+        PoiUtil.createCellWithStyle(titleRow, 2, "", cellStyle);
         PoiUtil.mergedRegion(mainSheet, 1, 2, 2, 2 + driverAttributeBOList.size() - 1);
         for (int i = 0; i < driverAttributeBOList.size(); i++) {
             PoiUtil.createCellWithStyle(attributeRow, 2 + i, driverAttributeBOList.get(i).getAttributeName(), cellStyle);
@@ -381,15 +381,15 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * 设置配置工作表
      *
-     * @param driverAttributeBOList 驱动属性Array
-     * @param pointAttributeBOList  位号属性Array
+     *
+     * @param driverAttributeBOList Array
+     * @param pointAttributeBOList  Array
      * @param pointBOList           Point Array
      * @param workbook              Workbook
      */
     private void configConfigSheet(List<DriverAttributeBO> driverAttributeBOList, List<PointAttributeBO> pointAttributeBOList, List<PointBO> pointBOList, Workbook workbook) {
-        Sheet configSheet = workbook.createSheet("配置(忽略)");
+        Sheet configSheet = workbook.createSheet("()");
         Row driverAttributesRow = configSheet.createRow(0);
         Row pointAttributesRow = configSheet.createRow(1);
         Row pointsRow = configSheet.createRow(2);
@@ -399,11 +399,11 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * 设置位号属性配置列
      *
-     * @param driverAttributeBOList 驱动属性Array
-     * @param pointAttributeBOList  位号属性Array
-     * @param pointBOList           Point  Array
+     *
+     * @param driverAttributeBOList Array
+     * @param pointAttributeBOList  Array
+     * @param pointBOList           Point Array
      * @param mainSheet             Main Sheet
      * @param titleRow              Title Row
      * @param attributeRow          Attribute Row
@@ -415,7 +415,7 @@ public class DeviceServiceImpl implements DeviceService {
         }
 
         Row pointRow = mainSheet.createRow(2);
-        PoiUtil.createCellWithStyle(titleRow, 2 + driverAttributeBOList.size(), "位号属性配置", cellStyle);
+        PoiUtil.createCellWithStyle(titleRow, 2 + driverAttributeBOList.size(), "", cellStyle);
         PoiUtil.mergedRegion(mainSheet, 1, 1, 2 + driverAttributeBOList.size(), 2 + driverAttributeBOList.size() + pointAttributeBOList.size() * pointBOList.size() - 1);
         for (int i = 0; i < pointBOList.size(); i++) {
             PoiUtil.createCellWithStyle(pointRow, 2 + driverAttributeBOList.size() + i * pointAttributeBOList.size(), pointBOList.get(i).getPointName(), cellStyle);
@@ -427,7 +427,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * 生成设备导入模版
+     *
      *
      * @param workbook Workbook
      * @return Path
@@ -470,10 +470,10 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * 存在性校验
      *
-     * @param id 设备ID
-     * @return 是否存在
+     *
+     * @param id Device ID
+     * @return
      */
     private boolean checkExist(Long id) {
         DeviceDO entityDO = deviceManager.getById(id);
@@ -481,7 +481,7 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link DeviceQuery}
      * @return {@link LambdaQueryWrapper}
@@ -500,11 +500,11 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO {@link DeviceBO}
-     * @param isUpdate 是否为更新操作
-     * @return 是否重复
+     * @param isUpdate
+     * @return
      */
     private boolean checkDuplicate(DeviceBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<DeviceDO> wrapper = Wrappers.<DeviceDO>query().lambda();
@@ -520,10 +520,10 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link DeviceDO}
      */
     private DeviceDO getDOById(Long id, boolean throwException) {

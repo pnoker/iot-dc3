@@ -19,6 +19,14 @@ package io.github.pnoker.driver.api.impl.serializer.converter;
 import io.github.pnoker.driver.api.S7Serializable;
 import io.github.pnoker.driver.api.S7Type;
 
+/**
+ * Integer Converter
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 public class IntegerConverter implements S7Serializable {
 
     private static final int OFFSET_HIGH_BYTE = 0;

@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.UserLoginDO;
 
 /**
  * <p>
- * 用户登录表 服务类
+ *
  * </p>
  *
  * @author pnoker

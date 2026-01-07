@@ -35,41 +35,41 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum AccrueFlagEnum {
     /**
-     * 无规律
+     * None
      */
-    NONE((byte) 0, "none", "无规律"),
+    NONE((byte) 0, "none", "None"),
 
     /**
-     * 递增
+     * Increment
      */
-    INCREMENT((byte) 1, "increment", "递增"),
+    INCREMENT((byte) 1, "increment", "Increment"),
 
     /**
-     * 递减
+     * Decrement
      */
-    DECREMENT((byte) 2, "decrement", "递减"),
+    DECREMENT((byte) 2, "decrement", "Decrement"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link AccrueFlagEnum}
      */
     public static AccrueFlagEnum ofIndex(Byte index) {
@@ -78,9 +78,9 @@ public enum AccrueFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link AccrueFlagEnum}
      */
     public static AccrueFlagEnum ofCode(String code) {
@@ -89,9 +89,9 @@ public enum AccrueFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link AccrueFlagEnum}
      */
     public static AccrueFlagEnum ofName(String name) {

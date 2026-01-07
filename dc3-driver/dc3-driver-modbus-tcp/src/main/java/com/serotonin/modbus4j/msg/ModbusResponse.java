@@ -30,7 +30,14 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
-abstract public class ModbusResponse extends ModbusMessage {
+abstract /**
+ * Modbus Response
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+public class ModbusResponse extends ModbusMessage {
     /**
      * Constant <code>MAX_FUNCTION_CODE=(byte) 0x80</code>
      */

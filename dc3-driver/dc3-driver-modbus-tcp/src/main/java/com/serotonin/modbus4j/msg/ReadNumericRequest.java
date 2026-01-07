@@ -28,7 +28,14 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
-abstract public class ReadNumericRequest extends ModbusRequest {
+abstract /**
+ * Read Numeric Request
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+public class ReadNumericRequest extends ModbusRequest {
     private int startOffset;
     private int numberOfRegisters;
 

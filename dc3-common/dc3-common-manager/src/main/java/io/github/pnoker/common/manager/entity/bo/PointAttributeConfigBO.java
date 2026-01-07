@@ -37,47 +37,47 @@ import lombok.*;
 public class PointAttributeConfigBO extends BaseBO {
 
     /**
-     * 位号属性ID
+     * ID
      */
     private Long attributeId;
 
     /**
-     * 位号属性配置值
+     *
      */
     private String configValue;
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 
     /**
-     * 位号配置信息
+     *
      */
     private JsonExt configExt;
 
     /**
-     * 位号ID
+     * Point ID
      */
     private Long pointId;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

@@ -83,7 +83,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
             throw new AddException("Failed to create point attribute config");
         }
 
-        // 通知驱动
+        // 
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
@@ -110,7 +110,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
             throw new DeleteException("Failed to remove point attribute config");
         }
 
-        // 通知驱动
+        //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
@@ -129,7 +129,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
             throw new UpdateException("Failed to update point attribute config");
         }
 
-        // 通知驱动
+        //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
@@ -192,7 +192,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link PointAttributeConfigQuery}
      * @return {@link LambdaQueryWrapper}
@@ -207,11 +207,11 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO {@link PointAttributeConfigBO}
-     * @param isUpdate 是否为更新操作
-     * @return 是否重复
+     * @param isUpdate
+     * @return
      */
     private boolean checkDuplicate(PointAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
@@ -228,10 +228,10 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link PointAttributeConfigDO}
      */
     private PointAttributeConfigDO getDOById(Long id, boolean throwException) {

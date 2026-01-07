@@ -24,7 +24,7 @@ import io.github.pnoker.common.manager.entity.query.PointAttributeQuery;
 import java.util.List;
 
 /**
- * 位号属性Interface
+ * Interface
  *
  * @author pnoker
  * @version 2025.9.0
@@ -32,19 +32,19 @@ import java.util.List;
  */
 public interface PointAttributeService extends BaseService<PointAttributeBO, PointAttributeQuery> {
     /**
-     * 根据 位号配置属性编号 和 驱动ID 查询
+     * Code Driver ID
      *
-     * @param name     属性编号
-     * @param driverId 驱动ID
+     * @param name     Code
+     * @param driverId Driver ID
      * @return PointAttribute
      */
     PointAttributeBO selectByNameAndDriverId(String name, Long driverId);
 
     /**
-     * 根据 驱动ID 查询
+     * Driver ID
      *
-     * @param driverId 驱动ID
-     * @return 位号属性Array
+     * @param driverId Driver ID
+     * @return Array
      */
     List<PointAttributeBO> selectByDriverId(Long driverId);
 }

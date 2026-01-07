@@ -44,7 +44,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 位号 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -66,7 +66,7 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 新增 Point
+     * Point
      *
      * @param entityVO {@link PointVO}
      * @return R of String
@@ -87,7 +87,7 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除 Point
+     * ID Point
      *
      * @param id ID
      * @return R of String
@@ -104,7 +104,7 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 更新 Point
+     * Point
      *
      * @param entityVO {@link PointVO}
      * @return R of String
@@ -122,7 +122,7 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询 Point
+     * ID Point
      *
      * @param id ID
      * @return PointVO {@link PointVO}
@@ -140,9 +140,9 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 根据 ID 集合查询 Point
+     * ID Point
      *
-     * @param pointIds 位号ID集
+     * @param pointIds Point ID
      * @return Map(ID, PointVO)
      */
     @PostMapping("/ids")
@@ -158,10 +158,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 根据 模版 ID 查询 Point
+     * ID Point
      *
-     * @param profileId 位号ID
-     * @return Point 集合
+     * @param profileId Point ID
+     * @return Point
      */
     @GetMapping("/profile_id/{profileId}")
     public Mono<R<List<PointVO>>> selectByProfileId(@NotNull @PathVariable(value = "profileId") Long profileId) {
@@ -176,9 +176,9 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 根据 设备ID 查询 Point
+     * Device ID Point
      *
-     * @param deviceId 设备ID
+     * @param deviceId Device ID
      * @return Point Array
      */
     @GetMapping("/device_id/{deviceId}")
@@ -194,7 +194,7 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 分页查询 Point
+     * Point
      *
      * @param entityQuery Point Dto
      * @return Page Of Point
@@ -216,9 +216,9 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 查询 位号单位
      *
-     * @param pointIds 位号ID集
+     *
+     * @param pointIds Point ID
      * @return Map String:String
      */
     @PostMapping("/unit")
@@ -238,10 +238,10 @@ public class PointController implements BaseController {
 
 
     /**
-     * 查询位号被多少设备引用
-     * 选择点位统计设备信息
      *
-     * @param pointId 点位id
+     *
+     *
+     * @param pointId id
      * @return {@link R}<{@link Set}<{@link Long}>>
      */
     @GetMapping("/selectPointStatisticsWithDevice/{pointId}")
@@ -258,11 +258,11 @@ public class PointController implements BaseController {
 
 
     /**
-     * 查询位号在不同设备下的数据量
-     * 按设备id统计位号数量
      *
-     * @param pointId   点位id
-     * @param deviceIds 设备id
+     * id
+     *
+     * @param pointId   id
+     * @param deviceIds id
      * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
      */
     @PostMapping("/selectPointStatisticsByDeviceId/{pointId}")
@@ -278,10 +278,10 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 当前位号下数据量
-     * 按位号id统计位号数据量
      *
-     * @param pointId 点位id
+     * id
+     *
+     * @param pointId id
      * @return {@link R}<{@link Map}<{@link Long}, {@link String}>>
      */
     @GetMapping("/selectPointStatisticsByPointId/{pointId}")
@@ -296,7 +296,7 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 设备下位号数量
+     *
      *
      * @param deviceId
      * @return
@@ -313,7 +313,7 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 设备下已配置位号数量 下拉框
+     *
      *
      * @param deviceId
      * @return
@@ -332,7 +332,7 @@ public class PointController implements BaseController {
 
 
     /**
-     * 位号在不同位号下的数据量
+     *
      *
      * @param deviceId
      * @param pointIds
@@ -351,7 +351,7 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 驱动下位号数据量
+     *
      *
      * @param driverId
      * @return
@@ -368,7 +368,7 @@ public class PointController implements BaseController {
     }
 
     /**
-     * 驱动下位号数量
+     *
      *
      * @param driverId
      * @return

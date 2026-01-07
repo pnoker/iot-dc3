@@ -35,66 +35,66 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum AttributeTypeFlagEnum {
     /**
-     * 字符串
+     * String
      */
-    STRING((byte) 0, "string", "字符串"),
+    STRING((byte) 0, "string", "String"),
 
     /**
-     * 字节
+     * Byte
      */
-    BYTE((byte) 1, "byte", "字节"),
+    BYTE((byte) 1, "byte", "Byte"),
 
     /**
-     * 短整数
+     * Short
      */
-    SHORT((byte) 2, "short", "短整数"),
+    SHORT((byte) 2, "short", "Short"),
 
     /**
-     * 整数
+     * Int
      */
-    INT((byte) 3, "int", "整数"),
+    INT((byte) 3, "int", "Int"),
 
     /**
-     * 长整数
+     * Long
      */
-    LONG((byte) 4, "long", "长整数"),
+    LONG((byte) 4, "long", "Long"),
 
     /**
-     * 浮点数
+     * Float
      */
-    FLOAT((byte) 5, "float", "浮点数"),
+    FLOAT((byte) 5, "float", "Float"),
 
     /**
-     * 双精度浮点数
+     * Double
      */
-    DOUBLE((byte) 6, "double", "双精度浮点数"),
+    DOUBLE((byte) 6, "double", "Double"),
 
     /**
-     * 布尔量
+     * Boolean
      */
-    BOOLEAN((byte) 7, "boolean", "布尔量"),
+    BOOLEAN((byte) 7, "boolean", "Boolean"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link AttributeTypeFlagEnum}
      */
     public static AttributeTypeFlagEnum ofIndex(Byte index) {
@@ -103,9 +103,9 @@ public enum AttributeTypeFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link AttributeTypeFlagEnum}
      */
     public static AttributeTypeFlagEnum ofCode(String code) {
@@ -114,9 +114,9 @@ public enum AttributeTypeFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link AttributeTypeFlagEnum}
      */
     public static AttributeTypeFlagEnum ofName(String name) {

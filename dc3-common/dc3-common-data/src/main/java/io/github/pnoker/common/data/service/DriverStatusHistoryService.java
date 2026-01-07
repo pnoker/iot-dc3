@@ -21,6 +21,14 @@ import io.github.pnoker.common.data.entity.model.DriverStatusHistoryDO;
 
 import java.util.List;
 
+/**
+ * Driver Status History Service
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 public interface DriverStatusHistoryService {
 
     List<DriverStatusHistoryDO> selectRecently2Data(long id);

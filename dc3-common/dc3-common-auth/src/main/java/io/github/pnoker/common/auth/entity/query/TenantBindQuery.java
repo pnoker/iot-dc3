@@ -43,15 +43,15 @@ public class TenantBindQuery implements Serializable {
 
     private Pages page;
 
-    // 查询字段
+    // 
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
     /**
-     * 用户ID
+     * ID
      */
     private Long userId;
 

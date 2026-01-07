@@ -44,29 +44,29 @@ public class ApiQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * Api接口类型标识
+     * ApiType
      */
     private ApiTypeFlagEnum apiTypeFlag;
 
     /**
-     * Api接口名称
+     * ApiName
      */
     private String apiName;
 
     /**
-     * Api接口编号, 一般为URL的MD5编码
+     * ApiCode, URLMD5
      */
     private String apiCode;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

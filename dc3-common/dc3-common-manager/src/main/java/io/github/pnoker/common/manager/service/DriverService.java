@@ -34,43 +34,43 @@ import java.util.Set;
 public interface DriverService extends BaseService<DriverBO, DriverQuery> {
 
     /**
-     * 根据 驱动ServiceName 查询 驱动
+     * ServiceName
      *
-     * @param serviceName 驱动服务名称
-     * @param tenantId    租户ID
+     * @param serviceName Driver service name
+     * @param tenantId    Tenant ID
      * @return Driver
      */
     DriverBO selectByServiceName(String serviceName, Long tenantId);
 
     /**
-     * 根据 模版ID 查询 驱动集
+     * ID
      *
-     * @param profileId 模版ID
-     * @return Driver 集合
+     * @param profileId ID
+     * @return Driver
      */
     List<DriverBO> selectByProfileId(Long profileId);
 
     /**
-     * 根据 位号ID 查询 驱动集
+     * Point ID
      *
-     * @param pointId 位号ID
-     * @return Driver 集合
+     * @param pointId Point ID
+     * @return Driver
      */
     List<DriverBO> selectByPointId(Long pointId);
 
     /**
-     * 根据 驱动ID 查询 驱动
+     * Driver ID
      *
-     * @param deviceId 设备ID
+     * @param deviceId Device ID
      * @return Driver
      */
     DriverBO selectByDeviceId(Long deviceId);
 
     /**
-     * 根据 驱动ID集 查询 驱动集
+     * Driver ID
      *
-     * @param ids 驱动ID 集合
-     * @return Driver 集合
+     * @param ids Driver ID
+     * @return Driver
      */
     List<DriverBO> selectByIds(Set<Long> ids);
 }

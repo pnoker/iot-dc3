@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.MenuDO;
 
 /**
  * <p>
- * 菜单表 服务类
+ *
  * </p>
  *
  * @author pnoker

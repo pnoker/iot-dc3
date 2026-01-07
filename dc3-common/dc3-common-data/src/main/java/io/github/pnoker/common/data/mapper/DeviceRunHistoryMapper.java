@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 设备运行时长历史表 Mapper 接口
+ * Device run time history table Mapper
  * </p>
  *
  * @author pnoker

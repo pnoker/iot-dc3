@@ -25,7 +25,7 @@ import lombok.*;
 
 /**
  * <p>
- * 报警信息模板表
+ * Alarm message template table
  * </p>
  *
  * @author pnoker
@@ -40,32 +40,32 @@ import lombok.*;
 public class MessageBO extends BaseBO {
 
     /**
-     * 报警信息模板标题
+     * Alarm message template title
      */
     private String messageName;
 
     /**
-     * 报警信息模板编号
+     * Alarm message template code
      */
     private String messageCode;
 
     /**
-     * 报警信息模板等级
+     * Alarm message template level
      */
     private AlarmMessageLevelFlagEnum messageLevel;
 
     /**
-     * 报警信息模板内容
+     * Alarm message template content
      */
     private MessageExt messageExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 }

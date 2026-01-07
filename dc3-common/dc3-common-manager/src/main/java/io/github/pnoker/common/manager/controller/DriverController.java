@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 驱动 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -62,7 +62,7 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * 新增 Driver
+     * Driver
      *
      * @param entityVO {@link DriverVO}
      * @return R of String
@@ -83,7 +83,7 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除 Driver
+     * ID Driver
      *
      * @param id ID
      * @return R of String
@@ -100,7 +100,7 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * 更新 Driver
+     * Driver
      *
      * @param entityVO {@link DriverVO}
      * @return R of String
@@ -118,7 +118,7 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询 Driver
+     * ID Driver
      *
      * @param id ID
      * @return DriverVO {@link DriverVO}
@@ -136,9 +136,9 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * 根据 ID 集合查询 Driver
+     * ID Driver
      *
-     * @param driverIds 驱动ID集
+     * @param driverIds Driver ID
      * @return Map(ID, DriverVO)
      */
     @PostMapping("/ids")
@@ -154,9 +154,9 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * 根据 SERVICENAME 查询 Driver
+     * SERVICENAME Driver
      *
-     * @param serviceName 驱动服务名称
+     * @param serviceName Driver service name
      * @return Driver
      */
     @GetMapping("/service/{serviceName}")
@@ -174,7 +174,7 @@ public class DriverController implements BaseController {
     }
 
     /**
-     * 分页查询 Driver
+     * Driver
      *
      * @param entityQuery Driver Dto
      * @return Page Of Driver

@@ -21,6 +21,14 @@ import io.github.pnoker.common.data.entity.model.DeviceRunDO;
 
 import java.util.List;
 
+/**
+ * Device Run Service
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 public interface DeviceRunService {
     List<DeviceRunDO> get7daysDuration(Long deviceId, String code);
 

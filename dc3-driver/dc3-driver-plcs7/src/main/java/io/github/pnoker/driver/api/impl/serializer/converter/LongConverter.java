@@ -19,6 +19,14 @@ package io.github.pnoker.driver.api.impl.serializer.converter;
 import io.github.pnoker.driver.api.S7Serializable;
 import io.github.pnoker.driver.api.S7Type;
 
+/**
+ * Long Converter
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 public final class LongConverter implements S7Serializable {
 
     @Override

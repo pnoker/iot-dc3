@@ -47,46 +47,46 @@ public class ProfileQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 模版名称
+     * Name
      */
     private String profileName;
 
     /**
-     * 模版编号
+     * Code
      */
     private String profileCode;
 
     /**
-     * 模版共享类型标识
+     * Type
      */
     private ProfileShareFlagEnum profileShareFlag;
 
     /**
-     * 模版类型标识
+     * Type
      */
     private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 
-    // 附加字段
+    //
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 }

@@ -31,7 +31,7 @@ import java.util.List;
 public interface DictionaryForAuthService {
 
     /**
-     * 获取租户字典
+     * Tenant
      *
      * @return Dictionary Array
      */

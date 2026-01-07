@@ -22,6 +22,14 @@ import io.github.pnoker.common.data.entity.vo.DeviceRunVO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 
+/**
+ * Device Duration Builder
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DeviceDurationBuilder {
 

@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.PointDataVolumeRunDO;
 
 /**
  * <p>
- * 位号状态历史表 Mapper 接口
+ * Status Mapper
  * </p>
  *
  * @author fukq

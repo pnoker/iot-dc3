@@ -112,7 +112,7 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link TenantBindQuery}
      * @return {@link LambdaQueryWrapper}
@@ -125,12 +125,12 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link TenantBindBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(TenantBindBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
@@ -149,10 +149,10 @@ public class TenantBindServiceImpl implements TenantBindService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link TenantBindDO}
      */
     private TenantBindDO getDOById(Long id, boolean throwException) {

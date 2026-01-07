@@ -28,7 +28,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 报警规则表
+ * Alarm rule
  * </p>
  *
  * @author pnoker
@@ -50,34 +50,34 @@ public class RuleQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 规则名称
+     * Rule name
      */
     private String alarmRuleName;
 
     /**
-     * 规则编号
+     * Rule code
      */
     private String alarmRuleCode;
 
     /**
-     * 位号ID
+     * Point ID
      */
     private Long pointId;
 
     /**
-     * 实体类型标识
+     * Entity type flag
      */
     private AlarmTypeFlagEnum alarmTypeFlag;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

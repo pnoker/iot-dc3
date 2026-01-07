@@ -44,41 +44,41 @@ public class ResourceQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 权限资源名称
+     * Name
      */
     private String resourceName;
 
     /**
-     * 权限资源编号
+     * Code
      */
     private String resourceCode;
 
     /**
-     * 权限资源类型标识
+     * Type
      */
     private ResourceTypeFlagEnum resourceTypeFlag;
 
     /**
-     * 权限资源范围标识, 参考: ResourceScopeFlagEnum
+     * , : ResourceScopeFlagEnum
      * <ul>
-     *     <li>0x01: 新增</li>
-     *     <li>0x02: 删除</li>
-     *     <li>0x04: 更新</li>
-     *     <li>0x08: 查询</li>
+     *   <li>0x01: </li>
+     *   <li>0x02: </li>
+     *   <li>0x04: </li>
+     *   <li>0x08: </li>
      * </ul>
-     * 具有多个权限范围可以累加
+     *
      */
     private Byte resourceScopeFlag;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

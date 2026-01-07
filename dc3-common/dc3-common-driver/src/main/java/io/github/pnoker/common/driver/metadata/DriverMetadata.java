@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 驱动元数据
+ * 
  *
  * @author pnoker
  * @version 2025.9.0
@@ -44,45 +44,45 @@ import java.util.Set;
 public final class DriverMetadata {
 
     /**
-     * 驱动状态
-     */
+   * Status
+   */
     private DriverStatusEnum driverStatus = DriverStatusEnum.OFFLINE;
 
     /**
-     * 驱动
-     */
+   * 
+   */
     private DriverBO driver;
 
     /**
-     * 设备ID集合
-     */
+   * Device ID
+   */
     private Set<Long> deviceIds;
 
     /**
-     * 驱动属性ID Map
-     * <p>
-     * attributeId,driverAttribute
-     */
+   * ID Map
+   * <p>
+   * attributeId,driverAttribute
+   */
     private Map<Long, DriverAttributeDTO> driverAttributeIdMap;
 
     /**
-     * 驱动属性编号 Map
-     * <p>
-     * attributeName,driverAttribute
-     */
+   * Code Map
+   * <p>
+   * attributeName,driverAttribute
+   */
     private Map<String, DriverAttributeDTO> driverAttributeNameMap;
 
     /**
-     * 位号属性ID Map
-     * <p>
-     * attributeId,pointAttribute
-     */
+   * ID Map
+   * <p>
+   * attributeId,pointAttribute
+   */
     private Map<Long, PointAttributeDTO> pointAttributeIdMap;
 
     /**
-     * 位号属性编号 Map
-     * <p>
-     * attributeName,driverAttribute
-     */
+   * Code Map
+   * <p>
+   * attributeName,driverAttribute
+   */
     private Map<String, PointAttributeDTO> pointAttributeNameMap;
 }

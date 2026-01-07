@@ -41,32 +41,32 @@ import java.time.LocalDateTime;
 public class DriverTokenVO extends BaseVO {
 
     /**
-     * 驱动编号
+     * Driver ID
      */
     private String driverCode;
 
     /**
-     * 驱动AppID
+     * AppID
      */
     private String driverAppId;
 
     /**
-     * 驱动AppKey
+     * AppKey
      */
     private String driverAppKey;
 
     /**
-     * 失效标识
+     *
      */
     private ExpireFlagEnum expireFlag;
 
     /**
-     * 失效时间
+     *
      */
     private LocalDateTime expireTime;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

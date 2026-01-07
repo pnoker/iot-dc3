@@ -35,41 +35,41 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum RwFlagEnum {
     /**
-     * 只读
+     * Read only
      */
-    R((byte) 0, "r", "只读"),
+    R((byte) 0, "r", "Read only"),
 
     /**
-     * 只写
+     * Write only
      */
-    W((byte) 1, "w", "只写"),
+    W((byte) 1, "w", "Write only"),
 
     /**
-     * 读写
+     * Read and Write
      */
-    RW((byte) 2, "rw", "读写"),
+    RW((byte) 2, "rw", "Read and Write"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link RwFlagEnum}
      */
     public static RwFlagEnum ofIndex(Byte index) {
@@ -78,9 +78,9 @@ public enum RwFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link RwFlagEnum}
      */
     public static RwFlagEnum ofCode(String code) {
@@ -89,9 +89,9 @@ public enum RwFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link RwFlagEnum}
      */
     public static RwFlagEnum ofName(String name) {

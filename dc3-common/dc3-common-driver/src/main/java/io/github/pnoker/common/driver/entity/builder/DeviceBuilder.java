@@ -34,7 +34,7 @@ import org.mapstruct.MappingTarget;
 import java.util.HashSet;
 
 /**
- * 设备 Builder
+ * Builder
  *
  * @author pnoker
  * @version 2025.9.0

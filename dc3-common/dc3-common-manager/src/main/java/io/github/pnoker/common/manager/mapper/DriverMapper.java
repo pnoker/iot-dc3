@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.DriverDO;
 
 /**
  * <p>
- * 驱动表 Mapper 接口
+ * Mapper
  * </p>
  *
  * @author pnoker

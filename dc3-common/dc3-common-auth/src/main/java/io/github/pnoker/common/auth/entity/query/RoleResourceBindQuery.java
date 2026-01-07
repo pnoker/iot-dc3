@@ -42,19 +42,19 @@ public class RoleResourceBindQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 角色ID
+     * ID
      */
     private Long roleId;
 
     /**
-     * 权限资源ID
+     * ID
      */
     private Long resourceId;
 }

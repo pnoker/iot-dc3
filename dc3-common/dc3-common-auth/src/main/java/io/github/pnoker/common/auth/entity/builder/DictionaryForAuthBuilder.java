@@ -36,7 +36,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DictionaryForAuthBuilder extends DictionaryBuilder {
 
-    // 租户相关
+    // Tenant
 
     /**
      * BO to VO
@@ -62,7 +62,7 @@ public interface DictionaryForAuthBuilder extends DictionaryBuilder {
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByTenantBOPage(Page<TenantBO> entityPageBO);
 
-    // 用户登录相关
+    //
 
     /**
      * BO to VO

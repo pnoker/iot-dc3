@@ -28,7 +28,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 元数据事件 DTO
+ * DTO
  *
  * @author zhangzi
  * @version 2025.9.0
@@ -44,17 +44,17 @@ public class MetadataEventDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 根据元数据类型{@link MetadataTypeEnum}决定是驱动, 设备, 位号
+     * Type{@link MetadataTypeEnum}, ,
      */
     private Long id;
 
     /**
-     * 元数据类型
+     * Type
      */
     private MetadataTypeEnum metadataType;
 
     /**
-     * 元数据操作类型, 新增, 删除, 修改
+     * Type, , ,
      */
     private MetadataOperateTypeEnum operateType;
 }

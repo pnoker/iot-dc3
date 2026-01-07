@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * 读数据实体类
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -53,26 +53,26 @@ public class RValue implements Serializable {
     private static final BigDecimal defaultMultiple = new BigDecimal(1);
 
     /**
-     * 设备
+     *
      */
     private DeviceBO device;
 
     /**
-     * 位号
+     *
      */
     private PointBO point;
 
     /**
-     * 值, string, 需要根据type确定真实的数据类型
+     * , string, typeType
      */
     private String value;
 
     /**
-     * 位号数据处理
-     * 当出现精度问题, 向上调整
-     * 例如: byte 类型的数据经过 base 和 multiple 之后超出范围, 将其调整为float类型
      *
-     * @return 根据位号配置计算返回计算值
+     * ,
+     * : byte Type base multiple , floatType
+     *
+     * @return
      */
     public String getFinalValue() {
         if (Objects.isNull(point)) {
@@ -97,7 +97,7 @@ public class RValue implements Serializable {
     }
 
     /**
-     * 线性函数: y = ax + b
+     * : y = ax + b
      *
      * @param x A
      * @param b B
@@ -120,10 +120,10 @@ public class RValue implements Serializable {
     }
 
     /**
-     * 字符串转短字节值
+     *
      * -128 ~ 127
      *
-     * @param rawValue 原始值
+     * @param rawValue Raw value
      * @return short
      */
     private byte getByteValue(String rawValue, BigDecimal base, BigDecimal multiple) {
@@ -136,10 +136,10 @@ public class RValue implements Serializable {
     }
 
     /**
-     * 字符串转短整数值
+     *
      * -32768 ~ 32767
      *
-     * @param rawValue 原始值
+     * @param rawValue Raw value
      * @return short
      */
     private short getShortValue(String rawValue, BigDecimal base, BigDecimal multiple) {
@@ -152,10 +152,10 @@ public class RValue implements Serializable {
     }
 
     /**
-     * 字符串转整数值
+     *
      * -2147483648 ~ 2147483647
      *
-     * @param rawValue 原始值
+     * @param rawValue Raw value
      * @return int
      */
     private int getIntegerValue(String rawValue, BigDecimal base, BigDecimal multiple) {
@@ -168,10 +168,10 @@ public class RValue implements Serializable {
     }
 
     /**
-     * 字符串转长整数值
+     *
      * -9223372036854775808 ~ 9223372036854775807
      *
-     * @param rawValue 原始值
+     * @param rawValue Raw value
      * @return long
      */
     private long getLongValue(String rawValue, BigDecimal base, BigDecimal multiple) {
@@ -184,9 +184,9 @@ public class RValue implements Serializable {
     }
 
     /**
-     * 字符串转浮点值
      *
-     * @param rawValue 原始值
+     *
+     * @param rawValue Raw value
      * @return float
      */
     private float getFloatValue(String rawValue, BigDecimal base, BigDecimal multiple, byte decimal) {
@@ -202,9 +202,9 @@ public class RValue implements Serializable {
     }
 
     /**
-     * 字符串转双精度浮点值
      *
-     * @param rawValue 原始值
+     *
+     * @param rawValue Raw value
      * @return double
      */
     private double getDoubleValue(String rawValue, BigDecimal base, BigDecimal multiple, byte decimal) {
@@ -220,9 +220,9 @@ public class RValue implements Serializable {
     }
 
     /**
-     * 字符串转布尔值
      *
-     * @param rawValue 原始值
+     *
+     * @param rawValue Raw value
      * @return boolean
      */
     private boolean getBooleanValue(String rawValue) {
