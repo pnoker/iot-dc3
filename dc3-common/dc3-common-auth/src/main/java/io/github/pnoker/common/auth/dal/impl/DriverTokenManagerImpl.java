@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 驱动令牌表 服务实现类
+ *
  * </p>
  *
  * @author pnoker

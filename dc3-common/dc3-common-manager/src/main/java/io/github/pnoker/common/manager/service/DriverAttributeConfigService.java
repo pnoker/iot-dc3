@@ -34,32 +34,32 @@ import java.util.List;
 public interface DriverAttributeConfigService extends BaseService<DriverAttributeConfigBO, DriverAttributeConfigQuery> {
 
     /**
-     * 根据 设备ID 查询
+     * Device ID
      *
-     * @param deviceId 设备ID
-     * @return DriverConfig 集合
+     * @param deviceId Device ID
+     * @return DriverConfig
      */
     List<DriverAttributeConfigBO> selectByDeviceId(Long deviceId);
 
     /**
-     * 根据 驱动属性配置ID 查询
+     * ID
      *
-     * @param attributeId 驱动属性ID
-     * @return DriverConfig 集合
+     * @param attributeId ID
+     * @return DriverConfig
      */
     List<DriverAttributeConfigBO> selectByAttributeId(Long attributeId);
 
     /**
-     * 根据 驱动属性配置ID 和 设备ID 查询
+     * ID Device ID
      *
-     * @param deviceId    设备ID
-     * @param attributeId 驱动属性ID
+     * @param deviceId    Device ID
+     * @param attributeId ID
      * @return DriverConfig
      */
     DriverAttributeConfigBO selectByAttributeIdAndDeviceId(Long deviceId, Long attributeId);
 
     /**
-     * 内部保存
+     *
      *
      * @param entityBO {@link DriverAttributeConfigBO}
      * @return {@link DeviceBO}

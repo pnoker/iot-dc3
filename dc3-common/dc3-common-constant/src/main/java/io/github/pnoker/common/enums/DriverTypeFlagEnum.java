@@ -35,46 +35,46 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum DriverTypeFlagEnum {
     /**
-     * 协议驱动, 客户端模式
+     * Protocol driver, client mode
      */
-    DRIVER_CLIENT((byte) 0, "driver_client", "协议类型驱动, 客户端模式"),
+    DRIVER_CLIENT((byte) 0, "driver_client", "Protocol driver, client mode"),
 
     /**
-     * 协议驱动,  服务端模式
+     * Protocol driver, server mode
      */
-    DRIVER_SERVER((byte) 1, "driver_server", "协议类型驱动, 服务端模式"),
+    DRIVER_SERVER((byte) 1, "driver_server", "Protocol driver, server mode"),
 
     /**
-     * 网关驱动
+     * Gateway driver
      */
-    GATEWAY((byte) 2, "gateway", "网关类型驱动"),
+    GATEWAY((byte) 2, "gateway", "Gateway driver"),
 
     /**
-     * 串联驱动
+     * Connection driver
      */
-    CONNECT((byte) 3, "connect", "串联类型驱动"),
+    CONNECT((byte) 3, "connect", "Connection driver"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link DriverTypeFlagEnum}
      */
     public static DriverTypeFlagEnum ofIndex(Byte index) {
@@ -83,9 +83,9 @@ public enum DriverTypeFlagEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link DriverTypeFlagEnum}
      */
     public static DriverTypeFlagEnum ofCode(String code) {
@@ -94,9 +94,9 @@ public enum DriverTypeFlagEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link DriverTypeFlagEnum}
      */
     public static DriverTypeFlagEnum ofName(String name) {

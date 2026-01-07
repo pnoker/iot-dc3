@@ -45,29 +45,29 @@ public class DriverAttributeConfigQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 驱动属性ID
+     * ID
      */
     private Long attributeId;
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

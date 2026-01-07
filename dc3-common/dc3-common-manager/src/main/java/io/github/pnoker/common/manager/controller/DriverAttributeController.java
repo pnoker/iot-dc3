@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 驱动连接配置信息 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -61,7 +61,7 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * 新增 DriverAttribute
+     * DriverAttribute
      *
      * @param entityVO {@link DriverAttributeVO}
      * @return R of String
@@ -82,7 +82,7 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除 DriverAttribute
+     * ID DriverAttribute
      *
      * @param id ID
      * @return R of String
@@ -99,7 +99,7 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * 更新 DriverAttribute
+     * DriverAttribute
      *
      * @param entityVO {@link DriverAttributeVO}
      * @return R of String
@@ -117,7 +117,7 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询 DriverAttribute
+     * ID DriverAttribute
      *
      * @param id ID
      * @return DriverAttributeVO {@link DriverAttributeVO}
@@ -135,9 +135,9 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * 根据 驱动ID 查询 DriverAttribute
+     * Driver ID DriverAttribute
      *
-     * @param id 驱动属性ID
+     * @param id ID
      * @return DriverAttribute
      */
     @GetMapping("/driver_id/{id}")
@@ -155,9 +155,9 @@ public class DriverAttributeController implements BaseController {
     }
 
     /**
-     * 分页查询 DriverAttribute
+     * DriverAttribute
      *
-     * @param entityQuery 驱动属性Dto
+     * @param entityQuery Dto
      * @return Page Of DriverAttribute
      */
     @PostMapping("/list")

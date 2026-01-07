@@ -71,7 +71,7 @@ public class MessageServiceImpl implements MessageService {
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 删除分组之前需要检查该分组是否存在关联
+        // 
         LambdaQueryChainWrapper<MessageDO> wrapper = messageManager.lambdaQuery()
                 .eq(MessageDO::getTenantId, id);
         long count = wrapper.count();
@@ -113,7 +113,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link MessageQuery}
      * @return {@link LambdaQueryWrapper}
@@ -126,12 +126,12 @@ public class MessageServiceImpl implements MessageService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link MessageBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(MessageBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
@@ -151,10 +151,10 @@ public class MessageServiceImpl implements MessageService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link MessageDO}
      */
     private MessageDO getDOById(Long id, boolean throwException) {

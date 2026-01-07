@@ -30,7 +30,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 /**
- * 驱动属性VO
+ * VO
  *
  * @author pnoker
  * @version 2025.9.0
@@ -45,7 +45,7 @@ import lombok.*;
 public class DriverAttributeVO extends BaseVO {
 
     /**
-     * 属性名称
+     * Name
      */
     @NotBlank(message = "属性名称不能为空",
             groups = {Add.class})
@@ -55,7 +55,7 @@ public class DriverAttributeVO extends BaseVO {
     private String attributeName;
 
     /**
-     * 属性编号
+     * Code
      */
     @NotBlank(message = "属性编号不能为空",
             groups = {Add.class})
@@ -65,39 +65,39 @@ public class DriverAttributeVO extends BaseVO {
     private String attributeCode;
 
     /**
-     * 属性类型标识
+     * Type
      */
     private AttributeTypeFlagEnum attributeTypeFlag;
 
     /**
-     * 默认值
+     *
      */
     private String defaultValue;
 
     /**
-     * 驱动ID
+     * Driver ID
      */
     @NotNull(message = "驱动ID不能为空"
             , groups = {Add.class, Update.class})
     private Long driverId;
 
     /**
-     * 驱动属性拓展信息
+     *
      */
     private DriverAttributeExt attributeExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

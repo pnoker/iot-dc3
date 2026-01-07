@@ -147,7 +147,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link ProfileBindQuery}
      * @return {@link LambdaQueryWrapper}
@@ -161,11 +161,11 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO {@link ProfileBindBO}
-     * @param isUpdate 是否为更新操作
-     * @return 是否重复
+     * @param isUpdate
+     * @return
      */
     private boolean checkDuplicate(ProfileBindBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
@@ -181,10 +181,10 @@ public class ProfileBindServiceImpl implements ProfileBindService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link ProfileBindDO}
      */
     private ProfileBindDO getDOById(Long id, boolean throwException) {

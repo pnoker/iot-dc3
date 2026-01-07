@@ -25,7 +25,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 /**
- * 元数据事件 Publisher
+ * Publisher
  *
  * @author zhangzi
  * @version 2025.9.0
@@ -43,7 +43,7 @@ public class MetadataEventPublisher {
     }
 
     /**
-     * 发布事件
+     *
      *
      * @param metadataEvent MetadataEvent
      */

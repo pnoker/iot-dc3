@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 驱动属性配置信息 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -61,7 +61,7 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * 新增 PointAttribute
+     * PointAttribute
      *
      * @param entityVO {@link PointAttributeVO}
      * @return R of String
@@ -82,7 +82,7 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除 PointAttribute
+     * ID PointAttribute
      *
      * @param id ID
      * @return R of String
@@ -99,7 +99,7 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * 更新 PointAttribute
+     * PointAttribute
      *
      * @param entityVO {@link PointAttributeVO}
      * @return R of String
@@ -117,7 +117,7 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询 PointAttribute
+     * ID PointAttribute
      *
      * @param id ID
      * @return PointAttributeVO {@link PointAttributeVO}
@@ -135,10 +135,10 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * 根据 驱动ID 查询 PointAttribute
+     * Driver ID PointAttribute
      *
-     * @param id 位号属性ID
-     * @return 位号属性Array
+     * @param id ID
+     * @return Array
      */
     @GetMapping("/driver_id/{id}")
     public Mono<R<List<PointAttributeVO>>> selectByDriverId(@NotNull @PathVariable(value = "id") Long id) {
@@ -155,9 +155,9 @@ public class PointAttributeController implements BaseController {
     }
 
     /**
-     * 分页查询 PointAttribute
+     * PointAttribute
      *
-     * @param entityQuery 位号属性和分页参数
+     * @param entityQuery
      * @return Page Of PointAttribute
      */
     @PostMapping("/list")

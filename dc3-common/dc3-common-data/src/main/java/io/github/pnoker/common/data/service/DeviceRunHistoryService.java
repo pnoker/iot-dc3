@@ -23,6 +23,14 @@ import io.github.pnoker.common.data.entity.model.DeviceRunHistoryDO;
 
 import java.time.LocalDateTime;
 
+/**
+ * Device Run History Service
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 public interface DeviceRunHistoryService extends IService<DeviceRunHistoryDO> {
     DeviceRunDO getDurationDay(Long id, String code, LocalDateTime startOfDay, LocalDateTime endOfDay);
 }

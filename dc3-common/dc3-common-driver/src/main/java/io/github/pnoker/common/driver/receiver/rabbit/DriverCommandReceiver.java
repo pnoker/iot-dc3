@@ -26,7 +26,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 /**
- * 接收驱动指令
+ *
  *
  * @author pnoker
  * @version 2025.9.0

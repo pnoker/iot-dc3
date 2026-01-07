@@ -25,7 +25,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 设备 Query
+ * Query
  *
  * @author pnoker
  * @version 2025.9.0
@@ -45,41 +45,41 @@ public class DeviceQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 设备名称
+     * Device Name
      */
     private String deviceName;
 
     /**
-     * 设备编号
+     * Device ID
      */
     private String deviceCode;
 
     /**
-     * 驱动ID
+     * Driver ID
      */
     private Long driverId;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 
-    // 附加字段
+    //
 
     /**
-     * 模版ID
+     * ID
      */
     private Long profileId;
 }

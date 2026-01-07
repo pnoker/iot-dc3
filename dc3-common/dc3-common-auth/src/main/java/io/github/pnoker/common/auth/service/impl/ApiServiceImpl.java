@@ -108,7 +108,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link ApiQuery}
      * @return {@link LambdaQueryWrapper}
@@ -121,12 +121,12 @@ public class ApiServiceImpl implements ApiService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link ApiBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(ApiBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
@@ -147,10 +147,10 @@ public class ApiServiceImpl implements ApiService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link ApiDO}
      */
     private ApiDO getDOById(Long id, boolean throwException) {

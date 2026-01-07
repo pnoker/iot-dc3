@@ -18,7 +18,7 @@
 package io.github.pnoker.common.driver.service;
 
 /**
- * 驱动注册相关接口
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,7 +27,7 @@ package io.github.pnoker.common.driver.service;
 public interface DriverRegisterService {
 
     /**
-     * 注册驱动信息到平台端
+     *
      */
     void initial();
 }

@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * 标签 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -58,7 +58,7 @@ public class LabelController implements BaseController {
     }
 
     /**
-     * 新增
+     *
      *
      * @param entityVO {@link LabelVO}
      * @return R of String
@@ -79,7 +79,7 @@ public class LabelController implements BaseController {
     }
 
     /**
-     * 删除
+     *
      *
      * @param id ID
      * @return R of String
@@ -96,7 +96,7 @@ public class LabelController implements BaseController {
     }
 
     /**
-     * 更新
+     *
      *
      * @param entityVO {@link LabelVO}
      * @return R of String
@@ -114,7 +114,7 @@ public class LabelController implements BaseController {
     }
 
     /**
-     * 单个查询
+     *
      *
      * @param id ID
      * @return LabelVO {@link LabelVO}
@@ -132,7 +132,7 @@ public class LabelController implements BaseController {
     }
 
     /**
-     * 分页查询
+     *
      *
      * @param entityQuery {@link LabelQuery}
      * @return R Of LabelVO Page

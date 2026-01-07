@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 设备 BO
+ * BO
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,66 +42,66 @@ import java.util.Set;
 public class DeviceBO extends BaseBO {
 
     /**
-     * 设备名称
+     * Device Name
      */
     private String deviceName;
 
     /**
-     * 设备编号
+     * Device ID
      */
     private String deviceCode;
 
     /**
-     * 驱动ID
+     * Driver ID
      */
     private Long driverId;
 
     /**
-     * 设备拓展信息
+     *
      */
     private DeviceExt deviceExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 
-    // 附加字段
+    // 
 
     /**
-     * 模版ID集
+     * ID
      */
     private Set<Long> profileIds;
 
     /**
-     * 位号ID集
+     * Point ID
      */
     private Set<Long> pointIds;
 
     /**
-     * 驱动配置
+     *
      * <p>
      * attributeId,attributeConfig
      */
     private Map<Long, DriverAttributeConfigDTO> driverAttributeConfigIdMap;
 
     /**
-     * 位号配置
+     *
      * pointId(attributeId,attributeConfig)
      */
     private Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigIdMap;

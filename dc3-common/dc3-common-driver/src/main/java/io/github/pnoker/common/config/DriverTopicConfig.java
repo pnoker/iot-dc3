@@ -55,25 +55,25 @@ public class DriverTopicConfig {
     }
 
     /**
-     * 元数据队列配置
-     * 用于处理驱动元数据信息
      *
-     * @return Queue 元数据队列
+     *
+     *
+     * @return Queue
      */
     @Bean
     Queue metadataQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        // 30秒: 30 * 1000 = 30000L
+        // 30 seconds: 30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
         return new Queue(RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX + driverProperties.getClient(), false, false, true, arguments);
     }
 
     /**
-     * 元数据绑定配置
-     * 将元数据队列绑定到元数据交换机
      *
-     * @param metadataQueue 元数据队列
-     * @return Binding 绑定关系
+     *
+     *
+     * @param metadataQueue
+     * @return Binding
      */
     @Bean
     Binding metadataBinding(Queue metadataQueue) {
@@ -86,25 +86,25 @@ public class DriverTopicConfig {
     }
 
     /**
-     * 驱动命令队列配置
-     * 用于处理发送给驱动的命令
      *
-     * @return Queue 驱动命令队列
+     *
+     *
+     * @return Queue
      */
     @Bean
     Queue driverCommandQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        // 30秒: 30 * 1000 = 30000L
+        // 30 seconds: 30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
         return new Queue(RabbitConstant.QUEUE_DRIVER_COMMAND_PREFIX + driverProperties.getService(), false, false, false, arguments);
     }
 
     /**
-     * 驱动命令绑定配置
-     * 将驱动命令队列绑定到命令交换机
      *
-     * @param driverCommandQueue 驱动命令队列
-     * @return Binding 绑定关系
+     *
+     *
+     * @param driverCommandQueue
+     * @return Binding
      */
     @Bean
     Binding driverCommandBinding(Queue driverCommandQueue) {
@@ -117,25 +117,25 @@ public class DriverTopicConfig {
     }
 
     /**
-     * 设备命令队列配置
-     * 用于处理发送给设备的命令
      *
-     * @return Queue 设备命令队列
+     *
+     *
+     * @return Queue
      */
     @Bean
     Queue deviceCommandQueue() {
         Map<String, Object> arguments = new HashMap<>();
-        // 30秒: 30 * 1000 = 30000L
+        // 30 seconds: 30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
         return new Queue(RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX + driverProperties.getService(), false, false, false, arguments);
     }
 
     /**
-     * 设备命令绑定配置
-     * 将设备命令队列绑定到命令交换机
      *
-     * @param deviceCommandQueue 设备命令队列
-     * @return Binding 绑定关系
+     *
+     *
+     * @param deviceCommandQueue
+     * @return Binding
      */
     @Bean
     Binding deviceCommandBinding(Queue deviceCommandQueue) {

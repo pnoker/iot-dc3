@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.UserLoginDO;
 
 /**
  * <p>
- * 用户登录表 Mapper 接口
+ * Mapper
  * </p>
  *
  * @author pnoker

@@ -39,47 +39,47 @@ import lombok.*;
 public class MenuBO extends BaseBO {
 
     /**
-     * 菜单父级ID
+     * ID
      */
     private Long parentMenuId;
 
     /**
-     * 菜单类型标识
+     * Type
      */
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
-     * 菜单名称
+     * Name
      */
     private String menuName;
 
     /**
-     * 菜单编号, 一般为URL的MD5编码
+     * Code, URLMD5
      */
     private String menuCode;
 
     /**
-     * 菜单层级
+     *
      */
     private MenuLevelFlagEnum menuLevel;
 
     /**
-     * 菜单顺序
+     *
      */
     private Integer menuIndex;
 
     /**
-     * 菜单拓展信息
+     *
      */
     private MenuExt menuExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 }

@@ -28,7 +28,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 报警信息模板表
+ * Alarm message template table
  * </p>
  *
  * @author pnoker
@@ -50,29 +50,29 @@ public class MessageQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 报警信息模板标题
+     * Alarm message template title
      */
     private String alarmMessageTitle;
 
     /**
-     * 报警信息模板编号
+     * Alarm message template code
      */
     private String alarmMessageCode;
 
     /**
-     * 报警信息模板等级
+     * Alarm message template level
      */
     private AlarmMessageLevelFlagEnum alarmMessageLevel;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

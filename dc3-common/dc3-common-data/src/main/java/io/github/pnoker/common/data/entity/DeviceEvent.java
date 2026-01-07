@@ -46,17 +46,17 @@ public class DeviceEvent implements Serializable {
     private Long id;
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 
     /**
-     * 位号ID
+     * Point ID
      */
     private Long pointId;
 
     /**
-     * 设备 Event
+     * Device Event
      * <p>
      * STATUS, LIMIT, ERROR
      */
@@ -72,17 +72,17 @@ public class DeviceEvent implements Serializable {
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
     /**
-     * 创建时间
+     * Create Time
      */
     private LocalDateTime createTime;
 
     /**
-     * 操作时间
+     * Operate Time
      */
     private LocalDateTime operateTime;
 
     /**
-     * 确认时间
+     * Confirm Time
      */
     private LocalDateTime confirmTime;
 }

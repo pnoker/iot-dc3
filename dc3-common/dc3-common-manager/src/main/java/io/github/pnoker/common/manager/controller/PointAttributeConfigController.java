@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 位号属性配置信息 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -59,7 +59,7 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 新增 PointConfig
+     * PointConfig
      *
      * @param entityVO {@link PointAttributeConfigVO}
      * @return R of String
@@ -80,7 +80,7 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除 PointConfig
+     * ID PointConfig
      *
      * @param id ID
      * @return R of String
@@ -97,7 +97,7 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 更新 PointConfig
+     * PointConfig
      *
      * @param entityVO {@link PointAttributeConfigVO}
      * @return R of String
@@ -115,9 +115,9 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询 PointConfig
+     * ID PointConfig
      *
-     * @param id 位号信息ID
+     * @param id ID
      * @return PointAttributeConfigVO {@link PointAttributeConfigVO}
      */
     @GetMapping("/id/{id}")
@@ -133,11 +133,11 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 属性ID, 设备ID 和 位号ID 查询 PointConfig
+     * ID, Device ID Point ID PointConfig
      *
      * @param attributeId Attribute ID
-     * @param deviceId    设备ID
-     * @param pointId     位号ID
+     * @param deviceId    Device ID
+     * @param pointId     Point ID
      * @return PointConfig
      */
     @GetMapping("/attribute_id/{attributeId}/device_id/{deviceId}/point_id/{pointId}")
@@ -155,10 +155,10 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 设备ID 和 位号ID 查询 PointConfig
+     * Device ID Point ID PointConfig
      *
-     * @param deviceId 设备ID
-     * @param pointId  位号ID
+     * @param deviceId Device ID
+     * @param pointId  Point ID
      * @return PointConfig
      */
     @GetMapping("/device_id/{deviceId}/point_id/{pointId}")
@@ -175,9 +175,9 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 设备ID 查询 PointConfig
+     * Device ID PointConfig
      *
-     * @param deviceId 设备ID
+     * @param deviceId Device ID
      * @return PointConfig
      */
     @GetMapping("/device_id/{deviceId}")
@@ -192,7 +192,7 @@ public class PointAttributeConfigController implements BaseController {
     }
 
     /**
-     * 分页查询 PointConfig
+     * PointConfig
      *
      * @param entityQuery PointConfig Dto
      * @return Page Of PointConfig

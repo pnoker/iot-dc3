@@ -47,25 +47,25 @@ public enum ResponseEnum {
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Text
      */
     private final String text;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link ResponseEnum}
      */
     public static ResponseEnum ofIndex(Byte index) {
@@ -74,9 +74,9 @@ public enum ResponseEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link ResponseEnum}
      */
     public static ResponseEnum ofCode(String code) {
@@ -85,9 +85,9 @@ public enum ResponseEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link ResponseEnum}
      */
     public static ResponseEnum ofName(String name) {

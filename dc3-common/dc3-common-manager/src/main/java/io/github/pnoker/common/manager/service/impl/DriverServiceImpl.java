@@ -168,7 +168,7 @@ public class DriverServiceImpl implements DriverService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link DriverQuery}
      * @return {@link LambdaQueryWrapper}
@@ -186,12 +186,12 @@ public class DriverServiceImpl implements DriverService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link DriverBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(DriverBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<DriverDO> wrapper = Wrappers.<DriverDO>query().lambda();
@@ -211,10 +211,10 @@ public class DriverServiceImpl implements DriverService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link DriverDO}
      */
     private DriverDO getDOById(Long id, boolean throwException) {

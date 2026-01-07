@@ -41,7 +41,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import java.util.List;
 
 /**
- * 设备 Api
+ * Api
  *
  * @author pnoker
  * @version 2025.9.0
@@ -69,22 +69,22 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
         GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
         try {
-            // 注册驱动
+            // 
             DriverBO entityBO = driverRegisterService.registerDriver(request);
             GrpcDriverDTO entityGrpcDTO = grpcDriverBuilder.buildGrpcDTOByBO(entityBO);
             builder.setDriver(entityGrpcDTO);
 
-            // 注册驱动属性
+            //
             List<DriverAttributeBO> driverAttributeBOList = driverRegisterService.registerDriverAttribute(request, entityBO);
             List<GrpcDriverAttributeDTO> grpcDriverAttributeDTOList = driverAttributeBOList.stream().map(grpcDriverAttributeBuilder::buildGrpcDTOByBO).toList();
             builder.addAllDriverAttributes(grpcDriverAttributeDTOList);
 
-            // 注册位号属性
+            //
             List<PointAttributeBO> pointAttributeBOList = driverRegisterService.registerPointAttribute(request, entityBO);
             List<GrpcPointAttributeDTO> grpcPointAttributeDTOList = pointAttributeBOList.stream().map(grpcPointAttributeBuilder::buildGrpcDTOByBO).toList();
             builder.addAllPointAttributes(grpcPointAttributeDTOList);
 
-            // 查询驱动下设备
+            //
             List<Long> idList = deviceService.selectIdsByDriverId(entityBO.getId());
             builder.addAllDeviceIds(idList);
 

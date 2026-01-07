@@ -22,6 +22,14 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Point Data Volume Run VO
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 @Getter
 @Setter
 @ToString

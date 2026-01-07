@@ -21,6 +21,14 @@ import io.github.pnoker.driver.api.S7Type;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * Date Converter
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 public final class DateConverter extends IntegerConverter {
 
     private static final long MILLI_TO_DAY_FACTOR = 24 * 60 * 60 * 1000;

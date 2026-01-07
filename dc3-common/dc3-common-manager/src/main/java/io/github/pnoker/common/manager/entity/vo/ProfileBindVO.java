@@ -40,14 +40,14 @@ import lombok.*;
 public class ProfileBindVO extends BaseVO {
 
     /**
-     * 模版ID
+     * ID
      */
     @NotNull(message = "模版ID不能为空",
             groups = {Add.class, Update.class})
     private Long profileId;
 
     /**
-     * 设备ID
+     * Device ID
      */
     @NotNull(message = "设备ID不能为空",
             groups = {Add.class, Update.class})

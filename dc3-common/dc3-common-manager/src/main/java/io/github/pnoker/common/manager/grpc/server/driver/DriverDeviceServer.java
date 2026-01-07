@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 设备 Api
+ * Api
  *
  * @author pnoker
  * @version 2025.9.0
@@ -135,7 +135,7 @@ public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
         GrpcDeviceDTO entityGrpcDTO = grpcDeviceBuilder.buildGrpcDTOByBO(entityBO);
         builder.setDevice(entityGrpcDTO);
 
-        // 附加字段
+        // 
         List<PointBO> pointBOList = pointService.selectByDeviceId(entityBO.getId());
         CollectionOptional.ofNullable(pointBOList)
                 .ifPresent(value -> builder.addAllPointIds(value.stream().map(PointBO::getId).toList()));

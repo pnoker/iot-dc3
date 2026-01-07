@@ -22,7 +22,7 @@ import io.github.pnoker.common.manager.entity.model.ProfileDO;
 
 /**
  * <p>
- * 模板表 服务类
+ *
  * </p>
  *
  * @author pnoker

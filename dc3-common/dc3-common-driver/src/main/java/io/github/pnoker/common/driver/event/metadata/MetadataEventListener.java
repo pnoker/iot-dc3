@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 /**
- * 元数据事件 Listener
+ * Listener
  *
  * @author zhangzi
  * @version 2025.9.0

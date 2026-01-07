@@ -39,7 +39,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
- * 自定义 Request Header 校验过滤器逻辑类
+ * Request Header
  *
  * @author pnoker
  * @version 2025.9.0

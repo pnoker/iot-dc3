@@ -40,14 +40,14 @@ import lombok.*;
 public class TenantBindVO extends BaseVO {
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     @NotNull(message = "Tenant id can't be empty",
             groups = {Add.class, Update.class})
     private Long tenantId;
 
     /**
-     * 用户ID
+     * ID
      */
     @NotNull(message = "User id can't be empty",
             groups = {Add.class, Update.class})

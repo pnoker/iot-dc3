@@ -59,7 +59,7 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     }
 
     /**
-     * 构建驱动注册信息
+     *
      * Build driver registration information from properties
      *
      * @return DriverRegisterBO Driver registration business object

@@ -33,6 +33,14 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Point Client
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 @Slf4j
 @Component
 public class PointClient {
@@ -68,9 +76,9 @@ public class PointClient {
     }
 
     /**
-     * 根据 位号ID 获取位号元数据
+     * Point ID
      *
-     * @param id 位号ID
+     * @param id Point ID
      * @return PointDTO
      */
     public PointBO selectById(Long id) {

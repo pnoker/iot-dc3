@@ -46,7 +46,7 @@ public class DriverEvent implements Serializable {
     private Long id;
 
     /**
-     * 驱动服务名称
+     * Driver service name
      */
     private String serviceName;
 
@@ -67,17 +67,17 @@ public class DriverEvent implements Serializable {
     private TimeUnit timeUnit = TimeUnit.MINUTES;
 
     /**
-     * 创建时间
+     * Create Time
      */
     private LocalDateTime createTime;
 
     /**
-     * 操作时间
+     * Operate Time
      */
     private LocalDateTime operateTime;
 
     /**
-     * 确认时间
+     * Confirm Time
      */
     private LocalDateTime confirmTime;
 }

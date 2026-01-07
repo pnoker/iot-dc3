@@ -38,32 +38,32 @@ import lombok.*;
 public class ApiBO extends BaseBO {
 
     /**
-     * Api接口类型标识
+     * ApiType
      */
     private ApiTypeFlagEnum apiTypeFlag;
 
     /**
-     * Api接口名称
+     * ApiName
      */
     private String apiName;
 
     /**
-     * Api接口编号, 一般为URL的MD5编码
+     * ApiCode, URLMD5
      */
     private String apiCode;
 
     /**
-     * Api接口拓展信息
+     * Api
      */
     private ApiExt apiExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 }

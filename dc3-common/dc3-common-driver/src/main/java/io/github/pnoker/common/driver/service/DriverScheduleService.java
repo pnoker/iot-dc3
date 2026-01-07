@@ -27,7 +27,7 @@ package io.github.pnoker.common.driver.service;
 public interface DriverScheduleService {
 
     /**
-     * 驱动定时任务初始化
+     *
      */
     void initial();
 }

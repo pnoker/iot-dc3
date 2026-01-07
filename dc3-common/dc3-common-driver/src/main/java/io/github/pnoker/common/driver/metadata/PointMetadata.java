@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 位号元数据
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 public final class PointMetadata {
 
     /**
-     * 位号元数据缓存
+     *
      * <p>
      * pointId,pointDTO
      */
@@ -65,9 +65,9 @@ public final class PointMetadata {
     }
 
     /**
-     * 获取缓存, 指定位号
+     * ,
      *
-     * @param id 位号ID
+     * @param id Point ID
      * @return PointBO
      */
     public PointBO getCache(long id) {
@@ -82,9 +82,9 @@ public final class PointMetadata {
     }
 
     /**
-     * 重新加载缓存, 指定位号
+     * ,
      *
-     * @param id 位号ID
+     * @param id Point ID
      */
     public void loadCache(long id) {
         CompletableFuture<PointBO> future = CompletableFuture.supplyAsync(() -> pointClient.selectById(id));
@@ -92,9 +92,9 @@ public final class PointMetadata {
     }
 
     /**
-     * 删除缓存, 指定位号
+     * ,
      *
-     * @param id 位号ID
+     * @param id Point ID
      */
     public void removeCache(long id) {
         cache.put(id, CompletableFuture.completedFuture(null));

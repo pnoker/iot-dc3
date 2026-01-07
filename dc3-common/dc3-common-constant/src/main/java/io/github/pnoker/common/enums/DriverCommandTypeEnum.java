@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用驱动事件枚举
+ * Common driver command type enumeration
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,31 +35,31 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum DriverCommandTypeEnum {
     /**
-     * 驱动配置类型指令
+     * Driver config command
      */
-    CONFIG((byte) 0, "config", "驱动配置类型指令"),
+    CONFIG((byte) 0, "config", "Driver config command"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link DriverCommandTypeEnum}
      */
     public static DriverCommandTypeEnum ofIndex(Byte index) {
@@ -68,9 +68,9 @@ public enum DriverCommandTypeEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link DriverCommandTypeEnum}
      */
     public static DriverCommandTypeEnum ofCode(String code) {
@@ -79,9 +79,9 @@ public enum DriverCommandTypeEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link DriverCommandTypeEnum}
      */
     public static DriverCommandTypeEnum ofName(String name) {

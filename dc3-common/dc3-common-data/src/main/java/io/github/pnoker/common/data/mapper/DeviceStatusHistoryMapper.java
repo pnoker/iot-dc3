@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * <p>
- * 设备状态历史表 Mapper 接口
+ * Device status history Mapper
  * </p>
  *
  * @author pnoker

@@ -30,7 +30,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Matthew Lohbihler
  * @version 2025.9.0
  */
-abstract public class ModbusSlaveSet extends Modbus {
+abstract /**
+ * Modbus Slave Set
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+public class ModbusSlaveSet extends Modbus {
 
     private LinkedHashMap<Integer, ProcessImage> processImages = new LinkedHashMap<>();
     private ReadWriteLock lock = new ReentrantReadWriteLock();

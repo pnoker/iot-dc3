@@ -26,7 +26,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 设备指令
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -44,17 +44,17 @@ public class DeviceCommandDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 指令类型
+     * Type
      */
     private DeviceCommandTypeEnum type;
 
     /**
-     * 指令内容
+     *
      */
     private String content;
 
     /**
-     * 创建时间
+     * Create Time
      */
     private LocalDateTime createTime;
 
@@ -65,7 +65,7 @@ public class DeviceCommandDTO implements Serializable {
     }
 
     /**
-     * 设备读指令
+     *
      *
      * @author pnoker
      * @version 2025.9.0
@@ -80,18 +80,18 @@ public class DeviceCommandDTO implements Serializable {
         private static final long serialVersionUID = 1L;
 
         /**
-         * 设备ID
+         * Device ID
          */
         private Long deviceId;
 
         /**
-         * 位号ID
+         * Point ID
          */
         private Long pointId;
 
 
         /**
-         * 创建时间
+         * Create Time
          */
         private LocalDateTime createTime;
 
@@ -103,7 +103,7 @@ public class DeviceCommandDTO implements Serializable {
     }
 
     /**
-     * 设备写指令
+     *
      *
      * @author pnoker
      * @version 2025.9.0
@@ -118,22 +118,22 @@ public class DeviceCommandDTO implements Serializable {
         private static final long serialVersionUID = 1L;
 
         /**
-         * 设备ID
+         * Device ID
          */
         private Long deviceId;
 
         /**
-         * 位号ID
+         * Point ID
          */
         private Long pointId;
 
         /**
-         * 待写入的值
+         *
          */
         private String value;
 
         /**
-         * 创建时间
+         * Create Time
          */
         private LocalDateTime createTime;
 

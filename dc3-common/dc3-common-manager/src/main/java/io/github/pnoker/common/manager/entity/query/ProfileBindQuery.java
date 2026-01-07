@@ -44,19 +44,19 @@ public class ProfileBindQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 模版ID
+     * ID
      */
     private Long profileId;
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 }

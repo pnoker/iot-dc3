@@ -74,7 +74,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
             throw new AddException("Failed to create driver attribute config");
         }
 
-        // 通知驱动
+        // 
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
@@ -101,7 +101,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
             throw new DeleteException("Failed to remove driver attribute config");
         }
 
-        // 通知驱动
+        //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
@@ -120,7 +120,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
             throw new UpdateException("Failed to update driver attribute config");
         }
 
-        // 通知驱动
+        //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
@@ -167,7 +167,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link DriverAttributeConfigQuery}
      * @return {@link LambdaQueryWrapper}
@@ -181,11 +181,11 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO {@link DriverAttributeConfigBO}
-     * @param isUpdate 是否为更新操作
-     * @return 是否重复
+     * @param isUpdate
+     * @return
      */
     private boolean checkDuplicate(DriverAttributeConfigBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
@@ -201,10 +201,10 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link DriverAttributeConfigDO}
      */
     private DriverAttributeConfigDO getDOById(Long id, boolean throwException) {

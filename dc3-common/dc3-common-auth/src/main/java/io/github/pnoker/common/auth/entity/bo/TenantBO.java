@@ -37,22 +37,22 @@ import lombok.*;
 public class TenantBO extends BaseBO {
 
     /**
-     * 租户名称
+     * TenantName
      */
     private String tenantName;
 
     /**
-     * 租户编号
+     * TenantCode
      */
     private String tenantCode;
 
     /**
-     * 租户拓展信息
+     * Tenant
      */
     private TenantExt tenantExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

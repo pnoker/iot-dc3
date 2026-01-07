@@ -40,14 +40,14 @@ import lombok.*;
 public class RoleResourceBindVO extends BaseVO {
 
     /**
-     * 角色ID
+     * ID
      */
     @NotNull(message = "Role id can't be empty",
             groups = {Add.class, Update.class})
     private Long roleId;
 
     /**
-     * 权限资源ID
+     * ID
      */
     @NotNull(message = "Resource id can't be empty",
             groups = {Add.class, Update.class})

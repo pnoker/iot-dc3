@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 设备位号历史数据表(Json类型)
+ * (JsonType)
  * </p>
  *
  * @author pnoker
@@ -51,43 +51,43 @@ public class PointValueJsonDO implements Serializable {
     private Long id;
 
     /**
-     * 设备ID
+     * Device ID
      */
     @TableField("device_id")
     private Long deviceId;
 
     /**
-     * 位号ID
+     * Point ID
      */
     @TableField("point_id")
     private Long pointId;
 
     /**
-     * 原始值
+     * Raw value
      */
     @TableField("raw_value")
     private Object rawValue;
 
     /**
-     * 计算值
+     *
      */
     @TableField("cal_value")
     private Object calValue;
 
     /**
-     * 驱动ID
+     * Driver ID
      */
     @TableField("driver_id")
     private Long driverId;
 
     /**
-     * 创建时间
+     * Create Time
      */
     @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
-     * 操作时间
+     * Operate Time
      */
     @TableField("operate_time")
     private LocalDateTime operateTime;

@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 位号状态历史表 服务实现类
+ * Status
  * </p>
  *
  * @author fukq

@@ -39,47 +39,47 @@ import lombok.*;
 public class ProfileBO extends BaseBO {
 
     /**
-     * 模版名称
+     * Name
      */
     private String profileName;
 
     /**
-     * 模版编号
+     * Code
      */
     private String profileCode;
 
     /**
-     * 模版共享类型标识
+     * Type
      */
     private ProfileShareFlagEnum profileShareFlag;
 
     /**
-     * 模版类型标识
+     * Type
      */
     private ProfileTypeFlagEnum profileTypeFlag;
 
     /**
-     * 模版拓展信息
+     *
      */
     private ProfileExt profileExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

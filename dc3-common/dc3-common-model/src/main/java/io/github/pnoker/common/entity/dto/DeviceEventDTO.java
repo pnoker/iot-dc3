@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 设备事件
+ * Device Event
  *
  * @author pnoker
  * @version 2025.9.0
@@ -46,17 +46,17 @@ public class DeviceEventDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 事件类型
+     * Type
      */
     private DeviceEventTypeEnum type;
 
     /**
-     * 事件内容
+     *
      */
     private String content;
 
     /**
-     * 创建时间
+     * Create Time
      */
     private LocalDateTime createTime;
 
@@ -67,7 +67,7 @@ public class DeviceEventDTO implements Serializable {
     }
 
     /**
-     * 设备状态
+     * Device status
      *
      * @author pnoker
      * @version 2025.9.0
@@ -83,29 +83,29 @@ public class DeviceEventDTO implements Serializable {
         private static final long serialVersionUID = 1L;
 
         /**
-         * 设备ID
+         * Device ID
          */
         private Long deviceId;
 
         /**
-         * 设备状态
+         * Device status
          */
         private DeviceStatusEnum status;
 
         /**
-         * 设备状态失效时间
+         * Device status
          */
         @Builder.Default
         private int timeOut = 15;
 
         /**
-         * 设备状态失效时间单位
+         * Device status
          */
         @Builder.Default
         private TimeUnit timeUnit = TimeUnit.MINUTES;
 
         /**
-         * 创建时间
+         * Create Time
          */
         private LocalDateTime createTime;
 

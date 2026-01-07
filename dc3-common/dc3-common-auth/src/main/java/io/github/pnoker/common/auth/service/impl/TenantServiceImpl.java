@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * 租户服务接口实现类
+ * Tenant
  *
  * @author pnoker
  * @version 2025.9.0
@@ -113,7 +113,7 @@ public class TenantServiceImpl implements TenantService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link TenantQuery}
      * @return {@link LambdaQueryWrapper}
@@ -125,12 +125,12 @@ public class TenantServiceImpl implements TenantService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link TenantBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(TenantBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
@@ -149,10 +149,10 @@ public class TenantServiceImpl implements TenantService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link TenantDO}
      */
     private TenantDO getDOById(Long id, boolean throwException) {

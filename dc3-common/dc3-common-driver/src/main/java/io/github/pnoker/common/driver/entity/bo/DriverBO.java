@@ -38,52 +38,52 @@ import lombok.*;
 public class DriverBO extends BaseBO {
 
     /**
-     * 驱动名称
+     * Name
      */
     private String driverName;
 
     /**
-     * 驱动编号
+     * Driver ID
      */
     private String driverCode;
 
     /**
-     * 驱动服务名称
+     * Driver service name
      */
     private String serviceName;
 
     /**
-     * 服务主机
+     *
      */
     private String serviceHost;
 
     /**
-     * 驱动类型标识
+     * Type
      */
     private DriverTypeFlagEnum driverTypeFlag;
 
     /**
-     * 驱动拓展信息
+     *
      */
     private DriverExt driverExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

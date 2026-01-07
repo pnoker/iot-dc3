@@ -44,14 +44,14 @@ public class DriverEventQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 驱动ID
+     * Driver ID
      */
     private Long driverId;
 }

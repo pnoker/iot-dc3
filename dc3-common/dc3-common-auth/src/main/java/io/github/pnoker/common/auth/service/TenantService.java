@@ -31,9 +31,9 @@ import io.github.pnoker.common.base.service.BaseService;
 public interface TenantService extends BaseService<TenantBO, TenantQuery> {
 
     /**
-     * 根据租户Code查询租户
+     * TenantCodeTenant
      *
-     * @param code 租户Code
+     * @param code TenantCode
      * @return {@link TenantBO}
      */
     TenantBO selectByCode(String code);

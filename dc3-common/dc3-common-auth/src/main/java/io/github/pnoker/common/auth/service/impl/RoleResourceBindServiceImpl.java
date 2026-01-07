@@ -131,7 +131,7 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link RoleResourceBindQuery}
      * @return {@link LambdaQueryWrapper}
@@ -145,11 +145,11 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO {@link RoleResourceBindBO}
-     * @param isUpdate 是否为更新操作
-     * @return 是否重复
+     * @param isUpdate
+     * @return
      */
     private boolean checkDuplicate(RoleResourceBindBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
@@ -165,10 +165,10 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link RoleResourceBindDO}
      */
     private RoleResourceBindDO getDOById(Long id, boolean throwException) {

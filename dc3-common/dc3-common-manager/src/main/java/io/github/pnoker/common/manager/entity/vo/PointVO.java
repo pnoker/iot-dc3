@@ -48,7 +48,7 @@ import java.math.BigDecimal;
 public class PointVO extends BaseVO {
 
     /**
-     * 位号名称
+     * Name
      */
     @NotBlank(message = "位号名称不能为空",
             groups = {Add.class})
@@ -58,64 +58,64 @@ public class PointVO extends BaseVO {
     private String pointName;
 
     /**
-     * 位号编号
+     * Code
      */
     private String pointCode;
 
     /**
-     * 位号类型标识
+     * Type
      */
     private PointTypeFlagEnum pointTypeFlag;
 
     /**
-     * 读写标识
+     *
      */
     private RwFlagEnum rwFlag;
 
     /**
-     * 基础值
+     *
      */
     private BigDecimal baseValue;
 
     /**
-     * 比例系数
+     *
      */
     private BigDecimal multiple;
 
     /**
-     * 数据精度
+     *
      */
     private Byte valueDecimal;
 
     /**
-     * 单位
+     *
      */
     private String unit;
 
     /**
-     * 模版ID
+     * ID
      */
     @NotNull(message = "模版ID不能为空",
             groups = {Add.class, Update.class})
     private Long profileId;
 
     /**
-     * 位号拓展信息
+     *
      */
     private PointExt pointExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 }

@@ -33,48 +33,48 @@ import java.util.concurrent.TimeUnit;
 public interface DriverSenderService {
 
     /**
-     * 发送驱动事件
+     * Driver Event
      *
      * @param entityDTO DriverEventDTO
      */
     void driverEventSender(DriverEventDTO entityDTO);
 
     /**
-     * 发送设备事件
+     * Device Event
      *
      * @param entityDTO Device Event
      */
     void deviceEventSender(DeviceEventDTO entityDTO);
 
     /**
-     * 发送设备状态事件
+     * Device status
      * <p>
-     * 设备状态默认15分钟失效
+     * Device status15
      *
-     * @param deviceId 设备ID
+     * @param deviceId Device ID
      * @param status   StatusEnum
      */
     void deviceStatusSender(Long deviceId, DeviceStatusEnum status);
 
     /**
-     * 发送设备状态事件
+     * Device status
      *
-     * @param deviceId 设备ID
+     * @param deviceId Device ID
      * @param status   StatusEnum
-     * @param timeOut  失效时间
-     * @param timeUnit 失效时间单位 {@link TimeUnit}
+     * @param timeOut
+     * @param timeUnit {@link TimeUnit}
      */
     void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit);
 
     /**
-     * 发送位号值到消息组件
+     *
      *
      * @param entityDTO PointValue
      */
     void pointValueSender(PointValue entityDTO);
 
     /**
-     * 批量发送位号值到消息组件
+     *
      *
      * @param entityDTOList PointValue Array
      */

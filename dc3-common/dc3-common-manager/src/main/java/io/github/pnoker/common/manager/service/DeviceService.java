@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * 设备 Interface
+ * Interface
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,57 +35,57 @@ import java.util.List;
 public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
 
     /**
-     * 根据 设备Name 和 租户Id 查询设备
+     * Name TenantId
      *
-     * @param name     设备名称
-     * @param tenantId 租户ID
+     * @param name     Device Name
+     * @param tenantId Tenant ID
      * @return {@link DeviceBO}
      */
     DeviceBO selectByName(String name, Long tenantId);
 
     /**
-     * 根据 设备Name 和 租户Id 查询设备
+     * Name TenantId
      *
-     * @param code     设备编号
-     * @param tenantId 租户ID
+     * @param code     Device ID
+     * @param tenantId Tenant ID
      * @return {@link DeviceBO}
      */
     DeviceBO selectByCode(String code, Long tenantId);
 
     /**
-     * 根据 驱动ID 查询该驱动下的全部设备
+     * Driver ID
      *
-     * @param driverId 驱动ID
-     * @return {@link DeviceBO} 集合
+     * @param driverId Driver ID
+     * @return {@link DeviceBO}
      */
     List<DeviceBO> selectByDriverId(Long driverId);
 
     /**
-     * 根据 驱动ID 查询该驱动下的全部设备ID集合
+     * Driver ID Device ID
      *
-     * @param driverId 驱动ID
-     * @return {@link DeviceBO} 集合
+     * @param driverId Driver ID
+     * @return {@link DeviceBO}
      */
     List<Long> selectIdsByDriverId(Long driverId);
 
     /**
-     * 根据 模板ID 查询该驱动下的全部设备
+     * ID
      *
-     * @param profileId 模版ID
-     * @return {@link DeviceBO} 集合
+     * @param profileId ID
+     * @return {@link DeviceBO}
      */
     List<DeviceBO> selectByProfileId(Long profileId);
 
     /**
-     * 根据 设备ID集合 查询设备
+     * Device ID
      *
-     * @param ids 设备ID集
-     * @return {@link DeviceBO} 集合
+     * @param ids Device ID
+     * @return {@link DeviceBO}
      */
     List<DeviceBO> selectByIds(List<Long> ids);
 
     /**
-     * 导入设备
+     *
      *
      * @param entityBO      {@link DeviceBO}
      * @param multipartFile {@link File}
@@ -93,7 +93,7 @@ public interface DeviceService extends BaseService<DeviceBO, DeviceQuery> {
     void importDevice(DeviceBO entityBO, File multipartFile);
 
     /**
-     * 生成导入模板
+     *
      *
      * @param entityBO {@link DeviceBO}
      * @return File Path

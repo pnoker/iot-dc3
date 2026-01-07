@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * <p>
- * 位号属性配置表 服务实现类
+ *
  * </p>
  *
  * @author pnoker

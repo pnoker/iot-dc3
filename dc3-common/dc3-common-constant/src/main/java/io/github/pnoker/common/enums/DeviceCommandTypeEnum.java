@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 通用驱动事件枚举
+ * Common device command type enumeration
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,51 +35,51 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum DeviceCommandTypeEnum {
     /**
-     * 读位号值类型指令
+     * Read point value command
      */
-    READ((byte) 0, "read", "读位号值类型指令"),
+    READ((byte) 0, "read", "Read point value command"),
 
     /**
-     * 批量读位号值类型指令
+     * Read point value batch command
      */
-    READ_BATCH((byte) 1, "read_batch", "批量读位号值类型指令"),
+    READ_BATCH((byte) 1, "read_batch", "Read point value batch command"),
 
     /**
-     * 写位号值类型指令
+     * Write point value command
      */
-    WRITE((byte) 2, "write", "写位号值类型指令"),
+    WRITE((byte) 2, "write", "Write point value command"),
 
     /**
-     * 批量写位号值类型指令
+     * Write point value batch command
      */
-    WRITE_BATCH((byte) 3, "write_batch", "批量写位号值类型指令"),
+    WRITE_BATCH((byte) 3, "write_batch", "Write point value batch command"),
 
     /**
-     * 配置设备类型指令
+     * Config device command
      */
-    CONFIG((byte) 4, "config", "配置设备类型指令"),
+    CONFIG((byte) 4, "config", "Config device command"),
     ;
 
     /**
-     * 索引
+     * Index
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * 编码
+     * Code
      */
     private final String code;
 
     /**
-     * 内容
+     * Remark
      */
     private final String remark;
 
     /**
-     * 根据枚举索引获取枚举
+     * Get enum by index
      *
-     * @param index 索引
+     * @param index Index
      * @return {@link DeviceCommandTypeEnum}
      */
     public static DeviceCommandTypeEnum ofIndex(Byte index) {
@@ -88,9 +88,9 @@ public enum DeviceCommandTypeEnum {
     }
 
     /**
-     * 根据枚举编码获取枚举
+     * Get enum by code
      *
-     * @param code 编码
+     * @param code Code
      * @return {@link DeviceCommandTypeEnum}
      */
     public static DeviceCommandTypeEnum ofCode(String code) {
@@ -99,9 +99,9 @@ public enum DeviceCommandTypeEnum {
     }
 
     /**
-     * 根据枚举内容获取枚举
+     * Get enum by name
      *
-     * @param name 枚举内容
+     * @param name Name
      * @return {@link DeviceCommandTypeEnum}
      */
     public static DeviceCommandTypeEnum ofName(String name) {

@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.TenantBindDO;
 
 /**
  * <p>
- * 租户和用户的绑定表 Mapper 接口
+ * Tenant Mapper
  * </p>
  *
  * @author pnoker

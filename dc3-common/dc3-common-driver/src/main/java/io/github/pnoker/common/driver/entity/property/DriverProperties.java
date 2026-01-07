@@ -33,7 +33,7 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 /**
- * 驱动配置文件 driver 字段内容
+ * driver
  *
  * @author pnoker
  * @version 2025.9.0
@@ -46,80 +46,80 @@ import java.util.List;
 public class DriverProperties {
 
     /**
-     * 租户
+     * Tenant
      */
     @NotBlank(message = "租户不能为空")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "无效的租户")
     private String tenant;
 
     /**
-     * 驱动类型
+     * Type
      */
     @NotNull(message = "驱动类型不能为空")
     private DriverTypeFlagEnum type = DriverTypeFlagEnum.DRIVER_CLIENT;
 
     /**
-     * 驱动名称
+     * Name
      */
     @NotBlank(message = "驱动名称不能为空")
     @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "驱动名称格式无效")
     private String name;
 
     /**
-     * 驱动编号
+     * Driver ID
      */
     @NotBlank(message = "驱动编号不能为空")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "无效的驱动编号")
     private String code;
 
     /**
-     * 描述
+     * Description
      */
     private String remark;
 
     /**
-     * 定时任务相关属性
+     *
      */
     private ScheduleProperties schedule;
 
     /**
-     * 驱动属性
+     *
      */
     private List<DriverAttributeDTO> driverAttribute;
 
     /**
-     * 位号属性
+     *
      */
     private List<PointAttributeDTO> pointAttribute;
 
-    /*以下定义为内部参数*/
+    /**/
     /**
-     * 驱动节点编号, 8位随机数
+     * Code, 8
      */
     private String node;
 
     /**
-     * 驱动服务名称, 租户/应用名称
+     * Driver service name, Tenant/Name
      */
     private String service;
 
     /**
-     * 驱动主机
+     *
      */
     private String host;
 
     /**
-     * 驱动端口
+     *
      */
     private Integer port;
 
     /**
-     * 驱动客户端, 租户/应用名称_驱动节点编号
+     * , Tenant/Name_Code
      */
     private String client;
 
     /**
-     * 驱动配置文件 driver.schedule 字段内容
+     * driver.schedule
      *
      * @author pnoker
      * @version 2025.9.0
@@ -130,17 +130,17 @@ public class DriverProperties {
     public static class ScheduleProperties {
 
         /**
-         * 读任务配置
+         *
          */
         private ScheduleConfig read;
 
         /**
-         * 自定义任务配置
+         *
          */
         private ScheduleConfig custom;
 
         /**
-         * 驱动调度任务配置
+         *
          *
          * @author pnoker
          * @version 2025.9.0

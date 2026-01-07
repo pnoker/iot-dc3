@@ -21,6 +21,14 @@ import io.github.pnoker.common.data.entity.model.DriverRunDO;
 
 import java.util.List;
 
+/**
+ * Driver Run Service
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 public interface DriverRunService {
     List<DriverRunDO> get7daysDuration(Long driverId, String code);
 

@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.RoleResourceBindDO;
 
 /**
  * <p>
- * 角色和资源的关联表 服务类
+ *
  * </p>
  *
  * @author pnoker

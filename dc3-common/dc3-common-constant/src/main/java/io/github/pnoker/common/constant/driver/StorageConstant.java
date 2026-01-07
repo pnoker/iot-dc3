@@ -23,7 +23,7 @@ import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 
 /**
- * 存储 相关常量
+ * Storage constant
  *
  * @author pnoker
  * @version 2025.9.0
@@ -32,7 +32,7 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 public class StorageConstant {
 
     /**
-     * 设备数据存储集合前缀
+     * Point value prefix
      */
     public static final String POINT_VALUE_PREFIX = PrefixConstant.POINT + SuffixConstant.VALUE + SymbolConstant.UNDERSCORE;
 

@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- * 接收设备指令
+ *
  *
  * @author pnoker
  * @version 2025.9.0

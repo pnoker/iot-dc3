@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 元数据事件 Listener
+ * Listener
  *
  * @author zhangzi
  * @version 2025.9.0
@@ -71,9 +71,9 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
     }
 
     /**
-     * 通知驱动
      *
-     * @param service   驱动服务
+     *
+     * @param service
      * @param entityDTO DriverTransferMetadataDTO
      */
     private void notifyDriver(String service, MetadataEventDTO entityDTO) {

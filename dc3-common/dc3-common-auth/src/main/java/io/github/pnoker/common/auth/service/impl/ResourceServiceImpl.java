@@ -104,7 +104,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link ResourceQuery}
      * @return {@link LambdaQueryWrapper}
@@ -120,11 +120,11 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO {@link ResourceBO}
-     * @param isUpdate 是否为更新操作
-     * @return 是否重复
+     * @param isUpdate
+     * @return
      */
     private boolean checkDuplicate(ResourceBO entityBO, boolean isUpdate) {
         LambdaQueryWrapper<ResourceDO> wrapper = Wrappers.<ResourceDO>query().lambda();
@@ -144,10 +144,10 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link ResourceDO}
      */
     private ResourceDO getDOById(Long id, boolean throwException) {

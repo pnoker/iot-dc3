@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.PointValueDO;
 
 /**
  * <p>
- * 设备位号历史数据表(默认数据表, String类型) Mapper 接口
+ * (, StringType) Mapper
  * </p>
  *
  * @author pnoker

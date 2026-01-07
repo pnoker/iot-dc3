@@ -25,15 +25,15 @@ import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 public interface DriverReadService {
 
     /**
-     * 读取位号值
      *
-     * @param deviceId 设备ID
-     * @param pointId  位号ID
+     *
+     * @param deviceId Device ID
+     * @param pointId  Point ID
      */
     void read(Long deviceId, Long pointId);
 
     /**
-     * 指令读取位号值
+     *
      *
      * @param commandDTO {@link DeviceCommandDTO}
      */

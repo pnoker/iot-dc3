@@ -47,45 +47,45 @@ public class BaseVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * Primary key ID
      */
     @NotNull(message = "主键ID不能为空",
             groups = {Update.class})
     private Long id;
 
     /**
-     * 描述
+     * Description
      */
     private String remark;
 
     /**
-     * 创建者ID
+     * Creator ID
      */
     private Long creatorId;
 
     /**
-     * 创建者名称
+     * Creator Name
      */
     private String creatorName;
 
     /**
-     * 创建时间
+     * Create Time
      */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
 
     /**
-     * 操作者ID
+     * Operator ID
      */
     private Long operatorId;
 
     /**
-     * 操作者名称
+     * Operator Name
      */
     private String operatorName;
 
     /**
-     * 操作时间
+     * Operate Time
      */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime operateTime;

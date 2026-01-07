@@ -23,6 +23,14 @@ import io.github.pnoker.common.data.entity.model.DriverRunHistoryDO;
 
 import java.time.LocalDateTime;
 
+/**
+ * Driver Run History Service
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 public interface DriverRunHistoryService extends IService<DriverRunHistoryDO> {
     DriverRunDO getDurationDay(Long id, String code, LocalDateTime startOfDay, LocalDateTime endOfDay);
 }

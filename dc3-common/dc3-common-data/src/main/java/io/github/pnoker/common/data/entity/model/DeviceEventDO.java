@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 设备事件表
+ * Device Event
  * </p>
  *
  * @author pnoker
@@ -45,61 +45,61 @@ public class DeviceEventDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * Primary key ID
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
-     * 设备ID
+     * Device ID
      */
     @TableField("device_id")
     private Long deviceId;
 
     /**
-     * 位号ID
+     * Point ID
      */
     @TableField("point_id")
     private Long pointId;
 
     /**
-     * 事件类型标识
+     * Type
      */
     @TableField("event_type_flag")
     private Byte eventTypeFlag;
 
     /**
-     * 事件相关信息
+     *
      */
     @TableField("event_ext")
     private Object eventExt;
 
     /**
-     * 过期时长, 秒
+     * ,
      */
     @TableField("expired_time")
     private Long expiredTime;
 
     /**
-     * 确认标识, 0:未确认, 1:已确认
+     * , 0:, 1:
      */
     @TableField("confirm_flag")
     private Byte confirmFlag;
 
     /**
-     * 创建时间
+     * Create Time
      */
     @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
-     * 操作时间
+     * Operate Time
      */
     @TableField("operate_time")
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识, 0:未删除, 1:已删除
+     * Logical delete flag, 0:not deleted, 1:deleted
      */
     @TableLogic
     @TableField("deleted")

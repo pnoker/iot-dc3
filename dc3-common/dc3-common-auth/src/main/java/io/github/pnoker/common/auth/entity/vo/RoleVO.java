@@ -45,14 +45,14 @@ import lombok.*;
 public class RoleVO extends BaseVO {
 
     /**
-     * 角色父级ID
+     * ID
      */
     @NotNull(message = "Role parent id can't be empty",
             groups = {Add.class, Update.class})
     private Long parentRoleId;
 
     /**
-     * 角色名称
+     * Name
      */
     @NotBlank(message = "Role name can't be empty",
             groups = {Add.class, Auth.class})
@@ -62,17 +62,17 @@ public class RoleVO extends BaseVO {
     private String roleName;
 
     /**
-     * 角色编号
+     * Code
      */
     private String roleCode;
 
     /**
-     * 角色拓展信息
+     *
      */
     private RoleExt roleExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

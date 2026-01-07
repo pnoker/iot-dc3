@@ -47,14 +47,14 @@ import lombok.*;
 public class ResourceVO extends BaseVO {
 
     /**
-     * 权限资源父级ID
+     * ID
      */
     @NotBlank(message = "Resource parent id can't be empty",
             groups = {Add.class, Update.class})
     private Long parentResourceId;
 
     /**
-     * 权限资源名称
+     * Name
      */
     @NotBlank(message = "Role name can't be empty",
             groups = {Add.class, Auth.class})
@@ -64,41 +64,41 @@ public class ResourceVO extends BaseVO {
     private String resourceName;
 
     /**
-     * 权限资源编号
+     * Code
      */
     private String resourceCode;
 
     /**
-     * 权限资源类型标识
+     * Type
      */
     private ResourceTypeFlagEnum resourceTypeFlag;
 
     /**
-     * 权限资源范围标识, 参考: ResourceScopeFlagEnum
+     * , : ResourceScopeFlagEnum
      * <ul>
-     *     <li>0x01: 新增</li>
-     *     <li>0x02: 删除</li>
-     *     <li>0x04: 更新</li>
-     *     <li>0x08: 查询</li>
+     *   <li>0x01: </li>
+     *   <li>0x02: </li>
+     *   <li>0x04: </li>
+     *   <li>0x08: </li>
      * </ul>
-     * 具有多个权限范围可以累加
+     *
      */
     private ResourceScopeFlagEnum resourceScopeFlag;
 
     /**
-     * 权限资源实体ID
+     * Entity ID
      */
     @NotNull(message = "实体ID不能为空",
             groups = {Add.class, Update.class})
     private Long entityId;
 
     /**
-     * 资源拓展信息
+     *
      */
     private ResourceExt resourceExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

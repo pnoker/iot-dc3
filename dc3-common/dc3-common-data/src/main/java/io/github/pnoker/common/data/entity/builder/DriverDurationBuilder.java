@@ -22,6 +22,14 @@ import io.github.pnoker.common.data.entity.vo.DriverRunVO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 
+/**
+ * Driver Duration Builder
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DriverDurationBuilder {
 

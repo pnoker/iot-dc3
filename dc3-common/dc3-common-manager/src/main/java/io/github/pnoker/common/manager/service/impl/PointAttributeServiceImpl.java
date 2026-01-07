@@ -123,7 +123,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link PointAttributeQuery}
      * @return {@link LambdaQueryWrapper}
@@ -139,12 +139,12 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link PointAttributeBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(PointAttributeBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
@@ -164,10 +164,10 @@ public class PointAttributeServiceImpl implements PointAttributeService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link PointAttributeDO}
      */
     private PointAttributeDO getDOById(Long id, boolean throwException) {

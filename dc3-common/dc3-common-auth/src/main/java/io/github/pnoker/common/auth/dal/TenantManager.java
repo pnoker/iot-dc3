@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.TenantDO;
 
 /**
  * <p>
- * 租户表 服务类
+ * Tenant
  * </p>
  *
  * @author pnoker

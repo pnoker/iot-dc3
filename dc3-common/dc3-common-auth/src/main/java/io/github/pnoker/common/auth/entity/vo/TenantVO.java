@@ -44,7 +44,7 @@ import lombok.*;
 public class TenantVO extends BaseVO {
 
     /**
-     * 租户名称
+     * TenantName
      */
     @NotBlank(message = "Tenant name can't be empty",
             groups = {Add.class, Auth.class})
@@ -54,7 +54,7 @@ public class TenantVO extends BaseVO {
     private String tenantName;
 
     /**
-     * 租户编号
+     * TenantCode
      */
     @NotBlank(message = "Tenant code can't be empty",
             groups = {Add.class})
@@ -64,12 +64,12 @@ public class TenantVO extends BaseVO {
     private String tenantCode;
 
     /**
-     * 租户拓展信息
+     * Tenant
      */
     private TenantExt tenantExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

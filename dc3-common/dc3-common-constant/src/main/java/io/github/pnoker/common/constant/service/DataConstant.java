@@ -20,7 +20,7 @@ package io.github.pnoker.common.constant.service;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 
 /**
- * 数据服务 相关常量
+ * Data service constant
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,7 +29,7 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 public class DataConstant {
 
     /**
-     * 服务名
+     * Service name
      */
     public static final String SERVICE_NAME = "dc3-center-data";
     public static final String POINT_VALUE_URL_PREFIX = "/point_value";

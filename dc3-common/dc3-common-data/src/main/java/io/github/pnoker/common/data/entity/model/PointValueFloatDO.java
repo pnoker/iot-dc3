@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 设备位号历史数据表(Float类型)
+ * (FloatType)
  * </p>
  *
  * @author pnoker
@@ -46,43 +46,43 @@ public class PointValueFloatDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 设备ID
+     * Device ID
      */
     @TableField("device_id")
     private Long deviceId;
 
     /**
-     * 位号ID
+     * Point ID
      */
     @TableField("point_id")
     private Long pointId;
 
     /**
-     * 原始值
+     * Raw value
      */
     @TableField("raw_value")
     private Double rawValue;
 
     /**
-     * 计算值
+     *
      */
     @TableField("cal_value")
     private Double calValue;
 
     /**
-     * 驱动ID
+     * Driver ID
      */
     @TableField("driver_id")
     private Long driverId;
 
     /**
-     * 创建时间
+     * Create Time
      */
     @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
-     * 操作时间
+     * Operate Time
      */
     @TableField("operate_time")
     private LocalDateTime operateTime;

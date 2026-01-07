@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 设备 Api
+ * Api
  *
  * @author pnoker
  * @version 2025.9.0

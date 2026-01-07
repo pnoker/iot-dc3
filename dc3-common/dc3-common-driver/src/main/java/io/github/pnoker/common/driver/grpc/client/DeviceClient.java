@@ -42,6 +42,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Device Client
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 @Slf4j
 @Component
 public class DeviceClient {
@@ -81,9 +89,9 @@ public class DeviceClient {
     }
 
     /**
-     * 根据 设备ID 获取设备元数据
+     * Device ID
      *
-     * @param id 设备ID
+     * @param id Device ID
      * @return DeviceBO
      */
     public DeviceBO selectById(Long id) {

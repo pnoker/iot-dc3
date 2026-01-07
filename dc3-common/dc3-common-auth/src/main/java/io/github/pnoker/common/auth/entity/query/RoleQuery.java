@@ -43,24 +43,24 @@ public class RoleQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 角色名称
+     * Name
      */
     private String roleName;
 
     /**
-     * 角色编号
+     * Code
      */
     private String roleCode;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

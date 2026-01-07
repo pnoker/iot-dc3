@@ -21,6 +21,14 @@ import io.github.pnoker.common.data.entity.model.DeviceStatusHistoryDO;
 
 import java.util.List;
 
+/**
+ * Device Status History Service
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 public interface DeviceStatusHistoryService {
 
     List<DeviceStatusHistoryDO> selectRecently2Data(long id);

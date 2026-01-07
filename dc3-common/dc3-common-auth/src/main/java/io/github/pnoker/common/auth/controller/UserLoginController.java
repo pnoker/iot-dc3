@@ -39,7 +39,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * 用户 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -61,7 +61,7 @@ public class UserLoginController implements BaseController {
     }
 
     /**
-     * 新增用户
+     *
      *
      * @param entityVO {@link UserLoginVO}
      * @return R of String
@@ -79,7 +79,7 @@ public class UserLoginController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除用户
+     * ID
      *
      * @param id ID
      * @return R of String
@@ -96,10 +96,10 @@ public class UserLoginController implements BaseController {
     }
 
     /**
-     * 更新用户
+     *
      * <ol>
-     * <li>支持更新: Enable,Password</li>
-     * <li>不支持更新: Name</li>
+     * <li>: Enable,Password</li>
+     * <li>: Name</li>
      * </ol>
      *
      * @param entityVO {@link UserLoginVO}
@@ -118,10 +118,10 @@ public class UserLoginController implements BaseController {
     }
 
     /**
-     * 根据 ID 重置用户密码
+     * ID
      *
-     * @param id 用户ID
-     * @return 是否重置
+     * @param id ID
+     * @return
      */
     @PostMapping("/reset/{id}")
     public Mono<R<Boolean>> restPassword(@NotNull @PathVariable(value = "id") Long id) {
@@ -135,7 +135,7 @@ public class UserLoginController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询用户
+     * ID
      *
      * @param id ID
      * @return UserLoginVO {@link UserLoginVO}
@@ -153,9 +153,9 @@ public class UserLoginController implements BaseController {
     }
 
     /**
-     * 根据 Name 查询 User
+     * Name User
      *
-     * @param name 用户名称
+     * @param name Name
      * @return {@link UserLoginBO}
      */
     @GetMapping("/name/{name}")
@@ -171,10 +171,10 @@ public class UserLoginController implements BaseController {
     }
 
     /**
-     * 分页查询 User
+     * User
      *
-     * @param entityQuery 用户和分页参数
-     * @return 带分页的 {@link UserLoginBO}
+     * @param entityQuery
+     * @return {@link UserLoginBO}
      */
     @PostMapping("/list")
     public Mono<R<Page<UserLoginVO>>> list(@RequestBody(required = false) UserLoginQuery entityQuery) {
@@ -192,10 +192,10 @@ public class UserLoginController implements BaseController {
     }
 
     /**
-     * 检测登录名称是否有效
+     * Name
      *
-     * @param name 用户名称
-     * @return 是否有效
+     * @param name Name
+     * @return
      */
     @GetMapping("/check/{name}")
     public Mono<R<Boolean>> checkLoginNameValid(@NotNull @PathVariable(value = "name") String name) {

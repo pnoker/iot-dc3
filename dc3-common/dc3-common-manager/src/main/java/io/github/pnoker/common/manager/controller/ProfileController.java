@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 模版 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -62,7 +62,7 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * 新增 Profile
+     * Profile
      *
      * @param entityVO {@link ProfileVO}
      * @return R of String
@@ -83,7 +83,7 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除 Profile
+     * ID Profile
      *
      * @param id ID
      * @return R of String
@@ -100,7 +100,7 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * 更新 Profile
+     * Profile
      *
      * @param entityVO {@link ProfileVO}
      * @return R of String
@@ -118,7 +118,7 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询 Profile
+     * ID Profile
      *
      * @param id ID
      * @return ProfileVO {@link ProfileVO}
@@ -136,9 +136,9 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * 根据 ID 集合查询 Profile
+     * ID Profile
      *
-     * @param profileIds 模版ID集
+     * @param profileIds ID
      * @return Map(ID, ProfileVO)
      */
     @PostMapping("/ids")
@@ -154,10 +154,10 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * 根据 设备ID 查询 Profile 集合
+     * Device ID Profile
      *
-     * @param deviceId 设备ID
-     * @return Profile 集合
+     * @param deviceId Device ID
+     * @return Profile
      */
     @GetMapping("/device_id/{deviceId}")
     public Mono<R<List<ProfileVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
@@ -172,7 +172,7 @@ public class ProfileController implements BaseController {
     }
 
     /**
-     * 分页查询 Profile
+     * Profile
      *
      * @param entityQuery Profile Dto
      * @return Page Of Profile

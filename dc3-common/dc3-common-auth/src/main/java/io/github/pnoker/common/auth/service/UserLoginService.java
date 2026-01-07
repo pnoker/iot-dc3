@@ -31,18 +31,18 @@ import io.github.pnoker.common.base.service.BaseService;
 public interface UserLoginService extends BaseService<UserLoginBO, UserLoginQuery> {
 
     /**
-     * 根据登录名称查询用户
+     * Name
      *
-     * @param loginName      登录名称
+     * @param loginName      Name
      * @param throwException Throw Exception
      * @return User
      */
     UserLoginBO selectByLoginName(String loginName, boolean throwException);
 
     /**
-     * 判断登录名称是否有效
+     * Name
      *
-     * @param loginName 登录名称
+     * @param loginName Name
      * @return Boolean
      */
     boolean checkLoginNameValid(String loginName);

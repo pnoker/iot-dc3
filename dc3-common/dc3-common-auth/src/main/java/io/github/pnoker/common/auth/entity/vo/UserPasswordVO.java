@@ -42,7 +42,7 @@ import lombok.*;
 public class UserPasswordVO extends BaseVO {
 
     /**
-     * 登录密码
+     *
      */
     @NotBlank(message = "Login password can't be empty",
             groups = {Add.class, Auth.class})

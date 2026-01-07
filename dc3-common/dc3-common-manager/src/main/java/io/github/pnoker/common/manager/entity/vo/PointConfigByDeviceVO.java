@@ -23,6 +23,14 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Point Config By Device VO
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
+
 @Getter
 @Setter
 @ToString
@@ -32,16 +40,16 @@ import java.util.List;
 public class PointConfigByDeviceVO {
 
     /**
-     * 未配置数量
+     *
      */
     private Long unConfigCount;
     /**
-     * 配置数量
+     *
      */
     private Long configCount;
 
     /**
-     * 位号集合
+     *
      */
     private List<PointDO> points;
 }

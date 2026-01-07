@@ -24,7 +24,7 @@ import io.github.pnoker.common.manager.entity.query.DriverAttributeQuery;
 import java.util.List;
 
 /**
- * 驱动属性Interface
+ * Interface
  *
  * @author pnoker
  * @version 2025.9.0
@@ -34,18 +34,18 @@ public interface DriverAttributeService extends BaseService<DriverAttributeBO, D
 
 
     /**
-     * 根据 驱动ID 查询
+     * Driver ID
      *
-     * @param driverId 驱动ID
-     * @return 驱动属性Array
+     * @param driverId Driver ID
+     * @return Array
      */
     List<DriverAttributeBO> selectByDriverId(Long driverId);
 
     /**
-     * 根据 驱动配置属性编号 和 驱动ID 查询
+     * Code Driver ID
      *
-     * @param name     属性编号
-     * @param driverId 驱动ID
+     * @param name     Code
+     * @param driverId Driver ID
      * @return DriverAttribute
      */
     DriverAttributeBO selectByNameAndDriverId(String name, Long driverId);

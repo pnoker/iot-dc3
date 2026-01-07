@@ -44,25 +44,25 @@ public class UserLoginQuery implements Serializable {
 
     private Pages page;
 
-    // 查询字段
+    // 
 
     /**
-     * 登录名称
+     * Name
      */
     private String loginName;
 
     /**
-     * 用户ID
+     * ID
      */
     private Long userId;
 
     /**
-     * 用户密码ID
+     * ID
      */
     private Long userPasswordId;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

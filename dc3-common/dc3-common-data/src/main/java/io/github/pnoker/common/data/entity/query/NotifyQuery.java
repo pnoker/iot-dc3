@@ -28,7 +28,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 报警通知模板表
+ * Alarm notification template table
  * </p>
  *
  * @author pnoker
@@ -50,34 +50,34 @@ public class NotifyQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 报警通知模板名称
+     * Alarm notification template name
      */
     private String alarmNotifyName;
 
     /**
-     * 报警通知模板编号
+     * Alarm notification template code
      */
     private String alarmNotifyCode;
 
     /**
-     * 自动确认标识
+     * Auto confirm flag
      */
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
-     * 报警通知间隔, 毫秒
+     * Alarm notification interval, milliseconds
      */
     private Long alarmNotifyInterval;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

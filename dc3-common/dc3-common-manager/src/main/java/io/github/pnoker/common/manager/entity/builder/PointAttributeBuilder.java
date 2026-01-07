@@ -37,7 +37,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * 位号属性Builder
+ * Builder
  *
  * @author pnoker
  * @version 2025.9.0

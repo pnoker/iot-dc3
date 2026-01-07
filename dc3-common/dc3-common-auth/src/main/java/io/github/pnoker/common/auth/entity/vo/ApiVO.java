@@ -45,12 +45,12 @@ import lombok.*;
 public class ApiVO extends BaseVO {
 
     /**
-     * Api接口类型标识
+     * ApiType
      */
     private ApiTypeFlagEnum apiTypeFlag;
 
     /**
-     * Api接口名称
+     * ApiName
      */
     @NotBlank(message = "Api接口名称不能为空",
             groups = {Add.class, Auth.class})
@@ -60,17 +60,17 @@ public class ApiVO extends BaseVO {
     private String apiName;
 
     /**
-     * Api接口编号, 一般为URL的MD5编码
+     * ApiCode, URLMD5
      */
     private String apiCode;
 
     /**
-     * Api接口拓展信息
+     * Api
      */
     private ApiExt apiExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

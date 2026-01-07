@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 驱动属性配置信息 Controller
+ * Controller
  *
  * @author pnoker
  * @version 2025.9.0
@@ -59,7 +59,7 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 新增 DriverConfig
+     * DriverConfig
      *
      * @param entityVO {@link DriverAttributeConfigVO}
      * @return R of String
@@ -80,7 +80,7 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 ID 删除 DriverConfig
+     * ID DriverConfig
      *
      * @param id ID
      * @return R of String
@@ -97,7 +97,7 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 更新 DriverConfig
+     * DriverConfig
      *
      * @param entityVO {@link DriverAttributeConfigVO}
      * @return R of String
@@ -115,7 +115,7 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 ID 查询 DriverConfig
+     * ID DriverConfig
      *
      * @param id ID
      * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
@@ -133,10 +133,10 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 属性ID 和 设备ID 查询 DriverConfig
+     * ID Device ID DriverConfig
      *
      * @param attributeId Attribute ID
-     * @param deviceId    设备ID
+     * @param deviceId    Device ID
      * @return DriverConfig
      */
     @GetMapping("/device_id/{deviceId}/attribute_id/{attributeId}")
@@ -153,10 +153,10 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 根据 设备ID 查询 DriverConfig
+     * Device ID DriverConfig
      *
-     * @param deviceId 设备ID
-     * @return DriverConfig 集合
+     * @param deviceId Device ID
+     * @return DriverConfig
      */
     @GetMapping("/device_id/{deviceId}")
     public Mono<R<List<DriverAttributeConfigVO>>> selectByDeviceId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
@@ -171,7 +171,7 @@ public class DriverAttributeConfigController implements BaseController {
     }
 
     /**
-     * 分页查询 DriverConfig
+     * DriverConfig
      *
      * @param entityQuery DriverConfig Dto
      * @return Page Of DriverConfig

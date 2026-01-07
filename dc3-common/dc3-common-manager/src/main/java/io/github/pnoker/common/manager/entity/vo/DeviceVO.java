@@ -32,7 +32,7 @@ import lombok.*;
 import java.util.Set;
 
 /**
- * 设备 VO
+ * VO
  *
  * @author pnoker
  * @version 2025.9.0
@@ -47,7 +47,7 @@ import java.util.Set;
 public class DeviceVO extends BaseVO {
 
     /**
-     * 设备名称
+     * Device Name
      */
     @NotBlank(message = "设备名称不能为空",
             groups = {Add.class})
@@ -57,39 +57,39 @@ public class DeviceVO extends BaseVO {
     private String deviceName;
 
     /**
-     * 设备编号
+     * Device ID
      */
     private String deviceCode;
 
     /**
-     * 驱动ID
+     * Driver ID
      */
     @NotNull(message = "驱动ID不能为空",
             groups = {Add.class, Update.class, Upload.class})
     private Long driverId;
 
     /**
-     * 设备拓展信息
+     *
      */
     private DeviceExt deviceExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 签名
+     *
      */
     private String signature;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 
-    // 附加字段
-    @NotNull(message = "模版ID集不能为空",
+    // 
+    @NotNull(message = "ID",
             groups = {Upload.class})
     private Set<Long> profileIds;
 }

@@ -43,14 +43,14 @@ public class TopicQuery implements Serializable {
     private Pages page;
 
     /**
-     * 主题
+     *
      */
 
     private String topic;
 
 
     /**
-     * 设备名称
+     * Device Name
      */
 
     private String deviceName;

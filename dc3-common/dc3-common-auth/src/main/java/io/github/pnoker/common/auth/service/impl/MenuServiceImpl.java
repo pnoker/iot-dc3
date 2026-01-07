@@ -71,7 +71,7 @@ public class MenuServiceImpl implements MenuService {
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 删除菜单之前需要检查该菜单是否存在关联
+        // 
         LambdaQueryChainWrapper<MenuDO> wrapper = menuManager.lambdaQuery().eq(MenuDO::getParentMenuId, id);
         long count = wrapper.count();
         if (count > 0) {
@@ -112,7 +112,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link MenuQuery}
      * @return {@link LambdaQueryWrapper}
@@ -125,12 +125,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link MenuBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(MenuBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
@@ -152,10 +152,10 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link MenuDO}
      */
     private MenuDO getDOById(Long id, boolean throwException) {

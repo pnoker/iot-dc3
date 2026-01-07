@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * <p>
- * 驱动状态历史表 Mapper 接口
+ * Driver status history Mapper
  * </p>
  *
  * @author pnoker

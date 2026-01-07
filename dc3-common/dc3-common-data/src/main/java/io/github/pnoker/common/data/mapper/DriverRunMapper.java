@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * <p>
- * 驱动运行时长历史表 Mapper 接口
+ * Driver run Mapper
  * </p>
  *
  * @author pnoker

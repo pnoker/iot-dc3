@@ -24,7 +24,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 字典查询实体类
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -44,11 +44,11 @@ public class DictionaryQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     private String label;
 

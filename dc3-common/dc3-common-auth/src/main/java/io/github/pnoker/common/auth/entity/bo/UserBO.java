@@ -37,37 +37,37 @@ import lombok.*;
 public class UserBO extends BaseBO {
 
     /**
-     * 用户昵称
+     *
      */
     private String nickName;
 
     /**
-     * 用户名称
+     * Name
      */
     private String userName;
 
     /**
-     * 手机号
+     *
      */
     private String phone;
 
     /**
-     * 邮箱
+     *
      */
     private String email;
 
     /**
-     * 社交相关拓展信息
+     *
      */
     private UserSocialExt socialExt;
 
     /**
-     * 身份相关拓展信息
+     *
      */
     private UserIdentityExt identityExt;
 
     /**
-     * 使能标识, 0:启用, 1:禁用
+     * Enable flag, 0:, 1:Disable
      */
     private Byte enableFlag;
 

@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.model.PointValueBoolDO;
 
 /**
  * <p>
- * 设备位号历史数据表(Boolean类型) Mapper 接口
+ * (BooleanType) Mapper
  * </p>
  *
  * @author pnoker

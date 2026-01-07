@@ -25,7 +25,6 @@ import lombok.Setter;
 /**
  * Driver Ext
  * <p>
- * 驱动相关拓展信息
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,9 +37,9 @@ import lombok.Setter;
 public class DriverExt extends BaseExt {
 
     /**
-     * 拓展内容
+     *
      * <p>
-     * 拓展内容可以根据 Type 和 Version 进行区分
+     * Type Version
      */
     private Content content;
 

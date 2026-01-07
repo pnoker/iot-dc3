@@ -26,7 +26,7 @@ import lombok.*;
 
 /**
  * <p>
- * 报警通知模板表
+ * Alarm notification template table
  * </p>
  *
  * @author pnoker
@@ -42,32 +42,32 @@ import lombok.*;
 public class NotifyVO extends BaseVO {
 
     /**
-     * 报警通知模板名称
+     * Alarm notification template name
      */
     private String notifyName;
 
     /**
-     * 报警通知模板编号
+     * Alarm notification template code
      */
     private String notifyCode;
 
     /**
-     * 自动确认标识
+     * Auto confirm flag
      */
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
-     * 报警通知间隔, 毫秒
+     * Alarm notification interval, milliseconds
      */
     private Long notifyInterval;
 
     /**
-     * 报警通知模版配置
+     * Alarm notification template configuration
      */
     private NotifyExt notifyExt;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 }

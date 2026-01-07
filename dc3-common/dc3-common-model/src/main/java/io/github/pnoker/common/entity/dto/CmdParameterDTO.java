@@ -23,7 +23,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 指令参数
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -41,17 +41,17 @@ public class CmdParameterDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 
     /**
-     * 位号ID
+     * Point ID
      */
     private Long pointId;
 
     /**
-     * 写入值
+     *
      */
     private String value;
 }

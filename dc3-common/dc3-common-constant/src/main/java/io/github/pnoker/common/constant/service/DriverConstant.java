@@ -20,7 +20,7 @@ package io.github.pnoker.common.constant.service;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 
 /**
- * 驱动服务 相关常量
+ * Driver service constant
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,7 +29,7 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 public class DriverConstant {
 
     /**
-     * 服务名
+     * Service name
      */
     public static final String SERVICE_NAME = "dc3-driver";
     public static final String COMMAND_URL_PREFIX = "/command";

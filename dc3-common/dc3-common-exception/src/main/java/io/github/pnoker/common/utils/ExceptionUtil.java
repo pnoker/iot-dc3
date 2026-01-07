@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.MessageFormat;
 
 /**
- * 异常 相关工具类
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,11 +38,11 @@ public class ExceptionUtil {
     }
 
     /**
-     * 获取不可用服务的错误信息
      *
-     * @param service 服务名称
-     * @param message 默认的错误信息
-     * @return 错误信息
+     *
+     * @param service Name
+     * @param message
+     * @return
      */
     public static String getNotAvailableServiceMessage(String service, String message) {
         if (StringUtils.isEmpty(message)) {

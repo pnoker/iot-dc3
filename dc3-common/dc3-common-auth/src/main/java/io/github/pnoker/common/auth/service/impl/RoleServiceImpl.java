@@ -72,7 +72,7 @@ public class RoleServiceImpl implements RoleService {
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 删除角色之前需要检查该角色是否存在关联
+        // 
         LambdaQueryChainWrapper<RoleDO> wrapper = roleManager.lambdaQuery().eq(RoleDO::getParentRoleId, id);
         long count = wrapper.count();
         if (count > 0) {
@@ -116,7 +116,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link RoleQuery}
      * @return {@link LambdaQueryWrapper}
@@ -130,12 +130,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link RoleBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(RoleBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
@@ -156,10 +156,10 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link RoleDO}
      */
     private RoleDO getDOById(Long id, boolean throwException) {

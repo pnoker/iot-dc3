@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * 设备元数据
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 public final class DeviceMetadata {
 
     /**
-     * 设备元数据缓存
+     *
      * <p>
      * deviceId, deviceDTO
      */
@@ -79,10 +79,10 @@ public final class DeviceMetadata {
     }
 
     /**
-     * 获取缓存, 指定设备
+     * ,
      * Get cache for specified device
      *
-     * @param id 设备ID Device ID
+     * @param id Device ID Device ID
      * @return DeviceBO Device business object
      */
     public DeviceBO getCache(long id) {
@@ -97,10 +97,10 @@ public final class DeviceMetadata {
     }
 
     /**
-     * 重新加载缓存, 指定设备
+     * ,
      * Reload cache for specified device
      *
-     * @param id 设备ID Device ID
+     * @param id Device ID Device ID
      */
     public void loadCache(long id) {
         CompletableFuture<DeviceBO> future = CompletableFuture.supplyAsync(() -> deviceClient.selectById(id));
@@ -108,24 +108,24 @@ public final class DeviceMetadata {
     }
 
     /**
-     * 删除缓存, 指定设备
+     * ,
      * Remove cache for specified device
      *
-     * @param id 设备ID Device ID
+     * @param id Device ID Device ID
      */
     public void removeCache(long id) {
         cache.put(id, CompletableFuture.completedFuture(null));
     }
 
     /**
-     * 获取驱动属性配置
+     *
      * Get driver attribute configuration
      * <p>
-     * 会校验是否完整
+     * <p>
      * Will verify if configuration is complete
      *
-     * @param deviceId 设备ID Device ID
-     * @return 属性配置Map Attribute configuration map
+     * @param deviceId Device ID Device ID
+     * @return Map Attribute configuration map
      */
     public Map<String, AttributeBO> getDriverConfig(long deviceId) {
         Map<Long, DriverAttributeDTO> attributeMap = driverMetadata.getDriverAttributeIdMap();
@@ -157,14 +157,14 @@ public final class DeviceMetadata {
     }
 
     /**
-     * 获取设备下全部位号属性配置
+     *
      * Get all point attribute configurations for device
      * <p>
-     * 会校验是否完整
+     * <p>
      * Will verify if configuration is complete
      *
-     * @param deviceId 设备ID Device ID
-     * @return 属性配置Map Attribute configuration map
+     * @param deviceId Device ID Device ID
+     * @return Map Attribute configuration map
      */
     public Map<Long, Map<String, AttributeBO>> getPointConfig(long deviceId) {
         Map<Long, PointAttributeDTO> attributeMap = driverMetadata.getPointAttributeIdMap();
@@ -195,15 +195,15 @@ public final class DeviceMetadata {
     }
 
     /**
-     * 获取设备下指定位号属性配置
+     *
      * Get specific point attribute configuration for device
      * <p>
-     * 会校验是否完整
+     * <p>
      * Will verify if configuration is complete
      *
-     * @param deviceId 设备ID Device ID
-     * @param pointId  位号ID Point ID
-     * @return 属性配置Map Attribute configuration map
+     * @param deviceId Device ID Device ID
+     * @param pointId  Point ID Point ID
+     * @return Map Attribute configuration map
      */
     public Map<String, AttributeBO> getPointConfig(long deviceId, long pointId) {
         Map<Long, PointAttributeDTO> attributeMap = driverMetadata.getPointAttributeIdMap();

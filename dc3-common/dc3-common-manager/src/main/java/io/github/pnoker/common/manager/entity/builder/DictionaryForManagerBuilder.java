@@ -38,7 +38,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface DictionaryForManagerBuilder extends DictionaryBuilder {
 
-    // 驱动相关
+    // 
 
     /**
      * BO to VO
@@ -64,7 +64,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByDriverBOPage(Page<DriverBO> entityPageBO);
 
-    // 模版相关
+    //
 
     /**
      * BO to VO
@@ -90,7 +90,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByProfileBOPage(Page<ProfileBO> entityPageBO);
 
-    // 位号相关
+    //
 
     /**
      * BO to VO
@@ -116,7 +116,7 @@ public interface DictionaryForManagerBuilder extends DictionaryBuilder {
     @Mapping(target = "optimizeJoinOfCountSql", ignore = true)
     Page<DictionaryBO> buildVOPageByPointBOPage(Page<PointBO> entityPageBO);
 
-    // 设备相关
+    //
 
     /**
      * BO to VO

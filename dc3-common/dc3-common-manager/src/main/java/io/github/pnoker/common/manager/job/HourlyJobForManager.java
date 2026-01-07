@@ -25,7 +25,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 /**
- * 通用: 每小时执行任务
+ * :
  *
  * @author pnoker
  * @version 2025.9.0
@@ -36,9 +36,9 @@ import org.springframework.stereotype.Component;
 public class HourlyJobForManager extends QuartzJobBean {
 
     /**
-     * 任务执行
+     *
      * * <p>
-     * * 具体逻辑请在 biz service 中定义
+     * * biz service
      *
      * @param context JobExecutionContext
      * @throws JobExecutionException JobExecutionException

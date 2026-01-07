@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.entity.model.DriverTokenDO;
 
 /**
  * <p>
- * 驱动令牌表 Mapper 接口
+ * Mapper
  * </p>
  *
  * @author pnoker

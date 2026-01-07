@@ -44,29 +44,29 @@ public class MenuQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 菜单类型标识
+     * Type
      */
     private MenuTypeFlagEnum menuTypeFlag;
 
     /**
-     * 菜单名称
+     * Name
      */
     private String menuName;
 
     /**
-     * 菜单编号, 一般为URL的MD5编码
+     * Code, URLMD5
      */
     private String menuCode;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 

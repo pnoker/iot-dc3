@@ -23,11 +23,11 @@ import com.google.common.collect.ImmutableMap;
 import io.github.pnoker.common.utils.MybatisUtil;
 
 /**
- * 自动代码生成工具
+ *
  * <p>
- * 注意:
+ * :
  * <p>
- * 当前配置仅用于 dc3-common-manager 服务模块, 如果需要用于其他模块请重新配置 path 参数。
+ * dc3-common-manager , path 。
  *
  * @author pnoker
  * @version 2025.9.0

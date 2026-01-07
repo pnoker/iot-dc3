@@ -47,51 +47,51 @@ public class PointQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID
      */
     private Long tenantId;
 
-    // 查询字段
+    // 
 
     /**
-     * 位号名称
+     * Name
      */
     private String pointName;
 
     /**
-     * 位号编号
+     * Code
      */
     private String pointCode;
 
     /**
-     * 位号类型标识
+     * Type
      */
     private PointTypeFlagEnum pointTypeFlag;
 
     /**
-     * 读写标识
+     *
      */
     private RwFlagEnum rwFlag;
 
     /**
-     * 模版ID
+     * ID
      */
     private Long profileId;
 
     /**
-     * 使能标识
+     * Enable flag
      */
     private EnableFlagEnum enableFlag;
 
     /**
-     * 版本
+     *
      */
     private Integer version;
 
-    // 附加字段
+    //
 
     /**
-     * 设备ID
+     * Device ID
      */
     private Long deviceId;
 

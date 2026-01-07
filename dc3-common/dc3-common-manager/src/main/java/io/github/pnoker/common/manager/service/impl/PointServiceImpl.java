@@ -106,7 +106,7 @@ public class PointServiceImpl implements PointService {
             throw new AddException("Failed to create 位号");
         }
 
-        // 通知驱动
+        // 
         metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT, MetadataOperateTypeEnum.ADD));
         List<Long> deviceIds = profileBindService.selectDeviceIdsByProfileId(entityDO.getProfileId());
         deviceIds.forEach(entityId -> metadataEventPublisher.publishEvent(new MetadataEvent(this, entityId, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE)));
@@ -117,10 +117,10 @@ public class PointServiceImpl implements PointService {
         PointDO entityDO = getDOById(id, true);
 
         if (!pointManager.removeById(id)) {
-            throw new DeleteException("Failed to remove 位号");
+            throw new DeleteException("Failed to remove ");
         }
 
-        // 通知驱动
+        //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT, MetadataOperateTypeEnum.DELETE);
         metadataEventPublisher.publishEvent(metadataEvent);
         List<Long> deviceIds = profileBindService.selectDeviceIdsByProfileId(entityDO.getProfileId());
@@ -139,7 +139,7 @@ public class PointServiceImpl implements PointService {
             throw new UpdateException("Failed to update point");
         }
 
-        // 通知驱动
+        //
         MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getId(), MetadataTypeEnum.POINT, MetadataOperateTypeEnum.UPDATE);
         metadataEventPublisher.publishEvent(metadataEvent);
     }
@@ -283,7 +283,7 @@ public class PointServiceImpl implements PointService {
                 List<PointAttributeConfigDO> list2 = pointAttributeConfigManager.list(new LambdaQueryWrapper<PointAttributeConfigDO>().eq(PointAttributeConfigDO::getDeviceId, deviceId));
                 if (Objects.nonNull(list2)) {
                     List<Long> attrList = new ArrayList<>(list2.stream().map(PointAttributeConfigDO::getPointId).toList());
-                    //取交集
+                    //
                     attrList.retainAll(profileList);
                     configCount.addAll(attrList);
                     unConfigCount.addAll(profileList);
@@ -385,7 +385,7 @@ public class PointServiceImpl implements PointService {
     }
 
     /**
-     * 构造模糊查询
+     *
      *
      * @param entityQuery {@link PointQuery}
      * @return {@link LambdaQueryWrapper}
@@ -404,12 +404,12 @@ public class PointServiceImpl implements PointService {
     }
 
     /**
-     * 重复性校验
+     *
      *
      * @param entityBO       {@link PointBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param isUpdate
+     * @param throwException
+     * @return
      */
     private boolean checkDuplicate(PointBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<PointDO> wrapper = Wrappers.<PointDO>query().lambda();
@@ -430,10 +430,10 @@ public class PointServiceImpl implements PointService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Primary key ID
      *
      * @param id             ID
-     * @param throwException 是否抛异常
+     * @param throwException
      * @return {@link PointDO}
      */
     private PointDO getDOById(Long id, boolean throwException) {
@@ -445,10 +445,10 @@ public class PointServiceImpl implements PointService {
     }
 
     /**
-     * 根据 设备ID 和 位号ID 查询位号是否已配置
+     * Device ID Point ID
      *
-     * @param deviceId 设备ID
-     * @param pointId  位号ID
+     * @param deviceId Device ID
+     * @param pointId  Point ID
      * @return PointConfig Array
      */
     private List<PointAttributeConfigDO> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
