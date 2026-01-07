@@ -31,6 +31,12 @@ import org.springframework.stereotype.Component;
 import java.net.InetSocketAddress;
 
 /**
+ * Netty-based UDP server for listening to incoming UDP datagrams.
+ * <p>
+ * This server starts a UDP listener on the specified port and handles
+ * incoming datagram packets with a write timeout of 30 seconds.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -38,6 +44,11 @@ import java.net.InetSocketAddress;
 @Component
 public class NettyUdpServer {
 
+    /**
+     * Starts the UDP server on the specified port.
+     *
+     * @param port The port number to listen on
+     */
     @SneakyThrows
     public void start(int port) {
         EventLoopGroup group = new NioEventLoopGroup();

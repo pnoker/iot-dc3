@@ -51,6 +51,18 @@ public class KeyLoader {
     @Getter
     private KeyPair clientKeyPair;
 
+    /**
+     * Loads or creates the client certificate and key pair.
+     * <p>
+     * If the keystore doesn't exist, a new self-signed certificate is generated
+     * with the configured subject alternative names (hostnames and IP addresses).
+     * The certificate and private key are stored in a PKCS12 keystore.
+     * </p>
+     *
+     * @param baseDir the base directory where the keystore file is located
+     * @return this KeyLoader instance with loaded certificate and key pair
+     * @throws Exception if certificate generation or loading fails
+     */
     public KeyLoader load(Path baseDir) throws Exception {
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         Path serverKeyStore = baseDir.resolve("dc3-opc-ua-client.pfx");

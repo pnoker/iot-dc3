@@ -41,6 +41,13 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
+ * Common message handler for processing incoming TCP/UDP data.
+ * <p>
+ * This service parses incoming byte buffers according to a specific format,
+ * extracts device and point information, and sends point values to the
+ * driver sender service for further processing.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -57,14 +64,19 @@ public class NettyServerHandler {
     private DriverSenderService driverSenderService;
 
     /**
-     * Example, for reference only. Please parse the actual data format according to your own needs.
+     * Processes incoming messages from TCP/UDP clients.
      * <p>
-     * This method is used to handle incoming messages from clients.
-     * It logs the received message, extracts the device name and ID, and then processes the point values based on the device configuration.
-     * Finally, it sends the processed point values to the driver sender service.
+     * Parses the byte buffer to extract device information and point values.
+     * The message format is:
+     * <pre>
+     * - Device name: 22 bytes (converted to device ID)
+     * - Keyword: 1 byte (hex)
+     * - Point values: variable length based on point configuration
+     * </pre>
+     * </p>
      *
-     * @param context The channel handler context for the current connection.
-     * @param byteBuf The byte buffer containing the incoming message.
+     * @param context The channel handler context for the current connection
+     * @param byteBuf The byte buffer containing the incoming message
      */
     public void read(ChannelHandlerContext context, ByteBuf byteBuf) {
         log.info("{}->{}", context.channel().remoteAddress(), ByteBufUtil.hexDump(byteBuf));

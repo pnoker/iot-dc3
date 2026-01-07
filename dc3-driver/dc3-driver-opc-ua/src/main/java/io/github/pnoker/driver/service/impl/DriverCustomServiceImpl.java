@@ -54,7 +54,12 @@ import java.util.concurrent.*;
 
 
 /**
- * Drive custom service implementation classes
+ * Custom driver service implementation for the OPC UA driver.
+ * <p>
+ * This service provides OPC UA-specific device communication capabilities using the
+ * Eclipse Milo OPC UA stack. It manages client connections to OPC UA servers and
+ * handles read/write operations to OPC UA nodes.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -71,6 +76,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, OpcUaClient> connectMap;
 
+    /**
+     * Initializes the OPC UA driver.
+     * <p>
+     * This method is called when the driver starts. It initializes the connection map
+     * used to manage OPC UA client instances. Override this method to implement
+     * custom initialization logic.
+     * </p>
+     */
     @Override
     public void initial() {
         /*
@@ -83,6 +96,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         connectMap = new ConcurrentHashMap<>(16);
     }
 
+    /**
+     * Scheduled task to report device status.
+     * <p>
+     * This method is called periodically to update device status. By default,
+     * all devices are reported as ONLINE with a 25-second validity period.
+     * Override this method to implement custom status reporting logic.
+     * </p>
+     */
     @Override
     public void schedule() {
         /*
@@ -106,6 +127,16 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
+    /**
+     * Handles metadata change events for drivers, devices, and points.
+     * <p>
+     * This method is called when metadata is created, updated, or deleted.
+     * For device update/delete events, it removes the cached OPC UA client connection
+     * to force reconnection with updated configuration.
+     * </p>
+     *
+     * @param metadataEvent the metadata event containing type, operation, and ID information
+     */
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
@@ -132,6 +163,20 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Reads data from an OPC UA device point.
+     * <p>
+     * This method obtains or creates an OPC UA client connection, then reads the
+     * value from the specified OPC UA node. The node is identified by namespace
+     * and tag from point configuration.
+     * </p>
+     *
+     * @param driverConfig driver configuration attributes (host, port, path)
+     * @param pointConfig point configuration attributes (namespace, tag)
+     * @param device the device to read from
+     * @param point the point to read
+     * @return the read value wrapped in an RValue object
+     */
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
@@ -146,6 +191,21 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     }
 
+    /**
+     * Writes data to an OPC UA device point.
+     * <p>
+     * This method obtains or creates an OPC UA client connection, then writes the
+     * value to the specified OPC UA node. The data type is automatically determined
+     * from the write value's type flag.
+     * </p>
+     *
+     * @param driverConfig driver configuration attributes (host, port, path)
+     * @param pointConfig point configuration attributes (namespace, tag)
+     * @param device the device to write to
+     * @param point the point to write
+     * @param wValue the value containing the data to write
+     * @return true if the write operation succeeded, false otherwise
+     */
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*

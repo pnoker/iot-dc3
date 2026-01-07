@@ -39,7 +39,12 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Drive custom service implementation classes
+ * Custom driver service implementation for the Virtual Driver.
+ * <p>
+ * This service provides virtual device simulation capabilities for testing and development.
+ * It generates random data for different point types and simulates device behavior without
+ * requiring physical hardware connections.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -54,6 +59,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverSenderService driverSenderService;
 
+    /**
+     * Initializes the virtual driver.
+     * <p>
+     * This method is called when the driver starts. Override this method to implement
+     * custom initialization logic specific to your virtual device simulation.
+     * </p>
+     */
     @Override
     public void initial() {
         /*
@@ -65,6 +77,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          */
     }
 
+    /**
+     * Scheduled task to report device status.
+     * <p>
+     * This method is called periodically to update device status. By default,
+     * all virtual devices are reported as ONLINE with a 25-second validity period.
+     * Override this method to implement custom status reporting logic.
+     * </p>
+     */
     @Override
     public void schedule() {
         /*
@@ -88,6 +108,15 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
+    /**
+     * Handles metadata change events for drivers, devices, and points.
+     * <p>
+     * This method is called when metadata is created, updated, or deleted.
+     * Override this method to implement custom event handling logic.
+     * </p>
+     *
+     * @param metadataEvent the metadata event containing type, operation, and ID information
+     */
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
@@ -109,6 +138,24 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Reads data from a virtual device point.
+     * <p>
+     * This method generates simulated data based on the point type:
+     * <ul>
+     *   <li>STRING type: returns "abcd1234"</li>
+     *   <li>BOOLEAN type: returns a random boolean value</li>
+     *   <li>Other types: returns a random float between 0 and 100</li>
+     * </ul>
+     * Override this method to implement custom data generation logic.
+     * </p>
+     *
+     * @param driverConfig driver configuration attributes
+     * @param pointConfig point configuration attributes
+     * @param device the device to read from
+     * @param point the point to read
+     * @return the read value wrapped in an RValue object
+     */
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
@@ -134,6 +181,20 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         return new RValue(device, point, String.valueOf(value));
     }
 
+    /**
+     * Writes data to a virtual device point.
+     * <p>
+     * By default, this method returns false indicating the write operation is not supported.
+     * Override this method to implement custom write logic for virtual devices.
+     * </p>
+     *
+     * @param driverConfig driver configuration attributes
+     * @param pointConfig point configuration attributes
+     * @param device the device to write to
+     * @param point the point to write
+     * @param wValue the value to write
+     * @return true if the write operation succeeded, false otherwise
+     */
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
         /*
