@@ -22,7 +22,7 @@ import io.github.pnoker.common.dal.entity.model.LabelDO;
 
 /**
  * <p>
- * 标签表 Mapper 接口
+ * Mapper interface for label table.
  * </p>
  *
  * @author pnoker

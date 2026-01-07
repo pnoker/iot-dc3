@@ -24,7 +24,12 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 位号值
+ * Point Value Business Object
+ * <p>
+ * Business object representing point values in IoT DC3 platform.
+ * Contains device ID, point ID, raw value, calculated value, driver ID,
+ * and timestamps for data storage and retrieval operations.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,37 +47,37 @@ public class PointValueBO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 设备ID
+     * Device ID associated with the point value
      */
     private Long deviceId;
 
     /**
-     * 位号ID
+     * Point ID associated with the value
      */
     private Long pointId;
 
     /**
-     * 原始值
+     * Raw value as received from the device
      */
     private String rawValue;
 
     /**
-     * 处理值
+     * Calculated/processed value after transformations
      */
     private String calValue;
 
     /**
-     * 驱动ID
+     * Driver ID that collected the data
      */
     private Long driverId;
 
     /**
-     * 创建时间
+     * Timestamp when the value was created
      */
     private LocalDateTime createTime;
 
     /**
-     * 操作时间
+     * Timestamp when the value was last operated on
      */
     private LocalDateTime operateTime;
 }

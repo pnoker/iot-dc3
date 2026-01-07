@@ -15,20 +15,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# # The following content will be overwritten by application-[dev|test|pre|pro].yml,
-# that is: if the following properties are configured in application-[dev|test|pre|pro].yml,
-# the property values configured in application.yml will be the main ones.
+# Global default web configuration.
+# The following properties can be overridden in environment-specific files:
+# application-dev.yml, application-test.yml, application-pre.yml, application-pro.yml.
+# If the same property exists in those files, their values will take precedence.
 spring:
   transaction:
+    # Enable rollback when a failure happens at transaction commit time.
     rollback-on-commit-failure: true
   main:
+    # Allow bean definition overriding between different auto-configurations or modules.
     allow-bean-definition-overriding: true
   web:
     resources:
+      # Disable default static resource mappings provided by Spring Boot.
+      # Static resource handling will be customized by the application if needed.
       add-mappings: false
 
 management:
   endpoints:
     web:
       exposure:
+        # Expose the Prometheus actuator endpoint for metrics scraping.
         include: prometheus

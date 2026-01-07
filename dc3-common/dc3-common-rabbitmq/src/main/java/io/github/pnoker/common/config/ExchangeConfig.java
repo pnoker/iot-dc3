@@ -26,6 +26,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * RabbitMQ Exchange Configuration Class
+ * <p>
+ * Configuration class for defining RabbitMQ topic exchanges in IoT DC3 platform.
+ * Configures different exchanges for events, metadata, commands, data, and MQTT.
+ * Each exchange serves different messaging purposes in the system architecture.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -37,9 +44,9 @@ import org.springframework.context.annotation.Configuration;
 public class ExchangeConfig {
 
     /**
-     * 事件相关, 平台端可负载
+     * Event exchange for platform-side load balancing
      *
-     * @return TopicExchange
+     * @return TopicExchange bean for event messages
      */
     @Bean
     TopicExchange eventExchange() {
@@ -47,9 +54,9 @@ public class ExchangeConfig {
     }
 
     /**
-     * 元数据相关, 平台端广播, 驱动端订阅
+     * Metadata exchange for platform broadcasting and driver subscription
      *
-     * @return FanoutExchange
+     * @return TopicExchange bean for metadata messages
      */
     @Bean
     TopicExchange metadataExchange() {
@@ -57,9 +64,9 @@ public class ExchangeConfig {
     }
 
     /**
-     * 指令相关, 驱动端可负载
+     * Command exchange for driver-side load balancing
      *
-     * @return TopicExchange
+     * @return TopicExchange bean for command messages
      */
     @Bean
     TopicExchange commandExchange() {
@@ -67,9 +74,9 @@ public class ExchangeConfig {
     }
 
     /**
-     * 数据相关, 平台端可负载
+     * Data exchange for platform-side load balancing
      *
-     * @return TopicExchange
+     * @return TopicExchange bean for data messages
      */
     @Bean
     TopicExchange valueExchange() {
@@ -77,9 +84,9 @@ public class ExchangeConfig {
     }
 
     /**
-     * MQTT 相关, 平台端可负载
+     * MQTT exchange for platform-side load balancing
      *
-     * @return TopicExchange
+     * @return TopicExchange bean for MQTT messages
      */
     @Bean
     TopicExchange mqttExchange() {

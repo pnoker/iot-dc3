@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 分组表
+ * Group data table entity.
  * </p>
  *
  * @author pnoker
@@ -45,103 +45,103 @@ public class GroupDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * Primary key ID.
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
-     * 父分组ID
+     * Parent group ID.
      */
     @TableField("parent_group_id")
     private Long parentGroupId;
 
     /**
-     * 分组类型标识
+     * Group type flag.
      */
     @TableField("group_type_flag")
     private Byte groupTypeFlag;
 
     /**
-     * 分组名称
+     * Group name.
      */
     @TableField("group_name")
     private String groupName;
 
     /**
-     * 分组编号
+     * Group code.
      */
     @TableField("group_code")
     private String groupCode;
 
     /**
-     * 分组层级
+     * Group level.
      */
     @TableField("group_level")
     private Byte groupLevel;
 
     /**
-     * 分组顺序
+     * Group index/order.
      */
     @TableField("group_index")
     private Byte groupIndex;
 
     /**
-     * 使能标识, 0:启用, 1:禁用
+     * Enable flag, {@code 0} for enabled, {@code 1} for disabled.
      */
     @TableField("enable_flag")
     private Byte enableFlag;
 
     /**
-     * 租户ID
+     * Tenant ID.
      */
     @TableField("tenant_id")
     private Long tenantId;
 
     /**
-     * 描述
+     * Remark or description.
      */
     @TableField("remark")
     private String remark;
 
     /**
-     * 创建者ID
+     * Creator ID.
      */
     @TableField("creator_id")
     private Long creatorId;
 
     /**
-     * 创建者名称
+     * Creator name.
      */
     @TableField("creator_name")
     private String creatorName;
 
     /**
-     * 创建时间
+     * Creation time.
      */
     @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
-     * 操作者ID
+     * Operator ID.
      */
     @TableField("operator_id")
     private Long operatorId;
 
     /**
-     * 操作者名称
+     * Operator name.
      */
     @TableField("operator_name")
     private String operatorName;
 
     /**
-     * 操作时间
+     * Operation time.
      */
     @TableField("operate_time")
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识, 0:未删除, 1:已删除
+     * Logical delete flag, {@code 0} for not deleted, {@code 1} for deleted.
      */
     @TableLogic
     @TableField("deleted")

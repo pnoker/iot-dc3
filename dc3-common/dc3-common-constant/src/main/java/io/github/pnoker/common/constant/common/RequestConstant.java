@@ -18,7 +18,7 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- * Constants related to requests
+ * HTTP request related constants.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,7 +27,7 @@ package io.github.pnoker.common.constant.common;
 public class RequestConstant {
 
     /**
-     * Maximum request size limit
+     * Default maximum request count limit.
      */
     public static final int DEFAULT_MAX_REQUEST_SIZE = 100;
 
@@ -36,7 +36,7 @@ public class RequestConstant {
     }
 
     /**
-     * Constants related to custom request headers
+     * Custom request header related constants.
      *
      * @author pnoker
      * @version 2025.9.0
@@ -45,26 +45,23 @@ public class RequestConstant {
     public static class Header {
 
         /**
-         * Custom tenant ID header
-         * Used in frontend request headers
+         * Custom tenant code request header, used by frontend requests.
          */
         public static final String X_AUTH_TENANT = "X-Auth-Tenant";
 
         /**
-         * Custom user login name header
-         * Used in frontend request headers
+         * Custom user login name request header, used by frontend requests.
          */
         public static final String X_AUTH_LOGIN = "X-Auth-Login";
 
         /**
-         * Custom token header
-         * Used in frontend request headers
+         * Custom token request header, used by frontend requests.
          */
         public static final String X_AUTH_TOKEN = "X-Auth-Token";
 
         /**
-         * Custom user header
-         * Used to pass user information to other services, including: tenant ID, user ID, user nickname, user name
+         * Custom user request header.
+         * Used to pass user information to other services, including tenant ID, user ID, user nickname, and username.
          */
         public static final String X_AUTH_USER = "X-Auth-User";
 
@@ -75,7 +72,7 @@ public class RequestConstant {
     }
 
     /**
-     * Constants related to custom request messages
+     * Custom request message related constants.
      *
      * @author pnoker
      * @version 2025.9.0
@@ -84,7 +81,7 @@ public class RequestConstant {
     public static class Message {
 
         /**
-         * Invalid authorization request header
+         * Invalid authorization request header message.
          */
         public static final String INVALID_REQUEST = "Invalid request auth header";
 
@@ -94,7 +91,7 @@ public class RequestConstant {
     }
 
     /**
-     * Constants related to custom request keys
+     * Custom request key related constants.
      *
      * @author pnoker
      * @version 2025.9.0
@@ -103,7 +100,7 @@ public class RequestConstant {
     public static class Key {
 
         /**
-         * User header key
+         * User request header key used in context.
          */
         public static final String USER_HEADER = "USER_HEADER_KEY";
 

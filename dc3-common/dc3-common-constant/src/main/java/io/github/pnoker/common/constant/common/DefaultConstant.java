@@ -18,7 +18,7 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- * 默认 相关常量
+ * Default value related constants.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,42 +27,42 @@ package io.github.pnoker.common.constant.common;
 public class DefaultConstant {
 
     /**
-     * 默认 Integer 空值: -1
+     * Default {@link Integer} null value: {@code -1}.
      */
     public static final Integer NULL_INT = -1;
 
     /**
-     * 默认 Integer 零值: 0
+     * Default {@link Integer} zero value: {@code 0}.
      */
     public static final Integer DEFAULT_INT = 0;
 
     /**
-     * 零: 0
+     * Zero constant: {@code 0}.
      */
     public static final Integer ZERO = 0;
 
     /**
-     * 一: 1
+     * One constant: {@code 1}.
      */
     public static final Integer ONE = 1;
 
     /**
-     * 默认 String 空值: nil
+     * Default username.
      */
     public static final String USER_NAME = "pnoker";
 
     /**
-     * 默认 String 空值: nil
+     * Default {@link String} null value: {@code "nil"}.
      */
     public static final String NULL_STRING = "nil";
 
     /**
-     * 默认分页数
+     * Default page size.
      */
     public static final Integer PAGE_SIZE = 20;
 
     /**
-     * 默认最大分页数
+     * Default maximum page size.
      */
     public static final Integer MAX_PAGE_SIZE = 100;
 

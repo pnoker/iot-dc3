@@ -22,56 +22,47 @@ package api.common.auth;
 import "api/common/base.proto";
 import "api/common/r.proto";
 
-/*
-Config
-*/
+// Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.auth";
 option java_outer_classname = "UserLoginProto";
 option objc_class_prefix = "Auth";
 option java_multiple_files = true;
 
-/*
-Api
-Service interface defining user login-related RPC calls
-*/
+// Service interface defining user login-related RPC calls
 service UserLoginApi {
   // Query user login information by login name
   rpc SelectByName (GrpcNameQuery) returns (GrpcRUserLoginDTO);
 }
 
-// selectByName Query
 // Request message for querying by name
 message GrpcNameQuery {
-  string name = 1; // Login name used to query user login info
+  // Login name used to query user login info
+  string name = 1;
 }
 
-// R of UserLogin DTO
 // Response wrapper for user login information
 message GrpcRUserLoginDTO {
-  /*
-  R
-  Common result wrapper with status code, message, etc.
-  */
+  // Common result wrapper with status code, message, etc.
   GrpcR result = 1;
 
-  /*
-  Data
-  Returned user login data
-  */
+  // Returned user login data
   GrpcUserLoginDTO data = 2;
 }
 
-// UserLogin DTO
 // User login data structure with basic information
 message GrpcUserLoginDTO {
-  /*
-  Base
-  Common base fields (e.g., ID, creation time, etc.)
-  */
+  // Common base fields (e.g., ID, creation time, etc.)
   GrpcBase base = 1;
 
-  string login_name = 2; // Login name, the username used to sign in
-  int64 user_id = 3; // User ID, references the specific user
-  int64 user_password_id = 4; // User password ID, references the password record
-  int32 enable_flag = 5; // Enable flag: 1 enabled, 0 disabled
+  // Login name, the username used to sign in
+  string login_name = 2;
+
+  // User ID, references the specific user
+  int64 user_id = 3;
+
+  // User password ID, references the password record
+  int64 user_password_id = 4;
+
+  // Enable flag: 1 enabled, 0 disabled
+  int32 enable_flag = 5;
 }

@@ -36,7 +36,12 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Exception 配置
+ * Global Exception Handler Configuration
+ * <p>
+ * Global exception handler for reactive web applications using @RestControllerAdvice.
+ * Provides centralized exception handling for common exceptions and validation errors,
+ * returning standardized error responses.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -47,11 +52,11 @@ import java.util.List;
 public class ExceptionConfig {
 
     /**
-     * Global Exception
+     * Handle global exceptions
      *
-     * @param exception Exception
-     * @param request   ServerHttpRequest
-     * @return Mono R
+     * @param exception Exception to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -65,11 +70,11 @@ public class ExceptionConfig {
     }
 
     /**
-     * NotFound Exception
+     * Handle NotFoundException
      *
-     * @param exception NotFoundException
-     * @param request   ServerHttpRequest
-     * @return Mono R
+     * @param exception NotFoundException to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response
      */
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -79,11 +84,11 @@ public class ExceptionConfig {
     }
 
     /**
-     * UnAuthorized Exception
+     * Handle UnAuthorizedException
      *
-     * @param exception UnAuthorizedException
-     * @param request   ServerHttpRequest
-     * @return Mono R
+     * @param exception UnAuthorizedException to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response
      */
     @ExceptionHandler(UnAuthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -93,11 +98,11 @@ public class ExceptionConfig {
     }
 
     /**
-     * Validation Exception
+     * Handle validation exceptions
      *
-     * @param exception MethodArgumentNotValidException
-     * @param request   ServerHttpRequest
-     * @return Mono R
+     * @param exception MethodArgumentNotValidException or BindException to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response with field validation details
      */
     @ExceptionHandler({
             BindException.class,

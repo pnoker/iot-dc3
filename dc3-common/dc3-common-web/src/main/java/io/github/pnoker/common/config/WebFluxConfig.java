@@ -28,7 +28,12 @@ import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 /**
- * WebFlux 配置
+ * WebFlux Configuration Class
+ * <p>
+ * Configuration class for Spring WebFlux reactive web framework.
+ * Configures resource handlers for static files and custom JSON message codecs
+ * using the project's JsonUtil for consistent serialization.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -39,11 +44,21 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 @Configuration
 public class WebFluxConfig implements WebFluxConfigurer {
 
+    /**
+     * Configure static resource handlers
+     *
+     * @param registry ResourceHandlerRegistry for configuring static resources
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/favicon.ico").addResourceLocations("classpath:/static/");
     }
 
+    /**
+     * Configure HTTP message codecs for JSON serialization/deserialization
+     *
+     * @param configurer ServerCodecConfigurer for configuring message codecs
+     */
     @Override
     public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
         configurer.customCodecs().registerWithDefaultConfig(new Jackson2JsonEncoder(JsonUtil.getJsonMapper()));

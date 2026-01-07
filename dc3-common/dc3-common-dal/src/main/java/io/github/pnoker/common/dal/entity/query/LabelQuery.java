@@ -46,29 +46,29 @@ public class LabelQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID.
      */
     private Long tenantId;
 
-    // 查询字段
+    // Query fields
 
     /**
-     * 标签名称
+     * Label name.
      */
     private String labelName;
 
     /**
-     * 标签颜色
+     * Label color.
      */
     private String color;
 
     /**
-     * 实体标识
+     * Entity type flag.
      */
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
-     * 使能标识
+     * Enable status flag.
      */
     private EnableFlagEnum enableFlag;
 }

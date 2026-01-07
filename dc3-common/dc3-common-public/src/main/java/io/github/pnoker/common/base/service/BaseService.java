@@ -20,7 +20,12 @@ package io.github.pnoker.common.base.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
- * 基础 Service 类接口
+ * Base Service Interface
+ * <p>
+ * Generic service interface defining standard CRUD operations
+ * for entity management in IoT DC3 platform.
+ * Provides common methods for create, read, update, and delete operations.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,49 +34,39 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public interface BaseService<B, Q> {
 
     /**
-     * <p>
-     * 新增
-     * </p>
+     * Save entity to database
      *
-     * @param entityBO Entity of BO
+     * @param entityBO Business object to save
      */
     void save(B entityBO);
 
     /**
-     * <p>
-     * 删除
-     * </p>
+     * Remove entity by ID
      *
-     * @param id Entity ID
+     * @param id Entity ID to remove
      */
     void remove(Long id);
 
     /**
-     * <p>
-     * 更新
-     * </p>
+     * Update existing entity
      *
-     * @param entityBO Entity of BO
+     * @param entityBO Business object with updated data
      */
     void update(B entityBO);
 
     /**
-     * <p>
-     * 主键查询
-     * </p>
+     * Select entity by primary key
      *
-     * @param id Entity ID
-     * @return Entity of BO
+     * @param id Entity ID to query
+     * @return Business object of the entity
      */
     B selectById(Long id);
 
     /**
-     * <p>
-     * 分页查询
-     * </p>
+     * Select entities with pagination
      *
-     * @param entityQuery Entity of Query
-     * @return Entity of BO Page
+     * @param entityQuery Query object with pagination parameters
+     * @return Paginated result of business objects
      */
     Page<B> selectByPage(Q entityQuery);
 }

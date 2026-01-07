@@ -21,7 +21,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Auth Center Service Startup Portal
+ * Authentication Center Service Application
+ * <p>
+ * Main entry point for the Authentication Center Service.
+ * This service handles user authentication, authorization, and token management.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -29,6 +33,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class AuthApplication {
+
+    /**
+     * Main entry point for the Authentication Center Service.
+     * 
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(AuthApplication.class, args);
     }

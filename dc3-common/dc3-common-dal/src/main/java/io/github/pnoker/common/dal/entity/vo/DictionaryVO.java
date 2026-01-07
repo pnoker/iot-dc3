@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Dictionary VO
+ * Dictionary view object (VO) representing hierarchical dictionary items.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -43,32 +43,32 @@ public class DictionaryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 字典类型
+     * Dictionary type.
      */
     private String type;
 
     /**
-     * 字典标签名称
+     * Dictionary label name.
      */
     private String label;
 
     /**
-     * 字典标签值
+     * Dictionary label value.
      */
     private String value;
 
     /**
-     * 是否禁用
+     * Whether the dictionary item is disabled.
      */
     private boolean disabled;
 
     /**
-     * 是否展开
+     * Whether the dictionary node is expanded.
      */
     private boolean expand;
 
     /**
-     * 子节点
+     * Child dictionary nodes.
      */
     private List<DictionaryVO> children;
 }

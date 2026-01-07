@@ -32,7 +32,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Types;
 
 /**
- * Mybatis  Util
+ * MyBatis Utility Class
+ * <p>
+ * Utility class for MyBatis-Plus code generation and configuration.
+ * Provides methods to configure database connections, global settings,
+ * data source settings, and strategy configurations for automatic code generation.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -46,17 +51,17 @@ public class MybatisUtil {
     }
 
     /**
-     * 默认的代码生成器
+     * Default code generator for MyBatis-Plus
      * <p>
-     * 数据库相关的连接参数会被环境变量覆盖
+     * Database connection parameters can be overridden by environment variables
      *
-     * @param defaultHost     默认的数据库主机
-     * @param defaultPort     默认的数据库端口
-     * @param defaultDb       默认的数据库名称
-     * @param defaultSchema   默认的数据库 Schema
-     * @param defaultUsername 默认的数据库用户名
-     * @param defaultPassword 默认的数据库密码
-     * @return FastAutoGenerator
+     * @param defaultHost     Default database host
+     * @param defaultPort     Default database port
+     * @param defaultDb       Default database name
+     * @param defaultSchema   Default database schema
+     * @param defaultUsername Default database username
+     * @param defaultPassword Default database password
+     * @return Configured FastAutoGenerator instance
      */
     public static FastAutoGenerator defaultGenerator(String defaultHost, String defaultPort, String defaultDb, String defaultSchema, String defaultUsername, String defaultPassword) {
         String host = System.getenv("POSTGRES_HOST");
@@ -92,10 +97,10 @@ public class MybatisUtil {
     }
 
     /**
-     * 默认的全局配置
+     * Default global configuration for code generation
      *
-     * @param builder {@link GlobalConfig.Builder}
-     * @param path    生成文件的根目录
+     * @param builder GlobalConfig.Builder instance
+     * @param path    Root directory for generated files
      */
     public static void defaultGlobalConfig(GlobalConfig.Builder builder, String path) {
         builder.outputDir(path + "/java")
@@ -105,9 +110,9 @@ public class MybatisUtil {
     }
 
     /**
-     * 默认的数据源配置
+     * Default data source configuration for code generation
      *
-     * @param builder {@link DataSourceConfig.Builder}
+     * @param builder DataSourceConfig.Builder instance
      */
     public static void defaultDataSourceConfig(DataSourceConfig.Builder builder) {
         builder.typeConvertHandler((globalConfig, typeRegistry, metaInfo) -> {
@@ -120,9 +125,9 @@ public class MybatisUtil {
     }
 
     /**
-     * 默认的生成策略配置
+     * Default strategy configuration for code generation
      *
-     * @param builder {@link StrategyConfig.Builder}
+     * @param builder StrategyConfig.Builder instance
      */
     public static void defaultStrategyConfig(StrategyConfig.Builder builder) {
         builder.addTablePrefix("dc3_")

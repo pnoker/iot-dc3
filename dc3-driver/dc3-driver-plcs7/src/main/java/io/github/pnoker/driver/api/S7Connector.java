@@ -19,7 +19,13 @@ package io.github.pnoker.driver.api;
 import java.io.Closeable;
 
 /**
+ * Interface for connecting to Siemens S7 PLCs.
+ * This interface provides methods to read from and write to different memory areas
+ * in Siemens S7 programmable logic controllers.
+ * 
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public interface S7Connector extends Closeable {
     /**

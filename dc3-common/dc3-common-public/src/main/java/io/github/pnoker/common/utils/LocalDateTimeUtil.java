@@ -28,7 +28,7 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 /**
- * 时间(不时区, 默认上海时区) 相关工具类
+ * Local date-time utility class (without time zone, default Shanghai time zone).
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,9 +42,9 @@ public class LocalDateTimeUtil {
     }
 
     /**
-     * 获取默认的时间格式
+     * Get the default date-time format.
      * <p>
-     * yyyy-MM-dd HH:mm:ss
+     * Pattern: yyyy-MM-dd HH:mm:ss
      *
      * @return {@link DateTimeFormatter}
      */
@@ -53,9 +53,9 @@ public class LocalDateTimeUtil {
     }
 
     /**
-     * 获取完整的时间格式
+     * Get the complete date-time format.
      * <p>
-     * yyyy-MM-dd HH:mm:ss.SSS
+     * Pattern: yyyy-MM-dd HH:mm:ss.SSS
      *
      * @return {@link DateTimeFormatter}
      */
@@ -64,7 +64,7 @@ public class LocalDateTimeUtil {
     }
 
     /**
-     * 获取当前时间
+     * Get the current time with default time zone.
      *
      * @return LocalDateTime {@link LocalDateTime}
      */
@@ -73,19 +73,19 @@ public class LocalDateTimeUtil {
     }
 
     /**
-     * 获取毫秒
+     * Get milliseconds from the given {@link LocalDateTime}.
      *
      * @param localDateTime {@link LocalDateTime}
-     * @return 毫秒
+     * @return Milliseconds
      */
     public static long milliSeconds(LocalDateTime localDateTime) {
         return localDateTime.atZone(TimeConstant.DEFAULT_ZONEID).toInstant().toEpochMilli();
     }
 
     /**
-     * 获取 DateTime
+     * Get a {@link LocalDateTime} from milliseconds.
      *
-     * @param milliSeconds 毫秒
+     * @param milliSeconds Milliseconds
      * @return LocalDateTime {@link LocalDateTime}
      */
     public static LocalDateTime dateTime(long milliSeconds) {
@@ -94,11 +94,11 @@ public class LocalDateTimeUtil {
     }
 
     /**
-     * 推迟时间 HOUR/MINUTE/...
+     * Delay time by the specified amount and unit, e.g., HOUR/MINUTE/...
      *
      * @param amount Integer
      * @param field  ChronoUnit field : {@link ChronoUnit ChronoUnit.HOUR/MINUTE/...}
-     * @return Date
+     * @return LocalDateTime
      */
     public static LocalDateTime expireTime(int amount, ChronoUnit field) {
         LocalDateTime localDateTime = LocalDateTimeUtil.now();
@@ -106,10 +106,10 @@ public class LocalDateTimeUtil {
     }
 
     /**
-     * 使用 yyyy-MM-dd HH:mm:ss 格式化时间
+     * Format time using the pattern yyyy-MM-dd HH:mm:ss.
      *
      * @param localDateTime {@link LocalDateTime}
-     * @return R of String
+     * @return Formatted time string
      */
     public static String defaultFormat(LocalDateTime localDateTime) {
         DateTimeFormatter formatter = getDefaultDateTimeFormatter();
@@ -117,10 +117,10 @@ public class LocalDateTimeUtil {
     }
 
     /**
-     * 使用 yyyy-MM-dd HH:mm:ss.SSS 格式化时间
+     * Format time using the pattern yyyy-MM-dd HH:mm:ss.SSS.
      *
      * @param localDateTime {@link LocalDateTime}
-     * @return R of String
+     * @return Formatted time string
      */
     public static String completeFormat(LocalDateTime localDateTime) {
         DateTimeFormatter formatter = getCompleteDateTimeFormatter();
@@ -128,10 +128,10 @@ public class LocalDateTimeUtil {
     }
 
     /**
-     * 将时间字符串 yyyy-MM-dd HH:mm:ss 转为时间类型
+     * Parse a time string in the pattern yyyy-MM-dd HH:mm:ss to {@link LocalDateTime}.
      *
      * @param dateString yyyy-MM-dd HH:mm:ss
-     * @return Date
+     * @return LocalDateTime or {@code null} if parsing fails
      */
     public static LocalDateTime defaultDate(String dateString) {
         try {
@@ -143,10 +143,10 @@ public class LocalDateTimeUtil {
     }
 
     /**
-     * 将时间字符串 yyyy-MM-dd HH:mm:ss.SSS
+     * Parse a time string in the pattern yyyy-MM-dd HH:mm:ss.SSS to {@link LocalDateTime}.
      *
-     * @param dateString Date String
-     * @return Date
+     * @param dateString Date string
+     * @return LocalDateTime or {@code null} if parsing fails
      */
     public static LocalDateTime completeDate(String dateString) {
         try {

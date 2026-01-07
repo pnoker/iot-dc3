@@ -23,6 +23,13 @@ import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import java.util.List;
 
 /**
+ * MQTT Receive Service Interface
+ * <p>
+ * Service interface for handling received MQTT messages in IoT DC3 platform.
+ * Provides methods for single and batch message processing with
+ * data parsing and publishing capabilities.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0

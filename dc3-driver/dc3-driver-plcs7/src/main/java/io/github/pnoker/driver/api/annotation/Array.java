@@ -19,9 +19,13 @@ package io.github.pnoker.driver.api.annotation;
 import java.lang.annotation.*;
 
 /**
- * Annotation for array-declaration
- *
+ * Annotation for marking fields as arrays in S7 PLC data structures.
+ * This annotation is used to specify the size of array fields when mapping
+ * Java objects to S7 PLC data blocks.
+ * 
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Target(value = {ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

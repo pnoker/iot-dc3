@@ -18,6 +18,12 @@
 package io.github.pnoker.common.mqtt.service;
 
 /**
+ * MQTT Schedule Service Interface
+ * <p>
+ * Service interface for MQTT scheduling operations in IoT DC3 platform.
+ * Provides methods to initialize and manage MQTT-related scheduling tasks.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0

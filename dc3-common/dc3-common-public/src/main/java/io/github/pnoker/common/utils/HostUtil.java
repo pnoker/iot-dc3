@@ -24,7 +24,11 @@ import java.net.*;
 import java.util.*;
 
 /**
- * Host 相关工具类
+ * Host Utility Class
+ * <p>
+ * Utility class for host and network operations in IoT DC3 platform.
+ * Provides methods for getting IP addresses, hostnames, and network information.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,9 +42,9 @@ public class HostUtil {
     }
 
     /**
-     * 获取当前主机的 Local Host
+     * Get the local host address of the current machine.
      *
-     * @return R of String
+     * @return Local host IP address as String, or {@code null} if unavailable
      */
     public static String localHost() {
         try {
@@ -94,9 +98,9 @@ public class HostUtil {
     }
 
     /**
-     * 获取电脑 Mac 物理地址列表
+     * Get the list of MAC (physical) addresses of the current machine.
      *
-     * @return Mac Array
+     * @return List of MAC addresses
      */
     public static List<String> localMacList() {
         ArrayList<String> macList = new ArrayList<>(16);

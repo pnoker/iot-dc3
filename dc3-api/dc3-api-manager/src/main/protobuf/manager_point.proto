@@ -24,56 +24,33 @@ import "api/common/r.proto";
 import "api/common/entity.proto";
 import "manager_query_page.proto";
 
-/*
-Config
-*/
+// Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "PointProto";
 option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
-/*
-Api
-Service interfaces defining RPC calls related to point management
-*/
+// Service interface defining RPC calls related to point management
 service PointApi {
   // Paginated query for point information
   rpc SelectByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
 }
 
-/*
-Point R Page
-Response structure for paginated point query
-*/
+// Response wrapper for paginated point query
 message GrpcRPagePointDTO {
-  /*
-  R
-  Generic return result containing status code, message, etc.
-  */
+  // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  /*
-  Data
-  Returned paginated point data
-  */
+  // Returned paginated point data
   GrpcPagePointDTO data = 2;
 }
 
-/*
-Point Page
-Point pagination data structure
-*/
+// Point pagination data structure
 message GrpcPagePointDTO {
-  /*
-  Page
-  Pagination information including page number, page size, total count etc.
-  */
+  // Pagination information including page number, page size, and total count
   GrpcPage page = 1;
 
-  /*
-  Data
-  List of point data
-  */
+  // List of point data
   repeated GrpcPointDTO data = 2;
 }
 

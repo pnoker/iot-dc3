@@ -22,6 +22,17 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Data access layer (DAL) auto-configuration.
+ * <p>
+ * Responsible for scanning DAL components (services, managers, builders, etc.)
+ * and MyBatis mapper interfaces under the {@code io.github.pnoker.common.dal} package.
+ * </p>
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 @Slf4j
 @Configuration
 @ComponentScan(basePackages = {

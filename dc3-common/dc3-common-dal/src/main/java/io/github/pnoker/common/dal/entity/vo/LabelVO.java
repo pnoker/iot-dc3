@@ -28,7 +28,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 /**
- * Label VO
+ * Label view object (VO) used for API responses and client interactions.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -43,7 +43,7 @@ import lombok.*;
 public class LabelVO extends BaseVO {
 
     /**
-     * 标签名称
+     * Label name.
      */
     @NotBlank(message = "标签名称不能为空",
             groups = {Add.class})
@@ -53,22 +53,22 @@ public class LabelVO extends BaseVO {
     private String labelName;
 
     /**
-     * 标签编号
+     * Label code.
      */
     private String labelCode;
 
     /**
-     * 标签颜色
+     * Label color.
      */
     private String labelColor;
 
     /**
-     * 实体标识
+     * Entity type flag.
      */
     private EntityTypeFlagEnum entityTypeFlag;
 
     /**
-     * 使能标识
+     * Enable status flag.
      */
     private EnableFlagEnum enableFlag;
 }

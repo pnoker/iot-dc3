@@ -21,6 +21,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
+ * OPC-DA Driver Application for DC3 IoT Platform.
+ * This driver implements communication with OPC-DA servers and devices,
+ * providing data collection and device management capabilities.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -28,6 +32,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class OpcDaApplication {
 
+    /**
+     * Main method to start the OPC-DA driver application
+     *
+     * @param args Command line arguments passed to the application
+     */
     public static void main(String[] args) {
         SpringApplication.run(OpcDaApplication.class, args);
     }

@@ -26,7 +26,12 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Response
+ * Unified Response Wrapper Class
+ * <p>
+ * Generic response wrapper class for API responses in IoT DC3 platform.
+ * Provides standardized response format with status, code, message, and data fields.
+ * Supports both success and failure response scenarios.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,79 +47,79 @@ public class R<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 响应状态
+     * Response status flag
      */
     private boolean ok = false;
 
     /**
-     * 响应编码
+     * Response status code
      */
     private String code = ResponseEnum.OK.getCode();
 
     /**
-     * 响应信息
+     * Response message
      */
     private String message = ResponseEnum.OK.getText();
 
     /**
-     * 响应数据
+     * Response data payload
      */
     @SuppressWarnings("all")
     private T data;
 
     /**
-     * 构造函数
+     * Private default constructor
      */
     private R() {
     }
 
     /**
-     * 构造函数
+     * Private constructor with data
      *
-     * @param data 数据
+     * @param data Response data payload
      */
     private R(T data) {
         this.data = data;
     }
 
     /**
-     * 成功
+     * Create success response with default settings
      *
-     * @param <T> Object
-     * @return Response
+     * @param <T>     Response data type
+     * @return Response with success status
      */
     public static <T> R<T> ok() {
         return new R<T>().success();
     }
 
     /**
-     * 成功 自定义提示信息
+     * Create success response with custom message
      *
-     * @param <T>     Object
-     * @param message 成功信息
-     * @return Response
+     * @param <T>     Response data type
+     * @param message Custom success message
+     * @return Response with success status and custom message
      */
     public static <T> R<T> ok(String message) {
         return new R<T>().success(message);
     }
 
     /**
-     * 成功 自定义 Code 和 提示信息ff
+     * Create success response with custom code and message
      *
-     * @param <T>  Object
-     * @param code {@link ResponseEnum}
-     * @return Response
+     * @param <T>     Response data type
+     * @param code    {@link ResponseEnum} custom response code
+     * @return Response with success status and custom code/message
      */
     public static <T> R<T> ok(ResponseEnum code) {
         return new R<T>().success(code.getCode(), code.getText());
     }
 
     /**
-     * 成功 自定义 Code 和 提示信息
+     * Success response with custom code and message.
      *
      * @param <T>     Object
      * @param code    {@link ResponseEnum}
-     * @param message 成功信息
+     * @param message Success message
      * @return Response
      */
     public static <T> R<T> ok(ResponseEnum code, String message) {
@@ -122,10 +127,10 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 成功 返回结果
+     * Success response with data.
      *
      * @param <T>  Object
-     * @param data 返回结果
+     * @param data Response data
      * @return Response
      */
     public static <T> R<T> ok(T data) {
@@ -133,11 +138,11 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 成功 返回结果 和 自定义提示信息
+     * Success response with data and custom message.
      *
      * @param <T>     Object
-     * @param data    返回结果
-     * @param message 成功信息
+     * @param data    Response data
+     * @param message Success message
      * @return Response
      */
     public static <T> R<T> ok(T data, String message) {
@@ -145,7 +150,7 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败
+     * Failure response with default settings.
      *
      * @param <T> Object
      * @return Response
@@ -155,10 +160,10 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败 自定义提示信息
+     * Failure response with custom message.
      *
      * @param <T>     Object
-     * @param message 失败信息
+     * @param message Failure message
      * @return Response
      */
     public static <T> R<T> fail(String message) {
@@ -166,7 +171,7 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败 自定义 Code 和 提示信息
+     * Failure response with custom code.
      *
      * @param <T>  Object
      * @param code {@link ResponseEnum}
@@ -177,11 +182,11 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败 自定义 Code 和 提示信息
+     * Failure response with custom code and message.
      *
      * @param <T>     Object
      * @param code    {@link ResponseEnum}
-     * @param message 失败信息
+     * @param message Failure message
      * @return Response
      */
     public static <T> R<T> fail(ResponseEnum code, String message) {
@@ -189,10 +194,10 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败 返回结果
+     * Failure response with data.
      *
      * @param <T>  Object
-     * @param data 返回结果
+     * @param data Response data
      * @return Response
      */
     public static <T> R<T> fail(T data) {
@@ -200,11 +205,11 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败 返回结果 和 自定义提示信息
+     * Failure response with data and custom message.
      *
      * @param <T>     Object
-     * @param data    返回结果
-     * @param message 失败信息
+     * @param data    Response data
+     * @param message Failure message
      * @return Response
      */
     public static <T> R<T> fail(T data, String message) {
@@ -212,7 +217,7 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 成功
+     * Internal success handler with default settings.
      *
      * @return Response
      */
@@ -224,9 +229,9 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 成功 自定义提示信息
+     * Internal success handler with custom message.
      *
-     * @param message 成功提示信息
+     * @param message Success message
      * @return Response
      */
     private R<T> success(String message) {
@@ -237,10 +242,10 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 成功 自定义提示信息
+     * Internal success handler with custom code and message.
      *
      * @param code    Code
-     * @param message 成功提示信息
+     * @param message Success message
      * @return Response
      */
     private R<T> success(String code, String message) {
@@ -251,7 +256,7 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败
+     * Internal failure handler with default settings.
      *
      * @return Response
      */
@@ -263,9 +268,9 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败 自定义提示信息
+     * Internal failure handler with custom message.
      *
-     * @param message 错误提示信息
+     * @param message Error message
      * @return Response
      */
     private R<T> failure(String message) {
@@ -276,10 +281,10 @@ public class R<T> implements Serializable {
     }
 
     /**
-     * 失败 自定义提示信息
+     * Internal failure handler with custom code and message.
      *
      * @param code    Code
-     * @param message 错误提示信息
+     * @param message Error message
      * @return Response
      */
     private R<T> failure(String code, String message) {

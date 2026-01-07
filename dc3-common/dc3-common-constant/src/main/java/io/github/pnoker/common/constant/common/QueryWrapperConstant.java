@@ -18,7 +18,10 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- * Query related constants
+ * Query wrapper related constants
+ * <p>
+ * Provides constants for SQL query wrapper operations, typically used with MyBatis-Plus.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,7 +30,7 @@ package io.github.pnoker.common.constant.common;
 public class QueryWrapperConstant {
 
     /**
-     * LIMIT
+     * SQL LIMIT clause for single record: "LIMIT 1"
      */
     public static final String LIMIT_ONE = "LIMIT 1";
 

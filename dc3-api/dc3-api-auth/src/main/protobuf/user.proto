@@ -22,58 +22,53 @@ package api.common.auth;
 import "api/common/base.proto";
 import "api/common/r.proto";
 
-/*
-Config
-*/
-option java_package = "io.github.pnoker.api.center.auth";
+// Configuration options for code generation
+option java_package = "io.github.pnoker.api.common.auth";
 option java_outer_classname = "UserProto";
 option objc_class_prefix = "Auth";
 option java_multiple_files = true;
 
-/*
-Api
-Service interface defining user-related RPC calls
-*/
+// Service interface defining user-related RPC calls
 service UserApi {
   // Query user information by user ID
   rpc SelectById (GrpcIdQuery) returns (GrpcRUserDTO);
 }
 
-// selectById Query
 // Request message for querying by user ID
 message GrpcIdQuery {
-  int64 id = 1; // User ID, unique identifier of a user
+  // User ID, unique identifier of a user
+  int64 id = 1;
 }
 
-// R of User DTO
 // Response wrapper for user information
 message GrpcRUserDTO {
-  /*
-  R
-  Common result wrapper with status code, message, etc.
-  */
+  // Common result wrapper containing status code, message, etc.
   GrpcR result = 1;
 
-  /*
-  Data
-  Returned user data
-  */
+  // Returned user data
   GrpcUserDTO data = 2;
 }
 
-// User DTO
-// User data structure with basic information
+// User data transfer object containing basic user information
 message GrpcUserDTO {
-  /*
-  Base
-  Common base fields (e.g., ID, creation time, etc.)
-  */
+  // Common base fields (e.g., ID, creation time, etc.)
   GrpcBase base = 1;
 
-  string nick_name = 2; // User nickname
-  string user_name = 3; // Username
-  string phone = 4; // Phone number
-  string email = 5; // Email
-  string social_ext = 6; // Social-related extension info, stored encrypted
-  string identity_ext = 7; // Identity-related extension info, stored encrypted
+  // User nickname
+  string nick_name = 2;
+
+  // Username
+  string user_name = 3;
+
+  // Phone number
+  string phone = 4;
+
+  // Email
+  string email = 5;
+
+  // Social-related extension info, stored encrypted
+  string social_ext = 6;
+
+  // Identity-related extension info, stored encrypted
+  string identity_ext = 7;
 }

@@ -28,7 +28,11 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 /**
- * 文件 相关工具类
+ * File Related Utility Class
+ * <p>
+ * Utility class for file operations including directory creation
+ * and random file name generation for temporary files.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,9 +46,9 @@ public class FileUtil {
     }
 
     /**
-     * 获取临时上传文件目录
+     * Get temporary upload file directory
      *
-     * @return 临时上传文件目录
+     * @return Temporary upload file directory path
      */
     public static String getTempPath() {
         String path = FolderConstant.TEMP_FILE_PATH;
@@ -60,9 +64,9 @@ public class FileUtil {
     }
 
     /**
-     * 获取随机的xlsx文件名
+     * Generate random XLSX file name
      *
-     * @return xlsx文件名
+     * @return Random XLSX file name with UUID
      */
     public static String getRandomXlsxName() {
         return UUID.randomUUID().toString() + ".xlsx";

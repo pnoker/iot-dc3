@@ -34,7 +34,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Environment Config
+ * MQTT Environment Configuration
+ * <p>
+ * Environment post processor for MQTT configuration in IoT DC3 platform.
+ * Sets up MQTT environment variables and property sources
+ * based on node configuration and service tags.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

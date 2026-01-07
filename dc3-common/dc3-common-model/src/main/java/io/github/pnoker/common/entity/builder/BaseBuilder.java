@@ -78,7 +78,7 @@ public interface BaseBuilder {
     /**
      * DTOList to BOList
      *
-     * @param entityDTOList EntityDTO 集合
+     * @param entityDTOList EntityDTO collection
      * @return EntityBO collection
      */
     List<BaseBO> buildBOListByDTOList(List<BaseDTO> entityDTOList);
@@ -95,7 +95,7 @@ public interface BaseBuilder {
      * BOList to DTOList
      *
      * @param entityBOList EntityBO collection
-     * @return EntityDTO 集合
+     * @return EntityDTO collection
      */
     List<BaseDTO> buildDTOListByBOList(List<BaseBO> entityBOList);
 }

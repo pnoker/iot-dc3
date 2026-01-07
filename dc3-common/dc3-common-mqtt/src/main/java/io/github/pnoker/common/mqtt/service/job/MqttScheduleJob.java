@@ -34,6 +34,13 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
+ * MQTT Schedule Job
+ * <p>
+ * Quartz job for processing MQTT messages in batch mode.
+ * Manages message counting, speed calculation, and batch processing
+ * of MQTT messages with thread-safe operations.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -83,8 +90,14 @@ public class MqttScheduleJob extends QuartzJobBean {
     }
 
     @Override
+    /**
+     * Execute scheduled job for batch MQTT message processing
+     *
+     * @param context Job execution context
+     * @throws JobExecutionException if job execution fails
+     */
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        // Statistical mqtt message receive rate
+        // Calculate MQTT message receive rate
         long speed = messageCount.getAndSet(0);
         messageSpeed.set(speed);
         speed /= interval;
@@ -92,7 +105,7 @@ public class MqttScheduleJob extends QuartzJobBean {
             log.debug("Mqtt message receiver speed: {} /s, value size: {}, interval: {}", speed, getMqttMessagesSize(), interval);
         }
 
-        // Receive batch mqtt message
+        // Process batch MQTT messages
         virtualThreadExecutor.execute(() -> {
             messageLock.writeLock().lock();
             if (!mqttMessages.isEmpty()) {

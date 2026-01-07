@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Common enable flag enumeration
+ * Common enable flag enumeration.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,37 +35,37 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum EnableFlagEnum {
     /**
-     * Enable
+     * Enabled.
      */
-    ENABLE((byte) 0, "enable", "Enable"),
+    ENABLE((byte) 0, "enable", "enable"),
 
     /**
-     * Disable
+     * Disabled.
      */
-    DISABLE((byte) 1, "disable", "Disable"),
+    DISABLE((byte) 1, "disable", "disable"),
     ;
 
     /**
-     * Index
+     * Index value stored in database.
      */
     @EnumValue
     private final Byte index;
 
     /**
-     * Code
+     * Code string.
      */
     private final String code;
 
     /**
-     * Remark
+     * Human-readable description.
      */
     private final String remark;
 
     /**
-     * Get enum by index
+     * Get enum by index value.
      *
-     * @param index Index
-     * @return {@link EnableFlagEnum}
+     * @param index index value
+     * @return {@link EnableFlagEnum} or {@code null} if not found
      */
     public static EnableFlagEnum ofIndex(Byte index) {
         Optional<EnableFlagEnum> any = Arrays.stream(EnableFlagEnum.values()).filter(type -> type.getIndex().equals(index)).findFirst();
@@ -73,10 +73,10 @@ public enum EnableFlagEnum {
     }
 
     /**
-     * Get enum by code
+     * Get enum by code string.
      *
-     * @param code Code
-     * @return {@link EnableFlagEnum}
+     * @param code code string
+     * @return {@link EnableFlagEnum} or {@code null} if not found
      */
     public static EnableFlagEnum ofCode(String code) {
         Optional<EnableFlagEnum> any = Arrays.stream(EnableFlagEnum.values()).filter(type -> type.getCode().equals(code)).findFirst();
@@ -84,10 +84,10 @@ public enum EnableFlagEnum {
     }
 
     /**
-     * Get enum by name
+     * Get enum by enum name.
      *
-     * @param name Enum name
-     * @return {@link EnableFlagEnum}
+     * @param name enum name
+     * @return {@link EnableFlagEnum} or {@code null} if parsing fails
      */
     public static EnableFlagEnum ofName(String name) {
         try {

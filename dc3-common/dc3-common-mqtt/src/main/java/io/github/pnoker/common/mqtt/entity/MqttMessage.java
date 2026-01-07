@@ -22,6 +22,13 @@ import lombok.*;
 import java.io.Serializable;
 
 /**
+ * MQTT Message Entity Class
+ * <p>
+ * Represents an MQTT message in IoT DC3 platform.
+ * Contains message header and payload data for
+ * MQTT communication and processing.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0

@@ -31,7 +31,12 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * RedisTemplate
+ * Redis Template Configuration Class
+ * <p>
+ * Configuration class for Redis template in Spring Boot applications.
+ * Configures serialization strategies for Redis operations to ensure
+ * proper data handling and type safety.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -47,14 +52,19 @@ public class RedisTemplateConfig {
         this.factory = factory;
     }
 
+    /**
+     * Configure RedisTemplate with custom serialization
+     *
+     * @return Configured RedisTemplate bean
+     */
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
-        // 配置 ObjectMapper
+        // Configure ObjectMapper for JSON serialization
         JsonMapper jsonMapper = JsonUtil.getJsonMapper();
         jsonMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(jsonMapper, Object.class);
 
-        // 配置 Key & Value 序列化
+        // Configure Key & Value serialization
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
         template.setKeySerializer(new StringRedisSerializer());

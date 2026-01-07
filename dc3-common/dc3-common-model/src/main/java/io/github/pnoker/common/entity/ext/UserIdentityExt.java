@@ -25,7 +25,7 @@ import lombok.Setter;
 /**
  * User Ext
  * <p>
- * 用户身份相关拓展信息
+ * Extended information related to user identity.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,9 +38,9 @@ import lombok.Setter;
 public class UserIdentityExt extends BaseExt {
 
     /**
-     * 拓展内容
+     * Extended content.
      * <p>
-     * 拓展内容可以根据 Type 和 Version 进行区分
+     * The content can be distinguished by Type and Version.
      */
     private Content content;
 
@@ -50,22 +50,22 @@ public class UserIdentityExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
         /**
-         * 真实姓名
+         * Real name.
          */
         private String realName;
 
         /**
-         * 性别
+         * Gender.
          */
         private String gender;
 
         /**
-         * 国籍
+         * Nationality.
          */
         private String nationality;
 
         /**
-         * 身份证号码
+         * Identification number.
          */
         private String idNumber;
     }

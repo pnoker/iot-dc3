@@ -106,10 +106,10 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     /**
-     * 构造模糊查询
+     * Build fuzzy query wrapper for label binding search.
      *
-     * @param entityQuery {@link LabelBindQuery}
-     * @return {@link LambdaQueryWrapper}
+     * @param entityQuery {@link LabelBindQuery} query parameters
+     * @return {@link LambdaQueryWrapper} for {@link LabelBindDO}
      */
     private LambdaQueryWrapper<LabelBindDO> fuzzyQuery(LabelBindQuery entityQuery) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
@@ -119,12 +119,12 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     /**
-     * 重复性校验
+     * Check whether a label binding is duplicated under the same tenant.
      *
-     * @param entityBO       {@link LabelBindBO}
-     * @param isUpdate       是否为更新操作
-     * @param throwException 如果重复是否抛异常
-     * @return 是否重复
+     * @param entityBO       {@link LabelBindBO} to be validated
+     * @param isUpdate       whether the operation is an update (true) or create (false)
+     * @param throwException whether to throw {@link DuplicateException} when duplicated
+     * @return {@code true} if duplicated, otherwise {@code false}
      */
     private boolean checkDuplicate(LabelBindBO entityBO, boolean isUpdate, boolean throwException) {
         LambdaQueryWrapper<LabelBindDO> wrapper = Wrappers.<LabelBindDO>query().lambda();
@@ -145,11 +145,11 @@ public class LabelBindServiceImpl implements LabelBindService {
     }
 
     /**
-     * 根据 主键ID 获取
+     * Get label binding data object by primary key ID.
      *
-     * @param id             ID
-     * @param throwException 是否抛异常
-     * @return {@link LabelBindDO}
+     * @param id             primary key ID
+     * @param throwException whether to throw {@link NotFoundException} when not found
+     * @return {@link LabelBindDO} if found, otherwise {@code null} when {@code throwException} is false
      */
     private LabelBindDO getDOById(Long id, boolean throwException) {
         LabelBindDO entityDO = labelBindManager.getById(id);

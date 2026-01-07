@@ -19,30 +19,20 @@ syntax = "proto3";
 
 package api.common;
 
-/*
-Config
-*/
+// Config
 option java_package = "io.github.pnoker.api.common";
 option java_outer_classname = "RProto";
 option objc_class_prefix = "Common";
 option java_multiple_files = true;
 
-/*
-R DTO
-*/
+// R DTO
 message GrpcR {
-  /*
-  Success flag
-  */
+  // Success flag
   bool ok = 1;
 
-  /*
-  Status code
-  */
+  // Status code
   string code = 2;
 
-  /*
-  Message
-  */
+  // Message
   string message = 3;
 }
