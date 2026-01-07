@@ -39,7 +39,13 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * Drive custom service implementation classes
+ * Custom driver service implementation for the MQTT driver.
+ * <p>
+ * This service provides MQTT-specific device communication capabilities. Since MQTT
+ * is a publish-subscribe protocol, data is passively received through subscriptions
+ * rather than actively polled. The read method returns null as data is received
+ * asynchronously through the MQTT receive handler.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -57,6 +63,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private MqttSendService mqttSendService;
 
+    /**
+     * Initializes the MQTT driver.
+     * <p>
+     * This method is called when the driver starts. Override this method to implement
+     * custom initialization logic specific to your MQTT devices and subscriptions.
+     * </p>
+     */
     @Override
     public void initial() {
         /*
@@ -68,6 +81,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
          */
     }
 
+    /**
+     * Scheduled task to report device status.
+     * <p>
+     * This method is called periodically to update device status. By default,
+     * all devices are reported as ONLINE with a 25-second validity period.
+     * Override this method to implement custom status reporting logic.
+     * </p>
+     */
     @Override
     public void schedule() {
         /*
@@ -91,6 +112,16 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
+    /**
+     * Handles metadata change events for drivers, devices, and points.
+     * <p>
+     * This method is called when metadata is created, updated, or deleted.
+     * Override this method to implement custom event handling logic such as
+     * managing MQTT topic subscriptions.
+     * </p>
+     *
+     * @param metadataEvent the metadata event containing type, operation, and ID information
+     */
     @Override
     public void event(MetadataEventDTO metadataEvent) {
         /*
@@ -112,6 +143,20 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
+    /**
+     * Reads data from an MQTT device point.
+     * <p>
+     * Since MQTT uses a publish-subscribe model, data is passively received through
+     * subscriptions rather than actively polled. This method returns null as the
+     * actual data processing is handled by {@link io.github.pnoker.common.mqtt.handler.MqttReceiveHandler#handlerValue}.
+     * </p>
+     *
+     * @param driverConfig driver configuration attributes
+     * @param pointConfig point configuration attributes
+     * @param device the device to read from
+     * @param point the point to read
+     * @return null (data is received asynchronously)
+     */
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
         /*
@@ -123,6 +168,21 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         return null;
     }
 
+    /**
+     * Writes data to an MQTT device point.
+     * <p>
+     * This method publishes messages to MQTT topics for device control. It retrieves
+     * the command topic from point configuration and optionally uses a configured QoS level.
+     * If QoS configuration fails, it falls back to the default QoS.
+     * </p>
+     *
+     * @param driverConfig driver configuration attributes
+     * @param pointConfig point configuration attributes (must contain "commandTopic", optionally "commandQos")
+     * @param device the device to write to
+     * @param point the point to write
+     * @param values the value containing the data to write
+     * @return true if the write operation succeeded, false otherwise
+     */
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue values) {
         /*

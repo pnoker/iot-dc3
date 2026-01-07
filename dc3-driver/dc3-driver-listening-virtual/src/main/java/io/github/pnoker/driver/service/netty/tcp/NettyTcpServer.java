@@ -36,7 +36,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * TCP server based on Netty for handling device connections and data exchange
+ * Netty-based TCP server for handling device connections and data exchange.
+ * <p>
+ * Maintains a mapping of device IDs to Netty channels for bi-directional
+ * communication with connected devices.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -45,12 +49,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class NettyTcpServer {
     /**
-     * DeviceId:Channel
-     * Used to store the Netty Context Channel for devices
-     * !!! Note: This logic is for reference only, please adapt to actual usage scenarios !!!
+     * Mapping of device IDs to Netty channels.
+     * <p>
+     * Used to store and retrieve the communication channel for each device.
+     * This enables sending data back to specific devices when needed.
+     * </p>
      */
     public static final Map<Long, Channel> deviceChannelMap = new ConcurrentHashMap<>(16);
 
+    /**
+     * Starts the TCP server on the specified port.
+     *
+     * @param port The port number to listen on
+     */
     @SneakyThrows
     public void start(int port) {
         EventLoopGroup group = new NioEventLoopGroup();

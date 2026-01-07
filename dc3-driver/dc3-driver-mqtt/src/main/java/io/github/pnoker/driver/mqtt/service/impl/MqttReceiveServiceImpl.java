@@ -30,6 +30,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
+ * MQTT message receive service implementation.
+ * <p>
+ * This service handles incoming MQTT messages by converting them to PointValue objects
+ * and forwarding them to the DC3 platform. It supports both single message and batch
+ * message processing.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -41,6 +48,15 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     @Resource
     private DriverSenderService driverSenderService;
 
+    /**
+     * Processes a single MQTT message received from the broker.
+     * <p>
+     * This method parses the MQTT message payload into a PointValue object,
+     * sets the creation time, and forwards it to the platform.
+     * </p>
+     *
+     * @param mqttMessage the MQTT message containing topic, payload, and metadata
+     */
     @Override
     public void receiveValue(MqttMessage mqttMessage) {
         // do something to process your mqtt messages
@@ -50,6 +66,15 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         driverSenderService.pointValueSender(pointValue);
     }
 
+    /**
+     * Processes a batch of MQTT messages received from the broker.
+     * <p>
+     * This method parses multiple MQTT messages into PointValue objects,
+     * sets their creation times, and forwards them as a batch to the platform.
+     * </p>
+     *
+     * @param mqttMessageList list of MQTT messages to process
+     */
     @Override
     public void receiveValues(List<MqttMessage> mqttMessageList) {
         // do something to process your mqtt messages

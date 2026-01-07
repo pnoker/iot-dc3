@@ -21,9 +21,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * MQTT Driver Application for DC3 IoT Platform.
- * This driver implements communication with MQTT brokers and devices,
- * providing data collection and device management capabilities.
+ * Main application class for the MQTT driver.
+ * <p>
+ * This driver enables communication with MQTT brokers and devices, providing
+ * bi-directional data exchange capabilities. It supports subscribing to MQTT topics
+ * for data collection and publishing messages to MQTT topics for device control.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,9 +36,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MqttDriverApplication {
 
     /**
-     * Main method to start the MQTT driver application
+     * Main entry point for the MQTT driver application.
      *
-     * @param args Command line arguments passed to the application
+     * @param args command line arguments passed to the application
      */
     public static void main(String[] args) {
         SpringApplication.run(MqttDriverApplication.class, args);

@@ -21,9 +21,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * OPC-UA Driver Application for DC3 IoT Platform.
- * This driver implements communication with OPC-UA servers and devices,
- * providing data collection and device management capabilities.
+ * Main application class for the OPC UA driver.
+ * <p>
+ * This driver enables communication with OPC UA servers, providing secure and
+ * standardized access to industrial automation data. It supports reading and
+ * writing to OPC UA nodes with proper certificate-based authentication.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -33,9 +36,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class OpcUaApplication {
 
     /**
-     * Main method to start the OPC-UA driver application
+     * Main entry point for the OPC UA driver application.
      *
-     * @param args Command line arguments passed to the application
+     * @param args command line arguments passed to the application
      */
     public static void main(String[] args) {
         SpringApplication.run(OpcUaApplication.class, args);

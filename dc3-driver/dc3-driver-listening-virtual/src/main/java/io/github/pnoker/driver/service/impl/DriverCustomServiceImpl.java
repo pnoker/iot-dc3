@@ -44,7 +44,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Drive custom service implementation classes
+ * Implementation of custom driver service for the listening virtual driver.
+ * <p>
+ * This service handles driver initialization, scheduling, metadata events,
+ * and read/write operations for devices that communicate via TCP/UDP.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -69,16 +73,16 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
 
+    /**
+     * Initializes the driver by starting TCP and UDP listening services.
+     * <p>
+     * This method is automatically called when the driver starts. It launches
+     * separate threads to listen for incoming TCP and UDP connections on the
+     * configured ports.
+     * </p>
+     */
     @Override
     public void initial() {
-        /*
-         * Driver initialization logic
-         *
-         * Note: The logic here is for reference only. Please modify it according to the actual application scenario.
-         * This method will be automatically executed when the driver starts. You can perform specific initialization operations here.
-         *
-         * For example: Start TCP and UDP listening services to monitor specified ports for receiving external data.
-         */
         threadPoolExecutor.execute(() -> {
             log.debug("Virtual Listening Driver Starting(TCP::{}) incoming data listener", tcpPort);
             nettyTcpServer.start(tcpPort);
@@ -89,73 +93,75 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         });
     }
 
+    /**
+     * Scheduled task to report device status.
+     * <p>
+     * Sets all devices to ONLINE status with a validity period of 25 seconds.
+     * This method is called periodically by the driver framework.
+     * </p>
+     */
     @Override
     public void schedule() {
-        /*
-         * Device status upload logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * Device status upload can be flexibly implemented based on specific requirements. Here are some common approaches:
-         * - Determine device status based on read data in the `read` method;
-         * - Periodically check device status in a custom scheduled task;
-         * - Trigger device status judgment based on specific business logic or events.
-         *
-         * Finally, submit the device status to the SDK management through the {@link DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} interface.
-         * The device status enumeration {@link DeviceStatusEnum} includes the following states:
-         * - ONLINE: Device online
-         * - OFFLINE: Device offline
-         * - MAINTAIN: Device under maintenance
-         * - FAULT: Device fault
-         *
-         * In the following example, all devices are set to {@link DeviceStatusEnum#ONLINE}, with a status validity period of 25 {@link TimeUnit#SECONDS}.
-         */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
+    /**
+     * Handles metadata events for drivers, devices, and points.
+     * <p>
+     * Processes addition, update, and deletion events for metadata.
+     * Currently logs device and point metadata events for monitoring purposes.
+     * </p>
+     *
+     * @param metadataEvent The metadata event containing type and operation details
+     */
     @Override
     public void event(MetadataEventDTO metadataEvent) {
-        /*
-         * Receive metadata addition, update, and deletion events for drivers, devices, and points.
-         *
-         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
-         *
-         * Note: The logic here is for reference only. Please modify it according to your actual application scenario.
-         */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            // to do something for device event
             log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            // to do something for point event
             log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
         }
     }
 
+    /**
+     * Reads data from a device point.
+     * <p>
+     * Since this driver passively receives data via TCP/UDP, this method
+     * returns null. Actual data reading is handled by the TCP and UDP
+     * server handlers in their respective channelRead methods.
+     * </p>
+     *
+     * @param driverConfig Driver configuration attributes
+     * @param pointConfig Point configuration attributes
+     * @param device The device to read from
+     * @param point The point to read
+     * @return null as data is received passively
+     */
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
-        /*
-         * Important: The following logic is for reference only; please adjust it according to your actual application scenario.
-         *
-         * Since the Listening Virtual driver passively receives data, there is no need to implement the `read` method here.
-         * Data reception and processing are already handled in:
-         * - {@link io.github.pnoker.driver.service.netty.tcp.NettyTcpServerHandler#channelRead}
-         * - {@link io.github.pnoker.driver.service.netty.udp.NettyUdpServerHandler#channelRead0}
-         */
         return null;
     }
 
+    /**
+     * Writes data to a device point.
+     * <p>
+     * Writes the specified value to the device by sending it through the
+     * Netty TCP channel associated with the device. If the device channel
+     * exists in the device-channel mapping, the value is converted to bytes
+     * and sent to the device.
+     * </p>
+     *
+     * @param driverConfig Driver configuration attributes
+     * @param pointConfig Point configuration attributes
+     * @param device The device to write to
+     * @param point The point to write
+     * @param wValue The value to write
+     * @return true if the write operation was processed
+     */
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
-        /*
-         * Important: The following logic is for reference only; please adjust it according to your actual application scenario.
-         *
-         * The implementation of this method relies on the device channel mapping table of the Netty TCP server. If the channel corresponding to the device exists,
-         * the value to be written is converted to bytes and sent to that channel.
-         *
-         * The return value is always true, indicating that the write operation has been successfully processed.
-         */
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.deviceChannelMap.get(deviceId);
         if (Objects.nonNull(channel)) {
