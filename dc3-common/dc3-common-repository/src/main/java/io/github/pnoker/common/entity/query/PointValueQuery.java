@@ -25,7 +25,12 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * PointValue Query
+ * Point Value Query Object
+ * <p>
+ * Query object for searching and filtering point values in the repository layer.
+ * Supports filtering by tenant, device, point name, and enable status.
+ * Includes pagination support for large datasets.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -45,34 +50,34 @@ public class PointValueQuery implements Serializable {
     private Pages page;
 
     /**
-     * 租户ID
+     * Tenant ID for multi-tenant data isolation
      */
     private Long tenantId;
 
-    // 查询字段
+    // Query fields
 
     /**
-     * 设备ID
+     * Device ID to filter by specific device
      */
     private Long deviceId;
 
     /**
-     * 设备名称
+     * Device name for text-based filtering
      */
     private String deviceName;
 
     /**
-     * 位号ID
+     * Point ID to filter by specific point
      */
     private Long pointId;
 
     /**
-     * 位号名称
+     * Point name for text-based filtering
      */
     private String pointName;
 
     /**
-     * 使能标识
+     * Enable flag to filter active/inactive points
      */
     private EnableFlagEnum enableFlag;
 

@@ -23,7 +23,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * 通用线程池属性
+ * Thread Pool Configuration Properties
+ * <p>
+ * Configuration properties for thread pools in Spring Boot applications.
+ * Supports configuration through application.yml with prefix "server.thread".
+ * Includes settings for core pool size, maximum pool size, keep alive time,
+ * and thread name prefix.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

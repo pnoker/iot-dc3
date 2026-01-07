@@ -27,68 +27,82 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import java.util.Map;
 
 /**
- * DriverCustomService 接口定义
+ * DriverCustomService Interface Definition
  * <p>
- * 用于描述驱动的核心自定义行为逻辑, 包括初始化、调度、自定义事件、读写操作的相关功能。
- * 实现该接口的类需要具体实现这些方法, 覆盖驱动的特定逻辑。
+ * Describes the core custom behavior logic of the driver, including initialization, scheduling,
+ * custom events, and read/write operations.
+ * Classes implementing this interface need to implement these methods to override specific driver logic.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public interface DriverCustomService {
     /**
-     * 驱动初始化接口
+     * Driver Initialization Interface
      * <p>
-     * 该接口在驱动启动时自动调用, 用于执行驱动所需的初始化操作。
-     * 开发者可以在此方法中配置驱动启动时的必要资源或进行环境准备。
+     * This interface is automatically called when the driver starts up, used to perform
+     * necessary initialization operations for the driver.
+     * Developers can configure essential resources or prepare the environment in this method.
      */
     void initial();
 
     /**
-     * 自定义调度接口
+     * Custom Scheduling Interface
      * <p>
-     * 该接口用于执行自定义调度任务, 可通过配置文件 {@code driver.schedule.custom} 进行相关配置。
-     * 开发者可以在此方法中实现自定义的调度逻辑, 例如定时任务, 周期性任务等。
+     * This interface is used to execute custom scheduling tasks, which can be configured
+     * through the configuration file {@code driver.schedule.custom}.
+     * Developers can implement custom scheduling logic here, such as timed tasks, periodic tasks, etc.
      * <p>
-     * 注意: 调度任务的执行频率, 触发条件等应根据实际需求进行合理配置。
+     * Note: The execution frequency and trigger conditions of scheduling tasks should be
+     * configured reasonably according to actual requirements.
      */
     void schedule();
 
     /**
-     * 处理驱动, 设备, 位号的元数据事件
+     * Handle Metadata Events for Driver, Device, and Point
      * <p>
-     * 当驱动, 设备或位号的元数据发生新增, 更新或删除操作时, 将触发此事件。
-     * 具体的事件类型(驱动, 设备或位号)由 {@link io.github.pnoker.common.enums.MetadataTypeEnum} 决定。
+     * This event is triggered when metadata for driver, device, or point undergoes
+     * addition, update, or deletion operations.
+     * The specific event type (driver, device, or point) is determined by {@link io.github.pnoker.common.enums.MetadataTypeEnum}.
      *
-     * @param metadataEvent 元数据事件对象, 包含事件相关的详细信息 {@link MetadataEventDTO}
+     * @param metadataEvent metadata event object containing detailed event information {@link MetadataEventDTO}
      */
     void event(MetadataEventDTO metadataEvent);
 
     /**
-     * 执行读操作
+     * Execute Read Operation
      * <p>
-     * 该接口用于从指定设备中读取位号的数据。由于设备类型和通信协议的差异, 读取操作可能无法直接执行, 请根据实际情况灵活处理。
+     * This interface is used to read point data from the specified device. Due to differences
+     * in device types and communication protocols, read operations may not be directly executable,
+     * please handle flexibly according to actual situations.
      * <p>
-     * 注意: 读取操作可能会抛出异常, 调用方需做好异常处理。
+     * Note: Read operations may throw exceptions, callers need to handle exceptions properly.
      *
-     * @param driverConfig 驱动属性配置, 包含驱动相关的配置信息
-     * @param pointConfig  位号属性配置, 包含位号相关的配置信息
-     * @param device       设备对象, 包含设备的基本信息和属性
-     * @param point        位号对象, 包含位号的基本信息和属性
-     * @return 返回读取到的数据, 封装在 {@link RValue} 对象中
+     * @param driverConfig driver property configuration containing driver-related configuration information
+     * @param pointConfig  point property configuration containing point-related configuration information
+     * @param device       device object containing basic device information and properties
+     * @param point        point object containing basic point information and properties
+     * @return returns the read data encapsulated in a {@link RValue} object
      */
     RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point);
 
     /**
-     * 执行写操作
+     * Execute Write Operation
      * <p>
-     * 该接口用于向指定设备中的位号写入数据。由于设备类型和通信协议的差异, 写入操作可能无法直接执行, 请根据实际情况灵活处理。
+     * This interface is used to write data to a point in the specified device. Due to differences
+     * in device types and communication protocols, write operations may not be directly executable,
+     * please handle flexibly according to actual situations.
      * <p>
-     * 注意: 写入操作可能会抛出异常, 调用方需做好异常处理。
+     * Note: Write operations may throw exceptions, callers need to handle exceptions properly.
      *
-     * @param driverConfig 驱动属性配置, 包含驱动相关的配置信息
-     * @param pointConfig  位号属性配置, 包含位号相关的配置信息
-     * @param device       设备对象, 包含设备的基本信息和属性
-     * @param point        位号对象, 包含位号的基本信息和属性
-     * @param wValue       待写入的数据, 封装在 {@link WValue} 对象中
-     * @return 返回写入操作是否成功, 若成功则返回 {@code true}, 否则返回 {@code false} 或抛出异常
+     * @param driverConfig driver property configuration containing driver-related configuration information
+     * @param pointConfig  point property configuration containing point-related configuration information
+     * @param device       device object containing basic device information and properties
+     * @param point        point object containing basic point information and properties
+     * @param wValue       data to be written encapsulated in a {@link WValue} object
+     * @return returns whether the write operation was successful, returns {@code true} if successful,
+     * otherwise returns {@code false} or throws an exception
      */
     Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue);
 

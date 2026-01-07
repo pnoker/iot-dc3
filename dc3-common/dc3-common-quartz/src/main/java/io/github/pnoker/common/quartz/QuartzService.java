@@ -23,7 +23,13 @@ import org.quartz.*;
 import org.springframework.stereotype.Component;
 
 /**
- * Scheduler  Util
+ * Quartz Scheduler Service Utility
+ * <p>
+ * Service class for managing Quartz scheduler operations in Spring Boot applications.
+ * Provides methods for creating jobs with intervals and cron expressions,
+ * as well as starting and stopping the scheduler.
+ * Supports flexible job scheduling with different time-based triggers.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -37,13 +43,13 @@ public class QuartzService {
     private Scheduler scheduler;
 
     /**
-     * 创建调度任务
+     * Create scheduled job with interval trigger
      *
-     * @param group        任务分组
-     * @param name         任务名称
-     * @param interval     时间间隔
-     * @param intervalUnit 时间间隔单位
-     * @param jobClass     任务执行类
+     * @param group        Task group for job organization
+     * @param name         Task name for job identification
+     * @param interval     Time interval between job executions
+     * @param intervalUnit Time unit for the interval
+     * @param jobClass     Job execution class
      * @throws SchedulerException SchedulerException
      */
     public void createJobWithInterval(String group, String name, Integer interval, DateBuilder.IntervalUnit intervalUnit, Class<? extends Job> jobClass) throws SchedulerException {
@@ -57,12 +63,12 @@ public class QuartzService {
     }
 
     /**
-     * 创建调度任务
+     * Create scheduled job with cron trigger
      *
-     * @param group    任务分组
-     * @param name     任务名称
-     * @param cron     Cron 表达式
-     * @param jobClass 任务执行类
+     * @param group    Task group for job organization
+     * @param name     Task name for job identification
+     * @param cron     Cron expression for scheduling
+     * @param jobClass Job execution class
      * @throws SchedulerException SchedulerException
      */
     public void createJobWithCron(String group, String name, String cron, Class<? extends Job> jobClass) throws SchedulerException {
@@ -76,7 +82,7 @@ public class QuartzService {
     }
 
     /**
-     * 启动调度服务
+     * Start the scheduler service
      *
      * @throws SchedulerException SchedulerException
      */
@@ -87,9 +93,9 @@ public class QuartzService {
     }
 
     /**
-     * 关闭调度服务
+     * Stop the scheduler service
      * <p>
-     * 直接关闭, 不等待未执行完的任务
+     * Shutdown immediately without waiting for currently executing jobs to complete
      *
      * @throws SchedulerException SchedulerException
      */

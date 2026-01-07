@@ -21,6 +21,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
+ * Siemens S7 PLC Driver Application.
+ * This Spring Boot application serves as a driver for communicating with Siemens S7 PLCs,
+ * enabling data exchange and device control through the DC3 IoT platform.
+ * The driver supports reading and writing operations to S7 PLC devices using the S7 protocol.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -28,6 +33,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class PlcS7DriverApplication {
 
+    /**
+     * Main method to start the Siemens S7 PLC Driver Application.
+     * Initializes and launches the Spring Boot application context.
+     *
+     * @param args Command line arguments passed to the application
+     */
     public static void main(String[] args) {
         SpringApplication.run(PlcS7DriverApplication.class, args);
     }

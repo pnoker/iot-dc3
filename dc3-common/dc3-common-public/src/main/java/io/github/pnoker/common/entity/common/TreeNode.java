@@ -26,7 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tree node
+ * Tree Node Data Structure
+ * <p>
+ * Generic tree node implementation for hierarchical data structures.
+ * Supports parent-child relationships with ID-based navigation.
+ * Commonly used for organization, category, or menu structures.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -45,9 +50,9 @@ public class TreeNode implements Serializable {
     private List<TreeNode> children = new ArrayList<>(16);
 
     /**
-     * Add
+     * Add child node to current node
      *
-     * @param node TreeNode
+     * @param node Tree node to add as child
      */
     public void add(TreeNode node) {
         children.add(node);

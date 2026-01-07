@@ -23,7 +23,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
- * Redis initialization runner
+ * Redis Initialization Runner for DC3 IoT Platform.
+ * This component handles Redis initialization tasks during application startup.
+ * It scans and initializes Redis-related components in the specified package.
+ * Currently implemented as a placeholder for future Redis initialization requirements.
  *
  * @author pnoker
  * @version 2025.9.0

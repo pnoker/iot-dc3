@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 标签与实体的绑定表
+ * Label and entity binding table entity.
  * </p>
  *
  * @author pnoker
@@ -45,79 +45,79 @@ public class LabelBindDO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主键ID
+     * Primary key ID.
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
-     * 实体类型标识
+     * Entity type flag.
      */
     @TableField("entity_type_flag")
     private Byte entityTypeFlag;
 
     /**
-     * 标签ID
+     * Label ID.
      */
     @TableField("label_id")
     private Long labelId;
 
     /**
-     * 实体ID
+     * Entity ID.
      */
     @TableField("entity_id")
     private Long entityId;
 
     /**
-     * 租户ID
+     * Tenant ID.
      */
     @TableField("tenant_id")
     private Long tenantId;
 
     /**
-     * 描述
+     * Remark or description.
      */
     @TableField("remark")
     private String remark;
 
     /**
-     * 创建者ID
+     * Creator ID.
      */
     @TableField("creator_id")
     private Long creatorId;
 
     /**
-     * 创建者名称
+     * Creator name.
      */
     @TableField("creator_name")
     private String creatorName;
 
     /**
-     * 创建时间
+     * Creation time.
      */
     @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
-     * 操作者ID
+     * Operator ID.
      */
     @TableField("operator_id")
     private Long operatorId;
 
     /**
-     * 操作者名称
+     * Operator name.
      */
     @TableField("operator_name")
     private String operatorName;
 
     /**
-     * 操作时间
+     * Operation time.
      */
     @TableField("operate_time")
     private LocalDateTime operateTime;
 
     /**
-     * 逻辑删除标识, 0:未删除, 1:已删除
+     * Logical delete flag, {@code 0} for not deleted, {@code 1} for deleted.
      */
     @TableLogic
     @TableField("deleted")

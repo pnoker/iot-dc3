@@ -24,7 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 树 相关工具类集合
+ * Tree Utility Class
+ * <p>
+ * Utility class for tree structure operations in IoT DC3 platform.
+ * Provides methods for building tree structures from flat lists
+ * and converting trees back to lists.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -34,11 +39,11 @@ import java.util.List;
 public class TreeUtil {
 
     /**
-     * 两层循环实现建树
+     * Build a tree structure using a two-level loop.
      *
-     * @param <T>       Object
-     * @param treeNodes 传入的树节点列表
-     * @param root      根节点
+     * @param <T>       Object type extending {@link TreeNode}
+     * @param treeNodes List of tree nodes to be processed
+     * @param root      Root node identifier
      * @return T Tree
      */
     public <T extends TreeNode> List<T> buildByLoop(List<T> treeNodes, Object root) {
@@ -60,11 +65,11 @@ public class TreeUtil {
     }
 
     /**
-     * 使用递归方法建树
+     * Build a tree structure using recursive calls.
      *
-     * @param <T>       Object
-     * @param treeNodes 传入的树节点列表
-     * @param root      根节点
+     * @param <T>       Object type extending {@link TreeNode}
+     * @param treeNodes List of tree nodes to be processed
+     * @param root      Root node identifier
      * @return T Tree
      */
     public <T extends TreeNode> List<T> buildByRecursive(List<T> treeNodes, Object root) {
@@ -78,11 +83,11 @@ public class TreeUtil {
     }
 
     /**
-     * 递归查找子节点
+     * Recursively find and attach child nodes.
      *
-     * @param <T>       Object
-     * @param treeNode  子节点
-     * @param treeNodes 传入的树节点列表
+     * @param <T>       Object type extending {@link TreeNode}
+     * @param treeNode  Current node
+     * @param treeNodes List of all tree nodes
      * @return T Tree
      */
     public <T extends TreeNode> T findChildren(T treeNode, List<T> treeNodes) {

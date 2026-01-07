@@ -27,6 +27,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
+ * MQTT Message Header Class
+ * <p>
+ * Represents header information for MQTT messages in IoT DC3 platform.
+ * Contains message metadata including MQTT ID, QoS level, topic,
+ * duplicate flag, retained flag, and timestamp.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0

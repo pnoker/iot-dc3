@@ -28,7 +28,7 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 /**
- * 时间(带时区, 默认上海时区) 相关工具类
+ * Zoned date-time utility class (with time zone, default Shanghai time zone).
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,9 +42,9 @@ public class ZoneDateTimeUtil {
     }
 
     /**
-     * 获取默认的时间格式
+     * Get the default date-time format.
      * <p>
-     * yyyy-MM-dd HH:mm:ss
+     * Pattern: yyyy-MM-dd HH:mm:ss
      *
      * @return {@link DateTimeFormatter}
      */
@@ -53,9 +53,9 @@ public class ZoneDateTimeUtil {
     }
 
     /**
-     * 获取完整的时间格式
+     * Get the complete date-time format.
      * <p>
-     * yyyy-MM-dd HH:mm:ss.SSS
+     * Pattern: yyyy-MM-dd HH:mm:ss.SSS
      *
      * @return {@link DateTimeFormatter}
      */
@@ -64,7 +64,7 @@ public class ZoneDateTimeUtil {
     }
 
     /**
-     * 获取当前时间
+     * Get the current time with default time zone.
      *
      * @return ZonedDateTime {@link ZonedDateTime}
      */
@@ -73,19 +73,19 @@ public class ZoneDateTimeUtil {
     }
 
     /**
-     * 获取毫秒
+     * Get milliseconds from the given {@link ZonedDateTime}.
      *
      * @param zonedDateTime {@link ZonedDateTime}
-     * @return 毫秒
+     * @return Milliseconds
      */
     public static long milliSeconds(ZonedDateTime zonedDateTime) {
         return zonedDateTime.toInstant().toEpochMilli();
     }
 
     /**
-     * 获取 DateTime
+     * Get a {@link ZonedDateTime} from milliseconds.
      *
-     * @param milliSeconds 毫秒
+     * @param milliSeconds Milliseconds
      * @return ZonedDateTime {@link ZonedDateTime}
      */
     public static ZonedDateTime dateTime(long milliSeconds) {
@@ -94,11 +94,11 @@ public class ZoneDateTimeUtil {
     }
 
     /**
-     * 推迟时间 HOUR/MINUTE/...
+     * Delay time by the specified amount and unit, e.g., HOUR/MINUTE/...
      *
      * @param amount Integer
      * @param field  ChronoUnit field : {@link ChronoUnit ChronoUnit.HOUR/MINUTE/...}
-     * @return Date
+     * @return ZonedDateTime
      */
     public static ZonedDateTime expireTime(int amount, ChronoUnit field) {
         ZonedDateTime zonedDateTime = ZoneDateTimeUtil.now();
@@ -106,10 +106,10 @@ public class ZoneDateTimeUtil {
     }
 
     /**
-     * 使用 yyyy-MM-dd HH:mm:ss 格式化时间
+     * Format time using the pattern yyyy-MM-dd HH:mm:ss.
      *
      * @param zonedDateTime {@link ZonedDateTime}
-     * @return R of String
+     * @return Formatted time string
      */
     public static String defaultFormat(ZonedDateTime zonedDateTime) {
         DateTimeFormatter formatter = getDefaultDateTimeFormatter();
@@ -117,10 +117,10 @@ public class ZoneDateTimeUtil {
     }
 
     /**
-     * 使用 yyyy-MM-dd HH:mm:ss.SSS 格式化时间
+     * Format time using the pattern yyyy-MM-dd HH:mm:ss.SSS.
      *
      * @param zonedDateTime {@link ZonedDateTime}
-     * @return R of String
+     * @return Formatted time string
      */
     public static String completeFormat(ZonedDateTime zonedDateTime) {
         DateTimeFormatter formatter = getCompleteDateTimeFormatter();
@@ -128,10 +128,10 @@ public class ZoneDateTimeUtil {
     }
 
     /**
-     * 将时间字符串 yyyy-MM-dd HH:mm:ss 转为时间类型
+     * Parse a time string in the pattern yyyy-MM-dd HH:mm:ss to {@link ZonedDateTime}.
      *
      * @param dateString yyyy-MM-dd HH:mm:ss
-     * @return Date
+     * @return ZonedDateTime or {@code null} if parsing fails
      */
     public static ZonedDateTime defaultDate(String dateString) {
         try {
@@ -143,10 +143,10 @@ public class ZoneDateTimeUtil {
     }
 
     /**
-     * 将时间字符串 yyyy-MM-dd HH:mm:ss.SSS
+     * Parse a time string in the pattern yyyy-MM-dd HH:mm:ss.SSS to {@link ZonedDateTime}.
      *
-     * @param dateString Date String
-     * @return Date
+     * @param dateString Date string
+     * @return ZonedDateTime or {@code null} if parsing fails
      */
     public static ZonedDateTime completeDate(String dateString) {
         try {

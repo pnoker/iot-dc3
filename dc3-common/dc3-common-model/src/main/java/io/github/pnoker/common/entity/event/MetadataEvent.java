@@ -23,7 +23,7 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * 元数据事件
+ * Metadata event.
  *
  * @author zhangzi
  * @version 2025.9.0
@@ -37,12 +37,12 @@ public class MetadataEvent extends ApplicationEvent {
     private final MetadataOperateTypeEnum operateType;
 
     /**
-     * 构造函数
+     * Constructor.
      *
-     * @param source       Object
-     * @param id           ID
-     * @param metadataType 元数据类型
-     * @param operateType  元数据操作类型
+     * @param source       Event source object
+     * @param id           Metadata ID
+     * @param metadataType Metadata type
+     * @param operateType  Metadata operation type
      */
     public MetadataEvent(Object source,
                          Long id,

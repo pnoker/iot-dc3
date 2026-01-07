@@ -25,7 +25,12 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 /**
- * PointValue Builder
+ * Redis Point Value Builder Interface
+ * <p>
+ * MapStruct mapper interface for converting between PointValueBO
+ * and RedisPointValueDO objects. Provides bidirectional conversion
+ * for single objects and collections.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -35,34 +40,34 @@ import java.util.List;
 public interface RedisPointValueBuilder {
 
     /**
-     * BO to Redis DO
+     * Convert PointValueBO to RedisPointValueDO
      *
-     * @param entityBO EntityBO
-     * @return EntityDO
+     * @param entityBO Point value business object to convert
+     * @return Redis point value data object
      */
     RedisPointValueDO buildDOByBO(PointValueBO entityBO);
 
     /**
-     * BOList to Redis DOList
+     * Convert list of PointValueBO to list of RedisPointValueDO
      *
-     * @param entityBOList EntityBO Array
-     * @return EntityDO
+     * @param entityBOList List of point value business objects to convert
+     * @return List of Redis point value data objects
      */
     List<RedisPointValueDO> buildDOListByBOList(List<PointValueBO> entityBOList);
 
     /**
-     * Redis DO to BO
+     * Convert RedisPointValueDO to PointValueBO
      *
-     * @param entityDO EntityDO
-     * @return EntityBO
+     * @param entityDO Redis point value data object to convert
+     * @return Point value business object
      */
     PointValueBO buildBOByDO(RedisPointValueDO entityDO);
 
     /**
-     * Redis DOList to BOList
+     * Convert list of RedisPointValueDO to list of PointValueBO
      *
-     * @param entityDOList EntityDO Array
-     * @return EntityBO Array
+     * @param entityDOList List of Redis point value data objects to convert
+     * @return List of point value business objects
      */
     List<PointValueBO> buildBOListByDOList(List<RedisPointValueDO> entityDOList);
 

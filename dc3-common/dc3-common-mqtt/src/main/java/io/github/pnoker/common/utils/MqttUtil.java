@@ -23,6 +23,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
 /**
+ * MQTT Utility Class
+ * <p>
+ * Utility class for MQTT operations in IoT DC3 platform.
+ * Provides methods to configure MQTT connection options,
+ * authentication settings, and SSL configurations.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -33,10 +40,16 @@ public class MqttUtil {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
+    /**
+     * Create MQTT connection options based on properties
+     *
+     * @param mqttProperties MQTT configuration properties
+     * @return Configured MqttConnectOptions
+     */
     public static MqttConnectOptions getMqttConnectOptions(MqttProperties mqttProperties) {
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
 
-        // username & password
+        // Configure username & password authentication
         if (MqttProperties.AuthTypeEnum.USERNAME.equals(mqttProperties.getAuthType()) || MqttProperties.AuthTypeEnum.X509.equals(mqttProperties.getAuthType())) {
             if (StringUtils.isNotEmpty(mqttProperties.getUsername())) {
                 mqttConnectOptions.setUserName(mqttProperties.getUsername());
@@ -46,7 +59,7 @@ public class MqttUtil {
             }
         }
 
-        // tls x509
+        // Configure TLS X509 certificate authentication
         if (MqttProperties.AuthTypeEnum.X509.equals(mqttProperties.getAuthType())) {
             mqttConnectOptions.setSocketFactory(X509Util.getSSLSocketFactory(
                     mqttProperties.getCaCrt(),
@@ -57,7 +70,7 @@ public class MqttUtil {
 
         }
 
-        // disable https hostname verification
+        // Disable HTTPS hostname verification
         mqttConnectOptions.setHttpsHostnameVerificationEnabled(false);
         mqttConnectOptions.setServerURIs(new String[]{mqttProperties.getUrl()});
         mqttConnectOptions.setKeepAliveInterval(mqttProperties.getKeepAlive());

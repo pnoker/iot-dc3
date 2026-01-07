@@ -25,7 +25,7 @@ import lombok.Setter;
 /**
  * Profile Ext
  * <p>
- * 模版相关拓展信息
+ * Extended information related to templates.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,9 +38,9 @@ import lombok.Setter;
 public class ProfileExt extends BaseExt {
 
     /**
-     * 拓展内容
+     * Extended content.
      * <p>
-     * 拓展内容可以根据 Type 和 Version 进行区分
+     * The content can be distinguished by Type and Version.
      */
     private Content content;
 

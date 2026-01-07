@@ -28,7 +28,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 /**
- * Group VO
+ * Group view object (VO) used for API responses and client interactions.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -43,17 +43,17 @@ import lombok.*;
 public class GroupVO extends BaseVO {
 
     /**
-     * 父分组ID
+     * Parent group ID.
      */
     private String parentGroupId;
 
     /**
-     * 分组标识
+     * Group type flag.
      */
     private GroupTypeFlagEnum groupTypeFlag;
 
     /**
-     * 分组名称
+     * Group name.
      */
     @NotBlank(message = "分组名称不能为空",
             groups = {Add.class})
@@ -63,22 +63,22 @@ public class GroupVO extends BaseVO {
     private String groupName;
 
     /**
-     * 分组编号
+     * Group code.
      */
     private String groupCode;
 
     /**
-     * 分组层级
+     * Group level.
      */
     private Byte groupLevel;
 
     /**
-     * 分组顺序
+     * Group index/order.
      */
     private Integer groupIndex;
 
     /**
-     * 使能标识
+     * Enable status flag.
      */
     private EnableFlagEnum enableFlag;
 }

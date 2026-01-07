@@ -25,7 +25,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
- * Data initialization runner
+ * Data Initialization Runner for DC3 IoT Platform.
+ * This class handles data initialization tasks during application startup,
+ * configuring component scanning for data-related classes and MyBatis mappers.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,10 +44,21 @@ public class DataInitRunner implements ApplicationRunner {
 
     private final ScheduleForDataService scheduleForDataService;
 
+    /**
+     * Constructor for DataInitRunner
+     *
+     * @param scheduleForDataService Service for handling data scheduling operations
+     */
     public DataInitRunner(ScheduleForDataService scheduleForDataService) {
         this.scheduleForDataService = scheduleForDataService;
     }
 
+    /**
+     * Executes the data initialization process when the application starts
+     *
+     * @param args Application arguments passed during startup
+     * @throws Exception If an error occurs during initialization
+     */
     @Override
     public void run(ApplicationArguments args) throws Exception {
         scheduleForDataService.initial();

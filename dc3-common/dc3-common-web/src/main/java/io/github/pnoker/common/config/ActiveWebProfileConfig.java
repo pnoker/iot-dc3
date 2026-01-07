@@ -26,7 +26,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Environment Config
+ * Active Web Profile Configuration
+ * <p>
+ * Environment post processor that automatically activates the "web" profile.
+ * This configuration runs with highest precedence to ensure the web profile
+ * is available during application startup for web-related configurations.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -37,6 +42,12 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveWebProfileConfig implements EnvironmentPostProcessor {
 
+    /**
+     * Post-process the environment to add the "web" active profile
+     *
+     * @param environment ConfigurableEnvironment to modify
+     * @param application SpringApplication instance
+     */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         environment.addActiveProfile("web");

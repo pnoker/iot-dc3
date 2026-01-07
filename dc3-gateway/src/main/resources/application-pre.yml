@@ -18,22 +18,24 @@
 # Pre-release environment configuration will overwrite the content configured in application-*.yml
 spring:
   cloud:
+    # Nacos service discovery and configuration center
     nacos:
       server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
       username: dc3
       password: dc3
       discovery:
         namespace: ${NODE_ENV:pre}
+    # Spring Cloud Gateway WebFlux configuration
     gateway.server.webflux:
       routes:
-        # token
+        # Token route for authentication (no authentication required)
         - id: auth_route_token
           uri: lb://dc3-center-auth
           predicates:
             - Path=/api/v3/auth/token/**
           filters:
             - StripPrefix=2
-        # auth
+        # Auth route for user, tenant, and dictionary operations (requires authentication)
         - id: auth_route
           uri: lb://dc3-center-auth
           predicates:
@@ -41,7 +43,7 @@ spring:
           filters:
             - StripPrefix=2
             - Authentic
-        # manager
+        # Manager route for device and driver management (requires authentication)
         - id: manager_route
           uri: lb://dc3-center-manager
           predicates:
@@ -49,7 +51,7 @@ spring:
           filters:
             - StripPrefix=2
             - Authentic
-        # data
+        # Data route for point value operations (requires authentication)
         - id: data_route
           uri: lb://dc3-center-data
           predicates:
@@ -57,7 +59,7 @@ spring:
           filters:
             - StripPrefix=2
             - Authentic
-        # ekuiper
+        # eKuiper route for stream processing operations (requires authentication)
         - id: ekuiper_route
           uri: lb://dc3-center-ekuiper:8600
           predicates:
@@ -66,8 +68,10 @@ spring:
             - StripPrefix=2
             - Authentic
 
+# gRPC client configuration
 grpc:
   client:
+    # gRPC client for dc3-center-auth service (uses Nacos discovery)
     dc3-center-auth:
       enable-keep-alive: true
       keep-alive-without-calls: true

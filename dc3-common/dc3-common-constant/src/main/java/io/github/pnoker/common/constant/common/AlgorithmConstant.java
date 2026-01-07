@@ -18,7 +18,10 @@
 package io.github.pnoker.common.constant.common;
 
 /**
- * 算法 相关常量
+ * Algorithm related constants
+ * <p>
+ * Provides constants for encryption algorithms, certificate types, and default keys/passwords.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,35 +30,35 @@ package io.github.pnoker.common.constant.common;
 public class AlgorithmConstant {
 
     /**
-     * 默认密钥
+     * Default encryption key
      */
     public static final String DEFAULT_KEY = "io.github.pnoker.dc3";
     /**
-     * 默认密码
+     * Default password
      */
     public static final String DEFAULT_PASSWORD = "dc3dc3dc3";
     /**
-     * 加密算法 对称AES
+     * Symmetric encryption algorithm: AES
      */
     public static final String ALGORITHM_AES = "AES";
     /**
-     * 加密算法 非对称RSA
+     * Asymmetric encryption algorithm: RSA
      */
     public static final String ALGORITHM_RSA = "RSA";
     /**
-     * 加密算法 SHA256withRSA
+     * Encryption algorithm: SHA256withRSA
      */
     public static final String ALGORITHM_SHA256_RSA = "SHA256withRSA";
     /**
-     * 证书类型 X.509
+     * Certificate type: X.509
      */
     public static final String CERTIFICATE_X509 = "X.509";
     /**
-     * 证书类型 PKCS12
+     * Certificate type: PKCS12
      */
     public static final String CERTIFICATE_PKCS12 = "PKCS12";
     /**
-     * 证书类型 JKS
+     * Certificate type: JKS (Java KeyStore)
      */
     public static final String CERTIFICATE_JKS = "jks";
 

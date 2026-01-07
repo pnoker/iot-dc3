@@ -33,6 +33,13 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.ExecutorService;
 
 /**
+ * MQTT Receive Handler
+ * <p>
+ * Handler for processing incoming MQTT messages in IoT DC3 platform.
+ * Manages message reception, routing, and batch processing based on
+ * message speed and configuration settings.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -50,11 +57,13 @@ public class MqttReceiveHandler {
     private ExecutorService virtualThreadExecutor;
 
     /**
-     * Receive data from MQTT; subscribed topics are defined in application.yml under mqtt.receive-topics
+     * Configure MQTT inbound message handler bean
+     * <p>
+     * Receives data from MQTT; subscribed topics are defined in application.yml under mqtt.receive-topics
      * + (plus): matches exactly one word
      * # (hash): matches multiple words (or none)
      *
-     * @return MessageHandler
+     * @return Configured MessageHandler for MQTT inbound processing
      */
     @Bean
     @ServiceActivator(inputChannel = "mqttInboundChannel")
@@ -71,14 +80,14 @@ public class MqttReceiveHandler {
                 MqttMessage mqttMessage = MqttMessage.builder().header(messageHeader).payload(payload).build();
                 log.debug("Mqtt inbound, From: {}, Qos: {}, Payload: {}", messageHeader.getMqttReceivedTopic(), messageHeader.getMqttReceivedQos(), payload);
 
-                // Judge whether to process data in batch according to the data transmission speed
+                // Determine whether to process data in batch based on transmission speed
                 if (MqttScheduleJob.messageSpeed.get() < batchSpeed) {
                     virtualThreadExecutor.execute(() ->
-                            // Receive single mqtt message
+                            // Process single MQTT message
                             mqttReceiveService.receiveValue(mqttMessage)
                     );
                 } else {
-                    // Save point value to schedule
+                    // Save message to batch schedule for processing
                     MqttScheduleJob.messageLock.writeLock().lock();
                     MqttScheduleJob.addMqttMessages(mqttMessage);
                     MqttScheduleJob.messageLock.writeLock().unlock();

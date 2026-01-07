@@ -15,18 +15,22 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+# Server configuration
 server:
   port: 8000
   servlet:
     context-path: /
 
+# Spring application configuration
 spring:
   application:
     name: @project.artifactId@
+  # Active profile configuration, defaults to 'dev' if NODE_ENV is not set
   profiles:
     active:
       - ${NODE_ENV:dev}
 
+# Logging configuration
 logging:
   file:
     name: dc3/logs/gateway/${spring.application.name}.log

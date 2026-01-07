@@ -25,7 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.UUID;
 
 /**
- * 环境相关的工具类集合
+ * Environment Utility Class
+ * <p>
+ * Utility class for environment-related operations in IoT DC3 platform.
+ * Provides methods for UUID generation and environment tag creation
+ * based on environment and group identifiers.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -39,21 +44,21 @@ public class EnvironmentUtil {
     }
 
     /**
-     * 获取节点 ID
+     * Get a unique node ID.
      *
-     * @return R of String Suffix
+     * @return Node ID string
      */
     public static String getNodeId() {
         return UUID.randomUUID().toString();
     }
 
     /**
-     * 获取 Topic Tag
-     * 开发环境用于区分多人开发
+     * Get the topic tag.
+     * In the development environment, it is used to distinguish multi-person development.
      *
-     * @param env   环境类型
-     * @param group 分组
-     * @return R of String Tag
+     * @param env   Environment type
+     * @param group Group identifier
+     * @return Topic tag string
      */
     public static String getTag(String env, String group) {
         String exchangeTag = "";
@@ -64,10 +69,10 @@ public class EnvironmentUtil {
     }
 
     /**
-     * 是否为开发环境
+     * Check whether the current environment is a development environment.
      *
-     * @param env 环境类型
-     * @return 是/否
+     * @param env Environment type
+     * @return true if it is a development environment, false otherwise
      */
     public static boolean isDev(String env) {
         return EnvironmentConstant.ENV_DEV.equals(env);

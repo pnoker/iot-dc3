@@ -43,10 +43,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>Abstract ModbusMaster class.</p>
- *
+ * Abstract base class for Modbus master implementations.
+ * This class provides the core functionality for implementing Modbus masters that can
+ * communicate with Modbus slave devices over various transport mechanisms.
+ * It includes methods for reading and writing values, batch operations,
+ * and slave node discovery.
+ * 
  * @author Matthew Lohbihler
  * @version 2025.9.0
+ * @since 2022.1.0
  */
 abstract public class ModbusMaster extends Modbus {
     private final Map<Integer, SlaveProfile> slaveProfiles = new HashMap<>();

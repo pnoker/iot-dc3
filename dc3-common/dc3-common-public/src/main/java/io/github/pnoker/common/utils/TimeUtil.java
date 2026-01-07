@@ -27,7 +27,11 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * 时间 相关工具类
+ * Time Related Utility Class
+ * <p>
+ * Utility class for time-related operations and formatting.
+ * Provides thread-safe date formatting and time calculation methods.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -37,7 +41,7 @@ import java.util.Date;
 public class TimeUtil {
 
     /**
-     * SimpleDateFormat ThreadLocal 保证线程安全
+     * ThreadLocal SimpleDateFormat to ensure thread safety
      */
     private static final ThreadLocal<SimpleDateFormat> DEFAULT_DATE_FORMAT_THREAD_LOCAL = ThreadLocal.withInitial(() -> new SimpleDateFormat(TimeConstant.DEFAULT_DATE_FORMAT));
     private static final ThreadLocal<SimpleDateFormat> COMPLETE_DATE_FORMAT_THREAD_LOCAL = ThreadLocal.withInitial(() -> new SimpleDateFormat(TimeConstant.COMPLETE_DATE_FORMAT));
@@ -47,19 +51,19 @@ public class TimeUtil {
     }
 
     /**
-     * 获取毫秒
+     * Get milliseconds from Date
      *
      * @param date {@link Date}
-     * @return 毫秒
+     * @return Milliseconds since epoch
      */
     public static long milliSeconds(Date date) {
         return date.getTime();
     }
 
     /**
-     * 获取 Date
+     * Get Date from milliseconds
      *
-     * @param milliSeconds 毫秒
+     * @param milliSeconds Milliseconds since epoch
      * @return Date {@link Date}
      */
     public static Date localDateTime(long milliSeconds) {
@@ -67,11 +71,11 @@ public class TimeUtil {
     }
 
     /**
-     * 推迟时间 HOUR/MINUTE/...
+     * Calculate expire time by adding amount to specified calendar field
      *
-     * @param amount Integer
+     * @param amount Integer amount to add
      * @param field  Calendar field : {@link Calendar Calendar.HOUR/MINUTE/...}
-     * @return Date
+     * @return Date with calculated expire time
      */
     public static Date expireTime(int amount, int field) {
         Calendar calendar = Calendar.getInstance();
@@ -81,30 +85,30 @@ public class TimeUtil {
     }
 
     /**
-     * 使用 yyyy-MM-dd HH:mm:ss 格式化时间
+     * Format date using yyyy-MM-dd HH:mm:ss pattern
      *
      * @param date {@link Date}
-     * @return R of String
+     * @return Formatted date string
      */
     public static String defaultFormat(Date date) {
         return DEFAULT_DATE_FORMAT_THREAD_LOCAL.get().format(date);
     }
 
     /**
-     * 使用 yyyy-MM-dd HH:mm:ss.SSS 格式化时间
+     * Format date using yyyy-MM-dd HH:mm:ss.SSS pattern
      *
      * @param date {@link Date}
-     * @return R of String
+     * @return Formatted date string with milliseconds
      */
     public static String completeFormat(Date date) {
         return COMPLETE_DATE_FORMAT_THREAD_LOCAL.get().format(date);
     }
 
     /**
-     * 将时间字符串 yyyy-MM-dd HH:mm:ss 转为时间类型
+     * Parse date string yyyy-MM-dd HH:mm:ss to Date
      *
-     * @param dateString yyyy-MM-dd HH:mm:ss
-     * @return Date
+     * @param dateString Date string in yyyy-MM-dd HH:mm:ss format
+     * @return Date object
      */
     public static Date defaultDate(String dateString) {
         try {
@@ -115,10 +119,10 @@ public class TimeUtil {
     }
 
     /**
-     * 将时间字符串 yyyy-MM-dd HH:mm:ss.SSS 转为时间类型
+     * Parse date string yyyy-MM-dd HH:mm:ss.SSS to Date
      *
-     * @param dateString yyyy-MM-dd HH:mm:ss.SSS
-     * @return Date
+     * @param dateString Date string in yyyy-MM-dd HH:mm:ss.SSS format
+     * @return Date object
      */
     public static Date completeDate(String dateString) {
         try {
@@ -129,7 +133,7 @@ public class TimeUtil {
     }
 
     /**
-     * 删除此线程局部变量的当前线程值
+     * Remove the current thread's values from the ThreadLocal variables.
      */
     public static void clean() {
         DEFAULT_DATE_FORMAT_THREAD_LOCAL.remove();

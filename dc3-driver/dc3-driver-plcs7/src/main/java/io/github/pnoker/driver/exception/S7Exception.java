@@ -17,9 +17,14 @@
 package io.github.pnoker.driver.exception;
 
 /**
- * The Class S7Exception is an exception related to S7 Communication
- *
+ * Exception class for handling S7 PLC communication errors.
+ * This exception is thrown when errors occur during communication with
+ * Siemens S7 PLCs, including connection issues, data conversion errors,
+ * and protocol-specific problems.
+ * 
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public final class S7Exception extends RuntimeException {
 

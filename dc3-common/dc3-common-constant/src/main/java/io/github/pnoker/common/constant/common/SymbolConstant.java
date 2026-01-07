@@ -19,6 +19,9 @@ package io.github.pnoker.common.constant.common;
 
 /**
  * Symbol related constants
+ * <p>
+ * Provides commonly used symbol constants for string manipulation and formatting.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,39 +30,39 @@ package io.github.pnoker.common.constant.common;
 public class SymbolConstant {
 
     /**
-     * Dot
+     * Dot symbol: "."
      */
     public static final String DOT = ".";
     /**
-     * Underscore
+     * Underscore symbol: "_"
      */
     public static final String UNDERSCORE = "_";
     /**
-     * Hyphen
+     * Hyphen symbol: "-"
      */
     public static final String HYPHEN = "-";
     /**
-     * Asterisk
+     * Asterisk symbol: "*"
      */
     public static final String ASTERISK = "*";
     /**
-     * Hashtag
+     * Hashtag symbol: "#"
      */
     public static final String HASHTAG = "#";
     /**
-     * Colon
+     * Colon symbol: ":"
      */
     public static final String COLON = ":";
     /**
-     * Double colon
+     * Double colon symbol: "::"
      */
     public static final String DOUBLE_COLON = "::";
     /**
-     * Slash
+     * Slash symbol: "/"
      */
     public static final String SLASH = "/";
     /**
-     * Double slash
+     * Double slash symbol: "//"
      */
     public static final String DOUBLE_SLASH = "//";
 

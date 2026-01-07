@@ -23,7 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.UUID;
 
 /**
- * 编码生成工具类, 提供唯一编码生成功能
+ * Code Generation Utility Class
+ * <p>
+ * Utility class for unique code generation.
+ * Provides methods to generate unique identifiers
+ * and validation codes for various purposes.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,9 +43,9 @@ public class CodeUtil {
 
 
     /**
-     * 生成一个简化的UUID作为唯一编码
+     * Generate a simplified UUID as a unique code.
      *
-     * @return 返回一个简化的UUID字符串
+     * @return Simplified UUID string
      */
     public static String getCode() {
         return UUID.randomUUID().toString();

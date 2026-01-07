@@ -32,7 +32,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Redis Util
+ * Redis Service Utility Class
+ * <p>
+ * Service class providing comprehensive Redis operations for caching and data storage.
+ * Supports key-value operations, batch operations, expiration management,
+ * and pattern-based key searches with generic type support.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0

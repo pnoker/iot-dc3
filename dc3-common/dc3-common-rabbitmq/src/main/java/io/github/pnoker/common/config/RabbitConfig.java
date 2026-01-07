@@ -31,6 +31,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * RabbitMQ Configuration Class
+ * <p>
+ * Configuration class for RabbitMQ messaging in Spring Boot applications.
+ * Configures RabbitTemplate, listener container factory, and message converter
+ * for reliable message publishing and consumption with proper error handling.
+ * </p>
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -45,6 +52,12 @@ public class RabbitConfig {
         this.connectionFactory = connectionFactory;
     }
 
+    /**
+     * Configure RabbitTemplate for message publishing
+     *
+     * @param messageConverter Message converter for JSON serialization
+     * @return Configured RabbitTemplate bean
+     */
     @Bean
     RabbitTemplate rabbitTemplate(MessageConverter messageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
@@ -59,6 +72,12 @@ public class RabbitConfig {
         return rabbitTemplate;
     }
 
+    /**
+     * Configure Rabbit listener container factory
+     *
+     * @param messageConverter Message converter for JSON deserialization
+     * @return Configured RabbitListenerContainerFactory bean
+     */
     @Bean
     public RabbitListenerContainerFactory<SimpleMessageListenerContainer> rabbitListenerContainerFactory(MessageConverter messageConverter) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
@@ -71,6 +90,11 @@ public class RabbitConfig {
         return factory;
     }
 
+    /**
+     * Configure message converter for JSON serialization/deserialization
+     *
+     * @return Jackson2JsonMessageConverter bean
+     */
     @Bean
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter(JsonUtil.getJsonMapper());

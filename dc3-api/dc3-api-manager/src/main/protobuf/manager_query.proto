@@ -19,59 +19,33 @@ syntax = "proto3";
 
 package api.common.manager;
 
-/*
-Config
-*/
+// Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "QueryProto";
 option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
-/*
-Driver ID Query
-Driver query structure for querying driver information by driver ID
-*/
+// Driver query structure for querying driver information by driver ID
 message GrpcDriverQuery {
-  /*
-  Driver ID
-  Identifies specific driver instance
-  */
+  // Identifies specific driver instance
   int64 driver_id = 1;
 }
 
-/*
-Profile ID Query
-Profile template query structure for querying template information by profile ID
-*/
+// Profile template query structure for querying template information by profile ID
 message GrpcProfileQuery {
-  /*
-  Profile ID
-  Profile template ID that identifies specific configuration template
-  */
+  // Profile template ID that identifies specific configuration template
   int64 profile_id = 1;
 }
 
-/*
-Point ID Query
-Point query structure for querying point information by point ID
-*/
+// Point query structure for querying point information by point ID
 message GrpcPointQuery {
-  /*
-  Point ID
-  Point ID that identifies specific point
-  */
+  // Point ID that identifies specific point
   int64 point_id = 1;
 }
 
-/*
-Device ID Query
-Device query structure for querying device information by device ID
-*/
+// Device query structure for querying device information by device ID
 message GrpcDeviceQuery {
-  /*
-  Device ID
-  Device ID that identifies specific device
-  */
+  // Device ID that identifies specific device
   int64 device_id = 1;
 }
 

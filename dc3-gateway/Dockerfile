@@ -15,12 +15,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# runtime
+# Runtime stage
 FROM pnoker/dc3-jre:2025.9 AS runtime
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 
-# default env
+# Default environment variables
 ENV PARAMS=''
 ENV NODE_ENV=test
 ENV SERVER_PORT=8000
@@ -29,28 +29,34 @@ ENV SERVER_PACKAGES=io.github.pnoker
 ENV APM_AGENT_ENABLE=false
 ENV APM_SERVICE=http://dc3-apm:9300
 
-# default jvm & gc env
-ENV JAVA_OPS="-server \
-              -Xms256m \
+# Default JVM and GC environment variables
+ENV JAVA_OPS="-Xms256m \
               -Xmx512m \
-              -XX:+UseG1GC \
-              -XX:+AlwaysPreTouch \
-              -XX:+UseContainerSupport \
-              -Djava.security.egd=file:/dev/./urandom"
-ENV GC_LOG="-Xlog:gc*:file=dc3/logs/gateway/gc/gc.log:time,uptime,level,tags:filecount=20,filesize=10M"
+              -XX:+UseG1GC-XX:+AlwaysPreTouch \
+              -XX:+HeapDumpOnOutOfMemoryError \
+              -XX:HeapDumpPath=dc3/logs/gateway/gc/dump.hprof"
+ENV GC_LOG="-Xlog:gc*:file=dc3/logs/gateway/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
 
+# Set working directory
 WORKDIR /dc3-gateway
 
+# Set timezone to Asia/Shanghai and create log directory
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && mkdir -p /dc3-gateway/dc3/logs/gateway/gc
 
+# Copy application JAR file
 COPY target/dc3-gateway.jar ./
 
+# Copy entrypoint script
 RUN cp /usr/share/dc3/entrypoint.sh ./entrypoint.sh
 
+# Expose server port
 EXPOSE ${SERVER_PORT}
+# Mount logs volume
 VOLUME /dc3-gateway/dc3/logs
 
+# Set entrypoint script
 ENTRYPOINT ["./entrypoint.sh"]
 
+# Default command
 CMD ["dc3-gateway.jar"]

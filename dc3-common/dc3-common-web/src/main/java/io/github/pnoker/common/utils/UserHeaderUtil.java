@@ -28,7 +28,12 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 /**
- * 用户请求头 相关工具类
+ * User Header Utility Class
+ * <p>
+ * Utility class for extracting user information from HTTP request headers
+ * in reactive applications. Provides methods to get user header information
+ * from Reactor context and extract specific user details.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,9 +47,9 @@ public class UserHeaderUtil {
     }
 
     /**
-     * 获取用户请求头信息
+     * Get user header information from Reactor context
      *
-     * @return 用户信息
+     * @return User header information as Mono
      */
     public static Mono<RequestHeader.UserHeader> getUserHeader() {
         return Mono.deferContextual(context -> {
@@ -57,9 +62,9 @@ public class UserHeaderUtil {
     }
 
     /**
-     * 获取用户请求头的租户ID
+     * Get tenant ID from user header
      *
-     * @return 租户ID
+     * @return Tenant ID as Mono
      */
     public static Mono<Long> getTenantId() {
         return getUserHeader().flatMap(userHeader -> {
@@ -72,9 +77,9 @@ public class UserHeaderUtil {
     }
 
     /**
-     * 获取用户请求头的用户ID
+     * Get user ID from user header
      *
-     * @return 用户ID
+     * @return User ID as Mono
      */
     public static Mono<Long> getUserId() {
         return getUserHeader().flatMap(userHeader -> {
@@ -87,9 +92,9 @@ public class UserHeaderUtil {
     }
 
     /**
-     * 获取用户请求头的用户昵称
+     * Get user nickname from user header
      *
-     * @return 用户昵称
+     * @return User nickname as Mono
      */
     public static Mono<String> getNickName() {
         return getUserHeader().flatMap(userHeader -> {
@@ -102,9 +107,9 @@ public class UserHeaderUtil {
     }
 
     /**
-     * 获取用户请求头的用户名称
+     * Get username from user header
      *
-     * @return 用户名称
+     * @return Username as Mono
      */
     public static Mono<String> getUserName() {
         return getUserHeader().flatMap(userHeader -> {
