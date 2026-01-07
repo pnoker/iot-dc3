@@ -37,16 +37,16 @@ service TokenApi {
 message GrpcLoginQuery {
   // Tenant, identifies the owning tenant
   string tenant = 1;
-  
+
   // Login name
   string name = 2;
-  
+
   // Salt used for password encryption
   string salt = 3;
-  
+
   // Login password
   string password = 4;
-  
+
   // Token
   string token = 5;
 }

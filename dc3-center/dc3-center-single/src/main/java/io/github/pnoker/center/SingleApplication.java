@@ -39,7 +39,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @MapperScan(basePackages = {
         "io.github.pnoker.common.dal.mapper",
-        "io.github.pnoker.common.auth.mapper", 
+        "io.github.pnoker.common.auth.mapper",
         "io.github.pnoker.common.data.mapper",
         "io.github.pnoker.common.manager.mapper"
 })
@@ -47,7 +47,7 @@ public class SingleApplication {
 
     /**
      * Main entry point for the Single Center Service.
-     * 
+     *
      * @param args command line arguments
      */
     public static void main(String[] args) {

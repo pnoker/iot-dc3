@@ -21,7 +21,7 @@ package io.github.pnoker.driver.api.impl.nodave;
  * This class provides methods for data conversion, protocol constants,
  * and error handling for S7 PLC communication.
  * Based on the libnodave library for PLC communication.
- * 
+ *
  * @author Thomas Rudin
  * @version 2025.9.0
  * @since 2022.1.0

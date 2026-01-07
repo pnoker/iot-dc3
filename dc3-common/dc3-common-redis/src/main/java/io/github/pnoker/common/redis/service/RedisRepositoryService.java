@@ -75,7 +75,7 @@ public class RedisRepositoryService {
     /**
      * Save multiple point values for a device to Redis
      *
-     * @param deviceId   Device ID for the point values
+     * @param deviceId     Device ID for the point values
      * @param entityBOList List of point value business objects to save
      */
     public void savePointValue(Long deviceId, List<PointValueBO> entityBOList) {

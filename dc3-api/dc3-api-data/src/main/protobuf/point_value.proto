@@ -37,7 +37,7 @@ service PointValueApi {
 message GrpcPointValueQuery {
   // Device ID, identifies the specific device
   int64 device_id = 1;
-  
+
   // Point ID, identifies the specific point
   int64 point_id = 2;
 

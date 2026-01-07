@@ -36,7 +36,7 @@ public class ManagerApplication {
 
     /**
      * Main entry point for the Manager Center Service.
-     * 
+     *
      * @param args command line arguments
      */
     public static void main(String[] args) {
