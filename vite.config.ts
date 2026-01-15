@@ -45,14 +45,12 @@ export default (configEnv: ConfigEnv) => {
     compact: true,
     manualChunks: (id: string) => {
       if (id.includes('node_modules')) {
-        if (id.includes('vue') || id.includes('pinia') || id.includes('vuex')) {
+        // Merge vue and element-plus to avoid circular dependency
+        if (id.includes('vue') || id.includes('pinia') || id.includes('element-plus') || id.includes('@element-plus')) {
           return 'vue-vendor';
         }
         if (id.includes('vue-router')) {
           return 'router-vendor';
-        }
-        if (id.includes('element-plus') || id.includes('@element-plus')) {
-          return 'element-vendor';
         }
         if (id.includes('echarts')) {
           return 'echarts-vendor';
@@ -62,6 +60,7 @@ export default (configEnv: ConfigEnv) => {
         }
         return 'vendor';
       }
+      return undefined;
     },
   };
 
@@ -102,7 +101,16 @@ export default (configEnv: ConfigEnv) => {
       }),
       AutoImport({
         resolvers: [ElementPlusResolver()],
-        imports: ['vue', 'vue-router', 'vuex'],
+        imports: [
+          'vue',
+          'vue-router',
+          'pinia',
+          {
+            'vue-router': ['RouteRecordRaw', 'NavigationGuardNext', 'RouteLocationNormalized', 'RouteMeta'],
+            axios: ['AxiosInstance'],
+            'element-plus': ['FormInstance', 'FormRules'],
+          },
+        ],
         dts: 'src/config/types/auto-imports.d.ts',
       }),
       Components({
@@ -118,7 +126,13 @@ export default (configEnv: ConfigEnv) => {
       preprocessorOptions: {
         scss: {
           charset: false,
-          additionalData: `@use "@/config/plugins/element/element-variables.scss" as *;`,
+          additionalData: (content, filename) => {
+            // Avoid circular import by not adding additionalData to the element-variables.scss file itself
+            if (filename.includes('element-variables.scss')) {
+              return content;
+            }
+            return `@use "@/config/plugins/element/element-variables.scss" as *;${content}`;
+          },
         },
       },
       modules: {

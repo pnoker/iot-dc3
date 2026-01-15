@@ -15,10 +15,8 @@
  */
 
 import { defineComponent, reactive, ref, unref } from 'vue';
-import { FormInstance, FormRules } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue';
-
-import { useStore } from 'vuex';
 
 export default defineComponent({
   name: 'DriverTool',
@@ -36,8 +34,6 @@ export default defineComponent({
   },
   emits: ['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change'],
   setup(props, { emit }) {
-    const store = useStore();
-
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
@@ -92,7 +88,6 @@ export default defineComponent({
     };
 
     return {
-      store,
       formDataRef,
       formRule,
       reactiveData,

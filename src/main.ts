@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
+import { createPinia } from 'pinia';
 import App from '@/App.vue';
 import plugins from '@/config/plugins/index';
 import router from '@/config/router';
-import store from '@/store';
 import { createApp } from 'vue';
 
 // config app
 const app = createApp(App);
 app.use(router);
-app.use(store);
+app.use(createPinia());
 plugins(app);
 app.mount('#app');
 

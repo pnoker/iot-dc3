@@ -14,5 +14,25 @@
  * limitations under the License.
  */
 
-export { useAuthStore } from './auth';
-export { useIntervalStore } from './interval';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+
+export const useIntervalStore = defineStore('interval', () => {
+  // State
+  const pointValueInterval = ref<number | null>(null);
+
+  // Actions
+  const clearPointValueInterval = (interval: number) => {
+    if (pointValueInterval.value) {
+      clearInterval(pointValueInterval.value);
+    }
+    pointValueInterval.value = interval;
+  };
+
+  return {
+    // State
+    pointValueInterval,
+    // Actions
+    clearPointValueInterval,
+  };
+});

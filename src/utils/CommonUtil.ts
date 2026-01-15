@@ -15,7 +15,7 @@
  */
 
 import router from '@/config/router';
-import store from '@/store';
+import { useAuthStore } from '@/store';
 import { dateFormat, setCopyContent } from '@/utils/utils';
 
 export const copy = (content: string, message: string) => {
@@ -26,6 +26,8 @@ export const timestamp = (timestamp: string): string => {
   return dateFormat(new Date(timestamp));
 };
 
-export const logout = () => {
-  store.dispatch('auth/logout').then(() => router.push({ name: 'login' }));
+export const logout = async () => {
+  const authStore = useAuthStore();
+  await authStore.logout();
+  await router.push({ name: 'login' });
 };

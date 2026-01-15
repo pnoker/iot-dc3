@@ -26,13 +26,17 @@
   "scripts": {
     "prepare": "husky",
     "dev": "vite --host --mode dev",
+    "dev:prod": "vite --host --mode production",
     "build": "vite build",
     "build:tauri": "tauri build",
     "preview": "vite preview",
     "check": "vue-tsc --noEmit --skipLibCheck",
-    "format": "prettier --write .",
-    "lint": "eslint --fix src/**/*.{vue,ts,js,jsx,tsx}",
-    "tauri": "tauri"
+    "type-check": "vue-tsc --noEmit --skipLibCheck",
+    "format": "prettier --write \"src/**/*.{vue,ts,js,jsx,tsx,scss,css,json,md}\"",
+    "lint": "eslint --fix \"src/**/*.{vue,ts,js,jsx,tsx}\" && prettier --write \"src/**/*.{scss,css,json,md}\"",
+    "lint:check": "eslint \"src/**/*.{vue,ts,js,jsx,tsx}\"",
+    "tauri": "tauri",
+    "clean": "rimraf dist"
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^1.0.1",
@@ -91,7 +95,6 @@
   },
   "lint-staged": {
     "*.{vue,js,ts,jsx,tsx}": [
-      "node scripts/add-license-header.js --check",
       "eslint --fix",
       "prettier --write"
     ],

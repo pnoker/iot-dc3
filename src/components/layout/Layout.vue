@@ -77,10 +77,10 @@
   import { warning } from '@/utils/MessageUtil';
   import { HomeFilled } from '@element-plus/icons-vue';
   import { computed } from 'vue';
-  import { useStore } from 'vuex';
+  import { useAuthStore } from '@/store';
   import { RouteRecordRaw } from 'vue-router';
 
-  const store = useStore();
+  const authStore = useAuthStore();
 
   const menus = computed(() => {
     const children: RouteRecordRaw[] = menu?.children || [];
@@ -101,9 +101,10 @@
     warning('待开发');
   };
 
-  const handleCommand = (command: string) => {
+  const handleCommand = async (command: string) => {
     if (command === 'logout') {
-      store.dispatch('auth/logout').then(() => router.push({ name: 'login' }));
+      await authStore.logout();
+      await router.push({ name: 'login' });
     } else if (command === 'help') {
       window.open('https://doc.dc3.site');
     }

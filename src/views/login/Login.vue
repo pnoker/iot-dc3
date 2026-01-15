@@ -75,17 +75,17 @@
   import { FormInstance, FormRules } from 'element-plus';
   import { Box, Lock, User } from '@element-plus/icons-vue';
 
-  import { useStore } from 'vuex';
+  import { useAuthStore } from '@/store';
 
   import Particles from '@/components/particles/particles.vue';
 
-  const store = useStore();
+  const authStore = useAuthStore();
   // 定义表单引用
   const formDataRef = ref<FormInstance>();
 
   // 定义响应式数据
-  const tenant = store.getters['auth/getTenant'] || 'default';
-  const name = store.getters['auth/getName'] || 'dc3';
+  const tenant = authStore.getTenant || 'default';
+  const name = authStore.getName || 'dc3';
   const reactiveData = reactive({
     isHide: 'View',
     passwordType: 'password',
@@ -116,7 +116,7 @@
   const handleLogin = () => {
     const form = unref(formDataRef);
     form?.validate((valid) => {
-      if (valid) store.dispatch('auth/login', reactiveData.formData);
+      if (valid) authStore.login(reactiveData.formData);
     });
   };
 </script>
