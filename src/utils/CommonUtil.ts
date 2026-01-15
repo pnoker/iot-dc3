@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import router from '@/config/router'
-import store from '@/store'
-import { dateFormat, setCopyContent } from '@/utils/utils'
+import router from '@/config/router';
+import store from '@/store';
+import { dateFormat, setCopyContent } from '@/utils/utils';
 
 export const copy = (content: string, message: string) => {
-    setCopyContent(content, true, message)
-}
+  setCopyContent(content, true, message);
+};
 
 export const timestamp = (timestamp: string): string => {
-    return dateFormat(new Date(timestamp))
-}
+  return dateFormat(new Date(timestamp));
+};
 
 export const logout = () => {
-    store.dispatch('auth/logout').then(() => router.push({ name: 'login' }))
-}
+  store.dispatch('auth/logout').then(() => router.push({ name: 'login' }));
+};

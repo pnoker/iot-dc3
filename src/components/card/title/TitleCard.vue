@@ -15,59 +15,59 @@
   -->
 
 <template>
-    <div class="title-card">
-        <el-card class="title-card__body" shadow="hover">
-            <div class="title-card__container">
-                <slot name="header">
-                    <span class="title-card__header">{{ props.title }}</span>
-                </slot>
-                <slot />
-            </div>
-        </el-card>
-    </div>
+  <div class="title-card">
+    <el-card class="title-card__body" shadow="hover">
+      <div class="title-card__container">
+        <slot name="header">
+          <span class="title-card__header">{{ props.title }}</span>
+        </slot>
+        <slot />
+      </div>
+    </el-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
-    const props = defineProps({
-        title: {
-            type: String,
-            default: ''
-        }
-    })
+  const props = defineProps({
+    title: {
+      type: String,
+      default: '',
+    },
+  });
 </script>
 
 <style lang="scss" scoped>
-    .title-card {
-        border-radius: 4px;
-        box-sizing: border-box;
+  .title-card {
+    border-radius: 4px;
+    box-sizing: border-box;
 
-        :deep(.el-card) {
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        :deep(.el-card__header) {
-            padding: 10px;
-        }
-
-        :deep(.el-card__body) {
-            padding: 10px 5px 0;
-        }
-
-        :deep(.el-tabs__nav) {
-            margin: 0 5px;
-        }
-
-        .title-card__container {
-            .title-card__header {
-                font-size: 14px;
-                font-weight: bold;
-            }
-
-            &:first-child {
-                padding-top: 0;
-                padding-left: 0;
-            }
-        }
+    :deep(.el-card) {
+      width: 100%;
+      box-sizing: border-box;
     }
+
+    :deep(.el-card__header) {
+      padding: 10px;
+    }
+
+    :deep(.el-card__body) {
+      padding: 10px 5px 0;
+    }
+
+    :deep(.el-tabs__nav) {
+      margin: 0 5px;
+    }
+
+    .title-card__container {
+      .title-card__header {
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      &:first-child {
+        padding-top: 0;
+        padding-left: 0;
+      }
+    }
+  }
 </style>

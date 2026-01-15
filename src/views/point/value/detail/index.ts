@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
-    name: 'PointValueDetail',
-    props: {
-        detailData: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        }
+  name: 'PointValueDetail',
+  props: {
+    detailData: {
+      type: Object,
+      default: () => {
+        return {};
+      },
     },
-    setup() {
-        const detailVisible = ref(false)
+  },
+  setup() {
+    const detailVisible = ref(false);
 
-        return {
-            detailVisible
-        }
-    }
-})
+    return {
+      detailVisible,
+    };
+  },
+});

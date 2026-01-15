@@ -15,40 +15,40 @@
   -->
 
 <template>
-    <div class="things-card cursor-pointer" @click="select(data)">
-        <el-card :shadow="data.shadow">
-            <div class="things-card-content">
-                <div
-                    :class="{
-                        'header-enable': isConfig,
-                        'header-disable': !isConfig
-                    }"
-                    class="things-card__header"
-                >
-                    <div class="things-card-header-icon">
-                        <img :alt="data.attributeName" :src="isSelect" />
-                    </div>
-                    <div class="things-card-header-name nowrap-name">{{ data.pointName }}</div>
-                </div>
-                <div class="things-card__body">
-                    <div class="things-card-body-content">
-                        <ul>
-                            <li v-for="attribute in attributes" :key="attribute.id" class="nowrap-item">
-                                <el-icon>
-                                    <Goblet />
-                                </el-icon>
-                                {{ attribute.attributeName }}: {{ data[attribute.attributeCode].configValue }}
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </el-card>
-    </div>
+  <div class="things-card cursor-pointer" @click="select(data)">
+    <el-card :shadow="data.shadow">
+      <div class="things-card-content">
+        <div
+          :class="{
+            'header-enable': isConfig,
+            'header-disable': !isConfig,
+          }"
+          class="things-card__header"
+        >
+          <div class="things-card-header-icon">
+            <img :alt="data.attributeName" :src="isSelect" />
+          </div>
+          <div class="things-card-header-name nowrap-name">{{ data.pointName }}</div>
+        </div>
+        <div class="things-card__body">
+          <div class="things-card-body-content">
+            <ul>
+              <li v-for="attribute in attributes" :key="attribute.id" class="nowrap-item">
+                <el-icon>
+                  <Goblet />
+                </el-icon>
+                {{ attribute.attributeName }}: {{ data[attribute.attributeCode].configValue }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </el-card>
+  </div>
 </template>
 
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss" scoped>
-    @use '@/components/card/styles/things-card.scss';
+  @use '@/components/card/styles/things-card.scss';
 </style>

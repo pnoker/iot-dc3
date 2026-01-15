@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 /**
  * 新增设备
@@ -23,11 +23,11 @@ import request from '@/config/axios'
  * @returns MyAxiosPromise
  */
 export const addDevice = (device: any) =>
-    request<R>({
-        url: `api/v3/manager/device/add`,
-        method: 'post',
-        data: device
-    })
+  request<R>({
+    url: `api/v3/manager/device/add`,
+    method: 'post',
+    data: device,
+  });
 
 /**
  * 删除设备
@@ -36,10 +36,10 @@ export const addDevice = (device: any) =>
  * @returns MyAxiosPromise
  */
 export const deleteDevice = (id: string) =>
-    request<R>({
-        url: `api/v3/manager/device/delete/${id}`,
-        method: 'post'
-    })
+  request<R>({
+    url: `api/v3/manager/device/delete/${id}`,
+    method: 'post',
+  });
 
 /**
  * 更新设备
@@ -48,11 +48,11 @@ export const deleteDevice = (id: string) =>
  * @returns MyAxiosPromise
  */
 export const updateDevice = (device: any) =>
-    request<R>({
-        url: `api/v3/manager/device/update`,
-        method: 'post',
-        data: device
-    })
+  request<R>({
+    url: `api/v3/manager/device/update`,
+    method: 'post',
+    data: device,
+  });
 
 /**
  * 通过设备ID查询设备
@@ -61,10 +61,10 @@ export const updateDevice = (device: any) =>
  * @returns MyAxiosPromise
  */
 export const getDeviceById = (id: string) =>
-    request<R>({
-        url: `api/v3/manager/device/id/${id}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/device/id/${id}`,
+    method: 'get',
+  });
 
 /**
  * 通过设备ID集查询设备
@@ -73,11 +73,11 @@ export const getDeviceById = (id: string) =>
  * @returns MyAxiosPromise
  */
 export const getDeviceByIds = (deviceIds: any) =>
-    request<R>({
-        url: `api/v3/manager/device/ids`,
-        method: 'post',
-        data: deviceIds
-    })
+  request<R>({
+    url: `api/v3/manager/device/ids`,
+    method: 'post',
+    data: deviceIds,
+  });
 
 /**
  * 通过驱动ID查询设备
@@ -86,10 +86,10 @@ export const getDeviceByIds = (deviceIds: any) =>
  * @returns MyAxiosPromise
  */
 export const getDeviceByDriverId = (driverId: string) =>
-    request<R>({
-        url: `api/v3/manager/device/driver_id/${driverId}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/device/driver_id/${driverId}`,
+    method: 'get',
+  });
 
 /**
  * 通过模板ID查询设备
@@ -98,10 +98,10 @@ export const getDeviceByDriverId = (driverId: string) =>
  * @returns MyAxiosPromise
  */
 export const getDeviceByProfileId = (profileId: string) =>
-    request<R>({
-        url: `api/v3/manager/device/profile_id/${profileId}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/device/profile_id/${profileId}`,
+    method: 'get',
+  });
 
 /**
  * 分页查询设备
@@ -110,11 +110,11 @@ export const getDeviceByProfileId = (profileId: string) =>
  * @returns MyAxiosPromise
  */
 export const getDeviceList = (device: any) =>
-    request<R>({
-        url: `api/v3/manager/device/list`,
-        method: 'post',
-        data: device
-    })
+  request<R>({
+    url: `api/v3/manager/device/list`,
+    method: 'post',
+    data: device,
+  });
 
 /**
  * 分页查询设备状态
@@ -123,11 +123,11 @@ export const getDeviceList = (device: any) =>
  * @returns MyAxiosPromise
  */
 export const getDeviceStatus = (device: any) =>
-    request<R>({
-        url: `api/v3/data/device/status/device`,
-        method: 'post',
-        data: device
-    })
+  request<R>({
+    url: `api/v3/data/device/status/device`,
+    method: 'post',
+    data: device,
+  });
 
 /**
  * 通过驱动ID查询设备状态
@@ -136,10 +136,10 @@ export const getDeviceStatus = (device: any) =>
  * @returns MyAxiosPromise
  */
 export const getDeviceStatusByDriverId = (driverId: string) =>
-    request<R>({
-        url: `api/v3/data/device/status/device/driver_id/${driverId}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/data/device/status/device/driver_id/${driverId}`,
+    method: 'get',
+  });
 
 /**
  * 通过模板ID查询设备状态
@@ -148,10 +148,10 @@ export const getDeviceStatusByDriverId = (driverId: string) =>
  * @returns MyAxiosPromise
  */
 export const getDeviceStatusByProfileId = (profileId: string) =>
-    request<R>({
-        url: `api/v3/data/device/status/device/profile_id/${profileId}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/data/device/status/device/profile_id/${profileId}`,
+    method: 'get',
+  });
 
 /**
  * 通过驱动ID和模板ID获取设备导入模板
@@ -160,12 +160,12 @@ export const getDeviceStatusByProfileId = (profileId: string) =>
  * @returns MyAxiosPromise
  */
 export const importDeviceTemplate = (device: any) =>
-    request<R>({
-        url: `api/v3/manager/device/export/import_template`,
-        responseType: 'blob',
-        method: 'post',
-        data: device
-    })
+  request<R>({
+    url: `api/v3/manager/device/export/import_template`,
+    responseType: 'blob',
+    method: 'post',
+    data: device,
+  });
 
 /**
  * 通过驱动ID和模板ID获取设备导入模板
@@ -174,10 +174,10 @@ export const importDeviceTemplate = (device: any) =>
  * @returns MyAxiosPromise
  */
 export const importDevice = (device: any) =>
-    request<R>({
-        url: `api/v3/manager/device/import`,
-        method: 'post',
-        timeout: 0,
-        headers: { 'Content-Type': 'multipart/form-data' },
-        data: device
-    })
+  request<R>({
+    url: `api/v3/manager/device/import`,
+    method: 'post',
+    timeout: 0,
+    headers: { 'Content-Type': 'multipart/form-data' },
+    data: device,
+  });

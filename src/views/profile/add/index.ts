@@ -14,86 +14,86 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from 'vue'
-import { FormInstance, FormRules } from 'element-plus'
+import { defineComponent, reactive, ref, unref } from 'vue';
+import { FormInstance, FormRules } from 'element-plus';
 
-import { successMessage } from '@/utils/NotificationUtil'
+import { successMessage } from '@/utils/NotificationUtil';
 
 export default defineComponent({
-    name: 'ProfileAddForm',
-    emits: ['add-thing'],
-    setup(props, { emit }) {
-        // 定义表单引用
-        const formDataRef = ref<FormInstance>()
+  name: 'ProfileAddForm',
+  emits: ['add-thing'],
+  setup(props, { emit }) {
+    // 定义表单引用
+    const formDataRef = ref<FormInstance>();
 
-        // 定义表单校验规则
-        const formRule = reactive<FormRules>({
-            profileName: [
-                {
-                    required: true,
-                    message: '请输入模板名称',
-                    trigger: 'blur'
-                },
-                {
-                    min: 2,
-                    max: 32,
-                    message: '请输入 2~32 位字长的模板名称',
-                    trigger: 'blur'
-                },
-                {
-                    pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-                    message: '请输入正确格式的模板名称'
-                }
-            ],
-            remark: [
-                {
-                    max: 300,
-                    message: '最多输入300个字符',
-                    trigger: 'blur'
-                }
-            ]
-        })
+    // 定义表单校验规则
+    const formRule = reactive<FormRules>({
+      profileName: [
+        {
+          required: true,
+          message: '请输入模板名称',
+          trigger: 'blur',
+        },
+        {
+          min: 2,
+          max: 32,
+          message: '请输入 2~32 位字长的模板名称',
+          trigger: 'blur',
+        },
+        {
+          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
+          message: '请输入正确格式的模板名称',
+        },
+      ],
+      remark: [
+        {
+          max: 300,
+          message: '最多输入300个字符',
+          trigger: 'blur',
+        },
+      ],
+    });
 
-        // 定义响应式数据
-        const reactiveData = reactive({
-            formData: {} as any,
-            formVisible: false
-        })
+    // 定义响应式数据
+    const reactiveData = reactive({
+      formData: {} as any,
+      formVisible: false,
+    });
 
-        const show = () => {
-            reactiveData.formVisible = true
+    const show = () => {
+      reactiveData.formVisible = true;
+    };
+
+    const cancel = () => {
+      reactiveData.formVisible = false;
+    };
+
+    const reset = () => {
+      const form = unref(formDataRef);
+      form?.resetFields();
+    };
+
+    const addThing = () => {
+      const form = unref(formDataRef);
+      form?.validate((valid) => {
+        if (valid) {
+          emit('add-thing', reactiveData.formData, () => {
+            cancel();
+            reset();
+            successMessage();
+          });
         }
+      });
+    };
 
-        const cancel = () => {
-            reactiveData.formVisible = false
-        }
-
-        const reset = () => {
-            const form = unref(formDataRef)
-            form?.resetFields()
-        }
-
-        const addThing = () => {
-            const form = unref(formDataRef)
-            form?.validate(valid => {
-                if (valid) {
-                    emit('add-thing', reactiveData.formData, () => {
-                        cancel()
-                        reset()
-                        successMessage()
-                    })
-                }
-            })
-        }
-
-        return {
-            formDataRef,
-            formRule,
-            reactiveData,
-            show,
-            cancel,
-            reset,
-            addThing
-        }
-    }
-})
+    return {
+      formDataRef,
+      formRule,
+      reactiveData,
+      show,
+      cancel,
+      reset,
+      addThing,
+    };
+  },
+});

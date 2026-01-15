@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
-module.exports = {
-    presets: ['@vue/cli-plugin-babel/preset']
-}
+export default {
+  tabWidth: 2,
+  printWidth: 120,
+  semi: true,
+  singleQuote: true,
+  endOfLine: 'lf',
+  trailingComma: 'es5',
+  bracketSpacing: true,
+  arrowParens: 'always',
+  vueIndentScriptAndStyle: true,
+  htmlWhitespaceSensitivity: 'css',
+  embeddedLanguageFormatting: 'auto',
+  proseWrap: 'preserve',
+};

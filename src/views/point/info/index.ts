@@ -14,69 +14,69 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent } from 'vue'
-import { Goblet } from '@element-plus/icons-vue'
+import { computed, defineComponent } from 'vue';
+import { Goblet } from '@element-plus/icons-vue';
 
-import { Attribute } from '@/config/entity'
+import { Attribute } from '@/config/entity';
 
 export default defineComponent({
-    name: 'PointInfoCard',
-    components: {
-        Goblet
-    },
-    props: {
-        data: {
-            type: Object,
-            default: () => {
-                return {
-                    attributeCode: '',
-                    defaultValue: '',
-                    remark: '',
-                    createTime: '',
-                    operateTime: ''
-                }
-            }
-        },
-        attributes: {
-            type: Array<Attribute>,
-            default: () => {
-                return []
-            }
-        },
-        icon: {
-            type: String,
-            default: 'images/common/point-info-disable.png'
-        }
-    },
-    emits: ['select'],
-    setup(props, { emit }) {
-        const isConfig = computed(() => {
-            for (let i = 0; i < props.attributes.length; i++) {
-                const attribute = props.attributes[i] as any
-                if (props.data[attribute.attributeCode].configValue === '') {
-                    return false
-                }
-            }
-
-            return true
-        })
-
-        const isSelect = computed(() => {
-            if (props.data.shadow === 'always') {
-                return 'images/common/point-info.png'
-            } else {
-                return 'images/common/point-info-disable.png'
-            }
-        })
-
-        const select = data => {
-            emit('select', data)
-        }
-
+  name: 'PointInfoCard',
+  components: {
+    Goblet,
+  },
+  props: {
+    data: {
+      type: Object,
+      default: () => {
         return {
-            isConfig,
-            isSelect,
-            select
+          attributeCode: '',
+          defaultValue: '',
+          remark: '',
+          createTime: '',
+          operateTime: '',
+        };
+      },
+    },
+    attributes: {
+      type: Array<Attribute>,
+      default: () => {
+        return [];
+      },
+    },
+    icon: {
+      type: String,
+      default: 'images/common/point-info-disable.png',
+    },
+  },
+  emits: ['select'],
+  setup(props, { emit }) {
+    const isConfig = computed(() => {
+      for (let i = 0; i < props.attributes.length; i++) {
+        const attribute = props.attributes[i] as any;
+        if (props.data[attribute.attributeCode].configValue === '') {
+          return false;
         }
-    }
-})
+      }
+
+      return true;
+    });
+
+    const isSelect = computed(() => {
+      if (props.data.shadow === 'always') {
+        return 'images/common/point-info.png';
+      } else {
+        return 'images/common/point-info-disable.png';
+      }
+    });
+
+    const select = (data) => {
+      emit('select', data);
+    };
+
+    return {
+      isConfig,
+      isSelect,
+      select,
+    };
+  },
+});

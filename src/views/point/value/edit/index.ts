@@ -14,80 +14,80 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from 'vue'
-import { FormInstance, FormRules } from 'element-plus'
+import { defineComponent, reactive, ref, unref } from 'vue';
+import { FormInstance, FormRules } from 'element-plus';
 
-import { successMessage } from '@/utils/NotificationUtil'
+import { successMessage } from '@/utils/NotificationUtil';
 
 export default defineComponent({
-    name: 'PointValueEditForm',
-    props: {
-        formData: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        }
+  name: 'PointValueEditForm',
+  props: {
+    formData: {
+      type: Object,
+      default: () => {
+        return {};
+      },
     },
-    emits: ['update-thing'],
-    setup(props, { emit }) {
-        // 定义表单引用
-        const formDataRef = ref<FormInstance>()
+  },
+  emits: ['update-thing'],
+  setup(props, { emit }) {
+    // 定义表单引用
+    const formDataRef = ref<FormInstance>();
 
-        // 定义响应式数据
-        const reactiveData = reactive({
-            formVisible: false
-        })
+    // 定义响应式数据
+    const reactiveData = reactive({
+      formVisible: false,
+    });
 
-        // 定义表单校验规则
-        const formRule = reactive<FormRules>({
-            value: [
-                {
-                    required: true,
-                    message: '请输入位号值',
-                    trigger: 'blur'
-                }
-            ],
-            remark: [
-                {
-                    max: 300,
-                    message: '最多输入300个字符',
-                    trigger: 'blur'
-                }
-            ]
-        })
+    // 定义表单校验规则
+    const formRule = reactive<FormRules>({
+      value: [
+        {
+          required: true,
+          message: '请输入位号值',
+          trigger: 'blur',
+        },
+      ],
+      remark: [
+        {
+          max: 300,
+          message: '最多输入300个字符',
+          trigger: 'blur',
+        },
+      ],
+    });
 
-        const show = () => {
-            reactiveData.formVisible = true
+    const show = () => {
+      reactiveData.formVisible = true;
+    };
+    const cancel = () => {
+      reactiveData.formVisible = false;
+    };
+    const reset = () => {
+      const form = unref(formDataRef);
+      form?.resetFields();
+    };
+    const updateThing = () => {
+      const form = unref(formDataRef);
+      form?.validate((valid) => {
+        if (valid) {
+          emit('update-thing', props.formData, () => {
+            cancel();
+            reset();
+            successMessage();
+          });
         }
-        const cancel = () => {
-            reactiveData.formVisible = false
-        }
-        const reset = () => {
-            const form = unref(formDataRef)
-            form?.resetFields()
-        }
-        const updateThing = () => {
-            const form = unref(formDataRef)
-            form?.validate(valid => {
-                if (valid) {
-                    emit('update-thing', props.formData, () => {
-                        cancel()
-                        reset()
-                        successMessage()
-                    })
-                }
-            })
-        }
+      });
+    };
 
-        return {
-            formDataRef,
-            reactiveData,
-            formRule,
-            show,
-            cancel,
-            reset,
-            updateThing
-        }
-    }
-})
+    return {
+      formDataRef,
+      reactiveData,
+      formRule,
+      show,
+      cancel,
+      reset,
+      updateThing,
+    };
+  },
+});

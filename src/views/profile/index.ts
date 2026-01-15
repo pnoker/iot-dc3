@@ -14,191 +14,191 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive, ref } from 'vue'
+import { computed, defineComponent, reactive, ref } from 'vue';
 
-import { addProfile, deleteProfile, getProfileList, updateProfile } from '@/api/profile'
+import { addProfile, deleteProfile, getProfileList, updateProfile } from '@/api/profile';
 
-import { Order } from '@/config/entity'
+import { Order } from '@/config/entity';
 
-import profileTool from '@/views/profile/tool/ProfileTool.vue'
-import blankCard from '@/components/card/blank/BlankCard.vue'
-import profileAddForm from '@/views/profile/add/ProfileAddForm.vue'
-import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
-import profileCard from '@/views/profile/card/ProfileCard.vue'
-import { isNull } from '@/utils/utils'
-import { failMessage } from '@/utils/NotificationUtil'
+import profileTool from '@/views/profile/tool/ProfileTool.vue';
+import blankCard from '@/components/card/blank/BlankCard.vue';
+import profileAddForm from '@/views/profile/add/ProfileAddForm.vue';
+import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+import profileCard from '@/views/profile/card/ProfileCard.vue';
+import { isNull } from '@/utils/utils';
+import { failMessage } from '@/utils/NotificationUtil';
 
 export default defineComponent({
-    components: {
-        blankCard,
-        skeletonCard,
-        profileTool,
-        profileAddForm,
-        profileCard
+  components: {
+    blankCard,
+    skeletonCard,
+    profileTool,
+    profileAddForm,
+    profileCard,
+  },
+  props: {
+    embedded: {
+      type: String,
+      default: () => {
+        return '';
+      },
     },
-    props: {
-        embedded: {
-            type: String,
-            default: () => {
-                return ''
-            }
-        },
-        deviceId: {
-            type: String,
-            default: () => {
-                return ''
-            }
-        }
+    deviceId: {
+      type: String,
+      default: () => {
+        return '';
+      },
     },
-    setup(props) {
-        const profileAddFormRef: any = ref<InstanceType<typeof profileAddForm>>()
+  },
+  setup(props) {
+    const profileAddFormRef: any = ref<InstanceType<typeof profileAddForm>>();
 
-        // 定义响应式数据
-        const reactiveData = reactive({
-            loading: true,
-            pointTable: {},
-            listData: [] as any[],
-            query: {},
-            order: false,
-            page: {
-                total: 0,
-                size: 12,
-                current: 1,
-                orders: [] as Order[]
-            }
+    // 定义响应式数据
+    const reactiveData = reactive({
+      loading: true,
+      pointTable: {},
+      listData: [] as any[],
+      query: {},
+      order: false,
+      page: {
+        total: 0,
+        size: 12,
+        current: 1,
+        orders: [] as Order[],
+      },
+    });
+
+    const hasData = computed(() => {
+      return !reactiveData.loading && reactiveData.listData?.length < 1;
+    });
+
+    const list = () => {
+      if (!isNull(props.deviceId)) {
+        reactiveData.query = {
+          ...reactiveData.query,
+          deviceId: props.deviceId,
+        };
+      }
+
+      getProfileList({
+        page: reactiveData.page,
+        ...reactiveData.query,
+      })
+        .then((res) => {
+          const data = res.data;
+          reactiveData.page.total = data.total;
+          reactiveData.listData = data.records;
         })
-
-        const hasData = computed(() => {
-            return !reactiveData.loading && reactiveData.listData?.length < 1
+        .catch(() => {
+          // nothing to do
         })
+        .finally(() => {
+          reactiveData.loading = false;
+        });
+    };
 
-        const list = () => {
-            if (!isNull(props.deviceId)) {
-                reactiveData.query = {
-                    ...reactiveData.query,
-                    deviceId: props.deviceId
-                }
-            }
+    const search = (params) => {
+      if (!isNull(props.deviceId)) {
+        params = {
+          ...params,
+          deviceId: props.deviceId,
+        };
+      }
 
-            getProfileList({
-                page: reactiveData.page,
-                ...reactiveData.query
-            })
-                .then(res => {
-                    const data = res.data
-                    reactiveData.page.total = data.total
-                    reactiveData.listData = data.records
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-                .finally(() => {
-                    reactiveData.loading = false
-                })
-        }
+      reactiveData.query = params;
+      list();
+    };
 
-        const search = params => {
-            if (!isNull(props.deviceId)) {
-                params = {
-                    ...params,
-                    deviceId: props.deviceId
-                }
-            }
+    const reset = () => {
+      let params = {};
+      if (!isNull(props.deviceId)) {
+        params = { deviceId: props.deviceId };
+      }
 
-            reactiveData.query = params
-            list()
-        }
+      reactiveData.query = params;
+      list();
+    };
+    const showAdd = () => {
+      profileAddFormRef.value?.show();
+    };
 
-        const reset = () => {
-            let params = {}
-            if (!isNull(props.deviceId)) {
-                params = { deviceId: props.deviceId }
-            }
+    const addThing = (form, done) => {
+      addProfile(form).then(() => {
+        list();
+        done();
+      });
+    };
 
-            reactiveData.query = params
-            list()
-        }
-        const showAdd = () => {
-            profileAddFormRef.value?.show()
-        }
+    const disableThing = (id, done) => {
+      updateProfile({ id: id, enableFlag: 'DISABLE' }).then(() => {
+        list();
+        done();
+      });
+    };
 
-        const addThing = (form, done) => {
-            addProfile(form).then(() => {
-                list()
-                done()
-            })
-        }
+    const enableThing = (id, done) => {
+      updateProfile({ id: id, enableFlag: 'ENABLE' }).then(() => {
+        list();
+        done();
+      });
+    };
 
-        const disableThing = (id, done) => {
-            updateProfile({ id: id, enableFlag: 'DISABLE' }).then(() => {
-                list()
-                done()
-            })
-        }
+    const deleteThing = (id, done) => {
+      deleteProfile(id)
+        .then((res) => {
+          if (res.data.ok) {
+            list();
+            done();
+          } else {
+            failMessage(res.data.message);
+          }
+        })
+        .catch(() => {
+          // nothing to do
+        });
+    };
 
-        const enableThing = (id, done) => {
-            updateProfile({ id: id, enableFlag: 'ENABLE' }).then(() => {
-                list()
-                done()
-            })
-        }
+    const refresh = () => {
+      list();
+    };
 
-        const deleteThing = (id, done) => {
-            deleteProfile(id)
-                .then(res => {
-                    if (res.data.ok) {
-                        list()
-                        done()
-                    } else {
-                        failMessage(res.data.message)
-                    }
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-        }
+    const sort = () => {
+      reactiveData.order = !reactiveData.order;
+      if (reactiveData.order) {
+        reactiveData.page.orders = [{ column: 'create_time', asc: true }];
+      } else {
+        reactiveData.page.orders = [{ column: 'create_time', asc: false }];
+      }
+      list();
+    };
 
-        const refresh = () => {
-            list()
-        }
+    const sizeChange = (size: number) => {
+      reactiveData.page.size = size;
+      list();
+    };
 
-        const sort = () => {
-            reactiveData.order = !reactiveData.order
-            if (reactiveData.order) {
-                reactiveData.page.orders = [{ column: 'create_time', asc: true }]
-            } else {
-                reactiveData.page.orders = [{ column: 'create_time', asc: false }]
-            }
-            list()
-        }
+    const currentChange = (current: number) => {
+      reactiveData.page.current = current;
+      list();
+    };
 
-        const sizeChange = (size: number) => {
-            reactiveData.page.size = size
-            list()
-        }
+    list();
 
-        const currentChange = (current: number) => {
-            reactiveData.page.current = current
-            list()
-        }
-
-        list()
-
-        return {
-            profileAddFormRef,
-            reactiveData,
-            hasData,
-            search,
-            reset,
-            showAdd,
-            addThing,
-            disableThing,
-            enableThing,
-            deleteThing,
-            refresh,
-            sort,
-            sizeChange,
-            currentChange
-        }
-    }
-})
+    return {
+      profileAddFormRef,
+      reactiveData,
+      hasData,
+      search,
+      reset,
+      showAdd,
+      addThing,
+      disableThing,
+      enableThing,
+      deleteThing,
+      refresh,
+      sort,
+      sizeChange,
+      currentChange,
+    };
+  },
+});

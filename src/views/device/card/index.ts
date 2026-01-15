@@ -14,101 +14,101 @@
  * limitations under the License.
  */
 
-import { CircleCheck, CircleClose, Coin, Edit, List, Promotion, Sunset, SwitchButton } from '@element-plus/icons-vue'
-import { defineComponent } from 'vue'
+import { CircleCheck, CircleClose, Coin, Edit, List, Promotion, Sunset, SwitchButton } from '@element-plus/icons-vue';
+import { defineComponent } from 'vue';
 
-import router from '@/config/router'
+import router from '@/config/router';
 
-import { copy, timestamp } from '@/utils/CommonUtil'
-import { successMessage } from '@/utils/NotificationUtil'
+import { copy, timestamp } from '@/utils/CommonUtil';
+import { successMessage } from '@/utils/NotificationUtil';
 
 export default defineComponent({
-    name: 'DeviceCard',
-    components: {
-        Promotion,
-        List,
-        Coin,
-        Edit,
-        Sunset
+  name: 'DeviceCard',
+  components: {
+    Promotion,
+    List,
+    Coin,
+    Edit,
+    Sunset,
+  },
+  props: {
+    embedded: {
+      type: Boolean,
+      default: () => {
+        return false;
+      },
     },
-    props: {
-        embedded: {
-            type: Boolean,
-            default: () => {
-                return false
-            }
-        },
-        status: {
-            type: String,
-            default: () => {
-                return ''
-            }
-        },
-        data: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        },
-        driver: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        },
-        icon: {
-            type: String,
-            default: 'images/common/device.png'
-        }
+    status: {
+      type: String,
+      default: () => {
+        return '';
+      },
     },
-    emits: ['disable-thing', 'enable-thing', 'delete-thing'],
-    setup(props, { emit }) {
-        // 图标
-        const Icon = {
-            SwitchButton,
-            CircleCheck,
-            CircleClose
-        }
+    data: {
+      type: Object,
+      default: () => {
+        return {};
+      },
+    },
+    driver: {
+      type: Object,
+      default: () => {
+        return {};
+      },
+    },
+    icon: {
+      type: String,
+      default: 'images/common/device.png',
+    },
+  },
+  emits: ['disable-thing', 'enable-thing', 'delete-thing'],
+  setup(props, { emit }) {
+    // 图标
+    const Icon = {
+      SwitchButton,
+      CircleCheck,
+      CircleClose,
+    };
 
-        const disableThing = () => {
-            emit('disable-thing', props.data.id, props.data.driverId, () => {
-                successMessage()
-            })
-        }
+    const disableThing = () => {
+      emit('disable-thing', props.data.id, props.data.driverId, () => {
+        successMessage();
+      });
+    };
 
-        const enableThing = () => {
-            emit('enable-thing', props.data.id, props.data.driverId, () => {
-                successMessage()
-            })
-        }
+    const enableThing = () => {
+      emit('enable-thing', props.data.id, props.data.driverId, () => {
+        successMessage();
+      });
+    };
 
-        const deleteThing = () => {
-            emit('delete-thing', props.data.id, () => {
-                successMessage()
-            })
-        }
+    const deleteThing = () => {
+      emit('delete-thing', props.data.id, () => {
+        successMessage();
+      });
+    };
 
-        const edit = () => {
-            router.push({ name: 'deviceEdit', query: { id: props.data.id, active: '0' } }).catch(() => {
-                // nothing to do
-            })
-        }
+    const edit = () => {
+      router.push({ name: 'deviceEdit', query: { id: props.data.id, active: '0' } }).catch(() => {
+        // nothing to do
+      });
+    };
 
-        const detail = () => {
-            router.push({ name: 'deviceDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
-                // nothing to do
-            })
-        }
+    const detail = () => {
+      router.push({ name: 'deviceDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
+        // nothing to do
+      });
+    };
 
-        return {
-            disableThing,
-            enableThing,
-            deleteThing,
-            edit,
-            detail,
-            copyId: copy,
-            timestamp,
-            ...Icon
-        }
-    }
-})
+    return {
+      disableThing,
+      enableThing,
+      deleteThing,
+      edit,
+      detail,
+      copyId: copy,
+      timestamp,
+      ...Icon,
+    };
+  },
+});

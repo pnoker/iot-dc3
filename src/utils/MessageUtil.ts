@@ -14,40 +14,40 @@
  * limitations under the License.
  */
 
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus';
 
 export const info = (message: string, grouping = true, showClose = true) => {
-    ElMessage({
-        type: 'info',
-        grouping: grouping,
-        showClose: showClose,
-        message: message
-    })
-}
+  ElMessage({
+    type: 'info',
+    grouping: grouping,
+    showClose: showClose,
+    message: message,
+  });
+};
 
 export const success = (message: string, grouping = true, showClose = true) => {
-    ElMessage({
-        type: 'success',
-        grouping: grouping,
-        showClose: showClose,
-        message: message
-    })
-}
+  ElMessage({
+    type: 'success',
+    grouping: grouping,
+    showClose: showClose,
+    message: message,
+  });
+};
 
 export const error = (message: string, grouping = true, showClose = true) => {
-    ElMessage({
-        type: 'error',
-        grouping: grouping,
-        showClose: showClose,
-        message: message
-    })
-}
+  ElMessage({
+    type: 'error',
+    grouping: grouping,
+    showClose: showClose,
+    message: message,
+  });
+};
 
 export const warning = (message: string, grouping = true, showClose = true) => {
-    ElMessage({
-        type: 'warning',
-        grouping: grouping,
-        showClose: showClose,
-        message: message
-    })
-}
+  ElMessage({
+    type: 'warning',
+    grouping: grouping,
+    showClose: showClose,
+    message: message,
+  });
+};

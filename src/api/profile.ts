@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 /**
  * 新增模板
@@ -23,11 +23,11 @@ import request from '@/config/axios'
  * @returns MyAxiosPromise
  */
 export const addProfile = (profile: any) =>
-    request<R>({
-        url: `api/v3/manager/profile/add`,
-        method: 'post',
-        data: profile
-    })
+  request<R>({
+    url: `api/v3/manager/profile/add`,
+    method: 'post',
+    data: profile,
+  });
 
 /**
  * 删除模板
@@ -36,10 +36,10 @@ export const addProfile = (profile: any) =>
  * @returns MyAxiosPromise
  */
 export const deleteProfile = (id: string) =>
-    request<R>({
-        url: `api/v3/manager/profile/delete/${id}`,
-        method: 'post'
-    })
+  request<R>({
+    url: `api/v3/manager/profile/delete/${id}`,
+    method: 'post',
+  });
 
 /**
  * 修改模板
@@ -48,11 +48,11 @@ export const deleteProfile = (id: string) =>
  * @returns MyAxiosPromise
  */
 export const updateProfile = (profile: any) =>
-    request<R>({
-        url: `api/v3/manager/profile/update`,
-        method: 'post',
-        data: profile
-    })
+  request<R>({
+    url: `api/v3/manager/profile/update`,
+    method: 'post',
+    data: profile,
+  });
 
 /**
  * 通过模板ID查询模板
@@ -61,10 +61,10 @@ export const updateProfile = (profile: any) =>
  * @returns MyAxiosPromise
  */
 export const getProfileById = (id: string) =>
-    request<R>({
-        url: `api/v3/manager/profile/id/${id}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/profile/id/${id}`,
+    method: 'get',
+  });
 
 /**
  * 通过模板ID集查询模板
@@ -73,11 +73,11 @@ export const getProfileById = (id: string) =>
  * @returns MyAxiosPromise
  */
 export const getProfileByIds = (profileIds: any) =>
-    request<R>({
-        url: `api/v3/manager/profile/ids`,
-        method: 'post',
-        data: profileIds
-    })
+  request<R>({
+    url: `api/v3/manager/profile/ids`,
+    method: 'post',
+    data: profileIds,
+  });
 
 /**
  * 通过设备ID查询模板
@@ -86,10 +86,10 @@ export const getProfileByIds = (profileIds: any) =>
  * @returns MyAxiosPromise
  */
 export const getProfileByDeviceId = (deviceId: string) =>
-    request<R>({
-        url: `api/v3/manager/profile/device_id/${deviceId}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/profile/device_id/${deviceId}`,
+    method: 'get',
+  });
 
 /**
  * 分页查询
@@ -98,8 +98,8 @@ export const getProfileByDeviceId = (deviceId: string) =>
  * @returns MyAxiosPromise
  */
 export const getProfileList = (profile: any) =>
-    request<R>({
-        url: `api/v3/manager/profile/list`,
-        method: 'post',
-        data: profile
-    })
+  request<R>({
+    url: `api/v3/manager/profile/list`,
+    method: 'post',
+    data: profile,
+  });

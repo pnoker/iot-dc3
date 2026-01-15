@@ -14,87 +14,96 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import { CircleCheck, CircleClose, CollectionTag, Edit, IceCreamSquare, Right, Sunset, SwitchButton } from '@element-plus/icons-vue'
+import { defineComponent } from 'vue';
+import {
+  CircleCheck,
+  CircleClose,
+  CollectionTag,
+  Edit,
+  IceCreamSquare,
+  Right,
+  Sunset,
+  SwitchButton,
+} from '@element-plus/icons-vue';
 
-import router from '@/config/router'
+import router from '@/config/router';
 
-import { successMessage } from '@/utils/NotificationUtil'
-import { copy, timestamp } from '@/utils/CommonUtil'
+import { successMessage } from '@/utils/NotificationUtil';
+import { copy, timestamp } from '@/utils/CommonUtil';
 
 export default defineComponent({
-    name: 'ProfileCard',
-    components: {
-        Edit,
-        Sunset,
-        IceCreamSquare,
-        CollectionTag
+  name: 'ProfileCard',
+  components: {
+    Edit,
+    Sunset,
+    IceCreamSquare,
+    CollectionTag,
+  },
+  props: {
+    embedded: {
+      type: Boolean,
+      default: () => false,
     },
-    props: {
-        embedded: {
-            type: Boolean,
-            default: () => false
-        },
-        data: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        },
-        icon: {
-            type: String,
-            default: () => 'images/common/profile.png'
-        }
+    data: {
+      type: Object,
+      default: () => {
+        return {};
+      },
     },
-    emits: ['disable-thing', 'enable-thing', 'delete-thing'],
-    setup(props, { emit }) {
-        // 图标
-        const Icon = {
-            SwitchButton,
-            CircleCheck,
-            Right,
-            CircleClose
-        }
+    icon: {
+      type: String,
+      default: () => 'images/common/profile.png',
+    },
+  },
+  emits: ['disable-thing', 'enable-thing', 'delete-thing'],
+  setup(props, { emit }) {
+    // 图标
+    const Icon = {
+      SwitchButton,
+      CircleCheck,
+      Right,
+      CircleClose,
+    };
 
-        const disableThing = () => {
-            emit('disable-thing', props.data.id, () => {
-                successMessage()
-            })
-        }
+    const disableThing = () => {
+      emit('disable-thing', props.data.id, () => {
+        successMessage();
+      });
+    };
 
-        const enableThing = () => {
-            emit('enable-thing', props.data.id, () => {
-                successMessage()
-            })
-        }
+    const enableThing = () => {
+      emit('enable-thing', props.data.id, () => {
+        successMessage();
+      });
+    };
 
-        const deleteThing = () => {
-            emit('delete-thing', props.data.id, () => {
-                successMessage()
-            })
-        }
+    const deleteThing = () => {
+      emit('delete-thing', props.data.id, () => {
+        successMessage();
+      });
+    };
 
-        const edit = () => {
-            router.push({ name: 'profileEdit', query: { id: props.data.id, active: '0' } }).catch(() => {
-                // nothing to do
-            })
-        }
+    const edit = () => {
+      router.push({ name: 'profileEdit', query: { id: props.data.id, active: '0' } }).catch(() => {
+        // nothing to do
+      });
+    };
 
-        const detail = () => {
-            router.push({ name: 'profileDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
-                // nothing to do
-            })
-        }
+    const detail = () => {
+      router.push({ name: 'profileDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
+        // nothing to do
+      });
+    };
 
-        return {
-            disableThing,
-            enableThing,
-            deleteThing,
-            edit,
-            detail,
-            copyId: copy,
-            timestamp,
-            ...Icon
-        }
-    }
-})
+    return {
+      disableThing,
+      enableThing,
+      deleteThing,
+      edit,
+      detail,
+      copyId: copy,
+      timestamp,
+      ...Icon,
+    };
+  },
+});

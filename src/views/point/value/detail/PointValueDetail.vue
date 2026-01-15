@@ -15,27 +15,27 @@
   -->
 
 <template>
-    <el-dialog
-        v-model="detailVisible"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :show-close="false"
-        class="things-dialog"
-        draggable
-        title="数据信息"
-    >
-        <pre v-highlightjs>
+  <el-dialog
+    v-model="detailVisible"
+    :append-to-body="true"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+    :show-close="false"
+    class="things-dialog"
+    draggable
+    title="数据信息"
+  >
+    <pre v-highlightjs>
             <code class="json">{{ detailData }}</code>
         </pre>
-        <div>
-            <el-button type="success" @click="detailVisible = false">关闭</el-button>
-        </div>
-    </el-dialog>
+    <div>
+      <el-button type="success" @click="detailVisible = false">关闭</el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss" scoped>
-    @use '@/components/dialog/styles/things-dialog';
+  @use '@/components/dialog/styles/things-dialog';
 </style>

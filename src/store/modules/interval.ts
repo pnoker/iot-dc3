@@ -15,23 +15,23 @@
  */
 
 const interval = {
-    state: {
-        pointValueInterval: null
+  state: {
+    pointValueInterval: null,
+  },
+  getters: {},
+  mutations: {
+    CLEAR_POINT_VALUE_INTERVAL: (state: any, interval: number) => {
+      if (state.pointValueInterval) {
+        clearInterval(state.pointValueInterval);
+      }
+      state.pointValueInterval = interval;
     },
-    getters: {},
-    mutations: {
-        CLEAR_POINT_VALUE_INTERVAL: (state: any, interval: number) => {
-            if (state.pointValueInterval) {
-                clearInterval(state.pointValueInterval)
-            }
-            state.pointValueInterval = interval
-        }
+  },
+  actions: {
+    ClearPointValueInterval({ commit }: any, interval: number) {
+      commit('CLEAR_POINT_VALUE_INTERVAL', interval);
     },
-    actions: {
-        ClearPointValueInterval({ commit }: any, interval: number) {
-            commit('CLEAR_POINT_VALUE_INTERVAL', interval)
-        }
-    }
-}
+  },
+};
 
-export default interval
+export default interval;

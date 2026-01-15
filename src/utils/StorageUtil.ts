@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { isNull } from '@/utils/utils'
-import { decode, encode } from 'js-base64'
-import Cookies from 'js-cookie'
+import { isNull } from '@/utils/utils';
+import { decode, encode } from 'js-base64';
+import Cookies from 'js-cookie';
 
 /**
  * 获取 Cookies 值
@@ -24,9 +24,9 @@ import Cookies from 'js-cookie'
  * @param key key
  */
 export const getCookies = (key: string) => {
-    const cookieString = Cookies.get(key) as string | ''
-    return JSON.parse(decode(cookieString))
-}
+  const cookieString = Cookies.get(key) as string | '';
+  return JSON.parse(decode(cookieString));
+};
 
 /**
  * 更新, 新增 Cookies 值
@@ -35,8 +35,8 @@ export const getCookies = (key: string) => {
  * @param value cookies
  */
 export const setCookies = (key: string, value: any) => {
-    return Cookies.set(key, encode(JSON.stringify(value)))
-}
+  return Cookies.set(key, encode(JSON.stringify(value)));
+};
 
 /**
  * 删除 Cookies 值
@@ -44,8 +44,8 @@ export const setCookies = (key: string, value: any) => {
  * @param key key
  */
 export const removeCookies = (key: string) => {
-    return Cookies.remove(key)
-}
+  return Cookies.remove(key);
+};
 
 /**
  * 获取 Storage 值
@@ -54,32 +54,32 @@ export const removeCookies = (key: string) => {
  * @param isSession 是否为 Session Storage, 默认 false: Local Storage
  */
 export const getStorage = (key: string, isSession?: boolean) => {
-    let obj: any, content: any
-    if (isSession) obj = window.sessionStorage.getItem(key)
-    else obj = window.localStorage.getItem(key)
-    if (isNull(obj)) return
+  let obj: any, content: any;
+  if (isSession) obj = window.sessionStorage.getItem(key);
+  else obj = window.localStorage.getItem(key);
+  if (isNull(obj)) return;
 
-    try {
-        obj = JSON.parse(decode(obj))
-    } catch {
-        return obj
-    }
+  try {
+    obj = JSON.parse(decode(obj));
+  } catch {
+    return obj;
+  }
 
-    if (obj.dataType === 'string') {
-        content = obj.content
-    } else if (obj.dataType === 'number') {
-        content = Number(obj.content)
-    } else if (obj.dataType === 'boolean') {
-        if (obj.content === 'true') {
-            content = true
-        } else {
-            content = false
-        }
-    } else if (obj.dataType === 'object') {
-        content = obj.content
+  if (obj.dataType === 'string') {
+    content = obj.content;
+  } else if (obj.dataType === 'number') {
+    content = Number(obj.content);
+  } else if (obj.dataType === 'boolean') {
+    if (obj.content === 'true') {
+      content = true;
+    } else {
+      content = false;
     }
-    return content
-}
+  } else if (obj.dataType === 'object') {
+    content = obj.content;
+  }
+  return content;
+};
 
 /**
  * 更新, 新增 Storage 值
@@ -89,15 +89,15 @@ export const getStorage = (key: string, isSession?: boolean) => {
  * @param isSession 是否为 Session Storage, 默认 false: Local Storage
  */
 export const setStorage = (key: string, value: any, isSession?: boolean) => {
-    const obj = {
-        dataType: typeof value,
-        content: value,
-        type: isSession,
-        datetime: new Date().getTime()
-    }
-    if (isSession) window.sessionStorage.setItem(key, encode(JSON.stringify(obj)))
-    else window.localStorage.setItem(key, encode(JSON.stringify(obj)))
-}
+  const obj = {
+    dataType: typeof value,
+    content: value,
+    type: isSession,
+    datetime: new Date().getTime(),
+  };
+  if (isSession) window.sessionStorage.setItem(key, encode(JSON.stringify(obj)));
+  else window.localStorage.setItem(key, encode(JSON.stringify(obj)));
+};
 
 /**
  * 删除 Storage 值
@@ -106,9 +106,9 @@ export const setStorage = (key: string, value: any, isSession?: boolean) => {
  * @param isSession 是否为 Session Storage, 默认 false: Local Storage
  */
 export const removeStorage = (key: string, isSession?: boolean) => {
-    if (isSession) window.sessionStorage.removeItem(key)
-    else window.localStorage.removeItem(key)
-}
+  if (isSession) window.sessionStorage.removeItem(key);
+  else window.localStorage.removeItem(key);
+};
 
 /**
  * 获取全部的 Storage 值
@@ -116,24 +116,24 @@ export const removeStorage = (key: string, isSession?: boolean) => {
  * @param isSession 是否为 Session Storage, 默认 false: Local Storage
  */
 export const getAllStorage = (isSession?: boolean) => {
-    const list = [] as Array<{ name: string | null; content: any }>
-    if (isSession) {
-        for (let i = 0; i <= window.sessionStorage.length; i++) {
-            list.push({
-                name: window.sessionStorage.key(i),
-                content: getStorage(window.sessionStorage.key(i) || '')
-            })
-        }
-    } else {
-        for (let i = 0; i <= window.localStorage.length; i++) {
-            list.push({
-                name: window.localStorage.key(i),
-                content: getStorage(window.localStorage.key(i) || '')
-            })
-        }
+  const list = [] as Array<{ name: string | null; content: any }>;
+  if (isSession) {
+    for (let i = 0; i <= window.sessionStorage.length; i++) {
+      list.push({
+        name: window.sessionStorage.key(i),
+        content: getStorage(window.sessionStorage.key(i) || ''),
+      });
     }
-    return list
-}
+  } else {
+    for (let i = 0; i <= window.localStorage.length; i++) {
+      list.push({
+        name: window.localStorage.key(i),
+        content: getStorage(window.localStorage.key(i) || ''),
+      });
+    }
+  }
+  return list;
+};
 
 /**
  * 删除全部的 Storage 值
@@ -141,9 +141,9 @@ export const getAllStorage = (isSession?: boolean) => {
  * @param isSession 是否为 Session Storage, 默认 false: Local Storage
  */
 export const clearAllStorage = (isSession?: boolean) => {
-    if (isSession) {
-        window.sessionStorage.clear()
-    } else {
-        window.localStorage.clear()
-    }
-}
+  if (isSession) {
+    window.sessionStorage.clear();
+  } else {
+    window.localStorage.clear();
+  }
+};

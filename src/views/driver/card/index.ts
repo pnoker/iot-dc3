@@ -14,79 +14,88 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent } from 'vue'
-import { CircleCheck, CircleClose, Connection, Edit, Monitor, Promotion, Sunset, SwitchButton } from '@element-plus/icons-vue'
+import { computed, defineComponent } from 'vue';
+import {
+  CircleCheck,
+  CircleClose,
+  Connection,
+  Edit,
+  Monitor,
+  Promotion,
+  Sunset,
+  SwitchButton,
+} from '@element-plus/icons-vue';
 
-import router from '@/config/router'
-import { copy, timestamp } from '@/utils/CommonUtil'
+import router from '@/config/router';
+import { copy, timestamp } from '@/utils/CommonUtil';
 
 export default defineComponent({
-    name: 'DriverCard',
-    components: {
-        Promotion,
-        Edit,
-        Sunset,
-        Connection,
-        Monitor
+  name: 'DriverCard',
+  components: {
+    Promotion,
+    Edit,
+    Sunset,
+    Connection,
+    Monitor,
+  },
+  props: {
+    icon: {
+      type: String,
+      default: 'images/common/driver.png',
     },
-    props: {
-        icon: {
-            type: String,
-            default: 'images/common/driver.png'
-        },
-        statusTable: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        },
-        data: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        },
-        footer: {
-            type: Boolean,
-            default: () => false
-        }
+    statusTable: {
+      type: Object,
+      default: () => {
+        return {};
+      },
     },
-    emits: ['select-change'],
-    setup(props, { emit }) {
-        // 图标
-        const Icon = {
-            SwitchButton,
-            CircleCheck,
-            CircleClose
-        }
+    data: {
+      type: Object,
+      default: () => {
+        return {};
+      },
+    },
+    footer: {
+      type: Boolean,
+      default: () => false,
+    },
+  },
+  emits: ['select-change'],
+  setup(props, { emit }) {
+    // 图标
+    const Icon = {
+      SwitchButton,
+      CircleCheck,
+      CircleClose,
+    };
 
-        // 驱动详情
-        const detail = () => {
-            const id = props.data.id
-            if (id)
-                router.push({ name: 'driverDetail', query: { id, active: 'detail' } }).catch(() => {
-                    // nothing to do
-                })
-        }
+    // 驱动详情
+    const detail = () => {
+      const id = props.data.id;
+      if (id)
+        router.push({ name: 'driverDetail', query: { id, active: 'detail' } }).catch(() => {
+          // nothing to do
+        });
+    };
 
-        // 选中驱动
-        const select = () => {
-            emit('select-change', props.data)
-        }
+    // 选中驱动
+    const select = () => {
+      emit('select-change', props.data);
+    };
 
-        // 驱动状态
-        const status = computed(() => {
-            const id = props.data.id
-            return id && props.statusTable[id] ? props.statusTable[id] : ''
-        })
+    // 驱动状态
+    const status = computed(() => {
+      const id = props.data.id;
+      return id && props.statusTable[id] ? props.statusTable[id] : '';
+    });
 
-        return {
-            status,
-            detail,
-            select,
-            copyId: copy,
-            timestamp,
-            ...Icon
-        }
-    }
-})
+    return {
+      status,
+      detail,
+      select,
+      copyId: copy,
+      timestamp,
+      ...Icon,
+    };
+  },
+});

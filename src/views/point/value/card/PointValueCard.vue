@@ -15,202 +15,210 @@
   -->
 
 <template>
-    <div class="things-card">
-        <el-card shadow="hover">
-            <div class="things-card-content">
-                <div
-                    :class="{
-                        'header-enable': data.interval < 200,
-                        'header-disable': data.interval >= 200
-                    }"
-                    class="things-card__header"
+  <div class="things-card">
+    <el-card shadow="hover">
+      <div class="things-card-content">
+        <div
+          :class="{
+            'header-enable': data.interval < 200,
+            'header-disable': data.interval >= 200,
+          }"
+          class="things-card__header"
+        >
+          <div class="things-card-header-icon">
+            <img :alt="data.pointName" :src="icon" />
+          </div>
+          <div class="things-card-header-name nowrap-name" @click="copy(data.pointId, '位号值ID')">
+            {{ point.pointName }}
+          </div>
+          <div class="things-card-header-status" title="读写标识">
+            <el-tag v-if="data.rwFlag === 'R'" effect="plain" type="warning">只读</el-tag>
+            <el-tag v-else-if="data.rwFlagrw === 'W'" effect="plain" type="info">只写</el-tag>
+            <el-tag v-else-if="data.rwFlag === 'RW'" effect="plain" type="success">读写</el-tag>
+          </div>
+        </div>
+        <div class="things-card__body">
+          <div class="things-card-body-content">
+            <div class="things-card-body-content-column">
+              <div class="things-card-body-content-value">
+                <span class="nowrap-item value" title="处理值, 点击复制" @click="copyValue(data)"
+                  >{{ data.calValue }} {{ unit }}</span
                 >
-                    <div class="things-card-header-icon">
-                        <img :alt="data.pointName" :src="icon" />
-                    </div>
-                    <div class="things-card-header-name nowrap-name" @click="copy(data.pointId, '位号值ID')">
-                        {{ point.pointName }}
-                    </div>
-                    <div class="things-card-header-status" title="读写标识">
-                        <el-tag v-if="data.rwFlag === 'R'" effect="plain" type="warning">只读</el-tag>
-                        <el-tag v-else-if="data.rwFlagrw === 'W'" effect="plain" type="info">只写</el-tag>
-                        <el-tag v-else-if="data.rwFlag === 'RW'" effect="plain" type="success">读写</el-tag>
-                    </div>
-                </div>
-                <div class="things-card__body">
-                    <div class="things-card-body-content">
-                        <div class="things-card-body-content-column">
-                            <div class="things-card-body-content-value">
-                                <span class="nowrap-item value" title="处理值, 点击复制" @click="copyValue(data)">{{ data.calValue }} {{ unit }}</span>
-                            </div>
-                            <ul>
-                                <li class="nowrap-item">
-                                    <el-icon>
-                                        <Sunrise />
-                                    </el-icon>
-                                    原始值: {{ data.rawValue }}
-                                </li>
-                                <li v-if="embedded == ''" class="nowrap-item value-point">
-                                    <el-icon>
-                                        <Management />
-                                    </el-icon>
-                                    所属设备: {{ device.deviceName }}
-                                </li>
-                                <li class="nowrap-item">
-                                    <el-icon>
-                                        <Timer />
-                                    </el-icon>
-                                    数据延时: {{ data.interval }} ms
-                                </li>
-                                <li class="nowrap-item">
-                                    <el-icon>
-                                        <Edit />
-                                    </el-icon>
-                                    采集日期: {{ timestamp(data.createTime) }}
-                                </li>
-                                <li class="nowrap-item">
-                                    <el-icon>
-                                        <Sunset />
-                                    </el-icon>
-                                    保存日期: {{ timestamp(data.createTime) }}
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div v-if="embedded != ''" :id="data.pointId" class="things-card-body-content-time"></div>
-                </div>
-                <div v-if="embedded == ''" class="things-card__footer">
-                    <div class="things-card-footer-operation">
-                        <el-popconfirm :icon="CircleClose" icon-color="#f56c6c" placement="top" title="是否确定删除该数据?该数据下的配置将会被全部删除, 且该操作不可恢复!">
-                            <template #reference>
-                                <el-button link type="primary">删除</el-button>
-                            </template>
-                        </el-popconfirm>
-                        <el-button link type="primary">编辑</el-button>
-                        <el-button link type="primary">详情</el-button>
-                    </div>
-                </div>
+              </div>
+              <ul>
+                <li class="nowrap-item">
+                  <el-icon>
+                    <Sunrise />
+                  </el-icon>
+                  原始值: {{ data.rawValue }}
+                </li>
+                <li v-if="embedded == ''" class="nowrap-item value-point">
+                  <el-icon>
+                    <Management />
+                  </el-icon>
+                  所属设备: {{ device.deviceName }}
+                </li>
+                <li class="nowrap-item">
+                  <el-icon>
+                    <Timer />
+                  </el-icon>
+                  数据延时: {{ data.interval }} ms
+                </li>
+                <li class="nowrap-item">
+                  <el-icon>
+                    <Edit />
+                  </el-icon>
+                  采集日期: {{ timestamp(data.createTime) }}
+                </li>
+                <li class="nowrap-item">
+                  <el-icon>
+                    <Sunset />
+                  </el-icon>
+                  保存日期: {{ timestamp(data.createTime) }}
+                </li>
+              </ul>
             </div>
-        </el-card>
-    </div>
+          </div>
+          <div v-if="embedded != ''" :id="data.pointId" class="things-card-body-content-time"></div>
+        </div>
+        <div v-if="embedded == ''" class="things-card__footer">
+          <div class="things-card-footer-operation">
+            <el-popconfirm
+              :icon="CircleClose"
+              icon-color="#f56c6c"
+              placement="top"
+              title="是否确定删除该数据?该数据下的配置将会被全部删除, 且该操作不可恢复!"
+            >
+              <template #reference>
+                <el-button link type="primary">删除</el-button>
+              </template>
+            </el-popconfirm>
+            <el-button link type="primary">编辑</el-button>
+            <el-button link type="primary">详情</el-button>
+          </div>
+        </div>
+      </div>
+    </el-card>
+  </div>
 </template>
 
 <script lang="ts" setup>
-    import { onMounted, watch } from 'vue'
-    import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue'
+  import { onMounted, watch } from 'vue';
+  import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue';
 
-    import { Chart } from '@antv/g2'
+  import { Chart } from '@antv/g2';
 
-    import { copy, timestamp } from '@/utils/CommonUtil'
-    import { getPointValueHistory } from '@/api/point'
+  import { copy, timestamp } from '@/utils/CommonUtil';
+  import { getPointValueHistory } from '@/api/point';
 
-    const props = defineProps({
-        embedded: {
-            type: String,
-            default: () => {
-                return ''
-            }
-        },
-        data: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        },
-        device: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        },
-        point: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        },
-        unit: {
-            type: String,
-            default: ''
-        },
-        icon: {
-            type: String,
-            default: 'images/common/point.png'
+  const props = defineProps({
+    embedded: {
+      type: String,
+      default: () => {
+        return '';
+      },
+    },
+    data: {
+      type: Object,
+      default: () => {
+        return {};
+      },
+    },
+    device: {
+      type: Object,
+      default: () => {
+        return {};
+      },
+    },
+    point: {
+      type: Object,
+      default: () => {
+        return {};
+      },
+    },
+    unit: {
+      type: String,
+      default: '',
+    },
+    icon: {
+      type: String,
+      default: 'images/common/point.png',
+    },
+  });
+
+  const copyValue = (data) => {
+    const content = {
+      deviceId: data.deviceId,
+      pointId: data.pointId,
+      calValue: data.calValue,
+      rawValue: data.rawValue,
+    };
+    copy(JSON.stringify(content, null, 2), '位号值');
+  };
+
+  let tinyArea: Chart;
+  const history = () => {
+    getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
+      .then((res) => {
+        let historyData: number[];
+        const pointValueType = props.point.pointTypeFlag.toLowerCase();
+        if (pointValueType === 'string') {
+          historyData = [];
+        } else if (pointValueType === 'boolean') {
+          historyData = res.data.reverse().map((value: string) => (value === 'true' ? 1 : 0));
+        } else {
+          historyData = res.data.reverse().map((value: string) => +value);
         }
-    })
 
-    const copyValue = data => {
-        const content = {
-            deviceId: data.deviceId,
-            pointId: data.pointId,
-            calValue: data.calValue,
-            rawValue: data.rawValue
-        }
-        copy(JSON.stringify(content, null, 2), '位号值')
+        tinyArea.changeData(historyData);
+      })
+      .catch(() => {
+        // nothing to do
+      });
+  };
+
+  watch(
+    () => props.data,
+    () => {
+      if (props.embedded != '') {
+        history();
+      }
     }
+  );
 
-    let tinyArea: Chart
-    const history = () => {
-        getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
-            .then(res => {
-                let historyData: number[]
-                const pointValueType = props.point.pointTypeFlag.toLowerCase()
-                if (pointValueType === 'string') {
-                    historyData = []
-                } else if (pointValueType === 'boolean') {
-                    historyData = res.data.reverse().map((value: string) => (value === 'true' ? 1 : 0))
-                } else {
-                    historyData = res.data.reverse().map((value: string) => +value)
-                }
+  onMounted(() => {
+    window.dispatchEvent(new Event('resize'));
 
-                tinyArea.changeData(historyData)
-            })
-            .catch(() => {
-                // nothing to do
-            })
+    if (props.embedded != '') {
+      tinyArea = new Chart({
+        container: props.data.pointId,
+        autoFit: true,
+        height: 80,
+      });
+
+      tinyArea
+        .area()
+        .encode('x', (_, i) => i)
+        .encode('y', (v) => v)
+        .encode('shape', 'smooth')
+        .scale('y', { zero: true })
+        .style('fill', 'linear-gradient(-90deg, white 0%, darkgreen 100%)')
+        .style('fillOpacity', 0.6)
+        .animate('enter', { type: 'fadeIn' })
+        .axis(false);
+
+      tinyArea.interaction('tooltip', {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        render: (e, { title, items }) => `${items[0].value} ${props.unit}`,
+      });
+
+      tinyArea.render();
+
+      history();
     }
-
-    watch(
-        () => props.data,
-        () => {
-            if (props.embedded != '') {
-                history()
-            }
-        }
-    )
-
-    onMounted(() => {
-        window.dispatchEvent(new Event('resize'))
-
-        if (props.embedded != '') {
-            tinyArea = new Chart({
-                container: props.data.pointId,
-                autoFit: true,
-                height: 80
-            })
-
-            tinyArea
-                .area()
-                .encode('x', (_, i) => i)
-                .encode('y', v => v)
-                .encode('shape', 'smooth')
-                .scale('y', { zero: true })
-                .style('fill', 'linear-gradient(-90deg, white 0%, darkgreen 100%)')
-                .style('fillOpacity', 0.6)
-                .animate('enter', { type: 'fadeIn' })
-                .axis(false)
-
-            tinyArea.interaction('tooltip', {
-                render: (e, { title, items }) => `${items[0].value} ${props.unit}`
-            })
-
-            tinyArea.render()
-
-            history()
-        }
-    })
+  });
 </script>
 
 <style lang="scss" scoped>
-    @use '@/components/card/styles/things-card';
+  @use '@/components/card/styles/things-card';
 </style>

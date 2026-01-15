@@ -18,38 +18,38 @@
  * 登录信息
  */
 export interface Login {
-    tenant?: string
-    name?: string
-    salt?: string
-    password?: string
-    token?: string
+  tenant?: string;
+  name?: string;
+  salt?: string;
+  password?: string;
+  token?: string;
 }
 
 /**
  * 属性
  */
 export interface Attribute {
-    id: string
-    name: string
-    attributeName: string
+  id: string;
+  name: string;
+  attributeName: string;
 }
 
 /**
  * 字典
  */
 export interface Dictionary {
-    type: string
-    label: string
-    value: string
-    disabled: boolean
-    expand: boolean
-    children: Array<Dictionary>
+  type: string;
+  label: string;
+  value: string;
+  disabled: boolean;
+  expand: boolean;
+  children: Array<Dictionary>;
 }
 
 /**
  * 排序
  */
 export interface Order {
-    column: string
-    asc: boolean
+  column: string;
+  asc: boolean;
 }

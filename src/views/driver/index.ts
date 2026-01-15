@@ -14,121 +14,121 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, reactive } from 'vue'
+import { computed, defineComponent, reactive } from 'vue';
 
-import { getDriverList, getDriverStatus } from '@/api/driver'
+import { getDriverList, getDriverStatus } from '@/api/driver';
 
-import { Order } from '@/config/entity'
+import { Order } from '@/config/entity';
 
-import blankCard from '@/components/card/blank/BlankCard.vue'
-import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue'
-import driverTool from './tool/DriverTool.vue'
-import driverCard from './card/DriverCard.vue'
+import blankCard from '@/components/card/blank/BlankCard.vue';
+import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+import driverTool from './tool/DriverTool.vue';
+import driverCard from './card/DriverCard.vue';
 
 export default defineComponent({
-    name: 'Driver',
-    components: {
-        blankCard,
-        skeletonCard,
-        driverTool,
-        driverCard
-    },
-    setup() {
-        // 定义响应式数据
-        const reactiveData = reactive({
-            loading: true,
-            statusTable: {},
-            listData: [] as any[],
-            query: {
-                type: 'driver'
-            },
-            order: false,
-            page: {
-                total: 0,
-                size: 12,
-                current: 1,
-                orders: [] as Order[]
-            }
+  name: 'Driver',
+  components: {
+    blankCard,
+    skeletonCard,
+    driverTool,
+    driverCard,
+  },
+  setup() {
+    // 定义响应式数据
+    const reactiveData = reactive({
+      loading: true,
+      statusTable: {},
+      listData: [] as any[],
+      query: {
+        type: 'driver',
+      },
+      order: false,
+      page: {
+        total: 0,
+        size: 12,
+        current: 1,
+        orders: [] as Order[],
+      },
+    });
+
+    const hasData = computed(() => {
+      return !reactiveData.loading && reactiveData.listData?.length < 1;
+    });
+
+    const list = () => {
+      getDriverList({
+        page: reactiveData.page,
+        ...reactiveData.query,
+      })
+        .then((res) => {
+          const data = res.data;
+          reactiveData.page.total = data.total;
+          reactiveData.listData = data.records;
         })
-
-        const hasData = computed(() => {
-            return !reactiveData.loading && reactiveData.listData?.length < 1
+        .catch(() => {
+          // nothing to do
         })
+        .finally(() => {
+          reactiveData.loading = false;
+        });
 
-        const list = () => {
-            getDriverList({
-                page: reactiveData.page,
-                ...reactiveData.query
-            })
-                .then(res => {
-                    const data = res.data
-                    reactiveData.page.total = data.total
-                    reactiveData.listData = data.records
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-                .finally(() => {
-                    reactiveData.loading = false
-                })
+      getDriverStatus({
+        page: reactiveData.page,
+        ...reactiveData.query,
+      })
+        .then((res) => {
+          reactiveData.statusTable = res.data;
+        })
+        .catch(() => {
+          // nothing to do
+        });
+    };
 
-            getDriverStatus({
-                page: reactiveData.page,
-                ...reactiveData.query
-            })
-                .then(res => {
-                    reactiveData.statusTable = res.data
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-        }
+    const search = (params) => {
+      reactiveData.query = { ...params, type: 'driver' };
+      list();
+    };
 
-        const search = params => {
-            reactiveData.query = { ...params, type: 'driver' }
-            list()
-        }
+    const reset = () => {
+      reactiveData.query = { type: 'driver' };
+      list();
+    };
 
-        const reset = () => {
-            reactiveData.query = { type: 'driver' }
-            list()
-        }
+    const refresh = () => {
+      list();
+    };
 
-        const refresh = () => {
-            list()
-        }
+    const sort = () => {
+      reactiveData.order = !reactiveData.order;
+      if (reactiveData.order) {
+        reactiveData.page.orders = [{ column: 'create_time', asc: true }];
+      } else {
+        reactiveData.page.orders = [{ column: 'create_time', asc: false }];
+      }
+      list();
+    };
 
-        const sort = () => {
-            reactiveData.order = !reactiveData.order
-            if (reactiveData.order) {
-                reactiveData.page.orders = [{ column: 'create_time', asc: true }]
-            } else {
-                reactiveData.page.orders = [{ column: 'create_time', asc: false }]
-            }
-            list()
-        }
+    const sizeChange = (size: number) => {
+      reactiveData.page.size = size;
+      list();
+    };
 
-        const sizeChange = (size: number) => {
-            reactiveData.page.size = size
-            list()
-        }
+    const currentChange = (current: number) => {
+      reactiveData.page.current = current;
+      list();
+    };
 
-        const currentChange = (current: number) => {
-            reactiveData.page.current = current
-            list()
-        }
+    list();
 
-        list()
-
-        return {
-            reactiveData,
-            hasData,
-            search,
-            reset,
-            refresh,
-            sort,
-            sizeChange,
-            currentChange
-        }
-    }
-})
+    return {
+      reactiveData,
+      hasData,
+      search,
+      reset,
+      refresh,
+      sort,
+      sizeChange,
+      currentChange,
+    };
+  },
+});

@@ -14,97 +14,97 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from 'vue'
-import { FormInstance, FormRules } from 'element-plus'
-import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue'
+import { defineComponent, reactive, ref, unref } from 'vue';
+import { FormInstance, FormRules } from 'element-plus';
+import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue';
 
 export default defineComponent({
-    name: 'ProfileTool',
-    props: {
-        embedded: {
-            type: String,
-            default: () => {
-                return ''
-            }
-        },
-        page: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        }
+  name: 'ProfileTool',
+  props: {
+    embedded: {
+      type: String,
+      default: () => {
+        return '';
+      },
     },
-    emits: ['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change'],
-    setup(props, { emit }) {
-        // 定义表单引用
-        const formDataRef = ref<FormInstance>()
+    page: {
+      type: Object,
+      default: () => {
+        return {};
+      },
+    },
+  },
+  emits: ['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change'],
+  setup(props, { emit }) {
+    // 定义表单引用
+    const formDataRef = ref<FormInstance>();
 
-        // 图标
-        const Icon = {
-            Search,
-            RefreshRight,
-            Plus,
-            Refresh,
-            Sort
+    // 图标
+    const Icon = {
+      Search,
+      RefreshRight,
+      Plus,
+      Refresh,
+      Sort,
+    };
+
+    // 定义响应式数据
+    const reactiveData = reactive({
+      formData: {} as any,
+    });
+
+    // 定义表单校验规则
+    const formRule = reactive<FormRules>({
+      port: [{ type: 'number', message: '端口必须为数字值' }],
+    });
+
+    const search = () => {
+      const form = unref(formDataRef);
+      form?.validate((valid) => {
+        if (valid) {
+          emit('search', reactiveData.formData);
         }
+      });
+    };
 
-        // 定义响应式数据
-        const reactiveData = reactive({
-            formData: {} as any
-        })
+    const reset = () => {
+      const form = unref(formDataRef);
+      form?.resetFields();
+      emit('reset');
+    };
 
-        // 定义表单校验规则
-        const formRule = reactive<FormRules>({
-            port: [{ type: 'number', message: '端口必须为数字值' }]
-        })
+    const showAdd = () => {
+      emit('show-add');
+    };
 
-        const search = () => {
-            const form = unref(formDataRef)
-            form?.validate(valid => {
-                if (valid) {
-                    emit('search', reactiveData.formData)
-                }
-            })
-        }
+    const refresh = () => {
+      emit('refresh');
+    };
 
-        const reset = () => {
-            const form = unref(formDataRef)
-            form?.resetFields()
-            emit('reset')
-        }
+    const sort = () => {
+      emit('sort');
+    };
 
-        const showAdd = () => {
-            emit('show-add')
-        }
+    const sizeChange = (size: number) => {
+      emit('size-change', size);
+    };
 
-        const refresh = () => {
-            emit('refresh')
-        }
+    const currentChange = (current: number) => {
+      emit('current-change', current);
+    };
 
-        const sort = () => {
-            emit('sort')
-        }
-
-        const sizeChange = (size: number) => {
-            emit('size-change', size)
-        }
-
-        const currentChange = (current: number) => {
-            emit('current-change', current)
-        }
-
-        return {
-            formDataRef,
-            reactiveData,
-            formRule,
-            search,
-            reset,
-            showAdd,
-            refresh,
-            sort,
-            sizeChange,
-            currentChange,
-            ...Icon
-        }
-    }
-})
+    return {
+      formDataRef,
+      reactiveData,
+      formRule,
+      search,
+      reset,
+      showAdd,
+      refresh,
+      sort,
+      sizeChange,
+      currentChange,
+      ...Icon,
+    };
+  },
+});

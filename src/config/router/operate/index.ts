@@ -14,121 +14,121 @@
  * limitations under the License.
  */
 
-import { RouteRecordRaw } from 'vue-router'
+import { RouteRecordRaw } from 'vue-router';
 
-const Layout = () => import('@/components/layout/Layout.vue')
+const Layout = () => import('@/components/layout/Layout.vue');
 const routes: Array<RouteRecordRaw> = [
-    {
-        path: '/home',
-        component: Layout,
-        children: [
-            {
-                name: 'dashboard',
-                path: '/home/dashboard',
-                meta: {
-                    icon: 'el-icon-s-home',
-                    title: '看板'
-                },
-                component: () => import('@/views/dashboard/Dashboard.vue')
-            },
-            {
-                name: 'application',
-                path: '/home/application',
-                meta: {
-                    icon: 'el-icon-s-home',
-                    title: '应用'
-                },
-                component: () => import('@/views/application/Application.vue')
-            }
-        ]
-    },
-    {
-        path: '/driver',
-        component: Layout,
-        children: [
-            {
-                name: 'driverDetail',
-                path: '/driver/detail',
-                meta: {
-                    icon: 'el-icon-s-promotion',
-                    title: '驱动信息'
-                },
-                component: () => import('@/views/driver/detail/DriverDetail.vue')
-            }
-        ]
-    },
-    {
-        path: '/device',
-        component: Layout,
-        children: [
-            {
-                name: 'deviceDetail',
-                path: '/device/detail',
-                meta: {
-                    icon: 'el-icon-s-finance',
-                    title: '设备信息'
-                },
-                component: () => import('@/views/device/detail/DeviceDetail.vue')
-            },
-            {
-                name: 'deviceEdit',
-                path: '/device/edit',
-                meta: {
-                    icon: 'el-icon-s-finance',
-                    title: '设备编辑'
-                },
-                component: () => import('@/views/device/edit/DeviceEdit.vue')
-            }
-        ]
-    },
-    {
-        path: '/profile',
-        component: Layout,
-        children: [
-            {
-                name: 'profileDetail',
-                path: '/profile/detail',
-                meta: {
-                    icon: 'el-icon-s-order',
-                    title: '模板信息'
-                },
-                component: () => import('@/views/profile/detail/ProfileDetail.vue')
-            },
-            {
-                name: 'profileEdit',
-                path: '/profile/edit',
-                meta: {
-                    icon: 'el-icon-s-order',
-                    title: '模板编辑'
-                },
-                component: () => import('@/views/profile/edit/ProfileEdit.vue')
-            }
-        ]
-    },
-    {
-        path: '/point',
-        component: Layout,
-        children: [
-            {
-                name: 'pointDetail',
-                path: '/point/detail',
-                meta: {
-                    icon: 'el-icon-s-order',
-                    title: '位号信息'
-                },
-                component: () => import('@/views/point/detail/PointDetail.vue')
-            },
-            {
-                name: 'pointEdit',
-                path: '/point/edit',
-                meta: {
-                    icon: 'el-icon-s-order',
-                    title: '位号编辑'
-                },
-                component: () => import('@/views/point/edit/PointEdit.vue')
-            }
-        ]
-    }
-]
+  {
+    path: '/home',
+    component: Layout,
+    children: [
+      {
+        name: 'dashboard',
+        path: '/home/dashboard',
+        meta: {
+          icon: 'el-icon-s-home',
+          title: '看板',
+        },
+        component: () => import('@/views/dashboard/Dashboard.vue'),
+      },
+      {
+        name: 'application',
+        path: '/home/application',
+        meta: {
+          icon: 'el-icon-s-home',
+          title: '应用',
+        },
+        component: () => import('@/views/application/Application.vue'),
+      },
+    ],
+  },
+  {
+    path: '/driver',
+    component: Layout,
+    children: [
+      {
+        name: 'driverDetail',
+        path: '/driver/detail',
+        meta: {
+          icon: 'el-icon-s-promotion',
+          title: '驱动信息',
+        },
+        component: () => import('@/views/driver/detail/DriverDetail.vue'),
+      },
+    ],
+  },
+  {
+    path: '/device',
+    component: Layout,
+    children: [
+      {
+        name: 'deviceDetail',
+        path: '/device/detail',
+        meta: {
+          icon: 'el-icon-s-finance',
+          title: '设备信息',
+        },
+        component: () => import('@/views/device/detail/DeviceDetail.vue'),
+      },
+      {
+        name: 'deviceEdit',
+        path: '/device/edit',
+        meta: {
+          icon: 'el-icon-s-finance',
+          title: '设备编辑',
+        },
+        component: () => import('@/views/device/edit/DeviceEdit.vue'),
+      },
+    ],
+  },
+  {
+    path: '/profile',
+    component: Layout,
+    children: [
+      {
+        name: 'profileDetail',
+        path: '/profile/detail',
+        meta: {
+          icon: 'el-icon-s-order',
+          title: '模板信息',
+        },
+        component: () => import('@/views/profile/detail/ProfileDetail.vue'),
+      },
+      {
+        name: 'profileEdit',
+        path: '/profile/edit',
+        meta: {
+          icon: 'el-icon-s-order',
+          title: '模板编辑',
+        },
+        component: () => import('@/views/profile/edit/ProfileEdit.vue'),
+      },
+    ],
+  },
+  {
+    path: '/point',
+    component: Layout,
+    children: [
+      {
+        name: 'pointDetail',
+        path: '/point/detail',
+        meta: {
+          icon: 'el-icon-s-order',
+          title: '位号信息',
+        },
+        component: () => import('@/views/point/detail/PointDetail.vue'),
+      },
+      {
+        name: 'pointEdit',
+        path: '/point/edit',
+        meta: {
+          icon: 'el-icon-s-order',
+          title: '位号编辑',
+        },
+        component: () => import('@/views/point/edit/PointEdit.vue'),
+      },
+    ],
+  },
+];
 
-export default routes
+export default routes;

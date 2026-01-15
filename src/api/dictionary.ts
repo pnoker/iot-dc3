@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 /**
  * 查询驱动字典
@@ -23,11 +23,11 @@ import request from '@/config/axios'
  * @returns MyAxiosPromise
  */
 export const getDriverDictionary = (dictionary: any) =>
-    request<R>({
-        url: `api/v3/manager/dictionary/driver`,
-        method: 'post',
-        data: dictionary
-    })
+  request<R>({
+    url: `api/v3/manager/dictionary/driver`,
+    method: 'post',
+    data: dictionary,
+  });
 
 /**
  * 查询设备字典
@@ -36,11 +36,11 @@ export const getDriverDictionary = (dictionary: any) =>
  * @returns MyAxiosPromise
  */
 export const getDeviceDictionary = (dictionary: any) =>
-    request<R>({
-        url: `api/v3/manager/dictionary/device`,
-        method: 'post',
-        data: dictionary
-    })
+  request<R>({
+    url: `api/v3/manager/dictionary/device`,
+    method: 'post',
+    data: dictionary,
+  });
 
 /**
  * 查询模板字典
@@ -49,11 +49,11 @@ export const getDeviceDictionary = (dictionary: any) =>
  * @returns MyAxiosPromise
  */
 export const getProfileDictionary = (dictionary: any) =>
-    request<R>({
-        url: `api/v3/manager/dictionary/profile`,
-        method: 'post',
-        data: dictionary
-    })
+  request<R>({
+    url: `api/v3/manager/dictionary/profile`,
+    method: 'post',
+    data: dictionary,
+  });
 
 /**
  * 查询位号字典
@@ -62,8 +62,8 @@ export const getProfileDictionary = (dictionary: any) =>
  * @returns MyAxiosPromise
  */
 export const getPointDictionary = (dictionary: any) =>
-    request<R>({
-        url: `api/v3/manager/dictionary/device_point`,
-        method: 'post',
-        data: dictionary
-    })
+  request<R>({
+    url: `api/v3/manager/dictionary/device_point`,
+    method: 'post',
+    data: dictionary,
+  });

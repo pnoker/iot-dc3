@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 export const getFlowsList = (flowsQuery: any) =>
-    request<R>({
-        url: 'api/v3/manager/ruleengine/flowsList',
-        method: 'post',
-        data: flowsQuery
-    })
+  request<R>({
+    url: 'api/v3/manager/ruleengine/flowsList',
+    method: 'post',
+    data: flowsQuery,
+  });

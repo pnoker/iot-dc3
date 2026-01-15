@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import App from '@/App.vue'
-import plugins from '@/config/plugins/index'
-import router from '@/config/router'
-import store from '@/store'
-import { createApp } from 'vue'
+import App from '@/App.vue';
+import plugins from '@/config/plugins/index';
+import router from '@/config/router';
+import store from '@/store';
+import { createApp } from 'vue';
 
 // config app
-const app = createApp(App)
-app.use(router)
-app.use(store)
-plugins(app)
-app.mount('#app')
+const app = createApp(App);
+app.use(router);
+app.use(store);
+plugins(app);
+app.mount('#app');
 
-export default app
+export default app;

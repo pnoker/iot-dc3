@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 /**
  * 新增驱动配置
@@ -23,11 +23,11 @@ import request from '@/config/axios'
  * @returns MyAxiosPromise
  */
 export const addDriverInfo = (driverInfo: any) =>
-    request<R>({
-        url: `api/v3/manager/driver_attribute_config/add`,
-        method: 'post',
-        data: driverInfo
-    })
+  request<R>({
+    url: `api/v3/manager/driver_attribute_config/add`,
+    method: 'post',
+    data: driverInfo,
+  });
 
 /**
  * 更新驱动配置
@@ -36,11 +36,11 @@ export const addDriverInfo = (driverInfo: any) =>
  * @returns MyAxiosPromise
  */
 export const updateDriverInfo = (driverInfo: any) =>
-    request<R>({
-        url: `api/v3/manager/driver_attribute_config/update`,
-        method: 'post',
-        data: driverInfo
-    })
+  request<R>({
+    url: `api/v3/manager/driver_attribute_config/update`,
+    method: 'post',
+    data: driverInfo,
+  });
 
 /**
  * 通过设备ID和属性ID查询驱动配置
@@ -50,10 +50,10 @@ export const updateDriverInfo = (driverInfo: any) =>
  * @returns MyAxiosPromise
  */
 export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attributeId: string) =>
-    request<R>({
-        url: `api/v3/manager/driver_attribute_config/device_id/${deviceId}/attribute_id/${attributeId}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/driver_attribute_config/device_id/${deviceId}/attribute_id/${attributeId}`,
+    method: 'get',
+  });
 
 /**
  * 通过设备ID查询驱动配置
@@ -62,10 +62,10 @@ export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attribut
  * @returns MyAxiosPromise
  */
 export const getDriverInfoByDeviceId = (deviceId: string) =>
-    request<R>({
-        url: `api/v3/manager/driver_attribute_config/device_id/${deviceId}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/driver_attribute_config/device_id/${deviceId}`,
+    method: 'get',
+  });
 
 /**
  * 新增位号配置
@@ -74,11 +74,11 @@ export const getDriverInfoByDeviceId = (deviceId: string) =>
  * @returns MyAxiosPromise
  */
 export const addPointInfo = (pointInfo: any) =>
-    request<R>({
-        url: `api/v3/manager/point_attribute_config/add`,
-        method: 'post',
-        data: pointInfo
-    })
+  request<R>({
+    url: `api/v3/manager/point_attribute_config/add`,
+    method: 'post',
+    data: pointInfo,
+  });
 
 /**
  * 更新位号配置
@@ -87,11 +87,11 @@ export const addPointInfo = (pointInfo: any) =>
  * @returns MyAxiosPromise
  */
 export const updatePointInfo = (pointInfo: any) =>
-    request<R>({
-        url: `api/v3/manager/point_attribute_config/update`,
-        method: 'post',
-        data: pointInfo
-    })
+  request<R>({
+    url: `api/v3/manager/point_attribute_config/update`,
+    method: 'post',
+    data: pointInfo,
+  });
 
 /**
  * 通过设备ID和位号ID查询位号配置
@@ -101,10 +101,10 @@ export const updatePointInfo = (pointInfo: any) =>
  * @returns MyAxiosPromise
  */
 export const getPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: string) =>
-    request<R>({
-        url: `api/v3/manager/point_attribute_config/device_id/${deviceId}/point_id/${pointId}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/point_attribute_config/device_id/${deviceId}/point_id/${pointId}`,
+    method: 'get',
+  });
 
 /**
  * 通过设备ID查询位号配置
@@ -113,7 +113,7 @@ export const getPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: stri
  * @returns MyAxiosPromise
  */
 export const getPointInfoByDeviceId = (deviceId: string) =>
-    request<R>({
-        url: `api/v3/manager/point_attribute_config/device_id/${deviceId}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/point_attribute_config/device_id/${deviceId}`,
+    method: 'get',
+  });

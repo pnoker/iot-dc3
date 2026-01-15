@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-import ElementPlugins from '@/config/plugins/element/element.js'
-import HighlightJSPlugins from '@/config/plugins/highlight/highlight.js'
+import ElementPlugins from '@/config/plugins/element/element.js';
+import HighlightJSPlugins from '@/config/plugins/highlight/highlight.js';
 
 export default (app: any) => {
-    ElementPlugins(app)
-    HighlightJSPlugins(app)
+  ElementPlugins(app);
+  HighlightJSPlugins(app);
 
-    console.log(
-        '.___     ___________ ________  _________ ________\n' +
-            '|   | ___\\__    ___/ \\______ \\ \\_   ___ \\\\_____  \\\n' +
-            '|   |/  _ \\|    |     |    |  \\/    \\  \\/  _(__  <\n' +
-            '|   (  <_> )    |     |    `   \\     \\____/       \\\n' +
-            '|___|\\____/|____|    /_______  /\\______  /______  /\n' +
-            '                             \\/        \\/       \\/\n' +
-            'https://doc.dc3.site\n' +
-            'IoT DC3 Platform V2025.9.0'
-    )
-}
+  console.log(
+    '.___     ___________ ________  _________ ________\n' +
+      '|   | ___\\__    ___/ \\______ \\ \\_   ___ \\\\_____  \\\n' +
+      '|   |/  _ \\|    |     |    |  \\/    \\  \\/  _(__  <\n' +
+      '|   (  <_> )    |     |    `   \\     \\____/       \\\n' +
+      '|___|\\____/|____|    /_______  /\\______  /______  /\n' +
+      '                             \\/        \\/       \\/\n' +
+      'https://doc.dc3.site\n' +
+      'IoT DC3 Platform V2025.9.0'
+  );
+};
