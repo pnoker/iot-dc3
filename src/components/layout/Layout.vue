@@ -78,7 +78,7 @@
   import { HomeFilled } from '@element-plus/icons-vue';
   import { computed } from 'vue';
   import { useAuthStore } from '@/store';
-  import { RouteRecordRaw } from 'vue-router';
+  import type { RouteRecordRaw } from 'vue-router';
 
   const authStore = useAuthStore();
 

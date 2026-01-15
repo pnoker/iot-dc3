@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
+import type { AxiosInstance } from 'axios';
 
 import CommonConstant from '@/config/constant/common';
 import { failMessage, warnMessage } from '@/utils/NotificationUtil';

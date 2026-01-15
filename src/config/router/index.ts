@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  createRouter,
-  createWebHashHistory,
-  NavigationGuardNext,
-  RouteLocationNormalized,
-  RouteMeta,
-} from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
+import type { NavigationGuardNext, RouteLocationNormalized, RouteMeta } from 'vue-router';
 
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
@@ -31,7 +26,7 @@ import { getStorage } from '@/utils/StorageUtil';
 import { isNull } from '@/utils/utils';
 import CommonConstant from '@/config/constant/common';
 import { checkTokenValid } from '@/api/token';
-import { Login } from '@/config/entity';
+import type { Login } from '@/config/entity';
 import { logout } from '@/utils/CommonUtil';
 
 NProgress.configure({

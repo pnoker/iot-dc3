@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import type { Axios, AxiosRequestConfig } from 'axios';
+
 declare module 'axios' {
   type MyAxiosPromise<T = any> = Promise<T>;
 
