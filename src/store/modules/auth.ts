@@ -14,93 +14,103 @@
  * limitations under the License.
  */
 
+import { defineStore } from 'pinia';
+import { computed, ref } from 'vue';
 import router from '@/config/router';
 import { ElLoading } from 'element-plus';
 
 import { cancelToken, generateSalt, generateToken } from '@/api/token';
 
 import CommonConstant from '@/config/constant/common';
-import { Login } from '@/config/entity';
+import type { Login } from '@/config/entity';
 import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtil';
 import { isNull } from '@/utils/utils';
 import { md5 } from 'js-md5';
 
-const auth = {
-  namespaced: true,
-  state: {
-    tenant: 'default',
-    name: 'dc3',
-  },
-  getters: {
-    getTenant: () => {
-      return getStorage(CommonConstant.X_AUTH_TENANT);
-    },
-    getName: () => {
-      return getStorage(CommonConstant.X_AUTH_LOGIN);
-    },
-  },
-  mutations: {
-    setToken: (state: any, login: any) => {
-      setStorage(CommonConstant.X_AUTH_TENANT, login.tenant);
-      setStorage(CommonConstant.X_AUTH_LOGIN, login.name);
-      setStorage(CommonConstant.X_AUTH_TOKEN, { salt: login.salt, token: login.token });
+export const useAuthStore = defineStore('auth', () => {
+  // State
+  const tenant = ref('default');
+  const name = ref('dc3');
 
-      state.tenant = login.tenant;
-      state.name = login.name;
-    },
-    removeToken: () => {
-      removeStorage(CommonConstant.X_AUTH_TENANT);
-      removeStorage(CommonConstant.X_AUTH_LOGIN);
-      removeStorage(CommonConstant.X_AUTH_TOKEN);
-    },
-  },
-  actions: {
-    login({ commit }: any, form: any) {
-      const loading = ElLoading.service({
-        lock: true,
-        text: '登录中,请稍后...',
-      });
-      const login: Login = {
+  // Getters
+  const getTenant = computed(() => {
+    return getStorage(CommonConstant.X_AUTH_TENANT);
+  });
+
+  const getName = computed(() => {
+    return getStorage(CommonConstant.X_AUTH_LOGIN);
+  });
+
+  // Actions
+  const setToken = (login: Login) => {
+    setStorage(CommonConstant.X_AUTH_TENANT, login.tenant);
+    setStorage(CommonConstant.X_AUTH_LOGIN, login.name);
+    setStorage(CommonConstant.X_AUTH_TOKEN, { salt: login.salt, token: login.token });
+
+    tenant.value = login.tenant || 'default';
+    name.value = login.name || 'dc3';
+  };
+
+  const removeToken = () => {
+    removeStorage(CommonConstant.X_AUTH_TENANT);
+    removeStorage(CommonConstant.X_AUTH_LOGIN);
+    removeStorage(CommonConstant.X_AUTH_TOKEN);
+  };
+
+  const login = async (form: any) => {
+    const loading = ElLoading.service({
+      lock: true,
+      text: '登录中,请稍后...',
+    });
+    const loginData: Login = {
+      tenant: form.tenant,
+      name: form.name,
+    };
+    try {
+      const saltRes = await generateSalt(loginData);
+      const salt: string = saltRes.data;
+      const loginWithPassword: Login = {
         tenant: form.tenant,
         name: form.name,
+        salt: salt,
+        password: md5.hex(md5.hex(form.password) + salt),
       };
-      generateSalt(login)
-        .then((res) => {
-          const salt: string = res.data;
-          const login: Login = {
-            tenant: form.tenant,
-            name: form.name,
-            salt: salt,
-            password: md5.hex(md5.hex(form.password) + salt),
-          };
 
-          generateToken(login)
-            .then((res) => {
-              commit('setToken', {
-                tenant: login.tenant,
-                name: login.name,
-                salt: login.salt,
-                token: res.data,
-              });
-              router.push({ name: 'home' }).then(() => loading.close());
-            })
-            .catch(() => loading.close());
-        })
-        .catch(() => loading.close());
-    },
-    logout({ commit, getters }: any) {
-      const tenant = getters.getTenant;
-      const user = getters.getName;
-      if (!isNull(tenant) && !isNull(user)) {
-        const login = {
-          tenant: tenant,
-          name: user,
-        } as Login;
-        cancelToken(login);
-      }
-      commit('removeToken');
-    },
-  },
-};
+      const tokenRes = await generateToken(loginWithPassword);
+      setToken({
+        tenant: loginWithPassword.tenant,
+        name: loginWithPassword.name,
+        salt: loginWithPassword.salt,
+        token: tokenRes.data,
+      });
+      await router.push({ name: 'home' });
+    } finally {
+      loading.close();
+    }
+  };
 
-export default auth;
+  const logout = async () => {
+    const tenantValue = getStorage(CommonConstant.X_AUTH_TENANT);
+    const userValue = getStorage(CommonConstant.X_AUTH_LOGIN);
+    if (!isNull(tenantValue) && !isNull(userValue)) {
+      const loginData = {
+        tenant: tenantValue,
+        name: userValue,
+      } as Login;
+      await cancelToken(loginData);
+    }
+    removeToken();
+  };
+
+  return {
+    // State
+    tenant,
+    name,
+    // Getters
+    getTenant,
+    getName,
+    // Actions
+    login,
+    logout,
+  };
+});

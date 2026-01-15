@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export { useAuthStore } from './auth';
-export { useIntervalStore } from './interval';
+export { useAuthStore } from './modules/auth';
+export { useIntervalStore } from './modules/interval';
