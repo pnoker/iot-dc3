@@ -17,9 +17,9 @@
 import request from '@/config/axios';
 
 /**
- * 新增位号
+ * Add a new point
  *
- * @param point Point
+ * @param point Point object
  * @returns MyAxiosPromise
  */
 export const pointAddApi = (point: any) =>
@@ -30,9 +30,9 @@ export const pointAddApi = (point: any) =>
   });
 
 /**
- * 新增位号
+ * Delete a point
  *
- * @param point Point
+ * @param id Point ID
  * @returns MyAxiosPromise
  */
 export const pointDeleteApi = (id: string) =>
@@ -42,9 +42,9 @@ export const pointDeleteApi = (id: string) =>
   });
 
 /**
- * 更新位号
+ * Update a point
  *
- * @param point Point
+ * @param point Point object
  * @returns MyAxiosPromise
  */
 export const getPointUpdate = (point: any) =>
@@ -55,9 +55,9 @@ export const getPointUpdate = (point: any) =>
   });
 
 /**
- * 通过位号ID查询位号
+ * Get point by ID
  *
- * @param id 位号ID
+ * @param id Point ID
  * @returns MyAxiosPromise
  */
 export const getPointById = (id: string) =>
@@ -67,9 +67,9 @@ export const getPointById = (id: string) =>
   });
 
 /**
- * 通过位号ID集查询位号
+ * Get points by IDs
  *
- * @param pointIds PointId Array
+ * @param pointIds Point ID array
  * @returns MyAxiosPromise
  */
 export const getPointByIds = (pointIds: any) =>
@@ -80,9 +80,9 @@ export const getPointByIds = (pointIds: any) =>
   });
 
 /**
- * 模糊分页查询位号
+ * Get point list with pagination and fuzzy search
  *
- * @param point Point
+ * @param point Point query parameters
  * @returns MyAxiosPromise
  */
 export const getPointList = (point: any) =>
@@ -93,9 +93,9 @@ export const getPointList = (point: any) =>
   });
 
 /**
- * 通过位号ID集查询位号单位
+ * Get point units by point IDs
  *
- * @param pointIds PointId Array
+ * @param pointIds Point ID array
  * @returns MyAxiosPromise
  */
 export const getPointUnit = (pointIds: any) =>
@@ -106,9 +106,9 @@ export const getPointUnit = (pointIds: any) =>
   });
 
 /**
- * 通过模板ID查询位号
+ * Get points by profile ID
  *
- * @param profileId 模板ID
+ * @param profileId Profile ID
  * @returns MyAxiosPromise
  */
 export const getPointByProfileId = (profileId: string) =>
@@ -118,9 +118,9 @@ export const getPointByProfileId = (profileId: string) =>
   });
 
 /**
- * 通过设备ID查询位号
+ * Get points by device ID
  *
- * @param deviceId 设备ID
+ * @param deviceId Device ID
  * @returns MyAxiosPromise
  */
 export const getPointByDeviceId = (deviceId: string) =>
@@ -130,9 +130,9 @@ export const getPointByDeviceId = (deviceId: string) =>
   });
 
 /**
- * 分页查询最新位号值
+ * Get latest point values with pagination
  *
- * @param pointValue PointValue
+ * @param pointValue Point value query parameters
  * @returns MyAxiosPromise
  */
 export const getPointValueLatest = (pointValue: any) =>
@@ -143,9 +143,9 @@ export const getPointValueLatest = (pointValue: any) =>
   });
 
 /**
- * 分页查询位号值
+ * Get point values with pagination
  *
- * @param pointValue PointValue
+ * @param pointValue Point value query parameters
  * @returns MyAxiosPromise
  */
 export const getPointValueList = (pointValue: any) =>
@@ -156,10 +156,12 @@ export const getPointValueList = (pointValue: any) =>
   });
 
 /**
- * 查询位号值历史
- * @param deviceId 设备ID
- * @param pointId 位号ID
- * @param count 数量
+ * Get point value history
+ *
+ * @param deviceId Device ID
+ * @param pointId Point ID
+ * @param count Number of records to retrieve
+ * @returns MyAxiosPromise
  */
 export const getPointValueHistory = (deviceId: number, pointId: number, count: number = 100) =>
   request<R>({
@@ -171,9 +173,9 @@ export const getPointValueHistory = (deviceId: number, pointId: number, count: n
   });
 
 /**
- * 读位号值
+ * Read point value
  *
- * @param pointValueReadVO PointValueReadVO
+ * @param pointValueReadVO Point value read object
  * @returns MyAxiosPromise
  */
 export const readPointValue = (pointValueReadVO: any) =>
@@ -184,9 +186,9 @@ export const readPointValue = (pointValueReadVO: any) =>
   });
 
 /**
- * 写位号值
+ * Write point value
  *
- * @param pointValueWriteVO PointValueWriteVO
+ * @param pointValueWriteVO Point value write object
  * @returns MyAxiosPromise
  */
 export const writePointValue = (pointValueWriteVO: any) =>

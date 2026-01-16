@@ -17,9 +17,9 @@
 import request from '@/config/axios';
 
 /**
- * 新增设备
+ * Add a new device
  *
- * @param device Device
+ * @param device Device object
  * @returns MyAxiosPromise
  */
 export const addDevice = (device: any) =>
@@ -30,9 +30,9 @@ export const addDevice = (device: any) =>
   });
 
 /**
- * 删除设备
+ * Delete a device
  *
- * @param id 设备ID
+ * @param id Device ID
  * @returns MyAxiosPromise
  */
 export const deleteDevice = (id: string) =>
@@ -42,9 +42,9 @@ export const deleteDevice = (id: string) =>
   });
 
 /**
- * 更新设备
+ * Update a device
  *
- * @param device Device
+ * @param device Device object
  * @returns MyAxiosPromise
  */
 export const updateDevice = (device: any) =>
@@ -55,9 +55,9 @@ export const updateDevice = (device: any) =>
   });
 
 /**
- * 通过设备ID查询设备
+ * Get device by ID
  *
- * @param id 设备ID
+ * @param id Device ID
  * @returns MyAxiosPromise
  */
 export const getDeviceById = (id: string) =>
@@ -67,9 +67,9 @@ export const getDeviceById = (id: string) =>
   });
 
 /**
- * 通过设备ID集查询设备
+ * Get devices by IDs
  *
- * @param deviceIds DeviceId Array
+ * @param deviceIds Device ID array
  * @returns MyAxiosPromise
  */
 export const getDeviceByIds = (deviceIds: any) =>
@@ -80,9 +80,9 @@ export const getDeviceByIds = (deviceIds: any) =>
   });
 
 /**
- * 通过驱动ID查询设备
+ * Get devices by driver ID
  *
- * @param driverId 驱动ID
+ * @param driverId Driver ID
  * @returns MyAxiosPromise
  */
 export const getDeviceByDriverId = (driverId: string) =>
@@ -92,9 +92,9 @@ export const getDeviceByDriverId = (driverId: string) =>
   });
 
 /**
- * 通过模板ID查询设备
+ * Get devices by profile ID
  *
- * @param profileId 模板ID
+ * @param profileId Profile ID
  * @returns MyAxiosPromise
  */
 export const getDeviceByProfileId = (profileId: string) =>
@@ -104,9 +104,9 @@ export const getDeviceByProfileId = (profileId: string) =>
   });
 
 /**
- * 分页查询设备
+ * Get device list with pagination
  *
- * @param device Device
+ * @param device Device query parameters
  * @returns MyAxiosPromise
  */
 export const getDeviceList = (device: any) =>
@@ -117,9 +117,9 @@ export const getDeviceList = (device: any) =>
   });
 
 /**
- * 分页查询设备状态
+ * Get device status with pagination
  *
- * @param device Device
+ * @param device Device query parameters
  * @returns MyAxiosPromise
  */
 export const getDeviceStatus = (device: any) =>
@@ -130,9 +130,9 @@ export const getDeviceStatus = (device: any) =>
   });
 
 /**
- * 通过驱动ID查询设备状态
+ * Get device status by driver ID
  *
- * @param driverId 驱动ID
+ * @param driverId Driver ID
  * @returns MyAxiosPromise
  */
 export const getDeviceStatusByDriverId = (driverId: string) =>
@@ -142,9 +142,9 @@ export const getDeviceStatusByDriverId = (driverId: string) =>
   });
 
 /**
- * 通过模板ID查询设备状态
+ * Get device status by profile ID
  *
- * @param profileId 模板ID
+ * @param profileId Profile ID
  * @returns MyAxiosPromise
  */
 export const getDeviceStatusByProfileId = (profileId: string) =>
@@ -154,9 +154,9 @@ export const getDeviceStatusByProfileId = (profileId: string) =>
   });
 
 /**
- * 通过驱动ID和模板ID获取设备导入模板
+ * Get device import template
  *
- * @param device Device
+ * @param device Device query parameters
  * @returns MyAxiosPromise
  */
 export const importDeviceTemplate = (device: any) =>
@@ -168,9 +168,9 @@ export const importDeviceTemplate = (device: any) =>
   });
 
 /**
- * 通过驱动ID和模板ID获取设备导入模板
+ * Import devices from file
  *
- * @param device Device
+ * @param device Device file data
  * @returns MyAxiosPromise
  */
 export const importDevice = (device: any) =>

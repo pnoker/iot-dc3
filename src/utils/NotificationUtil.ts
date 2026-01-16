@@ -15,17 +15,17 @@
  */
 
 import { ElNotification } from 'element-plus';
-import { isNull } from './utils';
+import { isNull } from './ValidationUtil';
 
 /**
- * 成功操作
+ * Show success notification
  *
- * @param message 消息内容
- * @param title 消息标题
+ * @param message Notification message content
+ * @param title Notification title
  */
-export const successMessage = (message?: string, title: string = '成功') => {
+export const successMessage = (message?: string, title: string = 'Success') => {
   if (isNull(message)) {
-    message = '操作成功!';
+    message = 'Operation successful!';
   }
 
   ElNotification({
@@ -37,15 +37,15 @@ export const successMessage = (message?: string, title: string = '成功') => {
 };
 
 /**
- * 警告操作
+ * Show warning notification
  *
- * @param message 消息内容
- * @param title 消息标题
- * @param error 错误信息
+ * @param message Notification message content
+ * @param title Notification title
+ * @param error Error object for debugging
  */
-export const warnMessage = (message?: string, title = '警告', error?: any) => {
+export const warnMessage = (message?: string, title = 'Warning', error?: any) => {
   if (isNull(message)) {
-    message = '操作警告!';
+    message = 'Operation warning!';
   }
 
   if ('dev' === import.meta.env.MODE && error) {
@@ -61,15 +61,15 @@ export const warnMessage = (message?: string, title = '警告', error?: any) => 
 };
 
 /**
- * 失败操作
+ * Show error notification
  *
- * @param message 消息内容
- * @param title 消息标题
- * @param error 错误信息
+ * @param message Notification message content
+ * @param title Notification title
+ * @param error Error object for debugging
  */
-export const failMessage = (message?: string, title = '错误', error?: any) => {
+export const failMessage = (message?: string, title = 'Error', error?: any) => {
   if (isNull(message)) {
-    message = '操作失败!';
+    message = 'Operation failed!';
   }
 
   if ('dev' === import.meta.env.MODE && error) {

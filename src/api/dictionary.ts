@@ -17,9 +17,9 @@
 import request from '@/config/axios';
 
 /**
- * 查询驱动字典
+ * Get driver dictionary
  *
- * @param dictionary Dictionary
+ * @param dictionary Dictionary query parameters
  * @returns MyAxiosPromise
  */
 export const getDriverDictionary = (dictionary: any) =>
@@ -30,9 +30,9 @@ export const getDriverDictionary = (dictionary: any) =>
   });
 
 /**
- * 查询设备字典
+ * Get device dictionary
  *
- * @param dictionary Dictionary
+ * @param dictionary Dictionary query parameters
  * @returns MyAxiosPromise
  */
 export const getDeviceDictionary = (dictionary: any) =>
@@ -43,9 +43,9 @@ export const getDeviceDictionary = (dictionary: any) =>
   });
 
 /**
- * 查询模板字典
+ * Get profile dictionary
  *
- * @param dictionary Dictionary
+ * @param dictionary Dictionary query parameters
  * @returns MyAxiosPromise
  */
 export const getProfileDictionary = (dictionary: any) =>
@@ -56,9 +56,9 @@ export const getProfileDictionary = (dictionary: any) =>
   });
 
 /**
- * 查询位号字典
+ * Get point dictionary
  *
- * @param dictionary Dictionary
+ * @param dictionary Dictionary query parameters
  * @returns MyAxiosPromise
  */
 export const getPointDictionary = (dictionary: any) =>

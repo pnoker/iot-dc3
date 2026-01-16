@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
-import ElementPlugins from '@/config/plugins/element/element.js';
-import HighlightJSPlugins from '@/config/plugins/highlight/highlight.js';
+import type { App } from 'vue';
+import setupElementPlus from '@/config/plugins/element/element';
+import setupHighlight from '@/config/plugins/highlight/highlight';
 
-export default (app: any) => {
-  ElementPlugins(app);
-  HighlightJSPlugins(app);
+/**
+ * IoT DC3 Platform ASCII art banner
+ */
+const PLATFORM_BANNER = `
+.___     ___________ ________  _________ ________
+|   | ___\\\\__    ___/ \\\\______ \\\\ \\\\   ___ \\\\\\\\_____  \\\\
+|   |/  _ \\\\|    |     |    |  \\\\/    \\\\  \\\\/  _(__  <
+|   (  <_> )    |     |    \`   \\\\     \\\\____/       \\\\
+|___|\\\\____/|____|    /_______  /\\\\______  /______  /
+                             \\\\/        \\\\/       \\\\/
+https://doc.dc3.site
+IoT DC3 Platform V2025.9.0`;
 
-  console.log(
-    '.___     ___________ ________  _________ ________\n' +
-      '|   | ___\\__    ___/ \\______ \\ \\_   ___ \\\\_____  \\\n' +
-      '|   |/  _ \\|    |     |    |  \\/    \\  \\/  _(__  <\n' +
-      '|   (  <_> )    |     |    `   \\     \\____/       \\\n' +
-      '|___|\\____/|____|    /_______  /\\______  /______  /\n' +
-      '                             \\/        \\/       \\/\n' +
-      'https://doc.dc3.site\n' +
-      'IoT DC3 Platform V2025.9.0'
-  );
-};
+/**
+ * Plugin setup function
+ * Registers all application plugins (Element Plus, Highlight.js)
+ *
+ * @param app Vue application instance
+ */
+export default function setupPlugins(app: App): void {
+  setupElementPlus(app);
+  setupHighlight(app);
+
+  console.log(PLATFORM_BANNER);
+}

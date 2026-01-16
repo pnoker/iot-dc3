@@ -21,10 +21,10 @@ import { ElLoading } from 'element-plus';
 
 import { cancelToken, generateSalt, generateToken } from '@/api/token';
 
-import CommonConstant from '@/config/constant/common';
+import { AUTH_HEADERS } from '@/config/constant/common';
 import type { Login } from '@/config/entity';
 import { getStorage, removeStorage, setStorage } from '@/utils/StorageUtil';
-import { isNull } from '@/utils/utils';
+import { isNull } from '@/utils/ValidationUtil';
 import { md5 } from 'js-md5';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -34,27 +34,27 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Getters
   const getTenant = computed(() => {
-    return getStorage(CommonConstant.X_AUTH_TENANT);
+    return getStorage(AUTH_HEADERS.TENANT);
   });
 
   const getName = computed(() => {
-    return getStorage(CommonConstant.X_AUTH_LOGIN);
+    return getStorage(AUTH_HEADERS.LOGIN);
   });
 
   // Actions
   const setToken = (login: Login) => {
-    setStorage(CommonConstant.X_AUTH_TENANT, login.tenant);
-    setStorage(CommonConstant.X_AUTH_LOGIN, login.name);
-    setStorage(CommonConstant.X_AUTH_TOKEN, { salt: login.salt, token: login.token });
+    setStorage(AUTH_HEADERS.TENANT, login.tenant);
+    setStorage(AUTH_HEADERS.LOGIN, login.name);
+    setStorage(AUTH_HEADERS.TOKEN, { salt: login.salt, token: login.token });
 
     tenant.value = login.tenant || 'default';
     name.value = login.name || 'dc3';
   };
 
   const removeToken = () => {
-    removeStorage(CommonConstant.X_AUTH_TENANT);
-    removeStorage(CommonConstant.X_AUTH_LOGIN);
-    removeStorage(CommonConstant.X_AUTH_TOKEN);
+    removeStorage(AUTH_HEADERS.TENANT);
+    removeStorage(AUTH_HEADERS.LOGIN);
+    removeStorage(AUTH_HEADERS.TOKEN);
   };
 
   const login = async (form: any) => {
@@ -90,8 +90,8 @@ export const useAuthStore = defineStore('auth', () => {
   };
 
   const logout = async () => {
-    const tenantValue = getStorage(CommonConstant.X_AUTH_TENANT);
-    const userValue = getStorage(CommonConstant.X_AUTH_LOGIN);
+    const tenantValue = getStorage(AUTH_HEADERS.TENANT);
+    const userValue = getStorage(AUTH_HEADERS.LOGIN);
     if (!isNull(tenantValue) && !isNull(userValue)) {
       const loginData = {
         tenant: tenantValue,

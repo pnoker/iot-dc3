@@ -15,9 +15,18 @@
  */
 
 import { ElMessage } from 'element-plus';
+import type { MessageHandler } from 'element-plus';
 
-export const info = (message: string, grouping = true, showClose = true) => {
-  ElMessage({
+/**
+ * Show info message
+ *
+ * @param message Message content
+ * @param grouping Whether to group messages
+ * @param showClose Whether to show close button
+ * @returns Message handler
+ */
+export const info = (message: string, grouping = true, showClose = true): MessageHandler => {
+  return ElMessage({
     type: 'info',
     grouping: grouping,
     showClose: showClose,
@@ -25,8 +34,16 @@ export const info = (message: string, grouping = true, showClose = true) => {
   });
 };
 
-export const success = (message: string, grouping = true, showClose = true) => {
-  ElMessage({
+/**
+ * Show success message
+ *
+ * @param message Message content
+ * @param grouping Whether to group messages
+ * @param showClose Whether to show close button
+ * @returns Message handler
+ */
+export const success = (message: string, grouping = true, showClose = true): MessageHandler => {
+  return ElMessage({
     type: 'success',
     grouping: grouping,
     showClose: showClose,
@@ -34,8 +51,16 @@ export const success = (message: string, grouping = true, showClose = true) => {
   });
 };
 
-export const error = (message: string, grouping = true, showClose = true) => {
-  ElMessage({
+/**
+ * Show error message
+ *
+ * @param message Message content
+ * @param grouping Whether to group messages
+ * @param showClose Whether to show close button
+ * @returns Message handler
+ */
+export const error = (message: string, grouping = true, showClose = true): MessageHandler => {
+  return ElMessage({
     type: 'error',
     grouping: grouping,
     showClose: showClose,
@@ -43,8 +68,16 @@ export const error = (message: string, grouping = true, showClose = true) => {
   });
 };
 
-export const warning = (message: string, grouping = true, showClose = true) => {
-  ElMessage({
+/**
+ * Show warning message
+ *
+ * @param message Message content
+ * @param grouping Whether to group messages
+ * @param showClose Whether to show close button
+ * @returns Message handler
+ */
+export const warning = (message: string, grouping = true, showClose = true): MessageHandler => {
+  return ElMessage({
     type: 'warning',
     grouping: grouping,
     showClose: showClose,

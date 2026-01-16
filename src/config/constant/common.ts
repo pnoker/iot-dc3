@@ -14,8 +14,28 @@
  * limitations under the License.
  */
 
+/**
+ * Common constant values used throughout the application
+ */
+
+/**
+ * HTTP header names for authentication
+ */
+export const AUTH_HEADERS = {
+  /** Header name for tenant identification */
+  TENANT: 'X-Auth-Tenant',
+  /** Header name for login information */
+  LOGIN: 'X-Auth-Login',
+  /** Header name for authentication token */
+  TOKEN: 'X-Auth-Token',
+} as const;
+
+/**
+ * Default export for backward compatibility
+ * @deprecated Use AUTH_HEADERS instead
+ */
 export default {
-  X_AUTH_TENANT: 'X-Auth-Tenant',
-  X_AUTH_LOGIN: 'X-Auth-Login',
-  X_AUTH_TOKEN: 'X-Auth-Token',
+  X_AUTH_TENANT: AUTH_HEADERS.TENANT,
+  X_AUTH_LOGIN: AUTH_HEADERS.LOGIN,
+  X_AUTH_TOKEN: AUTH_HEADERS.TOKEN,
 };

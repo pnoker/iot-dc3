@@ -14,28 +14,16 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios';
-
 /**
- * Get driver attributes by driver ID
+ * Serialize form data
  *
- * @param id Driver ID
- * @returns MyAxiosPromise
+ * @param data Data object
+ * @returns {string} Serialized string
  */
-export const getDriverAttributeByDriverId = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/driver_attribute/driver_id/${id}`,
-    method: 'get',
+export const serialize = (data: any) => {
+  const list: string[] = [];
+  Object.keys(data).forEach((ele) => {
+    list.push(`${ele}=${data[ele]}`);
   });
-
-/**
- * Get point attributes by driver ID
- *
- * @param id Driver ID
- * @returns MyAxiosPromise
- */
-export const getPointAttributeByDriverId = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/point_attribute/driver_id/${id}`,
-    method: 'get',
-  });
+  return list.join('&');
+};

@@ -16,6 +16,10 @@
 
 import type { RouteRecordRaw } from 'vue-router';
 
+/**
+ * Common routes configuration
+ * Includes login page and error pages
+ */
 const routes: Array<RouteRecordRaw> = [
   {
     name: 'login',
@@ -29,7 +33,7 @@ const routes: Array<RouteRecordRaw> = [
     name: '403',
     path: '/403',
     meta: {
-      title: '403',
+      title: '403 Forbidden',
     },
     component: () => import('@/components/error/403.vue'),
   },
@@ -37,7 +41,7 @@ const routes: Array<RouteRecordRaw> = [
     name: '404',
     path: '/404',
     meta: {
-      title: '404',
+      title: '404 Not Found',
     },
     component: () => import('@/components/error/404.vue'),
   },
@@ -45,7 +49,7 @@ const routes: Array<RouteRecordRaw> = [
     name: '500',
     path: '/500',
     meta: {
-      title: '500',
+      title: '500 Server Error',
     },
     component: () => import('@/components/error/500.vue'),
   },

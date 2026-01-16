@@ -108,7 +108,8 @@
 
   import { Chart } from '@antv/g2';
 
-  import { copy, timestamp } from '@/utils/CommonUtil';
+  import { copy } from '@/utils/CommonUtil';
+  import { timestamp } from '@/utils/DateUtil';
   import { getPointValueHistory } from '@/api/point';
 
   const props = defineProps({

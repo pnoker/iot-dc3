@@ -14,83 +14,129 @@
  * limitations under the License.
  */
 
-import axios from 'axios';
+import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import type { AxiosInstance } from 'axios';
 
-import CommonConstant from '@/config/constant/common';
+import { AUTH_HEADERS } from '@/config/constant/common';
 import { failMessage, warnMessage } from '@/utils/NotificationUtil';
 import { getStorage } from '@/utils/StorageUtil';
-import { isNull } from '@/utils/utils';
+import { isNull } from '@/utils/ValidationUtil';
 import JSONBigInt from 'json-bigint';
 
+/**
+ * Configuration constants for the Axios instance
+ */
+const AXIOS_CONFIG = {
+  TIMEOUT: 15000,
+  MIN_STATUS: 200,
+  MAX_STATUS: 500,
+  UNAUTHORIZED_STATUS: 401,
+  HEADERS: {
+    ACCEPT: 'application/json',
+    CONTENT_TYPE: 'application/json',
+  },
+} as const;
+
+/**
+ * Error messages
+ */
+const ERROR_MESSAGES = {
+  UNAUTHORIZED: 'You are not logged in or your login credentials have expired. Please log in again!',
+  UNAUTHORIZED_TITLE: 'Login credentials expired',
+  REQUEST_ERROR: 'API request error. Please contact the system administrator.',
+} as const;
+
+/**
+ * JSONBigInt parser instance with storeAsString option
+ */
 const JSONBigIntStr = JSONBigInt({ storeAsString: true });
+
+/**
+ * Transform response data using JSONBigInt to handle large integers
+ *
+ * @param data Raw response data
+ * @returns Parsed data
+ */
+function transformResponse(data: string): any {
+  try {
+    return JSONBigIntStr.parse(data);
+  } catch {
+    return { data };
+  }
+}
+
+/**
+ * Custom Axios instance with default configuration
+ * Handles large integers via JSONBigInt and includes authentication headers
+ */
 const request: AxiosInstance = axios.create({
-  timeout: 15000,
+  timeout: AXIOS_CONFIG.TIMEOUT,
   withCredentials: true,
-  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-  validateStatus: (status) => status >= 200 && status <= 500,
-  transformResponse: [
-    function (data) {
-      try {
-        return JSONBigIntStr.parse(data);
-      } catch {
-        return { data };
-      }
-    },
-  ],
+  headers: { Accept: AXIOS_CONFIG.HEADERS.ACCEPT, 'Content-Type': AXIOS_CONFIG.HEADERS.CONTENT_TYPE },
+  validateStatus: (status) => status >= AXIOS_CONFIG.MIN_STATUS && status <= AXIOS_CONFIG.MAX_STATUS,
+  transformResponse: [transformResponse],
 });
 
+/**
+ * Request interceptor to add authentication headers
+ */
 request.interceptors.request.use(
-  (config) => {
+  (config: InternalAxiosRequestConfig) => {
     const headers = config.headers;
     if (!headers) {
       return config;
     }
 
-    const tenant = getStorage(CommonConstant.X_AUTH_TENANT);
+    const tenant = getStorage(AUTH_HEADERS.TENANT);
     if (!isNull(tenant)) {
-      headers[CommonConstant.X_AUTH_TENANT] = tenant;
+      headers[AUTH_HEADERS.TENANT] = tenant;
     }
 
-    const login = getStorage(CommonConstant.X_AUTH_LOGIN);
+    const login = getStorage(AUTH_HEADERS.LOGIN);
     if (!isNull(login)) {
-      headers[CommonConstant.X_AUTH_LOGIN] = login;
+      headers[AUTH_HEADERS.LOGIN] = login;
     }
 
-    const token = getStorage(CommonConstant.X_AUTH_TOKEN);
+    const token = getStorage(AUTH_HEADERS.TOKEN);
     if (!isNull(token)) {
-      headers[CommonConstant.X_AUTH_TOKEN] = JSON.stringify(token);
+      headers[AUTH_HEADERS.TOKEN] = JSON.stringify(token);
     }
 
     return config;
   },
-  (error: any) => {
+  (error: AxiosError) => {
     return Promise.reject(error);
   }
 );
 
+/**
+ * Response interceptor to handle responses and errors
+ */
 request.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     const ok = response.data.ok || false;
-    const status = response.status || 401;
+    const status = response.status || AXIOS_CONFIG.UNAUTHORIZED_STATUS;
     const responseType = response.config.responseType;
 
+    // Handle blob response type (e.g., file downloads)
     if (responseType === 'blob') {
       return response;
     }
 
+    // Return data if request was successful
     if (ok) {
       return response.data;
     }
 
-    if (status === 401) {
-      warnMessage('检测到您未登录或登陆凭证已失效, 请重新登录!', '登录凭证失效');
+    // Handle unauthorized access
+    if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
+      warnMessage(ERROR_MESSAGES.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED_TITLE);
     } else {
-      failMessage('接口请求异常, 请联系系统管理员。', response.data.code, response.data);
+      failMessage(ERROR_MESSAGES.REQUEST_ERROR, response.data.code, response.data);
     }
     return Promise.reject();
   },
-  (error: any) => {
+  (error: AxiosError) => {
     return Promise.reject(error);
   }
 );

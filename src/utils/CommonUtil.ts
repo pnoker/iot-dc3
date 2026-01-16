@@ -16,16 +16,21 @@
 
 import router from '@/config/router';
 import { useAuthStore } from '@/store';
-import { dateFormat, setCopyContent } from '@/utils/utils';
+import { setCopyContent } from '@/utils/ClipboardUtil';
 
+/**
+ * Copy content to clipboard with success message
+ *
+ * @param content Content to copy
+ * @param message Success message to display
+ */
 export const copy = (content: string, message: string) => {
   setCopyContent(content, true, message);
 };
 
-export const timestamp = (timestamp: string): string => {
-  return dateFormat(new Date(timestamp));
-};
-
+/**
+ * Logout and redirect to login page
+ */
 export const logout = async () => {
   const authStore = useAuthStore();
   await authStore.logout();

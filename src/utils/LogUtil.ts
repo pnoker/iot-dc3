@@ -19,17 +19,37 @@ import 'moment/locale/zh-cn';
 
 moment.locale('zh-cn');
 
+/**
+ * Log utility with timestamp and color-coded levels
+ */
 export const log = {
+  /**
+   * Log info message
+   *
+   * @param message Message to log
+   */
   info(message: string) {
     const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
-    console.log(now, '%cINFO%c  ---  :', 'color:#F00', message);
+    console.log(now, '%cINFO%c  ---  :', 'color:#67C23A', message);
   },
+
+  /**
+   * Log warning message
+   *
+   * @param message Message to log
+   */
   warn(message: string) {
     const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
-    console.log(now, '%cWARN%c  ---  :', 'color:#F00', message);
+    console.log(now, '%cWARN%c  ---  :', 'color:#E6A23C', message);
   },
+
+  /**
+   * Log error message
+   *
+   * @param message Message to log
+   */
   error(message: string) {
     const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
-    console.log(now, '%cERROR%c  ---  :', 'color:#F00', message);
+    console.log(now, '%cERROR%c  ---  :', 'color:#F56C6C', message);
   },
 };

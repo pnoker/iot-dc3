@@ -29,7 +29,8 @@ import {
 import router from '@/config/router';
 
 import { successMessage } from '@/utils/NotificationUtil';
-import { copy, timestamp } from '@/utils/CommonUtil';
+import { copy } from '@/utils/CommonUtil';
+import { timestamp } from '@/utils/DateUtil';
 
 export default defineComponent({
   name: 'ProfileCard',

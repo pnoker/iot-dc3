@@ -14,28 +14,22 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios';
-
 /**
- * Get driver attributes by driver ID
+ * Generate random number with specified length
  *
- * @param id Driver ID
- * @returns MyAxiosPromise
+ * @param len Number length
+ * @param date Whether to append timestamp
+ * @returns {string} Random number string
  */
-export const getDriverAttributeByDriverId = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/driver_attribute/driver_id/${id}`,
-    method: 'get',
-  });
+export const randomLenNum = (len: number, date?: boolean): string => {
+  const length = len ? len : 4;
+  let random = '';
 
-/**
- * Get point attributes by driver ID
- *
- * @param id Driver ID
- * @returns MyAxiosPromise
- */
-export const getPointAttributeByDriverId = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/point_attribute/driver_id/${id}`,
-    method: 'get',
-  });
+  // Generate random digits to ensure we always get the requested length
+  for (let i = 0; i < length; i++) {
+    random += Math.floor(Math.random() * 10).toString();
+  }
+
+  if (date) random = random + Date.now();
+  return random;
+};

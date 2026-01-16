@@ -17,9 +17,9 @@
 import request from '@/config/axios';
 
 /**
- * 新增驱动配置
+ * Add driver configuration
  *
- * @param driverInfo DriverInfo
+ * @param driverInfo Driver configuration object
  * @returns MyAxiosPromise
  */
 export const addDriverInfo = (driverInfo: any) =>
@@ -30,9 +30,9 @@ export const addDriverInfo = (driverInfo: any) =>
   });
 
 /**
- * 更新驱动配置
+ * Update driver configuration
  *
- * @param driverInfo DriverInfo
+ * @param driverInfo Driver configuration object
  * @returns MyAxiosPromise
  */
 export const updateDriverInfo = (driverInfo: any) =>
@@ -43,10 +43,10 @@ export const updateDriverInfo = (driverInfo: any) =>
   });
 
 /**
- * 通过设备ID和属性ID查询驱动配置
+ * Get driver configuration by device ID and attribute ID
  *
- * @param deviceId DeviceId
- * @param attributeId AttributeId
+ * @param deviceId Device ID
+ * @param attributeId Attribute ID
  * @returns MyAxiosPromise
  */
 export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attributeId: string) =>
@@ -56,9 +56,9 @@ export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attribut
   });
 
 /**
- * 通过设备ID查询驱动配置
+ * Get driver configuration by device ID
  *
- * @param deviceId DeviceId
+ * @param deviceId Device ID
  * @returns MyAxiosPromise
  */
 export const getDriverInfoByDeviceId = (deviceId: string) =>
@@ -68,9 +68,9 @@ export const getDriverInfoByDeviceId = (deviceId: string) =>
   });
 
 /**
- * 新增位号配置
+ * Add point configuration
  *
- * @param pointInfo PointInfo
+ * @param pointInfo Point configuration object
  * @returns MyAxiosPromise
  */
 export const addPointInfo = (pointInfo: any) =>
@@ -81,9 +81,9 @@ export const addPointInfo = (pointInfo: any) =>
   });
 
 /**
- * 更新位号配置
+ * Update point configuration
  *
- * @param pointInfo PointInfo
+ * @param pointInfo Point configuration object
  * @returns MyAxiosPromise
  */
 export const updatePointInfo = (pointInfo: any) =>
@@ -94,10 +94,10 @@ export const updatePointInfo = (pointInfo: any) =>
   });
 
 /**
- * 通过设备ID和位号ID查询位号配置
+ * Get point configuration by device ID and point ID
  *
- * @param deviceId DeviceId
- * @param pointId PointId
+ * @param deviceId Device ID
+ * @param pointId Point ID
  * @returns MyAxiosPromise
  */
 export const getPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: string) =>
@@ -107,9 +107,9 @@ export const getPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: stri
   });
 
 /**
- * 通过设备ID查询位号配置
+ * Get point configuration by device ID
  *
- * @param deviceId DeviceId
+ * @param deviceId Device ID
  * @returns MyAxiosPromise
  */
 export const getPointInfoByDeviceId = (deviceId: string) =>

@@ -26,7 +26,7 @@ import pointTool from './tool/PointTool.vue';
 import pointAddForm from './add/PointAddForm.vue';
 import pointCard from './card/PointCard.vue';
 import blankCard from '@/components/card/blank/BlankCard.vue';
-import { isNull } from '@/utils/utils';
+import { isNull } from '@/utils/ValidationUtil';
 import { failMessage } from '@/utils/NotificationUtil';
 
 export default defineComponent({

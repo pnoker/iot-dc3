@@ -16,12 +16,24 @@
 
 import request from '@/config/axios';
 
+/**
+ * Get driver by ID
+ *
+ * @param id Driver ID
+ * @returns MyAxiosPromise
+ */
 export const getDriverById = (id: string) =>
   request<R>({
     url: `api/v3/manager/driver/id/${id}`,
     method: 'get',
   });
 
+/**
+ * Get drivers by IDs
+ *
+ * @param driverIds Driver ID array
+ * @returns MyAxiosPromise
+ */
 export const getDriverByIds = (driverIds: any) =>
   request<R>({
     url: `api/v3/manager/driver/ids`,
@@ -29,6 +41,12 @@ export const getDriverByIds = (driverIds: any) =>
     data: driverIds,
   });
 
+/**
+ * Get driver list with pagination
+ *
+ * @param driver Driver query parameters
+ * @returns MyAxiosPromise
+ */
 export const getDriverList = (driver: any) =>
   request<R>({
     url: `api/v3/manager/driver/list`,
@@ -36,6 +54,12 @@ export const getDriverList = (driver: any) =>
     data: driver,
   });
 
+/**
+ * Get driver status
+ *
+ * @param driver Driver query parameters
+ * @returns MyAxiosPromise
+ */
 export const getDriverStatus = (driver: any) =>
   request<R>({
     url: `api/v3/data/driver/status/driver`,

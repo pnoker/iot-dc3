@@ -15,41 +15,61 @@
  */
 
 /**
- * 登录信息
+ * Common entity types used throughout the application
+ */
+
+/**
+ * Login information interface
  */
 export interface Login {
+  /** Tenant identifier */
   tenant?: string;
+  /** Username */
   name?: string;
+  /** Salt value for password encryption */
   salt?: string;
+  /** Encrypted password */
   password?: string;
+  /** Authentication token */
   token?: string;
 }
 
 /**
- * 属性
+ * Attribute information interface
  */
 export interface Attribute {
+  /** Attribute ID */
   id: string;
+  /** Attribute display name */
   name: string;
+  /** Attribute internal name */
   attributeName: string;
 }
 
 /**
- * 字典
+ * Dictionary interface for hierarchical data structures
  */
 export interface Dictionary {
+  /** Dictionary type/category */
   type: string;
+  /** Display label */
   label: string;
+  /** Internal value */
   value: string;
+  /** Whether the item is disabled */
   disabled: boolean;
+  /** Whether the item is expanded */
   expand: boolean;
+  /** Child dictionary items */
   children: Array<Dictionary>;
 }
 
 /**
- * 排序
+ * Sort order interface for table sorting
  */
 export interface Order {
+  /** Column name to sort by */
   column: string;
+  /** Sort direction (true for ascending, false for descending) */
   asc: boolean;
 }

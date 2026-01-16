@@ -19,7 +19,8 @@ import { CircleClose, Edit, Management, Sunrise, Sunset, Timer, ZoomIn } from '@
 
 import { TinyArea } from '@antv/g2plot';
 
-import { copy, timestamp } from '@/utils/CommonUtil';
+import { copy } from '@/utils/CommonUtil';
+import { timestamp } from '@/utils/DateUtil';
 
 export default defineComponent({
   name: 'PointValueCard',

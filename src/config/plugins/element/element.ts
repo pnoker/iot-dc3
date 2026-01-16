@@ -14,16 +14,32 @@
  * limitations under the License.
  */
 
+import type { App } from 'vue';
 import { Connection, Hide, Histogram, List, Management, Promotion, View } from '@element-plus/icons-vue';
 import element from 'element-plus';
 import 'element-plus/dist/index.css';
 import './element-variables.scss';
 import locale from 'element-plus/es/locale/lang/zh-cn';
 
-export default (app: any) => {
-  const Icons = [Hide, Histogram, List, Management, Promotion, View, Connection];
-  Icons.forEach((icon) => {
-    app.component(icon.name, icon);
+/**
+ * Element Plus icons to register globally
+ */
+const ICONS = [Hide, Histogram, List, Management, Promotion, View, Connection] as const;
+
+/**
+ * Element Plus plugin configuration
+ * Registers Element Plus components and icons globally
+ *
+ * @param app Vue application instance
+ */
+export default function setupElementPlus(app: App): void {
+  // Register icons globally
+  ICONS.forEach((icon) => {
+    if (icon.name) {
+      app.component(icon.name, icon);
+    }
   });
+
+  // Install Element Plus with Chinese locale
   app.use(element, { locale });
-};
+}

@@ -16,7 +16,15 @@
 
 import type { RouteRecordRaw } from 'vue-router';
 
+/**
+ * Lazy-loaded layout component
+ */
 const Layout = () => import('@/components/layout/Layout.vue');
+
+/**
+ * Main view routes configuration
+ * Includes navigation menu items
+ */
 const routes: RouteRecordRaw = {
   path: '/',
   redirect: '/home',
@@ -26,7 +34,7 @@ const routes: RouteRecordRaw = {
       name: 'home',
       path: '/home',
       meta: {
-        title: '首页',
+        title: 'Home',
       },
       component: () => import('@/views/home/Home.vue'),
     },
@@ -35,7 +43,7 @@ const routes: RouteRecordRaw = {
       path: '/driver',
       meta: {
         icon: 'Promotion',
-        title: '驱动',
+        title: 'Driver',
       },
       component: () => import('@/views/driver/Driver.vue'),
     },
@@ -44,7 +52,7 @@ const routes: RouteRecordRaw = {
       path: '/profile',
       meta: {
         icon: 'List',
-        title: '模板',
+        title: 'Profile',
       },
       component: () => import('@/views/profile/Profile.vue'),
     },
@@ -53,7 +61,7 @@ const routes: RouteRecordRaw = {
       path: '/device',
       meta: {
         icon: 'Management',
-        title: '设备',
+        title: 'Device',
       },
       component: () => import('@/views/device/Device.vue'),
     },
@@ -62,7 +70,7 @@ const routes: RouteRecordRaw = {
       path: '/point_value',
       meta: {
         icon: 'Histogram',
-        title: '数据',
+        title: 'Data',
       },
       component: () => import('@/views/point/value/PointValue.vue'),
     },

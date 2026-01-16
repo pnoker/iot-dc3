@@ -37,7 +37,7 @@ import { Dictionary, Order } from '@/config/entity';
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue';
-import { isNull } from '@/utils/utils';
+import { isNull } from '@/utils/ValidationUtil';
 import { getDriverById } from '@/api/driver';
 import { getProfileByIds } from '@/api/profile';
 import { getPointByDeviceId } from '@/api/point';

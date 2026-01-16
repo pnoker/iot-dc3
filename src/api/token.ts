@@ -15,12 +15,12 @@
  */
 
 import request from '@/config/axios';
-import { Login } from '@/config/entity';
+import type { Login } from '@/config/entity';
 
 /**
- * 获取 Salt
+ * Generate salt for password encryption
  *
- * @param login Login
+ * @param login Login object
  * @returns MyAxiosPromise
  */
 export const generateSalt = (login: Login) =>
@@ -31,9 +31,9 @@ export const generateSalt = (login: Login) =>
   });
 
 /**
- * 登录
+ * Generate authentication token (login)
  *
- * @param login Login
+ * @param login Login object
  * @returns MyAxiosPromise
  */
 export const generateToken = (login: Login) =>
@@ -44,9 +44,9 @@ export const generateToken = (login: Login) =>
   });
 
 /**
- * 注销
+ * Cancel authentication token (logout)
  *
- * @param login Login
+ * @param login Login object
  * @returns MyAxiosPromise
  */
 export const cancelToken = (login: Login) =>
@@ -57,9 +57,9 @@ export const cancelToken = (login: Login) =>
   });
 
 /**
- * 校验 Token
+ * Check if token is valid
  *
- * @param login Login
+ * @param login Login object
  * @returns MyAxiosPromise
  */
 export const checkTokenValid = (login: Login) =>

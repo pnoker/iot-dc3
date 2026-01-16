@@ -23,38 +23,55 @@ import commonRouters from './common';
 import operateRouters from './operate';
 import viewsRouters from './views';
 import { getStorage } from '@/utils/StorageUtil';
-import { isNull } from '@/utils/utils';
-import CommonConstant from '@/config/constant/common';
+import { isNull } from '@/utils/ValidationUtil';
+import { AUTH_HEADERS } from '@/config/constant/common';
 import { checkTokenValid } from '@/api/token';
 import type { Login } from '@/config/entity';
 import { logout } from '@/utils/CommonUtil';
 
-NProgress.configure({
+/**
+ * NProgress configuration
+ */
+const NPROGRESS_CONFIG = {
   easing: 'ease',
   showSpinner: false,
-});
+} as const;
 
+/**
+ * Configure NProgress
+ */
+NProgress.configure(NPROGRESS_CONFIG);
+
+/**
+ * Vue Router instance with authentication guards
+ */
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [...commonRouters, viewsRouters, ...operateRouters],
 });
 
+/**
+ * Navigation guard to handle authentication and page title
+ */
 router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
   NProgress.start();
 
+  // Skip authentication check for login page
   if (from.name === 'login' || to.name === 'login') {
     next();
     return;
   }
 
-  const tenant = getStorage(CommonConstant.X_AUTH_TENANT);
-  const user = getStorage(CommonConstant.X_AUTH_LOGIN);
-  const token = getStorage(CommonConstant.X_AUTH_TOKEN);
+  // Check if user is authenticated
+  const tenant = getStorage(AUTH_HEADERS.TENANT);
+  const user = getStorage(AUTH_HEADERS.LOGIN);
+  const token = getStorage(AUTH_HEADERS.TOKEN);
   if (isNull(tenant) || isNull(user) || isNull(token)) {
     next({ path: '/login' });
     return;
   }
 
+  // Validate token
   const login: Login = {
     tenant: tenant,
     name: user,
@@ -68,6 +85,7 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
         return;
       }
 
+      // Update page title
       const meta: RouteMeta = to.meta || {};
       if (meta.title) {
         document.title = to.meta.title as string;
@@ -80,10 +98,16 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
     });
 });
 
+/**
+ * Navigation guard to handle progress bar completion
+ */
 router.afterEach(() => {
   NProgress.done();
 });
 
+/**
+ * Error handler to remove progress bar on navigation errors
+ */
 router.onError(() => {
   NProgress.remove();
 });

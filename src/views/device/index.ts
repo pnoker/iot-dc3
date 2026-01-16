@@ -32,7 +32,7 @@ import { Order } from '@/config/entity';
 import blankCard from '@/components/card/blank/BlankCard.vue';
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import { failMessage } from '@/utils/NotificationUtil';
-import { isNull } from '@/utils/utils';
+import { isNull } from '@/utils/ValidationUtil';
 import deviceAddForm from './add/DeviceAddForm.vue';
 import deviceCard from './card/DeviceCard.vue';
 import deviceImportForm from './import/DeviceImportForm.vue';

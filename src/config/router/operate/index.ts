@@ -16,7 +16,15 @@
 
 import type { RouteRecordRaw } from 'vue-router';
 
+/**
+ * Lazy-loaded layout component
+ */
 const Layout = () => import('@/components/layout/Layout.vue');
+
+/**
+ * Operate routes configuration
+ * Includes detail and edit pages for various entities
+ */
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/home',
@@ -27,7 +35,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/home/dashboard',
         meta: {
           icon: 'el-icon-s-home',
-          title: '看板',
+          title: 'Dashboard',
         },
         component: () => import('@/views/dashboard/Dashboard.vue'),
       },
@@ -36,7 +44,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/home/application',
         meta: {
           icon: 'el-icon-s-home',
-          title: '应用',
+          title: 'Application',
         },
         component: () => import('@/views/application/Application.vue'),
       },
@@ -51,7 +59,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/driver/detail',
         meta: {
           icon: 'el-icon-s-promotion',
-          title: '驱动信息',
+          title: 'Driver Detail',
         },
         component: () => import('@/views/driver/detail/DriverDetail.vue'),
       },
@@ -66,7 +74,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/device/detail',
         meta: {
           icon: 'el-icon-s-finance',
-          title: '设备信息',
+          title: 'Device Detail',
         },
         component: () => import('@/views/device/detail/DeviceDetail.vue'),
       },
@@ -75,7 +83,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/device/edit',
         meta: {
           icon: 'el-icon-s-finance',
-          title: '设备编辑',
+          title: 'Device Edit',
         },
         component: () => import('@/views/device/edit/DeviceEdit.vue'),
       },
@@ -90,7 +98,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/profile/detail',
         meta: {
           icon: 'el-icon-s-order',
-          title: '模板信息',
+          title: 'Profile Detail',
         },
         component: () => import('@/views/profile/detail/ProfileDetail.vue'),
       },
@@ -99,7 +107,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/profile/edit',
         meta: {
           icon: 'el-icon-s-order',
-          title: '模板编辑',
+          title: 'Profile Edit',
         },
         component: () => import('@/views/profile/edit/ProfileEdit.vue'),
       },
@@ -114,7 +122,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/point/detail',
         meta: {
           icon: 'el-icon-s-order',
-          title: '位号信息',
+          title: 'Point Detail',
         },
         component: () => import('@/views/point/detail/PointDetail.vue'),
       },
@@ -123,7 +131,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/point/edit',
         meta: {
           icon: 'el-icon-s-order',
-          title: '位号编辑',
+          title: 'Point Edit',
         },
         component: () => import('@/views/point/edit/PointEdit.vue'),
       },

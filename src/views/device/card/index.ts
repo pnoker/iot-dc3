@@ -19,7 +19,8 @@ import { defineComponent } from 'vue';
 
 import router from '@/config/router';
 
-import { copy, timestamp } from '@/utils/CommonUtil';
+import { copy } from '@/utils/CommonUtil';
+import { timestamp } from '@/utils/DateUtil';
 import { successMessage } from '@/utils/NotificationUtil';
 
 export default defineComponent({

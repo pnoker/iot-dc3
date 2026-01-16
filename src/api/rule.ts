@@ -16,6 +16,12 @@
 
 import request from '@/config/axios';
 
+/**
+ * Get flows list
+ *
+ * @param flowsQuery Flows query parameters
+ * @returns MyAxiosPromise
+ */
 export const getFlowsList = (flowsQuery: any) =>
   request<R>({
     url: 'api/v3/manager/ruleengine/flowsList',

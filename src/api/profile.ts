@@ -17,9 +17,9 @@
 import request from '@/config/axios';
 
 /**
- * 新增模板
+ * Add a new profile
  *
- * @param profile Profile
+ * @param profile Profile object
  * @returns MyAxiosPromise
  */
 export const addProfile = (profile: any) =>
@@ -30,9 +30,9 @@ export const addProfile = (profile: any) =>
   });
 
 /**
- * 删除模板
+ * Delete a profile
  *
- * @param id 模板ID
+ * @param id Profile ID
  * @returns MyAxiosPromise
  */
 export const deleteProfile = (id: string) =>
@@ -42,9 +42,9 @@ export const deleteProfile = (id: string) =>
   });
 
 /**
- * 修改模板
+ * Update a profile
  *
- * @param profile Profile
+ * @param profile Profile object
  * @returns MyAxiosPromise
  */
 export const updateProfile = (profile: any) =>
@@ -55,9 +55,9 @@ export const updateProfile = (profile: any) =>
   });
 
 /**
- * 通过模板ID查询模板
+ * Get profile by ID
  *
- * @param id 模板ID
+ * @param id Profile ID
  * @returns MyAxiosPromise
  */
 export const getProfileById = (id: string) =>
@@ -67,9 +67,9 @@ export const getProfileById = (id: string) =>
   });
 
 /**
- * 通过模板ID集查询模板
+ * Get profiles by IDs
  *
- * @param profileIds ProfileId Array
+ * @param profileIds Profile ID array
  * @returns MyAxiosPromise
  */
 export const getProfileByIds = (profileIds: any) =>
@@ -80,9 +80,9 @@ export const getProfileByIds = (profileIds: any) =>
   });
 
 /**
- * 通过设备ID查询模板
+ * Get profile by device ID
  *
- * @param deviceId DeviceId
+ * @param deviceId Device ID
  * @returns MyAxiosPromise
  */
 export const getProfileByDeviceId = (deviceId: string) =>
@@ -92,9 +92,9 @@ export const getProfileByDeviceId = (deviceId: string) =>
   });
 
 /**
- * 分页查询
+ * Get profile list with pagination
  *
- * @param profile Profile
+ * @param profile Profile query parameters
  * @returns MyAxiosPromise
  */
 export const getProfileList = (profile: any) =>

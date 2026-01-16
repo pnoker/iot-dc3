@@ -14,27 +14,41 @@
  * limitations under the License.
  */
 
+/**
+ * Element Plus form component size variables
+ * Used to define consistent widths for form inputs and selects
+ */
+
+// Form size widths
+$form-width-small: 120px;
+$form-width-medium: 150px;
+$form-width-default: 250px;
+$form-width-special: 300px;
+$form-width-large: 500px;
+
+// Small form elements
 .el-select.edit-form-small,
 .el-input.edit-form-small {
-  width: 120px;
+  width: $form-width-small;
 }
 
-.el-select.edit-form-medium,
-.el-input.edit-form-special {
-  width: 150px;
+// Medium form elements
+.el-select.edit-form-medium {
+  width: $form-width-medium;
 }
 
-.el-select.edit-form-default,
-.el-input.edit-form-special {
-  width: 250px;
+// Default form elements
+.el-select.edit-form-default {
+  width: $form-width-default;
 }
 
+// Special form elements
 .el-select.edit-form-special,
 .el-input.edit-form-special {
-  width: 300px;
+  width: $form-width-special;
 }
 
-.el-select.edit-form-large,
-.el-input.edit-form-special {
-  width: 500px;
+// Large form elements
+.el-select.edit-form-large {
+  width: $form-width-large;
 }
