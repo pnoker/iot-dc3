@@ -15,63 +15,92 @@
   -->
 
 <template>
-    <div class="tool-card">
-        <el-card shadow="hover">
-            <div class="tool-card__container">
-                <el-form ref="formDataRef" :inline="true" :model="reactiveData.formData" :rules="formRule" class="tool-card__body">
-                    <div class="tool-card-body-form">
-                        <el-form-item label="驱动名称" prop="name">
-                            <el-input v-model="reactiveData.formData.driverName" class="edit-form-default" clearable placeholder="请输入驱动名称" @keyup.enter="search"></el-input>
-                        </el-form-item>
-                        <el-form-item label="服务名称" prop="serviceName">
-                            <el-input v-model="reactiveData.formData.serviceName" class="edit-form-default" clearable placeholder="请输入服务名称" @keyup.enter="search"></el-input>
-                        </el-form-item>
-                        <el-form-item label="主机" prop="host">
-                            <el-input v-model="reactiveData.formData.serviceHost" class="edit-form-default" clearable placeholder="请输入主机" @keyup.enter="search"></el-input>
-                        </el-form-item>
-                        <el-form-item label="使能" prop="enableFlag">
-                            <el-select v-model="reactiveData.formData.enableFlag" class="edit-form-small" clearable placeholder="请选择使能">
-                                <el-option label="启用" value="ENABLE"></el-option>
-                                <el-option label="停用" value="DISABLE"></el-option>
-                            </el-select>
-                        </el-form-item>
-                    </div>
-                    <el-form-item class="tool-card-body-button">
-                        <el-button :icon="Search" type="primary" @click="search">搜索</el-button>
-                        <el-button :icon="RefreshRight" @click="reset">重置</el-button>
-                    </el-form-item>
-                </el-form>
-                <div class="tool-card__footer">
-                    <div class="tool-card-footer-button">
-                        <el-button v-if="add" :icon="Plus" type="success">新增</el-button>
-                    </div>
-                    <div class="tool-card-footer-page">
-                        <el-pagination
-                            :current-page="+page.current"
-                            :page-size="+page.size"
-                            :page-sizes="[6, 12, 24, 36, 48, 96]"
-                            :total="+page.total"
-                            background
-                            layout="total, prev, pager, next, sizes"
-                            @size-change="sizeChange"
-                            @current-change="currentChange"
-                        >
-                        </el-pagination>
-                        <el-tooltip class="item" content="刷新" effect="dark" placement="top">
-                            <el-button :icon="Refresh" circle @click="refresh"></el-button>
-                        </el-tooltip>
-                        <el-tooltip class="item" content="排序" effect="dark" placement="top">
-                            <el-button :icon="Sort" circle @click="sort"></el-button>
-                        </el-tooltip>
-                    </div>
-                </div>
-            </div>
-        </el-card>
-    </div>
+  <div class="tool-card">
+    <el-card shadow="hover">
+      <div class="tool-card__container">
+        <el-form
+          ref="formDataRef"
+          :inline="true"
+          :model="reactiveData.formData"
+          :rules="formRule"
+          class="tool-card__body"
+        >
+          <div class="tool-card-body-form">
+            <el-form-item label="驱动名称" prop="name">
+              <el-input
+                v-model="reactiveData.formData.driverName"
+                class="edit-form-default"
+                clearable
+                placeholder="请输入驱动名称"
+                @keyup.enter="search"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="服务名称" prop="serviceName">
+              <el-input
+                v-model="reactiveData.formData.serviceName"
+                class="edit-form-default"
+                clearable
+                placeholder="请输入服务名称"
+                @keyup.enter="search"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="主机" prop="host">
+              <el-input
+                v-model="reactiveData.formData.serviceHost"
+                class="edit-form-default"
+                clearable
+                placeholder="请输入主机"
+                @keyup.enter="search"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="使能" prop="enableFlag">
+              <el-select
+                v-model="reactiveData.formData.enableFlag"
+                class="edit-form-small"
+                clearable
+                placeholder="请选择使能"
+              >
+                <el-option label="启用" value="ENABLE"></el-option>
+                <el-option label="停用" value="DISABLE"></el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+          <el-form-item class="tool-card-body-button">
+            <el-button :icon="Search" type="primary" @click="search">搜索</el-button>
+            <el-button :icon="RefreshRight" @click="reset">重置</el-button>
+          </el-form-item>
+        </el-form>
+        <div class="tool-card__footer">
+          <div class="tool-card-footer-button">
+            <el-button v-if="add" :icon="Plus" type="success">新增</el-button>
+          </div>
+          <div class="tool-card-footer-page">
+            <el-pagination
+              :current-page="+page.current"
+              :page-size="+page.size"
+              :page-sizes="[6, 12, 24, 36, 48, 96]"
+              :total="+page.total"
+              background
+              layout="total, prev, pager, next, sizes"
+              @size-change="sizeChange"
+              @current-change="currentChange"
+            >
+            </el-pagination>
+            <el-tooltip class="item" content="刷新" effect="dark" placement="top">
+              <el-button :icon="Refresh" circle @click="refresh"></el-button>
+            </el-tooltip>
+            <el-tooltip class="item" content="排序" effect="dark" placement="top">
+              <el-button :icon="Sort" circle @click="sort"></el-button>
+            </el-tooltip>
+          </div>
+        </div>
+      </div>
+    </el-card>
+  </div>
 </template>
 
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss" scoped>
-    @use '@/components/card/styles/tool-card.scss';
+  @use '@/components/card/styles/tool-card.scss';
 </style>

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios'
-import { Login } from '@/config/entity'
+import request from '@/config/axios';
+import { Login } from '@/config/entity';
 
 /**
  * 获取 Salt
@@ -24,11 +24,11 @@ import { Login } from '@/config/entity'
  * @returns MyAxiosPromise
  */
 export const generateSalt = (login: Login) =>
-    request<R>({
-        url: `api/v3/auth/token/salt`,
-        method: 'post',
-        data: login
-    })
+  request<R>({
+    url: `api/v3/auth/token/salt`,
+    method: 'post',
+    data: login,
+  });
 
 /**
  * 登录
@@ -37,11 +37,11 @@ export const generateSalt = (login: Login) =>
  * @returns MyAxiosPromise
  */
 export const generateToken = (login: Login) =>
-    request<R>({
-        url: `api/v3/auth/token/generate`,
-        method: 'post',
-        data: login
-    })
+  request<R>({
+    url: `api/v3/auth/token/generate`,
+    method: 'post',
+    data: login,
+  });
 
 /**
  * 注销
@@ -50,11 +50,11 @@ export const generateToken = (login: Login) =>
  * @returns MyAxiosPromise
  */
 export const cancelToken = (login: Login) =>
-    request<R>({
-        url: `api/v3/auth/token/cancel`,
-        method: 'post',
-        data: login
-    })
+  request<R>({
+    url: `api/v3/auth/token/cancel`,
+    method: 'post',
+    data: login,
+  });
 
 /**
  * 校验 Token
@@ -63,8 +63,8 @@ export const cancelToken = (login: Login) =>
  * @returns MyAxiosPromise
  */
 export const checkTokenValid = (login: Login) =>
-    request<R>({
-        url: `api/v3/auth/token/check`,
-        method: 'post',
-        data: login
-    })
+  request<R>({
+    url: `api/v3/auth/token/check`,
+    method: 'post',
+    data: login,
+  });

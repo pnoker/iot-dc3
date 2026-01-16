@@ -14,59 +14,59 @@
  * limitations under the License.
  */
 
-import { RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router';
 
-const Layout = () => import('@/components/layout/Layout.vue')
+const Layout = () => import('@/components/layout/Layout.vue');
 const routes: RouteRecordRaw = {
-    path: '/',
-    redirect: '/home',
-    component: Layout,
-    children: [
-        {
-            name: 'home',
-            path: '/home',
-            meta: {
-                title: '首页'
-            },
-            component: () => import('@/views/home/Home.vue')
-        },
-        {
-            name: 'driver',
-            path: '/driver',
-            meta: {
-                icon: 'Promotion',
-                title: '驱动'
-            },
-            component: () => import('@/views/driver/Driver.vue')
-        },
-        {
-            name: 'profile',
-            path: '/profile',
-            meta: {
-                icon: 'List',
-                title: '模板'
-            },
-            component: () => import('@/views/profile/Profile.vue')
-        },
-        {
-            name: 'device',
-            path: '/device',
-            meta: {
-                icon: 'Management',
-                title: '设备'
-            },
-            component: () => import('@/views/device/Device.vue')
-        },
-        {
-            name: 'pointValue',
-            path: '/point_value',
-            meta: {
-                icon: 'Histogram',
-                title: '数据'
-            },
-            component: () => import('@/views/point/value/PointValue.vue')
-        }
-    ]
-}
+  path: '/',
+  redirect: '/home',
+  component: Layout,
+  children: [
+    {
+      name: 'home',
+      path: '/home',
+      meta: {
+        title: '首页',
+      },
+      component: () => import('@/views/home/Home.vue'),
+    },
+    {
+      name: 'driver',
+      path: '/driver',
+      meta: {
+        icon: 'Promotion',
+        title: '驱动',
+      },
+      component: () => import('@/views/driver/Driver.vue'),
+    },
+    {
+      name: 'profile',
+      path: '/profile',
+      meta: {
+        icon: 'List',
+        title: '模板',
+      },
+      component: () => import('@/views/profile/Profile.vue'),
+    },
+    {
+      name: 'device',
+      path: '/device',
+      meta: {
+        icon: 'Management',
+        title: '设备',
+      },
+      component: () => import('@/views/device/Device.vue'),
+    },
+    {
+      name: 'pointValue',
+      path: '/point_value',
+      meta: {
+        icon: 'Histogram',
+        title: '数据',
+      },
+      component: () => import('@/views/point/value/PointValue.vue'),
+    },
+  ],
+};
 
-export default routes
+export default routes;

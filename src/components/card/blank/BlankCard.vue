@@ -15,46 +15,46 @@
   -->
 
 <template>
-    <div class="blank-card">
-        <el-card class="blank-card__body" shadow="hover">
-            <div class="blank-card__container">
-                <slot />
-            </div>
-        </el-card>
-    </div>
+  <div class="blank-card">
+    <el-card class="blank-card__body" shadow="hover">
+      <div class="blank-card__container">
+        <slot />
+      </div>
+    </el-card>
+  </div>
 </template>
 
 <script lang="ts" setup></script>
 
 <style lang="scss" scoped>
-    .blank-card {
-        border-radius: 4px;
-        box-sizing: border-box;
+  .blank-card {
+    border-radius: 4px;
+    box-sizing: border-box;
 
-        ul {
-            list-style: none;
+    ul {
+      list-style: none;
 
-            li {
-                font-size: 13px;
-                margin-top: 8px;
-            }
-        }
-
-        :deep(.el-card) {
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        :deep(.el-card.blank-card__body) {
-            border: 0;
-        }
-
-        :deep(.el-card__body) {
-            padding: 10px 5px 0;
-        }
-
-        :deep(.el-tabs__nav) {
-            margin: 0 5px;
-        }
+      li {
+        font-size: 13px;
+        margin-top: 8px;
+      }
     }
+
+    :deep(.el-card) {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    :deep(.el-card.blank-card__body) {
+      border: 0;
+    }
+
+    :deep(.el-card__body) {
+      padding: 10px 5px 0;
+    }
+
+    :deep(.el-tabs__nav) {
+      margin: 0 5px;
+    }
+  }
 </style>

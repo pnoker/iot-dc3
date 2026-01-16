@@ -15,14 +15,21 @@
   -->
 
 <template>
-    <iframe :src="iframeUrl" border="0" class="things-application-iframe" frameborder="no" marginheight="0" marginwidth="0"></iframe>
+  <iframe
+    :src="iframeUrl"
+    border="0"
+    class="things-application-iframe"
+    frameborder="no"
+    marginheight="0"
+    marginwidth="0"
+  ></iframe>
 </template>
 
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss" scoped>
-    .things-application-iframe {
-        width: 100%;
-        height: 100%;
-    }
+  .things-application-iframe {
+    width: 100%;
+    height: 100%;
+  }
 </style>

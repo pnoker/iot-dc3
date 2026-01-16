@@ -15,15 +15,15 @@
   -->
 
 <template>
-    <div>
-        <title-card class="home-count">
-            <div id="count-data" ref="countDataChartRef"></div>
-        </title-card>
-    </div>
+  <div>
+    <title-card class="home-count">
+      <div id="count-data" ref="countDataChartRef"></div>
+    </title-card>
+  </div>
 </template>
 
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss" scoped>
-    @use '@/views/home/style.scss';
+  @use '@/views/home/style.scss';
 </style>

@@ -14,14 +14,5 @@
  * limitations under the License.
  */
 
-import { createStore } from 'vuex'
-
-import auth from '@/store/modules/auth'
-import interval from '@/store/modules/interval'
-
-export default createStore({
-    modules: {
-        auth,
-        interval
-    }
-})
+export { useAuthStore } from './modules/auth';
+export { useIntervalStore } from './modules/interval';

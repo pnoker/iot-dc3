@@ -15,46 +15,46 @@
   -->
 
 <template>
-    <div>
-        <point-tool
-            :embedded="embedded"
-            :next="next"
-            :page="reactiveData.page"
-            :pre="pre"
-            @refresh="refresh"
-            @reset="reset"
-            @search="search"
-            @sort="sort"
-            @pre-handle="preHandle"
-            @next-handle="nextHandle"
-            @show-add="showAdd"
-            @size-change="sizeChange"
-            @current-change="currentChange"
-        ></point-tool>
+  <div>
+    <point-tool
+      :embedded="embedded"
+      :next="next"
+      :page="reactiveData.page"
+      :pre="pre"
+      @refresh="refresh"
+      @reset="reset"
+      @search="search"
+      @sort="sort"
+      @pre-handle="preHandle"
+      @next-handle="nextHandle"
+      @show-add="showAdd"
+      @size-change="sizeChange"
+      @current-change="currentChange"
+    ></point-tool>
 
-        <blank-card>
-            <el-row>
-                <el-col v-for="data in 12" :key="data" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
-                    <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
-                </el-col>
-                <el-col v-if="hasData">
-                    <el-empty description="暂无位号数据!"></el-empty>
-                </el-col>
-                <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
-                    <point-card
-                        :data="data"
-                        :embedded="embedded != '' && embedded != 'edit'"
-                        :profile="reactiveData.profileTable[data.profileId]"
-                        @disable-thing="disableThing"
-                        @enable-thing="enableThing"
-                        @delete-thing="deleteThing"
-                    ></point-card>
-                </el-col>
-            </el-row>
-        </blank-card>
+    <blank-card>
+      <el-row>
+        <el-col v-for="data in 12" :key="data" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
+          <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
+        </el-col>
+        <el-col v-if="hasData">
+          <el-empty description="暂无位号数据!"></el-empty>
+        </el-col>
+        <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
+          <point-card
+            :data="data"
+            :embedded="embedded != '' && embedded != 'edit'"
+            :profile="reactiveData.profileTable[data.profileId]"
+            @disable-thing="disableThing"
+            @enable-thing="enableThing"
+            @delete-thing="deleteThing"
+          ></point-card>
+        </el-col>
+      </el-row>
+    </blank-card>
 
-        <point-add-form ref="pointAddFormRef" :profile-id="profileId" @add-thing="addThing"></point-add-form>
-    </div>
+    <point-add-form ref="pointAddFormRef" :profile-id="profileId" @add-thing="addThing"></point-add-form>
+  </div>
 </template>
 
 <script lang="ts" src="./index.ts" />

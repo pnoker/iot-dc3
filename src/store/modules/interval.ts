@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-const interval = {
-    state: {
-        pointValueInterval: null
-    },
-    getters: {},
-    mutations: {
-        CLEAR_POINT_VALUE_INTERVAL: (state: any, interval: number) => {
-            if (state.pointValueInterval) {
-                clearInterval(state.pointValueInterval)
-            }
-            state.pointValueInterval = interval
-        }
-    },
-    actions: {
-        ClearPointValueInterval({ commit }: any, interval: number) {
-            commit('CLEAR_POINT_VALUE_INTERVAL', interval)
-        }
-    }
-}
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
 
-export default interval
+export const useIntervalStore = defineStore('interval', () => {
+  // State
+  const pointValueInterval = ref<number | null>(null);
+
+  // Actions
+  const clearPointValueInterval = (interval: number) => {
+    if (pointValueInterval.value) {
+      clearInterval(pointValueInterval.value);
+    }
+    pointValueInterval.value = interval;
+  };
+
+  return {
+    // State
+    pointValueInterval,
+    // Actions
+    clearPointValueInterval,
+  };
+});

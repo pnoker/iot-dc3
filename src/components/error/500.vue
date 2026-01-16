@@ -15,20 +15,20 @@
   -->
 
 <template>
-    <div class="error">
-        <div class="img" style="background-image: url('/images/error/error.svg')"></div>
-        <div class="content">
-            <h1>500</h1>
-            <div class="desc">抱歉, 你访问的页面不可用</div>
-            <div class="actions">
-                <router-link :to="{ path: '/' }">
-                    <el-button plain type="primary">返回首页</el-button>
-                </router-link>
-            </div>
-        </div>
+  <div class="error">
+    <div class="img" style="background-image: url('/images/error/error.svg')"></div>
+    <div class="content">
+      <h1>500</h1>
+      <div class="desc">抱歉, 你访问的页面不可用</div>
+      <div class="actions">
+        <router-link :to="{ path: '/' }">
+          <el-button plain type="primary">返回首页</el-button>
+        </router-link>
+      </div>
     </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-    @use 'style.scss';
+  @use 'style.scss';
 </style>

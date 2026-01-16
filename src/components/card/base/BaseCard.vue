@@ -15,52 +15,52 @@
   -->
 
 <template>
-    <div class="base-card">
-        <el-card class="base-card__body" shadow="hover">
-            <div class="base-card__container">
-                <slot />
-            </div>
-        </el-card>
-    </div>
+  <div class="base-card">
+    <el-card class="base-card__body" shadow="hover">
+      <div class="base-card__container">
+        <slot />
+      </div>
+    </el-card>
+  </div>
 </template>
 
 <script lang="ts" setup></script>
 
 <style lang="scss" scoped>
-    .base-card {
-        border-radius: 4px;
-        box-sizing: border-box;
+  .base-card {
+    border-radius: 4px;
+    box-sizing: border-box;
 
-        ul {
-            list-style: none;
+    ul {
+      list-style: none;
 
-            li {
-                font-size: 13px;
-                margin-top: 8px;
-            }
-        }
-
-        :deep(.el-card) {
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        :deep(.el-tabs__nav) {
-            margin: 0 5px;
-        }
-
-        .base-card__container {
-            :deep(.el-tabs__header) {
-                margin-bottom: 0;
-
-                .el-tabs__nav-wrap:after {
-                    height: 1px;
-                }
-            }
-
-            :deep(.el-tab-pane) {
-                background: #f6f7f9;
-            }
-        }
+      li {
+        font-size: 13px;
+        margin-top: 8px;
+      }
     }
+
+    :deep(.el-card) {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    :deep(.el-tabs__nav) {
+      margin: 0 5px;
+    }
+
+    .base-card__container {
+      :deep(.el-tabs__header) {
+        margin-bottom: 0;
+
+        .el-tabs__nav-wrap:after {
+          height: 1px;
+        }
+      }
+
+      :deep(.el-tab-pane) {
+        background: #f6f7f9;
+      }
+    }
+  }
 </style>

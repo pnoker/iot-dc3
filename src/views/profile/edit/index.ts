@@ -14,136 +14,136 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref, unref } from 'vue'
-import { FormInstance, FormRules } from 'element-plus'
-import { Back, Edit, RefreshLeft, Right } from '@element-plus/icons-vue'
+import { defineComponent, reactive, ref, unref } from 'vue';
+import { FormInstance, FormRules } from 'element-plus';
+import { Back, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
 
-import router from '@/config/router'
-import { useRoute } from 'vue-router'
+import router from '@/config/router';
+import { useRoute } from 'vue-router';
 
-import { getProfileById, updateProfile } from '@/api/profile'
+import { getProfileById, updateProfile } from '@/api/profile';
 
-import point from '@/views/point/Point.vue'
+import point from '@/views/point/Point.vue';
 
 export default defineComponent({
-    components: { point },
-    setup() {
-        const route = useRoute()
+  components: { point },
+  setup() {
+    const route = useRoute();
 
-        // 定义表单引用
-        const formDataRef = ref<FormInstance>()
+    // 定义表单引用
+    const formDataRef = ref<FormInstance>();
 
-        // 图标
-        const Icon = {
-            Edit,
-            RefreshLeft,
-            Right,
-            Back
+    // 图标
+    const Icon = {
+      Edit,
+      RefreshLeft,
+      Right,
+      Back,
+    };
+
+    // 定义响应式数据
+    const reactiveData = reactive({
+      id: route.query.id,
+      active: +(route.query.active || 0),
+      oldProfileFormData: {},
+      profileFormData: {} as any,
+    });
+
+    // 定义表单校验规则
+    const formRule = reactive<FormRules>({
+      profileName: [
+        {
+          required: true,
+          message: '请输入模板名称',
+          trigger: 'blur',
+        },
+        {
+          min: 2,
+          max: 32,
+          message: '请输入 2~32 位字长的模板名称',
+          trigger: 'blur',
+        },
+        {
+          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
+          message: '请输入正确格式的模板名称',
+        },
+      ],
+      enableFlag: [
+        {
+          required: true,
+          message: '请选择使能',
+          trigger: 'change',
+        },
+      ],
+      remark: [
+        {
+          max: 300,
+          message: '最多输入300个字符',
+          trigger: 'blur',
+        },
+      ],
+    });
+
+    const profile = () => {
+      const id = route.query.id as string;
+      getProfileById(id).then((res) => {
+        reactiveData.profileFormData = res.data;
+        reactiveData.oldProfileFormData = { ...res.data };
+      });
+    };
+
+    const profileUpdate = () => {
+      const form = unref(formDataRef);
+      form?.validate((valid) => {
+        if (valid) {
+          updateProfile(reactiveData.profileFormData).then((res) => {
+            reactiveData.oldProfileFormData = { ...res.data };
+          });
         }
+      });
+    };
 
-        // 定义响应式数据
-        const reactiveData = reactive({
-            id: route.query.id,
-            active: +(route.query.active || 0),
-            oldProfileFormData: {},
-            profileFormData: {} as any
-        })
+    const pre = () => {
+      reactiveData.active--;
+      changeActive(reactiveData.active);
+    };
 
-        // 定义表单校验规则
-        const formRule = reactive<FormRules>({
-            profileName: [
-                {
-                    required: true,
-                    message: '请输入模板名称',
-                    trigger: 'blur'
-                },
-                {
-                    min: 2,
-                    max: 32,
-                    message: '请输入 2~32 位字长的模板名称',
-                    trigger: 'blur'
-                },
-                {
-                    pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-                    message: '请输入正确格式的模板名称'
-                }
-            ],
-            enableFlag: [
-                {
-                    required: true,
-                    message: '请选择使能',
-                    trigger: 'change'
-                }
-            ],
-            remark: [
-                {
-                    max: 300,
-                    message: '最多输入300个字符',
-                    trigger: 'blur'
-                }
-            ]
-        })
+    const next = () => {
+      if (reactiveData.active === 0) {
+        profileUpdate();
+      }
 
-        const profile = () => {
-            const id = route.query.id as string
-            getProfileById(id).then(res => {
-                reactiveData.profileFormData = res.data
-                reactiveData.oldProfileFormData = { ...res.data }
-            })
-        }
+      reactiveData.active++;
+      changeActive(reactiveData.active);
+    };
 
-        const profileUpdate = () => {
-            const form = unref(formDataRef)
-            form?.validate(valid => {
-                if (valid) {
-                    updateProfile(reactiveData.profileFormData).then(res => {
-                        reactiveData.oldProfileFormData = { ...res.data }
-                    })
-                }
-            })
-        }
+    const done = () => {
+      router.push({ name: 'profile' }).catch(() => {
+        // nothing to do
+      });
+    };
 
-        const pre = () => {
-            reactiveData.active--
-            changeActive(reactiveData.active)
-        }
+    const profileReset = () => {
+      reactiveData.profileFormData = { ...reactiveData.oldProfileFormData };
+    };
 
-        const next = () => {
-            if (reactiveData.active === 0) {
-                profileUpdate()
-            }
+    const changeActive = (step) => {
+      const query = route.query;
+      router.push({ query: { ...query, active: step } });
+    };
 
-            reactiveData.active++
-            changeActive(reactiveData.active)
-        }
+    profile();
 
-        const done = () => {
-            router.push({ name: 'profile' }).catch(() => {
-                // nothing to do
-            })
-        }
-
-        const profileReset = () => {
-            reactiveData.profileFormData = { ...reactiveData.oldProfileFormData }
-        }
-
-        const changeActive = step => {
-            const query = route.query
-            router.push({ query: { ...query, active: step } })
-        }
-
-        profile()
-
-        return {
-            formDataRef,
-            reactiveData,
-            formRule,
-            pre,
-            next,
-            done,
-            profileReset,
-            changeActive,
-            ...Icon
-        }
-    }
-})
+    return {
+      formDataRef,
+      reactiveData,
+      formRule,
+      pre,
+      next,
+      done,
+      profileReset,
+      changeActive,
+      ...Icon,
+    };
+  },
+});

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { Connection, Hide, Histogram, List, Management, Promotion, View } from '@element-plus/icons-vue'
-import element from 'element-plus'
-import 'element-plus/dist/index.css'
-import './element-variables.scss'
-import locale from 'element-plus/es/locale/lang/zh-cn'
+import { Connection, Hide, Histogram, List, Management, Promotion, View } from '@element-plus/icons-vue';
+import element from 'element-plus';
+import 'element-plus/dist/index.css';
+import './element-variables.scss';
+import locale from 'element-plus/es/locale/lang/zh-cn';
 
 export default (app: any) => {
-    const Icons = [Hide, Histogram, List, Management, Promotion, View, Connection]
-    Icons.forEach(icon => {
-        app.component(icon.name, icon)
-    })
-    app.use(element, { locale })
-}
+  const Icons = [Hide, Histogram, List, Management, Promotion, View, Connection];
+  Icons.forEach((icon) => {
+    app.component(icon.name, icon);
+  });
+  app.use(element, { locale });
+};

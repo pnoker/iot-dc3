@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 /**
  * 通过驱动ID查询驱动属性
@@ -23,10 +23,10 @@ import request from '@/config/axios'
  * @returns MyAxiosPromise
  */
 export const getDriverAttributeByDriverId = (id: string) =>
-    request<R>({
-        url: `api/v3/manager/driver_attribute/driver_id/${id}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/driver_attribute/driver_id/${id}`,
+    method: 'get',
+  });
 
 /**
  * 通过驱动ID查询位号属性
@@ -34,7 +34,7 @@ export const getDriverAttributeByDriverId = (id: string) =>
  * @returns MyAxiosPromise
  */
 export const getPointAttributeByDriverId = (id: string) =>
-    request<R>({
-        url: `api/v3/manager/point_attribute/driver_id/${id}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/point_attribute/driver_id/${id}`,
+    method: 'get',
+  });

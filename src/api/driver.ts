@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios'
+import request from '@/config/axios';
 
 export const getDriverById = (id: string) =>
-    request<R>({
-        url: `api/v3/manager/driver/id/${id}`,
-        method: 'get'
-    })
+  request<R>({
+    url: `api/v3/manager/driver/id/${id}`,
+    method: 'get',
+  });
 
 export const getDriverByIds = (driverIds: any) =>
-    request<R>({
-        url: `api/v3/manager/driver/ids`,
-        method: 'post',
-        data: driverIds
-    })
+  request<R>({
+    url: `api/v3/manager/driver/ids`,
+    method: 'post',
+    data: driverIds,
+  });
 
 export const getDriverList = (driver: any) =>
-    request<R>({
-        url: `api/v3/manager/driver/list`,
-        method: 'post',
-        data: driver
-    })
+  request<R>({
+    url: `api/v3/manager/driver/list`,
+    method: 'post',
+    data: driver,
+  });
 
 export const getDriverStatus = (driver: any) =>
-    request<R>({
-        url: `api/v3/data/driver/status/driver`,
-        method: 'post',
-        data: driver
-    })
+  request<R>({
+    url: `api/v3/data/driver/status/driver`,
+    method: 'post',
+    data: driver,
+  });

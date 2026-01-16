@@ -18,8 +18,8 @@
  * 统一返回
  */
 declare type R<T = any> = {
-    ok: boolean
-    code: number
-    message: string
-    data: T
-}
+  ok: boolean;
+  code: number;
+  message: string;
+  data: T;
+};

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-/* eslint-disable */
+import type { Axios, AxiosRequestConfig } from 'axios';
 
 declare module 'axios' {
-    type MyAxiosPromise<T = any> = Promise<T>
+  type MyAxiosPromise<T = any> = Promise<T>;
 
-    interface AxiosInstance extends Axios {
-        <T>(config: AxiosRequestConfig): MyAxiosPromise<T>
+  interface AxiosInstance extends Axios {
+    <T>(config: AxiosRequestConfig): MyAxiosPromise<T>;
 
-        <T>(url: string, config?: AxiosRequestConfig): MyAxiosPromise<T>
-    }
+    <T>(url: string, config?: AxiosRequestConfig): MyAxiosPromise<T>;
+  }
 }

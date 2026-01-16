@@ -14,142 +14,142 @@
  * limitations under the License.
  */
 
-import { Plus, Refresh, RefreshRight, Search, Sort, Upload } from '@element-plus/icons-vue'
-import { FormInstance, FormRules } from 'element-plus'
-import { defineComponent, reactive, ref, unref } from 'vue'
+import { Plus, Refresh, RefreshRight, Search, Sort, Upload } from '@element-plus/icons-vue';
+import { FormInstance, FormRules } from 'element-plus';
+import { defineComponent, reactive, ref, unref } from 'vue';
 
-import { getDriverDictionary } from '@/api/dictionary'
-import { Dictionary, Order } from '@/config/entity'
+import { getDriverDictionary } from '@/api/dictionary';
+import { Dictionary, Order } from '@/config/entity';
 
 export default defineComponent({
-    name: 'DeviceTool',
-    props: {
-        embedded: {
-            type: String,
-            default: () => {
-                return ''
-            }
-        },
-        page: {
-            type: Object,
-            default: () => {
-                return {}
-            }
-        }
+  name: 'DeviceTool',
+  props: {
+    embedded: {
+      type: String,
+      default: () => {
+        return '';
+      },
     },
-    emits: ['search', 'reset', 'show-add', 'show-import', 'refresh', 'sort', 'size-change', 'current-change'],
-    setup(props, { emit }) {
-        // 定义表单引用
-        const formDataRef = ref<FormInstance>()
+    page: {
+      type: Object,
+      default: () => {
+        return {};
+      },
+    },
+  },
+  emits: ['search', 'reset', 'show-add', 'show-import', 'refresh', 'sort', 'size-change', 'current-change'],
+  setup(props, { emit }) {
+    // 定义表单引用
+    const formDataRef = ref<FormInstance>();
 
-        // 定义响应式数据
-        const reactiveData = reactive({
-            formData: {} as any,
-            driverQuery: '',
-            driverDictionary: [] as Dictionary[],
-            driverPage: {
-                total: 0,
-                size: 5,
-                current: 1,
-                orders: [] as Order[]
-            }
+    // 定义响应式数据
+    const reactiveData = reactive({
+      formData: {} as any,
+      driverQuery: '',
+      driverDictionary: [] as Dictionary[],
+      driverPage: {
+        total: 0,
+        size: 5,
+        current: 1,
+        orders: [] as Order[],
+      },
+    });
+
+    // 定义表单校验规则
+    const formRule = reactive<FormRules>({});
+
+    // 图标
+    const Icon = {
+      Plus,
+      Upload,
+      Search,
+      RefreshRight,
+      Refresh,
+      Sort,
+    };
+
+    const driverDictionary = (query?: string) => {
+      getDriverDictionary({
+        page: reactiveData.driverPage,
+        label: query ? query : reactiveData.driverQuery,
+      })
+        .then((res) => {
+          const data = res.data;
+          reactiveData.driverPage.total = data.total;
+          reactiveData.driverDictionary = data.records;
         })
+        .catch(() => {
+          // nothing to do
+        });
+    };
 
-        // 定义表单校验规则
-        const formRule = reactive<FormRules>({})
+    const driverCurrentChange = (current: number) => {
+      reactiveData.driverPage.current = current;
+      driverDictionary();
+    };
 
-        // 图标
-        const Icon = {
-            Plus,
-            Upload,
-            Search,
-            RefreshRight,
-            Refresh,
-            Sort
+    const driverDictionaryVisible = (visible: boolean) => {
+      if (visible) {
+        reactiveData.driverQuery = '';
+        driverDictionary();
+      }
+    };
+
+    const search = () => {
+      const form = unref(formDataRef);
+      form?.validate((valid) => {
+        if (valid) {
+          emit('search', reactiveData.formData);
         }
+      });
+    };
 
-        const driverDictionary = (query?: string) => {
-            getDriverDictionary({
-                page: reactiveData.driverPage,
-                label: query ? query : reactiveData.driverQuery
-            })
-                .then(res => {
-                    const data = res.data
-                    reactiveData.driverPage.total = data.total
-                    reactiveData.driverDictionary = data.records
-                })
-                .catch(() => {
-                    // nothing to do
-                })
-        }
+    const reset = () => {
+      const form = unref(formDataRef);
+      form?.resetFields();
+      emit('reset');
+    };
 
-        const driverCurrentChange = (current: number) => {
-            reactiveData.driverPage.current = current
-            driverDictionary()
-        }
+    const showAdd = () => {
+      emit('show-add');
+    };
 
-        const driverDictionaryVisible = (visible: boolean) => {
-            if (visible) {
-                reactiveData.driverQuery = ''
-                driverDictionary()
-            }
-        }
+    const showImport = () => {
+      emit('show-import');
+    };
 
-        const search = () => {
-            const form = unref(formDataRef)
-            form?.validate(valid => {
-                if (valid) {
-                    emit('search', reactiveData.formData)
-                }
-            })
-        }
+    const refresh = () => {
+      emit('refresh');
+    };
 
-        const reset = () => {
-            const form = unref(formDataRef)
-            form?.resetFields()
-            emit('reset')
-        }
+    const sort = () => {
+      emit('sort');
+    };
 
-        const showAdd = () => {
-            emit('show-add')
-        }
+    const sizeChange = (size: number) => {
+      emit('size-change', size);
+    };
 
-        const showImport = () => {
-            emit('show-import')
-        }
+    const currentChange = (current: number) => {
+      emit('current-change', current);
+    };
 
-        const refresh = () => {
-            emit('refresh')
-        }
-
-        const sort = () => {
-            emit('sort')
-        }
-
-        const sizeChange = (size: number) => {
-            emit('size-change', size)
-        }
-
-        const currentChange = (current: number) => {
-            emit('current-change', current)
-        }
-
-        return {
-            formDataRef,
-            formRule,
-            reactiveData,
-            driverDictionary,
-            driverCurrentChange,
-            driverDictionaryVisible,
-            search,
-            reset,
-            showAdd,
-            showImport,
-            refresh,
-            sort,
-            sizeChange,
-            currentChange,
-            ...Icon
-        }
-    }
-})
+    return {
+      formDataRef,
+      formRule,
+      reactiveData,
+      driverDictionary,
+      driverCurrentChange,
+      driverDictionaryVisible,
+      search,
+      reset,
+      showAdd,
+      showImport,
+      refresh,
+      sort,
+      sizeChange,
+      currentChange,
+      ...Icon,
+    };
+  },
+});
