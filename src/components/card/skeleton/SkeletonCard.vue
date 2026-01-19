@@ -23,7 +23,7 @@
             <el-card class="skeleton-card__body" shadow="hover">
               <div class="skeleton-card__container">
                 <div class="skeleton-card__header">
-                  <el-skeleton-item ariant="image" class="skeleton-card-icon" />
+                  <el-skeleton-item variant="image" class="skeleton-card-icon" />
                   <el-skeleton-item class="skeleton-card-name" variant="text" />
                 </div>
                 <div class="skeleton-card__body">

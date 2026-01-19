@@ -29,13 +29,13 @@
             首页
           </el-menu-item>
           <template v-for="menusItem in menus">
-            <el-sub-menu v-if="menusItem.children" :key="menusItem.path" :index="menusItem.path">
+            <el-sub-menu v-if="menusItem.children" :key="`${menusItem.path}-submenu`" :index="menusItem.path">
               <template #title>{{ (menusItem.meta as any).title }}</template>
               <el-menu-item v-for="item in menusItem.children" :key="item.path" :index="item.path">
-                {{ (menusItem.meta as any).title }}
+                {{ (item.meta as any).title }}
               </el-menu-item>
             </el-sub-menu>
-            <el-menu-item v-else :key="menusItem.path" :index="menusItem.path">
+            <el-menu-item v-else :key="`${menusItem.path}-menuitem`" :index="menusItem.path">
               <el-icon>
                 <component :is="(menusItem.meta as any).icon"></component>
               </el-icon>
