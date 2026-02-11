@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ *
  *
  * @author pnoker
  * @version 2025.9.0
@@ -44,45 +44,45 @@ import java.util.Set;
 public final class DriverMetadata {
 
     /**
-   * Status
-   */
+     * Status
+     */
     private DriverStatusEnum driverStatus = DriverStatusEnum.OFFLINE;
 
     /**
-   * 
-   */
+     *
+     */
     private DriverBO driver;
 
     /**
-   * Device ID
-   */
+     * Device ID
+     */
     private Set<Long> deviceIds;
 
     /**
-   * ID Map
-   * <p>
-   * attributeId,driverAttribute
-   */
+     * ID Map
+     * <p>
+     * attributeId,driverAttribute
+     */
     private Map<Long, DriverAttributeDTO> driverAttributeIdMap;
 
     /**
-   * Code Map
-   * <p>
-   * attributeName,driverAttribute
-   */
+     * Code Map
+     * <p>
+     * attributeName,driverAttribute
+     */
     private Map<String, DriverAttributeDTO> driverAttributeNameMap;
 
     /**
-   * ID Map
-   * <p>
-   * attributeId,pointAttribute
-   */
+     * ID Map
+     * <p>
+     * attributeId,pointAttribute
+     */
     private Map<Long, PointAttributeDTO> pointAttributeIdMap;
 
     /**
-   * Code Map
-   * <p>
-   * attributeName,driverAttribute
-   */
+     * Code Map
+     * <p>
+     * attributeName,driverAttribute
+     */
     private Map<String, PointAttributeDTO> pointAttributeNameMap;
 }

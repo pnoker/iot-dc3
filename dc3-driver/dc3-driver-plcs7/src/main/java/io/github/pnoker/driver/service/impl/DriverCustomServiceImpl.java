@@ -178,9 +178,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * </p>
      *
      * @param driverConfig driver configuration attributes (host, port)
-     * @param pointConfig point configuration attributes (dbNum, byteOffset, bitOffset, blockSize)
-     * @param device the device to read from
-     * @param point the point to read
+     * @param pointConfig  point configuration attributes (dbNum, byteOffset, bitOffset, blockSize)
+     * @param device       the device to read from
+     * @param point        the point to read
      * @return the read value wrapped in an RValue object, or null if the read fails
      */
     @Override
@@ -221,10 +221,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * </p>
      *
      * @param driverConfig driver configuration attributes (host, port)
-     * @param pointConfig point configuration attributes (dbNum, byteOffset, bitOffset, blockSize)
-     * @param device the device to write to
-     * @param point the point to write
-     * @param wValue the value containing the data to write
+     * @param pointConfig  point configuration attributes (dbNum, byteOffset, bitOffset, blockSize)
+     * @param device       the device to write to
+     * @param point        the point to write
+     * @param wValue       the value containing the data to write
      * @return true if the write operation succeeded, false otherwise
      */
     @Override

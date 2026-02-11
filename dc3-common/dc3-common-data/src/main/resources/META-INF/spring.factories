@@ -17,5 +17,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   io.github.pnoker.common.config.DataTopicConfig,\
   io.github.pnoker.common.init.DataInitRunner
-org.springframework.boot.env.EnvironmentPostProcessor=\
+org.springframework.boot.EnvironmentPostProcessor=\
   io.github.pnoker.common.config.ActiveDataProfileConfig

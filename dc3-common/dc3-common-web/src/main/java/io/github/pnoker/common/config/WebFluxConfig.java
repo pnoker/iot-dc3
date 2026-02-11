@@ -21,8 +21,8 @@ import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.http.codec.json.JacksonJsonDecoder;
+import org.springframework.http.codec.json.JacksonJsonEncoder;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
@@ -61,7 +61,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
      */
     @Override
     public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-        configurer.customCodecs().registerWithDefaultConfig(new Jackson2JsonEncoder(JsonUtil.getJsonMapper()));
-        configurer.customCodecs().registerWithDefaultConfig(new Jackson2JsonDecoder(JsonUtil.getJsonMapper()));
+        configurer.customCodecs().registerWithDefaultConfig(new JacksonJsonEncoder(JsonUtil.getJsonMapper()));
+        configurer.customCodecs().registerWithDefaultConfig(new JacksonJsonDecoder(JsonUtil.getJsonMapper()));
     }
 }

@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -98,7 +98,7 @@ public class RedisCacheConfig implements CachingConfigurer {
     @Override
     public CacheManager cacheManager() {
         // Configure ObjectMapper
-        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(JsonUtil.getJsonMapper(), Object.class);
+        JacksonJsonRedisSerializer<Object> serializer = new JacksonJsonRedisSerializer<>(JsonUtil.getObjectMapper(), Object.class);
 
         // Configure Key & Value serialization
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()

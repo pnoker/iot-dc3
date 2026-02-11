@@ -134,9 +134,9 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * </p>
      *
      * @param driverConfig Driver configuration attributes
-     * @param pointConfig Point configuration attributes
-     * @param device The device to read from
-     * @param point The point to read
+     * @param pointConfig  Point configuration attributes
+     * @param device       The device to read from
+     * @param point        The point to read
      * @return null as data is received passively
      */
     @Override
@@ -154,10 +154,10 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * </p>
      *
      * @param driverConfig Driver configuration attributes
-     * @param pointConfig Point configuration attributes
-     * @param device The device to write to
-     * @param point The point to write
-     * @param wValue The value to write
+     * @param pointConfig  Point configuration attributes
+     * @param device       The device to write to
+     * @param point        The point to write
+     * @param wValue       The value to write
      * @return true if the write operation was processed
      */
     @Override
