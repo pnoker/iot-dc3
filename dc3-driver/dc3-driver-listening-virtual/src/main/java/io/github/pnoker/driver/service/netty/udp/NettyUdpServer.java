@@ -18,11 +18,8 @@
 package io.github.pnoker.driver.service.netty.udp;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.SneakyThrows;
@@ -51,7 +48,7 @@ public class NettyUdpServer {
      */
     @SneakyThrows
     public void start(int port) {
-        EventLoopGroup group = new NioEventLoopGroup();
+        EventLoopGroup group = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(group)
