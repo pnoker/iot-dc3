@@ -18,5 +18,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   io.github.pnoker.common.config.RedisTemplateConfig,\
   io.github.pnoker.common.config.RedisCacheConfig,\
   io.github.pnoker.common.init.RedisInitRunner
-org.springframework.boot.env.EnvironmentPostProcessor=\
+org.springframework.boot.EnvironmentPostProcessor=\
   io.github.pnoker.common.config.ActiveRedisProfileConfig

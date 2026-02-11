@@ -73,7 +73,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
      * Handles incoming UDP datagram packets.
      *
      * @param context The channel handler context
-     * @param msg The received datagram packet
+     * @param msg     The received datagram packet
      */
     @Override
     @SneakyThrows
@@ -84,7 +84,7 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
     /**
      * Handles exceptions during UDP packet processing.
      *
-     * @param context The channel handler context
+     * @param context   The channel handler context
      * @param throwable The exception that occurred
      */
     @Override

@@ -17,18 +17,16 @@
 
 package io.github.pnoker.common.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import io.github.pnoker.common.utils.JsonUtil;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Redis Template Configuration Class
@@ -43,7 +41,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * @since 2022.1.0
  */
 @Configuration
-@AutoConfigureBefore(RedisAutoConfiguration.class)
+@AutoConfigureBefore(DataRedisAutoConfiguration.class)
 public class RedisTemplateConfig {
 
     private final RedisConnectionFactory factory;
@@ -60,9 +58,8 @@ public class RedisTemplateConfig {
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         // Configure ObjectMapper for JSON serialization
-        JsonMapper jsonMapper = JsonUtil.getJsonMapper();
-        jsonMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
-        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(jsonMapper, Object.class);
+        ObjectMapper objectMapper = JsonUtil.getObjectMapper();
+        JacksonJsonRedisSerializer<Object> serializer = new JacksonJsonRedisSerializer<>(objectMapper, Object.class);
 
         // Configure Key & Value serialization
         RedisTemplate<String, Object> template = new RedisTemplate<>();

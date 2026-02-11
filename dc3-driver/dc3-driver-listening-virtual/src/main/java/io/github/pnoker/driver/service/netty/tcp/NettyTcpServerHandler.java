@@ -73,7 +73,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
      * Handles incoming TCP messages.
      *
      * @param context The channel handler context
-     * @param msg The received message object
+     * @param msg     The received message object
      */
     @Override
     @SneakyThrows
@@ -84,7 +84,7 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     /**
      * Handles exceptions during TCP message processing.
      *
-     * @param context The channel handler context
+     * @param context   The channel handler context
      * @param throwable The exception that occurred
      */
     @Override

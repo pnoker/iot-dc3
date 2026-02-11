@@ -16,5 +16,5 @@
 #
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   io.github.pnoker.common.quartz.QuartzService
-org.springframework.boot.env.EnvironmentPostProcessor=\
+org.springframework.boot.EnvironmentPostProcessor=\
   io.github.pnoker.common.config.ActiveQuartzProfileConfig
