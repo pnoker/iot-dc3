@@ -1,13 +1,27 @@
 name: Docker Image
-permissions:
-  contents: write
+
 on:
   push:
     tags:
       - dc3.release.*
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROFILE: pro
+  DOCKER_REGISTRY_DEFAULT: pnoker
+  DOCKER_REGISTRY_ALIYUN: registry.cn-beijing.aliyuncs.com/dc3
+
 jobs:
   build-push:
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,71 +34,17 @@ jobs:
           cache: maven
           cache-dependency-path: "**/pom.xml"
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-m2-
-
-      - name: Extract Variables
+      - name: Extract variables
         id: variables
         run: |
-          echo "profile=pro" >> $GITHUB_OUTPUT
+          set -euo pipefail
           VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)
-          echo "service_version=$VERSION" >> $GITHUB_OUTPUT
-          echo "service_name_gateway=dc3-gateway" >> $GITHUB_OUTPUT
-          echo "service_path_gateway=dc3-gateway" >> $GITHUB_OUTPUT
-          echo "service_name_center_auth=dc3-center-auth" >> $GITHUB_OUTPUT
-          echo "service_path_center_auth=dc3-center/dc3-center-auth" >> $GITHUB_OUTPUT
-          echo "service_name_center_data=dc3-center-data" >> $GITHUB_OUTPUT
-          echo "service_path_center_data=dc3-center/dc3-center-data" >> $GITHUB_OUTPUT
-          echo "service_name_center_manager=dc3-center-manager" >> $GITHUB_OUTPUT
-          echo "service_path_center_manager=dc3-center/dc3-center-manager" >> $GITHUB_OUTPUT
-          echo "service_name_center_single=dc3-center-single" >> $GITHUB_OUTPUT
-          echo "service_path_center_single=dc3-center/dc3-center-single" >> $GITHUB_OUTPUT
-          echo "service_name_driver_listening_virtual=dc3-driver-listening-virtual" >> $GITHUB_OUTPUT
-          echo "service_path_driver_listening_virtual=dc3-driver/dc3-driver-listening-virtual" >> $GITHUB_OUTPUT
-          echo "service_name_driver_modbus_tcp=dc3-driver-modbus-tcp" >> $GITHUB_OUTPUT
-          echo "service_path_driver_modbus_tcp=dc3-driver/dc3-driver-modbus-tcp" >> $GITHUB_OUTPUT
-          echo "service_name_driver_mqtt=dc3-driver-mqtt" >> $GITHUB_OUTPUT
-          echo "service_path_driver_mqtt=dc3-driver/dc3-driver-mqtt" >> $GITHUB_OUTPUT
-          echo "service_name_driver_opc_da=dc3-driver-opc-da" >> $GITHUB_OUTPUT
-          echo "service_path_driver_opc_da=dc3-driver/dc3-driver-opc-da" >> $GITHUB_OUTPUT
-          echo "service_name_driver_opc_ua=dc3-driver-opc-ua" >> $GITHUB_OUTPUT
-          echo "service_path_driver_opc_ua=dc3-driver/dc3-driver-opc-ua" >> $GITHUB_OUTPUT
-          echo "service_name_driver_plcs7=dc3-driver-plcs7" >> $GITHUB_OUTPUT
-          echo "service_path_driver_plcs7=dc3-driver/dc3-driver-plcs7" >> $GITHUB_OUTPUT
-          echo "service_name_driver_virtual=dc3-driver-virtual" >> $GITHUB_OUTPUT
-          echo "service_path_driver_virtual=dc3-driver/dc3-driver-virtual" >> $GITHUB_OUTPUT
-          echo "docker_registry_default=pnoker" >> $GITHUB_OUTPUT
-          echo "docker_registry_aliyun=registry.cn-beijing.aliyuncs.com/dc3" >> $GITHUB_OUTPUT
-          echo "✅ All service variables configured successfully"
-
-      - name: Print Service Configuration
-        run: |
-          echo "📋 Service Configuration Summary:"
-          echo "  🌐 Default Registry: pnoker"
-          echo "  🇨🇳 Aliyun Registry: registry.cn-beijing.aliyuncs.com/dc3"
-          echo "  📦 Profile: pro"
-          echo "  🏷️  Version: ${{ steps.extract_version.outputs.service_version }}"
-          echo "  🚀 Services to build: Gateway, Center (Auth/Data/Manager/Single), Drivers (Listening Virtual, Modbus TCP, MQTT, OPC DA, OPC UA, PLC S7, Virtual)"
+          echo "service_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build with Maven
         run: |
-          echo "🔨 Starting Maven build..."
-          echo "📋 Profile: ${{ steps.variables.outputs.profile }}"
-          echo "📋 Maven command: mvn -U -e -B clean package -DskipTests -P ${{ steps.variables.outputs.profile }} --no-transfer-progress"
-          mvn -U -e -B clean package -DskipTests -P ${{ steps.variables.outputs.profile }} --no-transfer-progress
-          echo "✅ Maven build completed successfully"
-
-      - name: List Workspace
-        run: |
-          echo "📁 Current workspace contents:"
-          ls -la ${{ github.workspace }}
-          echo "📁 Detailed workspace structure:"
-          ls -R ${{ github.workspace }}
+          set -euo pipefail
+          mvn -U -e -B clean package -DskipTests -P "$PROFILE" --no-transfer-progress
 
       - name: Set Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -105,192 +65,86 @@ jobs:
           username: ${{ vars.ALIYUN_DOCKERHUB_USERNAME }}
           password: ${{ secrets.ALIYUN_DOCKERHUB_TOKEN }}
 
-      - name: Build and Push For Gateway
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_gateway }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_gateway }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_gateway }}:${{ steps.variables.outputs.service_version }}
+      - name: Build and push all images
+        env:
+          SERVICE_VERSION: ${{ steps.variables.outputs.service_version }}
+        run: |
+          set -euo pipefail
 
-      - name: Build and Push For Center Auth
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_auth }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_auth }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_auth }}:${{ steps.variables.outputs.service_version }}
+          services=(
+            "dc3-gateway:dc3-gateway"
+            "dc3-center-auth:dc3-center/dc3-center-auth"
+            "dc3-center-data:dc3-center/dc3-center-data"
+            "dc3-center-manager:dc3-center/dc3-center-manager"
+            "dc3-center-single:dc3-center/dc3-center-single"
+            "dc3-driver-listening-virtual:dc3-driver/dc3-driver-listening-virtual"
+            "dc3-driver-modbus-tcp:dc3-driver/dc3-driver-modbus-tcp"
+            "dc3-driver-mqtt:dc3-driver/dc3-driver-mqtt"
+            "dc3-driver-opc-da:dc3-driver/dc3-driver-opc-da"
+            "dc3-driver-opc-ua:dc3-driver/dc3-driver-opc-ua"
+            "dc3-driver-plcs7:dc3-driver/dc3-driver-plcs7"
+            "dc3-driver-virtual:dc3-driver/dc3-driver-virtual"
+          )
 
-      - name: Build and Push For Center Data
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_data }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_data }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_data }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_data }}:${{ steps.variables.outputs.service_version }}
+          for item in "${services[@]}"; do
+            name="${item%%:*}"
+            path="${item##*:}"
 
-      - name: Build and Push For Center Manager
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_manager }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_manager }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_manager }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_manager }}:${{ steps.variables.outputs.service_version }}
+            echo "Building and pushing: $name"
+            docker buildx build \
+              --platform linux/arm64,linux/amd64 \
+              --file "$path/Dockerfile" \
+              --push \
+              --tag "$DOCKER_REGISTRY_DEFAULT/$name:latest" \
+              --tag "$DOCKER_REGISTRY_DEFAULT/$name:$SERVICE_VERSION" \
+              --tag "$DOCKER_REGISTRY_ALIYUN/$name:latest" \
+              --tag "$DOCKER_REGISTRY_ALIYUN/$name:$SERVICE_VERSION" \
+              "$path"
+          done
 
-      - name: Build and Push For Center Single
-        uses: docker/build-push-action@v6
+  release:
+    runs-on: ubuntu-latest
+    needs: build-push
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_single }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_center_single }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_single }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_center_single }}:${{ steps.variables.outputs.service_version }}
+          fetch-depth: 0
 
-      - name: Build and Push For Driver Listening Virtual
-        uses: docker/build-push-action@v6
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_listening_virtual }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_listening_virtual }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_listening_virtual }}:${{ steps.variables.outputs.service_version }}
+          distribution: liberica
+          java-version: 21
+          cache: maven
+          cache-dependency-path: "**/pom.xml"
 
-      - name: Build and Push For Driver Modbus Tcp
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_modbus_tcp }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_modbus_tcp }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_modbus_tcp }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Mqtt
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_mqtt }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_mqtt }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_mqtt }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Opc Da
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_da }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_da }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_da }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Opc Ua
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_ua }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_opc_ua }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_opc_ua }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Plcs7
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_plcs7 }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_plcs7 }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_plcs7 }}:${{ steps.variables.outputs.service_version }}
-
-      - name: Build and Push For Driver Virtual
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          context: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_virtual }}
-          platforms: linux/arm64,linux/amd64
-          file: ${{ github.workspace }}/${{ steps.variables.outputs.service_path_driver_virtual }}/Dockerfile
-          tags: |
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:latest
-            ${{ steps.variables.outputs.docker_registry_default }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_virtual }}:latest
-            ${{ steps.variables.outputs.docker_registry_aliyun }}/${{ steps.variables.outputs.service_name_driver_virtual }}:${{ steps.variables.outputs.service_version }}
+      - name: Extract variables
+        id: variables
+        run: |
+          set -euo pipefail
+          VERSION=$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)
+          echo "service_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Generate release notes
         id: release_notes
+        env:
+          SERVICE_VERSION: ${{ steps.variables.outputs.service_version }}
+          SERVICE_WORKSPACE: ${{ github.workspace }}
         run: |
-          echo "📝 Generating release notes..."
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
-          echo "🔍 Previous tag: ${PREVIOUS_TAG:-"No previous tag found"}"
-          echo "🏷️ Current tag: ${{ github.ref_name }}"
-          
-          if [ -n "$PREVIOUS_TAG" ]; then
-            echo "📊 Collecting changes since $PREVIOUS_TAG..."
-            CHANGES=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD | head -20)
-          else
-            echo "📊 Collecting all changes (no previous tag)..."
-            CHANGES=$(git log --pretty=format:"- %s" --reverse | head -20)
-          fi
-          
-          echo "📄 Creating release notes content..."
-          
-          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          export SERVICE_VERSION=${{ steps.variables.outputs.service_version }}
-          export SERVICE_WORKSPACE=${{ github.workspace }}
-          envsubst < ${{ github.workspace }}/dc3/doc/TITLE.md >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          envsubst < ${{ github.workspace }}/dc3/doc/CHANGE.md >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          envsubst < ${{ github.workspace }}/dc3/doc/USAGE.md >> $GITHUB_OUTPUT
-          
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "✅ Release notes generated successfully"
+          set -euo pipefail
+
+          echo "release_notes<<EOF" >> "$GITHUB_OUTPUT"
+          echo "" >> "$GITHUB_OUTPUT"
+          envsubst < "$SERVICE_WORKSPACE/dc3/doc/TITLE.md" >> "$GITHUB_OUTPUT"
+          echo "" >> "$GITHUB_OUTPUT"
+          envsubst < "$SERVICE_WORKSPACE/dc3/doc/CHANGE.md" >> "$GITHUB_OUTPUT"
+          echo "" >> "$GITHUB_OUTPUT"
+          envsubst < "$SERVICE_WORKSPACE/dc3/doc/USAGE.md" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

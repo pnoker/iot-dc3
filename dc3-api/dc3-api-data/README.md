@@ -9,7 +9,7 @@ and historical data retrieval.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-api-data
-- **Version**: 2025.11.1
+- **Version**: 2026.4.18.3
 - **Package**: `io.github.pnoker.api.center.data`
 
 ## Proto Definitions
@@ -71,7 +71,7 @@ This module depends on common proto definitions:
 <dependency>
     <groupId>io.github.pnoker</groupId>
     <artifactId>dc3-api-data</artifactId>
-    <version>2025.11.1</version>
+    <version>2026.4.18.3</version>
 </dependency>
 ```
 

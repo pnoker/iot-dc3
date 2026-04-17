@@ -33,7 +33,7 @@
     <version>2026.4.18.3</version>
     <packaging>jar</packaging>
 
-    <inceptionYear>2016-2022</inceptionYear>
+    <inceptionYear>2016</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
         The common Web configuration of the IoT DC3 platform.
@@ -62,8 +62,8 @@
 
     <scm>
         <url>https://github.com/pnoker/iot-dc3</url>
-        <connection>https://github.com/pnoker/iot-dc3.git</connection>
-        <developerConnection>https://github.com/pnoker/iot-dc3.git</developerConnection>
+        <connection>scm:git:https://github.com/pnoker/iot-dc3.git</connection>
+        <developerConnection>scm:git:https://github.com/pnoker/iot-dc3.git</developerConnection>
     </scm>
 
     <dependencies>
