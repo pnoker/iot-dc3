@@ -16,25 +16,32 @@
 #
 
 # Global default web configuration.
-# The following properties can be overridden in environment-specific files:
+# These properties can be overridden in environment-specific files:
 # application-dev.yml, application-test.yml, application-pre.yml, application-pro.yml.
-# If the same property exists in those files, their values will take precedence.
+# Property values in environment-specific files take precedence over these defaults.
 spring:
   transaction:
-    # Enable rollback when a failure happens at transaction commit time.
+    # Enable rollback if a failure occurs during transaction commit.
     rollback-on-commit-failure: true
   main:
-    # Allow bean definition overriding between different auto-configurations or modules.
+    # Allow bean definition overriding when multiple configurations define the same bean.
     allow-bean-definition-overriding: true
   web:
     resources:
-      # Disable default static resource mappings provided by Spring Boot.
-      # Static resource handling will be customized by the application if needed.
+      # Disable Spring Boot's default static resource mappings.
+      # Resource handling should be customized by the application if required.
       add-mappings: false
+  jackson:
+    serialization:
+      # Disable writing dates as numeric timestamps (use ISO-8601 instead).
+      write-dates-as-timestamps: false
+    deserialization:
+      # Do not fail when encountering unknown properties during JSON deserialization.
+      fail-on-unknown-properties: false
 
 management:
   endpoints:
     web:
       exposure:
-        # Expose the Prometheus actuator endpoint for metrics scraping.
+        # Expose the Prometheus endpoint for metrics collection and scraping.
         include: prometheus

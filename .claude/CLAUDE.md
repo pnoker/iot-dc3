@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding assistants when working with code in this repository.
 
 ## Project Overview
 
@@ -161,7 +161,7 @@ Key driver responsibilities:
 **Dependency Management:**
 
 - Parent POM (`dc3-parent`) manages all dependency versions
-- All modules use version `2025.11.1` (coordinated across project)
+- All modules use version `2026.4.18.3` (coordinated across project)
 - Maven profiles: dev (default), test, pre, pro
 
 **Configuration:**
