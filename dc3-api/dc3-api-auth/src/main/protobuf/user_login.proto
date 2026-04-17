@@ -17,7 +17,7 @@
 
 syntax = "proto3";
 
-package api.common.auth;
+package api.center.auth;
 
 import "api/common/base.proto";
 import "api/common/r.proto";

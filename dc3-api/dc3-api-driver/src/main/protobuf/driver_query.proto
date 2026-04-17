@@ -48,6 +48,3 @@ message GrpcPointQuery {
   // Identifier of the specific point
   int64 point_id = 2;
 }
-
-
-

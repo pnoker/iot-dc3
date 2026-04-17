@@ -79,6 +79,47 @@
         <module>dc3-api-manager</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- DC3 Common Api -->
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-api</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+
+        <!-- DC3 Common Api -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-api</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <extensions>
+            <!-- OS Plugin -->
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>${os.maven.plugin.version}</version>
+            </extension>
+        </extensions>
+
+        <plugins>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>deploy</id>
@@ -115,46 +156,5 @@
             </distributionManagement>
         </profile>
     </profiles>
-
-    <dependencies>
-
-        <!-- DC3 Common Api -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-api</artifactId>
-        </dependency>
-
-    </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-
-            <!-- DC3 Common Api -->
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-api</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-
-        </dependencies>
-    </dependencyManagement>
-
-    <build>
-        <extensions>
-            <!-- OS Plugin -->
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-                <version>${os.maven.plugin.version}</version>
-            </extension>
-        </extensions>
-
-        <plugins>
-            <plugin>
-                <groupId>org.xolstice.maven.plugins</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
