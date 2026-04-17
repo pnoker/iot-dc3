@@ -17,7 +17,7 @@
 
 syntax = "proto3";
 
-package api.center.data;
+package api.common.data;
 
 import "api/common/r.proto";
 
