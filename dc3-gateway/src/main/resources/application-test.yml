@@ -23,7 +23,7 @@ spring:
       routes:
         # Token route for authentication (no authentication required)
         - id: auth_route_token
-          uri: http://${CENTER_AUTH_HOST:dc3-center-auth}:8300/
+          uri: http://${CENTER_AUTH_HOST:dc3-center-auth}:8300
           predicates:
             - Path=/api/v3/auth/token/**
           filters:
