@@ -62,6 +62,3 @@ message GrpcPagePointQuery {
   // Identifier for querying a specific point
   int64 point_id = 6;
 }
-
-
-

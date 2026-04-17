@@ -75,8 +75,8 @@ message GrpcRDeviceAttachDTO {
   repeated int64 point_ids = 2;
 
   // Driver attribute configuration list
-  repeated GrpcDriverAttributeConfigDTO driverConfigs = 3;
+  repeated GrpcDriverAttributeConfigDTO driver_configs = 3;
 
   // Point attribute configuration list
-  repeated GrpcPointAttributeConfigDTO pointConfigs = 4;
+  repeated GrpcPointAttributeConfigDTO point_configs = 4;
 }
