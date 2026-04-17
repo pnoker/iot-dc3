@@ -22,9 +22,9 @@ import io.github.pnoker.api.center.auth.GrpcRUserLoginDTO;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.JsonUtil;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -49,45 +49,40 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticGatewayFilter implements GatewayFilter {
 
-    @Resource
-    private FilterService filterService;
+    private final FilterService filterService;
+
+    public AuthenticGatewayFilter(FilterService filterService) {
+        this.filterService = filterService;
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        // Get the HTTP request from the exchange
         ServerHttpRequest request = exchange.getRequest();
 
         try {
-            // Get tenant and login information from the request
-            // Tenant, Login
             GrpcRTenantDTO rTenantDTO = filterService.getTenantDTO(request);
             GrpcRUserLoginDTO rUserLoginDTO = filterService.getLoginDTO(request);
-
-            // Validate the authentication token
-            // Check Token Valid
             filterService.checkValid(request, rTenantDTO, rUserLoginDTO);
 
-            // Build a new request with modified headers containing user authentication info
-            // Header
-            ServerHttpRequest build = request.mutate().headers(headers -> {
-                RequestHeader.UserHeader entityBO = filterService.getUserDTO(rUserLoginDTO, rTenantDTO);
-                headers.set(RequestConstant.Header.X_AUTH_USER, JsonUtil.toJsonString(entityBO));
-            }).build();
-
-            // Continue the filter chain with the modified request
+            RequestHeader.UserHeader userHeader = filterService.getUserDTO(rUserLoginDTO, rTenantDTO);
+            ServerHttpRequest build = request.mutate()
+                    .headers(headers -> headers.set(RequestConstant.Header.X_AUTH_USER, JsonUtil.toJsonString(userHeader)))
+                    .build();
             return chain.filter(exchange.mutate().request(build).build());
+        } catch (UnAuthorizedException e) {
+            log.warn("AuthenticGatewayFilter unauthorized: {}, Url: {}", e.getMessage(), request.getURI());
+            return writeErrorResponse(exchange, e.getMessage());
         } catch (Exception e) {
-            // Log the authentication error
             log.error("AuthenticGatewayFilter error: {}, Url: {}", e.getMessage(), request.getURI(), e);
-
-            // Prepare error response
-            ServerHttpResponse response = exchange.getResponse();
-            response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
-
-            // Create response data buffer with error message
-            DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(e.getMessage())));
-            return response.writeWith(Mono.just(dataBuffer));
+            return writeErrorResponse(exchange, e.getMessage());
         }
+    }
+
+    private Mono<Void> writeErrorResponse(ServerWebExchange exchange, String message) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(message)));
+        return response.writeWith(Mono.just(dataBuffer));
     }
 }
