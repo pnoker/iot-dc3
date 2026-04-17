@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @ComponentScan(basePackages = {
-        "io.github.pnoker.common.auth.*"
+        "io.github.pnoker.common.auth"
 })
 @MapperScan(basePackages = {
         "io.github.pnoker.common.auth.mapper"

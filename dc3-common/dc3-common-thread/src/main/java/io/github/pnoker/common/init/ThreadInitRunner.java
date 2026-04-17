@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ComponentScan(basePackages = {
-        "io.github.pnoker.common.thread.*"
+        "io.github.pnoker.common.thread"
 })
 @EnableConfigurationProperties({ThreadProperties.class})
 public class ThreadInitRunner implements ApplicationRunner {
