@@ -17,7 +17,7 @@
 
 syntax = "proto3";
 
-package api.common.manager;
+package api.center.manager;
 
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.manager";

@@ -17,7 +17,7 @@
 
 syntax = "proto3";
 
-package api.common.manager;
+package api.center.manager;
 
 import "api/common/page.proto";
 
@@ -127,6 +127,3 @@ message GrpcPageDeviceQuery {
   // Profile template ID for querying devices under specific template
   int64 profile_id = 9;
 }
-
-
-
