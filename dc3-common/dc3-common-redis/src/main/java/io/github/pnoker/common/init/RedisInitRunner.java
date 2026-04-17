@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ComponentScan(basePackages = {
-        "io.github.pnoker.common.redis.*"
+        "io.github.pnoker.common.redis"
 })
 public class RedisInitRunner implements ApplicationRunner {
 
