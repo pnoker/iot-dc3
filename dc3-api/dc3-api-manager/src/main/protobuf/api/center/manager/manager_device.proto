@@ -17,7 +17,7 @@
 
 syntax = "proto3";
 
-package api.center.manager;
+package api.common.manager;
 
 import "api/common/page.proto";
 import "api/common/r.proto";
