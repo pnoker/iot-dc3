@@ -55,8 +55,8 @@
 
     <scm>
         <url>https://github.com/pnoker/iot-dc3</url>
-        <connection>https://github.com/pnoker/iot-dc3.git</connection>
-        <developerConnection>https://github.com/pnoker/iot-dc3.git</developerConnection>
+        <connection>scm:git:https://github.com/pnoker/iot-dc3.git</connection>
+        <developerConnection>scm:git:https://github.com/pnoker/iot-dc3.git</developerConnection>
     </scm>
 
 </project>
