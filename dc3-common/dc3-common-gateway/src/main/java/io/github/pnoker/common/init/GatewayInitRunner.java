@@ -32,9 +32,7 @@ import org.springframework.stereotype.Component;
  * @since 2022.1.0
  */
 @Component
-@ComponentScan(basePackages = {
-        "io.github.pnoker.common.gateway.*"
-})
+@ComponentScan(basePackages = {"io.github.pnoker.common.gateway"})
 public class GatewayInitRunner implements ApplicationRunner {
 
     @Override
