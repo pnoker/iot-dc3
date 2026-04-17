@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ComponentScan(basePackages = {
-        "io.github.pnoker.common.driver.*"
+        "io.github.pnoker.common.driver"
 })
 @EnableConfigurationProperties({DriverProperties.class})
 public class DriverInitRunner implements ApplicationRunner {

@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ComponentScan(basePackages = {
-        "io.github.pnoker.common.data.*"
+        "io.github.pnoker.common.data"
 })
 @MapperScan(basePackages = {
         "io.github.pnoker.common.data.mapper"
