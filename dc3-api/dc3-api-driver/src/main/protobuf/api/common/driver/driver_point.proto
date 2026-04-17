@@ -1,0 +1,67 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package api.common.driver;
+
+import "api/common/page.proto";
+import "api/common/r.proto";
+import "api/common/entity.proto";
+import "api/common/driver/driver_query.proto";
+import "api/common/driver/driver_query_page.proto";
+
+// Configuration options for code generation
+option java_package = "io.github.pnoker.api.common.driver";
+option java_outer_classname = "DriverPointProto";
+option objc_class_prefix = "Driver";
+option java_multiple_files = true;
+
+// Service interface defining RPC calls related to driver points
+service PointApi {
+  // Query points with pagination
+  rpc SelectByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
+  // Query point by point ID
+  rpc SelectById (GrpcPointQuery) returns (GrpcRPointDTO);
+}
+
+// Response wrapper for paged point query
+message GrpcRPagePointDTO {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Paged point data
+  GrpcPagePointDTO data = 2;
+}
+
+// Paged point data structure
+message GrpcPagePointDTO {
+  // Pagination information including page number, page size, and total count
+  GrpcPage page = 1;
+
+  // List of points
+  repeated GrpcPointDTO data = 2;
+}
+
+// Response wrapper for single point query
+message GrpcRPointDTO {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Single point data
+  GrpcPointDTO data = 2;
+}

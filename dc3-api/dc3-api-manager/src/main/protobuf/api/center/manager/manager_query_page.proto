@@ -23,7 +23,7 @@ import "api/common/page.proto";
 
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.manager";
-option java_outer_classname = "QueryPageProto";
+option java_outer_classname = "ManagerQueryPageProto";
 option objc_class_prefix = "Manager";
 option java_multiple_files = true;
 
