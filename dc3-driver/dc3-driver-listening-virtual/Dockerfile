@@ -27,13 +27,14 @@ ENV SERVER_NAME=dc3-driver-listening-virtual
 ENV SERVER_PACKAGES=io.github.pnoker
 ENV APM_AGENT_ENABLE=false
 ENV APM_SERVICE=http://dc3-apm:9300
-ENV TCP_PORT 6270
-ENV UDP_PORT 6271
+ENV TCP_PORT=6270
+ENV UDP_PORT=6271
 
 # Default JVM and GC environment variables
 ENV JAVA_OPS="-Xms256m \
               -Xmx512m \
-              -XX:+UseG1GC-XX:+AlwaysPreTouch \
+              -XX:+UseG1GC \
+              -XX:+AlwaysPreTouch \
               -XX:+HeapDumpOnOutOfMemoryError \
               -XX:HeapDumpPath=dc3/logs/driver/listening-virtual/gc/dump.hprof"
 ENV GC_LOG="-Xlog:gc*:file=dc3/logs/driver/listening-virtual/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
