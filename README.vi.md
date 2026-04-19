@@ -13,9 +13,10 @@
 </a>
 <br>
 <strong>
-IoT DC3 là một nền tảng Internet vạn vật (IoT) phân tán hoàn toàn mã nguồn mở được xây dựng trên Spring Cloud.
-Nó đẩy nhanh quá trình phát triển dự án IoT và đơn giản hóa việc quản lý thiết bị IoT, cung cấp các giải pháp toàn diện để xây dựng hệ thống IoT mạnh mẽ.
-Tất cả các thành phần và mã nguồn đều là mã nguồn mở, đảm bảo tính minh bạch, linh hoạt và đổi mới do cộng đồng thúc đẩy.
+IoT DC3 là nền tảng Internet vạn vật (IoT) phân tán, hoàn toàn mã nguồn mở, được xây dựng trên Spring Cloud.
+Nền tảng giúp tăng tốc triển khai giải pháp IoT, đơn giản hóa quản lý toàn bộ vòng đời thiết bị và cung cấp kiến trúc toàn diện cho hệ thống IoT bền vững, sẵn sàng vận hành thực tế.
+IoT DC3 cũng AI-Ready, cho phép tích hợp liền mạch kết nối thông minh, tự động hóa và vận hành dựa trên dữ liệu.
+Toàn bộ thành phần và mã nguồn đều mở, đảm bảo tính minh bạch, linh hoạt và đổi mới do cộng đồng thúc đẩy.
 </strong>
 </p>
 
@@ -25,36 +26,24 @@ Tất cả các thành phần và mã nguồn đều là mã nguồn mở, đả
 
 # 1 Kiến trúc
 
-- **Tầng Driver**: Cung cấp SDK để tạo điều kiện kết nối liền mạch với các thiết bị vật lý bằng cả giao thức tiêu chuẩn
-  và độc quyền. Tầng này chịu trách nhiệm thu thập dữ liệu và
-  thực thi lệnh theo hướng nam, cho phép phát triển driver nhanh chóng thông qua SDK toàn diện của nó;
-- **Tầng Dữ liệu**: Quản lý việc thu thập, lưu trữ và truy xuất dữ liệu thiết bị, cung cấp dịch vụ giao diện quản lý dữ
-  liệu mạnh mẽ để đảm bảo xử lý dữ liệu hiệu quả;
-- **Tầng Quản lý**: Hoạt động như trung tâm cốt lõi cho các tương tác microservice, cung cấp các dịch vụ thiết yếu như
-  đăng ký microservice, giao diện lệnh thiết bị, đăng ký và
-  ghép nối thiết bị, và hệ thống quản lý dữ liệu tập trung. Nó giám sát các dữ liệu cấu hình khác nhau và cung cấp dịch
-  vụ giao diện bên ngoài để tích hợp liền mạch;
-- **Tầng Ứng dụng**: Cung cấp các chức năng nâng cao bao gồm tính mở của dữ liệu, lập lịch nhiệm vụ, thông báo cảnh báo
-  và tin nhắn, quản lý nhật ký, và khả năng tích hợp với các
-  nền tảng bên thứ ba, nâng cao tính đa dụng và khả năng sử dụng của nền tảng.
+Kiến trúc được thiết kế để cung cấp năng lực IoT đầu-cuối, bao gồm kết nối thiết bị, dịch vụ dữ liệu, quản lý vận hành và tích hợp ứng dụng mở rộng.
+
+- **Tầng Driver**: Cung cấp SDK để kết nối thiết bị vật lý qua giao thức tiêu chuẩn hoặc độc quyền, đảm nhiệm thu thập dữ liệu hướng nam và thực thi lệnh điều khiển;
+- **Tầng Dữ liệu**: Cung cấp thu thập, lưu trữ và truy vấn dữ liệu thiết bị một cách tin cậy, phục vụ cả dữ liệu thời gian thực và lịch sử;
+- **Tầng Quản lý**: Đóng vai trò trung tâm hợp tác microservice phân tán, bao gồm đăng ký dịch vụ, quản lý driver/thiết bị, điều phối lệnh và quản trị cấu hình tập trung;
+- **Tầng Ứng dụng**: Hỗ trợ mở dữ liệu, lập lịch tác vụ, cảnh báo/thông báo, quản lý log, tích hợp bên thứ ba và các kịch bản tự động hóa tăng cường bởi AI.
 
 # 2 Mục tiêu
 
-- **Khả năng mở rộng**: Được thiết kế để mở rộng theo chiều ngang, tận dụng sức mạnh của Spring Cloud, một công nghệ mã
-  nguồn mở hàng đầu;
-- **Khả năng chịu lỗi**: Đảm bảo không có điểm lỗi đơn lẻ, với mỗi nút cụm giống nhau và có thể thay thế lẫn nhau;
-- **Hiệu suất**: Có khả năng xử lý hàng trăm nghìn thiết bị trên một nút máy chủ đơn, tùy thuộc vào trường hợp sử dụng
-  cụ thể;
-- **Khả năng tùy chỉnh**: Dễ dàng tích hợp các giao thức thiết bị mới và đăng ký chúng trong trung tâm dịch vụ;
-- **Tương thích đa nền tảng**: Hoàn toàn tương thích với môi trường Java, cho phép triển khai phân tán liền mạch trên
-  nhiều nền tảng;
-- **Linh hoạt trong triển khai**: Hỗ trợ triển khai đám mây riêng, đám mây công cộng và edge, cung cấp quyền kiểm soát
-  đầy đủ đối với cơ sở hạ tầng của bạn;
-- **Hiệu quả**: Hợp lý hóa quy trình đưa thiết bị vào hệ thống, đăng ký và xác thực quyền;
-- **Bảo mật**: Đảm bảo việc truyền dữ liệu được mã hóa, bảo vệ thông tin nhạy cảm;
-- **Đa người thuê**: Hỗ trợ không gian tên và đa người thuê, làm cho nó lý tưởng cho các môi trường người dùng đa dạng;
-- **Cloud-Native**: Được tối ưu hóa cho Kubernetes, đảm bảo tích hợp suôn sẻ với cơ sở hạ tầng đám mây hiện đại;
-- **Container hóa**: Hoàn toàn được container hóa với Docker, đơn giản hóa việc triển khai và quản lý.
+- **Khả năng mở rộng**: Hỗ trợ mở rộng ngang bằng Spring Cloud cho khối lượng công việc IoT phân tán, thông lượng cao;
+- **Tính bền vững**: Giảm rủi ro điểm lỗi đơn lẻ nhờ thiết kế chịu lỗi và các node dịch vụ có thể thay thế;
+- **Hiệu năng**: Đáp ứng nhu cầu kết nối thiết bị quy mô lớn và xử lý telemetry;
+- **Khả năng mở rộng phát triển**: Tăng tốc tích hợp giao thức mới và driver tùy biến thông qua SDK và cơ chế đăng ký dịch vụ;
+- **Linh hoạt triển khai**: Vận hành trên private cloud, public cloud và edge, đồng thời giữ tương thích hệ sinh thái Java;
+- **Hiệu quả vận hành**: Đơn giản hóa quy trình onboarding, đăng ký và xác thực quyền;
+- **Bảo mật và đa tenant**: Hỗ trợ mã hóa truyền dữ liệu, tách biệt namespace và cơ chế phân tách theo tenant;
+- **Phân phối cloud-native**: Tối ưu cho Kubernetes và container hóa bằng Docker để triển khai nhất quán;
+- **Tiến hóa AI-Ready**: Sẵn sàng tích hợp tự động hóa thông minh và vận hành dựa trên dữ liệu.
 
 # 3 Phát triển
 
@@ -66,18 +55,18 @@ Tất cả các thành phần và mã nguồn đều là mã nguồn mở, đả
 > xuất
 
 ```bash
-# Truy cập toàn cầu với dịch vụ đăng ký Docker tiêu chuẩn
-docker-compose -f dc3/docker-compose-db.yml up -d
+# Truy cập toàn cầu với dịch vụ đăng ký container tiêu chuẩn
+podman compose -f dc3/docker-compose-db.yml up -d
 
 # Dịch vụ đăng ký được tối ưu hóa cho người dùng ở Trung Quốc đại lục
-docker-compose -f dc3/docker-compose-db-aliyun.yml up -d
+podman compose -f dc3/docker-compose-db-aliyun.yml up -d
 ```
 
 ## 3.2 Chuẩn bị
 
 ```bash
 source dc3/env/dev.env.sh
-mvn clean package
+mvn -s .mvn/settings.xml clean package
 ```
 
 ## 3.3 Khởi động dịch vụ

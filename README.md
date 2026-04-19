@@ -13,8 +13,9 @@
 </a>
 <br>
 <strong>
-IoT DC3 is a fully open-source distributed Internet of Things (IoT) platform built on Spring Cloud.
-It accelerates IoT project development and simplifies IoT device management, providing comprehensive solutions for building robust IoT systems.
+IoT DC3 is a fully open-source, distributed Internet of Things (IoT) platform built on Spring Cloud.
+It accelerates IoT solution delivery and simplifies full-lifecycle device management with a comprehensive architecture for robust, production-ready IoT systems.
+It is AI-ready, enabling seamless integration of intelligent connectivity, automation, and data-driven operations.
 All components and code are open-source, ensuring transparency, flexibility, and community-driven innovation.
 </strong>
 </p>
@@ -25,36 +26,28 @@ All components and code are open-source, ensuring transparency, flexibility, and
 
 # 1 Architecture
 
-- **Driver Layer**: Offers SDKs to facilitate seamless connectivity with physical devices using both standard and
-  proprietary protocols. This layer is responsible for southbound
-  data acquisition and command execution, enabling rapid driver development through its comprehensive SDK;
-- **Data Layer**: Manages the collection, storage, and retrieval of device data, providing robust data management
-  interface services to ensure efficient data handling;
-- **Management Layer**: Acts as the core hub for microservice interactions, offering essential services such as
-  microservice registration, device command interfaces, device
-  registration and pairing, and a centralized data management system. It oversees various configuration data and
-  provides external interface services for seamless integration;
-- **Application Layer**: Delivers advanced functionalities including data openness, task scheduling, alarm and message
-  notifications, log management, and the
-  ability to integrate with third-party platforms, enhancing the platform's versatility and usability.
+The architecture is designed for end-to-end IoT capabilities across device connectivity, data services, operational management, and extensible application integration.
+
+- **Driver Layer**: Provides SDKs for rapid driver development and seamless connectivity to physical devices through
+  standard or proprietary protocols. This layer handles southbound data acquisition and command execution;
+- **Data Layer**: Supports reliable collection, storage, and retrieval of device data, exposing robust interfaces for
+  real-time and historical data services;
+- **Management Layer**: Serves as the core hub for distributed microservice collaboration, including service
+  registration, device/driver management, command orchestration, and centralized configuration governance;
+- **Application Layer**: Enables data openness, scheduling, alarms, messaging, logging, third-party integrations, and
+  AI-enhanced automation scenarios.
 
 # 2 Objectives
 
-- **Scalability**: Designed for horizontal scaling, leveraging the power of Spring Cloud, a leading open-source
-  technology;
-- **Fault Tolerance**: Ensures no single point of failure, with each cluster node being identical and interchangeable;
-- **Performance**: Capable of handling hundreds of thousands of devices on a single server node, depending on the
-  specific use case;
-- **Customizability**: Easily integrate new device protocols and register them within the service center;
-- **Cross-Platform Compatibility**: Fully compatible with Java environments, enabling seamless distributed deployment
-  across multiple platforms;
-- **Deployment Flexibility**: Supports private cloud, public cloud, and edge deployments, offering full control over
-  your infrastructure;
-- **Efficiency**: Streamlines device onboarding, registration, and permission validation processes;
-- **Security**: Ensures data transmission is encrypted, safeguarding sensitive information;
-- **Multi-Tenancy**: Supports namespaces and multi-tenancy, making it ideal for diverse user environments;
-- **Cloud-Native**: Optimized for Kubernetes, ensuring smooth integration with modern cloud infrastructures;
-- **Containerization**: Fully containerized with Docker, simplifying deployment and management.
+- **Scalability**: Supports horizontal scaling with Spring Cloud for distributed, high-throughput IoT workloads;
+- **Resilience**: Minimizes single-point-of-failure risk with interchangeable service nodes and fault-tolerant design;
+- **Performance**: Handles large-scale device access and telemetry workloads for demanding IoT scenarios;
+- **Extensibility**: Accelerates integration of new protocols and custom drivers through SDK and service registration;
+- **Deployment Flexibility**: Runs across private cloud, public cloud, and edge environments with Java compatibility;
+- **Operational Efficiency**: Streamlines onboarding, registration, and permission validation for devices and services;
+- **Security and Multi-Tenancy**: Enforces encrypted communication, namespace isolation, and tenant-level separation;
+- **Cloud-Native Delivery**: Optimized for Kubernetes and containerized with Docker for consistent deployments;
+- **AI-Ready Evolution**: Enables integration of intelligent automation and data-driven operational workflows.
 
 # 3 Development
 
@@ -65,18 +58,18 @@ All components and code are open-source, ensuring transparency, flexibility, and
 > If you need a database SQL script, connect directly to the started database in the container for export
 
 ```bash
-# Global access with standard Docker registry service
-docker-compose -f dc3/docker-compose-db.yml up -d
+# Global access with standard container registry service
+podman compose -f dc3/docker-compose-db.yml up -d
 
 # Optimized registry service for users in mainland China
-docker-compose -f dc3/docker-compose-db-aliyun.yml up -d
+podman compose -f dc3/docker-compose-db-aliyun.yml up -d
 ```
 
 ## 3.2 Preparation
 
 ```bash
 source dc3/env/dev.env.sh
-mvn clean package
+mvn -s .mvn/settings.xml clean package
 ```
 
 ## 3.3 Start Services
