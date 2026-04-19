@@ -9,7 +9,7 @@ token validation, and user login operations.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-api-auth
-- **Version**: 2026.4.18.3
+- **Version**: 2026.4.19
 - **Package**: `io.github.pnoker.api.center.auth`
 
 ## Proto Definitions
@@ -84,7 +84,7 @@ This module depends on common proto definitions:
 <dependency>
     <groupId>io.github.pnoker</groupId>
     <artifactId>dc3-api-auth</artifactId>
-    <version>2026.4.18.3</version>
+    <version>2026.4.19</version>
 </dependency>
 ```
 
@@ -159,10 +159,10 @@ public class TenantServiceImpl extends TenantApiGrpc.TenantApiImplBase {
 
 ```bash
 # Build the module
-mvn clean package
+mvn -s ../../.mvn/settings.xml clean package
 
 # Install to local repository
-mvn clean install
+mvn -s ../../.mvn/settings.xml clean install
 ```
 
 ## License

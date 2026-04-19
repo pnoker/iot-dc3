@@ -9,7 +9,7 @@ manager service, enabling device registration, metadata synchronization, and poi
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-api-driver
-- **Version**: 2026.4.18.3
+- **Version**: 2026.4.19
 - **Package**: `io.github.pnoker.api.common.driver`
 
 ## Proto Definitions
@@ -108,7 +108,7 @@ This module depends on common proto definitions:
 <dependency>
     <groupId>io.github.pnoker</groupId>
     <artifactId>dc3-api-driver</artifactId>
-    <version>2026.4.18.3</version>
+    <version>2026.4.19</version>
 </dependency>
 ```
 
@@ -378,10 +378,10 @@ Driver Device SDK → Read Device → Convert Data → Send to Data Center
 
 ```bash
 # Build the module
-mvn clean package
+mvn -s ../../.mvn/settings.xml clean package
 
 # Install to local repository
-mvn clean install
+mvn -s ../../.mvn/settings.xml clean install
 ```
 
 ## Related Modules
