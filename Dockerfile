@@ -33,4 +33,4 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 COPY ./ ./
 
 # Build project with Maven (skip tests)
-RUN mvn -U -e -B clean package -DskipTests -P ${PROFILE}
+RUN mvn -U -e -B -s .mvn/settings.xml clean package -DskipTests -P ${PROFILE}
