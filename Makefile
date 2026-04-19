@@ -18,31 +18,41 @@
 # tip:
 # make -f ./Makefile help
 
-.PHONY: help
+.PHONY: help clean package dev build deploy tag
+
+COMPOSE_FILE := docker-compose-dev.yml
+COMPOSE := podman compose
+MVN_SETTINGS := .mvn/settings.xml
+MVN := mvn -s $(MVN_SETTINGS)
+MVN_SUB := mvn -s ../$(MVN_SETTINGS)
 
 help:
 	echo 'You can use make to execute the following commands:' \
-	&& echo 'Usage: make [clean | package | deploy | dev | tag]' \
+	&& echo 'Usage: make [help | clean | package | dev | build | deploy | tag]' \
+	&& echo ' - make clean: clean Maven build artifacts' \
+	&& echo ' - make package: package all modules with Maven' \
 	&& echo ' - make tag: git tag' \
-	&& echo ' - make dev: run local development environment' \
-	&& echo ' - make build: build images' \
-	&& echo ' - make deploy: mvn deploy'
+	&& echo ' - make dev: run local development environment with podman compose' \
+	&& echo ' - make build: build images with podman compose' \
+	&& echo ' - make deploy: deploy with mvn -s .mvn/settings.xml'
+
+clean:
+	$(MVN) clean
+
+package:
+	$(MVN) clean package
 
 tag:
 	dc3/bin/tag.sh
 
 dev:
-	cd dc3 \
-	&& docker-compose -f docker-compose-dev.yml up -d \
+	$(COMPOSE) -f dc3/$(COMPOSE_FILE) up -d
 
-build:
-	mvn clean package \
-    && cd dc3 \
-	&& docker-compose build \
+build: package
+	$(COMPOSE) -f dc3/$(COMPOSE_FILE) build
 
-deploy:
-	mvn clean package \
-    && cd dc3-api \
-	&& mvn clean deploy -p deploy \
+deploy: package
+	cd dc3-api \
+	&& $(MVN_SUB) clean deploy -p deploy \
 	&& cd ../dc3-common \
-    && mvn clean deploy -p deploy
+	&& $(MVN_SUB) clean deploy -p deploy

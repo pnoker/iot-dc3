@@ -7,7 +7,7 @@
 
 - **JDK 21**: Java Development Kit version 21 or higher
 - **Maven**: Build automation and dependency management tool
-- **Docker**: Container platform for building and running applications
+- **Podman**: Container platform for building and running applications
 
 ### 🍻 Quick Start
 
@@ -19,8 +19,8 @@
 
 ```bash
 cd iot-dc3/dc3
-docker-compose -f docker-compose-db.yml up -d
-docker-compose -f docker-compose.yml up -d
+podman compose -f docker-compose-db.yml up -d
+podman compose -f docker-compose.yml up -d
 ```
 
 #### 🐱 Aliyun Container Registry
@@ -29,8 +29,8 @@ docker-compose -f docker-compose.yml up -d
 
 ```bash
 cd iot-dc3/dc3
-docker-compose -f docker-compose-db-aliyun.yml up -d
-docker-compose -f docker-compose-aliyun.yml up -d
+podman compose -f docker-compose-db-aliyun.yml up -d
+podman compose -f docker-compose-aliyun.yml up -d
 ```
 
 ## 🐳 Container
