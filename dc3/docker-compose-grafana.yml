@@ -15,9 +15,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: ${DC3_LOG_MAX_SIZE:-10M}
+    max-file: "${DC3_LOG_MAX_FILE:-20}"
+
 services:
   prometheus:
-    image: pnoker/dc3-prometheus:2026.5
+    image: pnoker/dc3-prometheus:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     container_name: dc3-prometheus
     hostname: dc3-prometheus
@@ -26,77 +32,57 @@ services:
       - "--storage.tsdb.retention.time=7d"
     volumes:
       - prometheus:/prometheus
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-prometheus
 
   postgres-exporter:
-    image: pnoker/dc3-postgres-exporter:2026.5
+    image: pnoker/dc3-postgres-exporter:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     container_name: dc3-postgres-exporter
     hostname: dc3-postgres-exporter
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-postgres-exporter
 
   redis-exporter:
-    image: pnoker/dc3-redis-exporter:2026.5
+    image: pnoker/dc3-redis-exporter:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     container_name: dc3-redis-exporter
     hostname: dc3-redis-exporter
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-redis-exporter
 
   nginx-exporter:
-    image: pnoker/dc3-nginx-exporter:2026.5
+    image: pnoker/dc3-nginx-exporter:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     container_name: dc3-nginx-exporter
     hostname: dc3-nginx-exporter
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-nginx-exporter
 
   grafana:
-    image: pnoker/dc3-grafana:2026.5
+    image: pnoker/dc3-grafana:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
-      - "3000:3000"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GRAFANA_PORT:-3000}:3000"
     environment:
-      - GF_SERVER_ROOT_URL=http://dc3-grafana:3000
+      - GF_SERVER_ROOT_URL=${GF_SERVER_ROOT_URL:-http://localhost:3000}
     container_name: dc3-grafana
     hostname: dc3-grafana
     volumes:
       - grafana:/var/lib/grafana
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:

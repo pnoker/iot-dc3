@@ -15,26 +15,34 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: ${DC3_LOG_MAX_SIZE:-10M}
+    max-file: "${DC3_LOG_MAX_FILE:-20}"
+
 services:
   emqx:
-    image: pnoker/dc3-emqx:2026.5
+    image: pnoker/dc3-emqx:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
-      - "38083:8083"
-      - "38084:8084"
-      - "31883:1883"
-      - "38883:8883"
-      - "18083:18083"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_EMQX_WS_PORT:-38083}:8083"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_EMQX_WSS_PORT:-38084}:8084"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_EMQX_MQTT_PORT:-31883}:1883"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_EMQX_MQTTS_PORT:-38883}:8883"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_EMQX_DASHBOARD_PORT:-18083}:18083"
+    healthcheck:
+      test: ["CMD-SHELL", "emqx ctl status"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     container_name: dc3-emqx
     hostname: dc3-emqx
     volumes:
       - emqx_data:/opt/emqx/data
       - emqx_log:/opt/emqx/log
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
