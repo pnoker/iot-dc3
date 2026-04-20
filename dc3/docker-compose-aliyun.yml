@@ -15,12 +15,18 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: ${DC3_LOG_MAX_SIZE:-10M}
+    max-file: "${DC3_LOG_MAX_FILE:-20}"
+
 services:
   gateway:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-gateway:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
-      - "8000:8000"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=false
@@ -28,22 +34,18 @@ services:
     hostname: dc3-gateway
     volumes:
       - logs:/dc3-gateway/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-gateway
 
   auth:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-auth:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
-      - "8300:8300"
-      - "9300:9300"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_PORT:-8300}:8300"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_GRPC_PORT:-9300}:9300"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=false
@@ -51,22 +53,18 @@ services:
     hostname: dc3-center-auth
     volumes:
       - logs:/dc3-center/dc3-center-auth/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-center-auth
 
   manager:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-manager:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
-      - "8400:8400"
-      - "9400:9400"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MANAGER_PORT:-8400}:8400"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_MANAGER_GRPC_PORT:-9400}:9400"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=false
@@ -74,22 +72,18 @@ services:
     hostname: dc3-center-manager
     volumes:
       - logs:/dc3-center/dc3-center-manager/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-center-manager
 
   data:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-center-data:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
-      - "8500:8500"
-      - "9500:9500"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DATA_PORT:-8500}:8500"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DATA_GRPC_PORT:-9500}:9500"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=false
@@ -97,22 +91,18 @@ services:
     hostname: dc3-center-data
     volumes:
       - logs:/dc3-center/dc3-center-data/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-center-data
 
   listening-virtual:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
-      - "6270:6270"
-      - "6271:6271"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_DRIVER_PORT:-6270}:6270"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_GRPC_PORT:-6271}:6271"
     environment:
       - NODE_ENV=test
       - APM_AGENT_ENABLE=false
@@ -120,18 +110,14 @@ services:
     hostname: dc3-driver-listening-virtual
     volumes:
       - logs:/dc3-driver/dc3-driver-listening-virtual/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-driver-listening-virtual
 
   modbus-tcp:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -140,18 +126,14 @@ services:
     hostname: dc3-driver-modbus-tcp
     volumes:
       - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-driver-modbus-tcp
 
   mqtt:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -160,18 +142,14 @@ services:
     hostname: dc3-driver-mqtt
     volumes:
       - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-driver-mqtt
 
   opc-da:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -180,18 +158,14 @@ services:
     hostname: dc3-driver-opc-da
     volumes:
       - logs:/dc3-driver/dc3-driver-opc-da/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-driver-opc-da
 
   opc-ua:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -200,18 +174,14 @@ services:
     hostname: dc3-driver-opc-ua
     volumes:
       - logs:/dc3-driver/dc3-driver-opc-ua/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-driver-opc-ua
 
   plcs7:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -220,18 +190,14 @@ services:
     hostname: dc3-driver-plcs7
     volumes:
       - logs:/dc3-driver/dc3-driver-plcs7/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-driver-plcs7
 
   virtual:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     environment:
       - NODE_ENV=test
@@ -240,11 +206,7 @@ services:
     hostname: dc3-driver-virtual
     volumes:
       - logs:/dc3-driver/dc3-driver-virtual/dc3/logs
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:

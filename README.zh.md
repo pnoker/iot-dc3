@@ -51,7 +51,7 @@ IoT DC3 是一个基于 Spring Cloud 构建的完全开源、分布式物联网 
 
 > 二选一
 >
-> 如果需要数据库 SQL 脚本，请直接连接到容器中已启动的数据库进行导出
+> 该基础依赖栈会启动 PostgreSQL 和 RabbitMQ。如果需要数据库 SQL 脚本，请直接连接到容器中已启动的数据库进行导出
 
 ```bash
 # 全球可访问的标准镜像仓库服务
@@ -60,6 +60,35 @@ podman compose -f dc3/docker-compose-db.yml up -d
 # 针对中国大陆用户优化的镜像仓库服务
 podman compose -f dc3/docker-compose-db-aliyun.yml up -d
 ```
+
+可选的 `make` 快捷命令：
+
+```bash
+make dev-db
+make dev-optional
+make dev
+make dev-all
+```
+
+如果你需要使用中国大陆镜像源，可以使用 `REGISTRY=domestic`。兼容别名 `REGISTRY=aliyun` 和 `REGISTRY=cn` 也同样可用：
+
+```bash
+make dev-db REGISTRY=domestic
+make dev-all REGISTRY=domestic
+make app-all REGISTRY=aliyun
+make compose-up STACK=grafana REGISTRY=cn
+make compose-logs STACK=dev REGISTRY=global
+```
+
+### Docker Compose 环境变量覆盖
+
+在修改发布端口、镜像版本或观测栈参数前，建议先复制模板文件：
+
+```bash
+cp .env.example .env
+```
+
+根目录 `.env` 用于 `dc3/` 下 Compose 文件的变量插值；应用运行时环境变量仍然位于 `dc3/env/dev.env` 或 `dc3/env/dev.env.sh`。
 
 ## 3.2 准备工作
 

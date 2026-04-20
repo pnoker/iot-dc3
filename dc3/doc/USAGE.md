@@ -18,9 +18,9 @@
 > Global access with standard Docker registry service
 
 ```bash
-cd iot-dc3/dc3
-podman compose -f docker-compose-db.yml up -d
-podman compose -f docker-compose.yml up -d
+cd iot-dc3
+make dev-db
+make app
 ```
 
 #### 🐱 Aliyun Container Registry
@@ -28,9 +28,21 @@ podman compose -f docker-compose.yml up -d
 > Optimized registry service for users in mainland China
 
 ```bash
-cd iot-dc3/dc3
-podman compose -f docker-compose-db-aliyun.yml up -d
-podman compose -f docker-compose-aliyun.yml up -d
+cd iot-dc3
+make dev-db REGISTRY=domestic
+make app REGISTRY=domestic
+```
+
+> You can also start full workflows or other compose stacks with the same selector, for example:
+
+```bash
+make dev-all
+make dev-all REGISTRY=domestic
+make app-all REGISTRY=aliyun
+make compose-up STACK=optional
+make compose-up STACK=optional REGISTRY=cn
+make compose-up STACK=grafana REGISTRY=domestic
+make compose-logs STACK=dev REGISTRY=global
 ```
 
 ## 🐳 Container

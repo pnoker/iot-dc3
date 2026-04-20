@@ -18,23 +18,76 @@
 # tip:
 # make -f ./Makefile help
 
-.PHONY: help clean package dev build deploy tag
+.PHONY: help clean package app app-all dev dev-all dev-db dev-optional build deploy tag \
+	check-compose compose-file compose-up compose-down compose-ps compose-config compose-build \
+	compose-logs compose-pull compose-restart
 
-COMPOSE_FILE := docker-compose-dev.yml
-COMPOSE := podman compose
+COMPOSE ?= podman compose
+COMPOSE_DIR ?= dc3
+REGISTRY ?= global
+STACK ?= dev
 MVN_SETTINGS := .mvn/settings.xml
 MVN := mvn -s $(MVN_SETTINGS)
 MVN_SUB := mvn -s ../$(MVN_SETTINGS)
 
+ifeq ($(REGISTRY),global)
+REGISTRY_SUFFIX :=
+else ifeq ($(REGISTRY),overseas)
+REGISTRY_SUFFIX :=
+else ifeq ($(REGISTRY),international)
+REGISTRY_SUFFIX :=
+else ifeq ($(REGISTRY),domestic)
+REGISTRY_SUFFIX := -aliyun
+else ifeq ($(REGISTRY),aliyun)
+REGISTRY_SUFFIX := -aliyun
+else ifeq ($(REGISTRY),cn)
+REGISTRY_SUFFIX := -aliyun
+else
+$(error Unsupported REGISTRY '$(REGISTRY)'. Use REGISTRY=global|overseas or REGISTRY=domestic|aliyun|cn)
+endif
+
+STACK_SUFFIX := $(if $(filter app,$(STACK)),,-$(STACK))
+
+ifeq ($(origin COMPOSE_FILE), undefined)
+RESOLVED_COMPOSE_FILE := $(COMPOSE_DIR)/docker-compose$(STACK_SUFFIX)$(REGISTRY_SUFFIX).yml
+MAKE_COMPOSE_OVERRIDE :=
+else
+RESOLVED_COMPOSE_FILE := $(if $(findstring /,$(COMPOSE_FILE)),$(COMPOSE_FILE),$(COMPOSE_DIR)/$(COMPOSE_FILE))
+MAKE_COMPOSE_OVERRIDE := COMPOSE_FILE="$(COMPOSE_FILE)"
+endif
+
 help:
 	echo 'You can use make to execute the following commands:' \
-	&& echo 'Usage: make [help | clean | package | dev | build | deploy | tag]' \
+	&& echo 'Usage: make [help | clean | package | app | app-all | dev-db | dev-optional | dev | dev-all | build | deploy | tag]' \
 	&& echo ' - make clean: clean Maven build artifacts' \
 	&& echo ' - make package: package all modules with Maven' \
 	&& echo ' - make tag: git tag' \
-	&& echo ' - make dev: run local development environment with podman compose' \
-	&& echo ' - make build: build images with podman compose' \
-	&& echo ' - make deploy: deploy with mvn -s .mvn/settings.xml'
+	&& echo ' - make app: run the packaged application stack (docker-compose.yml)' \
+	&& echo ' - make app-all: run db + optional + packaged application stacks' \
+	&& echo ' - make dev-db: run the base dependency stack (Postgres + RabbitMQ)' \
+	&& echo ' - make dev-optional: run optional local dependencies (EMQX)' \
+	&& echo ' - make dev: run the local development application stack (docker-compose-dev.yml)' \
+	&& echo ' - make dev-all: run db + optional + local development application stacks' \
+	&& echo ' - make build: build images with the selected compose file (default: docker-compose-dev.yml)' \
+	&& echo ' - make compose-up STACK=<app|dev|db|optional|grafana|elasticsearch> [REGISTRY=domestic]' \
+	&& echo ' - make compose-down STACK=<...>: stop the selected compose stack' \
+	&& echo ' - make compose-ps STACK=<...>: list containers in the selected compose stack' \
+	&& echo ' - make compose-config STACK=<...>: print the rendered compose configuration' \
+	&& echo ' - make compose-pull STACK=<...>: pull images for the selected compose stack' \
+	&& echo ' - make compose-logs STACK=<...>: tail logs for the selected compose stack' \
+	&& echo ' - make compose-restart STACK=<...>: restart the selected compose stack' \
+	&& echo ' - make compose-file STACK=<...>: print the resolved compose file path' \
+	&& echo ' - make deploy: deploy with mvn -s .mvn/settings.xml' \
+	&& echo 'Registry aliases:' \
+	&& echo '   global / overseas / international -> Docker Hub' \
+	&& echo '   domestic / aliyun / cn           -> Aliyun registry' \
+	&& echo 'Examples:' \
+	&& echo '   make dev' \
+	&& echo '   make dev REGISTRY=domestic' \
+	&& echo '   make dev-all REGISTRY=domestic' \
+	&& echo '   make app-all REGISTRY=aliyun' \
+	&& echo '   make compose-up STACK=grafana REGISTRY=cn' \
+	&& echo '   make compose-logs STACK=dev REGISTRY=global'
 
 clean:
 	$(MVN) clean
@@ -45,11 +98,60 @@ package:
 tag:
 	dc3/bin/tag.sh
 
+check-compose:
+	@test -f "$(RESOLVED_COMPOSE_FILE)" || (echo "Compose file not found: $(RESOLVED_COMPOSE_FILE)" && exit 1)
+
+compose-file: check-compose
+	@echo "$(RESOLVED_COMPOSE_FILE)"
+
+compose-up: check-compose
+	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" up -d
+
+compose-down: check-compose
+	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" down
+
+compose-ps: check-compose
+	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" ps
+
+compose-config: check-compose
+	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" config
+
+compose-build: check-compose
+	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" build
+
+compose-pull: check-compose
+	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" pull
+
+compose-logs: check-compose
+	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" logs -f --tail=200
+
+compose-restart: check-compose
+	$(COMPOSE) -f "$(RESOLVED_COMPOSE_FILE)" restart
+
+app:
+	@$(MAKE) compose-up STACK=app REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+
+app-all:
+	@$(MAKE) dev-db REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+	@$(MAKE) dev-optional REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+	@$(MAKE) app REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+
+dev-db:
+	@$(MAKE) compose-up STACK=db REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+
+dev-optional:
+	@$(MAKE) compose-up STACK=optional REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+
 dev:
-	$(COMPOSE) -f dc3/$(COMPOSE_FILE) up -d
+	@$(MAKE) compose-up STACK=dev REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+
+dev-all:
+	@$(MAKE) dev-db REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+	@$(MAKE) dev-optional REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
+	@$(MAKE) dev REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
 
 build: package
-	$(COMPOSE) -f dc3/$(COMPOSE_FILE) build
+	@$(MAKE) compose-build STACK=dev REGISTRY=$(REGISTRY) COMPOSE='$(COMPOSE)' COMPOSE_DIR='$(COMPOSE_DIR)' $(MAKE_COMPOSE_OVERRIDE)
 
 deploy: package
 	cd dc3-api \
