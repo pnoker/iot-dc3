@@ -15,42 +15,52 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: ${DC3_LOG_MAX_SIZE:-10M}
+    max-file: "${DC3_LOG_MAX_FILE:-20}"
+
 services:
   postgres:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-postgres:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-postgres:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
-      - "35432:5432"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_POSTGRES_PORT:-35432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME:-dc3} -d ${POSTGRES_DB:-dc3}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     container_name: dc3-postgres
     hostname: dc3-postgres
     volumes:
       - postgres:/var/lib/postgresql/data
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-postgres
 
   rabbitmq:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:2026.5
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-rabbitmq:${DC3_IMAGE_TAG:-2026.5}
     restart: always
     ports:
-      - "35671:5671"
-      - "35672:5672"
-      - "15672:15672"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_RABBITMQ_TLS_PORT:-35671}:5671"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_RABBITMQ_PORT:-35672}:5672"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     container_name: dc3-rabbitmq
     hostname: dc3-rabbitmq
     volumes:
       - rabbitmq:/var/lib/rabbitmq
-    logging:
-      driver: json-file
-      options:
-        max-size: "10M"
-        max-file: "20"
+    logging: *default-logging
     networks:
       dc3net:
         aliases:

@@ -52,7 +52,7 @@ Kiến trúc được thiết kế để cung cấp năng lực IoT đầu-cuố
 > Chọn một
 >
 > Nếu bạn cần một tập lệnh SQL cơ sở dữ liệu, hãy kết nối trực tiếp với cơ sở dữ liệu đã khởi động trong container để
-> xuất
+> xuất. Stack phụ thuộc cơ bản này sẽ khởi động PostgreSQL và RabbitMQ.
 
 ```bash
 # Truy cập toàn cầu với dịch vụ đăng ký container tiêu chuẩn
@@ -61,6 +61,35 @@ podman compose -f dc3/docker-compose-db.yml up -d
 # Dịch vụ đăng ký được tối ưu hóa cho người dùng ở Trung Quốc đại lục
 podman compose -f dc3/docker-compose-db-aliyun.yml up -d
 ```
+
+Các lệnh tắt `make` hữu ích:
+
+```bash
+make dev-db
+make dev-optional
+make dev
+make dev-all
+```
+
+Nếu bạn muốn dùng registry tối ưu cho người dùng ở Trung Quốc đại lục, hãy đặt `REGISTRY=domestic`. Các bí danh tương thích `REGISTRY=aliyun` và `REGISTRY=cn` vẫn dùng được:
+
+```bash
+make dev-db REGISTRY=domestic
+make dev-all REGISTRY=domestic
+make app-all REGISTRY=aliyun
+make compose-up STACK=grafana REGISTRY=cn
+make compose-logs STACK=dev REGISTRY=global
+```
+
+### Ghi đè biến môi trường cho Docker Compose
+
+Trước khi thay đổi cổng publish, tag image hoặc tham số observability, nên sao chép tệp mẫu trước:
+
+```bash
+cp .env.example .env
+```
+
+Tệp `.env` ở thư mục gốc được dùng cho nội suy biến trong các file Compose dưới `dc3/`; các biến runtime của ứng dụng vẫn nằm trong `dc3/env/dev.env` hoặc `dc3/env/dev.env.sh`.
 
 ## 3.2 Chuẩn bị
 
