@@ -17,14 +17,12 @@
 
 package io.github.pnoker.common.manager.biz.impl;
 
-import io.github.pnoker.api.center.auth.GrpcCodeQuery;
-import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
-import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.api.common.GrpcDriverAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
-import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.facade.api.TenantFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.manager.biz.DriverRegisterService;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
@@ -37,7 +35,6 @@ import io.github.pnoker.common.manager.service.DriverService;
 import io.github.pnoker.common.manager.service.PointAttributeService;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -63,27 +60,33 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     private final DriverService driverService;
     private final DriverAttributeService driverAttributeService;
     private final PointAttributeService pointAttributeService;
-    @GrpcClient(AuthConstant.SERVICE_NAME)
-    private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
+    private final TenantFacade tenantFacade;
 
-    public DriverRegisterServiceImpl(GrpcDriverBuilder grpcDriverBuilder, GrpcDriverAttributeBuilder grpcDriverAttributeBuilder, GrpcPointAttributeBuilder grpcPointAttributeBuilder, DriverService driverService, DriverAttributeService driverAttributeService, PointAttributeService pointAttributeService) {
+    public DriverRegisterServiceImpl(GrpcDriverBuilder grpcDriverBuilder,
+                                     GrpcDriverAttributeBuilder grpcDriverAttributeBuilder,
+                                     GrpcPointAttributeBuilder grpcPointAttributeBuilder,
+                                     DriverService driverService,
+                                     DriverAttributeService driverAttributeService,
+                                     PointAttributeService pointAttributeService,
+                                     TenantFacade tenantFacade) {
         this.grpcDriverBuilder = grpcDriverBuilder;
         this.grpcDriverAttributeBuilder = grpcDriverAttributeBuilder;
         this.grpcPointAttributeBuilder = grpcPointAttributeBuilder;
         this.driverService = driverService;
         this.driverAttributeService = driverAttributeService;
         this.pointAttributeService = pointAttributeService;
+        this.tenantFacade = tenantFacade;
     }
 
     @Override
     public DriverBO registerDriver(GrpcDriverRegisterDTO entityGrpc) {
-        GrpcRTenantDTO rTenantDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(entityGrpc.getTenant()).build());
-        if (!rTenantDTO.getResult().getOk()) {
-            throw new ServiceException("Tenant[{}] information is invalid: {}", entityGrpc.getTenant(), rTenantDTO.getResult().getMessage());
+        FacadeTenantBO tenant = tenantFacade.selectByCode(entityGrpc.getTenant());
+        if (Objects.isNull(tenant)) {
+            throw new ServiceException("Tenant[{}] information is invalid", entityGrpc.getTenant());
         }
 
         DriverBO driverBO = grpcDriverBuilder.buildBOByGrpcDTO(entityGrpc.getDriver());
-        Objects.requireNonNull(driverBO).setTenantId(rTenantDTO.getData().getBase().getId());
+        Objects.requireNonNull(driverBO).setTenantId(tenant.getId());
         DriverBO entityBO = driverService.selectByServiceName(driverBO.getServiceName(), driverBO.getTenantId());
         if (Objects.nonNull(entityBO)) {
             log.info("The driver has been registered, perform update: {}", JsonUtil.toJsonString(driverBO));
