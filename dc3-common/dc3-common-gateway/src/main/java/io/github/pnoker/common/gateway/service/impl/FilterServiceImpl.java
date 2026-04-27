@@ -17,17 +17,22 @@
 
 package io.github.pnoker.common.gateway.service.impl;
 
-import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.facade.api.TenantFacade;
+import io.github.pnoker.common.facade.api.TokenFacade;
+import io.github.pnoker.common.facade.api.UserFacade;
+import io.github.pnoker.common.facade.api.UserLoginFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.RequestUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
@@ -43,82 +48,73 @@ import java.util.Objects;
 @Service
 public class FilterServiceImpl implements FilterService {
 
-    @GrpcClient(AuthConstant.SERVICE_NAME)
-    private UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub;
-    @GrpcClient(AuthConstant.SERVICE_NAME)
-    private UserApiGrpc.UserApiBlockingStub userApiBlockingStub;
-    @GrpcClient(AuthConstant.SERVICE_NAME)
-    private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
-    @GrpcClient(AuthConstant.SERVICE_NAME)
-    private TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
+    @Resource
+    private TenantFacade tenantFacade;
+
+    @Resource
+    private UserLoginFacade userLoginFacade;
+
+    @Resource
+    private UserFacade userFacade;
+
+    @Resource
+    private TokenFacade tokenFacade;
 
     @Override
-    public GrpcRTenantDTO getTenantDTO(ServerHttpRequest request) {
-        // Get tenant code from request header
-        String tenant = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
-        if (StringUtils.isEmpty(tenant)) {
+    public FacadeTenantBO getTenant(ServerHttpRequest request) {
+        String code = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
+        if (StringUtils.isEmpty(code)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        // Query tenant info by tenant code
-        GrpcRTenantDTO entityDTO = tenantApiBlockingStub.selectByCode(GrpcCodeQuery.newBuilder().setCode(tenant).build());
-        if (!entityDTO.getResult().getOk() || EnableFlagEnum.ENABLE.getIndex() != entityDTO.getData().getEnableFlag()) {
+        FacadeTenantBO tenant = tenantFacade.selectByCode(code);
+        if (Objects.isNull(tenant) || tenant.getEnableFlag() != EnableFlagEnum.ENABLE) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
-        return entityDTO;
+        return tenant;
     }
 
     @Override
-    public GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request) {
-        // Get user login name from request header
-        String user = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
-        if (StringUtils.isEmpty(user)) {
+    public FacadeUserLoginBO getUserLogin(ServerHttpRequest request) {
+        String name = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
+        if (StringUtils.isEmpty(name)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        // Query user login info by login name
-        GrpcRUserLoginDTO entityDTO = userLoginApiBlockingStub.selectByName(GrpcNameQuery.newBuilder().setName(user).build());
-        if (!entityDTO.getResult().getOk() || EnableFlagEnum.ENABLE.getIndex() != entityDTO.getData().getEnableFlag()) {
+        FacadeUserLoginBO userLogin = userLoginFacade.selectByName(name);
+        if (Objects.isNull(userLogin) || userLogin.getEnableFlag() != EnableFlagEnum.ENABLE) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
-        return entityDTO;
+        return userLogin;
     }
 
     @Override
-    public RequestHeader.UserHeader getUserDTO(GrpcRUserLoginDTO rUserLoginDTO, GrpcRTenantDTO rTenantDTO) {
-        // Query user info by user id
-        GrpcRUserDTO entityDTO = userApiBlockingStub.selectById(GrpcIdQuery.newBuilder().setId(rUserLoginDTO.getData().getBase().getId()).build());
-        if (!entityDTO.getResult().getOk()) {
+    public RequestHeader.UserHeader getUser(FacadeUserLoginBO userLogin, FacadeTenantBO tenant) {
+        // Preserves the existing (surprising) behavior: lookup UserApi by UserLogin.id,
+        // not UserLogin.userId. Changing that belongs in a separate bug-fix PR.
+        FacadeUserBO user = userFacade.selectById(userLogin.getId());
+        if (Objects.isNull(user)) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        // Build user header info
-        RequestHeader.UserHeader entityBO = new RequestHeader.UserHeader();
-        entityBO.setUserId(entityDTO.getData().getBase().getId());
-        entityBO.setNickName(entityDTO.getData().getNickName());
-        entityBO.setUserName(entityDTO.getData().getUserName());
-        entityBO.setTenantId(rTenantDTO.getData().getBase().getId());
-        return entityBO;
+        RequestHeader.UserHeader header = new RequestHeader.UserHeader();
+        header.setUserId(user.getId());
+        header.setNickName(user.getNickName());
+        header.setUserName(user.getUserName());
+        header.setTenantId(tenant.getId());
+        return header;
     }
 
     @Override
-    public void checkValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO) {
-        // Get token from request header and parse it
+    public void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeUserLoginBO userLogin) {
         String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
-        RequestHeader.TokenHeader entityBO = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
-        if (Objects.isNull(entityBO) || StringUtils.isAnyEmpty(entityBO.getSalt(), entityBO.getToken())) {
+        RequestHeader.TokenHeader header = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
+        if (Objects.isNull(header) || StringUtils.isAnyEmpty(header.getSalt(), header.getToken())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
 
-        // Build login query and validate token
-        GrpcLoginQuery login = GrpcLoginQuery.newBuilder()
-                .setTenant(rTenantDTO.getData().getTenantCode())
-                .setName(rUserLoginDTO.getData().getLoginName())
-                .setSalt(entityBO.getSalt())
-                .setToken(entityBO.getToken())
-                .build();
-        GrpcRTokenDTO entityDTO = tokenApiBlockingStub.checkValid(login);
-        if (!entityDTO.getResult().getOk()) {
+        boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), userLogin.getLoginName(), header.getSalt(), header.getToken());
+        if (!valid) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
     }

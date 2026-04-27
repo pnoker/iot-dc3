@@ -30,6 +30,10 @@ spring:
     active:
       - ${NODE_ENV:dev}
 
+dc3:
+  facade:
+    mode: ${DC3_FACADE_MODE:grpc}
+
 # Logging configuration
 logging:
   file:
