@@ -21,15 +21,20 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-center</artifactId>
+        <artifactId>dc3-common</artifactId>
         <version>2026.4.19</version>
     </parent>
 
-    <artifactId>dc3-center-single</artifactId>
+    <name>${project.artifactId}</name>
+    <artifactId>dc3-common-facade-local</artifactId>
+    <version>2026.4.19</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 Platform Integrated Service - A comprehensive collection of authorization, data, management,
-        and API services combined into a single module.
+    <inceptionYear>2016</inceptionYear>
+    <url>https://github.com/pnoker/iot-dc3</url>
+    <description>
+        Local (in-process) implementation of the Facade API, selected when
+        dc3.facade.mode=local. Directly invokes manager services without gRPC.
     </description>
 
     <dependencies>
@@ -37,15 +42,11 @@
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-facade-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-auth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-data</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-facade-local</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
