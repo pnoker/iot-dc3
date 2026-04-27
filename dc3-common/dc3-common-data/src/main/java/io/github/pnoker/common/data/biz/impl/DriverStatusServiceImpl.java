@@ -17,13 +17,7 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.GrpcDeviceDTO;
-import io.github.pnoker.api.common.GrpcDriverDTO;
-import io.github.pnoker.api.common.GrpcPage;
-import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.data.biz.DriverStatusService;
 import io.github.pnoker.common.data.entity.bo.DriverRunBO;
 import io.github.pnoker.common.data.entity.model.DriverRunDO;
@@ -31,12 +25,15 @@ import io.github.pnoker.common.data.entity.query.DriverQuery;
 import io.github.pnoker.common.data.service.DriverRunService;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
-import io.github.pnoker.common.optional.LongOptional;
-import io.github.pnoker.common.optional.StringOptional;
+import io.github.pnoker.common.facade.api.DeviceFacade;
+import io.github.pnoker.common.facade.api.DriverFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
 import io.github.pnoker.common.redis.service.RedisService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -53,125 +50,105 @@ import java.util.stream.Collectors;
 @Service
 public class DriverStatusServiceImpl implements DriverStatusService {
 
-    @GrpcClient(ManagerConstant.SERVICE_NAME)
-    private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
+    @Resource
+    private DriverFacade driverFacade;
+
+    @Resource
+    private DeviceFacade deviceFacade;
 
     @Resource
     private RedisService redisService;
+
     @Resource
     private DriverRunService driverRunService;
 
-    @GrpcClient(ManagerConstant.SERVICE_NAME)
-    private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
-
     @Override
     public Map<Long, String> selectByPage(DriverQuery pageQuery) {
-        GrpcPage.Builder page = GrpcPage.newBuilder().setSize(pageQuery.getPage().getSize()).setCurrent(pageQuery.getPage().getCurrent());
-        GrpcPageDriverQuery.Builder query = GrpcPageDriverQuery.newBuilder().setPage(page);
-        StringOptional.ofNullable(pageQuery.getDriverName()).ifPresent(query::setDriverName);
-        StringOptional.ofNullable(pageQuery.getDriverCode()).ifPresent(query::setDriverCode);
-        StringOptional.ofNullable(pageQuery.getServiceName()).ifPresent(query::setServiceName);
-        StringOptional.ofNullable(pageQuery.getServiceHost()).ifPresent(query::setServiceHost);
-        LongOptional.ofNullable(pageQuery.getTenantId()).ifPresent(query::setTenantId);
-        Optional.ofNullable(pageQuery.getDriverTypeFlag()).ifPresentOrElse(value -> query.setDriverTypeFlag(value.getIndex()), () -> query.setDriverTypeFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.DEFAULT_INT));
-        GrpcRPageDriverDTO rPageDriverDTO = driverApiBlockingStub.selectByPage(query.build());
+        FacadeDriverQuery facadeQuery = FacadeDriverQuery.builder()
+                .page(pageQuery.getPage())
+                .driverName(pageQuery.getDriverName())
+                .driverCode(pageQuery.getDriverCode())
+                .serviceName(pageQuery.getServiceName())
+                .serviceHost(pageQuery.getServiceHost())
+                .tenantId(pageQuery.getTenantId())
+                .driverTypeFlag(pageQuery.getDriverTypeFlag())
+                .enableFlag(pageQuery.getEnableFlag())
+                .build();
 
-        if (!rPageDriverDTO.getResult().getOk()) {
+        FacadePage<FacadeDriverBO> page = driverFacade.selectByPage(facadeQuery);
+        if (page.getRecords().isEmpty()) {
             return Map.of();
         }
-
-        List<GrpcDriverDTO> drivers = rPageDriverDTO.getData().getDataList();
-        return getStatusMap(drivers);
+        return getStatusMap(page.getRecords());
     }
 
     @Override
     public DriverRunBO selectOnlineByDriverId(Long driverId) {
-        List<DriverRunDO> driverRunDOList = driverRunService.get7daysDuration(driverId, DriverStatusEnum.ONLINE.getCode());
-        Long totalDuration = driverRunService.selectSumDuration(driverId, DriverStatusEnum.ONLINE.getCode());
-        GrpcDriverQuery.Builder builder = GrpcDriverQuery.newBuilder();
-        builder.setDriverId(driverId);
-        GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
-        if (!rDriverDTO.getResult().getOk()) {
-            throw new RuntimeException("Driver does not exist");
-        }
-        DriverRunBO driverRunBO = new DriverRunBO();
-        List<Long> zeroList = Collections.nCopies(7, 0L);
-        ArrayList<Long> list = new ArrayList<>(zeroList);
-        driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
-        driverRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
-        driverRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
-        if (Objects.isNull(driverRunDOList)) {
-            driverRunBO.setDuration(list);
-            return driverRunBO;
-        }
-        for (int i = 0; i < driverRunDOList.size(); i++) {
-            list.set(i, driverRunDOList.get(i).getDuration());
-        }
-        driverRunBO.setDuration(list);
-        return driverRunBO;
+        return buildDriverRun(driverId, DriverStatusEnum.ONLINE);
     }
 
     @Override
     public DriverRunBO selectOfflineByDriverId(Long driverId) {
-        List<DriverRunDO> driverRunDOList = driverRunService.get7daysDuration(driverId, DriverStatusEnum.OFFLINE.getCode());
-        Long totalDuration = driverRunService.selectSumDuration(driverId, DriverStatusEnum.OFFLINE.getCode());
-        GrpcDriverQuery.Builder builder = GrpcDriverQuery.newBuilder();
-        builder.setDriverId(driverId);
-        GrpcRDriverDTO rDriverDTO = driverApiBlockingStub.selectByDriverId(builder.build());
-        if (!rDriverDTO.getResult().getOk()) {
-            throw new RuntimeException("Driver id does not exist");
-        }
-        DriverRunBO driverRunBO = new DriverRunBO();
-        List<Long> zeroList = Collections.nCopies(7, 0L);
-        ArrayList<Long> list = new ArrayList<>(zeroList);
-        driverRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
-        driverRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
-        driverRunBO.setDriverName(rDriverDTO.getData().getDriverName());
-        if (Objects.isNull(driverRunDOList)) {
-            driverRunBO.setDuration(list);
-            return driverRunBO;
-        }
-        for (int i = 0; i < driverRunDOList.size(); i++) {
-            list.set(i, driverRunDOList.get(i).getDuration());
-        }
-        driverRunBO.setDuration(list);
-        return driverRunBO;
+        return buildDriverRun(driverId, DriverStatusEnum.OFFLINE);
     }
 
     @Override
     public String getDeviceOnlineByDriverId(Long driverId) {
-        List<String> list = getList(driverId);
-        if (list == null) return String.valueOf(0L);
+        List<String> list = getDeviceStatuses(driverId);
+        if (list == null) {
+            return String.valueOf(0L);
+        }
         long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.ONLINE.getCode())).count();
         return String.valueOf(count);
     }
 
     @Override
     public String getDeviceOfflineByDriverId(Long driverId) {
-        List<String> list = getList(driverId);
-        if (list == null) return String.valueOf(0L);
+        List<String> list = getDeviceStatuses(driverId);
+        if (list == null) {
+            return String.valueOf(0L);
+        }
         long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.OFFLINE.getCode())).count();
         return String.valueOf(count);
     }
 
+    private DriverRunBO buildDriverRun(Long driverId, DriverStatusEnum statusEnum) {
+        List<DriverRunDO> durations = driverRunService.get7daysDuration(driverId, statusEnum.getCode());
+        Long totalDuration = driverRunService.selectSumDuration(driverId, statusEnum.getCode());
+
+        FacadeDriverBO driver = driverFacade.selectById(driverId);
+        if (Objects.isNull(driver)) {
+            throw new RuntimeException("Driver does not exist");
+        }
+
+        DriverRunBO runBO = new DriverRunBO();
+        ArrayList<Long> list = new ArrayList<>(Collections.nCopies(7, 0L));
+        runBO.setDriverName(driver.getDriverName());
+        runBO.setStatus(statusEnum.getCode());
+        runBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
+        if (Objects.isNull(durations)) {
+            runBO.setDuration(list);
+            return runBO;
+        }
+        for (int i = 0; i < durations.size(); i++) {
+            list.set(i, durations.get(i).getDuration());
+        }
+        runBO.setDuration(list);
+        return runBO;
+    }
+
     /**
-     * get deviceList  Online/Offline BY driverId
-     *
-     * @param driverId
-     * @return
+     * Load the status of every device attached to the given driver.
+     * Returns {@code null} when the driver has no devices (preserves legacy "0" signal).
      */
-    private List<String> getList(Long driverId) {
-        GrpcDriverQuery query = GrpcDriverQuery.newBuilder()
-                .setDriverId(driverId)
-                .build();
-        GrpcRDeviceListDTO onlineByDriverId = deviceApiBlockingStub.selectByDriverId(query);
-        if (!onlineByDriverId.getResult().getOk()) {
+    private List<String> getDeviceStatuses(Long driverId) {
+        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(driverId);
+        if (devices.isEmpty()) {
             return null;
         }
-        List<GrpcDeviceDTO> devices = onlineByDriverId.getDataList();
-        Set<Long> deviceIds = devices.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
-        List<String> list = new ArrayList<>();
+
+        Set<Long> deviceIds = devices.stream().map(FacadeDeviceBO::getId).collect(Collectors.toSet());
+        List<String> list = new ArrayList<>(deviceIds.size());
         deviceIds.forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisService.getKey(key);
@@ -181,15 +158,9 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         return list;
     }
 
-    /**
-     * Get status map
-     *
-     * @param drivers GrpcDriverDTO Array
-     * @return Status Map
-     */
-    private Map<Long, String> getStatusMap(List<GrpcDriverDTO> drivers) {
+    private Map<Long, String> getStatusMap(List<FacadeDriverBO> drivers) {
         Map<Long, String> statusMap = new HashMap<>(16);
-        Set<Long> driverIds = drivers.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
+        Set<Long> driverIds = drivers.stream().map(FacadeDriverBO::getId).collect(Collectors.toSet());
         driverIds.forEach(id -> {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + id;
             String status = redisService.getKey(key);
@@ -198,5 +169,4 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         });
         return statusMap;
     }
-
 }
