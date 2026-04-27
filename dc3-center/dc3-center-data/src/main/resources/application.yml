@@ -40,6 +40,10 @@ data:
       speed: ${POINT_BATCH_SPEED:100}
       interval: ${POINT_BATCH_INTERVAL:5}
 
+dc3:
+  facade:
+    mode: ${DC3_FACADE_MODE:grpc}
+
 logging:
   file:
     name: dc3/logs/center/data/${spring.application.name}.log
