@@ -82,6 +82,9 @@
         <module>dc3-common-data</module>
         <module>dc3-common-driver</module>
         <module>dc3-common-exception</module>
+        <module>dc3-common-facade-api</module>
+        <module>dc3-common-facade-grpc</module>
+        <module>dc3-common-facade-local</module>
         <module>dc3-common-gateway</module>
         <module>dc3-common-log</module>
         <module>dc3-common-manager</module>
@@ -211,6 +214,21 @@
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-exception</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-facade-api</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-facade-grpc</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-facade-local</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>

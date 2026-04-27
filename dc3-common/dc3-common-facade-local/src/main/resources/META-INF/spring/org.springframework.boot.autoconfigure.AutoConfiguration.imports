@@ -15,35 +15,4 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-server:
-  port: ${SERVER_PORT:8100}
-  servlet:
-    context-path: /single
-
-grpc:
-  server:
-    port: ${GRPC_SERVER_PORT:9100}
-
-spring:
-  application:
-    name: @project.artifactId@
-  profiles:
-    active:
-      - ${NODE_ENV:dev}
-  data:
-    redis:
-      database: 1
-
-data:
-  point:
-    batch:
-      speed: ${POINT_BATCH_SPEED:100}
-      interval: ${POINT_BATCH_INTERVAL:5}
-
-dc3:
-  facade:
-    mode: ${DC3_FACADE_MODE:local}
-
-logging:
-  file:
-    name: dc3/logs/center/single/${spring.application.name}.log
+io.github.pnoker.common.facade.local.config.LocalFacadeAutoConfiguration
