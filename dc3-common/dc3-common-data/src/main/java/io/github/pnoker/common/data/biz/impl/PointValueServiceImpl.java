@@ -18,18 +18,15 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
-import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
-import io.github.pnoker.api.center.manager.PointApiGrpc;
-import io.github.pnoker.api.common.GrpcPage;
-import io.github.pnoker.api.common.GrpcPointDTO;
-import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.common.exception.RepositoryException;
+import io.github.pnoker.common.facade.api.PointFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 import io.github.pnoker.common.redis.service.RedisRepositoryService;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
@@ -37,10 +34,8 @@ import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -55,8 +50,8 @@ import java.util.stream.Collectors;
 @Service
 public class PointValueServiceImpl implements PointValueService {
 
-    @GrpcClient(ManagerConstant.SERVICE_NAME)
-    private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
+    @Resource
+    private PointFacade pointFacade;
 
     @Resource
     private RedisRepositoryService redisRepositoryService;
@@ -112,29 +107,20 @@ public class PointValueServiceImpl implements PointValueService {
         Page<PointValueBO> entityPageBO = new Page<>();
         entityPageBO.setCurrent(entityQuery.getPage().getCurrent()).setSize(entityQuery.getPage().getSize());
 
-        GrpcPage.Builder entityPageGrpcDTO = GrpcPage.newBuilder()
-                .setSize(entityQuery.getPage().getSize())
-                .setCurrent(entityQuery.getPage().getCurrent());
-        GrpcPagePointQuery.Builder query = GrpcPagePointQuery.newBuilder()
-                .setPage(entityPageGrpcDTO);
-        if (StringUtils.isNotEmpty(entityQuery.getPointName())) {
-            query.setPointName(entityQuery.getPointName());
-        }
-        query.setPointTypeFlag(DefaultConstant.NULL_INT);
-        query.setRwFlag(DefaultConstant.NULL_INT);
-        query.setProfileId(DefaultConstant.NULL_INT);
-        query.setTenantId(entityQuery.getTenantId());
-        if (Objects.nonNull(entityQuery.getDeviceId())) {
-            query.setDeviceId(entityQuery.getDeviceId());
-        }
-        Optional.ofNullable(entityQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.DEFAULT_INT));
-        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.selectByPage(query.build());
-        if (!rPagePointDTO.getResult().getOk()) {
+        FacadePointQuery facadeQuery = FacadePointQuery.builder()
+                .page(entityQuery.getPage())
+                .pointName(entityQuery.getPointName())
+                .tenantId(entityQuery.getTenantId())
+                .deviceId(entityQuery.getDeviceId())
+                .enableFlag(entityQuery.getEnableFlag())
+                .build();
+
+        FacadePage<FacadePointBO> page = pointFacade.selectByPage(facadeQuery);
+        List<Long> pointIds = page.getRecords().stream().map(FacadePointBO::getId).toList();
+
+        if (pointIds.isEmpty()) {
             return entityPageBO;
         }
-
-        List<GrpcPointDTO> points = rPagePointDTO.getData().getDataList();
-        List<Long> pointIds = points.stream().map(p -> p.getBase().getId()).toList();
 
         Map<Long, PointValueBO> pointValueBOMap = redisRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
         RepositoryService repositoryService = getFirstRepositoryService();
@@ -143,9 +129,9 @@ public class PointValueServiceImpl implements PointValueService {
             return Objects.isNull(value) ? repositoryService.selectLatestPointValue(entityQuery.getDeviceId(), id) : value;
         }).filter(Objects::nonNull).toList();
 
-        entityPageBO.setCurrent(rPagePointDTO.getData().getPage().getCurrent())
-                .setSize(rPagePointDTO.getData().getPage().getSize())
-                .setTotal(rPagePointDTO.getData().getPage().getTotal())
+        entityPageBO.setCurrent(page.getCurrent())
+                .setSize(page.getSize())
+                .setTotal(page.getTotal())
                 .setRecords(pointValueBOList);
 
         return entityPageBO;

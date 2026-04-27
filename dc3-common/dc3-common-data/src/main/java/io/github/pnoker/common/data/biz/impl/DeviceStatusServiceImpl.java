@@ -17,12 +17,7 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import io.github.pnoker.api.center.manager.*;
-import io.github.pnoker.api.common.GrpcDeviceDTO;
-import io.github.pnoker.api.common.GrpcPage;
-import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.PrefixConstant;
-import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.data.biz.DeviceStatusService;
 import io.github.pnoker.common.data.entity.bo.DeviceRunBO;
 import io.github.pnoker.common.data.entity.model.DeviceRunDO;
@@ -30,12 +25,13 @@ import io.github.pnoker.common.data.entity.query.DeviceQuery;
 import io.github.pnoker.common.data.service.DeviceRunService;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
-import io.github.pnoker.common.optional.LongOptional;
-import io.github.pnoker.common.optional.StringOptional;
+import io.github.pnoker.common.facade.api.DeviceFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.redis.service.RedisService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -52,8 +48,8 @@ import java.util.stream.Collectors;
 @Service
 public class DeviceStatusServiceImpl implements DeviceStatusService {
 
-    @GrpcClient(ManagerConstant.SERVICE_NAME)
-    private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
+    @Resource
+    private DeviceFacade deviceFacade;
 
     @Resource
     private RedisService redisService;
@@ -63,33 +59,30 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Override
     public Map<Long, String> selectByPage(DeviceQuery pageQuery) {
-        GrpcPage.Builder page = GrpcPage.newBuilder().setSize(pageQuery.getPage().getSize()).setCurrent(pageQuery.getPage().getCurrent());
-        GrpcPageDeviceQuery.Builder query = GrpcPageDeviceQuery.newBuilder().setPage(page);
-        StringOptional.ofNullable(pageQuery.getDeviceName()).ifPresent(query::setDeviceName);
-        StringOptional.ofNullable(pageQuery.getDeviceCode()).ifPresent(query::setDeviceCode);
-        LongOptional.ofNullable(pageQuery.getDriverId()).ifPresent(query::setDriverId);
-        LongOptional.ofNullable(pageQuery.getProfileId()).ifPresent(query::setProfileId);
-        LongOptional.ofNullable(pageQuery.getTenantId()).ifPresent(query::setTenantId);
-        Optional.ofNullable(pageQuery.getEnableFlag()).ifPresentOrElse(value -> query.setEnableFlag(value.getIndex()), () -> query.setEnableFlag(DefaultConstant.DEFAULT_INT));
-        GrpcRPageDeviceDTO rPageDeviceDTO = deviceApiBlockingStub.selectByPage(query.build());
+        FacadeDeviceQuery facadeQuery = FacadeDeviceQuery.builder()
+                .page(pageQuery.getPage())
+                .deviceName(pageQuery.getDeviceName())
+                .deviceCode(pageQuery.getDeviceCode())
+                .driverId(pageQuery.getDriverId())
+                .profileId(pageQuery.getProfileId())
+                .tenantId(pageQuery.getTenantId())
+                .enableFlag(pageQuery.getEnableFlag())
+                .build();
 
-        if (!rPageDeviceDTO.getResult().getOk()) {
+        FacadePage<FacadeDeviceBO> page = deviceFacade.selectByPage(facadeQuery);
+        if (page.getRecords().isEmpty()) {
             return Map.of();
         }
 
-        List<GrpcDeviceDTO> devices = rPageDeviceDTO.getData().getDataList();
-        return getStatusMap(devices);
+        return getStatusMap(page.getRecords());
     }
 
     @Override
     public Map<Long, String> selectByProfileId(Long profileId) {
-        GrpcProfileQuery query = GrpcProfileQuery.newBuilder().setProfileId(profileId).build();
-        GrpcRDeviceListDTO rDeviceListDTO = deviceApiBlockingStub.selectByProfileId(query);
-        if (!rDeviceListDTO.getResult().getOk()) {
+        List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(profileId);
+        if (devices.isEmpty()) {
             return Map.of();
         }
-
-        List<GrpcDeviceDTO> devices = rDeviceListDTO.getDataList();
         return getStatusMap(devices);
     }
 
@@ -97,18 +90,17 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     public DeviceRunBO selectOnlineByDeviceId(Long deviceId) {
         List<DeviceRunDO> deviceRunDOList = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
         Long totalDuration = deviceRunService.selectSumDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
-        GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
-        builder.setDeviceId(deviceId);
-        GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
-        if (!rDeviceDTO.getResult().getOk()) {
+
+        FacadeDeviceBO device = deviceFacade.selectById(deviceId);
+        if (Objects.isNull(device)) {
             throw new RuntimeException("Device does not exist");
         }
+
         DeviceRunBO deviceRunBO = new DeviceRunBO();
-        List<Long> zeroList = Collections.nCopies(7, 0L);
-        ArrayList<Long> list = new ArrayList<>(zeroList);
+        ArrayList<Long> list = new ArrayList<>(Collections.nCopies(7, 0L));
         deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
         deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
-        deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
+        deviceRunBO.setDeviceName(device.getDeviceName());
         if (Objects.isNull(deviceRunDOList)) {
             deviceRunBO.setDuration(list);
             return deviceRunBO;
@@ -124,18 +116,17 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     public DeviceRunBO selectOfflineByDeviceId(Long deviceId) {
         List<DeviceRunDO> deviceRunDOList = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
         Long totalDuration = deviceRunService.selectSumDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
-        GrpcDeviceQuery.Builder builder = GrpcDeviceQuery.newBuilder();
-        builder.setDeviceId(deviceId);
-        GrpcRDeviceDTO rDeviceDTO = deviceApiBlockingStub.selectByDeviceId(builder.build());
-        if (!rDeviceDTO.getResult().getOk()) {
+
+        FacadeDeviceBO device = deviceFacade.selectById(deviceId);
+        if (Objects.isNull(device)) {
             throw new RuntimeException("Device does not exist");
         }
+
         DeviceRunBO deviceRunBO = new DeviceRunBO();
-        List<Long> zeroList = Collections.nCopies(7, 0L);
-        ArrayList<Long> list = new ArrayList<>(zeroList);
+        ArrayList<Long> list = new ArrayList<>(Collections.nCopies(7, 0L));
         deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
         deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
-        deviceRunBO.setDeviceName(rDeviceDTO.getData().getDeviceName());
+        deviceRunBO.setDeviceName(device.getDeviceName());
         if (Objects.isNull(deviceRunDOList)) {
             deviceRunBO.setDuration(list);
             return deviceRunBO;
@@ -148,14 +139,11 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     }
 
     /**
-     * Get a map of device statuses
-     *
-     * @param devices GrpcDeviceDTO Array
-     * @return Status Map
+     * Get a map of device statuses keyed by device id.
      */
-    private Map<Long, String> getStatusMap(List<GrpcDeviceDTO> devices) {
+    private Map<Long, String> getStatusMap(List<FacadeDeviceBO> devices) {
         Map<Long, String> statusMap = new HashMap<>(16);
-        Set<Long> deviceIds = devices.stream().map(d -> d.getBase().getId()).collect(Collectors.toSet());
+        Set<Long> deviceIds = devices.stream().map(FacadeDeviceBO::getId).collect(Collectors.toSet());
         deviceIds.forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
             String status = redisService.getKey(key);
@@ -164,5 +152,4 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         });
         return statusMap;
     }
-
 }
