@@ -1,0 +1,106 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package io.github.pnoker.common.facade.grpc;
+
+import io.github.pnoker.api.center.manager.*;
+import io.github.pnoker.api.common.GrpcR;
+import io.github.pnoker.common.constant.service.ManagerConstant;
+import io.github.pnoker.common.enums.ResponseEnum;
+import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.facade.api.DriverFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
+import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
+import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcDriverBuilder;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+/**
+ * gRPC DriverFacade: forwards to Manager Center via
+ * {@link DriverApiGrpc.DriverApiBlockingStub}.
+ *
+ * @author pnoker
+ * @since 2026.4.19
+ */
+@Slf4j
+@Component
+public class DriverGrpcFacade implements DriverFacade {
+
+    @GrpcClient(ManagerConstant.SERVICE_NAME)
+    private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
+
+    @Resource
+    private FacadeGrpcDriverBuilder facadeGrpcDriverBuilder;
+
+    @Override
+    public FacadeDriverBO selectById(Long id) {
+        GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(id).build();
+        GrpcRDriverDTO response = driverApiBlockingStub.selectByDriverId(request);
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectById");
+            return null;
+        }
+        return facadeGrpcDriverBuilder.toFacadeBO(response.getData());
+    }
+
+    @Override
+    public FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query) {
+        GrpcPageDriverQuery request = facadeGrpcDriverBuilder.toGrpcPageQuery(query);
+        GrpcRPageDriverDTO response = driverApiBlockingStub.selectByPage(request);
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectByPage");
+            return FacadePage.empty();
+        }
+
+        GrpcPageDriverDTO pageDTO = response.getData();
+        List<FacadeDriverBO> records = pageDTO.getDataList().stream()
+                .map(facadeGrpcDriverBuilder::toFacadeBO)
+                .toList();
+
+        return new FacadePage<>(
+                pageDTO.getPage().getCurrent(),
+                pageDTO.getPage().getSize(),
+                pageDTO.getPage().getTotal(),
+                pageDTO.getPage().getPages(),
+                records);
+    }
+
+    @Override
+    public FacadeDriverBO selectByDeviceId(Long deviceId) {
+        GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).build();
+        GrpcRDriverDTO response = driverApiBlockingStub.selectByDeviceId(request);
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectByDeviceId");
+            return null;
+        }
+        return facadeGrpcDriverBuilder.toFacadeBO(response.getData());
+    }
+
+    private void guardOrThrow(GrpcR result, String op) {
+        String code = result.getCode();
+        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+            log.debug("DriverGrpcFacade.{} => no resource", op);
+            return;
+        }
+        throw new ServiceException("DriverFacade." + op + " failed: [" + code + "] " + result.getMessage());
+    }
+}
