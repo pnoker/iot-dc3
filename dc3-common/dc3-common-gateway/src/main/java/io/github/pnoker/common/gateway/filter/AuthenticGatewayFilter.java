@@ -17,12 +17,12 @@
 
 package io.github.pnoker.common.gateway.filter;
 
-import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
-import io.github.pnoker.api.center.auth.GrpcRUserLoginDTO;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -60,11 +60,11 @@ public class AuthenticGatewayFilter implements GatewayFilter {
         ServerHttpRequest request = exchange.getRequest();
 
         try {
-            GrpcRTenantDTO rTenantDTO = filterService.getTenantDTO(request);
-            GrpcRUserLoginDTO rUserLoginDTO = filterService.getLoginDTO(request);
-            filterService.checkValid(request, rTenantDTO, rUserLoginDTO);
+            FacadeTenantBO tenant = filterService.getTenant(request);
+            FacadeUserLoginBO userLogin = filterService.getUserLogin(request);
+            filterService.checkValid(request, tenant, userLogin);
 
-            RequestHeader.UserHeader userHeader = filterService.getUserDTO(rUserLoginDTO, rTenantDTO);
+            RequestHeader.UserHeader userHeader = filterService.getUser(userLogin, tenant);
             ServerHttpRequest build = request.mutate()
                     .headers(headers -> headers.set(RequestConstant.Header.X_AUTH_USER, JsonUtil.toJsonString(userHeader)))
                     .build();

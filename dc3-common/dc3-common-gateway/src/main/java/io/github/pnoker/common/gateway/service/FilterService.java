@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.gateway.service;
 
-import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
-import io.github.pnoker.api.center.auth.GrpcRUserLoginDTO;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
@@ -28,11 +28,12 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
  * @since 2022.1.0
  */
 public interface FilterService {
-    GrpcRTenantDTO getTenantDTO(ServerHttpRequest request);
 
-    GrpcRUserLoginDTO getLoginDTO(ServerHttpRequest request);
+    FacadeTenantBO getTenant(ServerHttpRequest request);
 
-    RequestHeader.UserHeader getUserDTO(GrpcRUserLoginDTO rUserLoginDTO, GrpcRTenantDTO rTenantDTO);
+    FacadeUserLoginBO getUserLogin(ServerHttpRequest request);
 
-    void checkValid(ServerHttpRequest request, GrpcRTenantDTO rTenantDTO, GrpcRUserLoginDTO rUserLoginDTO);
+    RequestHeader.UserHeader getUser(FacadeUserLoginBO userLogin, FacadeTenantBO tenant);
+
+    void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeUserLoginBO userLogin);
 }

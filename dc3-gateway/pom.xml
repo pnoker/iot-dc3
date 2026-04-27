@@ -72,6 +72,10 @@
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-facade-grpc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-gateway</artifactId>
         </dependency>
 
