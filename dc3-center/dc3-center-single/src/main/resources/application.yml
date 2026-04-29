@@ -30,9 +30,6 @@ spring:
   profiles:
     active:
       - ${NODE_ENV:dev}
-  data:
-    redis:
-      database: 1
 
 data:
   point:
