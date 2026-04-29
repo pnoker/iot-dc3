@@ -43,8 +43,17 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class KeyLoader {
+    /**
+     * IPv4 address regex pattern, used to validate if a string is a legal IPv4 address.
+     */
     private static final Pattern IP_ADDR_PATTERN = Pattern.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+    /**
+     * PKCS12 keystore password, used to load/generate client certificate keystore.
+     */
     private static final char[] PASSWORD = "password".toCharArray();
+    /**
+     * Client certificate alias, used to read client private key and certificate from keystore.
+     */
     private static final String CLIENT_ALIAS = "client-ai";
     @Getter
     private X509Certificate clientCertificate;
