@@ -18,55 +18,33 @@
   <div>
     <base-card>
       <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
-        <el-tab-pane label="设备信息" name="detail">
+        <el-tab-pane :label="$t('device.detail.deviceInfo')" name="detail">
           <detail-card>
-            <ul>
-              <li>
-                <el-icon>
-                  <Management />
-                </el-icon>
-                设备名称: {{ reactiveData.data.deviceName }}
-              </li>
-              <li>
-                <el-icon>
-                  <List />
-                </el-icon>
-                关联模板: {{ profileLength }} 个
-              </li>
-              <li>
-                <el-icon>
-                  <CollectionTag />
-                </el-icon>
-                关联位号: {{ pointLength }} 个
-              </li>
-              <li>
-                <el-icon>
-                  <Promotion />
-                </el-icon>
-                所属驱动: {{ reactiveData.driver.driverName }}
-              </li>
-              <li>
-                <el-icon>
-                  <Edit />
-                </el-icon>
-                修改日期: {{ timestamp(reactiveData.data.createTime) }}
-              </li>
-              <li>
-                <el-icon>
-                  <Sunset />
-                </el-icon>
-                创建日期: {{ timestamp(reactiveData.data.createTime) }}
-              </li>
-            </ul>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item :label="$t('device.detail.deviceName')">{{
+                reactiveData.data.deviceName
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('device.detail.profileCount')">{{ profileLength }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('device.detail.pointCount')">{{ pointLength }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('device.detail.driverName')">{{
+                reactiveData.driver.driverName
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('common.operationTime')">{{
+                timestamp(reactiveData.data.createTime)
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('common.createTime')">{{
+                timestamp(reactiveData.data.createTime)
+              }}</el-descriptions-item>
+            </el-descriptions>
           </detail-card>
         </el-tab-pane>
-        <el-tab-pane label="关联模板" name="profile">
+        <el-tab-pane :label="$t('device.detail.relatedProfiles')" name="profile">
           <profile ref="profileViewRef" :device-id="reactiveData.id" :embedded="'device'"></profile>
         </el-tab-pane>
-        <el-tab-pane label="关联位号" name="point">
+        <el-tab-pane :label="$t('device.detail.relatedPoints')" name="point">
           <point ref="pointViewRef" :device-id="reactiveData.id" :embedded="'device'"></point>
         </el-tab-pane>
-        <el-tab-pane label="设备数据" name="pointValue">
+        <el-tab-pane :label="$t('device.detail.deviceData')" name="pointValue">
           <point-value ref="pointValueViewRef" :device-id="reactiveData.id" :embedded="'device'"></point-value>
         </el-tab-pane>
       </el-tabs>
@@ -76,7 +54,6 @@
 
 <script lang="ts" setup>
   import { computed, onMounted, reactive, ref } from 'vue';
-  import { CollectionTag, Edit, List, Management, Promotion, Sunset } from '@element-plus/icons-vue';
 
   import { useRoute } from 'vue-router';
   import router from '@/config/router';
@@ -93,7 +70,6 @@
   import { timestamp } from '@/utils/DateUtil';
 
   const route = useRoute();
-
   const profileViewRef: any = ref<InstanceType<typeof profile>>();
   const pointViewRef: any = ref<InstanceType<typeof point>>();
   const pointValueViewRef: any = ref<InstanceType<typeof pointValue>>();

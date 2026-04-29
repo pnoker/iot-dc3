@@ -24,12 +24,15 @@ import type { Dictionary, Order } from '@/config/entity';
 
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
 import { successMessage } from '@/utils/NotificationUtil';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'DeviceImportForm',
   components: { UploadFilled },
   emits: ['import-template', 'import-thing'],
   setup(_props, { emit }) {
+    const { t } = useI18n();
+
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
@@ -64,14 +67,14 @@ export default defineComponent({
       driverId: [
         {
           required: true,
-          message: '请选择所属驱动',
+          message: () => t('device.add.driverRequired'),
           trigger: 'change',
         },
       ],
       profileIds: [
         {
           required: true,
-          message: '请选择关联模板',
+          message: () => t('device.add.profileRequired'),
           trigger: 'change',
         },
       ],
@@ -155,7 +158,7 @@ export default defineComponent({
       form?.validate((valid) => {
         if (valid) {
           emit('import-template', reactiveData.formData, () => {
-            successMessage('模板生成成功, 正在导出!');
+            successMessage(t('device.import.templateSuccess'));
           });
         }
       });
@@ -167,7 +170,7 @@ export default defineComponent({
       emit('import-thing', formData, () => {
         cancel();
         reset();
-        successMessage('设备导入成功!');
+        successMessage(t('device.import.importSuccess'));
       });
       return Promise.resolve();
     };

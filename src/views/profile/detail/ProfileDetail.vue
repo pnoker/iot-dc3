@@ -18,51 +18,33 @@
   <div>
     <base-card>
       <el-tabs :model-value="String(reactiveData.active ?? 'detail')" @tab-click="changeActive">
-        <el-tab-pane label="模板信息" name="detail">
+        <el-tab-pane :label="$t('profile.detail.profileInfo')" name="detail">
           <detail-card>
-            <ul>
-              <li>
-                <el-icon>
-                  <List />
-                </el-icon>
-                模板名称: {{ reactiveData.data.profileName }}
-              </li>
-              <li>
-                <el-icon>
-                  <CollectionTag />
-                </el-icon>
-                关联位号: {{ pointLength }} 个
-              </li>
-              <li>
-                <el-icon>
-                  <Management />
-                </el-icon>
-                关联设备: {{ deviceLength }} 个
-              </li>
-              <li>
-                <el-icon>
-                  <Edit />
-                </el-icon>
-                修改日期: {{ timestamp(reactiveData.data.createTime) }}
-              </li>
-              <li>
-                <el-icon>
-                  <Sunset />
-                </el-icon>
-                创建日期: {{ timestamp(reactiveData.data.createTime) }}
-              </li>
-            </ul>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item :label="$t('profile.detail.profileName')">{{
+                reactiveData.data.profileName
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('profile.detail.pointCount')"
+                >{{ pointLength }} {{ $t('common.count', { count: '' }) }}</el-descriptions-item
+              >
+              <el-descriptions-item :label="$t('profile.detail.deviceCount')"
+                >{{ deviceLength }} {{ $t('common.count', { count: '' }) }}</el-descriptions-item
+              >
+              <el-descriptions-item :label="$t('common.operationTime')">{{
+                timestamp(reactiveData.data.createTime)
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('common.createTime')">{{
+                timestamp(reactiveData.data.createTime)
+              }}</el-descriptions-item>
+            </el-descriptions>
           </detail-card>
         </el-tab-pane>
-        <el-tab-pane label="关联位号" name="point">
+        <el-tab-pane :label="$t('profile.detail.relatedPoints')" name="point">
           <point ref="pointViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></point>
         </el-tab-pane>
-        <el-tab-pane label="关联设备" name="device">
+        <el-tab-pane :label="$t('profile.detail.relatedDevices')" name="device">
           <device ref="deviceViewRef" :embedded="'profile'" :profile-id="reactiveData.id"></device>
         </el-tab-pane>
-        <!-- <el-tab-pane label="模板模型" name="model">
-            <el-empty description="暂无模板模型数据!"></el-empty>
-        </el-tab-pane> -->
       </el-tabs>
     </base-card>
   </div>

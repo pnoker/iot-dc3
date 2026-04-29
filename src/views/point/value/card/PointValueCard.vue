@@ -28,20 +28,23 @@
           <div class="things-card-header-icon">
             <img :alt="data.pointName" :src="icon" />
           </div>
-          <div class="things-card-header-name nowrap-name" @click="copy(data.pointId, '位号值ID')">
+          <div
+            class="things-card-header-name nowrap-name"
+            @click="copy(data.pointId, $t('pointValue.card.pointValueId'))"
+          >
             {{ point.pointName }}
           </div>
-          <div class="things-card-header-status" title="读写标识">
-            <el-tag v-if="data.rwFlag === 'R'" effect="plain" type="warning">只读</el-tag>
-            <el-tag v-else-if="data.rwFlagrw === 'W'" effect="plain" type="info">只写</el-tag>
-            <el-tag v-else-if="data.rwFlag === 'RW'" effect="plain" type="success">读写</el-tag>
+          <div class="things-card-header-status" :title="$t('pointValue.card.rwType')">
+            <el-tag v-if="data.rwFlag === 'R'" effect="plain" type="warning">{{ $t('status.readOnly') }}</el-tag>
+            <el-tag v-else-if="data.rwFlagrw === 'W'" effect="plain" type="info">{{ $t('status.writeOnly') }}</el-tag>
+            <el-tag v-else-if="data.rwFlag === 'RW'" effect="plain" type="success">{{ $t('status.readWrite') }}</el-tag>
           </div>
         </div>
         <div class="things-card__body">
           <div class="things-card-body-content">
             <div class="things-card-body-content-column">
               <div class="things-card-body-content-value">
-                <span class="nowrap-item value" title="处理值, 点击复制" @click="copyValue(data)"
+                <span class="nowrap-item value" :title="$t('pointValue.card.processedValue')" @click="copyValue(data)"
                   >{{ data.calValue }} {{ unit }}</span
                 >
               </div>
@@ -50,31 +53,31 @@
                   <el-icon>
                     <Sunrise />
                   </el-icon>
-                  原始值: {{ data.rawValue }}
+                  {{ $t('pointValue.card.rawValue') }}: {{ data.rawValue }}
                 </li>
                 <li v-if="embedded == ''" class="nowrap-item value-point">
                   <el-icon>
                     <Management />
                   </el-icon>
-                  所属设备: {{ device.deviceName }}
+                  {{ $t('pointValue.card.device') }}: {{ device.deviceName }}
                 </li>
                 <li class="nowrap-item">
                   <el-icon>
                     <Timer />
                   </el-icon>
-                  数据延时: {{ data.interval }} ms
+                  {{ $t('pointValue.card.delay') }}: {{ data.interval }} ms
                 </li>
                 <li class="nowrap-item">
                   <el-icon>
                     <Edit />
                   </el-icon>
-                  采集日期: {{ timestamp(data.createTime) }}
+                  {{ $t('pointValue.card.collectTime') }}: {{ timestamp(data.createTime) }}
                 </li>
                 <li class="nowrap-item">
                   <el-icon>
                     <Sunset />
                   </el-icon>
-                  保存日期: {{ timestamp(data.createTime) }}
+                  {{ $t('pointValue.card.saveTime') }}: {{ timestamp(data.createTime) }}
                 </li>
               </ul>
             </div>
@@ -87,14 +90,14 @@
               :icon="CircleClose"
               icon-color="#f56c6c"
               placement="top"
-              title="是否确定删除该数据?该数据下的配置将会被全部删除, 且该操作不可恢复!"
+              :title="$t('pointValue.card.confirmDelete')"
             >
               <template #reference>
-                <el-button link type="primary">删除</el-button>
+                <el-button link type="primary">{{ $t('common.delete') }}</el-button>
               </template>
             </el-popconfirm>
-            <el-button link type="primary">编辑</el-button>
-            <el-button link type="primary">详情</el-button>
+            <el-button link type="primary">{{ $t('common.edit') }}</el-button>
+            <el-button link type="primary">{{ $t('common.detail') }}</el-button>
           </div>
         </div>
       </div>
@@ -105,12 +108,15 @@
 <script lang="ts" setup>
   import { onMounted, watch } from 'vue';
   import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue';
+  import { useI18n } from 'vue-i18n';
 
   import { Chart } from '@antv/g2';
 
   import { copy } from '@/utils/CommonUtil';
   import { timestamp } from '@/utils/DateUtil';
   import { getPointValueHistory } from '@/api/point';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     embedded: {
@@ -154,7 +160,7 @@
       calValue: data.calValue,
       rawValue: data.rawValue,
     };
-    copy(JSON.stringify(content, null, 2), '位号值');
+    copy(JSON.stringify(content, null, 2), t('pointValue.card.pointValueId'));
   };
 
   let tinyArea: Chart;

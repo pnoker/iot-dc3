@@ -18,40 +18,26 @@
   <div>
     <base-card>
       <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
-        <el-tab-pane label="位号信息" name="detail">
+        <el-tab-pane :label="$t('point.detail.pointInfo')" name="detail">
           <detail-card>
-            <ul>
-              <li>
-                <el-icon>
-                  <CollectionTag />
-                </el-icon>
-                位号名称:
-                {{ reactiveData.data.pointName }}
-              </li>
-              <li>
-                <el-icon>
-                  <Management />
-                </el-icon>
-                关联设备 [{{ reactiveData.listDeviceData.length || 0 }} 个]: {{ deviceName() }}
-              </li>
-              <li>
-                <el-icon>
-                  <Edit />
-                </el-icon>
-                修改日期:
-                {{ timestamp(reactiveData.data.createTime) }}
-              </li>
-              <li>
-                <el-icon>
-                  <Sunset />
-                </el-icon>
-                创建日期:
-                {{ timestamp(reactiveData.data.createTime) }}
-              </li>
-            </ul>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item :label="$t('point.detail.pointName')">{{
+                reactiveData.data.pointName
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('point.detail.relatedDeviceCount')">
+                {{ reactiveData.listDeviceData.length || 0 }} {{ $t('common.count', { count: '' }) }}:
+                {{ deviceName() }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('common.operationTime')">{{
+                timestamp(reactiveData.data.createTime)
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('common.createTime')">{{
+                timestamp(reactiveData.data.createTime)
+              }}</el-descriptions-item>
+            </el-descriptions>
           </detail-card>
         </el-tab-pane>
-        <el-tab-pane label="关联设备" name="device">
+        <el-tab-pane :label="$t('point.detail.relatedDevices')" name="device">
           <el-row>
             <el-col
               v-for="data in reactiveData.listDeviceData"

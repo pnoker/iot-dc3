@@ -14,6 +14,60 @@
  * limitations under the License.
  */
 
+.home-statistic {
+  margin-bottom: 5px;
+
+  :deep(.el-card__body) {
+    padding-bottom: 10px;
+  }
+
+  .statistic-card {
+    border-radius: 8px;
+
+    .statistic-card-inner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .statistic-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    :deep(.el-statistic__head) {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.65);
+    }
+  }
+
+  .statistic-device .statistic-icon {
+    background: rgba(64, 158, 255, 0.1);
+    color: #409eff;
+  }
+
+  .statistic-point .statistic-icon {
+    background: rgba(103, 194, 58, 0.1);
+    color: #67c23a;
+  }
+
+  .statistic-profile .statistic-icon {
+    background: rgba(230, 162, 60, 0.1);
+    color: #e6a23c;
+  }
+
+  .statistic-driver .statistic-icon {
+    background: rgba(144, 89, 246, 0.1);
+    color: #9059f6;
+  }
+}
+
 .home-app {
   margin-top: 1px;
   margin-bottom: 4px;

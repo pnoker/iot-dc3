@@ -23,18 +23,22 @@
     :show-close="false"
     class="things-dialog"
     draggable
-    title="新增设备"
+    :title="$t('device.add.title')"
   >
     <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-      <el-form-item class="things-dialog-form-item" label="设备名称" prop="deviceName">
-        <el-input v-model="reactiveData.formData.deviceName" clearable placeholder="请输入设备名称"></el-input>
+      <el-form-item class="things-dialog-form-item" :label="$t('device.add.deviceName')" prop="deviceName">
+        <el-input
+          v-model="reactiveData.formData.deviceName"
+          clearable
+          :placeholder="$t('device.add.deviceNamePlaceholder')"
+        ></el-input>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
+      <el-form-item class="things-dialog-form-item" :label="$t('device.add.driver')" prop="driverId">
         <el-select
           v-model="reactiveData.formData.driverId"
           class="edit-form-special"
           clearable
-          placeholder="请选择所属驱动"
+          :placeholder="$t('device.add.driverPlaceholder')"
           @visible-change="driverDictionaryVisible"
         >
           <div class="tool-select">
@@ -42,7 +46,7 @@
               <el-input
                 v-model="reactiveData.driverQuery"
                 clearable
-                placeholder="请选择所属驱动"
+                :placeholder="$t('device.add.driverPlaceholder')"
                 @input="driverDictionary"
               />
             </el-form-item>
@@ -66,13 +70,13 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="关联模板" prop="profileIds">
+      <el-form-item class="things-dialog-form-item" :label="$t('device.add.profiles')" prop="profileIds">
         <el-select
           v-model="reactiveData.formData.profileIds"
           :multiple="true"
           class="edit-form-special"
           clearable
-          placeholder="请选择关联模板"
+          :placeholder="$t('device.add.profilePlaceholder')"
           @visible-change="profileDictionaryVisible"
         >
           <div class="tool-select">
@@ -80,7 +84,7 @@
               <el-input
                 v-model="reactiveData.profileQuery"
                 clearable
-                placeholder="请选择关联模板"
+                :placeholder="$t('device.add.profilePlaceholder')"
                 @input="profileDictionary"
               />
             </el-form-item>
@@ -104,12 +108,12 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="描述" prop="remark">
+      <el-form-item class="things-dialog-form-item" :label="$t('device.add.description')" prop="remark">
         <el-input
           v-model="reactiveData.formData.remark"
           clearable
           maxlength="300"
-          placeholder="请输入设备描述"
+          :placeholder="$t('device.add.descriptionPlaceholder')"
           show-word-limit
           type="textarea"
         ></el-input>
@@ -117,9 +121,9 @@
     </el-form>
     <div class="things-dialog-footer">
       <slot name="footer">
-        <el-button @click="cancel">取消</el-button>
-        <el-button plain type="success" @click="reset">重置</el-button>
-        <el-button type="primary" @click="addThing">确定</el-button>
+        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
+        <el-button plain type="success" @click="reset">{{ $t('common.reset') }}</el-button>
+        <el-button type="primary" @click="addThing">{{ $t('common.confirm') }}</el-button>
       </slot>
     </div>
   </el-dialog>

@@ -23,18 +23,22 @@
     :show-close="false"
     class="things-dialog"
     draggable
-    title="新增模板"
+    :title="$t('profile.add.title')"
   >
     <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-      <el-form-item class="things-dialog-form-item" label="模板名称" prop="profileName">
-        <el-input v-model="reactiveData.formData.profileName" clearable placeholder="请输入模板名称"></el-input>
+      <el-form-item class="things-dialog-form-item" :label="$t('profile.add.profileName')" prop="profileName">
+        <el-input
+          v-model="reactiveData.formData.profileName"
+          clearable
+          :placeholder="$t('profile.add.profileNamePlaceholder')"
+        ></el-input>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="描述" prop="remark">
+      <el-form-item class="things-dialog-form-item" :label="$t('profile.add.description')" prop="remark">
         <el-input
           v-model="reactiveData.formData.remark"
           clearable
           maxlength="300"
-          placeholder="请输入模板描述"
+          :placeholder="$t('profile.add.descriptionPlaceholder')"
           show-word-limit
           type="textarea"
         ></el-input>
@@ -42,9 +46,9 @@
     </el-form>
     <div class="things-dialog-footer">
       <slot name="footer">
-        <el-button @click="cancel">取消</el-button>
-        <el-button plain type="success" @click="reset">重置</el-button>
-        <el-button type="primary" @click="addThing">确定</el-button>
+        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
+        <el-button plain type="success" @click="reset">{{ $t('common.reset') }}</el-button>
+        <el-button type="primary" @click="addThing">{{ $t('common.confirm') }}</el-button>
       </slot>
     </div>
   </el-dialog>

@@ -15,7 +15,6 @@
  */
 
 import { defineComponent, reactive } from 'vue';
-import { CollectionTag, Edit, Management, Sunset } from '@element-plus/icons-vue';
 
 import { useRoute } from 'vue-router';
 import router from '@/config/router';
@@ -37,10 +36,6 @@ export default defineComponent({
     detailCard,
     deviceCard,
     pointCard,
-    CollectionTag,
-    Edit,
-    Sunset,
-    Management,
   },
   setup() {
     const route = useRoute();

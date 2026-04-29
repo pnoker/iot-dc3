@@ -16,7 +16,7 @@
 
 <template>
   <div class="tool-card">
-    <el-card shadow="hover">
+    <el-card shadow="never">
       <div class="tool-card__container">
         <el-form
           ref="formDataRef"
@@ -26,53 +26,52 @@
           class="tool-card__body"
         >
           <div class="tool-card-body-form">
-            <el-form-item label="驱动名称" prop="name">
+            <el-form-item :label="$t('driver.tool.driverName')" prop="name">
               <el-input
                 v-model="reactiveData.formData.driverName"
                 class="edit-form-default"
                 clearable
-                placeholder="请输入驱动名称"
+                :placeholder="$t('driver.tool.driverNamePlaceholder')"
                 @keyup.enter="search"
               ></el-input>
             </el-form-item>
-            <el-form-item label="服务名称" prop="serviceName">
+            <el-form-item :label="$t('driver.tool.serviceName')" prop="serviceName">
               <el-input
                 v-model="reactiveData.formData.serviceName"
                 class="edit-form-default"
                 clearable
-                placeholder="请输入服务名称"
+                :placeholder="$t('driver.tool.serviceNamePlaceholder')"
                 @keyup.enter="search"
               ></el-input>
             </el-form-item>
-            <el-form-item label="主机" prop="host">
+            <el-form-item :label="$t('driver.tool.host')" prop="host">
               <el-input
                 v-model="reactiveData.formData.serviceHost"
                 class="edit-form-default"
                 clearable
-                placeholder="请输入主机"
+                :placeholder="$t('driver.tool.hostPlaceholder')"
                 @keyup.enter="search"
               ></el-input>
             </el-form-item>
-            <el-form-item label="使能" prop="enableFlag">
-              <el-select
+            <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+              <el-segmented
                 v-model="reactiveData.formData.enableFlag"
-                class="edit-form-small"
-                clearable
-                placeholder="请选择使能"
-              >
-                <el-option label="启用" value="ENABLE"></el-option>
-                <el-option label="停用" value="DISABLE"></el-option>
-              </el-select>
+                :options="[
+                  { label: $t('common.all'), value: '' },
+                  { label: $t('common.enable'), value: 'ENABLE' },
+                  { label: $t('common.disable'), value: 'DISABLE' },
+                ]"
+              />
             </el-form-item>
           </div>
           <el-form-item class="tool-card-body-button">
-            <el-button :icon="Search" type="primary" @click="search">搜索</el-button>
-            <el-button :icon="RefreshRight" @click="reset">重置</el-button>
+            <el-button :icon="Search" type="primary" @click="search">{{ $t('common.search') }}</el-button>
+            <el-button :icon="RefreshRight" @click="reset">{{ $t('common.reset') }}</el-button>
           </el-form-item>
         </el-form>
         <div class="tool-card__footer">
           <div class="tool-card-footer-button">
-            <el-button v-if="add" :icon="Plus" type="success">新增</el-button>
+            <el-button v-if="add" :icon="Plus" type="success">{{ $t('common.add') }}</el-button>
           </div>
           <div class="tool-card-footer-page">
             <el-pagination
@@ -86,10 +85,10 @@
               @current-change="currentChange"
             >
             </el-pagination>
-            <el-tooltip class="item" content="刷新" effect="dark" placement="top">
+            <el-tooltip class="item" :content="$t('common.refresh')" effect="dark" placement="top">
               <el-button :icon="Refresh" circle @click="refresh"></el-button>
             </el-tooltip>
-            <el-tooltip class="item" content="排序" effect="dark" placement="top">
+            <el-tooltip class="item" :content="$t('common.sort')" effect="dark" placement="top">
               <el-button :icon="Sort" circle @click="sort"></el-button>
             </el-tooltip>
           </div>

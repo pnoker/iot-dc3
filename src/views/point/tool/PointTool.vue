@@ -16,7 +16,7 @@
 
 <template>
   <div class="tool-card">
-    <el-card shadow="hover">
+    <el-card shadow="never">
       <el-form
         ref="formDataRef"
         :inline="true"
@@ -25,21 +25,25 @@
         class="tool-card__body"
       >
         <div class="tool-card-body-form">
-          <el-form-item label="位号名称" prop="pointName">
+          <el-form-item :label="$t('point.tool.pointName')" prop="pointName">
             <el-input
               v-model="reactiveData.formData.pointName"
               class="edit-form-default"
               clearable
-              placeholder="请输入位号名称"
+              :placeholder="$t('point.tool.pointNamePlaceholder')"
               @keyup.enter="search"
             ></el-input>
           </el-form-item>
-          <el-form-item v-if="embedded != 'profile' && embedded != 'edit'" label="所属模板" prop="profileId">
+          <el-form-item
+            v-if="embedded != 'profile' && embedded != 'edit'"
+            :label="$t('point.tool.profile')"
+            prop="profileId"
+          >
             <el-select
               v-model="reactiveData.formData.profileId"
               class="edit-form-special"
               clearable
-              placeholder="请选择所属模板"
+              :placeholder="$t('point.tool.profilePlaceholder')"
               @visible-change="profileDictionaryVisible"
             >
               <div class="tool-select">
@@ -47,7 +51,7 @@
                   <el-input
                     v-model="reactiveData.profileQuery"
                     clearable
-                    placeholder="请输入模板名称"
+                    :placeholder="$t('point.tool.pointNamePlaceholder')"
                     @input="profileDictionary"
                   />
                 </el-form-item>
@@ -72,29 +76,32 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="使能" prop="enableFlag">
-            <el-select
+          <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+            <el-segmented
               v-model="reactiveData.formData.enableFlag"
-              class="edit-form-small"
-              clearable
-              placeholder="请选择使能"
-            >
-              <el-option label="启用" value="ENABLE"></el-option>
-              <el-option label="停用" value="DISABLE"></el-option>
-            </el-select>
+              :options="[
+                { label: 'All', value: '' },
+                { label: 'Enable', value: 'ENABLE' },
+                { label: 'Disable', value: 'DISABLE' },
+              ]"
+            />
           </el-form-item>
         </div>
         <el-form-item class="tool-card-body-button">
-          <el-button v-if="pre" :icon="Back" plain type="success" @click="preHandle">上一步</el-button>
-          <el-button :icon="Search" type="primary" @click="search">搜索</el-button>
-          <el-button :icon="RefreshLeft" @click="reset">重置</el-button>
-          <el-button v-if="pre" :icon="Check" plain type="warning" @click="nextHandle">下一步</el-button>
+          <el-button v-if="pre" :icon="Back" plain type="success" @click="preHandle">{{
+            $t('common.previous')
+          }}</el-button>
+          <el-button :icon="Search" type="primary" @click="search">{{ $t('common.search') }}</el-button>
+          <el-button :icon="RefreshLeft" @click="reset">{{ $t('common.reset') }}</el-button>
+          <el-button v-if="pre" :icon="Check" plain type="warning" @click="nextHandle">{{
+            $t('common.next')
+          }}</el-button>
         </el-form-item>
       </el-form>
       <div class="tool-card__footer">
         <div class="tool-card-footer-button">
           <el-button v-if="embedded == '' || embedded == 'edit'" :icon="Plus" type="success" @click="showAdd">
-            新增
+            {{ $t('common.add') }}
           </el-button>
         </div>
         <div class="tool-card-footer-page">
@@ -109,10 +116,10 @@
             @current-change="currentChange"
           >
           </el-pagination>
-          <el-tooltip class="item" content="刷新" effect="dark" placement="top">
+          <el-tooltip class="item" :content="$t('common.refresh')" effect="dark" placement="top">
             <el-button :icon="Refresh" circle @click="refresh"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" content="排序" effect="dark" placement="top">
+          <el-tooltip class="item" :content="$t('common.sort')" effect="dark" placement="top">
             <el-button :icon="Sort" circle @click="sort"></el-button>
           </el-tooltip>
         </div>

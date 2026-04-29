@@ -26,6 +26,7 @@ import {
   SwitchButton,
   Top,
 } from '@element-plus/icons-vue';
+import { useI18n } from 'vue-i18n';
 
 import router from '@/config/router';
 
@@ -75,6 +76,8 @@ export default defineComponent({
   },
   emits: ['disable-thing', 'enable-thing', 'delete-thing'],
   setup(props, { emit }) {
+    const { t } = useI18n();
+
     // 图标
     const Icon = {
       SwitchButton,
@@ -85,35 +88,35 @@ export default defineComponent({
     const pointTypeFlag = computed(() => {
       const pointTypeFlag = props.data.pointTypeFlag;
       if (pointTypeFlag === 'STRING') {
-        return '字符串';
+        return t('dataType.string');
       } else if (pointTypeFlag === 'BYTE') {
-        return '字节';
+        return t('dataType.byte');
       } else if (pointTypeFlag === 'SHORT') {
-        return '短整数';
+        return t('dataType.short');
       } else if (pointTypeFlag === 'INT') {
-        return '整数';
+        return t('dataType.int');
       } else if (pointTypeFlag === 'LONG') {
-        return '长整数';
+        return t('dataType.long');
       } else if (pointTypeFlag === 'FLOAT') {
-        return '浮点数';
+        return t('dataType.float');
       } else if (pointTypeFlag === 'DOUBLE') {
-        return '双精度浮点数';
+        return t('dataType.double');
       } else if (pointTypeFlag === 'BOOLEAN') {
-        return '布尔量';
+        return t('dataType.boolean');
       }
-      return '未知';
+      return t('status.unknown');
     });
 
     const rwFlag = computed(() => {
       const rwFlag = props.data.rwFlag;
       if (rwFlag === 'R') {
-        return '只读';
+        return t('status.readOnly');
       } else if (rwFlag === 'W') {
-        return '只写';
+        return t('status.writeOnly');
       } else if (rwFlag === 'RW') {
-        return '读写';
+        return t('status.readWrite');
       }
-      return '未知';
+      return t('status.unknown');
     });
 
     const disableThing = () => {

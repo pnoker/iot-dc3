@@ -56,7 +56,7 @@ export default defineComponent({
     });
 
     const list = () => {
-      getDriverList({
+      const listPromise = getDriverList({
         page: reactiveData.page,
         ...reactiveData.query,
       })
@@ -67,12 +67,9 @@ export default defineComponent({
         })
         .catch(() => {
           // nothing to do
-        })
-        .finally(() => {
-          reactiveData.loading = false;
         });
 
-      getDriverStatus({
+      const statusPromise = getDriverStatus({
         page: reactiveData.page,
         ...reactiveData.query,
       })
@@ -82,6 +79,10 @@ export default defineComponent({
         .catch(() => {
           // nothing to do
         });
+
+      Promise.all([listPromise, statusPromise]).finally(() => {
+        reactiveData.loading = false;
+      });
     };
 
     const search = (params: any) => {

@@ -19,46 +19,46 @@
     <div class="edit-card-header">
       <el-card shadow="hover">
         <el-steps :active="reactiveData.active" align-center finish-status="success">
-          <el-step title="模板信息配置"></el-step>
-          <el-step title="模板位号配置"></el-step>
-          <el-step title="模板配置完成"></el-step>
+          <el-step :title="$t('profile.edit.profileConfig')"></el-step>
+          <el-step :title="$t('profile.edit.pointConfig')"></el-step>
+          <el-step :title="$t('profile.edit.complete')"></el-step>
         </el-steps>
       </el-card>
     </div>
 
     <div class="edit-card-body">
       <el-card v-if="reactiveData.active === 0" shadow="hover">
-        <el-divider content-position="left">模板信息配置</el-divider>
+        <el-divider content-position="left">{{ $t('profile.edit.profileConfig') }}</el-divider>
         <el-form ref="formDataRef" :inline="true" :model="reactiveData.profileFormData" :rules="formRule">
           <div class="edit-form-item">
-            <el-form-item class="edit-form-large" label="模板名称" prop="name">
+            <el-form-item class="edit-form-large" :label="$t('profile.edit.profileName')" prop="name">
               <el-input
                 v-model="reactiveData.profileFormData.profileName"
                 clearable
-                placeholder="请输入模板名称"
+                :placeholder="$t('profile.edit.profileNamePlaceholder')"
               ></el-input>
             </el-form-item>
           </div>
           <div class="edit-form-item">
-            <el-form-item class="edit-form-large" label="使能" prop="enableFlag">
+            <el-form-item class="edit-form-large" :label="$t('common.enableFlag')" prop="enableFlag">
               <el-select
                 v-model="reactiveData.profileFormData.enableFlag"
                 class="edit-form-large"
                 clearable
-                placeholder="请选择使能"
+                :placeholder="$t('common.enableFlag')"
               >
-                <el-option label="启用" value="ENABLE"></el-option>
-                <el-option label="停用" value="DISABLE"></el-option>
+                <el-option :label="$t('common.enable')" value="ENABLE"></el-option>
+                <el-option :label="$t('common.disable')" value="DISABLE"></el-option>
               </el-select>
             </el-form-item>
           </div>
           <div class="edit-form-item">
-            <el-form-item class="edit-form-large" label="模板描述" prop="remark">
+            <el-form-item class="edit-form-large" :label="$t('profile.edit.description')" prop="remark">
               <el-input
                 v-model="reactiveData.profileFormData.remark"
                 clearable
                 maxlength="300"
-                placeholder="请输入模板描述"
+                :placeholder="$t('profile.edit.descriptionPlaceholder')"
                 show-word-limit
                 type="textarea"
               >
@@ -66,14 +66,14 @@
             </el-form-item>
           </div>
           <el-form-item class="edit-form-button">
-            <el-button :icon="Back" plain type="success" @click="done">返回</el-button>
-            <el-button :icon="RefreshLeft" @click="profileReset">恢复</el-button>
-            <el-button :icon="Right" plain type="warning" @click="next">下一步</el-button>
+            <el-button :icon="Back" plain type="success" @click="done">{{ $t('common.return') }}</el-button>
+            <el-button :icon="RefreshLeft" @click="profileReset">{{ $t('common.restore') }}</el-button>
+            <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
           </el-form-item>
         </el-form>
       </el-card>
       <el-card v-if="reactiveData.active === 1" shadow="hover">
-        <el-divider content-position="left">模板位号配置</el-divider>
+        <el-divider content-position="left">{{ $t('profile.edit.pointConfig') }}</el-divider>
         <point
           :embedded="'edit'"
           :pre="true"
@@ -83,10 +83,14 @@
         ></point>
       </el-card>
       <el-card v-if="reactiveData.active === 2" shadow="hover">
-        <el-divider content-position="left">模板配置完成</el-divider>
-        <el-result icon="success" sub-title="您可以返回进行下一步操作" title="配置完成">
+        <el-divider content-position="left">{{ $t('profile.edit.complete') }}</el-divider>
+        <el-result
+          icon="success"
+          :sub-title="$t('profile.edit.completeSubTitle')"
+          :title="$t('profile.edit.completeTitle')"
+        >
           <template #extra>
-            <el-button plain type="primary" @click="done">返回</el-button>
+            <el-button plain type="primary" @click="done">{{ $t('common.return') }}</el-button>
           </template>
         </el-result>
       </el-card>

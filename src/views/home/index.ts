@@ -18,19 +18,39 @@ import { defineComponent, onMounted, reactive, ref } from 'vue';
 
 import { Chart } from '@antv/g2';
 
+import { getDeviceList } from '@/api/device';
+import { getPointList } from '@/api/point';
+import { getProfileList } from '@/api/profile';
+import { getDriverList } from '@/api/driver';
+
 import TitleCard from '@/components/card/title/TitleCard.vue';
+import BlankCard from '@/components/card/blank/BlankCard.vue';
 import ApplicationCard from '@/views/application/card/ApplicationCard.vue';
 import DashboardCard from '@/views/dashboard/card/DashboardCard.vue';
-import { ArrowRight, CaretBottom, CaretTop, Warning } from '@element-plus/icons-vue';
+import {
+  ArrowRight,
+  CaretBottom,
+  CaretTop,
+  CollectionTag,
+  List,
+  Management,
+  Promotion,
+  Warning,
+} from '@element-plus/icons-vue';
 
 export default defineComponent({
   components: {
     TitleCard,
+    BlankCard,
     ApplicationCard,
     DashboardCard,
     ArrowRight,
     CaretBottom,
     CaretTop,
+    CollectionTag,
+    List,
+    Management,
+    Promotion,
     Warning,
   },
   setup() {
@@ -38,6 +58,10 @@ export default defineComponent({
 
     // 定义响应式数据
     const reactiveData = reactive({
+      deviceCount: 0,
+      pointCount: 0,
+      profileCount: 0,
+      driverCount: 0,
       hours: [
         '08:00',
         '09:00',
@@ -64,7 +88,7 @@ export default defineComponent({
         '07:00',
         '08:00',
       ],
-      days: ['周一', '周二', '周三', '周四', '周五', '周六', '周天'],
+      days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       data: [
         [0, 0, 5],
         [0, 1, 1],
@@ -237,6 +261,32 @@ export default defineComponent({
       ],
     });
 
+    const loadStatistics = () => {
+      const emptyPage = { current: 1, size: 1 };
+      getDeviceList({ page: emptyPage })
+        .then((res) => {
+          reactiveData.deviceCount = res.data.total || 0;
+        })
+        .catch(() => {});
+      getPointList({ page: emptyPage })
+        .then((res) => {
+          reactiveData.pointCount = res.data.total || 0;
+        })
+        .catch(() => {});
+      getProfileList({ page: emptyPage })
+        .then((res) => {
+          reactiveData.profileCount = res.data.total || 0;
+        })
+        .catch(() => {});
+      getDriverList({ page: emptyPage })
+        .then((res) => {
+          reactiveData.driverCount = res.data.total || 0;
+        })
+        .catch(() => {});
+    };
+
+    loadStatistics();
+
     onMounted(() => {
       const el = countDataChartRef.value as HTMLElement | null;
       if (!el) return;
@@ -266,7 +316,7 @@ export default defineComponent({
         .axis({ x: { title: false }, y: { title: false } })
         .tooltip({
           title: (d: { hour: string; day: string }) => `${d.day} ${d.hour}`,
-          items: [{ field: 'count', name: '数据量' }],
+          items: [{ field: 'count', name: 'Data Volume' }],
         });
 
       chart.render();

@@ -21,11 +21,13 @@ import type { Dictionary, Order } from '@/config/entity';
 
 import { successMessage } from '@/utils/NotificationUtil';
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'DeviceAddForm',
   emits: ['add-thing'],
   setup(_props, { emit }) {
+    const { t } = useI18n();
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
@@ -56,31 +58,31 @@ export default defineComponent({
       deviceName: [
         {
           required: true,
-          message: '请输入设备名称',
+          message: () => t('device.add.nameRequired'),
           trigger: 'blur',
         },
         {
           min: 2,
           max: 32,
-          message: '请输入 2~32 位字长的设备名称',
+          message: () => t('device.add.nameLength'),
           trigger: 'blur',
         },
         {
-          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-          message: '请输入正确格式的设备名称',
+          pattern: /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥-_]*$/,
+          message: () => t('device.add.nameFormat'),
         },
       ],
       driverId: [
         {
           required: true,
-          message: '请选择所属驱动',
+          message: () => t('device.add.driverRequired'),
           trigger: 'change',
         },
       ],
       remark: [
         {
           max: 300,
-          message: '最多输入300个字符',
+          message: () => t('device.add.remarkLength'),
           trigger: 'blur',
         },
       ],

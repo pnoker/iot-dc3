@@ -16,6 +16,7 @@
 
 import { defineComponent, reactive, ref, unref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
+import { useI18n } from 'vue-i18n';
 
 import { successMessage } from '@/utils/NotificationUtil';
 
@@ -31,6 +32,8 @@ export default defineComponent({
   },
   emits: ['update-thing'],
   setup(props, { emit }) {
+    const { t } = useI18n();
+
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
@@ -46,14 +49,14 @@ export default defineComponent({
       value: [
         {
           required: true,
-          message: '请输入位号值',
+          message: t('pointValue.edit.valueRequired'),
           trigger: 'blur',
         },
       ],
       remark: [
         {
           max: 300,
-          message: '最多输入300个字符',
+          message: t('pointValue.edit.remarkLength'),
           trigger: 'blur',
         },
       ],

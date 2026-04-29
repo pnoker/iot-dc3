@@ -17,6 +17,7 @@
 import { defineComponent, reactive, ref, unref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
+import { useI18n } from 'vue-i18n';
 
 import router from '@/config/router';
 import { useRoute } from 'vue-router';
@@ -29,6 +30,7 @@ export default defineComponent({
   components: { pointList },
   setup() {
     const route = useRoute();
+    const { t } = useI18n();
 
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
@@ -54,31 +56,31 @@ export default defineComponent({
       pointName: [
         {
           required: true,
-          message: '请输入位号名称',
+          message: t('point.edit.nameRequired'),
           trigger: 'blur',
         },
         {
           min: 2,
           max: 32,
-          message: '请输入 2~32 位字长的位号名称',
+          message: t('point.edit.nameLength'),
           trigger: 'blur',
         },
         {
-          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-          message: '请输入正确格式的位号名称',
+          pattern: /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥-_]*$/,
+          message: t('point.edit.nameFormat'),
         },
       ],
       enable: [
         {
           required: true,
-          message: '请选择使能',
+          message: t('common.enableFlag'),
           trigger: 'change',
         },
       ],
       remark: [
         {
           max: 300,
-          message: '最多输入300个字符',
+          message: t('point.edit.remarkLength'),
           trigger: 'blur',
         },
       ],

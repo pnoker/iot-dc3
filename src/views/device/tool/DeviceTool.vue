@@ -16,7 +16,7 @@
 
 <template>
   <div class="tool-card">
-    <el-card shadow="hover">
+    <el-card shadow="never">
       <el-form
         ref="formDataRef"
         :inline="true"
@@ -25,23 +25,23 @@
         class="tool-card__body"
       >
         <div class="tool-card-body-form">
-          <el-form-item label="设备名称" prop="deviceName">
+          <el-form-item :label="$t('device.tool.deviceName')" prop="deviceName">
             <el-input
               v-model="reactiveData.formData.deviceName"
               class="edit-form-default"
               clearable
-              placeholder="请输入设备名称"
+              :placeholder="$t('device.tool.deviceNamePlaceholder')"
               @keyup.enter="search"
             />
           </el-form-item>
-          <el-form-item v-if="embedded != 'driver'" label="所属驱动" prop="driverId">
+          <el-form-item v-if="embedded != 'driver'" :label="$t('device.tool.driver')" prop="driverId">
             <el-select
               v-model="reactiveData.formData.driverId"
               :remote-method="driverDictionary"
               class="edit-form-special"
               clearable
               filterable
-              placeholder="请选择所属驱动"
+              :placeholder="$t('device.tool.driverPlaceholder')"
               remote
               @change="driverCurrentChange"
               @visible-change="driverDictionaryVisible"
@@ -67,27 +67,30 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="使能" prop="enableFlag">
-            <el-select
+          <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+            <el-segmented
               v-model="reactiveData.formData.enableFlag"
-              class="edit-form-small"
-              clearable
-              placeholder="请选择使能"
-            >
-              <el-option label="启用" value="ENABLE"></el-option>
-              <el-option label="停用" value="DISABLE"></el-option>
-            </el-select>
+              :options="[
+                { label: 'All', value: '' },
+                { label: 'Enable', value: 'ENABLE' },
+                { label: 'Disable', value: 'DISABLE' },
+              ]"
+            />
           </el-form-item>
         </div>
         <el-form-item class="tool-card-body-button">
-          <el-button :icon="Search" type="primary" @click="search">搜索</el-button>
-          <el-button :icon="RefreshRight" @click="reset">重置</el-button>
+          <el-button :icon="Search" type="primary" @click="search">{{ $t('common.search') }}</el-button>
+          <el-button :icon="RefreshRight" @click="reset">{{ $t('common.reset') }}</el-button>
         </el-form-item>
       </el-form>
       <div class="tool-card__footer">
         <div class="tool-card-footer-button">
-          <el-button v-if="embedded == ''" :icon="Plus" type="success" @click="showAdd">新增</el-button>
-          <el-button v-if="embedded == ''" :icon="Upload" type="primary" @click="showImport">导入</el-button>
+          <el-button v-if="embedded == ''" :icon="Plus" type="success" @click="showAdd">{{
+            $t('common.add')
+          }}</el-button>
+          <el-button v-if="embedded == ''" :icon="Upload" type="primary" @click="showImport">{{
+            $t('common.import')
+          }}</el-button>
         </div>
         <div class="tool-card-footer-page">
           <el-pagination
@@ -100,10 +103,10 @@
             @size-change="sizeChange"
             @current-change="currentChange"
           ></el-pagination>
-          <el-tooltip class="item" content="刷新" effect="dark" placement="top">
+          <el-tooltip class="item" :content="$t('common.refresh')" effect="dark" placement="top">
             <el-button :icon="Refresh" circle @click="refresh"></el-button>
           </el-tooltip>
-          <el-tooltip class="item" content="排序" effect="dark" placement="top">
+          <el-tooltip class="item" :content="$t('common.sort')" effect="dark" placement="top">
             <el-button :icon="Sort" circle @click="sort"></el-button>
           </el-tooltip>
         </div>

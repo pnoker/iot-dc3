@@ -38,7 +38,7 @@
           <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
         </el-col>
         <el-col v-if="hasData">
-          <el-empty description="暂无位号数据!"></el-empty>
+          <el-empty :description="$t('point.empty')"></el-empty>
         </el-col>
         <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
           <point-card

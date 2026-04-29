@@ -23,18 +23,22 @@
     :show-close="false"
     class="things-dialog"
     draggable
-    title="编辑位号值"
+    :title="$t('pointValue.edit.title')"
   >
     <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-      <el-form-item class="things-dialog-form-item" label="位号值" prop="value">
-        <el-input v-model="formData.value" clearable placeholder="请输入位号值"></el-input>
+      <el-form-item class="things-dialog-form-item" :label="$t('pointValue.edit.pointValue')" prop="value">
+        <el-input
+          v-model="formData.value"
+          clearable
+          :placeholder="$t('pointValue.edit.pointValuePlaceholder')"
+        ></el-input>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="操作描述" prop="remark">
+      <el-form-item class="things-dialog-form-item" :label="$t('pointValue.edit.description')" prop="remark">
         <el-input
           v-model="reactiveData.remark"
           clearable
           maxlength="300"
-          placeholder="请输入本次操作描述"
+          :placeholder="$t('pointValue.edit.descriptionPlaceholder')"
           show-word-limit
           type="textarea"
         ></el-input>
@@ -42,9 +46,9 @@
     </el-form>
     <div class="things-dialog-footer">
       <slot name="footer">
-        <el-button @click="cancel">取消</el-button>
-        <el-button plain type="success" @click="reset">重置</el-button>
-        <el-button type="primary" @click="updateThing">确定</el-button>
+        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
+        <el-button plain type="success" @click="reset">{{ $t('common.reset') }}</el-button>
+        <el-button type="primary" @click="updateThing">{{ $t('common.confirm') }}</el-button>
       </slot>
     </div>
   </el-dialog>

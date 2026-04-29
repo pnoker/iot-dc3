@@ -15,7 +15,6 @@
  */
 
 import { computed, defineComponent, reactive, ref } from 'vue';
-import { CollectionTag, Edit, List, Management, Sunset } from '@element-plus/icons-vue';
 
 import router from '@/config/router';
 import { useRoute } from 'vue-router';
@@ -41,11 +40,6 @@ export default defineComponent({
     device,
     pointCard,
     point,
-    List,
-    CollectionTag,
-    Management,
-    Edit,
-    Sunset,
   },
   setup() {
     const route = useRoute();

@@ -28,13 +28,15 @@
 
     <blank-card>
       <el-row>
-        <el-col v-for="data in 12" :key="data" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
+        <el-col v-for="data in 12" :key="data" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
           <skeleton-card :footer="true" :loading="reactiveData.loading"></skeleton-card>
         </el-col>
         <el-col v-if="hasData">
-          <el-empty :description="embedded == 'device' ? '暂无设备数据' : '暂无数据, 请选择设备和位号!'"></el-empty>
+          <el-empty
+            :description="embedded == 'device' ? $t('pointValue.empty.noDevice') : $t('pointValue.empty.noData')"
+          ></el-empty>
         </el-col>
-        <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
+        <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
           <point-value-card
             :data="data"
             :device="reactiveData.deviceTable[data.deviceId]"
@@ -50,7 +52,6 @@
 
 <script lang="ts" setup>
   import { computed, onMounted, reactive } from 'vue';
-
   import { getPointByIds, getPointUnit, getPointValueLatest, getPointValueList } from '@/api/point';
   import { getDeviceByIds } from '@/api/device';
 

@@ -18,70 +18,33 @@
   <div>
     <base-card>
       <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
-        <el-tab-pane label="驱动信息" name="detail">
+        <el-tab-pane :label="$t('driver.detail.driverInfo')" name="detail">
           <detail-card>
-            <ul>
-              <li>
-                <el-icon>
-                  <Position />
-                </el-icon>
-                驱动名称: {{ reactiveData.data.driverName }}
-              </li>
-              <li>
-                <el-icon>
-                  <Management />
-                </el-icon>
-                关联设备: {{ deviceLength }} 个
-              </li>
-              <li class="nowrap-item">
-                <el-icon>
-                  <Monitor />
-                </el-icon>
-                主机: {{ reactiveData.data.serviceHost }}
-              </li>
-              <li class="nowrap-item">
-                <el-icon>
-                  <Promotion />
-                </el-icon>
-                驱动服务: {{ reactiveData.data.serviceName }}
-              </li>
-              <li>
-                <el-icon>
-                  <Edit />
-                </el-icon>
-                修改日期: {{ timestamp(reactiveData.data.createTime) }}
-              </li>
-              <li>
-                <el-icon>
-                  <Sunset />
-                </el-icon>
-                创建日期: {{ timestamp(reactiveData.data.createTime) }}
-              </li>
-            </ul>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item :label="$t('driver.detail.driverName')">{{
+                reactiveData.data.driverName
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('driver.detail.relatedDeviceCount')">{{
+                deviceLength
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('driver.card.host')">{{
+                reactiveData.data.serviceHost
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('driver.card.driverService')">{{
+                reactiveData.data.serviceName
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('common.operationTime')">{{
+                timestamp(reactiveData.data.createTime)
+              }}</el-descriptions-item>
+              <el-descriptions-item :label="$t('common.createTime')">{{
+                timestamp(reactiveData.data.createTime)
+              }}</el-descriptions-item>
+            </el-descriptions>
           </detail-card>
         </el-tab-pane>
-        <el-tab-pane label="关联设备" name="device">
+        <el-tab-pane :label="$t('driver.detail.relatedDevices')" name="device">
           <device ref="deviceViewRef" :driver-id="reactiveData.id" :embedded="'driver'"></device>
         </el-tab-pane>
-        <!-- <el-tab-pane label="驱动模型" name="model">
-            <el-empty description="暂无驱动模型数据!"></el-empty>
-        </el-tab-pane>
-        <el-tab-pane label="驱动事件" name="event">
-            <el-timeline>
-                <el-timeline-item timestamp="2021/7/30" placement="top">
-                    <el-card>
-                        <h4>驱动上线</h4>
-                        <p>该驱动于 2021/7/30 20:46 上线</p>
-                    </el-card>
-                </el-timeline-item>
-                <el-timeline-item timestamp="2021/7/30" placement="top">
-                    <el-card>
-                        <h4>驱动注册</h4>
-                        <p>该驱动于 2021/7/30 20:46 注册成功</p>
-                    </el-card>
-                </el-timeline-item>
-            </el-timeline>
-        </el-tab-pane> -->
       </el-tabs>
     </base-card>
   </div>

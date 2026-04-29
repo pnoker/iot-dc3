@@ -28,16 +28,18 @@
           <div class="things-card-header-icon">
             <img :alt="data.driverName" :src="icon" />
           </div>
-          <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '驱动ID')">
+          <div class="things-card-header-name nowrap-name" @click="copyId(data.id, 'Driver ID')">
             {{ data.driverName }}
           </div>
-          <div class="things-card-header-status" title="状态">
-            <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">在线</el-tag>
-            <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">维护</el-tag>
-            <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">故障</el-tag>
-            <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">停用</el-tag>
-            <el-tag v-else-if="status === 'REGISTERING'" effect="plain" type="info">注册中</el-tag>
-            <el-tag v-else effect="plain" type="info">离线</el-tag>
+          <div class="things-card-header-status" title="Status">
+            <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
+            <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">{{ $t('status.maintain') }}</el-tag>
+            <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">{{ $t('status.fault') }}</el-tag>
+            <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">{{ $t('status.disable') }}</el-tag>
+            <el-tag v-else-if="status === 'REGISTERING'" effect="plain" type="info">{{
+              $t('status.registering')
+            }}</el-tag>
+            <el-tag v-else effect="plain" type="info">{{ $t('status.offline') }}</el-tag>
           </div>
         </div>
         <div class="things-card__body">
@@ -47,37 +49,37 @@
                 <el-icon>
                   <Monitor />
                 </el-icon>
-                主机: {{ data.serviceHost }}
+                {{ $t('driver.card.host') }}: {{ data.serviceHost }}
               </li>
               <li class="nowrap-item">
                 <el-icon>
                   <Promotion />
                 </el-icon>
-                驱动服务: {{ data.serviceName }}
+                {{ $t('driver.card.driverService') }}: {{ data.serviceName }}
               </li>
               <li class="nowrap-item">
                 <el-icon>
                   <Edit />
                 </el-icon>
-                修改日期: {{ timestamp(data.operateTime) }}
+                {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime) }}
               </li>
               <li class="nowrap-item">
                 <el-icon>
                   <Sunset />
                 </el-icon>
-                创建日期: {{ timestamp(data.createTime) }}
+                {{ $t('common.createTime') }}: {{ timestamp(data.createTime) }}
               </li>
             </ul>
           </div>
-          <div :title="data.remark ? data.remark : '驱动描述信息'" class="things-card-body-content">
+          <div :title="data.remark ? data.remark : $t('driver.card.remarkTitle')" class="things-card-body-content">
             <p class="nowrap-description">
-              {{ data.remark ? data.remark : '无描述信息' }}
+              {{ data.remark ? data.remark : $t('common.noDescription') }}
             </p>
           </div>
         </div>
         <div v-if="!footer" class="things-card__footer">
           <div class="things-card-footer-operation">
-            <el-button link type="primary" @click="detail">详情</el-button>
+            <el-button link type="primary" @click="detail">{{ $t('common.detail') }}</el-button>
           </div>
         </div>
       </div>

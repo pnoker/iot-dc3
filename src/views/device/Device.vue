@@ -33,9 +33,9 @@
       <el-row>
         <skeleton-card :footer="true" :loading="reactiveData.loading">
           <el-col v-if="hasData">
-            <el-empty description="暂无设备数据!" />
+            <el-empty :description="$t('device.empty')" />
           </el-col>
-          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
+          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="8" :md="12" :sm="12" :xl="6" :xs="24">
             <device-card
               :data="data"
               :driver="reactiveData.driverTable[data.driverId]"
@@ -53,7 +53,7 @@
                                 <skeleton-card :footer="true" :loading="reactiveData.loading" />
                             </el-col>
                             <el-col v-if="hasData">
-                                <el-empty description="暂无设备数据!" />
+                                <el-empty :description="$t('device.empty')" />
                             </el-col>
                             <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
                                 <device-card

@@ -28,15 +28,15 @@
           <div class="things-card-header-icon">
             <img :alt="data.deviceName" :src="icon" />
           </div>
-          <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '设备ID')">
+          <div class="things-card-header-name nowrap-name" @click="copyId(data.id, 'Device ID')">
             {{ data.deviceName }}
           </div>
-          <div class="things-card-header-status" title="状态">
-            <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">在线</el-tag>
-            <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">维护</el-tag>
-            <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">故障</el-tag>
-            <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">停用</el-tag>
-            <el-tag v-else effect="plain" type="info">离线</el-tag>
+          <div class="things-card-header-status" :title="$t('common.enableFlag')">
+            <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
+            <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">{{ $t('status.maintain') }}</el-tag>
+            <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">{{ $t('status.fault') }}</el-tag>
+            <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">{{ $t('status.disable') }}</el-tag>
+            <el-tag v-else effect="plain" type="info">{{ $t('status.offline') }}</el-tag>
           </div>
         </div>
         <div class="things-card__body">
@@ -46,25 +46,25 @@
                 <el-icon>
                   <Promotion />
                 </el-icon>
-                所属驱动: {{ driver.driverName }}
+                {{ $t('device.card.driver') }}: {{ driver.driverName }}
               </li>
               <li class="nowrap-item">
                 <el-icon>
                   <Edit />
                 </el-icon>
-                修改日期: {{ timestamp(data.operateTime) }}
+                {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime) }}
               </li>
               <li class="nowrap-item">
                 <el-icon>
                   <Sunset />
                 </el-icon>
-                创建日期: {{ timestamp(data.createTime) }}
+                {{ $t('common.createTime') }}: {{ timestamp(data.createTime) }}
               </li>
             </ul>
           </div>
-          <div class="things-card-body-content" title="设备描述信息">
+          <div class="things-card-body-content" :title="$t('device.card.remarkTitle')">
             <p class="nowrap-description">
-              {{ data.remark ? data.remark : '无描述信息' }}
+              {{ data.remark ? data.remark : $t('common.noDescription') }}
             </p>
           </div>
         </div>
@@ -74,37 +74,41 @@
               :icon="SwitchButton"
               icon-color="#e6a23c"
               placement="top"
-              title="是否确定停用该设备?"
+              :title="$t('device.card.confirmDisable')"
               @confirm="disableThing"
             >
               <template #reference>
-                <el-button :disabled="'ENABLE' !== data.enableFlag" link type="primary">停用</el-button>
+                <el-button :disabled="'ENABLE' !== data.enableFlag" link type="primary">{{
+                  $t('common.disable')
+                }}</el-button>
               </template>
             </el-popconfirm>
             <el-popconfirm
               :icon="CircleCheck"
               icon-color="#67c23a"
               placement="top"
-              title="是否确定启用该设备?"
+              :title="$t('device.card.confirmEnable')"
               @confirm="enableThing"
             >
               <template #reference>
-                <el-button :disabled="'ENABLE' === data.enableFlag" link type="primary">启用</el-button>
+                <el-button :disabled="'ENABLE' === data.enableFlag" link type="primary">{{
+                  $t('common.enable')
+                }}</el-button>
               </template>
             </el-popconfirm>
             <el-popconfirm
               :icon="CircleClose"
               icon-color="#f56c6c"
               placement="top"
-              title="是否确定删除该设备?该设备下的配置将会被全部删除, 且该操作不可恢复!"
+              :title="$t('device.card.confirmDelete')"
               @confirm="deleteThing"
             >
               <template #reference>
-                <el-button link type="primary">删除</el-button>
+                <el-button link type="primary">{{ $t('common.delete') }}</el-button>
               </template>
             </el-popconfirm>
-            <el-button link type="primary" @click="edit">编辑</el-button>
-            <el-button link type="primary" @click="detail">详情</el-button>
+            <el-button link type="primary" @click="edit">{{ $t('common.edit') }}</el-button>
+            <el-button link type="primary" @click="detail">{{ $t('common.detail') }}</el-button>
           </div>
         </div>
       </div>

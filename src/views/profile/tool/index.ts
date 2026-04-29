@@ -17,6 +17,7 @@
 import { defineComponent, reactive, ref, unref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'ProfileTool',
@@ -36,6 +37,8 @@ export default defineComponent({
   },
   emits: ['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change'],
   setup(_props, { emit }) {
+    const { t } = useI18n();
+
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
@@ -55,7 +58,7 @@ export default defineComponent({
 
     // 定义表单校验规则
     const formRule = reactive<FormRules>({
-      port: [{ type: 'number', message: '端口必须为数字值' }],
+      port: [{ type: 'number', message: t('common.name') }],
     });
 
     const search = () => {

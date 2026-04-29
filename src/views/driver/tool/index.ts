@@ -34,20 +34,16 @@ export default defineComponent({
   },
   emits: ['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change'],
   setup(_props, { emit }) {
-    // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
-    // 定义响应式数据
     const reactiveData = reactive({
       formData: {} as any,
     });
 
-    // 定义表单校验规则
     const formRule = reactive<FormRules>({
-      port: [{ type: 'number', message: '端口必须为数字值' }],
+      port: [{ type: 'number', message: 'Port must be a number' }],
     });
 
-    // 图标
     const Icon = {
       Plus,
       Search,

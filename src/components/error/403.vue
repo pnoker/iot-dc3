@@ -16,19 +16,27 @@
 
 <template>
   <div class="error">
-    <div class="img" style="background-image: url('/images/error/error.svg')"></div>
-    <div class="content">
-      <h1>403</h1>
-      <div class="desc">抱歉, 你无权访问该页面</div>
-      <div class="actions">
+    <el-result icon="warning" :sub-title="t('error.forbidden')" title="403">
+      <template #extra>
         <router-link :to="{ path: '/' }">
-          <el-button plain type="primary">返回首页</el-button>
+          <el-button plain type="primary">{{ t('error.backHome') }}</el-button>
         </router-link>
-      </div>
-    </div>
+      </template>
+    </el-result>
   </div>
 </template>
 
+<script lang="ts" setup>
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
+</script>
+
 <style lang="scss" scoped>
-  @use 'style.scss';
+  .error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
 </style>

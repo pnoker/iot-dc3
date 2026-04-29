@@ -25,14 +25,14 @@
     <div class="login-wrapper-right animated bounce-in-down">
       <div class="login-right">
         <div class="login-main">
-          <h4 class="login-title">IoT DC3 平台</h4>
+          <h4 class="login-title">{{ t('login.title') }}</h4>
           <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" class="login-form" status-icon>
             <el-form-item prop="tenant">
               <el-input
                 v-model="reactiveData.formData.tenant"
                 :prefix-icon="Box"
                 auto-complete="off"
-                placeholder="请输入租户名"
+                :placeholder="t('login.tenantPlaceholder')"
                 @keyup.enter="handleLogin"
               >
               </el-input>
@@ -42,7 +42,7 @@
                 v-model="reactiveData.formData.name"
                 :prefix-icon="User"
                 auto-complete="off"
-                placeholder="请输入用户名"
+                :placeholder="t('login.usernamePlaceholder')"
                 @keyup.enter="handleLogin"
               ></el-input>
             </el-form-item>
@@ -52,7 +52,7 @@
                 :prefix-icon="Lock"
                 :type="reactiveData.passwordType"
                 auto-complete="off"
-                placeholder="请输入密码"
+                :placeholder="t('login.passwordPlaceholder')"
                 @keyup.enter="handleLogin"
               >
                 <template #append>
@@ -61,7 +61,9 @@
               </el-input>
             </el-form-item>
             <el-form-item>
-              <el-button class="login-submit" type="primary" @click.prevent="handleLogin">登录</el-button>
+              <el-button class="login-submit" type="primary" @click.prevent="handleLogin">{{
+                t('login.submit')
+              }}</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -74,11 +76,13 @@
   import { reactive, ref, unref } from 'vue';
   import type { FormInstance, FormRules } from 'element-plus';
   import { Box, Lock, User } from '@element-plus/icons-vue';
+  import { useI18n } from 'vue-i18n';
 
   import { useAuthStore } from '@/store';
 
   import Particles from '@/components/particles/particles.vue';
 
+  const { t } = useI18n();
   const authStore = useAuthStore();
   // 定义表单引用
   const formDataRef = ref<FormInstance>();
@@ -98,11 +102,11 @@
 
   // 定义表单校验规则
   const formRule = reactive<FormRules>({
-    tenant: [{ required: true, message: '请输入租户名', trigger: 'blur' }],
-    name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+    tenant: [{ required: true, message: t('login.tenantRequired'), trigger: 'blur' }],
+    name: [{ required: true, message: t('login.usernameRequired'), trigger: 'blur' }],
     password: [
-      { required: true, message: '请输入密码', trigger: 'blur' },
-      { min: 6, message: '密码长度最少为6位', trigger: 'blur' },
+      { required: true, message: t('login.passwordRequired'), trigger: 'blur' },
+      { min: 6, message: t('login.passwordMin'), trigger: 'blur' },
     ],
   });
 

@@ -16,6 +16,7 @@
 
 import { defineComponent, reactive, ref, unref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
+import { useI18n } from 'vue-i18n';
 
 import { successMessage } from '@/utils/NotificationUtil';
 
@@ -23,6 +24,8 @@ export default defineComponent({
   name: 'ProfileAddForm',
   emits: ['add-thing'],
   setup(_props, { emit }) {
+    const { t } = useI18n();
+
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
@@ -31,24 +34,24 @@ export default defineComponent({
       profileName: [
         {
           required: true,
-          message: '请输入模板名称',
+          message: t('profile.add.nameRequired'),
           trigger: 'blur',
         },
         {
           min: 2,
           max: 32,
-          message: '请输入 2~32 位字长的模板名称',
+          message: t('profile.add.nameLength'),
           trigger: 'blur',
         },
         {
           pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-          message: '请输入正确格式的模板名称',
+          message: t('profile.add.nameFormat'),
         },
       ],
       remark: [
         {
           max: 300,
-          message: '最多输入300个字符',
+          message: t('profile.add.remarkLength'),
           trigger: 'blur',
         },
       ],

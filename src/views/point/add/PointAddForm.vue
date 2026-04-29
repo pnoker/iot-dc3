@@ -23,49 +23,73 @@
     :show-close="false"
     class="things-dialog"
     draggable
-    title="新增位号"
+    :title="$t('point.add.title')"
   >
     <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-      <el-form-item class="things-dialog-form-item" label="位号名称" prop="pointName">
-        <el-input v-model="reactiveData.formData.pointName" clearable placeholder="请输入位号名称"></el-input>
+      <el-form-item class="things-dialog-form-item" :label="$t('point.add.pointName')" prop="pointName">
+        <el-input
+          v-model="reactiveData.formData.pointName"
+          clearable
+          :placeholder="$t('point.add.pointNamePlaceholder')"
+        ></el-input>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="数据类型" prop="pointTypeFlag">
-        <el-select v-model="reactiveData.formData.pointTypeFlag" clearable placeholder="请选择数据类型">
-          <el-option label="字符串(string)" value="STRING"></el-option>
-          <el-option label="字节(byte)" value="BYTE"></el-option>
-          <el-option label="短整数(short)" value="SHORT"></el-option>
-          <el-option label="整数(int)" value="INT"></el-option>
-          <el-option label="长整数(long)" value="LONG"></el-option>
-          <el-option label="浮点数(float)" value="FLOAT"></el-option>
-          <el-option label="双精度浮点数(double)" value="DOUBLE"></el-option>
-          <el-option label="布尔量(boolean)" value="BOOLEAN"></el-option>
+      <el-form-item class="things-dialog-form-item" :label="$t('point.add.dataType')" prop="pointTypeFlag">
+        <el-select
+          v-model="reactiveData.formData.pointTypeFlag"
+          clearable
+          :placeholder="$t('point.add.dataTypeRequired')"
+        >
+          <el-option :label="$t('dataType.string')" value="STRING"></el-option>
+          <el-option :label="$t('dataType.byte')" value="BYTE"></el-option>
+          <el-option :label="$t('dataType.short')" value="SHORT"></el-option>
+          <el-option :label="$t('dataType.int')" value="INT"></el-option>
+          <el-option :label="$t('dataType.long')" value="LONG"></el-option>
+          <el-option :label="$t('dataType.float')" value="FLOAT"></el-option>
+          <el-option :label="$t('dataType.double')" value="DOUBLE"></el-option>
+          <el-option :label="$t('dataType.boolean')" value="BOOLEAN"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="读写标识" prop="rwFlag">
-        <el-select v-model="reactiveData.formData.rwFlag" clearable placeholder="请选择读写标识">
-          <el-option label="只读" value="R"></el-option>
-          <el-option label="只写" value="W"></el-option>
-          <el-option label="读写" value="RW"></el-option>
+      <el-form-item class="things-dialog-form-item" :label="$t('point.add.rwType')" prop="rwFlag">
+        <el-select v-model="reactiveData.formData.rwFlag" clearable :placeholder="$t('point.add.rwTypeRequired')">
+          <el-option :label="$t('status.readOnly')" value="R"></el-option>
+          <el-option :label="$t('status.writeOnly')" value="W"></el-option>
+          <el-option :label="$t('status.readWrite')" value="RW"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="数据精度" prop="valueDecimal">
-        <el-input v-model="reactiveData.formData.valueDecimal" clearable placeholder="请输入数据精度"></el-input>
+      <el-form-item class="things-dialog-form-item" :label="$t('point.add.accuracy')" prop="valueDecimal">
+        <el-input
+          v-model="reactiveData.formData.valueDecimal"
+          clearable
+          :placeholder="$t('point.add.accuracyPlaceholder')"
+        ></el-input>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="单位" prop="unit">
-        <el-input v-model="reactiveData.formData.unit" clearable placeholder="请输入单位"></el-input>
+      <el-form-item class="things-dialog-form-item" :label="$t('point.add.unit')" prop="unit">
+        <el-input
+          v-model="reactiveData.formData.unit"
+          clearable
+          :placeholder="$t('point.add.unitPlaceholder')"
+        ></el-input>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="基础值" prop="baseValue">
-        <el-input v-model="reactiveData.formData.baseValue" clearable placeholder="请输入基础值"></el-input>
+      <el-form-item class="things-dialog-form-item" :label="$t('point.add.baseValue')" prop="baseValue">
+        <el-input
+          v-model="reactiveData.formData.baseValue"
+          clearable
+          :placeholder="$t('point.add.baseValuePlaceholder')"
+        ></el-input>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="比例系数" prop="multiple">
-        <el-input v-model="reactiveData.formData.multiple" clearable placeholder="请输入比例系数"></el-input>
+      <el-form-item class="things-dialog-form-item" :label="$t('point.add.ratio')" prop="multiple">
+        <el-input
+          v-model="reactiveData.formData.multiple"
+          clearable
+          :placeholder="$t('point.add.ratioPlaceholder')"
+        ></el-input>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="描述" prop="remark">
+      <el-form-item class="things-dialog-form-item" :label="$t('point.add.description')" prop="remark">
         <el-input
           v-model="reactiveData.formData.remark"
           clearable
           maxlength="300"
-          placeholder="请输入位号描述"
+          :placeholder="$t('point.add.descriptionPlaceholder')"
           show-word-limit
           type="textarea"
         ></el-input>
@@ -73,9 +97,9 @@
     </el-form>
     <div class="things-dialog-footer">
       <slot name="footer">
-        <el-button @click="cancel">取消</el-button>
-        <el-button plain type="success" @click="reset">重置</el-button>
-        <el-button type="primary" @click="addThing">确定</el-button>
+        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
+        <el-button plain type="success" @click="reset">{{ $t('common.reset') }}</el-button>
+        <el-button type="primary" @click="addThing">{{ $t('common.confirm') }}</el-button>
       </slot>
     </div>
   </el-dialog>

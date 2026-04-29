@@ -24,19 +24,19 @@
     :show-close="false"
     class="things-dialog"
     draggable
-    title="导入设备"
+    :title="$t('device.import.title')"
   >
     <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
       <el-alert :closable="false" class="things-dialog-form-alert" show-icon type="warning">
-        <p>提示：建议每次导入前下载新模板, 避免模板配置数据不一致。</p>
-        <p>方法：先选择驱动和模板, 然后点击生成导入模板, 再将待导入的设备数据填写到导入模板, 最后上传导入数据。</p>
+        <p>{{ $t('device.import.instruction1') }}</p>
+        <p>{{ $t('device.import.instruction2') }}</p>
       </el-alert>
-      <el-form-item class="things-dialog-form-item" label="所属驱动" prop="driverId">
+      <el-form-item class="things-dialog-form-item" :label="$t('device.import.driver')" prop="driverId">
         <el-select
           v-model="reactiveData.formData.driverId"
           class="edit-form-special"
           clearable
-          placeholder="请选择所属驱动"
+          :placeholder="$t('device.import.driverPlaceholder')"
           @visible-change="driverDictionaryVisible"
         >
           <div class="tool-select">
@@ -44,7 +44,7 @@
               <el-input
                 v-model="reactiveData.driverQuery"
                 clearable
-                placeholder="请选择所属驱动"
+                :placeholder="$t('device.import.driverPlaceholder')"
                 @input="driverDictionary"
               />
             </el-form-item>
@@ -68,13 +68,13 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" label="关联模板" prop="profileIds">
+      <el-form-item class="things-dialog-form-item" :label="$t('device.add.profiles')" prop="profileIds">
         <el-select
           v-model="reactiveData.formData.profileIds"
           :multiple="true"
           class="edit-form-special"
           clearable
-          placeholder="请选择关联模板"
+          :placeholder="$t('device.add.profilePlaceholder')"
           @visible-change="profileDictionaryVisible"
         >
           <div class="tool-select">
@@ -82,7 +82,7 @@
               <el-input
                 v-model="reactiveData.profileQuery"
                 clearable
-                placeholder="请选择关联模板"
+                :placeholder="$t('device.add.profilePlaceholder')"
                 @input="profileDictionary"
               />
             </el-form-item>
@@ -119,15 +119,15 @@
         <el-icon class="el-upload__icon">
           <UploadFilled />
         </el-icon>
-        <div class="el-upload__text">拖拽文件 或 <em>点击上传</em></div>
+        <div class="el-upload__text" v-html="$t('device.import.upload')"></div>
       </el-upload>
     </el-form>
     <div class="things-dialog-footer">
       <slot name="footer">
-        <el-button @click="cancel">取消</el-button>
-        <el-button plain type="success" @click="reset">重置</el-button>
-        <el-button plain type="warning" @click="importTemplate">下载导入模板</el-button>
-        <el-button type="primary" @click="importThing">确定</el-button>
+        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
+        <el-button plain type="success" @click="reset">{{ $t('common.reset') }}</el-button>
+        <el-button plain type="warning" @click="importTemplate">{{ $t('device.import.template') }}</el-button>
+        <el-button type="primary" @click="importThing">{{ $t('common.confirm') }}</el-button>
       </slot>
     </div>
   </el-dialog>

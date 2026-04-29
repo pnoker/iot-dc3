@@ -17,6 +17,7 @@
 import { defineComponent, reactive, ref, unref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Check, Plus, Refresh, RefreshLeft, Search, Sort } from '@element-plus/icons-vue';
+import { useI18n } from 'vue-i18n';
 
 import type { Dictionary, Order } from '@/config/entity';
 import { getProfileDictionary } from '@/api/dictionary';
@@ -61,6 +62,8 @@ export default defineComponent({
     'next-handle',
   ],
   setup(_props, { emit }) {
+    const { t } = useI18n();
+
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
@@ -90,7 +93,7 @@ export default defineComponent({
 
     // 定义表单校验规则
     const formRule = reactive<FormRules>({
-      port: [{ type: 'number', message: '端口必须为数字值' }],
+      port: [{ type: 'number', message: t('common.name') }],
     });
 
     const profileDictionary = () => {

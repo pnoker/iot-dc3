@@ -17,6 +17,7 @@
 import { successMessage } from '@/utils/NotificationUtil';
 import { defineComponent, reactive, ref, unref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'PointAddForm',
@@ -30,6 +31,8 @@ export default defineComponent({
   },
   emits: ['add-thing'],
   setup(props, { emit }) {
+    const { t } = useI18n();
+
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
@@ -52,57 +55,57 @@ export default defineComponent({
       pointName: [
         {
           required: true,
-          message: '请输入位号名称',
+          message: t('point.add.nameRequired'),
           trigger: 'blur',
         },
         {
           min: 2,
           max: 32,
-          message: '请输入 2~32 位字长的位号名称',
+          message: t('point.add.nameLength'),
           trigger: 'blur',
         },
         {
-          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-          message: '请输入正确格式的位号名称',
+          pattern: /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥-_]*$/,
+          message: t('point.add.nameFormat'),
         },
       ],
       pointTypeFlag: [
         {
           required: true,
-          message: '请选择位号数据类型',
+          message: t('point.add.dataTypeRequired'),
           trigger: 'change',
         },
       ],
       rwFlag: [
         {
           required: true,
-          message: '请选择位号读写标识',
+          message: t('point.add.rwTypeRequired'),
           trigger: 'change',
         },
       ],
       baseValue: [
         {
           pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
-          message: '请输入 正确格式的基础值',
+          message: t('point.add.baseValueFormat'),
         },
       ],
       multiple: [
         {
           pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
-          message: '请输入 正确格式的比例系数',
+          message: t('point.add.ratioFormat'),
         },
       ],
       valueDecimal: [
         {
           required: true,
-          message: '请输入 数据格式',
+          message: t('point.add.accuracyFormat'),
           trigger: 'blur',
         },
       ],
       remark: [
         {
           max: 300,
-          message: '最多输入300个字符',
+          message: t('point.add.remarkLength'),
           trigger: 'blur',
         },
       ],

@@ -28,71 +28,71 @@
           <div class="things-card-header-icon">
             <img :alt="data.pointName" :src="icon" />
           </div>
-          <div class="things-card-header-name nowrap-name" @click="copyId(data.id, '位号ID')">
+          <div class="things-card-header-name nowrap-name" @click="copyId(data.id, $t('point.card.profile'))">
             {{ data.pointName }}
           </div>
-          <div class="things-card-header-status" title="状态"></div>
+          <div class="things-card-header-status" :title="$t('common.name')"></div>
         </div>
         <div class="things-card__body">
           <div class="things-card-body-content">
             <ul class="things-body-content-item-column-2">
               <li class="nowrap-item">
                 <span
-                  ><el-icon><List /></el-icon> 所属模板: </span
+                  ><el-icon><List /></el-icon> {{ $t('point.card.profile') }}: </span
                 >{{ profile.profileName }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> 比例系数: </span
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.ratio') }}: </span
                 >{{ data.multiple }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> 数据精度: </span
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.accuracy') }}: </span
                 >{{ data.valueDecimal }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> 单位: </span
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.unit') }}: </span
                 >{{ data.unit }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Edit /></el-icon> 修改日期: </span
+                  ><el-icon><Edit /></el-icon> {{ $t('common.operationTime') }}: </span
                 >{{ timestamp(data.operateTime) }}
               </li>
             </ul>
             <ul class="things-body-content-item-column-2">
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> 数据类型: </span
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.dataType') }}: </span
                 >{{ pointTypeFlag }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> 基础值: </span
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.baseValue') }}: </span
                 >{{ data.baseValue }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> 处理值: </span
-                >Y = {{ data.multiple }}X + {{ data.baseValue }}, 保留{{ data.valueDecimal }}位小数
+                  ><el-icon><Location /></el-icon> {{ $t('pointValue.card.processedValue') }}: </span
+                >Y = {{ data.multiple }}X + {{ data.baseValue }}, {{ data.valueDecimal }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> 读写标识: </span
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.rw') }}: </span
                 >{{ rwFlag }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Sunset /></el-icon> 创建日期: </span
+                  ><el-icon><Sunset /></el-icon> {{ $t('common.createTime') }}: </span
                 >{{ timestamp(data.createTime) }}
               </li>
             </ul>
           </div>
-          <div class="things-card-body-content" title="位号描述信息">
+          <div class="things-card-body-content" :title="$t('point.add.description')">
             <p class="nowrap-description">
-              {{ data.remark ? data.remark : '无描述信息' }}
+              {{ data.remark ? data.remark : $t('common.noDescription') }}
             </p>
           </div>
         </div>
@@ -102,37 +102,41 @@
               :icon="SwitchButton"
               icon-color="#e6a23c"
               placement="top"
-              title="是否确定停用该位号?"
+              :title="$t('point.card.confirmDisable')"
               @confirm="disableThing"
             >
               <template #reference>
-                <el-button :disabled="'ENABLE' !== data.enableFlag" link type="primary">停用</el-button>
+                <el-button :disabled="'ENABLE' !== data.enableFlag" link type="primary">{{
+                  $t('common.disable')
+                }}</el-button>
               </template>
             </el-popconfirm>
             <el-popconfirm
               :icon="CircleCheck"
               icon-color="#67c23a"
               placement="top"
-              title="是否确定启用该位号?"
+              :title="$t('point.card.confirmEnable')"
               @confirm="enableThing"
             >
               <template #reference>
-                <el-button :disabled="'ENABLE' === data.enableFlag" link type="primary">启用</el-button>
+                <el-button :disabled="'ENABLE' === data.enableFlag" link type="primary">{{
+                  $t('common.enable')
+                }}</el-button>
               </template>
             </el-popconfirm>
             <el-popconfirm
               :icon="CircleClose"
               icon-color="#f56c6c"
               placement="top"
-              title="是否确定删除该位号?该位号下的配置将会被全部删除, 且该操作不可恢复!"
+              :title="$t('point.card.confirmDelete')"
               @confirm="deleteThing"
             >
               <template #reference>
-                <el-button link type="primary">删除</el-button>
+                <el-button link type="primary">{{ $t('common.delete') }}</el-button>
               </template>
             </el-popconfirm>
-            <el-button link type="primary" @click="edit">编辑</el-button>
-            <el-button disabled link type="primary" @click="detail">详情</el-button>
+            <el-button link type="primary" @click="edit">{{ $t('common.edit') }}</el-button>
+            <el-button disabled link type="primary" @click="detail">{{ $t('common.detail') }}</el-button>
           </div>
         </div>
       </div>

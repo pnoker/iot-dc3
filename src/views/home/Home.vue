@@ -16,6 +16,50 @@
 
 <template>
   <div>
+    <blank-card class="home-statistic">
+      <el-row :gutter="16">
+        <el-col :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+          <el-card class="statistic-card statistic-device" shadow="hover">
+            <div class="statistic-card-inner">
+              <div class="statistic-icon">
+                <el-icon :size="36"><Management /></el-icon>
+              </div>
+              <el-statistic :title="$t('home.deviceCount')" :value="reactiveData.deviceCount" />
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+          <el-card class="statistic-card statistic-point" shadow="hover">
+            <div class="statistic-card-inner">
+              <div class="statistic-icon">
+                <el-icon :size="36"><CollectionTag /></el-icon>
+              </div>
+              <el-statistic :title="$t('home.pointCount')" :value="reactiveData.pointCount" />
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+          <el-card class="statistic-card statistic-profile" shadow="hover">
+            <div class="statistic-card-inner">
+              <div class="statistic-icon">
+                <el-icon :size="36"><List /></el-icon>
+              </div>
+              <el-statistic :title="$t('home.profileCount')" :value="reactiveData.profileCount" />
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+          <el-card class="statistic-card statistic-driver" shadow="hover">
+            <div class="statistic-card-inner">
+              <div class="statistic-icon">
+                <el-icon :size="36"><Promotion /></el-icon>
+              </div>
+              <el-statistic :title="$t('home.driverCount')" :value="reactiveData.driverCount" />
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </blank-card>
     <title-card class="home-count">
       <div id="count-data" ref="countDataChartRef"></div>
     </title-card>

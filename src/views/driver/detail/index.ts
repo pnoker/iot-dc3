@@ -15,7 +15,6 @@
  */
 
 import { computed, defineComponent, reactive, ref } from 'vue';
-import { Connection, Edit, Management, Monitor, Position, Promotion, Sunset } from '@element-plus/icons-vue';
 
 import { useRoute } from 'vue-router';
 import router from '@/config/router';
@@ -48,13 +47,6 @@ export default defineComponent({
     deviceCard,
     device,
     pointCard,
-    Position,
-    Promotion,
-    Edit,
-    Sunset,
-    Management,
-    Connection,
-    Monitor,
   },
   setup() {
     const route = useRoute();

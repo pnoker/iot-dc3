@@ -41,6 +41,7 @@ import { isNull } from '@/utils/ValidationUtil';
 import { getDriverById } from '@/api/driver';
 import { getProfileByIds } from '@/api/profile';
 import { getPointByDeviceId } from '@/api/point';
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'DeviceEdit',
@@ -50,6 +51,7 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
+    const { t } = useI18n();
 
     // 定义表单引用
     const deviceFormRef = ref<FormInstance>();
@@ -104,45 +106,45 @@ export default defineComponent({
       deviceName: [
         {
           required: true,
-          message: '请输入设备名称',
+          message: () => t('device.edit.nameRequired'),
           trigger: 'blur',
         },
         {
           min: 2,
           max: 32,
-          message: '请输入 2~32 位字长的设备名称',
+          message: () => t('device.edit.nameLength'),
           trigger: 'blur',
         },
         {
-          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-          message: '请输入正确格式的设备名称',
+          pattern: /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥-_]*$/,
+          message: () => t('device.edit.nameFormat'),
         },
       ],
       driverId: [
         {
           required: true,
-          message: '请选择所属驱动',
+          message: () => t('device.edit.driverRequired'),
           trigger: 'change',
         },
       ],
       profileIds: [
         {
           required: true,
-          message: '请选择关联模板',
+          message: () => t('device.add.profileRequired'),
           trigger: 'change',
         },
       ],
       enableFlag: [
         {
           required: true,
-          message: '请选择使能',
+          message: 'Select enable status',
           trigger: 'change',
         },
       ],
       remark: [
         {
           max: 300,
-          message: '最多输入300个字符',
+          message: () => t('device.edit.remarkLength'),
           trigger: 'blur',
         },
       ],

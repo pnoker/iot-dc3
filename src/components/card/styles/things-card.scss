@@ -69,6 +69,10 @@
       line-height: 48px;
       text-align: right;
       flex: 1;
+
+      .el-tag {
+        vertical-align: middle;
+      }
     }
   }
 

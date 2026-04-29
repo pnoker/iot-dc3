@@ -43,7 +43,7 @@
     props: {
       name: {
         type: String,
-        default: '数据看板',
+        default: 'Dashboard',
       },
       icon: {
         type: String,
