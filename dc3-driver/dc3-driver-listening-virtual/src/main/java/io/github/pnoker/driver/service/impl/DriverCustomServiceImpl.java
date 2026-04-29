@@ -109,7 +109,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
      * Handles metadata events for drivers, devices, and points.
      * <p>
      * Processes addition, update, and deletion events for metadata.
-     * Currently logs device and point metadata events for monitoring purposes.
+     * Currently, logs device and point metadata events for monitoring purposes.
      * </p>
      *
      * @param metadataEvent The metadata event containing type and operation details
