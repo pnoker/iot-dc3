@@ -32,12 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * DriverTopicConfig is a configuration class that provides queue and binding
- * configurations for metadata, driver command, and device command messages
- * within a message broker. It is conditional on the presence of the ExchangeConfig class.
- * <p>
- * The queues and bindings are used to facilitate communication between
- * components in the driver service by leveraging message exchanges.
+ * RabbitMQ configuration that declares the driver-specific metadata and command queues together
+ * with their exchange bindings.
  */
 @Slf4j
 @Configuration
@@ -55,25 +51,23 @@ public class DriverTopicConfig {
     }
 
     /**
+     * Creates the metadata queue used to receive driver metadata synchronization events.
      *
-     *
-     *
-     * @return Queue
+     * @return metadata queue
      */
     @Bean
     Queue metadataQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 30 seconds: 30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX + driverProperties.getClient(), false, false, true, arguments);
+        return new Queue(RabbitConstant.QUEUE_DRIVER_METADATA_PREFIX + driverProperties.getClient(), true, false, true, arguments);
     }
 
     /**
+     * Binds the metadata queue to the metadata exchange.
      *
-     *
-     *
-     * @param metadataQueue
-     * @return Binding
+     * @param metadataQueue metadata queue
+     * @return queue binding
      */
     @Bean
     Binding metadataBinding(Queue metadataQueue) {
@@ -86,25 +80,23 @@ public class DriverTopicConfig {
     }
 
     /**
+     * Creates the driver command queue used to receive driver-level commands.
      *
-     *
-     *
-     * @return Queue
+     * @return driver command queue
      */
     @Bean
     Queue driverCommandQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 30 seconds: 30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DRIVER_COMMAND_PREFIX + driverProperties.getService(), false, false, false, arguments);
+        return new Queue(RabbitConstant.QUEUE_DRIVER_COMMAND_PREFIX + driverProperties.getService(), true, false, false, arguments);
     }
 
     /**
+     * Binds the driver command queue to the command exchange.
      *
-     *
-     *
-     * @param driverCommandQueue
-     * @return Binding
+     * @param driverCommandQueue driver command queue
+     * @return queue binding
      */
     @Bean
     Binding driverCommandBinding(Queue driverCommandQueue) {
@@ -117,25 +109,23 @@ public class DriverTopicConfig {
     }
 
     /**
+     * Creates the device command queue used to receive device read and write commands.
      *
-     *
-     *
-     * @return Queue
+     * @return device command queue
      */
     @Bean
     Queue deviceCommandQueue() {
         Map<String, Object> arguments = new HashMap<>();
         // 30 seconds: 30 * 1000 = 30000L
         arguments.put(RabbitConstant.MESSAGE_TTL, 30000L);
-        return new Queue(RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX + driverProperties.getService(), false, false, false, arguments);
+        return new Queue(RabbitConstant.QUEUE_DEVICE_COMMAND_PREFIX + driverProperties.getService(), true, false, false, arguments);
     }
 
     /**
+     * Binds the device command queue to the command exchange.
      *
-     *
-     *
-     * @param deviceCommandQueue
-     * @return Binding
+     * @param deviceCommandQueue device command queue
+     * @return queue binding
      */
     @Bean
     Binding deviceCommandBinding(Queue deviceCommandQueue) {
