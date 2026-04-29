@@ -38,9 +38,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Implementation of the DriverWriteService interface, providing functionalities to handle
- * device point value write operations. This service interacts with metadata caches
- * and utilizes custom driver services for executing write commands.
+ * Default {@link DriverWriteService} implementation that resolves metadata, delegates the actual
+ * write operation to the custom driver, and handles command payload execution.
  *
  * @author pnoker
  * @version 2025.9.0

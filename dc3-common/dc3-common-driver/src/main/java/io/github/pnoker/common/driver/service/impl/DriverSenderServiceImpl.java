@@ -35,8 +35,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Implementation of the {@code DriverSenderService} interface.
- * Provides methods to send various events and data related to drivers and devices to a message queue.
+ * Default {@link DriverSenderService} implementation that publishes driver events, device events,
+ * heartbeats, and point values to RabbitMQ.
  */
 @Slf4j
 @Service

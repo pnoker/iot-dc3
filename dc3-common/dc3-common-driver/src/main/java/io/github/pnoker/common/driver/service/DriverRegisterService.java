@@ -18,7 +18,7 @@
 package io.github.pnoker.common.driver.service;
 
 /**
- *
+ * Service contract for registering the current driver instance with the manager center.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,7 +27,7 @@ package io.github.pnoker.common.driver.service;
 public interface DriverRegisterService {
 
     /**
-     *
+     * Performs driver registration during application startup.
      */
     void initial();
 }

@@ -28,9 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementation class responsible for driver registration services.
- * This service facilitates the initialization and registration of a driver
- * with the platform using the driver properties and the driver client.
+ * Default {@link DriverRegisterService} implementation that builds the registration payload from
+ * {@link io.github.pnoker.common.driver.entity.property.DriverProperties} and submits it to the manager center.
  */
 @Slf4j
 @Service
