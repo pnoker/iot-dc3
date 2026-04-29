@@ -4,7 +4,8 @@ This file provides guidance to AI coding assistants when working with code in th
 
 ## Project Overview
 
-IoT DC3 is a distributed IoT platform built on Spring Cloud for industrial device connectivity, data collection, and management. It uses a microservices architecture with gRPC + RabbitMQ for inter-service communication and supports multiple industrial protocols (Modbus TCP, OPC DA/UA, MQTT, Siemens S7, virtual listening).
+IoT DC3 is a distributed IoT platform built on Spring Cloud for industrial device connectivity, data collection, and management. It uses a microservices architecture with gRPC +
+RabbitMQ for inter-service communication and supports multiple industrial protocols (Modbus TCP, OPC DA/UA, MQTT, Siemens S7, virtual listening).
 
 **Architecture Layers:**
 
@@ -15,7 +16,7 @@ IoT DC3 is a distributed IoT platform built on Spring Cloud for industrial devic
 
 **Technology Stack:**
 
-- Java 21, Spring Boot 3.5.5, Spring Cloud 2025.0.0 (project version `2026.4.19`)
+- Java 21, Spring Boot 3.5.5, Spring Cloud 2025.0.0 (project version `2026.4.29`)
 - PostgreSQL (primary DB), Redis (cache), RabbitMQ (messaging), EMQX/MQTT (IoT protocol)
 - gRPC/Protobuf for inter-service APIs (`@GrpcService` / `@GrpcClient`)
 - Nacos for service discovery & config in `pre`/`pro` profiles
@@ -27,14 +28,14 @@ IoT DC3 is a distributed IoT platform built on Spring Cloud for industrial devic
 
 The `dc3/` directory ships multiple compose files. Each has an `-aliyun` variant that pulls images from the Aliyun registry (for users in mainland China):
 
-| Stack           | File                                 | Contents                                  |
-|-----------------|--------------------------------------|-------------------------------------------|
-| `db`            | `dc3/docker-compose-db.yml`          | Postgres (`35432`), RabbitMQ (`35672`/`15672`) |
-| `optional`      | `dc3/docker-compose-optional.yml`    | EMQX broker (MQTT `31883`, dashboard `18083`) |
-| `dev`           | `dc3/docker-compose-dev.yml`         | All center services + drivers (built from source) |
-| `app`           | `dc3/docker-compose.yml`             | Packaged application stack (released images) |
-| `grafana`       | `dc3/docker-compose-grafana.yml`     | Grafana observability stack               |
-| `elasticsearch` | `dc3/docker-compose-elasticsearch.yml` | Elasticsearch stack                     |
+| Stack           | File                                   | Contents                                          |
+|-----------------|----------------------------------------|---------------------------------------------------|
+| `db`            | `dc3/docker-compose-db.yml`            | Postgres (`35432`), RabbitMQ (`35672`/`15672`)    |
+| `optional`      | `dc3/docker-compose-optional.yml`      | EMQX broker (MQTT `31883`, dashboard `18083`)     |
+| `dev`           | `dc3/docker-compose-dev.yml`           | All center services + drivers (built from source) |
+| `app`           | `dc3/docker-compose.yml`               | Packaged application stack (released images)      |
+| `grafana`       | `dc3/docker-compose-grafana.yml`       | Grafana observability stack                       |
+| `elasticsearch` | `dc3/docker-compose-elasticsearch.yml` | Elasticsearch stack                               |
 
 Note: **Redis is not part of the `db` stack** — it is bundled into service images / started by the full `dev` or `app` stacks.
 
@@ -105,14 +106,16 @@ Services must be started in this order:
 2. **Auth Center** — HTTP `8300`, gRPC `9300`
 3. **Data Center** — HTTP `8500`, gRPC `9500`
 4. **Manager Center** — HTTP `8400`, gRPC `9400`
-5. **Drivers** — e.g. `dc3-driver-virtual`, `dc3-driver-listening-virtual` (HTTP `6270`, gRPC `6271`), `dc3-driver-modbus-tcp`, `dc3-driver-mqtt`, `dc3-driver-opc-da`, `dc3-driver-opc-ua`, `dc3-driver-plcs7`
+5. **Drivers** — e.g. `dc3-driver-virtual`, `dc3-driver-listening-virtual` (HTTP `6270`, gRPC `6271`), `dc3-driver-modbus-tcp`, `dc3-driver-mqtt`, `dc3-driver-opc-da`,
+   `dc3-driver-opc-ua`, `dc3-driver-plcs7`
 
-`dc3/env/dev.env.sh` defines host/port/credentials for local infra and `CENTER_AUTH_HOST` / `CENTER_DATA_HOST` / `CENTER_MANAGER_HOST` gRPC targets. Note that the file uses a `source KEY=value` form — verify your shell actually exports them before relying on it.
+`dc3/env/dev.env.sh` defines host/port/credentials for local infra and `CENTER_AUTH_HOST` / `CENTER_DATA_HOST` / `CENTER_MANAGER_HOST` gRPC targets. Note that the file uses a
+`source KEY=value` form — verify your shell actually exports them before relying on it.
 
 ## Module Structure
 
 ```
-iot-dc3/                            # root POM (parent: dc3-parent:2026.4.19)
+iot-dc3/                            # root POM (parent: dc3-parent:2026.4.29)
 ├── dc3-api/                        # Protobuf/gRPC API contracts
 │   ├── dc3-api-auth                # tenant, token, user, user_login
 │   ├── dc3-api-data                # point_value
@@ -160,7 +163,7 @@ iot-dc3/                            # root POM (parent: dc3-parent:2026.4.19)
 ├── dc3/                            # Compose files, env scripts (env/dev.env.sh), bin/, doc/
 ├── .mvn/settings.xml               # Checked-in Maven settings (always pass via -s)
 ├── Makefile                        # Wraps mvn + podman compose workflows
-└── Dockerfile                      # Base image build (FROM pnoker/dc3-jdk:2025.9)
+└── Dockerfile                      # Base image build (FROM pnoker/dc3-jdk:25)
 ```
 
 ## gRPC Service API Definitions
@@ -169,7 +172,8 @@ Proto files live under `dc3-api/*/src/main/protobuf/api/<layer>/<service>/`:
 
 - **dc3-api-auth** (`api/center/auth/`): `tenant.proto`, `token.proto`, `user.proto`, `user_login.proto`
 - **dc3-api-data** (`api/center/data/`): `point_value.proto`
-- **dc3-api-driver** (`api/common/driver/`): `driver_device.proto`, `driver_driver.proto`, `driver_entity.proto`, `driver_point.proto`, `driver_query.proto`, `driver_query_page.proto`
+- **dc3-api-driver** (`api/common/driver/`): `driver_device.proto`, `driver_driver.proto`, `driver_entity.proto`, `driver_point.proto`, `driver_query.proto`,
+  `driver_query_page.proto`
 - **dc3-api-manager** (`api/center/manager/`): `manager_device.proto`, `manager_driver.proto`, `manager_point.proto`, `manager_query.proto`, `manager_query_page.proto`
 
 When modifying service APIs:
@@ -181,35 +185,41 @@ When modifying service APIs:
 
 ## Service Boundaries & Runtime Data Flow
 
-- HTTP enters via `dc3-gateway` (port 8000). Routes defined in `dc3-gateway/src/main/resources/application-pre.yml` strip the `/api/v3` prefix (`StripPrefix=2`) and optionally apply the `Authentic` filter.
+- HTTP enters via `dc3-gateway` (port 8000). Routes defined in `dc3-gateway/src/main/resources/application-pre.yml` strip the `/api/v3` prefix (`StripPrefix=2`) and optionally
+  apply the `Authentic` filter.
 - Manager / Data / Auth each expose both **REST** (for the gateway) and **gRPC** (for inter-service + drivers).
 - Drivers register and fetch device/point config via Manager gRPC:
-  - Server: `@GrpcService` implementations under `dc3-common-manager/.../grpc/server/driver/` (e.g. `DriverDriverServer`)
-  - Client stubs: drivers and Data service use `@GrpcClient(ManagerConstant.SERVICE_NAME)`
+    - Server: `@GrpcService` implementations under `dc3-common-manager/.../grpc/server/driver/` (e.g. `DriverDriverServer`)
+    - Client stubs: drivers and Data service use `@GrpcClient(ManagerConstant.SERVICE_NAME)`
 - Commands and metadata changes flow asynchronously over **RabbitMQ topic exchanges**:
-  - Exchange/routing key constants: `dc3-common-constant/.../RabbitConstant.java`
-  - Exchange declarations: `dc3-common-rabbitmq/.../ExchangeConfig.java`
-  - Example command path — Data service resolves the driver by gRPC, then publishes to `dc3.e.command` keyed by driver service name (`dc3-common-data/.../PointValueCommandServiceImpl.java`).
+    - Exchange/routing key constants: `dc3-common-constant/.../RabbitConstant.java`
+    - Exchange declarations: `dc3-common-rabbitmq/.../ExchangeConfig.java`
+    - Example command path — Data service resolves the driver by gRPC, then publishes to `dc3.e.command` keyed by driver service name (
+      `dc3-common-data/.../PointValueCommandServiceImpl.java`).
 
 ## Code Architecture Patterns
 
 **Reactive Web Layer (center services, gateway):**
+
 - Controllers return `Mono<R<T>>` and typically `extends BaseController` to pull tenant/user headers from the reactive context.
 - Response envelope is always `R<T>` (`dc3-common-public/.../R.java`) for REST, `GrpcR` for gRPC.
 - Validation uses grouped marker interfaces (`Add`, `Update`, etc.) with `@Validated(...)` on controller methods.
 - URL prefixes/constants go in `*Constant` classes (e.g. `ManagerConstant.DRIVER_URL_PREFIX`), never hardcoded in controllers.
 
 **Models & Mapping:**
+
 - Explicit BO / VO / DTO separation — **never expose entities directly**.
 - Conversions go through `*Builder` classes (e.g. `DriverBuilder`, `GrpcDriverBuilder`) rather than reflection-based mappers.
 
 **Configuration:**
+
 - All YAML uses `${ENV:default}` placeholders — **never hardcode `localhost` in code paths**.
 - Profile selection via `${NODE_ENV:dev}`; Maven profiles: `dev` (default), `test`, `pre`, `pro`.
 - `pre` / `pro` profiles resolve service discovery/config through Nacos (`spring.cloud.nacos.*` in gateway + center YAMLs).
 - gRPC targets overridable via env (`CENTER_AUTH_HOST`, `CENTER_DATA_HOST`, `CENTER_MANAGER_HOST`).
 
 **Driver Services:**
+
 - Main class: `@SpringBootApplication` with `SpringApplication.run()`.
 - Extend base classes from `dc3-common-driver`.
 - Implement gRPC service interfaces from `dc3-api-driver`.
@@ -217,14 +227,17 @@ When modifying service APIs:
 - **Driver service names are routing-critical** — they become suffixes in RabbitMQ routing keys and gRPC target names. Preserve existing naming constants when refactoring.
 
 **Center Services:**
+
 - Implement gRPC service interfaces from the matching `dc3-api-*` module.
 - Use `dc3-common-dal` for data access, `dc3-common-redis` for caching, `dc3-common-rabbitmq` for messaging.
 
 **Multi-tenancy:**
+
 - Tenant/namespace isolation is managed through Auth Center.
 - Tenant context is propagated via request headers and available through `BaseController`.
 
 **Error Handling:**
+
 - Use standard exceptions from `dc3-common-exception`.
 - Responses always wrapped (`R<T>` / `GrpcR`) — never leak stack traces.
 
@@ -240,7 +253,8 @@ When modifying service APIs:
 
 **Project-only rule — only applies to commits Claude makes in this repository.**
 
-When committing, Claude must use the `claude[bot]` GitHub App identity so commits show Claude's real avatar on GitHub, consistent with how Copilot's commits already appear in this repo's history. Run every commit as:
+When committing, Claude must use the `claude[bot]` GitHub App identity so commits show Claude's real avatar on GitHub, consistent with how Copilot's commits already appear in this
+repo's history. Run every commit as:
 
 ```bash
 git -c user.name='Claude' \
@@ -267,6 +281,8 @@ EOF
 
 ## Notes on Existing State
 
-- No Java unit tests (`**/src/test/**/*.java` is empty). Validate changes by compile + targeted runtime smoke (spin up a compose stack, hit gateway, check driver registration / gRPC calls).
-- READMEs with additional context: root `README.md` (and `.ja.md`, `.vi.md`, `.zh.md`), plus per-API READMEs (`dc3-api/dc3-api-auth/README.md`, `.../dc3-api-data/README.md`, `.../dc3-api-driver/README.md`).
+- No Java unit tests (`**/src/test/**/*.java` is empty). Validate changes by compile + targeted runtime smoke (spin up a compose stack, hit gateway, check driver registration /
+  gRPC calls).
+- READMEs with additional context: root `README.md` (and `.ja.md`, `.vi.md`, `.zh.md`), plus per-API READMEs (`dc3-api/dc3-api-auth/README.md`, `.../dc3-api-data/README.md`,
+  `.../dc3-api-driver/README.md`).
 - `AGENTS.md` at repo root summarizes the same architecture for other coding agents — keep it in sync when conventions change.

@@ -94,30 +94,30 @@ cp .env.example .env
 
 Common overrides used by the Compose stacks in `dc3/`:
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `DC3_IMAGE_TAG` | `2026.5` | Shared image tag for application, database, EMQX, and observability images |
-| `DC3_LOG_MAX_SIZE` | `10M` | Maximum size per container log file |
-| `DC3_LOG_MAX_FILE` | `20` | Number of rotated log files to keep |
-| `DC3_BIND_HOST` | `127.0.0.1` | Host address used for published ports; set `0.0.0.0` if you need LAN access |
-| `POSTGRES_USERNAME` | `dc3` | Username used by the Postgres health check |
-| `POSTGRES_DB` | `dc3` | Database name used by the Postgres health check |
-| `DC3_POSTGRES_PORT` | `35432` | Published PostgreSQL port |
-| `DC3_RABBITMQ_TLS_PORT` / `DC3_RABBITMQ_PORT` | `35671` / `35672` | RabbitMQ TLS / AMQP ports |
-| `DC3_RABBITMQ_MANAGEMENT_PORT` | `15672` | RabbitMQ management UI port |
-| `DC3_GATEWAY_PORT` | `8000` | Gateway HTTP port |
-| `DC3_AUTH_PORT` / `DC3_AUTH_GRPC_PORT` | `8300` / `9300` | Auth center HTTP and gRPC ports |
-| `DC3_MANAGER_PORT` / `DC3_MANAGER_GRPC_PORT` | `8400` / `9400` | Manager center HTTP and gRPC ports |
-| `DC3_DATA_PORT` / `DC3_DATA_GRPC_PORT` | `8500` / `9500` | Data center HTTP and gRPC ports |
-| `DC3_LISTENING_VIRTUAL_DRIVER_PORT` / `DC3_LISTENING_VIRTUAL_GRPC_PORT` | `6270` / `6271` | Listening virtual driver ports |
-| `DC3_EMQX_WS_PORT` / `DC3_EMQX_WSS_PORT` | `38083` / `38084` | EMQX WebSocket endpoints |
-| `DC3_EMQX_MQTT_PORT` / `DC3_EMQX_MQTTS_PORT` | `31883` / `38883` | EMQX MQTT / MQTTS ports |
-| `DC3_EMQX_DASHBOARD_PORT` | `18083` | EMQX dashboard port |
-| `GF_SERVER_ROOT_URL` | `http://localhost:3000` | Grafana external root URL |
-| `DC3_GRAFANA_PORT` | `3000` | Grafana HTTP port |
-| `DC3_KIBANA_PORT` | `5601` | Kibana HTTP port |
-| `DC3_ES_JAVA_OPTS` | `-Xms512m -Xmx512m` | Elasticsearch JVM heap settings |
-| `DC3_LS_JAVA_OPTS` | `-Xms256m -Xmx256m` | Logstash JVM heap settings |
+| Variable                                                                | Default                 | Purpose                                                                     |
+|-------------------------------------------------------------------------|-------------------------|-----------------------------------------------------------------------------|
+| `DC3_IMAGE_TAG`                                                         | `2026.5`                | Shared image tag for application, database, EMQX, and observability images  |
+| `DC3_LOG_MAX_SIZE`                                                      | `10M`                   | Maximum size per container log file                                         |
+| `DC3_LOG_MAX_FILE`                                                      | `20`                    | Number of rotated log files to keep                                         |
+| `DC3_BIND_HOST`                                                         | `127.0.0.1`             | Host address used for published ports; set `0.0.0.0` if you need LAN access |
+| `POSTGRES_USERNAME`                                                     | `dc3`                   | Username used by the Postgres health check                                  |
+| `POSTGRES_DB`                                                           | `dc3`                   | Database name used by the Postgres health check                             |
+| `DC3_POSTGRES_PORT`                                                     | `35432`                 | Published PostgreSQL port                                                   |
+| `DC3_RABBITMQ_TLS_PORT` / `DC3_RABBITMQ_PORT`                           | `35671` / `35672`       | RabbitMQ TLS / AMQP ports                                                   |
+| `DC3_RABBITMQ_MANAGEMENT_PORT`                                          | `15672`                 | RabbitMQ management UI port                                                 |
+| `DC3_GATEWAY_PORT`                                                      | `8000`                  | Gateway HTTP port                                                           |
+| `DC3_AUTH_PORT` / `DC3_AUTH_GRPC_PORT`                                  | `8300` / `9300`         | Auth center HTTP and gRPC ports                                             |
+| `DC3_MANAGER_PORT` / `DC3_MANAGER_GRPC_PORT`                            | `8400` / `9400`         | Manager center HTTP and gRPC ports                                          |
+| `DC3_DATA_PORT` / `DC3_DATA_GRPC_PORT`                                  | `8500` / `9500`         | Data center HTTP and gRPC ports                                             |
+| `DC3_LISTENING_VIRTUAL_DRIVER_PORT` / `DC3_LISTENING_VIRTUAL_GRPC_PORT` | `6270` / `6271`         | Listening virtual driver ports                                              |
+| `DC3_EMQX_WS_PORT` / `DC3_EMQX_WSS_PORT`                                | `38083` / `38084`       | EMQX WebSocket endpoints                                                    |
+| `DC3_EMQX_MQTT_PORT` / `DC3_EMQX_MQTTS_PORT`                            | `31883` / `38883`       | EMQX MQTT / MQTTS ports                                                     |
+| `DC3_EMQX_DASHBOARD_PORT`                                               | `18083`                 | EMQX dashboard port                                                         |
+| `GF_SERVER_ROOT_URL`                                                    | `http://localhost:3000` | Grafana external root URL                                                   |
+| `DC3_GRAFANA_PORT`                                                      | `3000`                  | Grafana HTTP port                                                           |
+| `DC3_KIBANA_PORT`                                                       | `5601`                  | Kibana HTTP port                                                            |
+| `DC3_ES_JAVA_OPTS`                                                      | `-Xms512m -Xmx512m`     | Elasticsearch JVM heap settings                                             |
+| `DC3_LS_JAVA_OPTS`                                                      | `-Xms256m -Xmx256m`     | Logstash JVM heap settings                                                  |
 
 ## 3.2 Preparation
 

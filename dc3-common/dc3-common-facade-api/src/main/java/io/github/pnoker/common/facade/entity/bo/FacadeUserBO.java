@@ -26,7 +26,7 @@ import lombok.*;
  * {@code GrpcUserDTO} contract does not expose it.
  *
  * @author pnoker
- * @since 2026.4.19
+ * @since 2026.4.29
  */
 @Getter
 @Setter

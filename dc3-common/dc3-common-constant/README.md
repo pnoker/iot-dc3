@@ -9,7 +9,7 @@ and enumeration types used across services, drivers, and common modules.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-constant
-- **Version**: 2026.4.19
+- **Version**: 2026.4.29
 
 ## Key Components
 

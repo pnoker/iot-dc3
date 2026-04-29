@@ -9,7 +9,7 @@ across all services.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-thread
-- **Version**: 2026.4.19
+- **Version**: 2026.4.29
 
 ## Key Components
 
