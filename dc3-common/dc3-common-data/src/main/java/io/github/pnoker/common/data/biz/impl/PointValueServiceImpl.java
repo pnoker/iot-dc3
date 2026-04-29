@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.biz.PointValueService;
+import io.github.pnoker.common.data.cache.PointValueLocalCacheService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
@@ -27,7 +28,6 @@ import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
-import io.github.pnoker.common.redis.service.RedisRepositoryService;
 import io.github.pnoker.common.repository.RepositoryService;
 import io.github.pnoker.common.strategy.RepositoryStrategyFactory;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
@@ -54,7 +54,7 @@ public class PointValueServiceImpl implements PointValueService {
     private PointFacade pointFacade;
 
     @Resource
-    private RedisRepositoryService redisRepositoryService;
+    private PointValueLocalCacheService pointValueLocalCacheService;
 
     @Override
     public void save(PointValueBO pointValueBO) {
@@ -122,7 +122,7 @@ public class PointValueServiceImpl implements PointValueService {
             return entityPageBO;
         }
 
-        Map<Long, PointValueBO> pointValueBOMap = redisRepositoryService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
+        Map<Long, PointValueBO> pointValueBOMap = pointValueLocalCacheService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
         RepositoryService repositoryService = getFirstRepositoryService();
         List<PointValueBO> pointValueBOList = pointIds.stream().map(id -> {
             PointValueBO value = pointValueBOMap.get(id);
@@ -155,8 +155,8 @@ public class PointValueServiceImpl implements PointValueService {
      */
     private void savePointValueToRepository(PointValueBO pointValueBO) {
         try {
-            // redis repository
-            redisRepositoryService.savePointValue(pointValueBO);
+            // local hot cache
+            pointValueLocalCacheService.savePointValue(pointValueBO);
 
             // other repository
             RepositoryService repositoryService = getFirstRepositoryService();
@@ -174,8 +174,8 @@ public class PointValueServiceImpl implements PointValueService {
      */
     private void savePointValuesToRepository(Long deviceId, List<PointValueBO> pointValueBOList) {
         try {
-            // redis repository
-            redisRepositoryService.savePointValue(deviceId, pointValueBOList);
+            // local hot cache
+            pointValueLocalCacheService.savePointValue(deviceId, pointValueBOList);
 
             // other repository
             RepositoryService repositoryService = getFirstRepositoryService();

@@ -19,8 +19,8 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DeviceEventService;
+import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
-import io.github.pnoker.common.redis.service.RedisService;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ import java.util.Objects;
 public class DeviceEventServiceImpl implements DeviceEventService {
 
     @Resource
-    private RedisService redisService;
+    private LocalCacheService localCacheService;
 
 
     @Override
@@ -49,7 +49,7 @@ public class DeviceEventServiceImpl implements DeviceEventService {
         if (Objects.isNull(deviceStatus)) {
             return;
         }
-        redisService.setKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceStatus.getDeviceId(), deviceStatus.getStatus(), deviceStatus.getTimeOut(), deviceStatus.getTimeUnit());
+        localCacheService.setKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceStatus.getDeviceId(), deviceStatus.getStatus(), deviceStatus.getTimeOut(), deviceStatus.getTimeUnit());
     }
 
 }

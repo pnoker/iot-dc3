@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DeviceStatusService;
+import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.entity.bo.DeviceRunBO;
 import io.github.pnoker.common.data.entity.model.DeviceRunDO;
 import io.github.pnoker.common.data.entity.query.DeviceQuery;
@@ -29,7 +30,6 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
-import io.github.pnoker.common.redis.service.RedisService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,7 +52,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
     private DeviceFacade deviceFacade;
 
     @Resource
-    private RedisService redisService;
+    private LocalCacheService localCacheService;
 
     @Resource
     private DeviceRunService deviceRunService;
@@ -146,7 +146,7 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
         Set<Long> deviceIds = devices.stream().map(FacadeDeviceBO::getId).collect(Collectors.toSet());
         deviceIds.forEach(id -> {
             String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + id;
-            String status = redisService.getKey(key);
+            String status = localCacheService.getKey(key);
             status = Objects.nonNull(status) ? status : DeviceStatusEnum.OFFLINE.getCode();
             statusMap.put(id, status);
         });

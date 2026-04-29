@@ -19,8 +19,8 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DriverEventService;
+import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.entity.dto.DriverEventDTO;
-import io.github.pnoker.common.redis.service.RedisService;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 public class DriverEventServiceImpl implements DriverEventService {
 
     @Resource
-    private RedisService redisService;
+    private LocalCacheService localCacheService;
 
 
     @Override
@@ -50,7 +50,7 @@ public class DriverEventServiceImpl implements DriverEventService {
         if (Objects.isNull(driverStatus)) {
             return;
         }
-        redisService.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getDriverId(), driverStatus.getStatus(), 10, TimeUnit.SECONDS);
+        localCacheService.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getDriverId(), driverStatus.getStatus(), 10, TimeUnit.SECONDS);
     }
 
 }
