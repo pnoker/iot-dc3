@@ -57,6 +57,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ChannelHandler.Sharable
 public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramPacket> {
+    /**
+     * Static self-reference for accessing Spring-injected beans from static context.
+     */
     private static NettyUdpServerHandler nettyUdpServerHandler;
     @Resource
     private NettyServerHandler nettyServerHandler;
