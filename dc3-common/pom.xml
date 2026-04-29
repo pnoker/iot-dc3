@@ -94,7 +94,6 @@
         <module>dc3-common-public</module>
         <module>dc3-common-quartz</module>
         <module>dc3-common-rabbitmq</module>
-        <module>dc3-common-redis</module>
         <module>dc3-common-repository</module>
         <module>dc3-common-thread</module>
         <module>dc3-common-web</module>
@@ -274,11 +273,6 @@
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-rabbitmq</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-redis</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
