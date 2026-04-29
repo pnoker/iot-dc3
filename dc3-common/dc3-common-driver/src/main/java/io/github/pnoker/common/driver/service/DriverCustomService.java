@@ -27,11 +27,8 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import java.util.Map;
 
 /**
- * DriverCustomService Interface Definition
- * <p>
- * Describes the core custom behavior logic of the driver, including initialization, scheduling,
- * custom events, and read/write operations.
- * Classes implementing this interface need to implement these methods to override specific driver logic.
+ * Extension contract implemented by concrete drivers to provide protocol-specific initialization,
+ * scheduling, metadata handling, and point read/write behavior.
  *
  * @author pnoker
  * @version 2025.9.0

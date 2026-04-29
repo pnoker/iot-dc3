@@ -33,12 +33,8 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * Implementation of the DriverScheduleService interface for initializing and managing driver job schedules.
- * <p>
- * This service is responsible for creating, validating, and scheduling jobs
- * for driver status monitoring, reading operations, and custom-defined tasks,
- * based on the configuration provided in the DriverProperties.
- * The implementation leverages Quartz Scheduler for job scheduling.
+ * Default {@link DriverScheduleService} implementation that validates cron settings and registers
+ * the built-in Quartz jobs required by the driver runtime.
  */
 @Slf4j
 @Service
