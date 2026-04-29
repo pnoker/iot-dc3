@@ -27,7 +27,7 @@ import {
 } from '@/api/device';
 import { getDriverByIds } from '@/api/driver';
 
-import { Order } from '@/config/entity';
+import type { Order } from '@/config/entity';
 
 import blankCard from '@/components/card/blank/BlankCard.vue';
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';

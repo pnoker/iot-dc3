@@ -72,7 +72,7 @@
 
 <script lang="ts" setup>
   import { reactive, ref, unref } from 'vue';
-  import { FormInstance, FormRules } from 'element-plus';
+  import type { FormInstance, FormRules } from 'element-plus';
   import { Box, Lock, User } from '@element-plus/icons-vue';
 
   import { useAuthStore } from '@/store';

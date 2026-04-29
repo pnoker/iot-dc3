@@ -144,9 +144,9 @@
 
 <script lang="ts" setup>
   import { reactive, ref, unref } from 'vue';
-  import { FormInstance, FormRules } from 'element-plus';
+  import type { FormInstance, FormRules } from 'element-plus';
   import { Plus, Refresh, RefreshRight, Search } from '@element-plus/icons-vue';
-  import { Dictionary, Order } from '@/config/entity';
+  import type { Dictionary, Order } from '@/config/entity';
   import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary';
 
   defineProps({

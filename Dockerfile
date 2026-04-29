@@ -25,8 +25,9 @@ WORKDIR /build
 
 COPY ./ ./
 
-RUN yarn
-RUN yarn build
+RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
 
 # runtime
 FROM pnoker/dc3-nginx:2025.2 AS runtime

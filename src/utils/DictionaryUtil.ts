@@ -27,8 +27,7 @@ export const findDicLabel = (dic: any[], value: any): any => {
   let result: any = '';
   if (isNull(dic)) return value;
   if (typeof value == 'string' || typeof value == 'number' || typeof value == 'boolean') {
-    let index = 0;
-    index = findDicIndex(dic, value);
+    const index = findDicIndex(dic, value);
     if (index !== -1) {
       result = dic[index].label;
     } else {
@@ -36,9 +35,8 @@ export const findDicLabel = (dic: any[], value: any): any => {
     }
   } else if (value instanceof Array) {
     result = [];
-    let index = 0;
     value.forEach((ele) => {
-      index = findDicIndex(dic, ele);
+      const index = findDicIndex(dic, ele);
       if (index !== -1) {
         result.push(dic[index].label);
       } else {

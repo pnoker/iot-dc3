@@ -46,7 +46,7 @@ NProgress.configure(NPROGRESS_CONFIG);
  * Vue Router instance with authentication guards
  */
 const router = createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(),
   routes: [...commonRouters, viewsRouters, ...operateRouters],
 });
 
@@ -81,6 +81,7 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
   checkTokenValid(login)
     .then((res) => {
       if (!res.data) {
+        next({ path: '/login' });
         logout();
         return;
       }
@@ -94,6 +95,7 @@ router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, n
       next();
     })
     .catch(() => {
+      next({ path: '/login' });
       logout();
     });
 });

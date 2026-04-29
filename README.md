@@ -3,7 +3,7 @@
 - `git`
 - `Visual Studio Code`
 - `nodejs` >= 18, recommended to use 22
-- `yarn`, install using `npm install -g yarn`
+- `pnpm`, install using `corepack enable && corepack prepare pnpm@latest --activate` (or `npm install -g pnpm`)
 
 ## 2. Source code
 
@@ -17,8 +17,8 @@ git clone https://github.com/pnoker/iot-dc3-web.git
 cd iot-dc3-web
 
 # install
-yarn
+pnpm install
 
 # run
-yarn serve
+pnpm dev
 ```

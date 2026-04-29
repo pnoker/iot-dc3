@@ -15,7 +15,7 @@
  */
 
 import { defineComponent, reactive, ref, unref } from 'vue';
-import { FormInstance, FormRules } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
 
 import router from '@/config/router';

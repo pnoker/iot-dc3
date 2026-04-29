@@ -16,10 +16,11 @@
 
 import { UploadFilled } from '@element-plus/icons-vue';
 import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
-import { FormInstance, FormRules, genFileId } from 'element-plus';
+import { genFileId } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 import { defineComponent, reactive, ref, unref } from 'vue';
 
-import { Dictionary, Order } from '@/config/entity';
+import type { Dictionary, Order } from '@/config/entity';
 
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
 import { successMessage } from '@/utils/NotificationUtil';

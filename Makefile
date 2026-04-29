@@ -15,17 +15,17 @@
 #
 
 Default:
-    @echo "make serve: npm run serve"
-    @echo "make build: npm run build"
-    @echo "make lint: npn run lint"
+	@echo "make dev: pnpm dev"
+	@echo "make build: pnpm build"
+	@echo "make lint: pnpm lint"
 
-.PHONY: serve build lint
+.PHONY: dev build lint
 
-serve:
-	npm run serve
+dev:
+	pnpm dev
 build:
-	npm run build
+	pnpm build
 	cd ./dc3
 	docker-compose build
 lint:
-	npm run lint
+	pnpm lint

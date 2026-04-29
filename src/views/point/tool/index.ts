@@ -15,10 +15,10 @@
  */
 
 import { defineComponent, reactive, ref, unref } from 'vue';
-import { FormInstance, FormRules } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Check, Plus, Refresh, RefreshLeft, Search, Sort } from '@element-plus/icons-vue';
 
-import { Dictionary, Order } from '@/config/entity';
+import type { Dictionary, Order } from '@/config/entity';
 import { getProfileDictionary } from '@/api/dictionary';
 
 export default defineComponent({

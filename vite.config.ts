@@ -119,7 +119,7 @@ export default (configEnv: ConfigEnv) => {
       }),
     ],
     optimizeDeps: {
-      include: ['vue', 'vue-router', 'vuex', 'element-plus', '@element-plus/icons-vue', 'echarts', 'lodash-es'],
+      include: ['vue', 'vue-router', 'element-plus', '@element-plus/icons-vue', 'echarts'],
       exclude: ['@vitejs/plugin-vue'],
     },
     css: {

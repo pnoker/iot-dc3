@@ -76,9 +76,12 @@ components.d.ts
 auto-imports.d.ts
 *.d.ts.map
 
-# Package manager lock files (keep yarn.lock, ignore others)
+# Package manager lock files (keep pnpm-lock.yaml, ignore others)
 package-lock.json
-pnpm-lock.yaml
+yarn.lock
+
+# Claude Code local settings (per-developer, should not be committed)
+.claude/settings.local.json
 
 # History
 .history/

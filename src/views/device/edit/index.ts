@@ -15,7 +15,7 @@
  */
 
 import { computed, defineComponent, reactive, ref, unref } from 'vue';
-import { FormInstance, FormRules } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Check, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
 
 import { useRoute } from 'vue-router';
@@ -33,7 +33,7 @@ import {
   updatePointInfo,
 } from '@/api/info';
 
-import { Dictionary, Order } from '@/config/entity';
+import type { Dictionary, Order } from '@/config/entity';
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import pointInfoCard from '@/views/point/info/PointInfoCard.vue';

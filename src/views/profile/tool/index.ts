@@ -15,7 +15,7 @@
  */
 
 import { defineComponent, reactive, ref, unref } from 'vue';
-import { FormInstance, FormRules } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 import { Plus, Refresh, RefreshRight, Search, Sort } from '@element-plus/icons-vue';
 
 export default defineComponent({

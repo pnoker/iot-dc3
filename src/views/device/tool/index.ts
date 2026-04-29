@@ -15,11 +15,11 @@
  */
 
 import { Plus, Refresh, RefreshRight, Search, Sort, Upload } from '@element-plus/icons-vue';
-import { FormInstance, FormRules } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 import { defineComponent, reactive, ref, unref } from 'vue';
 
 import { getDriverDictionary } from '@/api/dictionary';
-import { Dictionary, Order } from '@/config/entity';
+import type { Dictionary, Order } from '@/config/entity';
 
 export default defineComponent({
   name: 'DeviceTool',
