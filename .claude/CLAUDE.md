@@ -16,10 +16,10 @@ RabbitMQ for inter-service communication and supports multiple industrial protoc
 
 **Technology Stack:**
 
-- Java 21, Spring Boot 3.5.5, Spring Cloud 2025.0.0 (project version `2026.4.29`)
-- PostgreSQL (primary DB), Redis (cache), RabbitMQ (messaging), EMQX/MQTT (IoT protocol)
-- gRPC/Protobuf for inter-service APIs (`@GrpcService` / `@GrpcClient`)
-- Nacos for service discovery & config in `pre`/`pro` profiles
+- Java 21, Spring Boot 4.0.6, Spring Framework 7.0.7 (project version `2026.4.29`, parent `dc3-parent:2026.4.29`)
+- PostgreSQL (primary DB), RabbitMQ (messaging), EMQX/MQTT (IoT protocol); in-process `LocalCacheService` replaces Redis
+- gRPC/Protobuf for inter-service APIs via `org.springframework.grpc:spring-grpc-spring-boot-starter` — server classes use `@Service` + extend generated `*ImplBase`; clients are
+  registered as beans in a central `GrpcStubConfig` using `GrpcChannelFactory`
 - Docker / Podman Compose for deployment; a top-level `Makefile` wraps the common flows
 
 ## Development Workflow
@@ -37,7 +37,7 @@ The `dc3/` directory ships multiple compose files. Each has an `-aliyun` variant
 | `grafana`       | `dc3/docker-compose-grafana.yml`       | Grafana observability stack                       |
 | `elasticsearch` | `dc3/docker-compose-elasticsearch.yml` | Elasticsearch stack                               |
 
-Note: **Redis is not part of the `db` stack** — it is bundled into service images / started by the full `dev` or `app` stacks.
+Note: The project no longer depends on Redis — caching is handled by the in-process `LocalCacheService` (see `dc3-common-public`).
 
 ### Starting Dependencies
 
@@ -109,7 +109,8 @@ Services must be started in this order:
 5. **Drivers** — e.g. `dc3-driver-virtual`, `dc3-driver-listening-virtual` (HTTP `6270`, gRPC `6271`), `dc3-driver-modbus-tcp`, `dc3-driver-mqtt`, `dc3-driver-opc-da`,
    `dc3-driver-opc-ua`, `dc3-driver-plcs7`
 
-`dc3/env/dev.env.sh` defines host/port/credentials for local infra and `CENTER_AUTH_HOST` / `CENTER_DATA_HOST` / `CENTER_MANAGER_HOST` gRPC targets. `source dc3/env/dev.env.sh` before running services from the shell or IDE.
+`dc3/env/dev.env.sh` defines host/port/credentials for local infra and `CENTER_AUTH_HOST` / `CENTER_DATA_HOST` / `CENTER_MANAGER_HOST` gRPC targets. `source dc3/env/dev.env.sh`
+before running services from the shell or IDE.
 
 ## Module Structure
 
@@ -129,16 +130,18 @@ iot-dc3/                            # root POM (parent: dc3-parent:2026.4.29)
 │   ├── dc3-common-data             # Data service business logic
 │   ├── dc3-common-driver           # Driver framework SDK (base classes for protocol drivers)
 │   ├── dc3-common-exception        # Standard exception types
+│   ├── dc3-common-facade-api       # Facade interface contracts (center-to-center service abstraction)
+│   ├── dc3-common-facade-grpc      # gRPC-backed facade implementations (client stubs + GrpcStubConfig)
+│   ├── dc3-common-facade-local     # In-process facade implementations (for single-node deployments)
 │   ├── dc3-common-gateway          # Gateway filters/routing helpers
 │   ├── dc3-common-log              # Logging (operation log, audit)
-│   ├── dc3-common-manager          # Manager service business logic (hosts @GrpcService servers)
+│   ├── dc3-common-manager          # Manager service business logic (hosts server-side gRPC implementations)
 │   ├── dc3-common-model            # Domain models (BO/VO/DTO) and Builders
 │   ├── dc3-common-mqtt             # MQTT client helpers
 │   ├── dc3-common-postgres         # Postgres-specific configuration
-│   ├── dc3-common-public           # Cross-cutting utilities; hosts `R<T>` response envelope
+│   ├── dc3-common-public           # Cross-cutting utilities; hosts `R<T>` response envelope, `LocalCacheService` in-process cache
 │   ├── dc3-common-quartz           # Quartz scheduling
 │   ├── dc3-common-rabbitmq         # RabbitMQ ExchangeConfig / routing
-│   ├── dc3-common-redis            # Redis configuration & cache helpers
 │   ├── dc3-common-repository       # Repository-pattern abstractions
 │   ├── dc3-common-thread           # Thread pool / executor helpers
 │   └── dc3-common-web              # Reactive web base (BaseController, validation groups)
@@ -162,7 +165,7 @@ iot-dc3/                            # root POM (parent: dc3-parent:2026.4.29)
 ├── dc3/                            # Compose files, env scripts (env/dev.env.sh), bin/, doc/
 ├── .mvn/settings.xml               # Checked-in Maven settings (always pass via -s)
 ├── Makefile                        # Wraps mvn + podman compose workflows
-└── Dockerfile                      # Base image build (FROM pnoker/dc3-jdk:25)
+└── Dockerfile                      # Base image build (FROM pnoker/dc3-jdk:21)
 ```
 
 ## gRPC Service API Definitions
@@ -179,8 +182,10 @@ When modifying service APIs:
 
 1. Edit the `.proto` file in the appropriate `dc3-api-*` module
 2. Regenerate Java classes: `mvn -s .mvn/settings.xml clean package` (protobuf-maven-plugin runs at compile phase)
-3. Implement the service interface in the corresponding `dc3-center-*` or driver module via `@GrpcService`
-4. Inter-service calls use gRPC stubs injected with `@GrpcClient(ManagerConstant.SERVICE_NAME)` (etc.) — **not REST**
+3. Implement the service interface in the corresponding `dc3-center-*` or driver module — the class extends the generated `*ImplBase` and is annotated with `@Service`. Spring gRPC
+   auto-registers all `BindableService` beans on the server.
+4. Inter-service calls use gRPC stubs produced by a central `GrpcStubConfig` (`@Bean` methods calling `GrpcChannelFactory.createChannel(<service-name>)`) and injected via
+   `@Resource` — **not REST**
 
 ## Service Boundaries & Runtime Data Flow
 
@@ -188,8 +193,8 @@ When modifying service APIs:
   apply the `Authentic` filter.
 - Manager / Data / Auth each expose both **REST** (for the gateway) and **gRPC** (for inter-service + drivers).
 - Drivers register and fetch device/point config via Manager gRPC:
-    - Server: `@GrpcService` implementations under `dc3-common-manager/.../grpc/server/driver/` (e.g. `DriverDriverServer`)
-    - Client stubs: drivers and Data service use `@GrpcClient(ManagerConstant.SERVICE_NAME)`
+    - Server: `@Service`-annotated `*ImplBase` subclasses under `dc3-common-manager/.../grpc/server/driver/` (e.g. `DriverDriverServer`); Spring gRPC registers them automatically
+    - Client stubs: drivers and Data service obtain stubs from `GrpcStubConfig` (channel named `ManagerConstant.SERVICE_NAME`) and inject them with `@Resource`
 - Commands and metadata changes flow asynchronously over **RabbitMQ topic exchanges**:
     - Exchange/routing key constants: `dc3-common-constant/.../RabbitConstant.java`
     - Exchange declarations: `dc3-common-rabbitmq/.../ExchangeConfig.java`
@@ -228,7 +233,7 @@ When modifying service APIs:
 **Center Services:**
 
 - Implement gRPC service interfaces from the matching `dc3-api-*` module.
-- Use `dc3-common-dal` for data access, `dc3-common-redis` for caching, `dc3-common-rabbitmq` for messaging.
+- Use `dc3-common-dal` for data access, `LocalCacheService` from `dc3-common-public` for caching, `dc3-common-rabbitmq` for messaging.
 
 **Multi-tenancy:**
 
@@ -284,4 +289,3 @@ EOF
   gRPC calls).
 - READMEs with additional context: root `README.md` (and `.ja.md`, `.vi.md`, `.zh.md`), plus per-API READMEs (`dc3-api/dc3-api-auth/README.md`, `.../dc3-api-data/README.md`,
   `.../dc3-api-driver/README.md`).
-- `AGENTS.md` at repo root summarizes the same architecture for other coding agents — keep it in sync when conventions change.
