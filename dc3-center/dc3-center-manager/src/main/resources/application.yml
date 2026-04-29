@@ -20,13 +20,12 @@ server:
   servlet:
     context-path: /manager
 
-grpc:
-  server:
-    port: ${GRPC_SERVER_PORT:9400}
-
 spring:
   application:
     name: @project.artifactId@
+  grpc:
+    server:
+      port: ${GRPC_SERVER_PORT:9400}
   profiles:
     active:
       - ${NODE_ENV:dev}
