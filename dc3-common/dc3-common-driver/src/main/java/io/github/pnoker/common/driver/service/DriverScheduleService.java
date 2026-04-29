@@ -18,7 +18,7 @@
 package io.github.pnoker.common.driver.service;
 
 /**
- * Driver Schedule Service
+ * Service contract for initializing built-in Quartz jobs used by the driver runtime.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -27,7 +27,7 @@ package io.github.pnoker.common.driver.service;
 public interface DriverScheduleService {
 
     /**
-     *
+     * Initializes and schedules all enabled driver jobs.
      */
     void initial();
 }

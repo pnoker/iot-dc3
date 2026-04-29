@@ -20,22 +20,22 @@ package io.github.pnoker.common.driver.service;
 import io.github.pnoker.common.entity.dto.DeviceCommandDTO;
 
 /**
- *
+ * Service contract for executing point read operations.
  */
 public interface DriverReadService {
 
     /**
+     * Reads the current value of the specified point on the specified device.
      *
-     *
-     * @param deviceId Device ID
-     * @param pointId  Point ID
+     * @param deviceId device identifier
+     * @param pointId  point identifier
      */
     void read(Long deviceId, Long pointId);
 
     /**
+     * Executes a read command received from the command queue.
      *
-     *
-     * @param commandDTO {@link DeviceCommandDTO}
+     * @param commandDTO device command payload
      */
     void read(DeviceCommandDTO commandDTO);
 

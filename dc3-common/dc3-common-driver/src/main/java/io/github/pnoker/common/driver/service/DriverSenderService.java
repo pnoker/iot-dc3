@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Service contract for publishing driver, device, and point-value messages to RabbitMQ.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -33,50 +35,48 @@ import java.util.concurrent.TimeUnit;
 public interface DriverSenderService {
 
     /**
-     * Driver Event
+     * Publishes a driver event.
      *
-     * @param entityDTO DriverEventDTO
+     * @param entityDTO driver event payload
      */
     void driverEventSender(DriverEventDTO entityDTO);
 
     /**
-     * Device Event
+     * Publishes a device event.
      *
-     * @param entityDTO Device Event
+     * @param entityDTO device event payload
      */
     void deviceEventSender(DeviceEventDTO entityDTO);
 
     /**
-     * Device status
-     * <p>
-     * Device status15
+     * Publishes a device status event using the default timeout.
      *
-     * @param deviceId Device ID
-     * @param status   StatusEnum
+     * @param deviceId device identifier
+     * @param status   device status
      */
     void deviceStatusSender(Long deviceId, DeviceStatusEnum status);
 
     /**
-     * Device status
+     * Publishes a device status event using the supplied timeout.
      *
-     * @param deviceId Device ID
-     * @param status   StatusEnum
-     * @param timeOut
-     * @param timeUnit {@link TimeUnit}
+     * @param deviceId device identifier
+     * @param status   device status
+     * @param timeOut  timeout value
+     * @param timeUnit timeout unit
      */
     void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit);
 
     /**
+     * Publishes a single point value.
      *
-     *
-     * @param entityDTO PointValue
+     * @param entityDTO point value payload
      */
     void pointValueSender(PointValue entityDTO);
 
     /**
+     * Publishes multiple point values.
      *
-     *
-     * @param entityDTOList PointValue Array
+     * @param entityDTOList point value payloads
      */
     void pointValueSender(List<PointValue> entityDTOList);
 
