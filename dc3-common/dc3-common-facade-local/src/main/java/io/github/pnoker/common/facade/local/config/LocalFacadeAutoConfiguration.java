@@ -27,7 +27,7 @@ import org.springframework.context.annotation.ComponentScan;
  * {@code @Component}/{@code @Mapper} beans are registered.
  *
  * @author pnoker
- * @since 2026.4.19
+ * @since 2026.4.29
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")

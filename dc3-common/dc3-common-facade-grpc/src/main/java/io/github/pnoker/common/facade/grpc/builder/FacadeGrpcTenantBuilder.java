@@ -31,7 +31,7 @@ import java.util.Optional;
  * {@code GrpcTenantDTO} → {@link FacadeTenantBO}.
  *
  * @author pnoker
- * @since 2026.4.19
+ * @since 2026.4.29
  */
 @Component
 public class FacadeGrpcTenantBuilder {

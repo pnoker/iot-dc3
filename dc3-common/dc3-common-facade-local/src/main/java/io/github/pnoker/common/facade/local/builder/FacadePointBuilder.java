@@ -28,7 +28,7 @@ import org.mapstruct.Mapper;
  * FacadePoint ↔ manager PointBO/Query mapper.
  *
  * @author pnoker
- * @since 2026.4.19
+ * @since 2026.4.29
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadePointBuilder {

@@ -45,7 +45,7 @@ import java.util.Optional;
  * that would each need an explicit {@code @Mapping(target = "...", ignore = true)}.
  *
  * @author pnoker
- * @since 2026.4.19
+ * @since 2026.4.29
  */
 @Component
 public class FacadeGrpcDeviceBuilder {

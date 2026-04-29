@@ -16,7 +16,7 @@
 #
 
 # Use JDK 2025.9 base image
-FROM pnoker/dc3-jdk:2025.9
+FROM pnoker/dc3-jdk:25
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 

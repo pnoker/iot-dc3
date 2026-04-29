@@ -29,7 +29,7 @@ import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
  * used by {@link DeviceFacade}.
  *
  * @author pnoker
- * @since 2026.4.19
+ * @since 2026.4.29
  */
 public interface DriverFacade {
 

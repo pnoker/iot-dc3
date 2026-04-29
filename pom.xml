@@ -22,12 +22,12 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-parent</artifactId>
-        <version>2026.4.19</version>
+        <version>2026.4.29</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>iot-dc3</artifactId>
-    <version>2026.4.19</version>
+    <version>2026.4.29</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2016</inceptionYear>
@@ -69,8 +69,11 @@
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
 
+        <!-- JDK Version -->
+        <java.version>25</java.version>
+
         <!-- DC3 Version -->
-        <dc3.version>2026.4.19</dc3.version>
+        <dc3.version>2026.4.29</dc3.version>
     </properties>
 
     <modules>
@@ -223,6 +226,36 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-jdk-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[25,26)</version>
+                                    <message>
+                                        This project requires JDK 25 to build.
+                                        Current JDK: ${java.version}
+                                        Please install JDK 25 and set JAVA_HOME accordingly.
+                                    </message>
+                                </requireJavaVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>
