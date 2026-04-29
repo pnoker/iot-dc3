@@ -57,6 +57,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ChannelHandler.Sharable
 public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
+    /**
+     * Static self-reference for accessing Spring-injected beans from static context.
+     */
     private static NettyTcpServerHandler nettyTcpServerHandler;
     @Resource
     private NettyServerHandler nettyServerHandler;

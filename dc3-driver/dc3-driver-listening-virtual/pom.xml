@@ -33,18 +33,11 @@
         intended for testing purposes only.
     </description>
 
-    <dependencies>
-
-        <!--Netty -->
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-resolver-dns-native-macos</artifactId>
-        </dependency>
-
-    </dependencies>
+    <!--
+        Netty is already on the runtime classpath transitively via grpc-netty
+        (spring-grpc-spring-boot-starter → grpc-netty → netty-*). Declaring its own netty
+        dependency used to drag in netty-all (heavyweight) and netty-resolver-dns-native-macos
+        (macOS-only native artifact that has no place in a production pom).
+    -->
 
 </project>
