@@ -36,7 +36,7 @@ import io.github.pnoker.common.manager.service.DeviceService;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.server.service.GrpcService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -48,7 +48,7 @@ import java.util.List;
  * @since 2022.1.0
  */
 @Slf4j
-@GrpcService
+@Service
 public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
     @Resource
