@@ -41,6 +41,9 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
   mapper-locations: classpath*:/mapping/*Mapper.xml
+  # Scanned for TypeHandlers — picks up TimestamptzLocalDateTimeTypeHandler which overrides the
+  # default LocalDateTime handler so Postgres TIMESTAMPTZ columns bridge cleanly into LocalDateTime.
+  type-handlers-package: io.github.pnoker.common.handler
   global-config:
     banner: false
     db-config:
