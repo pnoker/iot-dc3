@@ -23,13 +23,16 @@ import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
@@ -67,6 +70,35 @@ public class ExceptionConfig {
                 Exception: {}
                 """, request.getURI().getRawPath(), exception.getMessage(), exception);
         return Mono.just(R.fail(exception.getMessage()));
+    }
+
+    /**
+     * Handle Spring's framework-level {@link ResponseStatusException} — e.g. 404 from the
+     * dispatcher when no handler matches a request. These are not application failures, so they
+     * must not surface as 500 ERROR entries. Preserves the original status on the response and
+     * logs at a level appropriate to the status class.
+     *
+     * @param exception ResponseStatusException raised by the reactive dispatcher or an HTTP client
+     * @param request   ServerHttpRequest that triggered the exception
+     * @param response  ServerHttpResponse to which the original status is applied
+     * @return Mono containing error response
+     */
+    @ExceptionHandler(ResponseStatusException.class)
+    public Mono<R<String>> responseStatusException(ResponseStatusException exception, ServerHttpRequest request, ServerHttpResponse response) {
+        HttpStatusCode status = exception.getStatusCode();
+        response.setStatusCode(status);
+
+        String path = request.getURI().getRawPath();
+        if (status.is5xxServerError()) {
+            log.error("Response status exception {} on {}: {}", status.value(), path, exception.getMessage(), exception);
+        } else if (HttpStatus.NOT_FOUND.value() == status.value()) {
+            log.debug("Not found: {}", path);
+        } else {
+            log.warn("Response status exception {} on {}: {}", status.value(), path, exception.getMessage());
+        }
+
+        String reason = exception.getReason();
+        return Mono.just(R.fail(reason != null ? reason : status.toString()));
     }
 
     /**

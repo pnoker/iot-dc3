@@ -74,6 +74,12 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
+        <!-- Jakarta EL implementation: enables EL-style interpolation in Bean Validation messages (silences HV000183 INFO at startup) -->
+        <dependency>
+            <groupId>org.glassfish.expressly</groupId>
+            <artifactId>expressly</artifactId>
+        </dependency>
+
         <!-- Spring Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
