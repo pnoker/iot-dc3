@@ -4,7 +4,8 @@
       "Bash(find:*)",
       "Bash(java *)",
       "Bash(mvn *)",
-      "WebSearch"
+      "WebSearch",
+      "mcp__context7__query-docs"
     ]
   }
 }
