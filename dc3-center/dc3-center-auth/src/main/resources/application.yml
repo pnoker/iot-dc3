@@ -21,15 +21,14 @@ server:
   servlet:
     context-path: /auth
 
-# gRPC server configuration
-grpc:
-  server:
-    port: ${GRPC_SERVER_PORT:9300}
-
 # Spring application configuration
 spring:
   application:
     name: @project.artifactId@
+  # gRPC server configuration
+  grpc:
+    server:
+      port: ${GRPC_SERVER_PORT:9300}
   # Active profile configuration, defaults to 'dev' if NODE_ENV is not set
   profiles:
     active:
