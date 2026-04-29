@@ -9,7 +9,7 @@ asynchronous communication between services and drivers.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-rabbitmq
-- **Version**: 2026.4.19
+- **Version**: 2026.4.29
 
 ## Key Components
 

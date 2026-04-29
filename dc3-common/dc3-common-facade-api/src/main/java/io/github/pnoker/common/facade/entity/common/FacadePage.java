@@ -31,7 +31,7 @@ import java.util.List;
  * {@code dc3-common-facade-api} keeps zero persistence dependencies.
  *
  * @author pnoker
- * @since 2026.4.19
+ * @since 2026.4.29
  */
 @Getter
 @Setter

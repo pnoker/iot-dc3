@@ -37,7 +37,7 @@ import java.util.List;
  * </ul>
  *
  * @author pnoker
- * @since 2026.4.19
+ * @since 2026.4.29
  */
 public interface DeviceFacade {
 

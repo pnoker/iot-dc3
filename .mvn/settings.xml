@@ -36,7 +36,7 @@
 
         <mirror>
             <id>public</id>
-            <mirrorOf>public</mirrorOf>
+            <mirrorOf>central</mirrorOf>
             <name>Aliyun Apache Maven Public Packages</name>
             <url>https://maven.aliyun.com/repository/public</url>
         </mirror>

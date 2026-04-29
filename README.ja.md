@@ -88,7 +88,8 @@ make compose-logs STACK=dev REGISTRY=global
 cp .env.example .env
 ```
 
-リポジトリ直下の `.env` は `dc3/` 配下の Compose ファイル用の変数展開に使用されます。アプリケーション実行時の環境変数は引き続き `dc3/env/dev.env` または `dc3/env/dev.env.sh` で管理されます。
+リポジトリ直下の `.env` は `dc3/` 配下の Compose ファイル用の変数展開に使用されます。アプリケーション実行時の環境変数は引き続き `dc3/env/dev.env` または `dc3/env/dev.env.sh`
+で管理されます。
 
 ## 3.2 準備
 
