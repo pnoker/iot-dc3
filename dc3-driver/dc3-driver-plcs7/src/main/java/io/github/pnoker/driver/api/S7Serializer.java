@@ -20,51 +20,53 @@ import io.github.pnoker.driver.bean.PlcS7PointVariable;
 import io.github.pnoker.driver.exception.S7Exception;
 
 /**
+ * Interface for reading (dispense) and writing (store) typed data
+ * to/from S7 PLC data blocks.
+ *
  * @author Thomas Rudin
  */
 public interface S7Serializer {
 
     /**
-     * Dispenses an Object from the mapping of the Datablock.
+     * Deserialize an object from a data block.
      *
-     * @param <T>        the generic type
-     * @param beanClass  the bean class
-     * @param dbNum      the db num
-     * @param byteOffset the byte offset
-     * @return the t
-     * @throws S7Exception the s7 exception
+     * @param <T>        target type
+     * @param beanClass  class to deserialize into
+     * @param dbNum      data block number
+     * @param byteOffset byte offset within the DB
+     * @return the deserialized object
+     * @throws S7Exception if reading fails
      */
     <T> T dispense(Class<T> beanClass, int dbNum, int byteOffset) throws S7Exception;
 
     /**
-     * Dispense.
+     * Deserialize an object from a data block with an explicit block size.
      *
-     * @param <T>        the generic type
-     * @param beanClass  the bean class
-     * @param dbNum      the db num
-     * @param byteOffset the byte offset
-     * @param blockSize  the block size
-     * @return the t
-     * @throws S7Exception the s7 exception
+     * @param <T>        target type
+     * @param beanClass  class to deserialize into
+     * @param dbNum      data block number
+     * @param byteOffset byte offset within the DB
+     * @param blockSize  number of bytes to read
+     * @return the deserialized object
+     * @throws S7Exception if reading fails
      */
     <T> T dispense(Class<T> beanClass, int dbNum, int byteOffset, int blockSize) throws S7Exception;
 
-
     /**
-     * Dispense.
+     * Read a point value from a data block using the point variable definition.
      *
-     * @param plcs7PointVariable the point
-     * @return Object
-     * @throws S7Exception the s7 exception
+     * @param plcs7PointVariable point variable with DB number, offsets, and type
+     * @return the read value
+     * @throws S7Exception if reading fails
      */
     Object dispense(PlcS7PointVariable plcs7PointVariable) throws S7Exception;
 
     /**
-     * Stores an Object to the Datablock.
+     * Serialize and write an object to a data block.
      *
-     * @param bean       the bean
-     * @param dbNum      the db num
-     * @param byteOffset the byte offset
+     * @param bean       the value to write
+     * @param dbNum      data block number
+     * @param byteOffset byte offset within the DB
      */
     void store(Object bean, int dbNum, int byteOffset);
 

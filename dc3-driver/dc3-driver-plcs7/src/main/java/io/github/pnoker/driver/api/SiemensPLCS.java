@@ -28,40 +28,14 @@ package io.github.pnoker.driver.api;
  * @since 2022.1.0
  */
 public enum SiemensPLCS {
-
-    /**
-     * S200
-     */
     S_200,
-
-    /**
-     * S200Smart
-     */
     S_200_SMART,
-
     /**
-     * except the 200 series
+     * Non-200 series (S7-300/400/1200/1500).
      */
     S_NON_200,
-
-    /**
-     * S300
-     */
     S_300,
-
-    /**
-     * S400
-     */
     S_400,
-
-    /**
-     * S1200
-     */
     S_1200,
-
-    /**
-     * S1500
-     */
     S_1500,
-
 }
