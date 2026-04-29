@@ -34,8 +34,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
- * <p>
+ * Quartz job that iterates through enabled devices and points and triggers periodic reads.
  *
  * @author pnoker
  * @version 2025.9.0

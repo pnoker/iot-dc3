@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- *
+ * RabbitMQ consumer that keeps local metadata caches in sync with platform metadata change events.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -29,10 +29,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 /**
- * Driver Initialization Runner for DC3 IoT Platform.
- * This class handles the initialization and startup sequence of driver components,
- * including driver registration, custom initialization, and task scheduling.
- * It implements ApplicationRunner to ensure these tasks are executed during application startup.
+ * Application startup runner that completes the standard driver bootstrap sequence: registration,
+ * custom initialization, and schedule initialization.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -27,7 +27,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Listener
+ * Listens for internal metadata events and forwards the relevant device and point changes to the
+ * custom driver service.
  *
  * @author zhangzi
  * @version 2025.9.0

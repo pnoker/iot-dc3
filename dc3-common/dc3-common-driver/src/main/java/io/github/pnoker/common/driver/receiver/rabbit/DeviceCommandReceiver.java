@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 /**
- *
+ * RabbitMQ consumer that dispatches device read and write commands to the corresponding services.
  *
  * @author pnoker
  * @version 2025.9.0

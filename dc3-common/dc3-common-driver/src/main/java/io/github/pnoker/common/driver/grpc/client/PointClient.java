@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Point Client
+ * gRPC client used to query point metadata associated with the current driver.
  *
  * @author pnoker
  * @version 2025.9.0

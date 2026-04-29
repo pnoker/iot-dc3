@@ -25,6 +25,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.grpc.client.GrpcChannelFactory;
 
+/**
+ * Spring configuration that creates the blocking gRPC stubs used by the driver SDK to talk to the
+ * manager center.
+ */
 @Configuration
 public class GrpcStubConfig {
 

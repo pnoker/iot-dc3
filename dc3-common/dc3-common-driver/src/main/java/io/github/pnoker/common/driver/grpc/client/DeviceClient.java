@@ -41,7 +41,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Device Client
+ * gRPC client used to query device metadata and device-specific attribute configuration from the
+ * manager center.
  *
  * @author pnoker
  * @version 2025.9.0

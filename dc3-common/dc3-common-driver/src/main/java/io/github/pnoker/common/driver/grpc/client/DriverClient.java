@@ -44,7 +44,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Driver Client
+ * gRPC client responsible for driver registration and for loading the metadata returned by the
+ * manager center after registration succeeds.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -69,9 +70,9 @@ public class DriverClient {
     private GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
     /**
-     * Register driver with metadata
+     * Registers the current driver and stores the returned metadata in the shared driver cache.
      *
-     * @param entityBO DriverRegisterBO containing driver registration information
+     * @param entityBO driver registration payload
      */
     public void driverRegister(RegisterBO entityBO) {
         // Build driver registration information

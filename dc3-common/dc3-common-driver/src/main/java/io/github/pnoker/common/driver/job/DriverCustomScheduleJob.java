@@ -24,7 +24,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 /**
- *
+ * Quartz job that invokes the custom scheduled task implemented by the driver.
  *
  * @author pnoker
  * @version 2025.9.0
