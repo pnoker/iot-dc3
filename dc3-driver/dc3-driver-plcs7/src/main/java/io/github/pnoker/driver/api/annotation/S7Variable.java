@@ -21,7 +21,8 @@ import io.github.pnoker.driver.api.S7Type;
 import java.lang.annotation.*;
 
 /**
- * Defines an Offset in a DB
+ * Annotation for mapping a Java field to an S7 PLC data block variable.
+ * Specifies the S7 type, byte/bit offsets, and optional size for the mapping.
  *
  * @author Thomas Rudin
  */
@@ -30,37 +31,27 @@ import java.lang.annotation.*;
 @Documented
 public @interface S7Variable {
     /**
-     * The size of the array
-     *
-     * @return Size
+     * @return number of elements (for array fields)
      */
     int arraySize() default 1;
 
     /**
-     * The bit offset, if any
-     *
-     * @return Offset
+     * @return bit offset within the byte
      */
     int bitOffset() default 0;
 
     /**
-     * The Byte Offset
-     *
-     * @return Offset
+     * @return byte offset within the data block
      */
     int byteOffset();
 
     /**
-     * The specified size (for String)
-     *
-     * @return Size
+     * @return byte size (required for STRING type)
      */
     int size() default 0;
 
     /**
-     * The corresponding S7 Type
-     *
-     * @return S7Type
+     * @return the S7 data type
      */
     S7Type type();
 

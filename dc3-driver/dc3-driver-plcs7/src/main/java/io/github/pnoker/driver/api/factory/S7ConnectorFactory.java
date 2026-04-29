@@ -22,7 +22,7 @@ import io.github.pnoker.driver.api.SiemensPLCS;
 import io.github.pnoker.driver.api.impl.S7TCPConnection;
 
 /**
- * S7 connector factory, currently only for TCP connections
+ * Factory for creating S7 connector instances (TCP only).
  *
  * @author Thomas Rudin
  */
@@ -33,19 +33,22 @@ public class S7ConnectorFactory {
     }
 
     /**
-     * @param type choose a siemens plc type to build a tcp connector.
-     * @return returns a new TCP connection builder
+     * @param type the Siemens PLC model
+     * @return a new TCP connection builder
      */
     public static TCPConnectionBuilder buildTCPConnector(SiemensPLCS type) {
         return new TCPConnectionBuilder(type);
     }
 
+    /**
+     * @return a TCP connection builder defaulting to non-200 series
+     */
     public static TCPConnectionBuilder buildTCPConnector() {
         return new TCPConnectionBuilder(SiemensPLCS.S_NON_200);
     }
 
     /**
-     * TCP Connection builder
+     * Builder for configuring and creating S7 TCP connections.
      */
     public static class TCPConnectionBuilder {
 

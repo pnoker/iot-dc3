@@ -22,7 +22,7 @@ import io.github.pnoker.driver.api.S7Serializer;
 import io.github.pnoker.driver.api.impl.serializer.S7SerializerImpl;
 
 /**
- * S7 Serializer factory
+ * Factory for creating S7Serializer instances bound to a given connector.
  *
  * @author Thomas Rudin
  */
