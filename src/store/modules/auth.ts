@@ -17,6 +17,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import router from '@/config/router';
+import i18n from '@/config/i18n';
 import { ElLoading } from 'element-plus';
 
 import { cancelToken, generateSalt, generateToken } from '@/api/token';
@@ -60,7 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (form: any) => {
     const loading = ElLoading.service({
       lock: true,
-      text: '登录中,请稍后...',
+      text: i18n.global.t('login.loading'),
     });
     const loginData: Login = {
       tenant: form.tenant,

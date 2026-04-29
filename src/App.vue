@@ -15,10 +15,25 @@
   -->
 
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <el-config-provider :locale="elementLocale">
+    <div id="app">
+      <router-view />
+    </div>
+  </el-config-provider>
 </template>
+
+<script lang="ts" setup>
+  import { computed } from 'vue';
+  import zhCn from 'element-plus/es/locale/lang/zh-cn';
+  import en from 'element-plus/es/locale/lang/en';
+  import { useI18n } from 'vue-i18n';
+
+  const { locale } = useI18n();
+
+  const elementLocale = computed(() => {
+    return locale.value === 'zh' ? zhCn : en;
+  });
+</script>
 
 <style lang="scss" scoped>
   #app {

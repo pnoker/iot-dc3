@@ -26,7 +26,7 @@
             <el-icon>
               <HomeFilled />
             </el-icon>
-            首页
+            {{ t('nav.home') }}
           </el-menu-item>
           <template v-for="menusItem in menus">
             <el-sub-menu v-if="menusItem.children" :key="`${menusItem.path}-submenu`" :index="menusItem.path">
@@ -45,28 +45,44 @@
         </el-menu>
       </el-col>
       <el-col :span="4" class="header_item header_user">
-        <el-dropdown class="user_avatar" trigger="click" @command="handleCommand">
-          <span class="el-dropdown-link">
+        <el-dropdown trigger="click" @command="handleCommand">
+          <span class="user_avatar">
             <el-avatar>
               <img src="/images/common/avatar.png" />
             </el-avatar>
+            <span class="user_name">{{ t('layout.admin') }}</span>
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="help">关于</el-dropdown-item>
-              <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
+              <el-dropdown-item :class="{ 'is-active': locale === 'en' }" command="lang-en">
+                <span class="lang-flag">🇺🇸</span>
+                <span class="lang-text">English</span>
+                <el-icon v-if="locale === 'en'" class="lang-check"><Check /></el-icon>
+              </el-dropdown-item>
+              <el-dropdown-item :class="{ 'is-active': locale === 'zh' }" command="lang-zh">
+                <span class="lang-flag">🇨🇳</span>
+                <span class="lang-text">中文</span>
+                <el-icon v-if="locale === 'zh'" class="lang-check"><Check /></el-icon>
+              </el-dropdown-item>
+              <el-dropdown-item divided command="help">{{ t('layout.about') }}</el-dropdown-item>
+              <el-dropdown-item command="logout">{{ t('layout.logout') }}</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <el-badge :max="99" :value="3" class="user_badge" type="primary">
-          <span class="user_name" @click="handleMessage">管理员</span>
-        </el-badge>
       </el-col>
     </div>
     <div class="body">
-      <el-scrollbar>
+      <el-scrollbar ref="scrollbarRef">
+        <div v-if="breadcrumbItems.length > 1" class="breadcrumb">
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item v-for="item in breadcrumbItems" :key="item.path" :to="item.path">
+              {{ item.title }}
+            </el-breadcrumb-item>
+          </el-breadcrumb>
+        </div>
         <router-view />
       </el-scrollbar>
+      <el-backtop :right="40" :bottom="40" target=".body .el-scrollbar__wrap" />
     </div>
   </div>
 </template>
@@ -74,13 +90,54 @@
 <script lang="ts" setup>
   import router from '@/config/router';
   import menu from '@/config/router/views';
-  import { warning } from '@/utils/MessageUtil';
-  import { HomeFilled } from '@element-plus/icons-vue';
+  import { Check, HomeFilled } from '@element-plus/icons-vue';
   import { computed } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { useRoute } from 'vue-router';
   import { useAuthStore } from '@/store';
   import type { RouteRecordRaw } from 'vue-router';
 
+  const { t, locale } = useI18n();
+  const route = useRoute();
   const authStore = useAuthStore();
+
+  const nameMap: Record<string, string> = {
+    home: 'nav.home',
+    driver: 'nav.driver',
+    profile: 'nav.profile',
+    device: 'nav.device',
+    pointValue: 'nav.data',
+    driverDetail: 'nav.driverDetail',
+    deviceDetail: 'nav.deviceDetail',
+    deviceEdit: 'nav.deviceEdit',
+    profileDetail: 'nav.profileDetail',
+    profileEdit: 'nav.profileEdit',
+    pointDetail: 'nav.pointDetail',
+    pointEdit: 'nav.pointEdit',
+    dashboard: 'nav.dashboard',
+    application: 'nav.application',
+  };
+
+  const breadcrumbItems = computed(() => {
+    const items: { path: string; title: string }[] = [{ path: '/home', title: t('nav.home') }];
+    const name = route.name as string;
+    if (!name || name === 'home') return items;
+
+    const title = nameMap[name] ? t(nameMap[name]) : name;
+    if (name.startsWith('driver')) {
+      items.push({ path: '/driver', title: t('nav.driver') });
+    } else if (name.startsWith('device')) {
+      items.push({ path: '/device', title: t('nav.device') });
+    } else if (name.startsWith('profile')) {
+      items.push({ path: '/profile', title: t('nav.profile') });
+    } else if (name.startsWith('point')) {
+      items.push({ path: '/point_value', title: t('nav.data') });
+    }
+    if (!['home', 'driver', 'profile', 'device', 'pointValue'].includes(name)) {
+      items.push({ path: route.path, title });
+    }
+    return items;
+  });
 
   const menus = computed(() => {
     const children: RouteRecordRaw[] = menu?.children || [];
@@ -97,12 +154,12 @@
     return index;
   };
 
-  const handleMessage = () => {
-    warning('待开发');
-  };
-
   const handleCommand = async (command: string) => {
-    if (command === 'logout') {
+    if (command.startsWith('lang-')) {
+      const lang = command.slice(5);
+      locale.value = lang;
+      localStorage.setItem('locale', lang);
+    } else if (command === 'logout') {
       await authStore.logout();
       await router.push({ name: 'login' });
     } else if (command === 'help') {
@@ -113,4 +170,22 @@
 
 <style lang="scss" scoped>
   @use '@/components/layout/style.scss';
+</style>
+
+<style lang="scss">
+  .el-dropdown-menu {
+    .lang-flag {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .lang-text {
+      margin-right: 16px;
+    }
+
+    .lang-check {
+      margin-left: auto;
+      color: var(--el-color-primary);
+    }
+  }
 </style>

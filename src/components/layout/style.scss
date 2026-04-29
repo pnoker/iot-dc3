@@ -54,27 +54,28 @@ body {
     .header_user {
       display: flex;
       justify-content: flex-end;
-      padding-right: 10px;
+      align-items: center;
+      padding-right: 20px;
 
       .user_avatar {
-        top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
         cursor: pointer;
 
         .el-avatar {
           background: #ffffff;
         }
+
+        .user_name {
+          color: #909399;
+          font-size: 14px;
+        }
       }
 
-      .user_badge {
-        top: 25px;
-        cursor: pointer;
-        margin-right: 40px;
-      }
-
-      .user_name {
-        color: #909399;
-        font-size: 14px;
-        margin: 20px 10px;
+      .lang-flag {
+        margin-right: 8px;
+        font-size: 16px;
       }
     }
   }
@@ -87,5 +88,13 @@ body {
     padding: 5px 0 5px 0;
     position: absolute;
     background: #f6f7f9;
+
+    .breadcrumb {
+      padding: 12px 20px;
+      margin-bottom: 0;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
   }
 }
