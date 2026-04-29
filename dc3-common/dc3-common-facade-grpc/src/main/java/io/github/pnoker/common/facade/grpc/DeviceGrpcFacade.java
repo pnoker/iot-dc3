@@ -19,7 +19,6 @@ package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.DeviceFacade;
@@ -29,7 +28,6 @@ import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcDeviceBuilder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -49,7 +47,7 @@ import java.util.List;
 @Component
 public class DeviceGrpcFacade implements DeviceFacade {
 
-    @GrpcClient(ManagerConstant.SERVICE_NAME)
+    @Resource
     private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
 
     @Resource

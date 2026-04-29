@@ -21,7 +21,6 @@ import io.github.pnoker.api.center.auth.GrpcNameQuery;
 import io.github.pnoker.api.center.auth.GrpcRUserLoginDTO;
 import io.github.pnoker.api.center.auth.UserLoginApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.UserLoginFacade;
@@ -29,7 +28,6 @@ import io.github.pnoker.common.facade.entity.bo.FacadeUserLoginBO;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcUserLoginBuilder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserLoginGrpcFacade implements UserLoginFacade {
 
-    @GrpcClient(AuthConstant.SERVICE_NAME)
+    @Resource
     private UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub;
 
     @Resource
