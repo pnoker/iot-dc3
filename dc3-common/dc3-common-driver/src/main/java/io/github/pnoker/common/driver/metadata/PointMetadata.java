@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * Point metadata cache used to lazily load and refresh point definitions referenced by the driver.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,9 +42,7 @@ import java.util.concurrent.TimeUnit;
 public final class PointMetadata {
 
     /**
-     *
-     * <p>
-     * pointId,pointDTO
+     * Asynchronous cache keyed by point identifier.
      */
     private final AsyncLoadingCache<Long, PointBO> cache;
 
@@ -65,10 +63,10 @@ public final class PointMetadata {
     }
 
     /**
-     * ,
+     * Returns the cached point metadata for the specified point identifier.
      *
-     * @param id Point ID
-     * @return PointBO
+     * @param id point identifier
+     * @return cached point business object
      */
     public PointBO getCache(long id) {
         try {
@@ -82,9 +80,9 @@ public final class PointMetadata {
     }
 
     /**
-     * ,
+     * Reloads the cache entry for the specified point identifier.
      *
-     * @param id Point ID
+     * @param id point identifier
      */
     public void loadCache(long id) {
         CompletableFuture<PointBO> future = CompletableFuture.supplyAsync(() -> pointClient.selectById(id));
@@ -92,9 +90,9 @@ public final class PointMetadata {
     }
 
     /**
-     * ,
+     * Removes the cache entry for the specified point identifier.
      *
-     * @param id Point ID
+     * @param id point identifier
      */
     public void removeCache(long id) {
         cache.put(id, CompletableFuture.completedFuture(null));
