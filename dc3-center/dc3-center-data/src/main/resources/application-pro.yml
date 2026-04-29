@@ -41,6 +41,14 @@ spring:
       password: dc3
       discovery:
         namespace: ${NODE_ENV:pro}
+  grpc:
+    client:
+      channels:
+        dc3-center-manager:
+          address: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9400'
+          enable-keep-alive: true
+          keep-alive-without-calls: true
+          negotiation-type: PLAINTEXT
 
 driver:
   mqtt:
@@ -52,10 +60,3 @@ driver:
     default-send-topic:
       qos: 1
       name: device
-
-grpc:
-  client:
-    dc3-center-manager:
-      enable-keep-alive: true
-      keep-alive-without-calls: true
-      negotiation-type: plaintext
