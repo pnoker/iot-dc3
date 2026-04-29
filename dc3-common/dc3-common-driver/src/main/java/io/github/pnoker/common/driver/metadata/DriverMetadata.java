@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * In-memory holder for driver registration state and shared metadata used across the driver runtime.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -44,45 +44,37 @@ import java.util.Set;
 public final class DriverMetadata {
 
     /**
-     * Status
+     * Current driver status.
      */
     private DriverStatusEnum driverStatus = DriverStatusEnum.OFFLINE;
 
     /**
-     *
+     * Registered driver definition.
      */
     private DriverBO driver;
 
     /**
-     * Device ID
+     * Identifiers of devices owned by the driver.
      */
     private Set<Long> deviceIds;
 
     /**
-     * ID Map
-     * <p>
-     * attributeId,driverAttribute
+     * Driver attributes keyed by attribute identifier.
      */
     private Map<Long, DriverAttributeDTO> driverAttributeIdMap;
 
     /**
-     * Code Map
-     * <p>
-     * attributeName,driverAttribute
+     * Driver attributes keyed by attribute code.
      */
     private Map<String, DriverAttributeDTO> driverAttributeNameMap;
 
     /**
-     * ID Map
-     * <p>
-     * attributeId,pointAttribute
+     * Point attributes keyed by attribute identifier.
      */
     private Map<Long, PointAttributeDTO> pointAttributeIdMap;
 
     /**
-     * Code Map
-     * <p>
-     * attributeName,driverAttribute
+     * Point attributes keyed by attribute code.
      */
     private Map<String, PointAttributeDTO> pointAttributeNameMap;
 }

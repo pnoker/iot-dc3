@@ -24,7 +24,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 /**
- * Publisher
+ * Publishes internal Spring metadata events so driver-specific components can react to metadata changes.
  *
  * @author zhangzi
  * @version 2025.9.0
@@ -41,9 +41,9 @@ public class MetadataEventPublisher {
     }
 
     /**
+     * Publishes the supplied metadata event to the Spring application context.
      *
-     *
-     * @param metadataEvent MetadataEvent
+     * @param metadataEvent metadata event
      */
     public void publishEvent(MetadataEvent metadataEvent) {
         log.info("Metadata event publisher publishEvent: {}", JsonUtil.toJsonString(metadataEvent));

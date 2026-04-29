@@ -29,7 +29,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 /**
- *
+ * Quartz job that periodically reports driver heartbeat status to the platform.
  *
  * @author pnoker
  * @version 2025.9.0

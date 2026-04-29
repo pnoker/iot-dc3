@@ -26,7 +26,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 /**
- *
+ * RabbitMQ consumer for driver-level commands.
  *
  * @author pnoker
  * @version 2025.9.0

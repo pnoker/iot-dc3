@@ -35,10 +35,10 @@ public class CodecUtil {
     }
 
     /**
-     * Encodes the provided string into a Base64 encoded string.
+     * Encodes the provided string into a Base64 string.
      *
-     * @param content The input string to be Base64 encoded.
-     * @return The Base64 encoded representation of the``` inputjava string.
+     * @param content input string
+     * @return Base64-encoded string
      */
     public static String base64Encode(String content) {
         byte[] bytes = DecodeUtil.stringToByte(content);
@@ -46,10 +46,10 @@ public class CodecUtil {
     }
 
     /**
-     * Decodes a Base64 encoded string into its original form.
+     * Decodes a Base64 string into its original form.
      *
-     * @param content The Base64 encoded string to decode.
-     * @return The decoded string in its original form.
+     * @param content Base64 string
+     * @return decoded string
      */
     public static String base64Decode(String content) {
         byte[] bytes = DecodeUtil.stringToByte(content);
@@ -57,7 +57,7 @@ public class CodecUtil {
     }
 
     /**
-     *
+     * Converts BCD bytes to a decimal string.
      */
     public static String bcdBytesToString(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);
@@ -69,7 +69,7 @@ public class CodecUtil {
     }
 
     /**
-     *
+     * Converts a decimal string to BCD bytes.
      */
     public static byte[] strToBcdBytes(String decimalString) {
         int length = decimalString.length();
@@ -106,7 +106,7 @@ public class CodecUtil {
     }
 
     /**
-     *
+     * Converts bytes to a hexadecimal string.
      */
     public static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
@@ -121,10 +121,10 @@ public class CodecUtil {
     }
 
     /**
-     * byteint()
+     * Converts a byte array to a big-endian integer.
      *
-     * @param bytes Byte Array
-     * @return Integer
+     * @param bytes byte array
+     * @return integer value
      */
     public static int bytesToInt(byte[] bytes) {
         byte[] temp = new byte[4];
@@ -142,10 +142,10 @@ public class CodecUtil {
     }
 
     /**
-     * byteint()
+     * Converts a byte array to a little-endian integer.
      *
-     * @param bytes Byte Array
-     * @return Integer
+     * @param bytes byte array
+     * @return integer value
      */
     public static int bytesToIntLE(byte[] bytes) {
         byte[] temp = new byte[4];
@@ -162,20 +162,20 @@ public class CodecUtil {
     }
 
     /**
-     * byte[]Ascii
+     * Converts bytes to an ISO-8859-1 string.
      *
-     * @param bytes Byte Array
-     * @return R of String
+     * @param bytes byte array
+     * @return decoded string
      */
     public static String bytesToAscii(byte[] bytes) {
         return new String(bytes, StandardCharsets.ISO_8859_1);
     }
 
     /**
-     * byte[]
+     * Reverses the order of the supplied bytes.
      *
-     * @param bytes Byte Array
-     * @return Byte Array
+     * @param bytes byte array
+     * @return reversed byte array
      */
     public static byte[] byteReverse(byte[] bytes) {
         int length = bytes.length;
@@ -187,10 +187,10 @@ public class CodecUtil {
     }
 
     /**
-     * byte[]
+     * Merges multiple byte arrays into a single array.
      *
-     * @param bytes Byte Array
-     * @return Byte Array
+     * @param bytes byte arrays
+     * @return merged byte array
      */
     public static byte[] mergerBytes(byte[]... bytes) {
         int lengthByte = 0;
@@ -207,10 +207,10 @@ public class CodecUtil {
     }
 
     /**
+     * Calculates the XOR checksum of the supplied byte arrays.
      *
-     *
-     * @param bytes Byte Array
-     * @return Byte
+     * @param bytes byte arrays
+     * @return XOR checksum
      */
     public static byte xorBytes(byte[]... bytes) {
         byte xor = 0x00;
@@ -223,10 +223,10 @@ public class CodecUtil {
     }
 
     /**
+     * Calculates the additive checksum of the supplied byte arrays.
      *
-     *
-     * @param bytes Byte Array
-     * @return Byte
+     * @param bytes byte arrays
+     * @return additive checksum
      */
     public static byte sumBytes(byte[]... bytes) {
         byte xor = 0x00;

@@ -42,7 +42,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- *
+ * Device metadata cache that loads device definitions and resolves driver and point configuration
+ * views for the driver runtime.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -53,9 +54,7 @@ import java.util.stream.Collectors;
 public final class DeviceMetadata {
 
     /**
-     *
-     * <p>
-     * deviceId, deviceDTO
+     * Asynchronous cache keyed by device identifier.
      */
     private final AsyncLoadingCache<Long, DeviceBO> cache;
 
@@ -79,11 +78,10 @@ public final class DeviceMetadata {
     }
 
     /**
-     * ,
-     * Get cache for specified device
+     * Returns the cached device metadata for the specified device identifier.
      *
-     * @param id Device ID Device ID
-     * @return DeviceBO Device business object
+     * @param id device identifier
+     * @return cached device business object
      */
     public DeviceBO getCache(long id) {
         try {
@@ -97,10 +95,9 @@ public final class DeviceMetadata {
     }
 
     /**
-     * ,
-     * Reload cache for specified device
+     * Reloads the cache entry for the specified device identifier.
      *
-     * @param id Device ID Device ID
+     * @param id device identifier
      */
     public void loadCache(long id) {
         CompletableFuture<DeviceBO> future = CompletableFuture.supplyAsync(() -> deviceClient.selectById(id));
@@ -108,24 +105,20 @@ public final class DeviceMetadata {
     }
 
     /**
-     * ,
-     * Remove cache for specified device
+     * Removes the cache entry for the specified device identifier.
      *
-     * @param id Device ID Device ID
+     * @param id device identifier
      */
     public void removeCache(long id) {
         cache.put(id, CompletableFuture.completedFuture(null));
     }
 
     /**
+     * Resolves driver attribute configuration for the specified device and verifies that all
+     * required attributes are present.
      *
-     * Get driver attribute configuration
-     * <p>
-     * <p>
-     * Will verify if configuration is complete
-     *
-     * @param deviceId Device ID Device ID
-     * @return Map Attribute configuration map
+     * @param deviceId device identifier
+     * @return driver configuration map keyed by attribute code
      */
     public Map<String, AttributeBO> getDriverConfig(long deviceId) {
         Map<Long, DriverAttributeDTO> attributeMap = driverMetadata.getDriverAttributeIdMap();
@@ -157,14 +150,10 @@ public final class DeviceMetadata {
     }
 
     /**
+     * Resolves point attribute configuration for all points of the specified device.
      *
-     * Get all point attribute configurations for device
-     * <p>
-     * <p>
-     * Will verify if configuration is complete
-     *
-     * @param deviceId Device ID Device ID
-     * @return Map Attribute configuration map
+     * @param deviceId device identifier
+     * @return point configuration map keyed by point identifier and attribute code
      */
     public Map<Long, Map<String, AttributeBO>> getPointConfig(long deviceId) {
         Map<Long, PointAttributeDTO> attributeMap = driverMetadata.getPointAttributeIdMap();
@@ -195,15 +184,11 @@ public final class DeviceMetadata {
     }
 
     /**
+     * Resolves point attribute configuration for a single point of the specified device.
      *
-     * Get specific point attribute configuration for device
-     * <p>
-     * <p>
-     * Will verify if configuration is complete
-     *
-     * @param deviceId Device ID Device ID
-     * @param pointId  Point ID Point ID
-     * @return Map Attribute configuration map
+     * @param deviceId device identifier
+     * @param pointId  point identifier
+     * @return point configuration map keyed by attribute code
      */
     public Map<String, AttributeBO> getPointConfig(long deviceId, long pointId) {
         Map<Long, PointAttributeDTO> attributeMap = driverMetadata.getPointAttributeIdMap();
