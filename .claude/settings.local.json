@@ -5,7 +5,8 @@
       "Bash(java *)",
       "Bash(mvn *)",
       "WebSearch",
-      "mcp__context7__query-docs"
+      "mcp__context7__query-docs",
+      "Bash(podman exec *)"
     ]
   }
 }
