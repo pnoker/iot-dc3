@@ -109,8 +109,7 @@ Services must be started in this order:
 5. **Drivers** — e.g. `dc3-driver-virtual`, `dc3-driver-listening-virtual` (HTTP `6270`, gRPC `6271`), `dc3-driver-modbus-tcp`, `dc3-driver-mqtt`, `dc3-driver-opc-da`,
    `dc3-driver-opc-ua`, `dc3-driver-plcs7`
 
-`dc3/env/dev.env.sh` defines host/port/credentials for local infra and `CENTER_AUTH_HOST` / `CENTER_DATA_HOST` / `CENTER_MANAGER_HOST` gRPC targets. Note that the file uses a
-`source KEY=value` form — verify your shell actually exports them before relying on it.
+`dc3/env/dev.env.sh` defines host/port/credentials for local infra and `CENTER_AUTH_HOST` / `CENTER_DATA_HOST` / `CENTER_MANAGER_HOST` gRPC targets. `source dc3/env/dev.env.sh` before running services from the shell or IDE.
 
 ## Module Structure
 
