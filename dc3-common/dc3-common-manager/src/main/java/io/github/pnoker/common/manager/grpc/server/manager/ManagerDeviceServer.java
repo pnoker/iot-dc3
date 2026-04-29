@@ -31,8 +31,8 @@ import io.github.pnoker.common.manager.service.DeviceService;
 import io.grpc.stub.StreamObserver;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.server.service.GrpcService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
@@ -45,7 +45,7 @@ import java.util.Objects;
  * @since 2022.1.0
  */
 @Slf4j
-@GrpcService
+@Service
 public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
 
     @Resource
