@@ -21,7 +21,6 @@ import io.github.pnoker.api.common.GrpcDriverAttributeConfigDTO;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointAttributeConfigDTO;
 import io.github.pnoker.api.common.driver.*;
-import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.builder.DeviceBuilder;
 import io.github.pnoker.common.driver.entity.builder.GrpcDriverAttributeConfigBuilder;
@@ -33,7 +32,6 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.optional.CollectionOptional;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -54,7 +52,7 @@ import java.util.stream.Collectors;
 @Component
 public class DeviceClient {
 
-    @GrpcClient(ManagerConstant.SERVICE_NAME)
+    @Resource
     private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
 
     @Resource
