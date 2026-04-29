@@ -46,10 +46,10 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     @Override
     public void heartbeatEvent(DeviceEventDTO entityDTO) {
         DeviceEventDTO.DeviceStatus deviceStatus = JsonUtil.parseObject(entityDTO.getContent(), DeviceEventDTO.DeviceStatus.class);
-        if (Objects.isNull(deviceStatus)) {
+        if (Objects.isNull(deviceStatus) || Objects.isNull(deviceStatus.getStatus())) {
             return;
         }
-        localCacheService.setKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceStatus.getDeviceId(), deviceStatus.getStatus(), deviceStatus.getTimeOut(), deviceStatus.getTimeUnit());
+        localCacheService.setKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceStatus.getDeviceId(), deviceStatus.getStatus().getCode(), deviceStatus.getTimeOut(), deviceStatus.getTimeUnit());
     }
 
 }
