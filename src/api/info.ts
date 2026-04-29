@@ -14,106 +14,25 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios';
+import { httpGet, httpPost } from '@/api/common';
 
-/**
- * Add driver configuration
- *
- * @param driverInfo Driver configuration object
- * @returns MyAxiosPromise
- */
-export const addDriverInfo = (driverInfo: any) =>
-  request<R>({
-    url: `api/v3/manager/driver_attribute_config/add`,
-    method: 'post',
-    data: driverInfo,
-  });
+export const addDriverInfo = (driverInfo: any) => httpPost('api/v3/manager/driver_attribute_config/add', driverInfo);
 
-/**
- * Update driver configuration
- *
- * @param driverInfo Driver configuration object
- * @returns MyAxiosPromise
- */
 export const updateDriverInfo = (driverInfo: any) =>
-  request<R>({
-    url: `api/v3/manager/driver_attribute_config/update`,
-    method: 'post',
-    data: driverInfo,
-  });
+  httpPost('api/v3/manager/driver_attribute_config/update', driverInfo);
 
-/**
- * Get driver configuration by device ID and attribute ID
- *
- * @param deviceId Device ID
- * @param attributeId Attribute ID
- * @returns MyAxiosPromise
- */
 export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attributeId: string) =>
-  request<R>({
-    url: `api/v3/manager/driver_attribute_config/device_id/${deviceId}/attribute_id/${attributeId}`,
-    method: 'get',
-  });
+  httpGet(`api/v3/manager/driver_attribute_config/device_id/${deviceId}/attribute_id/${attributeId}`);
 
-/**
- * Get driver configuration by device ID
- *
- * @param deviceId Device ID
- * @returns MyAxiosPromise
- */
 export const getDriverInfoByDeviceId = (deviceId: string) =>
-  request<R>({
-    url: `api/v3/manager/driver_attribute_config/device_id/${deviceId}`,
-    method: 'get',
-  });
+  httpGet(`api/v3/manager/driver_attribute_config/device_id/${deviceId}`);
 
-/**
- * Add point configuration
- *
- * @param pointInfo Point configuration object
- * @returns MyAxiosPromise
- */
-export const addPointInfo = (pointInfo: any) =>
-  request<R>({
-    url: `api/v3/manager/point_attribute_config/add`,
-    method: 'post',
-    data: pointInfo,
-  });
+export const addPointInfo = (pointInfo: any) => httpPost('api/v3/manager/point_attribute_config/add', pointInfo);
 
-/**
- * Update point configuration
- *
- * @param pointInfo Point configuration object
- * @returns MyAxiosPromise
- */
-export const updatePointInfo = (pointInfo: any) =>
-  request<R>({
-    url: `api/v3/manager/point_attribute_config/update`,
-    method: 'post',
-    data: pointInfo,
-  });
+export const updatePointInfo = (pointInfo: any) => httpPost('api/v3/manager/point_attribute_config/update', pointInfo);
 
-/**
- * Get point configuration by device ID and point ID
- *
- * @param deviceId Device ID
- * @param pointId Point ID
- * @returns MyAxiosPromise
- */
 export const getPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: string) =>
-  request<R>({
-    url: `api/v3/manager/point_attribute_config/device_id/${deviceId}/point_id/${pointId}`,
-    method: 'get',
-  });
+  httpGet(`api/v3/manager/point_attribute_config/device_id/${deviceId}/point_id/${pointId}`);
 
-/**
- * Get point configuration by device ID
- *
- * @param deviceId Device ID
- * @returns MyAxiosPromise
- */
 export const getPointInfoByDeviceId = (deviceId: string) =>
-  request<R>({
-    url: `api/v3/manager/point_attribute_config/device_id/${deviceId}`,
-    method: 'get',
-  });
+  httpGet(`api/v3/manager/point_attribute_config/device_id/${deviceId}`);

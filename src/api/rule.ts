@@ -14,17 +14,6 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios';
+import { httpPost } from '@/api/common';
 
-/**
- * Get flows list
- *
- * @param flowsQuery Flows query parameters
- * @returns MyAxiosPromise
- */
-export const getFlowsList = (flowsQuery: any) =>
-  request<R>({
-    url: 'api/v3/manager/ruleengine/flowsList',
-    method: 'post',
-    data: flowsQuery,
-  });
+export const getFlowsList = (flowsQuery: any) => httpPost('api/v3/manager/ruleengine/flowsList', flowsQuery);

@@ -14,92 +14,18 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios';
+import { httpGet, httpPost } from '@/api/common';
 
-/**
- * Add a new profile
- *
- * @param profile Profile object
- * @returns MyAxiosPromise
- */
-export const addProfile = (profile: any) =>
-  request<R>({
-    url: `api/v3/manager/profile/add`,
-    method: 'post',
-    data: profile,
-  });
+export const addProfile = (profile: any) => httpPost('api/v3/manager/profile/add', profile);
 
-/**
- * Delete a profile
- *
- * @param id Profile ID
- * @returns MyAxiosPromise
- */
-export const deleteProfile = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/profile/delete/${id}`,
-    method: 'post',
-  });
+export const deleteProfile = (id: string) => httpPost(`api/v3/manager/profile/delete/${id}`);
 
-/**
- * Update a profile
- *
- * @param profile Profile object
- * @returns MyAxiosPromise
- */
-export const updateProfile = (profile: any) =>
-  request<R>({
-    url: `api/v3/manager/profile/update`,
-    method: 'post',
-    data: profile,
-  });
+export const updateProfile = (profile: any) => httpPost('api/v3/manager/profile/update', profile);
 
-/**
- * Get profile by ID
- *
- * @param id Profile ID
- * @returns MyAxiosPromise
- */
-export const getProfileById = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/profile/id/${id}`,
-    method: 'get',
-  });
+export const getProfileById = (id: string) => httpGet(`api/v3/manager/profile/id/${id}`);
 
-/**
- * Get profiles by IDs
- *
- * @param profileIds Profile ID array
- * @returns MyAxiosPromise
- */
-export const getProfileByIds = (profileIds: any) =>
-  request<R>({
-    url: `api/v3/manager/profile/ids`,
-    method: 'post',
-    data: profileIds,
-  });
+export const getProfileByIds = (profileIds: any) => httpPost('api/v3/manager/profile/ids', profileIds);
 
-/**
- * Get profile by device ID
- *
- * @param deviceId Device ID
- * @returns MyAxiosPromise
- */
-export const getProfileByDeviceId = (deviceId: string) =>
-  request<R>({
-    url: `api/v3/manager/profile/device_id/${deviceId}`,
-    method: 'get',
-  });
+export const getProfileByDeviceId = (deviceId: string) => httpGet(`api/v3/manager/profile/device_id/${deviceId}`);
 
-/**
- * Get profile list with pagination
- *
- * @param profile Profile query parameters
- * @returns MyAxiosPromise
- */
-export const getProfileList = (profile: any) =>
-  request<R>({
-    url: `api/v3/manager/profile/list`,
-    method: 'post',
-    data: profile,
-  });
+export const getProfileList = (profile: any) => httpPost('api/v3/manager/profile/list', profile);

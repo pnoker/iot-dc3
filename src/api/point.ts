@@ -14,186 +14,37 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios';
+import { httpGet, httpPost } from '@/api/common';
 
-/**
- * Add a new point
- *
- * @param point Point object
- * @returns MyAxiosPromise
- */
-export const pointAddApi = (point: any) =>
-  request<R>({
-    url: `api/v3/manager/point/add`,
-    method: 'post',
-    data: point,
-  });
+export const pointAddApi = (point: any) => httpPost('api/v3/manager/point/add', point);
 
-/**
- * Delete a point
- *
- * @param id Point ID
- * @returns MyAxiosPromise
- */
-export const pointDeleteApi = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/point/delete/${id}`,
-    method: 'post',
-  });
+export const pointDeleteApi = (id: string) => httpPost(`api/v3/manager/point/delete/${id}`);
 
-/**
- * Update a point
- *
- * @param point Point object
- * @returns MyAxiosPromise
- */
-export const getPointUpdate = (point: any) =>
-  request<R>({
-    url: `api/v3/manager/point/update`,
-    method: 'post',
-    data: point,
-  });
+export const getPointUpdate = (point: any) => httpPost('api/v3/manager/point/update', point);
 
-/**
- * Get point by ID
- *
- * @param id Point ID
- * @returns MyAxiosPromise
- */
-export const getPointById = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/point/id/${id}`,
-    method: 'get',
-  });
+export const getPointById = (id: string) => httpGet(`api/v3/manager/point/id/${id}`);
 
-/**
- * Get points by IDs
- *
- * @param pointIds Point ID array
- * @returns MyAxiosPromise
- */
-export const getPointByIds = (pointIds: any) =>
-  request<R>({
-    url: `api/v3/manager/point/ids`,
-    method: 'post',
-    data: pointIds,
-  });
+export const getPointByIds = (pointIds: any) => httpPost('api/v3/manager/point/ids', pointIds);
 
-/**
- * Get point list with pagination and fuzzy search
- *
- * @param point Point query parameters
- * @returns MyAxiosPromise
- */
-export const getPointList = (point: any) =>
-  request<R>({
-    url: `api/v3/manager/point/list`,
-    method: 'post',
-    data: point,
-  });
+export const getPointList = (point: any) => httpPost('api/v3/manager/point/list', point);
 
-/**
- * Get point units by point IDs
- *
- * @param pointIds Point ID array
- * @returns MyAxiosPromise
- */
-export const getPointUnit = (pointIds: any) =>
-  request<R>({
-    url: `api/v3/manager/point/unit`,
-    method: 'post',
-    data: pointIds,
-  });
+export const getPointUnit = (pointIds: any) => httpPost('api/v3/manager/point/unit', pointIds);
 
-/**
- * Get points by profile ID
- *
- * @param profileId Profile ID
- * @returns MyAxiosPromise
- */
-export const getPointByProfileId = (profileId: string) =>
-  request<R>({
-    url: `api/v3/manager/point/profile_id/${profileId}`,
-    method: 'get',
-  });
+export const getPointByProfileId = (profileId: string) => httpGet(`api/v3/manager/point/profile_id/${profileId}`);
 
-/**
- * Get points by device ID
- *
- * @param deviceId Device ID
- * @returns MyAxiosPromise
- */
-export const getPointByDeviceId = (deviceId: string) =>
-  request<R>({
-    url: `api/v3/manager/point/device_id/${deviceId}`,
-    method: 'get',
-  });
+export const getPointByDeviceId = (deviceId: string) => httpGet(`api/v3/manager/point/device_id/${deviceId}`);
 
-/**
- * Get latest point values with pagination
- *
- * @param pointValue Point value query parameters
- * @returns MyAxiosPromise
- */
-export const getPointValueLatest = (pointValue: any) =>
-  request<R>({
-    url: `api/v3/data/point_value/latest`,
-    method: 'post',
-    data: pointValue,
-  });
+export const getPointValueLatest = (pointValue: any) => httpPost('api/v3/data/point_value/latest', pointValue);
 
-/**
- * Get point values with pagination
- *
- * @param pointValue Point value query parameters
- * @returns MyAxiosPromise
- */
-export const getPointValueList = (pointValue: any) =>
-  request<R>({
-    url: `api/v3/data/point_value/list`,
-    method: 'post',
-    data: pointValue,
-  });
+export const getPointValueList = (pointValue: any) => httpPost('api/v3/data/point_value/list', pointValue);
 
-/**
- * Get point value history
- *
- * @param deviceId Device ID
- * @param pointId Point ID
- * @param count Number of records to retrieve
- * @returns MyAxiosPromise
- */
 export const getPointValueHistory = (deviceId: number, pointId: number, count: number = 100) =>
-  request<R>({
-    url: `api/v3/data/point_value/history/device_id/${deviceId}/point_id/${pointId}`,
-    method: 'get',
-    params: {
-      count,
-    },
+  httpGet(`api/v3/data/point_value/history/device_id/${deviceId}/point_id/${pointId}`, {
+    params: { count },
   });
 
-/**
- * Read point value
- *
- * @param pointValueReadVO Point value read object
- * @returns MyAxiosPromise
- */
 export const readPointValue = (pointValueReadVO: any) =>
-  request<R>({
-    url: `api/v3/data/point_value_command/read`,
-    method: 'post',
-    data: pointValueReadVO,
-  });
+  httpPost('api/v3/data/point_value_command/read', pointValueReadVO);
 
-/**
- * Write point value
- *
- * @param pointValueWriteVO Point value write object
- * @returns MyAxiosPromise
- */
 export const writePointValue = (pointValueWriteVO: any) =>
-  request<R>({
-    url: `api/v3/data/point_value_command/write`,
-    method: 'post',
-    data: pointValueWriteVO,
-  });
+  httpPost('api/v3/data/point_value_command/write', pointValueWriteVO);

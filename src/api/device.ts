@@ -14,170 +14,37 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios';
+import { httpGet, httpPost } from '@/api/common';
 
-/**
- * Add a new device
- *
- * @param device Device object
- * @returns MyAxiosPromise
- */
-export const addDevice = (device: any) =>
-  request<R>({
-    url: `api/v3/manager/device/add`,
-    method: 'post',
-    data: device,
-  });
+export const addDevice = (device: any) => httpPost('api/v3/manager/device/add', device);
 
-/**
- * Delete a device
- *
- * @param id Device ID
- * @returns MyAxiosPromise
- */
-export const deleteDevice = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/device/delete/${id}`,
-    method: 'post',
-  });
+export const deleteDevice = (id: string) => httpPost(`api/v3/manager/device/delete/${id}`);
 
-/**
- * Update a device
- *
- * @param device Device object
- * @returns MyAxiosPromise
- */
-export const updateDevice = (device: any) =>
-  request<R>({
-    url: `api/v3/manager/device/update`,
-    method: 'post',
-    data: device,
-  });
+export const updateDevice = (device: any) => httpPost('api/v3/manager/device/update', device);
 
-/**
- * Get device by ID
- *
- * @param id Device ID
- * @returns MyAxiosPromise
- */
-export const getDeviceById = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/device/id/${id}`,
-    method: 'get',
-  });
+export const getDeviceById = (id: string) => httpGet(`api/v3/manager/device/id/${id}`);
 
-/**
- * Get devices by IDs
- *
- * @param deviceIds Device ID array
- * @returns MyAxiosPromise
- */
-export const getDeviceByIds = (deviceIds: any) =>
-  request<R>({
-    url: `api/v3/manager/device/ids`,
-    method: 'post',
-    data: deviceIds,
-  });
+export const getDeviceByIds = (deviceIds: any) => httpPost('api/v3/manager/device/ids', deviceIds);
 
-/**
- * Get devices by driver ID
- *
- * @param driverId Driver ID
- * @returns MyAxiosPromise
- */
-export const getDeviceByDriverId = (driverId: string) =>
-  request<R>({
-    url: `api/v3/manager/device/driver_id/${driverId}`,
-    method: 'get',
-  });
+export const getDeviceByDriverId = (driverId: string) => httpGet(`api/v3/manager/device/driver_id/${driverId}`);
 
-/**
- * Get devices by profile ID
- *
- * @param profileId Profile ID
- * @returns MyAxiosPromise
- */
-export const getDeviceByProfileId = (profileId: string) =>
-  request<R>({
-    url: `api/v3/manager/device/profile_id/${profileId}`,
-    method: 'get',
-  });
+export const getDeviceByProfileId = (profileId: string) => httpGet(`api/v3/manager/device/profile_id/${profileId}`);
 
-/**
- * Get device list with pagination
- *
- * @param device Device query parameters
- * @returns MyAxiosPromise
- */
-export const getDeviceList = (device: any) =>
-  request<R>({
-    url: `api/v3/manager/device/list`,
-    method: 'post',
-    data: device,
-  });
+export const getDeviceList = (device: any) => httpPost('api/v3/manager/device/list', device);
 
-/**
- * Get device status with pagination
- *
- * @param device Device query parameters
- * @returns MyAxiosPromise
- */
-export const getDeviceStatus = (device: any) =>
-  request<R>({
-    url: `api/v3/data/device/status/device`,
-    method: 'post',
-    data: device,
-  });
+export const getDeviceStatus = (device: any) => httpPost('api/v3/data/device/status/device', device);
 
-/**
- * Get device status by driver ID
- *
- * @param driverId Driver ID
- * @returns MyAxiosPromise
- */
 export const getDeviceStatusByDriverId = (driverId: string) =>
-  request<R>({
-    url: `api/v3/data/device/status/device/driver_id/${driverId}`,
-    method: 'get',
-  });
+  httpGet(`api/v3/data/device/status/device/driver_id/${driverId}`);
 
-/**
- * Get device status by profile ID
- *
- * @param profileId Profile ID
- * @returns MyAxiosPromise
- */
 export const getDeviceStatusByProfileId = (profileId: string) =>
-  request<R>({
-    url: `api/v3/data/device/status/device/profile_id/${profileId}`,
-    method: 'get',
-  });
+  httpGet(`api/v3/data/device/status/device/profile_id/${profileId}`);
 
-/**
- * Get device import template
- *
- * @param device Device query parameters
- * @returns MyAxiosPromise
- */
 export const importDeviceTemplate = (device: any) =>
-  request<R>({
-    url: `api/v3/manager/device/export/import_template`,
-    responseType: 'blob',
-    method: 'post',
-    data: device,
-  });
+  httpPost('api/v3/manager/device/export/import_template', device, { responseType: 'blob' });
 
-/**
- * Import devices from file
- *
- * @param device Device file data
- * @returns MyAxiosPromise
- */
 export const importDevice = (device: any) =>
-  request<R>({
-    url: `api/v3/manager/device/import`,
-    method: 'post',
+  httpPost('api/v3/manager/device/import', device, {
     timeout: 0,
     headers: { 'Content-Type': 'multipart/form-data' },
-    data: device,
   });

@@ -14,56 +14,12 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios';
+import { httpPost } from '@/api/common';
 
-/**
- * Get driver dictionary
- *
- * @param dictionary Dictionary query parameters
- * @returns MyAxiosPromise
- */
-export const getDriverDictionary = (dictionary: any) =>
-  request<R>({
-    url: `api/v3/manager/dictionary/driver`,
-    method: 'post',
-    data: dictionary,
-  });
+export const getDriverDictionary = (dictionary: any) => httpPost('api/v3/manager/dictionary/driver', dictionary);
 
-/**
- * Get device dictionary
- *
- * @param dictionary Dictionary query parameters
- * @returns MyAxiosPromise
- */
-export const getDeviceDictionary = (dictionary: any) =>
-  request<R>({
-    url: `api/v3/manager/dictionary/device`,
-    method: 'post',
-    data: dictionary,
-  });
+export const getDeviceDictionary = (dictionary: any) => httpPost('api/v3/manager/dictionary/device', dictionary);
 
-/**
- * Get profile dictionary
- *
- * @param dictionary Dictionary query parameters
- * @returns MyAxiosPromise
- */
-export const getProfileDictionary = (dictionary: any) =>
-  request<R>({
-    url: `api/v3/manager/dictionary/profile`,
-    method: 'post',
-    data: dictionary,
-  });
+export const getProfileDictionary = (dictionary: any) => httpPost('api/v3/manager/dictionary/profile', dictionary);
 
-/**
- * Get point dictionary
- *
- * @param dictionary Dictionary query parameters
- * @returns MyAxiosPromise
- */
-export const getPointDictionary = (dictionary: any) =>
-  request<R>({
-    url: `api/v3/manager/dictionary/device_point`,
-    method: 'post',
-    data: dictionary,
-  });
+export const getPointDictionary = (dictionary: any) => httpPost('api/v3/manager/dictionary/device_point', dictionary);

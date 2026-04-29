@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-import { httpGet, httpPost } from '@/api/common';
+import request from '@/config/axios';
+import type { AxiosRequestConfig } from 'axios';
 
-export const getDriverById = (id: string) => httpGet(`api/v3/manager/driver/id/${id}`);
+/**
+ * Shared HTTP helpers so every `src/api/*.ts` module stays a one-liner per
+ * endpoint. Keeps URL strings visible inline (grep-friendly) and lets the
+ * response interceptor do the payload unwrapping.
+ */
 
-export const getDriverByIds = (driverIds: any) => httpPost('api/v3/manager/driver/ids', driverIds);
+export const httpGet = <T = R>(url: string, config?: AxiosRequestConfig) =>
+  request<T>({ ...config, url, method: 'get' });
 
-export const getDriverList = (driver: any) => httpPost('api/v3/manager/driver/list', driver);
-
-export const getDriverStatus = (driver: any) => httpPost('api/v3/data/driver/status/driver', driver);
+export const httpPost = <T = R, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) =>
+  request<T>({ ...config, url, method: 'post', data });

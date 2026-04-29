@@ -14,57 +14,13 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios';
+import { httpPost } from '@/api/common';
 import type { Login } from '@/config/entity';
 
-/**
- * Generate salt for password encryption
- *
- * @param login Login object
- * @returns MyAxiosPromise
- */
-export const generateSalt = (login: Login) =>
-  request<R>({
-    url: `api/v3/auth/token/salt`,
-    method: 'post',
-    data: login,
-  });
+export const generateSalt = (login: Login) => httpPost('api/v3/auth/token/salt', login);
 
-/**
- * Generate authentication token (login)
- *
- * @param login Login object
- * @returns MyAxiosPromise
- */
-export const generateToken = (login: Login) =>
-  request<R>({
-    url: `api/v3/auth/token/generate`,
-    method: 'post',
-    data: login,
-  });
+export const generateToken = (login: Login) => httpPost('api/v3/auth/token/generate', login);
 
-/**
- * Cancel authentication token (logout)
- *
- * @param login Login object
- * @returns MyAxiosPromise
- */
-export const cancelToken = (login: Login) =>
-  request<R>({
-    url: `api/v3/auth/token/cancel`,
-    method: 'post',
-    data: login,
-  });
+export const cancelToken = (login: Login) => httpPost('api/v3/auth/token/cancel', login);
 
-/**
- * Check if token is valid
- *
- * @param login Login object
- * @returns MyAxiosPromise
- */
-export const checkTokenValid = (login: Login) =>
-  request<R>({
-    url: `api/v3/auth/token/check`,
-    method: 'post',
-    data: login,
-  });
+export const checkTokenValid = (login: Login) => httpPost('api/v3/auth/token/check', login);

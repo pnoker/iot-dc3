@@ -14,28 +14,8 @@
  * limitations under the License.
  */
 
-import request from '@/config/axios';
+import { httpGet } from '@/api/common';
 
-/**
- * Get driver attributes by driver ID
- *
- * @param id Driver ID
- * @returns MyAxiosPromise
- */
-export const getDriverAttributeByDriverId = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/driver_attribute/driver_id/${id}`,
-    method: 'get',
-  });
+export const getDriverAttributeByDriverId = (id: string) => httpGet(`api/v3/manager/driver_attribute/driver_id/${id}`);
 
-/**
- * Get point attributes by driver ID
- *
- * @param id Driver ID
- * @returns MyAxiosPromise
- */
-export const getPointAttributeByDriverId = (id: string) =>
-  request<R>({
-    url: `api/v3/manager/point_attribute/driver_id/${id}`,
-    method: 'get',
-  });
+export const getPointAttributeByDriverId = (id: string) => httpGet(`api/v3/manager/point_attribute/driver_id/${id}`);

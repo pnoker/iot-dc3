@@ -134,7 +134,9 @@ request.interceptors.response.use(
     } else {
       failMessage(ERROR_MESSAGES.REQUEST_ERROR, response.data.code, response.data);
     }
-    return Promise.reject();
+    // Reject with the server payload so callers can inspect code/message if needed.
+    // Existing no-op `.catch(() => {})` sites remain valid because they ignore the argument.
+    return Promise.reject(response.data ?? { status, message: 'Request failed' });
   },
   (error: AxiosError) => {
     return Promise.reject(error);
