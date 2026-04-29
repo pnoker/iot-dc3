@@ -19,7 +19,6 @@ package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.manager.*;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.PointFacade;
@@ -29,7 +28,6 @@ import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcPointBuilder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -45,7 +43,7 @@ import java.util.List;
 @Component
 public class PointGrpcFacade implements PointFacade {
 
-    @GrpcClient(ManagerConstant.SERVICE_NAME)
+    @Resource
     private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
     @Resource

@@ -20,10 +20,9 @@ package io.github.pnoker.common.facade.grpc;
 import io.github.pnoker.api.center.auth.GrpcLoginQuery;
 import io.github.pnoker.api.center.auth.GrpcRTokenDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
-import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.facade.api.TokenFacade;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,7 +35,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenGrpcFacade implements TokenFacade {
 
-    @GrpcClient(AuthConstant.SERVICE_NAME)
+    @Resource
     private TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
 
     @Override
