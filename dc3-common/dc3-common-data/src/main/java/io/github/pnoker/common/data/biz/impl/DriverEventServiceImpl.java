@@ -47,10 +47,10 @@ public class DriverEventServiceImpl implements DriverEventService {
     @Override
     public void heartbeatEvent(DriverEventDTO entityDTO) {
         DriverEventDTO.DriverStatus driverStatus = JsonUtil.parseObject(entityDTO.getContent(), DriverEventDTO.DriverStatus.class);
-        if (Objects.isNull(driverStatus)) {
+        if (Objects.isNull(driverStatus) || Objects.isNull(driverStatus.getStatus())) {
             return;
         }
-        localCacheService.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getDriverId(), driverStatus.getStatus(), 10, TimeUnit.SECONDS);
+        localCacheService.setKey(PrefixConstant.DRIVER_STATUS_KEY_PREFIX + driverStatus.getDriverId(), driverStatus.getStatus().getCode(), 10, TimeUnit.SECONDS);
     }
 
 }
