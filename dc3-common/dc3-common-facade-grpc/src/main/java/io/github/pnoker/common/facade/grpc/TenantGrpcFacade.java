@@ -21,7 +21,6 @@ import io.github.pnoker.api.center.auth.GrpcCodeQuery;
 import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.TenantFacade;
@@ -29,7 +28,6 @@ import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcTenantBuilder;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TenantGrpcFacade implements TenantFacade {
 
-    @GrpcClient(AuthConstant.SERVICE_NAME)
+    @Resource
     private TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
 
     @Resource
