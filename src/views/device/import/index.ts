@@ -15,7 +15,7 @@
  */
 
 import { UploadFilled } from '@element-plus/icons-vue';
-import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
+import type { UploadInstance, UploadProps, UploadRawFile, UploadRequestOptions } from 'element-plus';
 import { genFileId } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
 import { defineComponent, reactive, ref, unref } from 'vue';
@@ -29,7 +29,7 @@ export default defineComponent({
   name: 'DeviceImportForm',
   components: { UploadFilled },
   emits: ['import-template', 'import-thing'],
-  setup(props, { emit }) {
+  setup(_props, { emit }) {
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
@@ -160,7 +160,7 @@ export default defineComponent({
         }
       });
     };
-    const uploadRequest = (param) => {
+    const uploadRequest = (param: UploadRequestOptions): Promise<unknown> => {
       const formData = reactiveData.formData;
       formData['file'] = param.file;
 
@@ -169,6 +169,7 @@ export default defineComponent({
         reset();
         successMessage('设备导入成功!');
       });
+      return Promise.resolve();
     };
     const importThing = () => {
       const form = unref(formDataRef);

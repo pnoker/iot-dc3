@@ -70,15 +70,15 @@ export default defineComponent({
       id: route.query.id as string,
       active: +(route.query.active || 0),
       loading: true,
-      oldDeviceFormData: {},
+      oldDeviceFormData: {} as Record<string, any>,
       deviceFormData: {} as any,
       driverAttributes: [] as any[],
-      driverAttributeTable: {},
-      oldDriverFormData: {},
+      driverAttributeTable: {} as Record<string, any>,
+      oldDriverFormData: {} as Record<string, any>,
       driverFormData: {} as any,
       pointAttributes: [] as any[],
-      pointAttributeTable: {},
-      oldPointFormData: {},
+      pointAttributeTable: {} as Record<string, any>,
+      oldPointFormData: {} as Record<string, any>,
       pointFormData: {} as any,
       pointInfoData: [] as any[],
       driverQuery: '',
@@ -246,12 +246,15 @@ export default defineComponent({
       getDriverAttributeByDriverId(driverId)
         .then((res) => {
           reactiveData.driverAttributes = res.data;
-          reactiveData.driverAttributeTable = reactiveData.driverAttributes.reduce((pre, cur) => {
-            pre[cur.id] = cur.attributeCode;
-            return pre;
-          }, {});
+          reactiveData.driverAttributeTable = reactiveData.driverAttributes.reduce(
+            (pre, cur) => {
+              pre[cur.id] = cur.attributeCode;
+              return pre;
+            },
+            {} as Record<string, any>
+          );
 
-          const driverFormData = {};
+          const driverFormData: Record<string, any> = {};
           reactiveData.driverAttributes.forEach((attribute) => {
             driverFormData[attribute.attributeCode] = {
               id: null,
@@ -270,10 +273,13 @@ export default defineComponent({
       getPointAttributeByDriverId(driverId)
         .then((res) => {
           reactiveData.pointAttributes = res.data;
-          reactiveData.pointAttributeTable = reactiveData.pointAttributes.reduce((pre, cur) => {
-            pre[cur.id] = cur.attributeCode;
-            return pre;
-          }, {});
+          reactiveData.pointAttributeTable = reactiveData.pointAttributes.reduce(
+            (pre, cur) => {
+              pre[cur.id] = cur.attributeCode;
+              return pre;
+            },
+            {} as Record<string, any>
+          );
 
           pointInfo();
         })
@@ -288,7 +294,7 @@ export default defineComponent({
     const driverInfo = () => {
       getDriverInfoByDeviceId(reactiveData.id)
         .then((res) => {
-          const formData = reactiveData.driverFormData;
+          const formData: Record<string, any> = reactiveData.driverFormData;
           res.data.forEach((info: { attributeId: string | number; id: any; configValue: any }) => {
             formData[reactiveData.driverAttributeTable[info.attributeId]] = {
               id: info.id,
@@ -308,7 +314,7 @@ export default defineComponent({
       getPointByDeviceId(reactiveData.id)
         .then((res) => {
           reactiveData.pointInfoData = res.data.map((point: { id: any; pointName: any }) => {
-            const pointInfo = {
+            const pointInfo: Record<string, any> = {
               id: point.id,
               pointName: point.pointName,
               shadow: 'hover',
@@ -365,7 +371,7 @@ export default defineComponent({
       const form = unref(driverFormRef);
       form?.validate((valid) => {
         if (valid) {
-          const driverFormData = {};
+          const driverFormData: Record<string, any> = {};
           reactiveData.driverAttributes.forEach((attribute) => {
             const driverInfo = {
               id: reactiveData.driverFormData[attribute.attributeCode].id,

@@ -76,7 +76,7 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       loading: true,
-      profileTable: {},
+      profileTable: {} as Record<string, any>,
       listData: [] as any[],
       query: {},
       order: false,
@@ -133,7 +133,7 @@ export default defineComponent({
         });
     };
 
-    const search = (params) => {
+    const search = (params: any) => {
       if (!isNull(props.profileId)) {
         params = {
           ...params,
@@ -168,7 +168,7 @@ export default defineComponent({
       pointAddFormRef.value?.show();
     };
 
-    const addThing = (form, done) => {
+    const addThing = (form: any, done: () => void) => {
       pointAddApi(form)
         .then(() => {
           list();
@@ -179,7 +179,7 @@ export default defineComponent({
         });
     };
 
-    const disableThing = (id, profileId, done) => {
+    const disableThing = (id: string, profileId: string, done: () => void) => {
       getPointUpdate({ id: id, profileId: profileId, enableFlag: 'DISABLE' })
         .then(() => {
           list();
@@ -190,7 +190,7 @@ export default defineComponent({
         });
     };
 
-    const enableThing = (id, profileId, done) => {
+    const enableThing = (id: string, profileId: string, done: () => void) => {
       getPointUpdate({ id: id, profileId: profileId, enableFlag: 'ENABLE' })
         .then(() => {
           list();
@@ -201,7 +201,7 @@ export default defineComponent({
         });
     };
 
-    const deleteThing = (id, done) => {
+    const deleteThing = (id: string, done: () => void) => {
       pointDeleteApi(id)
         .then((res) => {
           if (res.data.ok) {

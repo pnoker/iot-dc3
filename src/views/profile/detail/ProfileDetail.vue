@@ -17,7 +17,7 @@
 <template>
   <div>
     <base-card>
-      <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
+      <el-tabs :model-value="String(reactiveData.active ?? 'detail')" @tab-click="changeActive">
         <el-tab-pane label="模板信息" name="detail">
           <detail-card>
             <ul>

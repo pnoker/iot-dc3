@@ -97,7 +97,7 @@ export default defineComponent({
         });
     };
 
-    const search = (params) => {
+    const search = (params: any) => {
       if (!isNull(props.deviceId)) {
         params = {
           ...params,
@@ -122,28 +122,28 @@ export default defineComponent({
       profileAddFormRef.value?.show();
     };
 
-    const addThing = (form, done) => {
+    const addThing = (form: any, done: () => void) => {
       addProfile(form).then(() => {
         list();
         done();
       });
     };
 
-    const disableThing = (id, done) => {
+    const disableThing = (id: number, done: () => void) => {
       updateProfile({ id: id, enableFlag: 'DISABLE' }).then(() => {
         list();
         done();
       });
     };
 
-    const enableThing = (id, done) => {
+    const enableThing = (id: number, done: () => void) => {
       updateProfile({ id: id, enableFlag: 'ENABLE' }).then(() => {
         list();
         done();
       });
     };
 
-    const deleteThing = (id, done) => {
+    const deleteThing = (id: string, done: () => void) => {
       deleteProfile(id)
         .then((res) => {
           if (res.data.ok) {

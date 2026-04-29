@@ -44,6 +44,8 @@ export interface Attribute {
   name: string;
   /** Attribute internal name */
   attributeName: string;
+  /** Attribute code */
+  attributeCode: string;
 }
 
 /**

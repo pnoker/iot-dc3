@@ -75,9 +75,9 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       loading: true,
-      driverTable: {},
-      profileTable: {},
-      statusTable: {},
+      driverTable: {} as Record<string, any>,
+      profileTable: {} as Record<string, any>,
+      statusTable: {} as Record<string, any>,
       listData: [] as any[],
       query: {},
       order: false,
@@ -145,7 +145,7 @@ export default defineComponent({
         });
     };
 
-    const search = (params) => {
+    const search = (params: any) => {
       if (!isNull(props.driverId)) {
         params = {
           ...params,
@@ -180,7 +180,7 @@ export default defineComponent({
       deviceAddFormRef.value?.show();
     };
 
-    const addThing = (form, done) => {
+    const addThing = (form: any, done: () => void) => {
       addDevice(form)
         .then(() => {
           list();
@@ -195,9 +195,9 @@ export default defineComponent({
       deviceImportFormRef.value?.show();
     };
 
-    const importTemplate = (form, done) => {
+    const importTemplate = (form: any, done: () => void) => {
       importDeviceTemplate(form)
-        .then((res) => {
+        .then((res: any) => {
           const url = window.URL.createObjectURL(new Blob([res.data.data as BlobPart]));
           const name = res.headers['content-disposition'].split(';')[1].split('filename=')[1];
           const link = document.createElement('a');
@@ -213,7 +213,7 @@ export default defineComponent({
         });
     };
 
-    const importThing = (form, done) => {
+    const importThing = (form: any, done: () => void) => {
       importDevice(form)
         .then(() => {
           list();
@@ -224,7 +224,7 @@ export default defineComponent({
         });
     };
 
-    const disableThing = (id, driverId, done) => {
+    const disableThing = (id: string, driverId: string, done: () => void) => {
       console.log(props);
       updateDevice({ id: id, driverId: driverId, enableFlag: 'DISABLE' })
         .then(() => {
@@ -236,7 +236,7 @@ export default defineComponent({
         });
     };
 
-    const enableThing = (id, driverId, done) => {
+    const enableThing = (id: string, driverId: string, done: () => void) => {
       updateDevice({ id: id, driverId: driverId, enableFlag: 'ENABLE' })
         .then(() => {
           list();
@@ -247,7 +247,7 @@ export default defineComponent({
         });
     };
 
-    const deleteThing = (id, done) => {
+    const deleteThing = (id: string, done: () => void) => {
       deleteDevice(id)
         .then((res) => {
           if (res.data.ok) {

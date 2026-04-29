@@ -84,7 +84,7 @@ export default defineComponent({
         });
     };
 
-    const search = (params) => {
+    const search = (params: any) => {
       reactiveData.query = { ...params, type: 'driver' };
       list();
     };

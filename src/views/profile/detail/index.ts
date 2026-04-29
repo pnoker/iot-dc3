@@ -81,7 +81,7 @@ export default defineComponent({
       });
     };
 
-    const changeActive = (tab) => {
+    const changeActive = (tab: any) => {
       const query = route.query;
       router.push({ query: { ...query, active: tab.props.name } });
       switch (tab.props.name) {

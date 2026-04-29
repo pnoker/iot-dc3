@@ -147,7 +147,7 @@
     },
   });
 
-  const copyValue = (data) => {
+  const copyValue = (data: any) => {
     const content = {
       deviceId: data.deviceId,
       pointId: data.pointId,
@@ -199,8 +199,8 @@
 
       tinyArea
         .area()
-        .encode('x', (_, i) => i)
-        .encode('y', (v) => v)
+        .encode('x', (_: any, i: number) => i)
+        .encode('y', (v: any) => v)
         .encode('shape', 'smooth')
         .scale('y', { zero: true })
         .style('fill', 'linear-gradient(-90deg, white 0%, darkgreen 100%)')
@@ -209,8 +209,7 @@
         .axis(false);
 
       tinyArea.interaction('tooltip', {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        render: (e, { title, items }) => `${items[0].value} ${props.unit}`,
+        render: (_e: any, { items }: any) => `${items[0].value} ${props.unit}`,
       });
 
       tinyArea.render();

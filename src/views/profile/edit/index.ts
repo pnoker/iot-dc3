@@ -127,7 +127,7 @@ export default defineComponent({
       reactiveData.profileFormData = { ...reactiveData.oldProfileFormData };
     };
 
-    const changeActive = (step) => {
+    const changeActive = (step: number) => {
       const query = route.query;
       router.push({ query: { ...query, active: step } });
     };

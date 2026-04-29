@@ -28,9 +28,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
 
-    const iframeUrl = () => {
-      return decode(route.query.id as string);
-    };
+    const iframeUrl = decode(route.query.id as string);
 
     return {
       iframeUrl,

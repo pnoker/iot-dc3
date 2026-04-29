@@ -37,6 +37,8 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       formVisible: false,
+      formData: {} as any,
+      remark: '',
     });
 
     // 定义表单校验规则

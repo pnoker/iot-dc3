@@ -25,7 +25,7 @@ import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
 export default defineComponent({
   name: 'DeviceAddForm',
   emits: ['add-thing'],
-  setup(props, { emit }) {
+  setup(_props, { emit }) {
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 

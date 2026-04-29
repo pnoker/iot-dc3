@@ -48,10 +48,10 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
-      active: route.query.active,
-      driverTable: {},
-      profileTable: {},
-      statusTable: {},
+      active: route.query.active as string,
+      driverTable: {} as Record<string, any>,
+      profileTable: {} as Record<string, any>,
+      statusTable: {} as Record<string, any>,
       data: {} as any,
       listDeviceData: [] as any[],
     });
@@ -115,7 +115,7 @@ export default defineComponent({
       return reactiveData.listDeviceData.map((device) => device.pointName).join(', ');
     };
 
-    const changeActive = (tab) => {
+    const changeActive = (tab: any) => {
       const query = route.query;
       router.push({ query: { ...query, active: tab.props.name } }).catch(() => {
         // nothing to do

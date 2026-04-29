@@ -135,7 +135,7 @@ export default defineComponent({
       reactiveData.pointFormData = { ...reactiveData.oldPointFormData };
     };
 
-    const changeActive = (step) => {
+    const changeActive = (step: string | number) => {
       const query = route.query;
       router.push({ query: { ...query, active: step } }).catch(() => {
         // nothing to do

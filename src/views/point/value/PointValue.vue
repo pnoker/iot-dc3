@@ -78,9 +78,9 @@
 
   const reactiveData = reactive({
     loading: true,
-    deviceTable: {},
-    pointTable: {},
-    unitTable: {},
+    deviceTable: {} as Record<string, any>,
+    pointTable: {} as Record<string, any>,
+    unitTable: {} as Record<string, any>,
     listData: [] as any[],
     query: {},
     page: {
@@ -133,8 +133,8 @@
     }
   };
 
-  const loadPointValueList = (res) => {
-    reactiveData.listData = res.data.records.map((record) => {
+  const loadPointValueList = (res: any) => {
+    reactiveData.listData = res.data.records.map((record: any) => {
       const tempDate1 = new Date(record.createTime);
       const tempDate2 = new Date(record.operateTime);
       record.interval = tempDate2.getTime() - tempDate1.getTime();
@@ -175,7 +175,7 @@
     }
   };
 
-  const search = (params) => {
+  const search = (params: any) => {
     reactiveData.query = params;
     list();
   };

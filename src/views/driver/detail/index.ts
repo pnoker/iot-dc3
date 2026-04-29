@@ -64,7 +64,7 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       id: route.query.id as string,
-      active: route.query.active,
+      active: (route.query.active as string) || 'detail',
       data: {} as any,
     });
 
@@ -80,7 +80,7 @@ export default defineComponent({
     };
 
     // 切换Tab
-    const changeActive = (tab) => {
+    const changeActive = (tab: any) => {
       reactiveData.active = tab.props.name;
       const query = route.query;
       switch (reactiveData.active) {

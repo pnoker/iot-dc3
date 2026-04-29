@@ -35,7 +35,7 @@ export default defineComponent({
     },
   },
   emits: ['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change'],
-  setup(props, { emit }) {
+  setup(_props, { emit }) {
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 

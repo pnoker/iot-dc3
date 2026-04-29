@@ -101,21 +101,21 @@
   // 定义响应式数据
   const reactiveData = reactive({
     id: route.query.id as string,
-    active: route.query.active,
+    active: (route.query.active as string) || 'detail',
     profileLoading: true,
     pointLoading: true,
     pointValueLoading: true,
     data: {} as any,
     driver: {} as any,
-    profileTable: {},
-    pointTable: {},
-    deviceTable: {},
-    unitTable: {},
+    profileTable: {} as Record<string, any>,
+    pointTable: {} as Record<string, any>,
+    deviceTable: {} as Record<string, any>,
+    unitTable: {} as Record<string, any>,
     listProfileData: [] as any[],
     listPointData: [] as any[],
     listPointValueData: [] as any[],
-    listPointValueHistoryData: {},
-    pointValueDetailData: {},
+    listPointValueHistoryData: {} as Record<string, any>,
+    pointValueDetailData: {} as Record<string, any>,
   });
 
   const profileLength = computed(() => {
@@ -168,9 +168,9 @@
       });
   };
 
-  const changeActive = (tab) => {
+  const changeActive = (tab: any) => {
     const query = route.query;
-    router.push({ query: { ...query, active: tab.props.name } }).catch(() => {
+    router.push({ query: { ...query, active: String(tab.props.name) } }).catch(() => {
       // nothing to do
     });
 

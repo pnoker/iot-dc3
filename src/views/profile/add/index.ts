@@ -22,7 +22,7 @@ import { successMessage } from '@/utils/NotificationUtil';
 export default defineComponent({
   name: 'ProfileAddForm',
   emits: ['add-thing'],
-  setup(props, { emit }) {
+  setup(_props, { emit }) {
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 

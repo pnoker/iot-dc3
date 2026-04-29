@@ -60,7 +60,7 @@ export default defineComponent({
     'pre-handle',
     'next-handle',
   ],
-  setup(props, { emit }) {
+  setup(_props, { emit }) {
     // 定义表单引用
     const formDataRef = ref<FormInstance>();
 
