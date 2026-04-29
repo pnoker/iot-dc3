@@ -29,7 +29,7 @@ const PLATFORM_BANNER = `
 |___|\\\\____/|____|    /_______  /\\\\______  /______  /
                              \\\\/        \\\\/       \\\\/
 https://doc.dc3.site
-IoT DC3 Platform V2025.9.0`;
+IoT DC3 Platform V2026.4.29`;
 
 /**
  * Plugin setup function

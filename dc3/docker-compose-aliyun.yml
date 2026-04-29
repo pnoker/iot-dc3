@@ -16,7 +16,7 @@
 
 services:
   web:
-    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-web:2025.9.0
+    image: registry.cn-beijing.aliyuncs.com/dc3/dc3-web:2026.4.29
     restart: always
     ports:
       - '8080:80'
