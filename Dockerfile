@@ -15,8 +15,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# Use JDK 2025.9 base image
-FROM pnoker/dc3-jdk:25
+# Use JDK 21 base image
+FROM pnoker/dc3-jdk:21
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 
