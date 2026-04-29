@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(java *)"
+      "Bash(java *)",
+      "Bash(mvn *)",
+      "WebSearch"
     ]
   }
 }
