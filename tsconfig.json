@@ -13,9 +13,8 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "moduleResolution": "bundler",
-    "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
     "types": ["vite/client", "element-plus/global"],
     "allowSyntheticDefaultImports": true,

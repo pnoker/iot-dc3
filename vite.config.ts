@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import legacy from '@vitejs/plugin-legacy';
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import AutoImport from 'unplugin-auto-import/vite';
@@ -42,7 +41,6 @@ export default (configEnv: ConfigEnv) => {
     entryFileNames: `assets/dc3.[name].[hash].js`,
     chunkFileNames: `assets/dc3.[name].[hash].js`,
     assetFileNames: `assets/dc3.[name].[hash].[ext]`,
-    compact: true,
     manualChunks: (id: string) => {
       if (id.includes('node_modules')) {
         // Merge vue and element-plus to avoid circular dependency
@@ -52,11 +50,8 @@ export default (configEnv: ConfigEnv) => {
         if (id.includes('vue-router')) {
           return 'router-vendor';
         }
-        if (id.includes('echarts')) {
-          return 'echarts-vendor';
-        }
-        if (id.includes('lodash')) {
-          return 'lodash-vendor';
+        if (id.includes('@antv')) {
+          return 'g2-vendor';
         }
         return 'vendor';
       }
@@ -85,7 +80,7 @@ export default (configEnv: ConfigEnv) => {
     build: {
       outDir: 'dist',
       chunkSizeWarningLimit: 1500,
-      minify: 'esbuild',
+      // minify defaults to rolldown in Vite 8
       sourcemap: configEnv.mode === 'production' ? false : true,
       reportCompressedSize: false,
       cssCodeSplit: true,
@@ -93,12 +88,6 @@ export default (configEnv: ConfigEnv) => {
     },
     plugins: [
       vue(),
-      legacy({
-        targets: 'defaults, not ie 11, not op_mini all',
-        additionalLegacyPolyfills: ['regenerator-runtime/runtime'],
-        renderLegacyChunks: true,
-        modernPolyfills: true,
-      }),
       AutoImport({
         resolvers: [ElementPlusResolver()],
         imports: [
@@ -119,7 +108,7 @@ export default (configEnv: ConfigEnv) => {
       }),
     ],
     optimizeDeps: {
-      include: ['vue', 'vue-router', 'element-plus', '@element-plus/icons-vue', 'echarts'],
+      include: ['vue', 'vue-router', 'element-plus', '@element-plus/icons-vue', '@antv/g2'],
       exclude: ['@vitejs/plugin-vue'],
     },
     css: {

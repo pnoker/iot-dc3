@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import moment from 'moment';
-import 'moment/locale/zh-cn';
-
-moment.locale('zh-cn');
+import dayjs from 'dayjs';
 
 /**
  * Log utility with timestamp and color-coded levels
@@ -29,7 +26,7 @@ export const log = {
    * @param message Message to log
    */
   info(message: string) {
-    const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+    const now = dayjs().format('YYYY-MM-DD HH:mm:ss.SSS');
     console.log(now, '%cINFO%c  ---  :', 'color:#67C23A', message);
   },
 
@@ -39,7 +36,7 @@ export const log = {
    * @param message Message to log
    */
   warn(message: string) {
-    const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+    const now = dayjs().format('YYYY-MM-DD HH:mm:ss.SSS');
     console.log(now, '%cWARN%c  ---  :', 'color:#E6A23C', message);
   },
 
@@ -49,7 +46,7 @@ export const log = {
    * @param message Message to log
    */
   error(message: string) {
-    const now = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+    const now = dayjs().format('YYYY-MM-DD HH:mm:ss.SSS');
     console.log(now, '%cERROR%c  ---  :', 'color:#F56C6C', message);
   },
 };

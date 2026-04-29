@@ -16,7 +16,7 @@
 
 import { defineComponent, onMounted, reactive, ref } from 'vue';
 
-import * as echarts from 'echarts';
+import { Chart } from '@antv/g2';
 
 import TitleCard from '@/components/card/title/TitleCard.vue';
 import ApplicationCard from '@/views/application/card/ApplicationCard.vue';
@@ -238,64 +238,38 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      const chart = echarts.init(countDataChartRef.value as HTMLElement);
-      reactiveData.data = reactiveData.data.map((item) => [item[1], item[0], item[2]]);
-      const option = {
-        legend: {
-          data: ['日/时数据量统计'],
-          left: 'right',
-        },
-        tooltip: {
-          position: 'top',
-          formatter: (params) => {
-            return (
-              params.value[2] +
-              ' commits in ' +
-              reactiveData.hours[params.value[0]] +
-              ' of ' +
-              reactiveData.days[params.value[1]]
-            );
-          },
-        },
-        grid: {
-          left: 2,
-          bottom: 10,
-          right: 10,
-          containLabel: true,
-        },
-        xAxis: {
-          type: 'category',
-          data: reactiveData.hours,
-          boundaryGap: false,
-          splitLine: {
-            show: true,
-          },
-          axisLine: {
-            show: false,
-          },
-        },
-        yAxis: {
-          type: 'category',
-          data: reactiveData.days,
-          axisLine: {
-            show: false,
-          },
-        },
-        series: [
-          {
-            name: '日/时数据量统计',
-            type: 'scatter',
-            symbolSize: (val) => {
-              return val[2] * 2;
-            },
-            data: reactiveData.data,
-            animationDelay: (idx) => {
-              return idx * 5;
-            },
-          },
-        ],
-      };
-      chart.setOption(option);
+      const el = countDataChartRef.value as HTMLElement | null;
+      if (!el) return;
+
+      // Original data is [dayIndex, hourIndex, count]; turn it into labeled objects
+      const points = reactiveData.data
+        .filter(([dayIdx, hourIdx]: number[]) => dayIdx !== undefined && hourIdx !== undefined)
+        .map(([dayIdx, hourIdx, count]: number[]) => ({
+          hour: reactiveData.hours[hourIdx!],
+          day: reactiveData.days[dayIdx!],
+          count,
+        }));
+
+      const chart = new Chart({ container: el, autoFit: true });
+
+      chart
+        .point()
+        .data(points)
+        .encode('x', 'hour')
+        .encode('y', 'day')
+        .encode('size', 'count')
+        .scale('size', { type: 'sqrt', range: [4, 24] })
+        .scale('x', { padding: 0.5 })
+        .scale('y', { padding: 0.5 })
+        .style('fill', '#409eff')
+        .style('fillOpacity', 0.65)
+        .axis({ x: { title: false }, y: { title: false } })
+        .tooltip({
+          title: (d: { hour: string; day: string }) => `${d.day} ${d.hour}`,
+          items: [{ field: 'count', name: '数据量' }],
+        });
+
+      chart.render();
     });
 
     return {

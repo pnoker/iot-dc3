@@ -30,16 +30,16 @@
           </el-menu-item>
           <template v-for="menusItem in menus">
             <el-sub-menu v-if="menusItem.children" :key="`${menusItem.path}-submenu`" :index="menusItem.path">
-              <template #title>{{ (menusItem.meta as any).title }}</template>
+              <template #title>{{ menusItem.meta?.title }}</template>
               <el-menu-item v-for="item in menusItem.children" :key="item.path" :index="item.path">
-                {{ (item.meta as any).title }}
+                {{ item.meta?.title }}
               </el-menu-item>
             </el-sub-menu>
             <el-menu-item v-else :key="`${menusItem.path}-menuitem`" :index="menusItem.path">
               <el-icon>
-                <component :is="(menusItem.meta as any).icon"></component>
+                <component :is="menusItem.meta?.icon"></component>
               </el-icon>
-              {{ (menusItem.meta as any).title }}
+              {{ menusItem.meta?.title }}
             </el-menu-item>
           </template>
         </el-menu>
