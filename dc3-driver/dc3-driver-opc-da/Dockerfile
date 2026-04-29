@@ -16,7 +16,7 @@
 #
 
 # Runtime stage
-FROM pnoker/dc3-jre:25 AS runtime
+FROM pnoker/dc3-jre:21 AS runtime
 LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 
