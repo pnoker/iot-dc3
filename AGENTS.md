@@ -30,7 +30,7 @@
 
 - Start infra dependencies first: `podman compose -f dc3/docker-compose-db.yml up -d` (Postgres/Redis/RabbitMQ).
 - Optional MQTT broker for drivers: `podman compose -f dc3/docker-compose-optional.yml up -d` (EMQX on `31883`).
-- Local env variables come from `dc3/env/dev.env.sh` (note this file uses `source KEY=value` lines; verify in your shell before relying on it).
+- Local env variables come from `dc3/env/dev.env.sh`; `source` the file before running services from the shell or IDE.
 - Build all modules from repo root: `mvn -s .mvn/settings.xml clean package`.
 - Recommended manual startup order from `README.md`: gateway -> auth -> data -> manager -> driver(s).
 - Full containerized dev stack can be started with `make dev` (`dc3/` compose-based).

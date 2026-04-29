@@ -206,11 +206,6 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-redis</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-repository</artifactId>
                 <version>${dc3.version}</version>
             </dependency>

@@ -49,17 +49,6 @@ services:
         aliases:
           - dc3-postgres-exporter
 
-  redis-exporter:
-    image: pnoker/dc3-redis-exporter:${DC3_IMAGE_TAG:-2026.5}
-    restart: always
-    container_name: dc3-redis-exporter
-    hostname: dc3-redis-exporter
-    logging: *default-logging
-    networks:
-      dc3net:
-        aliases:
-          - dc3-redis-exporter
-
   nginx-exporter:
     image: pnoker/dc3-nginx-exporter:${DC3_IMAGE_TAG:-2026.5}
     restart: always
