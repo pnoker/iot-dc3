@@ -32,9 +32,6 @@ spring:
       # Resource handling should be customized by the application if required.
       add-mappings: false
   jackson:
-    serialization:
-      # Disable writing dates as numeric timestamps (use ISO-8601 instead).
-      write-dates-as-timestamps: false
     deserialization:
       # Do not fail when encountering unknown properties during JSON deserialization.
       fail-on-unknown-properties: false
