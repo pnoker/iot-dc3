@@ -24,7 +24,7 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.*;
 
 /**
- * Driver BO
+ * Business object that describes a registered driver instance and its platform metadata.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,32 +38,32 @@ import lombok.*;
 public class DriverBO extends BaseBO {
 
     /**
-     * Name
+     * Driver display name.
      */
     private String driverName;
 
     /**
-     * Driver ID
+     * Driver code defined in configuration.
      */
     private String driverCode;
 
     /**
-     * Driver service name
+     * Driver service name used for registration and routing.
      */
     private String serviceName;
 
     /**
-     *
+     * Driver service host address.
      */
     private String serviceHost;
 
     /**
-     * Type
+     * Driver runtime type.
      */
     private DriverTypeFlagEnum driverTypeFlag;
 
     /**
-     *
+     * Extended driver metadata.
      */
     private DriverExt driverExt;
 
@@ -73,17 +73,17 @@ public class DriverBO extends BaseBO {
     private EnableFlagEnum enableFlag;
 
     /**
-     * Tenant ID
+     * Tenant identifier.
      */
     private Long tenantId;
 
     /**
-     *
+     * Data signature used for optimistic checks or synchronization.
      */
     private String signature;
 
     /**
-     *
+     * Data version.
      */
     private Integer version;
 }

@@ -32,7 +32,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- *
+ * Represents a raw point value read from a device together with the device and point metadata
+ * required to calculate its final value.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -53,26 +54,25 @@ public class RValue implements Serializable {
     private static final BigDecimal defaultMultiple = new BigDecimal(1);
 
     /**
-     *
+     * Source device that produced the value.
      */
     private DeviceBO device;
 
     /**
-     *
+     * Point definition associated with the value.
      */
     private PointBO point;
 
     /**
-     * , string, typeType
+     * Raw point value represented as a string.
      */
     private String value;
 
     /**
+     * Returns the final point value after applying scaling and type conversion rules defined by
+     * the point metadata.
      *
-     * ,
-     * : byte Type base multiple , floatType
-     *
-     * @return
+     * @return final point value as a string
      */
     public String getFinalValue() {
         if (Objects.isNull(point)) {
@@ -97,12 +97,12 @@ public class RValue implements Serializable {
     }
 
     /**
-     * : y = ax + b
+     * Applies a linear transformation using the formula {@code y = ax + b}.
      *
-     * @param x A
-     * @param b B
-     * @param a X
-     * @return BigDecimal
+     * @param a multiplier
+     * @param x raw value
+     * @param b offset
+     * @return transformed decimal value
      */
     private BigDecimal getLinearValue(BigDecimal a, String x, BigDecimal b) {
         BigDecimal bigDecimal = new BigDecimal(x);
@@ -120,11 +120,10 @@ public class RValue implements Serializable {
     }
 
     /**
+     * Converts the raw value to a byte after linear scaling.
      *
-     * -128 ~ 127
-     *
-     * @param rawValue Raw value
-     * @return short
+     * @param rawValue raw value
+     * @return converted byte value
      */
     private byte getByteValue(String rawValue, BigDecimal base, BigDecimal multiple) {
         try {
@@ -136,11 +135,10 @@ public class RValue implements Serializable {
     }
 
     /**
+     * Converts the raw value to a short after linear scaling.
      *
-     * -32768 ~ 32767
-     *
-     * @param rawValue Raw value
-     * @return short
+     * @param rawValue raw value
+     * @return converted short value
      */
     private short getShortValue(String rawValue, BigDecimal base, BigDecimal multiple) {
         try {
@@ -152,11 +150,10 @@ public class RValue implements Serializable {
     }
 
     /**
+     * Converts the raw value to an integer after linear scaling.
      *
-     * -2147483648 ~ 2147483647
-     *
-     * @param rawValue Raw value
-     * @return int
+     * @param rawValue raw value
+     * @return converted integer value
      */
     private int getIntegerValue(String rawValue, BigDecimal base, BigDecimal multiple) {
         try {
@@ -168,11 +165,10 @@ public class RValue implements Serializable {
     }
 
     /**
+     * Converts the raw value to a long after linear scaling.
      *
-     * -9223372036854775808 ~ 9223372036854775807
-     *
-     * @param rawValue Raw value
-     * @return long
+     * @param rawValue raw value
+     * @return converted long value
      */
     private long getLongValue(String rawValue, BigDecimal base, BigDecimal multiple) {
         try {
@@ -184,10 +180,10 @@ public class RValue implements Serializable {
     }
 
     /**
+     * Converts the raw value to a rounded float after linear scaling.
      *
-     *
-     * @param rawValue Raw value
-     * @return float
+     * @param rawValue raw value
+     * @return converted float value
      */
     private float getFloatValue(String rawValue, BigDecimal base, BigDecimal multiple, byte decimal) {
         try {
@@ -202,10 +198,10 @@ public class RValue implements Serializable {
     }
 
     /**
+     * Converts the raw value to a rounded double after linear scaling.
      *
-     *
-     * @param rawValue Raw value
-     * @return double
+     * @param rawValue raw value
+     * @return converted double value
      */
     private double getDoubleValue(String rawValue, BigDecimal base, BigDecimal multiple, byte decimal) {
         try {
@@ -220,10 +216,10 @@ public class RValue implements Serializable {
     }
 
     /**
+     * Converts the raw value to a boolean.
      *
-     *
-     * @param rawValue Raw value
-     * @return boolean
+     * @param rawValue raw value
+     * @return converted boolean value
      */
     private boolean getBooleanValue(String rawValue) {
         return Boolean.parseBoolean(rawValue);

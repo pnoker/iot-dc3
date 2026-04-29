@@ -27,7 +27,8 @@ import lombok.*;
 import java.math.BigDecimal;
 
 /**
- * Point BO
+ * Business object that describes a device point, including read/write access and value
+ * calculation parameters.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -41,52 +42,52 @@ import java.math.BigDecimal;
 public class PointBO extends BaseBO {
 
     /**
-     * Name
+     * Point display name.
      */
     private String pointName;
 
     /**
-     * Code
+     * Point code defined in the platform.
      */
     private String pointCode;
 
     /**
-     * Type
+     * Point data type.
      */
     private PointTypeFlagEnum pointTypeFlag;
 
     /**
-     *
+     * Read/write capability of the point.
      */
     private RwFlagEnum rwFlag;
 
     /**
-     *
+     * Base offset applied during value conversion.
      */
     private BigDecimal baseValue;
 
     /**
-     *
+     * Multiplier applied during value conversion.
      */
     private BigDecimal multiple;
 
     /**
-     *
+     * Decimal precision used for floating-point rounding.
      */
     private Byte valueDecimal;
 
     /**
-     *
+     * Engineering unit of the point value.
      */
     private String unit;
 
     /**
-     * ID
+     * Associated profile identifier.
      */
     private Long profileId;
 
     /**
-     *
+     * Extended point metadata.
      */
     private PointExt pointExt;
 
@@ -96,17 +97,17 @@ public class PointBO extends BaseBO {
     private EnableFlagEnum enableFlag;
 
     /**
-     * Tenant ID
+     * Tenant identifier.
      */
     private Long tenantId;
 
     /**
-     *
+     * Data signature used for optimistic checks or synchronization.
      */
     private String signature;
 
     /**
-     *
+     * Data version.
      */
     private Integer version;
 
