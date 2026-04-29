@@ -34,6 +34,9 @@ public class PlcS7PointVariable {
     private int dbNum;
     private int byteOffset;
     private int bitOffset;
+    /**
+     * Data block size, the number of bytes occupied by point data.
+     */
     private int size;
     private S7Type type;
     private Class<?> fieldType;
