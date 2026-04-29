@@ -20,14 +20,12 @@ package io.github.pnoker.common.driver.grpc.client;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.api.common.driver.*;
-import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.entity.builder.PointBuilder;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.exception.ServiceException;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ import java.util.List;
 @Component
 public class PointClient {
 
-    @GrpcClient(ManagerConstant.SERVICE_NAME)
+    @Resource
     private PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
 
     @Resource

@@ -23,7 +23,6 @@ import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
 import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
-import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.bo.RegisterBO;
 import io.github.pnoker.common.driver.entity.builder.DriverBuilder;
@@ -37,7 +36,6 @@ import io.github.pnoker.common.exception.RegisterException;
 import io.github.pnoker.common.optional.CollectionOptional;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -57,7 +55,7 @@ import java.util.stream.Collectors;
 @Component
 public class DriverClient {
 
-    @GrpcClient(ManagerConstant.SERVICE_NAME)
+    @Resource
     private DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
 
     @Resource
