@@ -36,7 +36,7 @@ import org.mapstruct.MappingTarget;
 import java.util.Optional;
 
 /**
- * DriverAttribute Builder
+ * MapStruct mapper for converting driver attribute definitions between gRPC DTOs and internal DTOs.
  *
  * @author pnoker
  * @version 2025.9.0

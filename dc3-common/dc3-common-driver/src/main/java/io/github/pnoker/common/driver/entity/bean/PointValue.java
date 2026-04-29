@@ -26,7 +26,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- *
+ * Message payload that carries a point reading, including the raw value, the calculated value,
+ * and the timestamp when the reading was produced.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -60,12 +61,12 @@ public class PointValue implements Serializable {
     private String rawValue;
 
     /**
-     * Processed value
+     * Calculated point value after applying scaling and type conversion.
      */
     private String calValue;
 
     /**
-     * Create Time
+     * Time when the point value message was created.
      */
     private LocalDateTime createTime;
 

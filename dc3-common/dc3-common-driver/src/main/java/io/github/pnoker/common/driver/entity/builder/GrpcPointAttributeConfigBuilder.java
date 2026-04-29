@@ -28,7 +28,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 /**
- * PointAttributeConfig Builder
+ * MapStruct mapper for converting point attribute configuration DTOs from gRPC responses.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -29,7 +29,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
+ * Represents a typed point value to be written to a device.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -47,23 +47,21 @@ public class WValue implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * , string, typeType
+     * Raw value content stored as a string before type conversion.
      */
     private String value;
 
     /**
-     * Type, value type, valueType
-     * <p>
-     * Type
+     * Declared point type used to convert the raw string value.
      */
     private PointTypeFlagEnum type;
 
     /**
-     * Type
+     * Converts the stored string value to the requested boxed Java type.
      *
-     * @param clazz T Class
-     * @param <T>   T
-     * @return T
+     * @param clazz target boxed type
+     * @param <T>   target type parameter
+     * @return converted value
      */
     @SuppressWarnings("unchecked")
     public <T> T getValue(Class<T> clazz) {

@@ -34,7 +34,7 @@ import org.mapstruct.MappingTarget;
 import java.util.HashSet;
 
 /**
- * Builder
+ * MapStruct mapper for converting device gRPC DTOs into internal business objects.
  *
  * @author pnoker
  * @version 2025.9.0

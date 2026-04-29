@@ -29,7 +29,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
+ * Represents a typed attribute value resolved from driver or point configuration.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -47,21 +47,21 @@ public class AttributeBO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * , string, typeType
+     * Raw attribute value stored as a string.
      */
     private String value;
 
     /**
-     * Type, value type, valueType
+     * Declared attribute type used for conversion.
      */
     private AttributeTypeFlagEnum type;
 
     /**
-     * Type
+     * Converts the attribute value to the requested boxed Java type.
      *
-     * @param clazz T Class
-     * @param <T>   T
-     * @return T
+     * @param clazz target boxed type
+     * @param <T>   target type parameter
+     * @return converted value
      */
     @SuppressWarnings("unchecked")
     public <T> T getValue(Class<T> clazz) {

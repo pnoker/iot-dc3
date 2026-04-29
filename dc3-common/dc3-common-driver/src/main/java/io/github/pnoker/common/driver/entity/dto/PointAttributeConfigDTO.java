@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * PointAttributeConfig BO
+ * Data transfer object that stores the configured value of a point attribute for a device point.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -38,12 +38,12 @@ import lombok.Setter;
 public class PointAttributeConfigDTO extends BaseDTO {
 
     /**
-     * ID
+     * Referenced attribute identifier.
      */
     private Long attributeId;
 
     /**
-     *
+     * Configured attribute value.
      */
     private String configValue;
 
@@ -63,17 +63,17 @@ public class PointAttributeConfigDTO extends BaseDTO {
     private EnableFlagEnum enableFlag;
 
     /**
-     * Tenant ID
+     * Tenant identifier.
      */
     private Long tenantId;
 
     /**
-     *
+     * Data signature used for optimistic checks or synchronization.
      */
     private String signature;
 
     /**
-     *
+     * Data version.
      */
     private Integer version;
 }
