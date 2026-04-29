@@ -19,6 +19,16 @@
 spring:
   env: dev
   group: ${user.name}
+  # gRPC client configuration
+  grpc:
+    client:
+      channels:
+        # gRPC client for dc3-center-auth service
+        dc3-center-auth:
+          address: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9300'
+          enable-keep-alive: true
+          keep-alive-without-calls: true
+          negotiation-type: PLAINTEXT
   cloud:
     # Spring Cloud Gateway WebFlux configuration
     gateway.server.webflux:
@@ -54,16 +64,6 @@ spring:
           filters:
             - StripPrefix=2
             - Authentic
-
-# gRPC client configuration
-grpc:
-  client:
-    # gRPC client for dc3-center-auth service
-    dc3-center-auth:
-      address: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9300'
-      enable-keep-alive: true
-      keep-alive-without-calls: true
-      negotiation-type: plaintext
 
 # Logging configuration
 logging:
