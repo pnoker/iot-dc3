@@ -35,7 +35,7 @@ import org.mapstruct.MappingTarget;
 import java.util.Optional;
 
 /**
- * Point Builder
+ * MapStruct mapper for converting point gRPC DTOs into internal business objects.
  *
  * @author pnoker
  * @version 2025.9.0

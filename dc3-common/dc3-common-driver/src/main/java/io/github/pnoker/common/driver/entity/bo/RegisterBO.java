@@ -26,6 +26,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * Registration payload used when a driver instance announces itself to the manager center.
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
@@ -41,10 +43,29 @@ public class RegisterBO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Tenant name of the driver instance.
+     */
     private String tenant;
+
+    /**
+     * Driver client identifier.
+     */
     private String client;
+
+    /**
+     * Driver definition to register.
+     */
     private DriverBO driver;
+
+    /**
+     * Driver-level attribute definitions.
+     */
     private List<DriverAttributeDTO> driverAttributes;
+
+    /**
+     * Point-level attribute definitions.
+     */
     private List<PointAttributeDTO> pointAttributes;
 
 }

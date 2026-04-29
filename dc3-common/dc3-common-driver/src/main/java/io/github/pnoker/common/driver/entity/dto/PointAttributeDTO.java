@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * BO
+ * Data transfer object that describes a point-level attribute definition.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -40,22 +40,22 @@ import lombok.Setter;
 public class PointAttributeDTO extends BaseDTO {
 
     /**
-     * Name
+     * Attribute display name.
      */
     private String attributeName;
 
     /**
-     * Code
+     * Attribute code used in configuration maps.
      */
     private String attributeCode;
 
     /**
-     * Type
+     * Attribute value type.
      */
     private AttributeTypeFlagEnum attributeTypeFlag;
 
     /**
-     *
+     * Default value used when no explicit configuration is provided.
      */
     private String defaultValue;
 
@@ -65,7 +65,7 @@ public class PointAttributeDTO extends BaseDTO {
     private Long driverId;
 
     /**
-     *
+     * Extended attribute metadata.
      */
     private PointAttributeExt attributeExt;
 
@@ -75,17 +75,17 @@ public class PointAttributeDTO extends BaseDTO {
     private EnableFlagEnum enableFlag;
 
     /**
-     * Tenant ID
+     * Tenant identifier.
      */
     private Long tenantId;
 
     /**
-     *
+     * Data signature used for optimistic checks or synchronization.
      */
     private String signature;
 
     /**
-     *
+     * Data version.
      */
     private Integer version;
 }

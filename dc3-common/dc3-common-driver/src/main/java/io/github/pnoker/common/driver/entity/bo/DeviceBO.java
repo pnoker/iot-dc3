@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * BO
+ * Business object that describes a device assigned to the current driver, including the cached
+ * point list and resolved attribute configurations.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,22 +43,22 @@ import java.util.Set;
 public class DeviceBO extends BaseBO {
 
     /**
-     * Device Name
+     * Device display name.
      */
     private String deviceName;
 
     /**
-     * Device ID
+     * Device code defined in the platform.
      */
     private String deviceCode;
 
     /**
-     * Driver ID
+     * Owning driver identifier.
      */
     private Long driverId;
 
     /**
-     *
+     * Extended device metadata.
      */
     private DeviceExt deviceExt;
 
@@ -67,42 +68,37 @@ public class DeviceBO extends BaseBO {
     private EnableFlagEnum enableFlag;
 
     /**
-     * Tenant ID
+     * Tenant identifier.
      */
     private Long tenantId;
 
     /**
-     *
+     * Data signature used for optimistic checks or synchronization.
      */
     private String signature;
 
     /**
-     *
+     * Data version.
      */
     private Integer version;
 
-    // 
-
     /**
-     * ID
+     * Assigned profile identifiers.
      */
     private Set<Long> profileIds;
 
     /**
-     * Point ID
+     * Identifiers of points owned by the device.
      */
     private Set<Long> pointIds;
 
     /**
-     *
-     * <p>
-     * attributeId,attributeConfig
+     * Driver attribute configuration map keyed by attribute identifier.
      */
     private Map<Long, DriverAttributeConfigDTO> driverAttributeConfigIdMap;
 
     /**
-     *
-     * pointId(attributeId,attributeConfig)
+     * Point attribute configuration map keyed by point identifier and then attribute identifier.
      */
     private Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigIdMap;
 }

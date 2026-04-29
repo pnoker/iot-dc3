@@ -36,7 +36,7 @@ import org.mapstruct.MappingTarget;
 import java.util.Optional;
 
 /**
- * PointAttribute Builder
+ * MapStruct mapper for converting point attribute definitions between gRPC DTOs and internal DTOs.
  *
  * @author pnoker
  * @version 2025.9.0
