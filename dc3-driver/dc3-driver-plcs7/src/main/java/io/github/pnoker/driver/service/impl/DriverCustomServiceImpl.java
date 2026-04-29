@@ -76,126 +76,39 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private DriverSenderService driverSenderService;
 
     /**
-     * PLC connector map
-     * For reference only
+     * Cache of device ID to S7 connector instances.
      */
     private Map<Long, MyS7Connector> connectMap;
 
-    /**
-     * Initializes the S7 PLC driver.
-     * <p>
-     * This method is called when the driver starts. It initializes the connection map
-     * used to manage S7 connector instances. Override this method to implement
-     * custom initialization logic.
-     * </p>
-     */
     @Override
     public void initial() {
-        /*
-         * Driver initialization logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * This method is automatically executed when the driver starts, and you can perform specific initialization operations here.
-         *
-         */
         connectMap = new ConcurrentHashMap<>(16);
     }
 
-    /**
-     * Scheduled task to report device status.
-     * <p>
-     * This method is called periodically to update device status. By default,
-     * all devices are reported as ONLINE with a 25-second validity period.
-     * Override this method to implement custom status reporting logic.
-     * </p>
-     */
     @Override
     public void schedule() {
-        /*
-         * Device status upload logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * Device status upload can be flexibly implemented based on specific requirements. Here are some common approaches:
-         * - Determine device status based on read data in the `read` method;
-         * - Periodically check device status in a custom scheduled task;
-         * - Trigger device status judgment based on specific business logic or events.
-         *
-         * Finally, submit the device status to the SDK management through the {@link DriverSenderService#deviceStatusSender} interface.
-         * The device status enumeration {@link DeviceStatusEnum} includes the following states:
-         * - ONLINE: Device online
-         * - OFFLINE: Device offline
-         * - MAINTAIN: Device under maintenance
-         * - FAULT: Device fault
-         *
-         * In the following example, all devices are set to {@link DeviceStatusEnum#ONLINE}, with a status validity period of 25 {@link TimeUnit#SECONDS}.
-         */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
-    /**
-     * Handles metadata change events for drivers, devices, and points.
-     * <p>
-     * This method is called when metadata is created, updated, or deleted.
-     * For device update/delete events, it removes the cached S7 connector connection
-     * to force reconnection with updated configuration.
-     * </p>
-     *
-     * @param metadataEvent the metadata event containing type, operation, and ID information
-     */
     @Override
     public void event(MetadataEventDTO metadataEvent) {
-        /*
-         * Receive metadata events for driver, device, and point creation, update, and deletion.
-         *
-         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
 
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            // to do something for device event
             log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
 
-            // When the device is updated or deleted, remove the corresponding connection handle
+            // Remove stale connection when device is updated or deleted
             if (MetadataOperateTypeEnum.DELETE.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 connectMap.remove(metadataEvent.getId());
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            // to do something for point event
             log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
         }
     }
 
-    /**
-     * Reads data from an S7 PLC device point.
-     * <p>
-     * This method obtains or creates an S7 connector, acquires a write lock for thread safety,
-     * and reads the value from the specified data block location. The read operation uses
-     * the S7 serializer to extract data based on the point configuration.
-     * </p>
-     *
-     * @param driverConfig driver configuration attributes (host, port)
-     * @param pointConfig  point configuration attributes (dbNum, byteOffset, bitOffset, blockSize)
-     * @param device       the device to read from
-     * @param point        the point to read
-     * @return the read value wrapped in an RValue object, or null if the read fails
-     */
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
-        /*
-         * PLC S7 data reading logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * This method is used to read data of the specified point from the PLC S7 device.
-         * 1. Obtain the S7 connector of the device.
-         * 2. Lock to ensure thread safety.
-         * 3. Use the S7 serializer to read the point data.
-         * 4. Package the read data as an RValue object and return it.
-         * 5. Catch and log exceptions, ensuring the lock is released in the finally block.
-         */
         log.debug("Plc S7 Read, device: {}, point: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(point));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverConfig);
 
@@ -212,34 +125,8 @@ public class DriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
-    /**
-     * Writes data to an S7 PLC device point.
-     * <p>
-     * This method obtains or creates an S7 connector, acquires a write lock for thread safety,
-     * and writes the value to the specified data block location. The write operation supports
-     * multiple data types (INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING).
-     * </p>
-     *
-     * @param driverConfig driver configuration attributes (host, port)
-     * @param pointConfig  point configuration attributes (dbNum, byteOffset, bitOffset, blockSize)
-     * @param device       the device to write to
-     * @param point        the point to write
-     * @param wValue       the value containing the data to write
-     * @return true if the write operation succeeded, false otherwise
-     */
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
-        /*
-         * PLC S7 data write logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * This method is used to write data of the specified point to the PLC S7 device.
-         * 1. Obtain the S7 connector of the device.
-         * 2. Lock to ensure thread safety.
-         * 3. Use the S7 serializer to write the point data.
-         * 4. Catch and log exceptions, ensuring the lock is released in the finally block.
-         * 5. Return the result of the write operation (success or failure).
-         */
         log.debug("Plc S7 Write, device: {}, value: {}", JsonUtil.toJsonString(device), JsonUtil.toJsonString(wValue));
         MyS7Connector myS7Connector = getS7Connector(device.getId(), driverConfig);
         myS7Connector.lock.writeLock().lock();
@@ -258,22 +145,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Get PLC S7 Connector
-     * <p>
-     * This method retrieves the S7 connector for the specified device from the cache. If the connector
-     * is not present in the cache, a new one is created based on the driver configuration and then
-     * cached for subsequent use.
-     * <p>
-     * During connector creation, the host address and port number are obtained from the driver
-     * configuration, and a read-write lock is initialized to ensure thread safety. If connector
-     * creation fails, a {@link ServiceException} is thrown.
+     * Get or create an S7 TCP connector for the given device.
      *
-     * @param deviceId     Device ID used to identify the unique device connector
-     * @param driverConfig Driver configuration containing parameters such as host address and port
-     *                     required to connect to the PLC
-     * @return The {@link MyS7Connector} object corresponding to the device ID, containing the S7
-     * connector and read-write lock
-     * @throws ServiceException Thrown if connector creation fails
+     * @param deviceId     unique device identifier
+     * @param driverConfig driver configuration (host, port)
+     * @return wrapper containing the connector and its read-write lock
+     * @throws ServiceException if connector creation fails
      */
     private MyS7Connector getS7Connector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         MyS7Connector myS7Connector = connectMap.get(deviceId);
@@ -297,24 +174,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Get PLC S7 point variable information
-     * <p>
-     * This method extracts PLC S7 point variable information from the point configuration
-     * and encapsulates it into a {@link PlcS7PointVariable} object.
-     * The point configuration should contain the following key attributes:
-     * - dbNum: data block number
-     * - byteOffset: byte offset
-     * - bitOffset: bit offset
-     * - blockSize: data block size
-     * - type: point data type
-     * <p>
-     * If any of the above attributes is missing in the point configuration,
-     * a {@link NullPointerException} will be thrown.
+     * Build a PlcS7PointVariable from point configuration attributes.
      *
-     * @param pointConfig point configuration information, containing related attributes of the point variable
-     * @param type        point data type, used to identify the type of point data
-     * @return the encapsulated {@link PlcS7PointVariable} object, containing detailed information of the point variable
-     * @throws NullPointerException if any necessary attribute is missing in the point configuration
+     * @param pointConfig point attributes (dbNum, byteOffset, bitOffset, blockSize)
+     * @param type        S7 data type code
+     * @return the point variable definition
      */
     private PlcS7PointVariable getPointVariable(Map<String, AttributeBO> pointConfig, String type) {
         log.debug("Plc S7 Point Attribute Config {}", JsonUtil.toJsonString(pointConfig));
@@ -327,27 +191,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Write data to PLC S7
-     * <p>
-     * This method is used to write data of a specified type to a designated point on the PLC S7.
-     * 1. Obtain the corresponding {@link AttributeTypeFlagEnum} enum value based on the type string.
-     * 2. If the type is not supported, throw an {@link UnSupportException}.
-     * 3. Convert the string value to the corresponding Java type based on the type.
-     * 4. Use {@link S7Serializer} to write the data to the specified data block and byte offset on the PLC S7.
-     * <p>
-     * Supported data types include:
-     * - INT: integer
-     * - LONG: long integer
-     * - FLOAT: single-precision floating point
-     * - DOUBLE: double-precision floating point
-     * - BOOLEAN: boolean
-     * - STRING: string
+     * Write a typed value to an S7 data block.
+     * <p>Supports INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING.
      *
-     * @param serializer         S7 serializer, used for data interaction with PLC S7
-     * @param plcS7PointVariable PLC S7 point variable information, including data block number, byte offset, etc.
-     * @param type               Data type string, used to identify the type of data to be written
-     * @param value              The data value in string format to be written
-     * @throws UnSupportException Thrown if the data type is not supported
+     * @param serializer         active S7 serializer
+     * @param plcS7PointVariable target point variable (DB number, offsets)
+     * @param type               data type code
+     * @param value              string representation of the value to write
+     * @throws UnSupportException if the type is unsupported
      */
     private void store(S7Serializer serializer, PlcS7PointVariable plcS7PointVariable, String type, String value) {
         AttributeTypeFlagEnum valueType = AttributeTypeFlagEnum.ofCode(type);
@@ -386,13 +237,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * MyS7Connector inner class
-     * <p>
-     * This class is used to encapsulate information related to the PLC S7 connection, including the read-write lock and the S7 connector.
-     * The read-write lock {@link ReentrantReadWriteLock} is used to ensure thread-safe operations on the S7 connector in a multi-threaded environment.
-     * The S7 connector {@link S7Connector} is used to communicate with the PLC S7 device.
-     * <p>
-     * This class provides a no-argument constructor and an all-argument constructor, and uses Lombok annotations to automatically generate getter and setter methods.
+     * Wrapper holding an S7 connector and its thread-safety lock.
      */
     @Getter
     @Setter

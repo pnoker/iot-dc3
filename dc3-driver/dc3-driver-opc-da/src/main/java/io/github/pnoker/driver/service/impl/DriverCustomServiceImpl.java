@@ -54,7 +54,11 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * Drive custom service implementation classes
+ * Custom driver service implementation for the OPC DA driver.
+ * <p>
+ * Manages OPC DA server connections via DCOM, reads/writes tag values
+ * through groups and items with support for multiple data types.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -70,109 +74,54 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     private DriverSenderService driverSenderService;
 
     /**
-     * Opc Da Server Map
+     * Cache of device ID to OPC DA server connections.
      */
     private Map<Long, Server> connectMap;
 
     @Override
     public void initial() {
-        /*
-         * Driver initialization logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * This method is automatically executed when the driver starts, and you can perform specific initialization operations here.
-         *
-         */
         connectMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
     public void schedule() {
-        /*
-         * Device status upload logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * Device status upload can be flexibly implemented based on specific requirements. Here are some common approaches:
-         * - Determine device status based on read data in the `read` method;
-         * - Periodically check device status in a custom scheduled task;
-         * - Trigger device status judgment based on specific business logic or events.
-         *
-         * Finally, submit the device status to the SDK management through the {@link DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} interface.
-         * The device status enumeration {@link DeviceStatusEnum} includes the following states:
-         * - ONLINE: Device online
-         * - OFFLINE: Device offline
-         * - MAINTAIN: Device under maintenance
-         * - FAULT: Device fault
-         *
-         * In the following example, all devices are set to {@link DeviceStatusEnum#ONLINE}, with a status validity period of 25 {@link TimeUnit#SECONDS}.
-         */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
     @Override
     public void event(MetadataEventDTO metadataEvent) {
-        /*
-         * Receive metadata events for driver, device, and point creation, update, and deletion.
-         *
-         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            // to do something for device event
             log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
 
-            // When the device is updated or deleted, remove the corresponding connection handle
+            // Remove stale connection when device is updated or deleted
             if (MetadataOperateTypeEnum.DELETE.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 connectMap.remove(metadataEvent.getId());
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            // to do something for point event
             log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
         }
     }
 
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
-        /*
-         * Read point value logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * 1. Obtain the Opc Da Server connection via device ID and driver configuration.
-         * 2. Read the corresponding point value according to the point configuration.
-         * 3. Wrap the read value into an RValue object and return it.
-         */
         return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
     }
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
-        /*
-         * Write point value logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * 1. Obtain the Opc Da Server connection via device ID and driver configuration.
-         * 2. According to the point configuration and write value, write the value to the corresponding point.
-         * 3. Return whether the write operation is successful.
-         */
         Server server = getConnector(device.getId(), driverConfig);
         return writeValue(server, pointConfig, wValue);
     }
 
     /**
-     * Get OPC DA Server Connection
-     * <p>
-     * Obtain the corresponding OPC DA server connection based on the device ID and driver configuration.
-     * If the connection does not exist, create a new connection and cache it.
+     * Get or create an OPC DA server connection for the given device.
      *
-     * @param deviceId     Device ID, used to identify the OPC DA server connection corresponding to the device
-     * @param driverConfig Driver configuration, including connection information of the OPC DA server
-     *                     (such as host address, CLSID, username, password, etc.)
-     * @return Server      Returns the OPC DA server connection corresponding to the device ID
-     * @throws ConnectorException If an exception occurs when connecting to the OPC DA server, this exception is thrown
+     * @param deviceId     unique device identifier
+     * @param driverConfig driver configuration (host, clsId, username, password)
+     * @return cached or newly connected OPC DA Server
+     * @throws ConnectorException if the connection fails
      */
     private Server getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("Opc Da Server Connection Info {}", JsonUtil.toJsonString(driverConfig));
@@ -197,20 +146,11 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Get the Item object from the OPC DA server
-     * <p>
-     * According to the group name and tag name in the point configuration, obtain the corresponding Item object
-     * from the specified OPC DA server. If the group does not exist, a new group will be created;
-     * if the group already exists, it will be used directly.
+     * Resolve an OPC DA Item from the server, creating the group if needed.
      *
-     * @param server      Connected OPC DA server instance
-     * @param pointConfig Point configuration, including group name and tag name, etc.
-     * @return Item       Returns the Item object corresponding to the point configuration
-     * @throws NotConnectedException   If the OPC DA server is not connected, this exception will be thrown
-     * @throws JIException             If an error occurs when communicating with the OPC DA server, this exception will be thrown
-     * @throws UnknownHostException    If the host address of the OPC DA server cannot be resolved, this exception will be thrown
-     * @throws DuplicateGroupException If trying to add an existing group, this exception will be thrown
-     * @throws AddFailedException      If adding a group or Item fails, this exception will be thrown
+     * @param server      connected OPC DA server
+     * @param pointConfig point configuration (group, tag)
+     * @return the resolved Item
      */
     public Item getItem(Server server, Map<String, AttributeBO> pointConfig) throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException, AddFailedException {
         Group group;
@@ -224,16 +164,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Read tag value from OPC DA server
-     * <p>
-     * This method obtains the corresponding Item object through the given OPC DA server and tag configuration,
-     * and reads its value.
-     * If an exception occurs during the reading process, the server connection will be disconnected and {@link ReadPointException} will be thrown.
+     * Read a tag value from the OPC DA server.
      *
-     * @param server      Connected OPC DA server instance
-     * @param pointConfig Tag configuration, including group name and tag name, etc.
-     * @return String     Returns the read tag value
-     * @throws ReadPointException If an exception occurs when reading the tag value, this exception will be thrown
+     * @param server      active OPC DA server connection
+     * @param pointConfig tag configuration (group, tag)
+     * @return the tag value as a string
+     * @throws ReadPointException if reading fails (server is disposed on error)
      */
     private String readValue(Server server, Map<String, AttributeBO> pointConfig) {
         try {
@@ -248,15 +184,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Read OPC DA tag value
-     * <p>
-     * This method reads the value from the given OPC DA Item object and converts it according to its data type.
-     * Supported data types: short (VT_I2), int (VT_I4), long (VT_I8), float (VT_R4), double (VT_R8), boolean (VT_BOOL), string (VT_BSTR).
-     * If the data type is not in the above list, the string representation of the object is returned.
+     * Read and convert an OPC DA Item value to string.
+     * <p>Supports VT_I2, VT_I4, VT_I8, VT_R4, VT_R8, VT_BOOL, VT_BSTR; falls back to toString().
      *
-     * @param item OPC DA Item object containing the tag value to be read
-     * @return String string representation of the read tag value
-     * @throws JIException thrown when communication with the OPC DA server fails
+     * @param item the OPC DA Item to read
+     * @return the value as a string
+     * @throws JIException if DCOM communication fails
      */
     public String readItem(Item item) throws JIException {
         JIVariant jiVariant = item.read(false).getValue();
@@ -287,17 +220,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Write value to OPC DA Server
-     * <p>
-     * This method obtains the corresponding Item object through the given OPC DA server, point configuration and write value,
-     * and writes the value into the Item.
-     * If an exception occurs during the writing process, the server connection will be disconnected and {@link WritePointException} will be thrown.
+     * Write a value to an OPC DA tag.
      *
-     * @param server      Connected OPC DA server instance
-     * @param pointConfig Point configuration, including group name, tag name, etc.
-     * @param wValue      Write value, including data type and value to be written
-     * @return boolean    Returns whether the write operation is successful
-     * @throws WritePointException If an exception occurs when writing the point value, this exception will be thrown
+     * @param server      active OPC DA server connection
+     * @param pointConfig tag configuration (group, tag)
+     * @param wValue      value to write
+     * @return true if the write succeeded
+     * @throws WritePointException if writing fails (server is disposed on error)
      */
     private boolean writeValue(Server server, Map<String, AttributeBO> pointConfig, WValue wValue) {
         try {
@@ -312,17 +241,14 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Write value to OPC DA Item
-     * <p>
-     * According to the data type of the write value, convert it to the corresponding JIVariant object and write it into the specified OPC DA Item.
-     * Supported data types: SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING.
-     * If the data type is not supported, an {@link UnSupportException} will be thrown.
+     * Write a typed value to an OPC DA Item via JIVariant.
+     * <p>Supports SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING.
      *
-     * @param item   OPC DA Item object, representing the target point to be written
-     * @param wValue write value object, containing the data type and value to be written
-     * @return boolean returns whether the write operation is successful, true for success, false for failure
-     * @throws JIException        if an error occurs while communicating with the OPC DA server, this exception will be thrown
-     * @throws UnSupportException if the data type of the write value is not supported, this exception will be thrown
+     * @param item   target OPC DA Item
+     * @param wValue value and type to write
+     * @return true if the server reported success
+     * @throws JIException        if DCOM communication fails
+     * @throws UnSupportException if the value type is unsupported
      */
     private boolean writeItem(Item item, WValue wValue) throws JIException {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());

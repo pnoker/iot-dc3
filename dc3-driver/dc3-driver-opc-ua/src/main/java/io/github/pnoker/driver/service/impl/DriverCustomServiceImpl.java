@@ -74,159 +74,55 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     @Resource
     private DriverSenderService driverSenderService;
 
+    /**
+     * Cache of device ID to OPC UA client connections.
+     */
     private Map<Long, OpcUaClient> connectMap;
 
-    /**
-     * Initializes the OPC UA driver.
-     * <p>
-     * This method is called when the driver starts. It initializes the connection map
-     * used to manage OPC UA client instances. Override this method to implement
-     * custom initialization logic.
-     * </p>
-     */
     @Override
     public void initial() {
-        /*
-         * Driver initialization logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * This method is automatically executed when the driver starts, and you can perform specific initialization operations here.
-         *
-         */
         connectMap = new ConcurrentHashMap<>(16);
     }
 
-    /**
-     * Scheduled task to report device status.
-     * <p>
-     * This method is called periodically to update device status. By default,
-     * all devices are reported as ONLINE with a 25-second validity period.
-     * Override this method to implement custom status reporting logic.
-     * </p>
-     */
     @Override
     public void schedule() {
-        /*
-         * Device status upload logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * Device status upload can be flexibly implemented based on specific requirements. Here are some common approaches:
-         * - Determine device status based on read data in the `read` method;
-         * - Periodically check device status in a custom scheduled task;
-         * - Trigger device status judgment based on specific business logic or events.
-         *
-         * Finally, submit the device status to the SDK management through the {@link DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} interface.
-         * The device status enumeration {@link DeviceStatusEnum} includes the following states:
-         * - ONLINE: Device online
-         * - OFFLINE: Device offline
-         * - MAINTAIN: Device under maintenance
-         * - FAULT: Device fault
-         *
-         * In the following example, all devices are set to {@link DeviceStatusEnum#ONLINE}, with a status validity period of 25 {@link TimeUnit#SECONDS}.
-         */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
-    /**
-     * Handles metadata change events for drivers, devices, and points.
-     * <p>
-     * This method is called when metadata is created, updated, or deleted.
-     * For device update/delete events, it removes the cached OPC UA client connection
-     * to force reconnection with updated configuration.
-     * </p>
-     *
-     * @param metadataEvent the metadata event containing type, operation, and ID information
-     */
     @Override
     public void event(MetadataEventDTO metadataEvent) {
-        /*
-         * Receive metadata events for driver, device, and point creation, update, and deletion.
-         *
-         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            // to do something for device event
             log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
 
-            // When the device is updated or deleted, remove the corresponding connection handle
+            // Remove stale connection when device is updated or deleted
             if (MetadataOperateTypeEnum.DELETE.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 connectMap.remove(metadataEvent.getId());
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            // to do something for point event
             log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
         }
     }
 
-    /**
-     * Reads data from an OPC UA device point.
-     * <p>
-     * This method obtains or creates an OPC UA client connection, then reads the
-     * value from the specified OPC UA node. The node is identified by namespace
-     * and tag from point configuration.
-     * </p>
-     *
-     * @param driverConfig driver configuration attributes (host, port, path)
-     * @param pointConfig  point configuration attributes (namespace, tag)
-     * @param device       the device to read from
-     * @param point        the point to read
-     * @return the read value wrapped in an RValue object
-     */
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
-        /*
-         * Read OPC UA point value
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * 1. Obtain the OPC UA client connection through device ID and driver configuration.
-         * 2. Read the OPC UA node value using point configuration.
-         * 3. Encapsulate the read value as an RValue object and return it.
-         */
         return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig));
-
     }
 
-    /**
-     * Writes data to an OPC UA device point.
-     * <p>
-     * This method obtains or creates an OPC UA client connection, then writes the
-     * value to the specified OPC UA node. The data type is automatically determined
-     * from the write value's type flag.
-     * </p>
-     *
-     * @param driverConfig driver configuration attributes (host, port, path)
-     * @param pointConfig  point configuration attributes (namespace, tag)
-     * @param device       the device to write to
-     * @param point        the point to write
-     * @param wValue       the value containing the data to write
-     * @return true if the write operation succeeded, false otherwise
-     */
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
-        /*
-         * Write OPC UA point value
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * 1. Obtain the OPC UA client connection through device ID and driver configuration.
-         * 2. Write data to the OPC UA node using point configuration and write value.
-         * 3. Return whether the write operation is successful.
-         */
         OpcUaClient client = getConnector(device.getId(), driverConfig);
         return writeValue(client, pointConfig, wValue);
     }
 
     /**
-     * Get OPC UA client connection
+     * Get or create an OPC UA client for the given device.
      *
-     * @param deviceId     Device ID, used to identify a unique device connection
-     * @param driverConfig Driver configuration info, contains parameters required to connect to the OPC UA server
-     * @return OpcUaClient Returns the OPC UA client instance associated with the specified device
-     * @throws ConnectorException Thrown if connecting to the OPC UA server fails
+     * @param deviceId     unique device identifier
+     * @param driverConfig driver configuration (host, port, path)
+     * @return cached or newly created OpcUaClient
+     * @throws ConnectorException if client creation fails
      */
     private OpcUaClient getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("OPC UA server connection info: {}", JsonUtil.toJsonString(driverConfig));
@@ -258,10 +154,7 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Get OPC UA node from point configuration
-     *
-     * @param pointConfig point configuration, contains namespace and tag
-     * @return OPC UA node identifier
+     * Build a NodeId from point configuration (namespace + tag).
      */
     private NodeId getNode(Map<String, AttributeBO> pointConfig) {
         int namespace = pointConfig.get("namespace").getValue(Integer.class);
@@ -270,12 +163,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Read the value of an OPC UA node
+     * Read a node value from the OPC UA server with a 1-second timeout.
      *
-     * @param client      OPC UA client instance
-     * @param pointConfig Point configuration info
-     * @return The read node value
-     * @throws ReadPointException Thrown if the read operation fails
+     * @param client      connected OPC UA client
+     * @param pointConfig point configuration (namespace, tag)
+     * @return the node value as a string
+     * @throws ReadPointException if reading fails or times out
      */
     private String readValue(OpcUaClient client, Map<String, AttributeBO> pointConfig) {
         try {
@@ -295,13 +188,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Write the value to an OPC UA node
+     * Write a value to an OPC UA node.
      *
-     * @param client      OPC UA client instance
-     * @param pointConfig point configuration info
+     * @param client      connected OPC UA client
+     * @param pointConfig point configuration (namespace, tag)
      * @param wValue      value to write
-     * @return whether the write operation is successful
-     * @throws WritePointException thrown if the write operation fails
+     * @return true if the write succeeded
+     * @throws WritePointException if writing fails
      */
     private boolean writeValue(OpcUaClient client, Map<String, AttributeBO> pointConfig, WValue wValue) {
         try {
@@ -319,14 +212,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Write value to OPC UA node
+     * Write a typed value to an OPC UA node via DataValue/Variant.
+     * <p>Supports INT, LONG, FLOAT, DOUBLE, BOOLEAN, STRING.
      *
-     * @param client OPC UA client instance
-     * @param nodeId OPC UA node identifier
-     * @param wValue value to be written
-     * @return whether the write operation is successful
-     * @throws ExecutionException   thrown when the write operation fails
-     * @throws InterruptedException thrown when the write operation is interrupted
+     * @param client connected OPC UA client
+     * @param nodeId target node identifier
+     * @param wValue value and type to write
+     * @return true if the server reported a good status
      */
     private boolean writeNode(OpcUaClient client, NodeId nodeId, WValue wValue) throws ExecutionException, InterruptedException {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(wValue.getType().getCode());

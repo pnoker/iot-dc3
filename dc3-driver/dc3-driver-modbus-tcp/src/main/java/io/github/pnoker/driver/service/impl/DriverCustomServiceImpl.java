@@ -56,7 +56,11 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * Drive custom service implementation classes
+ * Custom driver service implementation for the Modbus TCP driver.
+ * <p>
+ * Manages Modbus TCP connections, reads point values from Modbus devices
+ * via function codes 1-4, and writes values to coils and holding registers.
+ * </p>
  *
  * @author pnoker
  * @version 2025.9.0
@@ -66,6 +70,9 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DriverCustomServiceImpl implements DriverCustomService {
 
+    /**
+     * Modbus factory for creating ModbusMaster instances.
+     */
     static ModbusFactory modbusFactory;
 
     static {
@@ -74,106 +81,59 @@ public class DriverCustomServiceImpl implements DriverCustomService {
 
     @Resource
     DriverMetadata driverMetadata;
+
     @Resource
     private DriverSenderService driverSenderService;
+
+    /**
+     * Cache of device ID to ModbusMaster connections.
+     */
     private Map<Long, ModbusMaster> connectMap;
 
     @Override
     public void initial() {
-        /*
-         * Driver initialization logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * This method is automatically executed when the driver starts, and you can perform specific initialization operations here.
-         *
-         */
         connectMap = new ConcurrentHashMap<>(16);
     }
 
     @Override
     public void schedule() {
-        /*
-         * Device status upload logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * Device status upload can be flexibly implemented based on specific requirements. Here are some common approaches:
-         * - Determine device status based on read data in the `read` method;
-         * - Periodically check device status in a custom scheduled task;
-         * - Trigger device status judgment based on specific business logic or events.
-         *
-         * Finally, submit the device status to the SDK management through the {@link DriverSenderService#deviceStatusSender(Long, DeviceStatusEnum)} interface.
-         * The device status enumeration {@link DeviceStatusEnum} includes the following states:
-         * - ONLINE: Device online
-         * - OFFLINE: Device offline
-         * - MAINTAIN: Device under maintenance
-         * - FAULT: Device fault
-         *
-         * In the following example, all devices are set to {@link DeviceStatusEnum#ONLINE}, with a status validity period of 25 {@link TimeUnit#SECONDS}.
-         */
         driverMetadata.getDeviceIds().forEach(id -> driverSenderService.deviceStatusSender(id, DeviceStatusEnum.ONLINE, 25, TimeUnit.SECONDS));
     }
 
     @Override
     public void event(MetadataEventDTO metadataEvent) {
-        /*
-         * Receive metadata events for driver, device, and point creation, update, and deletion.
-         *
-         * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT)
-         * Metadata operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            // to do something for device event
             log.info("Device metadata event: deviceId: {}, operate: {}", metadataEvent.getId(), operateType);
 
-            // When the device is updated or deleted, remove the corresponding connection handle
+            // Remove stale connection when device is updated or deleted
             if (MetadataOperateTypeEnum.DELETE.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 connectMap.remove(metadataEvent.getId());
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            // to do something for point event
             log.info("Point metadata event: pointId: {}, operate: {}", metadataEvent.getId(), operateType);
         }
     }
 
     @Override
     public RValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point) {
-        /*
-         * Read device point data
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * Read the specified device point data through the Modbus connector and return an RValue object.
-         * The RValue object contains device information, point information, and the read value.
-         */
         return new RValue(device, point, readValue(getConnector(device.getId(), driverConfig), pointConfig, point.getPointTypeFlag().getCode()));
     }
 
     @Override
     public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device, PointBO point, WValue wValue) {
-        /*
-         * Write device point data
-         *
-         * Hint: The logic here is for reference only; please modify it according to the actual application scenario.
-         * Write the specified value to the device point through the Modbus connector and return the write result.
-         */
         ModbusMaster modbusMaster = getConnector(device.getId(), driverConfig);
         return writeValue(modbusMaster, pointConfig, wValue);
     }
 
     /**
-     * Get Modbus Master connector
-     * <p>
-     * This method is used to obtain or create a Modbus Master connector based on the device ID and driver configuration.
-     * If the connector already exists, it will be returned directly; otherwise, a new connector will be created and initialized according to the configuration.
-     * If initialization fails, the connector will be removed and an exception will be thrown.
+     * Get or create a Modbus TCP connection for the given device.
      *
-     * @param deviceId     Device ID, used to identify a unique device connection
-     * @param driverConfig Driver configuration, including the host address and port number required to connect to the Modbus device
-     * @return ModbusMaster Returns the Modbus Master connector associated with the device
-     * @throws ConnectorException If the connector initialization fails, this exception will be thrown
+     * @param deviceId     unique device identifier
+     * @param driverConfig driver configuration containing host and port
+     * @return cached or newly created ModbusMaster
+     * @throws ConnectorException if connection initialization fails
      */
     private ModbusMaster getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         log.debug("Modbus Tcp Connection Info: {}", JsonUtil.toJsonString(driverConfig));
@@ -196,19 +156,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Read Modbus device point value
-     * <p>
-     * According to the function code(functionCode) and offset in the point configuration, read the corresponding type of value from the Modbus device.
-     * Supported function codes include:
-     * - 1: Read Coil Status
-     * - 2: Read Input Status
-     * - 3: Read Holding Register
-     * - 4: Read Input Register
+     * Read a point value from the Modbus device by function code.
+     * <p>Function codes: 1=coil, 2=input status, 3=holding register, 4=input register.
      *
-     * @param modbusMaster ModbusMaster connector for communication with the device
-     * @param pointConfig  Point configuration, including slaveId, functionCode, offset, etc.
-     * @param type         Point value type, used to determine how to parse data in the register
-     * @return String Returns the read point value as a string. If the function code is not supported, returns "0".
+     * @param modbusMaster active Modbus connection
+     * @param pointConfig  point configuration (slaveId, functionCode, offset)
+     * @param type         point value type for register data interpretation
+     * @return read value as string, or "0" for unsupported function codes
      */
     private String readValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, String type) {
         int slaveId = pointConfig.get("slaveId").getValue(Integer.class);
@@ -237,17 +191,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Read data of a specified point from the ModbusMaster connector
-     * <p>
-     * This method reads data from the ModbusMaster connector via the given {@link BaseLocator}.
-     * If a {@link ModbusTransportException} or {@link ErrorResponseException} occurs during reading,
-     * an error log is recorded and a {@link ReadPointException} is thrown.
+     * Read a value from the Modbus device using the given locator.
      *
-     * @param modbusMaster ModbusMaster connector for communication with the device
-     * @param locator      Point locator, containing slave ID, function code, offset, etc.
-     * @param <T>          Return value type, determined by the point data type
-     * @return T           The read point data
-     * @throws ReadPointException Thrown if an exception occurs during reading
+     * @param modbusMaster active Modbus connection
+     * @param locator      identifies the target point (slave, function, offset)
+     * @param <T>          value type determined by the locator
+     * @return the read value
+     * @throws ReadPointException if a transport or error response occurs
      */
     private <T> T getMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator) {
         try {
@@ -259,21 +209,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Write point value to Modbus device
-     * <p>
-     * According to the function code and offset in the point configuration, write the specified value to the corresponding point of the Modbus device.
-     * Supported function codes include:
-     * - 1: Write Coil Status
-     * - 3: Write Holding Register
-     * <p>
-     * For function code 1, write a boolean value to the coil status and return the write result.
-     * For function code 3, write a numeric value to the holding register and return the write success status.
-     * Other function codes are not supported and return false.
+     * Write a point value to the Modbus device by function code.
+     * <p>Function codes: 1=write coil, 3=write holding register. Others return false.
      *
-     * @param modbusMaster ModbusMaster connector for communication with the device
-     * @param pointConfig  Point configuration, including slave ID, function code, offset, etc.
-     * @param wValue       Value to be written, including value type and specific value
-     * @return boolean Write result, true indicates successful write, false indicates failed write or unsupported function code
+     * @param modbusMaster active Modbus connection
+     * @param pointConfig  point configuration (slaveId, functionCode, offset)
+     * @param wValue       value to write
+     * @return true if write succeeded, false if failed or unsupported function code
      */
     private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, WValue wValue) {
         int slaveId = pointConfig.get("slaveId").getValue(Integer.class);
@@ -293,20 +235,12 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Get Modbus data type
-     * <p>
-     * Return the corresponding Modbus data type based on the point value type.
-     * Supported point value types include:
-     * - {@link PointTypeFlagEnum#LONG}: returns 4-byte signed integer ({@link DataType#FOUR_BYTE_INT_SIGNED})
-     * - {@link PointTypeFlagEnum#FLOAT}: returns 4-byte float ({@link DataType#FOUR_BYTE_FLOAT})
-     * - {@link PointTypeFlagEnum#DOUBLE}: returns 8-byte float ({@link DataType#EIGHT_BYTE_FLOAT})
-     * - Other types: return 2-byte signed integer ({@link DataType#TWO_BYTE_INT_SIGNED})
-     * <p>
-     * Hint: This method can be extended according to actual project requirements, such as supporting byte swapping, big/little-endian mode, etc.
+     * Map a point type flag to a Modbus DataType constant.
+     * <p>LONG->4-byte int, FLOAT->4-byte float, DOUBLE->8-byte float, else 2-byte int.
      *
-     * @param type Point value type, used to determine the Modbus data type
-     * @return int Returns the corresponding Modbus data type
-     * @throws UnSupportException If the point value type is not supported, this exception is thrown
+     * @param type point type code
+     * @return Modbus DataType constant
+     * @throws UnSupportException if the type is unknown
      */
     private int getValueType(String type) {
         PointTypeFlagEnum valueType = PointTypeFlagEnum.ofCode(type);
@@ -314,30 +248,23 @@ public class DriverCustomServiceImpl implements DriverCustomService {
             throw new UnSupportException("Unsupported type of " + type);
         }
 
-        switch (valueType) {
-            case LONG:
-                return DataType.FOUR_BYTE_INT_SIGNED;
-            case FLOAT:
-                return DataType.FOUR_BYTE_FLOAT;
-            case DOUBLE:
-                return DataType.EIGHT_BYTE_FLOAT;
-            default:
-                return DataType.TWO_BYTE_INT_SIGNED;
-        }
+        return switch (valueType) {
+            case LONG -> DataType.FOUR_BYTE_INT_SIGNED;
+            case FLOAT -> DataType.FOUR_BYTE_FLOAT;
+            case DOUBLE -> DataType.EIGHT_BYTE_FLOAT;
+            default -> DataType.TWO_BYTE_INT_SIGNED;
+        };
     }
 
     /**
-     * Write coil status value to Modbus device
-     * <p>
-     * This method writes a boolean value to the coil (offset) of the specified slave (slaveId) via the ModbusMaster connector.
-     * If a {@link ModbusTransportException} occurs during the write process, an error log is recorded and a {@link WritePointException} is thrown.
+     * Write a boolean value to a Modbus coil.
      *
-     * @param modbusMaster ModbusMaster connector for communication with the device
-     * @param slaveId      Slave ID, identifying the target device
-     * @param offset       Coil offset, identifying the target coil
-     * @param wValue       Value to be written, containing the boolean value
-     * @return WriteCoilResponse Returns the response result of the write operation
-     * @throws WritePointException Thrown if an exception occurs during the write process
+     * @param modbusMaster active Modbus connection
+     * @param slaveId      target slave address
+     * @param offset       coil offset
+     * @param wValue       value containing the boolean to write
+     * @return the coil write response
+     * @throws WritePointException if a transport error occurs
      */
     private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, WValue wValue) {
         try {
@@ -350,20 +277,13 @@ public class DriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Write a value of the specified type to the Modbus device
-     * <p>
-     * This method writes a value to a designated point via the ModbusMaster connector. The point information
-     * is defined by {@link BaseLocator}, and the value type to be written is specified by {@link WValue}.
-     * It supports writing floating-point data.
-     * <p>
-     * If a {@link ModbusTransportException} or {@link ErrorResponseException} occurs during the write process,
-     * an error log is recorded and a {@link WritePointException} is thrown.
+     * Write a numeric value to a Modbus holding register via the given locator.
      *
-     * @param modbusMaster ModbusMaster connector used to communicate with the device
-     * @param locator      Point locator containing slave ID, function code, offset, etc.
-     * @param wValue       Value to be written, including value type and specific numeric value
-     * @param <T>          Return value type determined by the point's data type
-     * @throws WritePointException Thrown if an exception occurs during the write process
+     * @param modbusMaster active Modbus connection
+     * @param locator      identifies the target register
+     * @param wValue       value to write (read as Float)
+     * @param <T>          value type determined by the locator
+     * @throws WritePointException if a transport or error response occurs
      */
     private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, WValue wValue) {
         try {
