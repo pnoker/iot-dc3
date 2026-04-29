@@ -34,10 +34,6 @@ spring:
   profiles:
     active:
       - ${NODE_ENV:dev}
-  data:
-    # Redis database configuration
-    redis:
-      database: 1
 
 # Logging configuration
 logging:
