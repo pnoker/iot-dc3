@@ -16,6 +16,7 @@
 
 import { createPinia } from 'pinia';
 import App from '@/App.vue';
+import i18n from '@/config/i18n';
 import plugins from '@/config/plugins/index';
 import router from '@/config/router';
 import { createApp } from 'vue';
@@ -24,6 +25,7 @@ import { createApp } from 'vue';
 const app = createApp(App);
 app.use(router);
 app.use(createPinia());
+app.use(i18n);
 plugins(app);
 app.mount('#app');
 
