@@ -24,14 +24,6 @@ spring:
           url: jdbc:postgresql://${POSTGRES_HOST:dc3-postgres}:${POSTGRES_PORT:5432}/${POSTGRES_DB:dc3}?currentSchema=${POSTGRES_SCHEMA:dc3_single}&applicationName=dc3&ssl=false&stringtype=unspecified&clientEncoding=UTF8&serverTimezone=Asia/Shanghai
           username: ${POSTGRES_USERNAME:dc3}
           password: ${POSTGRES_PASSWORD:dc3dc3dc3}
-  data:
-    redis:
-      host: ${REDIS_HOST:dc3-redis}
-      port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:dc3dc3dc3}
-  cache:
-    redis:
-      time-to-live: ${CACHE_REDIS_TIME_TO_LIVE:12H}
   cloud:
     nacos:
       server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
