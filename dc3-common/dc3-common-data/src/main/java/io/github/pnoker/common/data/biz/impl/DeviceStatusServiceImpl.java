@@ -20,12 +20,8 @@ package io.github.pnoker.common.data.biz.impl;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DeviceStatusService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
-import io.github.pnoker.common.data.entity.bo.DeviceRunBO;
-import io.github.pnoker.common.data.entity.model.DeviceRunDO;
 import io.github.pnoker.common.data.entity.query.DeviceQuery;
-import io.github.pnoker.common.data.service.DeviceRunService;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
-import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
@@ -34,7 +30,11 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -53,9 +53,6 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     @Resource
     private LocalCacheService localCacheService;
-
-    @Resource
-    private DeviceRunService deviceRunService;
 
     @Override
     public Map<Long, String> selectByPage(DeviceQuery pageQuery) {
@@ -84,58 +81,6 @@ public class DeviceStatusServiceImpl implements DeviceStatusService {
             return Map.of();
         }
         return getStatusMap(devices);
-    }
-
-    @Override
-    public DeviceRunBO selectOnlineByDeviceId(Long deviceId) {
-        List<DeviceRunDO> deviceRunDOList = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
-        Long totalDuration = deviceRunService.selectSumDuration(deviceId, DriverStatusEnum.ONLINE.getCode());
-
-        FacadeDeviceBO device = deviceFacade.selectById(deviceId);
-        if (Objects.isNull(device)) {
-            throw new RuntimeException("Device does not exist");
-        }
-
-        DeviceRunBO deviceRunBO = new DeviceRunBO();
-        ArrayList<Long> list = new ArrayList<>(Collections.nCopies(7, 0L));
-        deviceRunBO.setStatus(DriverStatusEnum.ONLINE.getCode());
-        deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
-        deviceRunBO.setDeviceName(device.getDeviceName());
-        if (Objects.isNull(deviceRunDOList)) {
-            deviceRunBO.setDuration(list);
-            return deviceRunBO;
-        }
-        for (int i = 0; i < deviceRunDOList.size(); i++) {
-            list.set(i, deviceRunDOList.get(i).getDuration());
-        }
-        deviceRunBO.setDuration(list);
-        return deviceRunBO;
-    }
-
-    @Override
-    public DeviceRunBO selectOfflineByDeviceId(Long deviceId) {
-        List<DeviceRunDO> deviceRunDOList = deviceRunService.get7daysDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
-        Long totalDuration = deviceRunService.selectSumDuration(deviceId, DriverStatusEnum.OFFLINE.getCode());
-
-        FacadeDeviceBO device = deviceFacade.selectById(deviceId);
-        if (Objects.isNull(device)) {
-            throw new RuntimeException("Device does not exist");
-        }
-
-        DeviceRunBO deviceRunBO = new DeviceRunBO();
-        ArrayList<Long> list = new ArrayList<>(Collections.nCopies(7, 0L));
-        deviceRunBO.setStatus(DriverStatusEnum.OFFLINE.getCode());
-        deviceRunBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
-        deviceRunBO.setDeviceName(device.getDeviceName());
-        if (Objects.isNull(deviceRunDOList)) {
-            deviceRunBO.setDuration(list);
-            return deviceRunBO;
-        }
-        for (int i = 0; i < deviceRunDOList.size(); i++) {
-            list.set(i, deviceRunDOList.get(i).getDuration());
-        }
-        deviceRunBO.setDuration(list);
-        return deviceRunBO;
     }
 
     /**

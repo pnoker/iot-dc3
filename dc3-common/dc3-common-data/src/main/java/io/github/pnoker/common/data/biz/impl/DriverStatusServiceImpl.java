@@ -20,10 +20,7 @@ package io.github.pnoker.common.data.biz.impl;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DriverStatusService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
-import io.github.pnoker.common.data.entity.bo.DriverRunBO;
-import io.github.pnoker.common.data.entity.model.DriverRunDO;
 import io.github.pnoker.common.data.entity.query.DriverQuery;
-import io.github.pnoker.common.data.service.DriverRunService;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
@@ -36,7 +33,12 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -59,9 +61,6 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     @Resource
     private LocalCacheService localCacheService;
 
-    @Resource
-    private DriverRunService driverRunService;
-
     @Override
     public Map<Long, String> selectByPage(DriverQuery pageQuery) {
         FacadeDriverQuery facadeQuery = FacadeDriverQuery.builder()
@@ -83,16 +82,6 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     }
 
     @Override
-    public DriverRunBO selectOnlineByDriverId(Long driverId) {
-        return buildDriverRun(driverId, DriverStatusEnum.ONLINE);
-    }
-
-    @Override
-    public DriverRunBO selectOfflineByDriverId(Long driverId) {
-        return buildDriverRun(driverId, DriverStatusEnum.OFFLINE);
-    }
-
-    @Override
     public String getDeviceOnlineByDriverId(Long driverId) {
         List<String> list = getDeviceStatuses(driverId);
         if (list == null) {
@@ -110,31 +99,6 @@ public class DriverStatusServiceImpl implements DriverStatusService {
         }
         long count = list.stream().filter(e -> e.equals(DeviceStatusEnum.OFFLINE.getCode())).count();
         return String.valueOf(count);
-    }
-
-    private DriverRunBO buildDriverRun(Long driverId, DriverStatusEnum statusEnum) {
-        List<DriverRunDO> durations = driverRunService.get7daysDuration(driverId, statusEnum.getCode());
-        Long totalDuration = driverRunService.selectSumDuration(driverId, statusEnum.getCode());
-
-        FacadeDriverBO driver = driverFacade.selectById(driverId);
-        if (Objects.isNull(driver)) {
-            throw new RuntimeException("Driver does not exist");
-        }
-
-        DriverRunBO runBO = new DriverRunBO();
-        ArrayList<Long> list = new ArrayList<>(Collections.nCopies(7, 0L));
-        runBO.setDriverName(driver.getDriverName());
-        runBO.setStatus(statusEnum.getCode());
-        runBO.setTotalDuration(totalDuration == null ? 0L : totalDuration);
-        if (Objects.isNull(durations)) {
-            runBO.setDuration(list);
-            return runBO;
-        }
-        for (int i = 0; i < durations.size(); i++) {
-            list.set(i, durations.get(i).getDuration());
-        }
-        runBO.setDuration(list);
-        return runBO;
     }
 
     /**
