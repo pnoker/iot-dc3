@@ -202,7 +202,7 @@ public class PointAttributeConfigServiceImpl implements PointAttributeConfigServ
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getAttributeId()), PointAttributeConfigDO::getAttributeId, entityQuery.getAttributeId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointId()), PointAttributeConfigDO::getPointId, entityQuery.getPointId());
-        wrapper.eq(PointAttributeConfigDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointAttributeConfigDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

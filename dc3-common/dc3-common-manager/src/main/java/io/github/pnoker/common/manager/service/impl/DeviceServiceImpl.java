@@ -494,7 +494,7 @@ public class DeviceServiceImpl implements DeviceService {
             wrapper.eq(StringUtils.isNotEmpty(entityQuery.getDeviceCode()), "dd.device_code", entityQuery.getDeviceCode());
             wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), "dd.driver_id", entityQuery.getDriverId());
             wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dd.enable_flag", entityQuery.getEnableFlag());
-            wrapper.eq("dd.tenant_id", entityQuery.getTenantId());
+            wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dd.tenant_id", entityQuery.getTenantId());
         }
         return wrapper.lambda();
     }
