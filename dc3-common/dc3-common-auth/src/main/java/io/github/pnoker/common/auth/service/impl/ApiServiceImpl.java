@@ -116,7 +116,11 @@ public class ApiServiceImpl implements ApiService {
     private LambdaQueryWrapper<ApiDO> fuzzyQuery(ApiQuery entityQuery) {
         LambdaQueryWrapper<ApiDO> wrapper = Wrappers.<ApiDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getApiName()), ApiDO::getApiName, entityQuery.getApiName());
-        wrapper.eq(ApiDO::getTenantId, entityQuery.getTenantId());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getApiCode()), ApiDO::getApiCode, entityQuery.getApiCode());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceName()), ApiDO::getServiceName, entityQuery.getServiceName());
+        wrapper.eq(Objects.nonNull(entityQuery.getApiTypeFlag()), ApiDO::getApiTypeFlag, entityQuery.getApiTypeFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ApiDO::getEnableFlag, entityQuery.getEnableFlag());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), ApiDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
