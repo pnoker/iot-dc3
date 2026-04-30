@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * gRPC {@link TokenFacade}.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Slf4j
 @Component

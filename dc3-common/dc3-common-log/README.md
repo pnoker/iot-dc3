@@ -9,7 +9,7 @@ services.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-log
-- **Version**: 2026.4.29
+- **Version**: 2026.4.30
 
 ## Key Components
 

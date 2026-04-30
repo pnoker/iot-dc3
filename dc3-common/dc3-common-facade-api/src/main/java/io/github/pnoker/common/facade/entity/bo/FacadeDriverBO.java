@@ -27,7 +27,7 @@ import lombok.*;
  * Facade-level driver BO. Field set matches {@code api.center.manager.DriverApi}.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Getter
 @Setter
