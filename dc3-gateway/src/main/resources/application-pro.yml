@@ -15,65 +15,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# Production environment configuration will overwrite the content configured in application-*.yml
+# Production environment configuration
+# Routes and gRPC are inherited from application-gateway.yml (gateway profile)
+# Route URIs can be overridden via GATEWAY_ROUTE_*_URI environment variables
 spring:
-  # gRPC client configuration
-  grpc:
-    client:
-      channels:
-        # gRPC client for dc3-center-auth service
-        dc3-center-auth:
-          address: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9300'
-          enable-keep-alive: true
-          keep-alive-without-calls: true
-          negotiation-type: PLAINTEXT
   cloud:
-    # Nacos service discovery and configuration center
     nacos:
       server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
       username: dc3
       password: dc3
       discovery:
         namespace: ${NODE_ENV:pro}
-    # Spring Cloud Gateway WebFlux configuration
-    gateway.server.webflux:
-      routes:
-        # Token route for authentication (no authentication required)
-        - id: auth_route_token
-          uri: lb://dc3-center-auth
-          predicates:
-            - Path=/api/v3/auth/token/**
-          filters:
-            - StripPrefix=2
-        # Auth route for user, tenant, and dictionary operations (requires authentication)
-        - id: auth_route
-          uri: lb://dc3-center-auth
-          predicates:
-            - Path=/api/v3/auth/user/**,/api/v3/auth/user-profile/**,/api/v3/auth/role/**,/api/v3/auth/resource/**,/api/v3/auth/role-user/**,/api/v3/auth/role-resource/**,/api/v3/auth/tenant/**,/api/v3/auth/dictionary/**,/api/v3/auth/api/**
-          filters:
-            - StripPrefix=2
-            - Authentic
-        # Manager route for device and driver management (requires authentication)
-        - id: manager_route
-          uri: lb://dc3-center-manager
-          predicates:
-            - Path=/api/v3/manager/**
-          filters:
-            - StripPrefix=2
-            - Authentic
-        # Data route for point value operations (requires authentication)
-        - id: data_route
-          uri: lb://dc3-center-data
-          predicates:
-            - Path=/api/v3/data/**
-          filters:
-            - StripPrefix=2
-            - Authentic
-        # eKuiper route for stream processing operations (requires authentication)
-        - id: ekuiper_route
-          uri: lb://dc3-center-ekuiper:8600
-          predicates:
-            - Path=/api/v3/ekuiper/**
-          filters:
-            - StripPrefix=2
-            - Authentic
