@@ -46,10 +46,12 @@ public class PointValueLocalCacheService {
     private LocalCacheService localCacheService;
 
     public void savePointValue(PointValueBO entityBO) {
-        if (Objects.isNull(entityBO.getDeviceId()) || Objects.isNull(entityBO.getPointId())) {
+        if (Objects.isNull(entityBO.getTenantId())
+                || Objects.isNull(entityBO.getDeviceId())
+                || Objects.isNull(entityBO.getPointId())) {
             return;
         }
-        String key = buildKey(entityBO.getDeviceId(), entityBO.getPointId());
+        String key = buildKey(entityBO.getTenantId(), entityBO.getDeviceId(), entityBO.getPointId());
         localCacheService.setKey(key, entityBO);
     }
 
@@ -58,23 +60,29 @@ public class PointValueLocalCacheService {
             return;
         }
         Map<String, PointValueBO> valuesMap = entityBOList.stream()
-                .filter(entityBO -> Objects.nonNull(entityBO.getPointId()))
-                .collect(Collectors.toMap(entityBO -> buildKey(deviceId, entityBO.getPointId()), Function.identity()));
+                .filter(entityBO -> Objects.nonNull(entityBO.getTenantId())
+                        && Objects.nonNull(entityBO.getPointId()))
+                .collect(Collectors.toMap(
+                        entityBO -> buildKey(entityBO.getTenantId(), deviceId, entityBO.getPointId()),
+                        Function.identity()));
         localCacheService.setKey(valuesMap);
     }
 
-    public Map<Long, PointValueBO> selectLatestPointValue(Long deviceId, List<Long> pointIds) {
-        if (Objects.isNull(deviceId) || CollectionUtils.isEmpty(pointIds)) {
+    public Map<Long, PointValueBO> selectLatestPointValue(Long tenantId, Long deviceId, List<Long> pointIds) {
+        if (Objects.isNull(tenantId) || Objects.isNull(deviceId) || CollectionUtils.isEmpty(pointIds)) {
             return Collections.emptyMap();
         }
-        List<String> keys = pointIds.stream().map(pointId -> buildKey(deviceId, pointId)).toList();
+        List<String> keys = pointIds.stream().map(pointId -> buildKey(tenantId, deviceId, pointId)).toList();
         List<PointValueBO> hits = localCacheService.getKey(keys);
         return hits.stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(PointValueBO::getPointId, Function.identity()));
     }
 
-    private String buildKey(Long deviceId, Long pointId) {
-        return PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX + deviceId + SymbolConstant.DOT + pointId;
+    private String buildKey(Long tenantId, Long deviceId, Long pointId) {
+        return PrefixConstant.REAL_TIME_VALUE_KEY_PREFIX
+                + tenantId + SymbolConstant.DOT
+                + deviceId + SymbolConstant.DOT
+                + pointId;
     }
 }

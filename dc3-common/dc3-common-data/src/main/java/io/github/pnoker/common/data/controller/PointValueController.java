@@ -84,17 +84,18 @@ public class PointValueController implements BaseController {
      */
     @PostMapping("/list")
     public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new PointValueQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Page<PointValueBO> entityPageBO = pointValueService.page(query);
+                Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            Page<PointValueBO> entityPageBO = pointValueService.page(entityQuery);
-            Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
     /**
@@ -109,13 +110,15 @@ public class PointValueController implements BaseController {
             @NotNull @PathVariable(name = "deviceId") Long deviceId,
             @NotNull @PathVariable(name = "pointId") Long pointId,
             @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
-        try {
-            List<String> history = pointValueService.history(deviceId, pointId, count);
-            return Mono.just(R.ok(history));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                List<String> history = pointValueService.history(tenantId, deviceId, pointId, count);
+                return Mono.just(R.ok(history));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
 }

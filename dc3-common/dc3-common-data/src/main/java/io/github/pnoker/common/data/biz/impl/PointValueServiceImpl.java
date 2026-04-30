@@ -74,7 +74,10 @@ public class PointValueServiceImpl implements PointValueService {
 
         final Map<Long, List<PointValueBO>> group = pointValueBOList.stream()
                 .map(pointValue -> {
-                    pointValue.setCreateTime(LocalDateTimeUtil.now());
+                    if (Objects.isNull(pointValue.getCreateTime())) {
+                        pointValue.setCreateTime(LocalDateTimeUtil.now());
+                    }
+                    pointValue.setOperateTime(pointValue.getCreateTime());
                     return pointValue;
                 })
                 .collect(Collectors.groupingBy(PointValueBO::getDeviceId));
@@ -83,8 +86,8 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public List<String> history(Long deviceId, Long pointId, int count) {
-        if (Objects.isNull(deviceId) || Objects.isNull(pointId)) {
+    public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
+        if (Objects.isNull(tenantId) || Objects.isNull(deviceId) || Objects.isNull(pointId)) {
             return Collections.emptyList();
         }
         if (count < 1) {
@@ -95,7 +98,7 @@ public class PointValueServiceImpl implements PointValueService {
         }
 
         RepositoryService repositoryService = getFirstRepositoryService();
-        return repositoryService.selectHistoryPointValue(deviceId, pointId, count);
+        return repositoryService.selectHistoryPointValue(tenantId, deviceId, pointId, count);
     }
 
     @Override
@@ -122,11 +125,12 @@ public class PointValueServiceImpl implements PointValueService {
             return entityPageBO;
         }
 
-        Map<Long, PointValueBO> pointValueBOMap = pointValueLocalCacheService.selectLatestPointValue(entityQuery.getDeviceId(), pointIds);
+        Long tenantId = entityQuery.getTenantId();
+        Map<Long, PointValueBO> pointValueBOMap = pointValueLocalCacheService.selectLatestPointValue(tenantId, entityQuery.getDeviceId(), pointIds);
         RepositoryService repositoryService = getFirstRepositoryService();
         List<PointValueBO> pointValueBOList = pointIds.stream().map(id -> {
             PointValueBO value = pointValueBOMap.get(id);
-            return Objects.isNull(value) ? repositoryService.selectLatestPointValue(entityQuery.getDeviceId(), id) : value;
+            return Objects.isNull(value) ? repositoryService.selectLatestPointValue(tenantId, entityQuery.getDeviceId(), id) : value;
         }).filter(Objects::nonNull).toList();
 
         entityPageBO.setCurrent(page.getCurrent())

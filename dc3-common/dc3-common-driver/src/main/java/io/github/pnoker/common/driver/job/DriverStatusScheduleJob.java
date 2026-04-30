@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.job;
 
+import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DriverEventDTO;
@@ -47,7 +48,9 @@ public class DriverStatusScheduleJob extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
-        DriverEventDTO.DriverStatus driverStatus = new DriverEventDTO.DriverStatus(driverMetadata.getDriver().getId(), driverMetadata.getDriverStatus());
+        DriverBO driver = driverMetadata.getDriver();
+        DriverEventDTO.DriverStatus driverStatus = new DriverEventDTO.DriverStatus(driver.getId(), driverMetadata.getDriverStatus());
+        driverStatus.setTenantId(driver.getTenantId());
         DriverEventDTO driverEventDTO = new DriverEventDTO(DriverEventTypeEnum.HEARTBEAT, JsonUtil.toJsonString(driverStatus));
         log.info("Report driver event: {}, event content: {}", driverEventDTO.getType().getCode(), JsonUtil.toJsonString(driverEventDTO));
         driverSenderService.driverEventSender(driverEventDTO);
