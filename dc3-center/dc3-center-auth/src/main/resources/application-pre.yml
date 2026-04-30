@@ -15,22 +15,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# Pre-release environment configuration will overwrite the content configured in application-*.yml
+# Pre-release environment configuration
 spring:
-  # Dynamic datasource configuration
   datasource:
     dynamic:
       datasource:
-        # Master datasource configuration (PostgreSQL)
         master:
           url: jdbc:postgresql://${POSTGRES_HOST:dc3-postgres}:${POSTGRES_PORT:5432}/${POSTGRES_DB:dc3_auth}?currentSchema=${POSTGRES_SCHEMA:dc3_auth}&applicationName=dc3&ssl=false&stringtype=unspecified&clientEncoding=UTF8&serverTimezone=Asia/Shanghai
           username: ${POSTGRES_USERNAME:dc3}
           password: ${POSTGRES_PASSWORD:dc3dc3dc3}
-  cloud:
-    # Nacos service discovery and configuration center
-    nacos:
-      server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
-      username: dc3
-      password: dc3
-      discovery:
-        namespace: ${NODE_ENV:pre}

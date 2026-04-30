@@ -109,7 +109,6 @@
     <logger name="org.springframework.data" level="WARN"/>
     <logger name="org.springframework.amqp" level="WARN"/>
     <logger name="com.zaxxer.hikari.pool" level="WARN"/>
-    <logger name="com.alibaba.cloud.nacos" level="WARN"/>
     <logger name="org.springframework.web" level="WARN"/>
     <logger name="com.baomidou.dynamic" level="WARN"/>
     <logger name="org.mybatis.spring" level="WARN"/>
@@ -117,7 +116,6 @@
     <logger name="org.mongodb.driver" level="WARN"/>
     <logger name="com.zaxxer.hikari" level="WARN"/>
     <logger name="org.eclipse.milo" level="WARN"/>
-    <logger name="com.alibaba.nacos" level="WARN"/>
     <logger name="io.lettuce.core" level="WARN"/>
     <logger name="org.reflections" level="WARN"/>
     <logger name="com.sun.jersey" level="WARN"/>

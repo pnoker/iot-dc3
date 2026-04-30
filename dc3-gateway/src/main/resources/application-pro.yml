@@ -18,11 +18,3 @@
 # Production environment configuration
 # Routes and gRPC are inherited from application-gateway.yml (gateway profile)
 # Route URIs can be overridden via GATEWAY_ROUTE_*_URI environment variables
-spring:
-  cloud:
-    nacos:
-      server-addr: ${NACOS_HOST:dc3-register}:${NACOS_PORT:8848}
-      username: dc3
-      password: dc3
-      discovery:
-        namespace: ${NODE_ENV:pro}
