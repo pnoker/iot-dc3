@@ -18,26 +18,18 @@
 package io.github.pnoker.common.init;
 
 import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * Gateway Initialization Runner for DC3 IoT Platform.
- * This class handles gateway initialization tasks during application startup,
- * configuring component scanning for gateway-related classes.
+ * Gateway Component Scan Configuration for DC3 IoT Platform.
+ * Enables component scanning for gateway-related beans (filters, services, etc.).
  *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Component
+@Configuration
 @ComponentScan(basePackages = {"io.github.pnoker.common.gateway"})
-public class GatewayInitRunner implements ApplicationRunner {
-
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        // Currently no initialization tasks are required
-        // This method can be extended to add future gateway initialization logic
-    }
+public class GatewayInitRunner {
 }

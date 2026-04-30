@@ -71,17 +71,17 @@ public class AuthenticGatewayFilter implements GatewayFilter {
             return chain.filter(exchange.mutate().request(build).build());
         } catch (UnAuthorizedException e) {
             log.warn("AuthenticGatewayFilter unauthorized: {}, Url: {}", e.getMessage(), request.getURI());
-            return writeErrorResponse(exchange, e.getMessage());
+            return writeErrorResponse(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
         } catch (Exception e) {
-            log.error("AuthenticGatewayFilter error: {}, Url: {}", e.getMessage(), request.getURI(), e);
-            return writeErrorResponse(exchange, e.getMessage());
+            log.error("AuthenticGatewayFilter unexpected error, Url: {}", request.getURI(), e);
+            return writeErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
         }
     }
 
-    private Mono<Void> writeErrorResponse(ServerWebExchange exchange, String message) {
+    private Mono<Void> writeErrorResponse(ServerWebExchange exchange, HttpStatus status, String message) {
         ServerHttpResponse response = exchange.getResponse();
         response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.setStatusCode(status);
         DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(message)));
         return response.writeWith(Mono.just(dataBuffer));
     }
