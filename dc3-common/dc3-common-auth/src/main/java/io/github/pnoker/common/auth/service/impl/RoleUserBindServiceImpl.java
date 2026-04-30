@@ -120,7 +120,8 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         if (CollectionUtils.isNotEmpty(roleUserBindBOList)) {
             List<RoleDO> roleBOList = roleManager.listByIds(roleUserBindBOList.stream().map(RoleUserBindDO::getRoleId)
                     .toList());
-            List<RoleDO> collect = roleBOList.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()) && tenantId.equals(e.getTenantId()))
+            List<RoleDO> collect = roleBOList.stream().filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag())
+                            && (Objects.isNull(tenantId) || tenantId.equals(e.getTenantId())))
                     .toList();
             return roleBuilder.buildBOListByDOList(collect);
         }
@@ -138,7 +139,7 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), RoleUserBindDO::getUserId, entityQuery.getUserId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleUserBindDO::getRoleId, entityQuery.getRoleId());
-        wrapper.eq(RoleUserBindDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RoleUserBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
