@@ -68,6 +68,11 @@ public class PointValueVO implements Serializable {
     private Long driverId;
 
     /**
+     * Tenant ID
+     */
+    private Long tenantId;
+
+    /**
      * Create Time
      */
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)

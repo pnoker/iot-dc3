@@ -83,6 +83,16 @@ public class DeviceEventDTO implements Serializable {
         private static final long serialVersionUID = 1L;
 
         /**
+         * Driver ID that reports this status. Populated by the sender.
+         */
+        private Long driverId;
+
+        /**
+         * Tenant ID the device belongs to. Populated by the sender.
+         */
+        private Long tenantId;
+
+        /**
          * Device ID
          */
         private Long deviceId;

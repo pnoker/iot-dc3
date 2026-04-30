@@ -19,7 +19,9 @@ package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.constant.driver.RabbitConstant;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
+import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
 import io.github.pnoker.common.entity.dto.DriverEventDTO;
@@ -43,10 +45,12 @@ import java.util.concurrent.TimeUnit;
 public class DriverSenderServiceImpl implements DriverSenderService {
 
     private final DriverProperties driverProperties;
+    private final DriverMetadata driverMetadata;
     private final RabbitTemplate rabbitTemplate;
 
-    public DriverSenderServiceImpl(DriverProperties driverProperties, RabbitTemplate rabbitTemplate) {
+    public DriverSenderServiceImpl(DriverProperties driverProperties, DriverMetadata driverMetadata, RabbitTemplate rabbitTemplate) {
         this.driverProperties = driverProperties;
+        this.driverMetadata = driverMetadata;
         this.rabbitTemplate = rabbitTemplate;
     }
 
@@ -118,6 +122,17 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     @Override
     public void pointValueSender(PointValue entityDTO) {
         if (Objects.nonNull(entityDTO)) {
+            DriverBO driver = driverMetadata.getDriver();
+            if (Objects.nonNull(driver)) {
+                if (Objects.isNull(entityDTO.getDriverId())) {
+                    entityDTO.setDriverId(driver.getId());
+                }
+                if (Objects.isNull(entityDTO.getTenantId())) {
+                    entityDTO.setTenantId(driver.getTenantId());
+                }
+            } else {
+                log.warn("DriverMetadata has no registered driver yet; point value will be published without driverId/tenantId");
+            }
             log.info("Send point value: {}", JsonUtil.toJsonString(entityDTO));
             rabbitTemplate.convertAndSend(
                     RabbitConstant.TOPIC_EXCHANGE_VALUE,
@@ -149,6 +164,13 @@ public class DriverSenderServiceImpl implements DriverSenderService {
      */
     private void sendDeviceStatus(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
         DeviceEventDTO.DeviceStatus deviceStatus = new DeviceEventDTO.DeviceStatus(deviceId, status, timeOut, timeUnit);
+        DriverBO driver = driverMetadata.getDriver();
+        if (Objects.nonNull(driver)) {
+            deviceStatus.setDriverId(driver.getId());
+            deviceStatus.setTenantId(driver.getTenantId());
+        } else {
+            log.warn("DriverMetadata has no registered driver yet; device status will be published without driverId/tenantId");
+        }
         DeviceEventDTO deviceEventDTO = new DeviceEventDTO(DeviceEventTypeEnum.HEARTBEAT, JsonUtil.toJsonString(deviceStatus));
         log.info("Report device event: {}, event content: {}", deviceEventDTO.getType().getCode(), JsonUtil.toJsonString(deviceEventDTO));
         deviceEventSender(deviceEventDTO);
