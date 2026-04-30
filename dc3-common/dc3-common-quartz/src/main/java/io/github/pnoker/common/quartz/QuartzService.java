@@ -20,7 +20,7 @@ package io.github.pnoker.common.quartz;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Quartz Scheduler Service Utility
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @since 2022.1.0
  */
 @Slf4j
-@Component
+@Configuration
 public class QuartzService {
 
     @Resource
