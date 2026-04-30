@@ -22,7 +22,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Manager Initialization Runner for DC3 IoT Platform.
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Component
+@Configuration
 @ComponentScan(basePackages = {
         "io.github.pnoker.common.manager"
 })

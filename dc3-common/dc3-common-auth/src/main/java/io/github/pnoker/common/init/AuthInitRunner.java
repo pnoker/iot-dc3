@@ -22,7 +22,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Authentication Initialization Runner for DC3 IoT Platform.
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
  * @since 2022.1.0
  */
 @Slf4j
-@Component
+@Configuration
 @ComponentScan(basePackages = {
         "io.github.pnoker.common.auth"
 })
