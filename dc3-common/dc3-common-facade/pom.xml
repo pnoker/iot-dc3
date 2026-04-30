@@ -26,33 +26,24 @@
     </parent>
 
     <name>${project.artifactId}</name>
-    <artifactId>dc3-common-facade-local</artifactId>
+    <artifactId>dc3-common-facade</artifactId>
     <version>2026.4.30</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <inceptionYear>2016</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        Local (in-process) implementation of the Facade API, selected when
-        dc3.facade.mode=local. Directly invokes manager services without gRPC.
+        Aggregator for the facade family. Groups the protocol-neutral API contract and the
+        concrete implementations (gRPC remote, local in-process) so consumers can pick the
+        domain-scoped module they need without dragging the whole dependency set in.
     </description>
 
-    <dependencies>
-
-        <!-- DC3 Common Related -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-facade-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-auth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-manager</artifactId>
-        </dependency>
-
-    </dependencies>
+    <modules>
+        <module>dc3-common-facade-api</module>
+        <module>dc3-common-facade-grpc</module>
+        <module>dc3-common-facade-local-auth</module>
+        <module>dc3-common-facade-local-manager</module>
+        <module>dc3-common-facade-local</module>
+    </modules>
 
 </project>

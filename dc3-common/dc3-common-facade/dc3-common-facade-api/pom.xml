@@ -21,7 +21,7 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-common</artifactId>
+        <artifactId>dc3-common-facade</artifactId>
         <version>2026.4.30</version>
     </parent>
 
