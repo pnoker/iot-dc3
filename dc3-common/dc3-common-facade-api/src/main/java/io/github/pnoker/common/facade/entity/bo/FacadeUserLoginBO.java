@@ -26,7 +26,7 @@ import lombok.*;
  * {@code api.center.auth.UserLoginApi} wire shape.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Getter
 @Setter

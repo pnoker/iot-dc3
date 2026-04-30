@@ -38,7 +38,7 @@ import java.util.Objects;
  * their JSON forms, so these two fields need an explicit conversion.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeUserBuilder {

@@ -30,7 +30,7 @@ import java.util.Objects;
  * stay as opaque JSON strings — keeping the wire representation untouched.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Component
 public class FacadeGrpcUserBuilder {
