@@ -120,7 +120,7 @@ public class RuleServiceImpl implements RuleService {
     private LambdaQueryWrapper<RuleDO> fuzzyQuery(RuleQuery entityQuery) {
         LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmRuleName()), RuleDO::getRuleName, entityQuery.getAlarmRuleName());
-        wrapper.eq(RuleDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RuleDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

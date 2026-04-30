@@ -174,7 +174,7 @@ public class ProfileServiceImpl implements ProfileService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getProfileCode()), "dp.profile_code", entityQuery.getProfileCode());
         wrapper.eq(Objects.nonNull(entityQuery.getProfileShareFlag()), "dp.profile_share_flag", entityQuery.getProfileShareFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
-        wrapper.eq("dp.tenant_id", entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dp.tenant_id", entityQuery.getTenantId());
         return wrapper.lambda();
     }
 

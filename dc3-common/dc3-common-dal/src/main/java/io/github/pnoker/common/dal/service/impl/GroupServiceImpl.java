@@ -120,7 +120,7 @@ public class GroupServiceImpl implements GroupService {
     private LambdaQueryWrapper<GroupDO> fuzzyQuery(GroupQuery entityQuery) {
         LambdaQueryWrapper<GroupDO> wrapper = Wrappers.<GroupDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getGroupName()), GroupDO::getGroupName, entityQuery.getGroupName());
-        wrapper.eq(GroupDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), GroupDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

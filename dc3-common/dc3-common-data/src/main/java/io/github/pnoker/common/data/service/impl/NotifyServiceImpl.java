@@ -120,7 +120,7 @@ public class NotifyServiceImpl implements NotifyService {
     private LambdaQueryWrapper<NotifyDO> fuzzyQuery(NotifyQuery entityQuery) {
         LambdaQueryWrapper<NotifyDO> wrapper = Wrappers.<NotifyDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmNotifyName()), NotifyDO::getNotifyName, entityQuery.getAlarmNotifyName());
-        wrapper.eq(NotifyDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), NotifyDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

@@ -125,9 +125,9 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
      */
     private LambdaQueryWrapper<PointValueDO> fuzzyQuery(PointValueQuery entityQuery) {
         LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
-        wrapper.eq(PointValueDO::getTenantId, entityQuery.getTenantId());
-        wrapper.eq(PointValueDO::getDeviceId, entityQuery.getDeviceId());
-        wrapper.eq(PointValueDO::getPointId, entityQuery.getPointId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointValueDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getDeviceId()), PointValueDO::getDeviceId, entityQuery.getDeviceId());
+        wrapper.eq(Objects.nonNull(entityQuery.getPointId()), PointValueDO::getPointId, entityQuery.getPointId());
         return wrapper;
     }
 

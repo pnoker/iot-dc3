@@ -138,7 +138,7 @@ public class DriverAttributeServiceImpl implements DriverAttributeService {
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeName()), DriverAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), DriverAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), DriverAttributeDO::getDriverId, entityQuery.getDriverId());
-        wrapper.eq(DriverAttributeDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverAttributeDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

@@ -176,7 +176,7 @@ public class DriverAttributeConfigServiceImpl implements DriverAttributeConfigSe
         LambdaQueryWrapper<DriverAttributeConfigDO> wrapper = Wrappers.<DriverAttributeConfigDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getAttributeId()), DriverAttributeConfigDO::getAttributeId, entityQuery.getAttributeId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), DriverAttributeConfigDO::getDeviceId, entityQuery.getDeviceId());
-        wrapper.eq(DriverAttributeConfigDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverAttributeConfigDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
