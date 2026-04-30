@@ -1,0 +1,43 @@
+/*!
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// 真正的全局样式,在 main.ts 里一次性 import。
+// 不能放到 element-variables.scss 里,因为后者是 Vite additionalData,
+// 会被预置到每个 scoped <style> 块,所有选择器都会被附加 scope hash,
+// 对 body、teleport(dropdown/popover/dialog 外层)等 scope-less 元素全部失效。
+
+body {
+  margin: 0;
+  min-width: 1280px;
+  min-height: 768px;
+}
+
+// el-dropdown-menu 通过 teleport 挂到 body,不在任何组件的 scope 里。
+.el-dropdown-menu {
+  .lang-flag {
+    margin-right: 8px;
+    font-size: 16px;
+  }
+
+  .lang-text {
+    margin-right: 16px;
+  }
+
+  .lang-check {
+    margin-left: auto;
+    color: var(--el-color-primary);
+  }
+}

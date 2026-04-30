@@ -257,28 +257,3 @@
     }
   }
 </style>
-
-<style lang="scss">
-  // body 全局规则和下拉菜单(teleport 到 body)不能在 scoped 内生效,放在全局块。
-  body {
-    margin: 0;
-    min-width: 1280px;
-    min-height: 768px;
-  }
-
-  .el-dropdown-menu {
-    .lang-flag {
-      margin-right: 8px;
-      font-size: 16px;
-    }
-
-    .lang-text {
-      margin-right: 16px;
-    }
-
-    .lang-check {
-      margin-left: auto;
-      color: var(--el-color-primary);
-    }
-  }
-</style>
