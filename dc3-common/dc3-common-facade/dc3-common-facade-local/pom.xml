@@ -21,31 +21,35 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-center</artifactId>
+        <artifactId>dc3-common-facade</artifactId>
         <version>2026.4.30</version>
     </parent>
 
-    <artifactId>dc3-center-auth</artifactId>
-    <packaging>jar</packaging>
+    <name>${project.artifactId}</name>
+    <artifactId>dc3-common-facade-local</artifactId>
+    <version>2026.4.30</version>
+    <packaging>pom</packaging>
 
-    <description>IoT DC3 Platform Authorization Service - Provides authentication and authorization management for the
-        entire platform.
+    <inceptionYear>2016</inceptionYear>
+    <url>https://github.com/pnoker/iot-dc3</url>
+    <description>
+        Convenience aggregator for the local (in-process) facade implementations. Depending on
+        this artifact pulls in every local facade domain (auth + manager). Single-node deployments
+        that need the full surface should depend on this module; services that only need one
+        domain (for example dc3-center-auth) should depend on the specific sub-module to avoid
+        unrelated transitive dependencies (e.g. RabbitMQ).
     </description>
 
     <dependencies>
 
-        <!-- DC3 Common Related -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-auth</artifactId>
-        </dependency>
+        <!-- Domain-scoped local facade implementations -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-facade-local-auth</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-resource-registrar</artifactId>
+            <artifactId>dc3-common-facade-local-manager</artifactId>
         </dependency>
 
     </dependencies>
