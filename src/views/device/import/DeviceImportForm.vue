@@ -26,84 +26,50 @@
     draggable
     :title="$t('device.import.title')"
   >
-    <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
+    <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" label-position="top">
       <el-alert :closable="false" class="things-dialog-form-alert" show-icon type="warning">
         <p>{{ $t('device.import.instruction1') }}</p>
         <p>{{ $t('device.import.instruction2') }}</p>
       </el-alert>
-      <el-form-item class="things-dialog-form-item" :label="$t('device.import.driver')" prop="driverId">
+      <el-form-item :label="$t('device.import.driver')" prop="driverId">
         <el-select
           v-model="reactiveData.formData.driverId"
-          class="edit-form-special"
           clearable
+          filterable
+          remote
+          reserve-keyword
           :placeholder="$t('device.import.driverPlaceholder')"
+          :remote-method="driverDictionary"
+          :loading="reactiveData.driverLoading"
           @visible-change="driverDictionaryVisible"
         >
-          <div class="tool-select">
-            <el-form-item class="tool-select-input">
-              <el-input
-                v-model="reactiveData.driverQuery"
-                clearable
-                :placeholder="$t('device.import.driverPlaceholder')"
-                @input="driverDictionary"
-              />
-            </el-form-item>
-            <el-pagination
-              :current-page="+reactiveData.driverPage.current"
-              :hide-on-single-page="true"
-              :page-size="+reactiveData.driverPage.size"
-              :pager-count="5"
-              :total="+reactiveData.driverPage.total"
-              background
-              class="tool-select-pagination"
-              layout="prev, pager, next"
-              @current-change="driverCurrentChange"
-            ></el-pagination>
-          </div>
           <el-option
             v-for="dictionary in reactiveData.driverDictionary"
             :key="dictionary.value"
             :label="dictionary.label"
             :value="dictionary.value"
-          ></el-option>
+          />
         </el-select>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" :label="$t('device.add.profiles')" prop="profileIds">
+      <el-form-item :label="$t('device.add.profiles')" prop="profileIds">
         <el-select
           v-model="reactiveData.formData.profileIds"
           :multiple="true"
-          class="edit-form-special"
           clearable
+          filterable
+          remote
+          reserve-keyword
           :placeholder="$t('device.add.profilePlaceholder')"
+          :remote-method="profileDictionary"
+          :loading="reactiveData.profileLoading"
           @visible-change="profileDictionaryVisible"
         >
-          <div class="tool-select">
-            <el-form-item class="tool-select-input">
-              <el-input
-                v-model="reactiveData.profileQuery"
-                clearable
-                :placeholder="$t('device.add.profilePlaceholder')"
-                @input="profileDictionary"
-              />
-            </el-form-item>
-            <el-pagination
-              :current-page="+reactiveData.profilePage.current"
-              :hide-on-single-page="true"
-              :page-size="+reactiveData.profilePage.size"
-              :pager-count="5"
-              :total="+reactiveData.profilePage.total"
-              background
-              class="tool-select-pagination"
-              layout="prev, pager, next"
-              @current-change="profileCurrentChange"
-            ></el-pagination>
-          </div>
           <el-option
             v-for="dictionary in reactiveData.profileDictionary"
             :key="dictionary.value"
             :label="dictionary.label"
             :value="dictionary.value"
-          ></el-option>
+          />
         </el-select>
       </el-form-item>
       <el-upload
@@ -137,5 +103,4 @@
 
 <style lang="scss" scoped>
   @use '@/components/dialog/styles/things-dialog';
-  @use '@/components/card/styles/tool-card';
 </style>

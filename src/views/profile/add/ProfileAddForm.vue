@@ -25,15 +25,15 @@
     draggable
     :title="$t('profile.add.title')"
   >
-    <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-      <el-form-item class="things-dialog-form-item" :label="$t('profile.add.profileName')" prop="profileName">
+    <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" label-position="top">
+      <el-form-item :label="$t('profile.add.profileName')" prop="profileName">
         <el-input
           v-model="reactiveData.formData.profileName"
           clearable
           :placeholder="$t('profile.add.profileNamePlaceholder')"
         ></el-input>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" :label="$t('profile.add.description')" prop="remark">
+      <el-form-item :label="$t('profile.add.description')" prop="remark">
         <el-input
           v-model="reactiveData.formData.remark"
           clearable

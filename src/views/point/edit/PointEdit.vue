@@ -28,115 +28,91 @@
     <div class="edit-card-body">
       <el-card v-if="reactiveData.active === 0" shadow="hover">
         <el-divider content-position="left">{{ $t('point.edit.pointConfig') }}</el-divider>
-        <el-form ref="formDataRef" :inline="true" :model="reactiveData.pointFormData" :rules="pointFormRule">
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('point.edit.pointName')" prop="pointName">
-              <el-input
-                v-model="reactiveData.pointFormData.pointName"
-                clearable
-                :placeholder="$t('point.edit.pointNamePlaceholder')"
-              ></el-input>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('point.edit.dataType')" prop="pointTypeFlag">
-              <el-select
-                v-model="reactiveData.pointFormData.pointTypeFlag"
-                class="edit-form-large"
-                clearable
-                :placeholder="$t('point.edit.dataTypeRequired')"
-              >
-                <el-option :label="$t('dataType.string')" value="STRING"></el-option>
-                <el-option :label="$t('dataType.byte')" value="BYTE"></el-option>
-                <el-option :label="$t('dataType.short')" value="SHORT"></el-option>
-                <el-option :label="$t('dataType.int')" value="INT"></el-option>
-                <el-option :label="$t('dataType.long')" value="LONG"></el-option>
-                <el-option :label="$t('dataType.float')" value="FLOAT"></el-option>
-                <el-option :label="$t('dataType.double')" value="DOUBLE"></el-option>
-                <el-option :label="$t('dataType.boolean')" value="BOOLEAN"></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('point.edit.rwType')" prop="rwFlag">
-              <el-select
-                v-model="reactiveData.pointFormData.rwFlag"
-                class="edit-form-large"
-                clearable
-                :placeholder="$t('point.edit.rwTypeRequired')"
-              >
-                <el-option :label="$t('status.readOnly')" value="R"></el-option>
-                <el-option :label="$t('status.writeOnly')" value="W"></el-option>
-                <el-option :label="$t('status.readWrite')" value="RW"></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('common.enableFlag')" prop="enableFlag">
-              <el-select
-                v-model="reactiveData.pointFormData.enableFlag"
-                class="edit-form-large"
-                clearable
-                :placeholder="$t('common.enableFlag')"
-              >
-                <el-option :label="$t('common.enable')" value="ENABLE"></el-option>
-                <el-option :label="$t('common.disable')" value="DISABLE"></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('point.edit.accuracy')" prop="valueDecimal">
-              <el-input
-                v-model="reactiveData.pointFormData.valueDecimal"
-                clearable
-                :placeholder="$t('point.edit.accuracyPlaceholder')"
-              ></el-input>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('point.edit.unit')" prop="unit">
-              <el-input
-                v-model="reactiveData.pointFormData.unit"
-                class="edit-form-large"
-                clearable
-                :placeholder="$t('point.edit.unitPlaceholder')"
-              ></el-input>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('point.edit.baseValue')" prop="baseValue">
-              <el-input
-                v-model="reactiveData.pointFormData.baseValue"
-                clearable
-                :placeholder="$t('point.edit.baseValuePlaceholder')"
-              ></el-input>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('point.edit.ratio')" prop="multiple">
-              <el-input
-                v-model="reactiveData.pointFormData.multiple"
-                clearable
-                :placeholder="$t('point.edit.ratioPlaceholder')"
-              ></el-input>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('point.edit.description')" prop="remark">
-              <el-input
-                v-model="reactiveData.pointFormData.remark"
-                clearable
-                maxlength="300"
-                :placeholder="$t('point.edit.descriptionPlaceholder')"
-                show-word-limit
-                type="textarea"
-              >
-              </el-input>
-            </el-form-item>
-          </div>
+        <el-form ref="formDataRef" label-position="top" :model="reactiveData.pointFormData" :rules="pointFormRule">
+          <el-form-item :label="$t('point.edit.pointName')" prop="pointName">
+            <el-input
+              v-model="reactiveData.pointFormData.pointName"
+              clearable
+              :placeholder="$t('point.edit.pointNamePlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('point.edit.dataType')" prop="pointTypeFlag">
+            <el-select
+              v-model="reactiveData.pointFormData.pointTypeFlag"
+              clearable
+              :placeholder="$t('point.edit.dataTypeRequired')"
+            >
+              <el-option :label="$t('dataType.string')" value="STRING" />
+              <el-option :label="$t('dataType.byte')" value="BYTE" />
+              <el-option :label="$t('dataType.short')" value="SHORT" />
+              <el-option :label="$t('dataType.int')" value="INT" />
+              <el-option :label="$t('dataType.long')" value="LONG" />
+              <el-option :label="$t('dataType.float')" value="FLOAT" />
+              <el-option :label="$t('dataType.double')" value="DOUBLE" />
+              <el-option :label="$t('dataType.boolean')" value="BOOLEAN" />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="$t('point.edit.rwType')" prop="rwFlag">
+            <el-select
+              v-model="reactiveData.pointFormData.rwFlag"
+              clearable
+              :placeholder="$t('point.edit.rwTypeRequired')"
+            >
+              <el-option :label="$t('status.readOnly')" value="R" />
+              <el-option :label="$t('status.writeOnly')" value="W" />
+              <el-option :label="$t('status.readWrite')" value="RW" />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+            <el-switch
+              v-model="reactiveData.pointFormData.enableFlag"
+              active-value="ENABLE"
+              inactive-value="DISABLE"
+              :active-text="$t('common.enable')"
+              :inactive-text="$t('common.disable')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('point.edit.accuracy')" prop="valueDecimal">
+            <el-input
+              v-model="reactiveData.pointFormData.valueDecimal"
+              clearable
+              :placeholder="$t('point.edit.accuracyPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('point.edit.unit')" prop="unit">
+            <el-input
+              v-model="reactiveData.pointFormData.unit"
+              clearable
+              :placeholder="$t('point.edit.unitPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('point.edit.baseValue')" prop="baseValue">
+            <el-input
+              v-model="reactiveData.pointFormData.baseValue"
+              clearable
+              :placeholder="$t('point.edit.baseValuePlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('point.edit.ratio')" prop="multiple">
+            <el-input
+              v-model="reactiveData.pointFormData.multiple"
+              clearable
+              :placeholder="$t('point.edit.ratioPlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('point.edit.description')" prop="remark">
+            <el-input
+              v-model="reactiveData.pointFormData.remark"
+              clearable
+              maxlength="300"
+              :placeholder="$t('point.edit.descriptionPlaceholder')"
+              show-word-limit
+              type="textarea"
+            />
+          </el-form-item>
           <el-form-item class="edit-form-button">
             <el-button :icon="Back" plain type="success" @click="done">{{ $t('common.return') }}</el-button>
-            <el-button :icon="RefreshLeft" @click="pointReset">{{ $t('common.restore') }}</el-button>
+            <el-button :icon="RefreshLeft" @click="pointReset">{{ $t('common.reset') }}</el-button>
             <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
           </el-form-item>
         </el-form>
@@ -161,4 +137,14 @@
 
 <style lang="scss" scoped>
   @use '@/components/card/styles/edit-card.scss';
+
+  // label-position="top" 模式下 label 应该左对齐、宽度自适应,覆盖 edit-card.scss 中 100px 固定宽度的规则
+  :deep(.el-form--label-top .el-form-item__label) {
+    width: auto;
+    text-align: left;
+
+    &::after {
+      display: none;
+    }
+  }
 </style>

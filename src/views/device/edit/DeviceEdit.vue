@@ -30,124 +30,78 @@
     <div class="edit-card-body">
       <el-card v-if="reactiveData.active === 0" shadow="hover">
         <el-divider content-position="left">{{ $t('device.edit.deviceConfig') }}</el-divider>
-        <el-form ref="deviceFormRef" :inline="true" :model="reactiveData.deviceFormData" :rules="deviceFormRule">
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('device.edit.deviceName')" prop="deviceName">
-              <el-input
-                v-model="reactiveData.deviceFormData.deviceName"
-                clearable
-                :placeholder="$t('device.edit.deviceNamePlaceholder')"
-              ></el-input>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('device.edit.driver')" prop="driverId">
-              <el-select
-                v-model="reactiveData.deviceFormData.driverId"
-                class="edit-form-large"
-                clearable
-                :placeholder="$t('device.edit.driverPlaceholder')"
-                @change="changeAttribute"
-                @visible-change="driverDictionaryVisible"
-              >
-                <div class="tool-select">
-                  <el-form-item class="tool-select-input">
-                    <el-input
-                      v-model="reactiveData.driverQuery"
-                      clearable
-                      placeholder="Enter driver name"
-                      @input="driverDictionary"
-                    />
-                  </el-form-item>
-                  <el-pagination
-                    :current-page="+reactiveData.driverPage.current"
-                    :hide-on-single-page="true"
-                    :page-size="+reactiveData.driverPage.size"
-                    :pager-count="5"
-                    :total="+reactiveData.driverPage.total"
-                    background
-                    class="tool-select-pagination"
-                    layout="prev, pager, next"
-                    @current-change="driverCurrentChange"
-                  ></el-pagination>
-                </div>
-                <el-option
-                  v-for="dictionary in reactiveData.driverDictionary"
-                  :key="dictionary.value"
-                  :label="dictionary.label"
-                  :value="dictionary.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('common.enableFlag')" prop="enableFlag">
-              <el-select
-                v-model="reactiveData.deviceFormData.enableFlag"
-                class="edit-form-large"
-                clearable
-                placeholder="Select enable status"
-              >
-                <el-option label="Enable" value="ENABLE"></el-option>
-                <el-option label="Disable" value="DISABLE"></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('device.edit.profiles')" prop="profileIds">
-              <el-select
-                v-model="reactiveData.deviceFormData.profileIds"
-                :multiple="true"
-                class="edit-form-large"
-                clearable
-                :placeholder="$t('device.edit.driverPlaceholder')"
-                @visible-change="profileDictionaryVisible"
-              >
-                <div class="tool-select">
-                  <el-form-item class="tool-select-input">
-                    <el-input
-                      v-model="reactiveData.profileQuery"
-                      clearable
-                      placeholder="Enter driver name"
-                      @input="profileDictionary"
-                    />
-                  </el-form-item>
-                  <el-pagination
-                    :current-page="+reactiveData.profilePage.current"
-                    :hide-on-single-page="true"
-                    :page-size="+reactiveData.profilePage.size"
-                    :pager-count="5"
-                    :total="+reactiveData.profilePage.total"
-                    background
-                    class="tool-select-pagination"
-                    layout="prev, pager, next"
-                    @current-change="profileCurrentChange"
-                  ></el-pagination>
-                </div>
-                <el-option
-                  v-for="dictionary in reactiveData.profileDictionary"
-                  :key="dictionary.value"
-                  :label="dictionary.label"
-                  :value="dictionary.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('device.edit.description')" prop="remark">
-              <el-input
-                v-model="reactiveData.deviceFormData.remark"
-                clearable
-                maxlength="300"
-                :placeholder="$t('device.edit.descriptionPlaceholder')"
-                show-word-limit
-                type="textarea"
-              ></el-input>
-            </el-form-item>
-          </div>
+        <el-form ref="deviceFormRef" label-position="top" :model="reactiveData.deviceFormData" :rules="deviceFormRule">
+          <el-form-item :label="$t('device.edit.deviceName')" prop="deviceName">
+            <el-input
+              v-model="reactiveData.deviceFormData.deviceName"
+              clearable
+              :placeholder="$t('device.edit.deviceNamePlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('device.edit.driver')" prop="driverId">
+            <el-select
+              v-model="reactiveData.deviceFormData.driverId"
+              clearable
+              filterable
+              remote
+              reserve-keyword
+              :placeholder="$t('device.edit.driverPlaceholder')"
+              :remote-method="driverDictionary"
+              :loading="reactiveData.driverLoading"
+              @change="changeAttribute"
+              @visible-change="driverDictionaryVisible"
+            >
+              <el-option
+                v-for="dictionary in reactiveData.driverDictionary"
+                :key="dictionary.value"
+                :label="dictionary.label"
+                :value="dictionary.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+            <el-switch
+              v-model="reactiveData.deviceFormData.enableFlag"
+              active-value="ENABLE"
+              inactive-value="DISABLE"
+              :active-text="$t('common.enable')"
+              :inactive-text="$t('common.disable')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('device.edit.profiles')" prop="profileIds">
+            <el-select
+              v-model="reactiveData.deviceFormData.profileIds"
+              :multiple="true"
+              clearable
+              filterable
+              remote
+              reserve-keyword
+              :placeholder="$t('device.edit.driverPlaceholder')"
+              :remote-method="profileDictionary"
+              :loading="reactiveData.profileLoading"
+              @visible-change="profileDictionaryVisible"
+            >
+              <el-option
+                v-for="dictionary in reactiveData.profileDictionary"
+                :key="dictionary.value"
+                :label="dictionary.label"
+                :value="dictionary.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="$t('device.edit.description')" prop="remark">
+            <el-input
+              v-model="reactiveData.deviceFormData.remark"
+              clearable
+              maxlength="300"
+              :placeholder="$t('device.edit.descriptionPlaceholder')"
+              show-word-limit
+              type="textarea"
+            />
+          </el-form-item>
           <el-form-item class="edit-form-button">
             <el-button :icon="Back" plain type="success" @click="done">{{ $t('common.return') }}</el-button>
-            <el-button :icon="RefreshLeft" @click="deviceReset">{{ $t('common.restore') }}</el-button>
+            <el-button :icon="RefreshLeft" @click="deviceReset">{{ $t('common.reset') }}</el-button>
             <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
           </el-form-item>
         </el-form>
@@ -163,36 +117,31 @@
           :description="$t('device.edit.driverConfigTip')"
           :title="$t('device.edit.driverConfig')"
           type="success"
-        ></el-alert>
+        />
         <el-form
           v-if="reactiveData.driverFormData.length > 0"
           ref="driverFormRef"
-          :inline="true"
+          label-position="top"
           :model="reactiveData.driverFormData"
         >
-          <div class="edit-form-item">
-            <el-row>
-              <el-form-item
-                v-for="attribute in reactiveData.driverAttributes"
-                :key="attribute.id"
-                :label="attribute.attributeName"
-                :prop="attribute.attributeCode"
-              >
-                <el-input
-                  v-if="reactiveData.driverFormData[attribute.attributeCode]"
-                  :key="reactiveData.driverFormData[attribute.attributeCode].id"
-                  v-model="reactiveData.driverFormData[attribute.attributeCode].configValue"
-                  :placeholder="'Enter ' + attribute.attributeName"
-                  class="edit-form-default"
-                  clearable
-                  @keyup.enter="driverUpdate"
-                ></el-input>
-              </el-form-item>
-            </el-row>
-          </div>
+          <el-form-item
+            v-for="attribute in reactiveData.driverAttributes"
+            :key="attribute.id"
+            :label="attribute.attributeName"
+            :prop="attribute.attributeCode"
+          >
+            <el-input
+              v-if="reactiveData.driverFormData[attribute.attributeCode]"
+              :key="reactiveData.driverFormData[attribute.attributeCode].id"
+              v-model="reactiveData.driverFormData[attribute.attributeCode].configValue"
+              :placeholder="'Enter ' + attribute.attributeName"
+              clearable
+              @keyup.enter="driverUpdate"
+            />
+          </el-form-item>
           <el-form-item class="edit-form-button">
             <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-            <el-button :icon="RefreshLeft" @click="driverInfoReset">{{ $t('common.restore') }}</el-button>
+            <el-button :icon="RefreshLeft" @click="driverInfoReset">{{ $t('common.reset') }}</el-button>
             <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
           </el-form-item>
         </el-form>
@@ -205,39 +154,32 @@
           :description="$t('device.edit.pointConfigTip')"
           :title="$t('device.edit.pointConfig')"
           type="success"
-        ></el-alert>
+        />
         <el-form
           v-if="reactiveData.pointFormData.length > 0"
           ref="pointFormRef"
-          :inline="true"
+          label-position="top"
           :model="reactiveData.pointFormData"
         >
-          <div class="edit-form-item">
-            <el-form-item :label="$t('device.edit.pointName')" prop="pointName">
-              <el-input v-model="reactiveData.pointFormData.pointName" class="edit-form-default" disabled></el-input>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-row>
-              <el-form-item
-                v-for="attribute in reactiveData.pointAttributes"
-                :key="attribute.id"
-                :label="attribute.attributeName"
-                :prop="attribute.attributeCode"
-              >
-                <el-input
-                  v-if="reactiveData.pointFormData[attribute.attributeCode]"
-                  :key="reactiveData.pointFormData[attribute.attributeCode].id"
-                  v-model="reactiveData.pointFormData[attribute.attributeCode].configValue"
-                  :placeholder="'Enter ' + attribute.attributeName"
-                  class="edit-form-default"
-                  clearable
-                  @keyup.enter="pointUpdate"
-                ></el-input>
-                <el-input v-else class="edit-form-default" disabled></el-input>
-              </el-form-item>
-            </el-row>
-          </div>
+          <el-form-item :label="$t('device.edit.pointName')" prop="pointName">
+            <el-input v-model="reactiveData.pointFormData.pointName" disabled />
+          </el-form-item>
+          <el-form-item
+            v-for="attribute in reactiveData.pointAttributes"
+            :key="attribute.id"
+            :label="attribute.attributeName"
+            :prop="attribute.attributeCode"
+          >
+            <el-input
+              v-if="reactiveData.pointFormData[attribute.attributeCode]"
+              :key="reactiveData.pointFormData[attribute.attributeCode].id"
+              v-model="reactiveData.pointFormData[attribute.attributeCode].configValue"
+              :placeholder="'Enter ' + attribute.attributeName"
+              clearable
+              @keyup.enter="pointUpdate"
+            />
+            <el-input v-else disabled />
+          </el-form-item>
         </el-form>
         <el-form-item class="edit-form-button">
           <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
@@ -245,7 +187,7 @@
             {{ $t('common.edit') }}
           </el-button>
           <el-button :disabled="!hasPointFormData" :icon="RefreshLeft" @click="pointInfoReset">
-            {{ $t('common.restore') }}
+            {{ $t('common.reset') }}
           </el-button>
           <el-button :icon="Check" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
         </el-form-item>
@@ -283,4 +225,14 @@
 <style lang="scss" scoped>
   @use '@/components/card/styles/edit-card';
   @use '@/components/card/styles/tool-card';
+
+  // label-position="top" 模式下 label 应该左对齐、宽度自适应,覆盖 edit-card.scss 中 100px 固定宽度的规则
+  :deep(.el-form--label-top .el-form-item__label) {
+    width: auto;
+    text-align: left;
+
+    &::after {
+      display: none;
+    }
+  }
 </style>

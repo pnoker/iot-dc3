@@ -15,6 +15,11 @@
  */
 
 .things-dialog {
+  &.el-dialog {
+    width: 520px;
+    max-width: calc(100% - 40px);
+  }
+
   .things-dialog-form-item {
     display: flex;
 

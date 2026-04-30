@@ -29,45 +29,36 @@
     <div class="edit-card-body">
       <el-card v-if="reactiveData.active === 0" shadow="hover">
         <el-divider content-position="left">{{ $t('profile.edit.profileConfig') }}</el-divider>
-        <el-form ref="formDataRef" :inline="true" :model="reactiveData.profileFormData" :rules="formRule">
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('profile.edit.profileName')" prop="name">
-              <el-input
-                v-model="reactiveData.profileFormData.profileName"
-                clearable
-                :placeholder="$t('profile.edit.profileNamePlaceholder')"
-              ></el-input>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('common.enableFlag')" prop="enableFlag">
-              <el-select
-                v-model="reactiveData.profileFormData.enableFlag"
-                class="edit-form-large"
-                clearable
-                :placeholder="$t('common.enableFlag')"
-              >
-                <el-option :label="$t('common.enable')" value="ENABLE"></el-option>
-                <el-option :label="$t('common.disable')" value="DISABLE"></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-          <div class="edit-form-item">
-            <el-form-item class="edit-form-large" :label="$t('profile.edit.description')" prop="remark">
-              <el-input
-                v-model="reactiveData.profileFormData.remark"
-                clearable
-                maxlength="300"
-                :placeholder="$t('profile.edit.descriptionPlaceholder')"
-                show-word-limit
-                type="textarea"
-              >
-              </el-input>
-            </el-form-item>
-          </div>
+        <el-form ref="formDataRef" label-position="top" :model="reactiveData.profileFormData" :rules="formRule">
+          <el-form-item :label="$t('profile.edit.profileName')" prop="name">
+            <el-input
+              v-model="reactiveData.profileFormData.profileName"
+              clearable
+              :placeholder="$t('profile.edit.profileNamePlaceholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+            <el-switch
+              v-model="reactiveData.profileFormData.enableFlag"
+              active-value="ENABLE"
+              inactive-value="DISABLE"
+              :active-text="$t('common.enable')"
+              :inactive-text="$t('common.disable')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('profile.edit.description')" prop="remark">
+            <el-input
+              v-model="reactiveData.profileFormData.remark"
+              clearable
+              maxlength="300"
+              :placeholder="$t('profile.edit.descriptionPlaceholder')"
+              show-word-limit
+              type="textarea"
+            />
+          </el-form-item>
           <el-form-item class="edit-form-button">
             <el-button :icon="Back" plain type="success" @click="done">{{ $t('common.return') }}</el-button>
-            <el-button :icon="RefreshLeft" @click="profileReset">{{ $t('common.restore') }}</el-button>
+            <el-button :icon="RefreshLeft" @click="profileReset">{{ $t('common.reset') }}</el-button>
             <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
           </el-form-item>
         </el-form>
@@ -102,4 +93,14 @@
 
 <style lang="scss" scoped>
   @use '@/components/card/styles/edit-card.scss';
+
+  // label-position="top" 模式下 label 应该左对齐、宽度自适应,覆盖 edit-card.scss 中 100px 固定宽度的规则
+  :deep(.el-form--label-top .el-form-item__label) {
+    width: auto;
+    text-align: left;
+
+    &::after {
+      display: none;
+    }
+  }
 </style>

@@ -43,46 +43,29 @@
               v-model="reactiveData.formData.profileId"
               class="edit-form-special"
               clearable
+              filterable
+              remote
+              reserve-keyword
               :placeholder="$t('point.tool.profilePlaceholder')"
+              :remote-method="profileDictionary"
+              :loading="reactiveData.profileLoading"
               @visible-change="profileDictionaryVisible"
             >
-              <div class="tool-select">
-                <el-form-item class="tool-select-input">
-                  <el-input
-                    v-model="reactiveData.profileQuery"
-                    clearable
-                    :placeholder="$t('point.tool.pointNamePlaceholder')"
-                    @input="profileDictionary"
-                  />
-                </el-form-item>
-                <el-pagination
-                  :current-page="+reactiveData.profilePage.current"
-                  :hide-on-single-page="true"
-                  :page-size="+reactiveData.profilePage.size"
-                  :pager-count="5"
-                  :total="+reactiveData.profilePage.total"
-                  background
-                  class="tool-select-pagination"
-                  layout="prev, pager, next"
-                  @current-change="profileCurrentChange"
-                ></el-pagination>
-              </div>
               <el-option
                 v-for="dictionary in reactiveData.profileDictionary"
                 :key="dictionary.value"
                 :label="dictionary.label"
                 :value="dictionary.value"
-              >
-              </el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
             <el-segmented
               v-model="reactiveData.formData.enableFlag"
               :options="[
-                { label: 'All', value: '' },
-                { label: 'Enable', value: 'ENABLE' },
-                { label: 'Disable', value: 'DISABLE' },
+                { label: $t('common.all'), value: '' },
+                { label: $t('common.enable'), value: 'ENABLE' },
+                { label: $t('common.disable'), value: 'DISABLE' },
               ]"
             />
           </el-form-item>

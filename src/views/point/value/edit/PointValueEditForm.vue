@@ -25,15 +25,15 @@
     draggable
     :title="$t('pointValue.edit.title')"
   >
-    <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule">
-      <el-form-item class="things-dialog-form-item" :label="$t('pointValue.edit.pointValue')" prop="value">
+    <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" label-position="top">
+      <el-form-item :label="$t('pointValue.edit.pointValue')" prop="value">
         <el-input
           v-model="formData.value"
           clearable
           :placeholder="$t('pointValue.edit.pointValuePlaceholder')"
         ></el-input>
       </el-form-item>
-      <el-form-item class="things-dialog-form-item" :label="$t('pointValue.edit.description')" prop="remark">
+      <el-form-item :label="$t('pointValue.edit.description')" prop="remark">
         <el-input
           v-model="reactiveData.remark"
           clearable

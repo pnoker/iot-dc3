@@ -20,7 +20,7 @@ import { genFileId } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
 import { defineComponent, reactive, ref, unref } from 'vue';
 
-import type { Dictionary, Order } from '@/config/entity';
+import type { Dictionary } from '@/config/entity';
 
 import { getDriverDictionary, getProfileDictionary } from '@/api/dictionary';
 import { successMessage } from '@/utils/NotificationUtil';
@@ -44,22 +44,10 @@ export default defineComponent({
       formData: {} as any,
       formVisible: false,
       formLoading: false,
-      driverQuery: '',
       driverDictionary: [] as Dictionary[],
-      driverPage: {
-        total: 0,
-        size: 5,
-        current: 1,
-        orders: [] as Order[],
-      },
-      profileQuery: '',
+      driverLoading: false,
       profileDictionary: [] as Dictionary[],
-      profilePage: {
-        total: 0,
-        size: 5,
-        current: 1,
-        orders: [] as Order[],
-      },
+      profileLoading: false,
     });
 
     // 定义表单校验规则
@@ -85,58 +73,46 @@ export default defineComponent({
       UploadFilled,
     };
 
-    const driverDictionary = () => {
+    const driverDictionary = (query?: string) => {
+      reactiveData.driverLoading = true;
       getDriverDictionary({
-        page: reactiveData.driverPage,
-        label: reactiveData.driverQuery,
+        page: { size: 50, current: 1 },
+        label: query || '',
       })
         .then((res) => {
-          const data = res.data;
-          reactiveData.driverPage.total = data.total;
-          reactiveData.driverDictionary = data.records;
+          reactiveData.driverDictionary = res.data.records;
         })
         .catch(() => {
           // nothing to do
+        })
+        .finally(() => {
+          reactiveData.driverLoading = false;
         });
-    };
-
-    const driverCurrentChange = (current: number) => {
-      reactiveData.driverPage.current = current;
-      driverDictionary();
     };
 
     const driverDictionaryVisible = (visible: boolean) => {
-      if (visible) {
-        reactiveData.driverQuery = '';
-        driverDictionary();
-      }
+      if (visible) driverDictionary('');
     };
 
-    const profileDictionary = () => {
+    const profileDictionary = (query?: string) => {
+      reactiveData.profileLoading = true;
       getProfileDictionary({
-        page: reactiveData.profilePage,
-        label: reactiveData.profileQuery,
+        page: { size: 50, current: 1 },
+        label: query || '',
       })
         .then((res) => {
-          const data = res.data;
-          reactiveData.profilePage.total = data.total;
-          reactiveData.profileDictionary = data.records;
+          reactiveData.profileDictionary = res.data.records;
         })
         .catch(() => {
           // nothing to do
+        })
+        .finally(() => {
+          reactiveData.profileLoading = false;
         });
     };
 
-    const profileCurrentChange = (current: number) => {
-      reactiveData.driverPage.current = current;
-      profileDictionary();
-    };
-
     const profileDictionaryVisible = (visible: boolean) => {
-      if (visible) {
-        reactiveData.profileQuery = '';
-        profileDictionary();
-      }
+      if (visible) profileDictionary('');
     };
 
     const show = () => {
@@ -197,10 +173,8 @@ export default defineComponent({
       formRule,
       reactiveData,
       driverDictionary,
-      driverCurrentChange,
       driverDictionaryVisible,
       profileDictionary,
-      profileCurrentChange,
       profileDictionaryVisible,
       show,
       cancel,

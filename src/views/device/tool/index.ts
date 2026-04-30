@@ -19,7 +19,7 @@ import type { FormInstance, FormRules } from 'element-plus';
 import { defineComponent, reactive, ref, unref } from 'vue';
 
 import { getDriverDictionary } from '@/api/dictionary';
-import type { Dictionary, Order } from '@/config/entity';
+import type { Dictionary } from '@/config/entity';
 
 export default defineComponent({
   name: 'DeviceTool',
@@ -45,14 +45,8 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       formData: {} as any,
-      driverQuery: '',
       driverDictionary: [] as Dictionary[],
-      driverPage: {
-        total: 0,
-        size: 5,
-        current: 1,
-        orders: [] as Order[],
-      },
+      driverLoading: false,
     });
 
     // 定义表单校验规则
@@ -69,30 +63,24 @@ export default defineComponent({
     };
 
     const driverDictionary = (query?: string) => {
+      reactiveData.driverLoading = true;
       getDriverDictionary({
-        page: reactiveData.driverPage,
-        label: query ? query : reactiveData.driverQuery,
+        page: { size: 50, current: 1 },
+        label: query || '',
       })
         .then((res) => {
-          const data = res.data;
-          reactiveData.driverPage.total = data.total;
-          reactiveData.driverDictionary = data.records;
+          reactiveData.driverDictionary = res.data.records;
         })
         .catch(() => {
           // nothing to do
+        })
+        .finally(() => {
+          reactiveData.driverLoading = false;
         });
     };
 
-    const driverCurrentChange = (current: number) => {
-      reactiveData.driverPage.current = current;
-      driverDictionary();
-    };
-
     const driverDictionaryVisible = (visible: boolean) => {
-      if (visible) {
-        reactiveData.driverQuery = '';
-        driverDictionary();
-      }
+      if (visible) driverDictionary('');
     };
 
     const search = () => {
@@ -139,7 +127,6 @@ export default defineComponent({
       formRule,
       reactiveData,
       driverDictionary,
-      driverCurrentChange,
       driverDictionaryVisible,
       search,
       reset,

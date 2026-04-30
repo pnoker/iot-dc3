@@ -37,43 +37,31 @@
           <el-form-item v-if="embedded != 'driver'" :label="$t('device.tool.driver')" prop="driverId">
             <el-select
               v-model="reactiveData.formData.driverId"
-              :remote-method="driverDictionary"
               class="edit-form-special"
               clearable
               filterable
-              :placeholder="$t('device.tool.driverPlaceholder')"
               remote
-              @change="driverCurrentChange"
+              reserve-keyword
+              :placeholder="$t('device.tool.driverPlaceholder')"
+              :remote-method="driverDictionary"
+              :loading="reactiveData.driverLoading"
               @visible-change="driverDictionaryVisible"
             >
-              <div class="tool-select">
-                <el-pagination
-                  :current-page="+reactiveData.driverPage.current"
-                  :hide-on-single-page="true"
-                  :page-size="+reactiveData.driverPage.size"
-                  :pager-count="5"
-                  :total="+reactiveData.driverPage.total"
-                  background
-                  class="tool-select-pagination"
-                  layout="prev, pager, next"
-                  @current-change="driverCurrentChange"
-                ></el-pagination>
-              </div>
               <el-option
                 v-for="dictionary in reactiveData.driverDictionary"
                 :key="dictionary.value"
                 :label="dictionary.label"
                 :value="dictionary.value"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
             <el-segmented
               v-model="reactiveData.formData.enableFlag"
               :options="[
-                { label: 'All', value: '' },
-                { label: 'Enable', value: 'ENABLE' },
-                { label: 'Disable', value: 'DISABLE' },
+                { label: $t('common.all'), value: '' },
+                { label: $t('common.enable'), value: 'ENABLE' },
+                { label: $t('common.disable'), value: 'DISABLE' },
               ]"
             />
           </el-form-item>

@@ -28,67 +28,43 @@
           <el-form-item v-if="embedded == ''" :label="$t('pointValue.tool.device')" prop="deviceId">
             <el-select
               v-model="reactiveData.formData.deviceId"
-              :remote-method="deviceDictionary"
               class="edit-form-special"
               clearable
               filterable
-              :placeholder="$t('pointValue.tool.devicePlaceholder')"
               remote
-              @change="deviceCurrentChange"
+              reserve-keyword
+              :placeholder="$t('pointValue.tool.devicePlaceholder')"
+              :remote-method="deviceDictionary"
+              :loading="reactiveData.deviceLoading"
               @visible-change="deviceDictionaryVisible"
             >
-              <div class="tool-select">
-                <el-pagination
-                  :current-page="+reactiveData.devicePage.current"
-                  :hide-on-single-page="true"
-                  :page-size="+reactiveData.devicePage.size"
-                  :pager-count="5"
-                  :total="+reactiveData.devicePage.total"
-                  background
-                  class="tool-select-pagination"
-                  layout="prev, pager, next"
-                  @current-change="deviceCurrentChange"
-                ></el-pagination>
-              </div>
               <el-option
                 v-for="dictionary in reactiveData.deviceDictionary"
                 :key="dictionary.value"
                 :label="dictionary.label"
                 :value="dictionary.value"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item v-if="embedded == ''" :label="$t('pointValue.tool.point')" prop="pointId">
             <el-select
               v-model="reactiveData.formData.pointId"
-              :remote-method="pointDictionary"
               class="edit-form-special"
               clearable
               filterable
-              :placeholder="$t('pointValue.tool.pointPlaceholder')"
               remote
-              @change="pointCurrentChange"
+              reserve-keyword
+              :placeholder="$t('pointValue.tool.pointPlaceholder')"
+              :remote-method="pointDictionary"
+              :loading="reactiveData.pointLoading"
               @visible-change="pointDictionaryVisible"
             >
-              <div class="tool-select">
-                <el-pagination
-                  :current-page="+reactiveData.pointPage.current"
-                  :hide-on-single-page="true"
-                  :page-size="+reactiveData.pointPage.size"
-                  :pager-count="5"
-                  :total="+reactiveData.pointPage.total"
-                  background
-                  class="tool-select-pagination"
-                  layout="prev, pager, next"
-                  @current-change="pointCurrentChange"
-                ></el-pagination>
-              </div>
               <el-option
                 v-for="dictionary in reactiveData.pointDictionary"
                 :key="dictionary.value"
                 :label="dictionary.label"
                 :value="dictionary.value"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item v-if="embedded == 'device'" :label="$t('pointValue.tool.pointName')" prop="pointName">
@@ -104,9 +80,9 @@
             <el-segmented
               v-model="reactiveData.formData.enableFlag"
               :options="[
-                { label: 'All', value: '' },
-                { label: 'Enable', value: 'ENABLE' },
-                { label: 'Disable', value: 'DISABLE' },
+                { label: $t('common.all'), value: '' },
+                { label: $t('common.enable'), value: 'ENABLE' },
+                { label: $t('common.disable'), value: 'DISABLE' },
               ]"
             />
           </el-form-item>
@@ -145,7 +121,7 @@
   import { reactive, ref, unref } from 'vue';
   import type { FormInstance, FormRules } from 'element-plus';
   import { Plus, Refresh, RefreshRight, Search } from '@element-plus/icons-vue';
-  import type { Dictionary, Order } from '@/config/entity';
+  import type { Dictionary } from '@/config/entity';
   import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary';
 
   defineProps({
@@ -171,80 +147,56 @@
   // 定义响应式数据
   const reactiveData = reactive({
     formData: {} as any,
-    deviceQuery: '',
     deviceDictionary: [] as Dictionary[],
-    devicePage: {
-      total: 0,
-      size: 5,
-      current: 1,
-      orders: [] as Order[],
-    },
-    pointQuery: '',
+    deviceLoading: false,
     pointDictionary: [] as Dictionary[],
-    pointPage: {
-      total: 0,
-      size: 5,
-      current: 1,
-      orders: [] as Order[],
-    },
+    pointLoading: false,
   });
 
   // 定义表单校验规则
   const formRule = reactive<FormRules>({});
 
   const deviceDictionary = (query?: string) => {
+    reactiveData.deviceLoading = true;
     getDeviceDictionary({
-      page: reactiveData.devicePage,
-      label: query ? query : reactiveData.deviceQuery,
+      page: { size: 50, current: 1 },
+      label: query || '',
     })
       .then((res) => {
-        const data = res.data;
-        reactiveData.devicePage.total = data.total;
-        reactiveData.deviceDictionary = data.records;
+        reactiveData.deviceDictionary = res.data.records;
       })
       .catch(() => {
         // nothing to do
+      })
+      .finally(() => {
+        reactiveData.deviceLoading = false;
       });
-  };
-
-  const deviceCurrentChange = (current: number) => {
-    reactiveData.devicePage.current = current;
-    deviceDictionary();
   };
 
   const pointDictionary = (query?: string) => {
+    reactiveData.pointLoading = true;
     getPointDictionary({
-      page: reactiveData.pointPage,
-      label: query ? query : reactiveData.pointQuery,
+      page: { size: 50, current: 1 },
+      label: query || '',
       parentId: reactiveData.formData.deviceId,
     })
       .then((res) => {
-        const data = res.data;
-        reactiveData.pointPage.total = data.total;
-        reactiveData.pointDictionary = data.records;
+        reactiveData.pointDictionary = res.data.records;
       })
       .catch(() => {
         // nothing to do
+      })
+      .finally(() => {
+        reactiveData.pointLoading = false;
       });
   };
 
-  const pointCurrentChange = (current: number) => {
-    reactiveData.pointPage.current = current;
-    pointDictionary();
-  };
-
   const deviceDictionaryVisible = (visible: boolean) => {
-    if (visible) {
-      reactiveData.deviceQuery = '';
-      deviceDictionary();
-    }
+    if (visible) deviceDictionary('');
   };
 
   const pointDictionaryVisible = (visible: boolean) => {
-    if (visible) {
-      reactiveData.pointQuery = '';
-      pointDictionary();
-    }
+    if (visible) pointDictionary('');
   };
 
   const search = () => {

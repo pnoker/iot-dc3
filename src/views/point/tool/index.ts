@@ -19,7 +19,7 @@ import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Check, Plus, Refresh, RefreshLeft, Search, Sort } from '@element-plus/icons-vue';
 import { useI18n } from 'vue-i18n';
 
-import type { Dictionary, Order } from '@/config/entity';
+import type { Dictionary } from '@/config/entity';
 import { getProfileDictionary } from '@/api/dictionary';
 
 export default defineComponent({
@@ -81,14 +81,8 @@ export default defineComponent({
     // 定义响应式数据
     const reactiveData = reactive({
       formData: {} as any,
-      profileQuery: '',
       profileDictionary: [] as Dictionary[],
-      profilePage: {
-        total: 0,
-        size: 5,
-        current: 1,
-        orders: [] as Order[],
-      },
+      profileLoading: false,
     });
 
     // 定义表单校验规则
@@ -96,31 +90,25 @@ export default defineComponent({
       port: [{ type: 'number', message: t('common.name') }],
     });
 
-    const profileDictionary = () => {
+    const profileDictionary = (query?: string) => {
+      reactiveData.profileLoading = true;
       getProfileDictionary({
-        page: reactiveData.profilePage,
-        label: reactiveData.profileQuery,
+        page: { size: 50, current: 1 },
+        label: query || '',
       })
         .then((res) => {
-          const data = res.data;
-          reactiveData.profilePage.total = data.total;
-          reactiveData.profileDictionary = data.records;
+          reactiveData.profileDictionary = res.data.records;
         })
         .catch(() => {
           // nothing to do
+        })
+        .finally(() => {
+          reactiveData.profileLoading = false;
         });
     };
 
-    const profileCurrentChange = (current: number) => {
-      reactiveData.profilePage.current = current;
-      profileDictionary();
-    };
-
     const profileDictionaryVisible = (visible: boolean) => {
-      if (visible) {
-        reactiveData.profileQuery = '';
-        profileDictionary();
-      }
+      if (visible) profileDictionary('');
     };
 
     const search = () => {
@@ -165,7 +153,6 @@ export default defineComponent({
       reactiveData,
       formRule,
       profileDictionary,
-      profileCurrentChange,
       profileDictionaryVisible,
       search,
       reset,
