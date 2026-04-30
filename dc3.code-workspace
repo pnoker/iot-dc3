@@ -14,7 +14,7 @@
     },
   ],
   "launch": {
-    "version": "2026.4.29",
+    "version": "2026.4.30",
     "configurations": [
       {
         "type": "node",
