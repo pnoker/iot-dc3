@@ -64,4 +64,9 @@ public class UserQuery implements Serializable {
      *
      */
     private String email;
+
+    /**
+     * Enable flag, 0 enabled, 1 disabled
+     */
+    private Byte enableFlag;
 }

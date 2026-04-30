@@ -187,6 +187,7 @@ public class UserServiceImpl implements UserService {
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getUserName()), UserDO::getUserName, entityQuery.getUserName());
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getPhone()), UserDO::getPhone, entityQuery.getPhone());
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getEmail()), UserDO::getEmail, entityQuery.getEmail());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), UserDO::getEnableFlag, entityQuery.getEnableFlag());
         return wrapper;
     }
 
