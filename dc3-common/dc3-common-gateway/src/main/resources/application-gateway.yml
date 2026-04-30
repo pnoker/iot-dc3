@@ -19,7 +19,7 @@
 # Each environment profile only needs to override environment-specific settings.
 # Route URIs can be overridden via environment variables:
 #   GATEWAY_ROUTE_AUTH_TOKEN_URI, GATEWAY_ROUTE_AUTH_URI,
-#   GATEWAY_ROUTE_MANAGER_URI, GATEWAY_ROUTE_DATA_URI, GATEWAY_ROUTE_EKUIPER_URI
+#   GATEWAY_ROUTE_MANAGER_URI, GATEWAY_ROUTE_DATA_URI
 
 spring:
   # gRPC client configuration
@@ -62,17 +62,9 @@ spring:
                 - Authentic
             # Data route for point value operations (requires authentication)
             - id: data_route
-              uri: ${GATEWAY_ROUTE_DATA_URI:http://${CENTER_DATA_HOST:dc3-center-data}:8500}
-              predicates:
-                - Path=/api/v3/data/**
-              filters:
-                - StripPrefix=2
-                - Authentic
-            # eKuiper route for stream processing operations (requires authentication)
-            - id: ekuiper_route
-              uri: ${GATEWAY_ROUTE_EKUIPER_URI:lb://dc3-center-ekuiper:8600}
-              predicates:
-                - Path=/api/v3/ekuiper/**
-              filters:
-                - StripPrefix=2
-                - Authentic
+             uri: ${GATEWAY_ROUTE_DATA_URI:http://${CENTER_DATA_HOST:dc3-center-data}:8500}
+             predicates:
+               - Path=/api/v3/data/**
+             filters:
+               - StripPrefix=2
+               - Authentic
