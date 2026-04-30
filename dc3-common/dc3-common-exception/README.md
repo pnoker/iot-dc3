@@ -9,7 +9,7 @@ errors consistently.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-exception
-- **Version**: 2026.4.29
+- **Version**: 2026.4.30
 
 ## Key Components
 

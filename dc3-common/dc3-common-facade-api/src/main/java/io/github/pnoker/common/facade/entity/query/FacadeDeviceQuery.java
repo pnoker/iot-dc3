@@ -30,7 +30,7 @@ import java.io.Serializable;
  * Field set matches the filters supported by {@code DeviceApi.SelectByPage}.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Getter
 @Setter

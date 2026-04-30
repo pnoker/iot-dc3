@@ -16,7 +16,7 @@ RabbitMQ for inter-service communication and supports multiple industrial protoc
 
 **Technology Stack:**
 
-- Java 21, Spring Boot 4.0.6, Spring Framework 7.0.7 (project version `2026.4.29`, parent `dc3-parent:2026.4.29`)
+- Java 21, Spring Boot 4.0.6, Spring Framework 7.0.7 (project version `2026.4.30`, parent `dc3-parent:2026.4.30`)
 - PostgreSQL (primary DB), RabbitMQ (messaging), EMQX/MQTT (IoT protocol); in-process `LocalCacheService` replaces Redis
 - gRPC/Protobuf for inter-service APIs via `org.springframework.grpc:spring-grpc-spring-boot-starter` — server classes use `@Service` + extend generated `*ImplBase`; clients are
   registered as beans in a central `GrpcStubConfig` using `GrpcChannelFactory`
@@ -115,7 +115,7 @@ before running services from the shell or IDE.
 ## Module Structure
 
 ```
-iot-dc3/                            # root POM (parent: dc3-parent:2026.4.29)
+iot-dc3/                            # root POM (parent: dc3-parent:2026.4.30)
 ├── dc3-api/                        # Protobuf/gRPC API contracts
 │   ├── dc3-api-auth                # tenant, token, user, user_login
 │   ├── dc3-api-data                # point_value

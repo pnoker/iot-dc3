@@ -9,7 +9,7 @@ rate limiting, authentication verification, service routing, and reverse proxyin
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-gateway
-- **Version**: 2026.4.29
+- **Version**: 2026.4.30
 - **Package**: `io.github.pnoker.gateway`
 
 ## Service Ports

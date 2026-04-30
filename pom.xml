@@ -22,12 +22,11 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>dc3-parent</artifactId>
-        <version>2026.4.29</version>
+        <version>2026.4.30</version>
     </parent>
 
     <name>${project.artifactId}</name>
     <artifactId>iot-dc3</artifactId>
-    <version>2026.4.29</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2016</inceptionYear>
@@ -73,7 +72,7 @@
         <java.version>21</java.version>
 
         <!-- DC3 Version -->
-        <dc3.version>2026.4.29</dc3.version>
+        <dc3.version>2026.4.30</dc3.version>
     </properties>
 
     <modules>

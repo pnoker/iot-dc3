@@ -26,7 +26,7 @@ import org.mapstruct.Mapper;
  * FacadeUserLogin ↔ auth UserLoginBO mapper.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeUserLoginBuilder {

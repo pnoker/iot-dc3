@@ -41,7 +41,7 @@ import java.util.Objects;
  * — the same JVM handles both caller and service.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Slf4j
 @Component

@@ -28,7 +28,7 @@ import org.mapstruct.Mapper;
  * FacadeDriver ↔ manager DriverBO/Query mapper. Field sets are aligned.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeDriverBuilder {

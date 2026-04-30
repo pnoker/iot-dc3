@@ -27,7 +27,7 @@ import org.mapstruct.Mapper;
  * facade shape and therefore dropped by MapStruct.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeTenantBuilder {

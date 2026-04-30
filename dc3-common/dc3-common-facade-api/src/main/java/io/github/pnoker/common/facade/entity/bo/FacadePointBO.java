@@ -30,7 +30,7 @@ import java.math.BigDecimal;
  * Facade-level point BO. Field set matches {@code api.center.manager.PointApi}.
  *
  * @author pnoker
- * @since 2026.4.29
+ * @since 2026.4.30
  */
 @Getter
 @Setter
