@@ -34,6 +34,11 @@ spring:
     active:
       - ${NODE_ENV:dev}
 
+# DC3 platform configuration
+dc3:
+  facade:
+    mode: local
+
 # Logging configuration
 logging:
   file:

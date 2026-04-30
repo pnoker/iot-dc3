@@ -53,6 +53,12 @@ public class ApiDO implements Serializable {
     private Long id;
 
     /**
+     * Owning service name, populated by resource registrar
+     */
+    @TableField("service_name")
+    private String serviceName;
+
+    /**
      * Type
      */
     @TableField("api_type_flag")

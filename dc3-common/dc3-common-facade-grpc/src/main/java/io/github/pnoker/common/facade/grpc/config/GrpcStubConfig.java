@@ -17,10 +17,7 @@
 
 package io.github.pnoker.common.facade.grpc.config;
 
-import io.github.pnoker.api.center.auth.TenantApiGrpc;
-import io.github.pnoker.api.center.auth.TokenApiGrpc;
-import io.github.pnoker.api.center.auth.UserApiGrpc;
-import io.github.pnoker.api.center.auth.UserLoginApiGrpc;
+import io.github.pnoker.api.center.auth.*;
 import io.github.pnoker.api.center.manager.DeviceApiGrpc;
 import io.github.pnoker.api.center.manager.DriverApiGrpc;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
@@ -51,6 +48,11 @@ public class GrpcStubConfig {
     @Bean
     public UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub(GrpcChannelFactory channels) {
         return UserLoginApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    }
+
+    @Bean
+    public ResourceRegistryApiGrpc.ResourceRegistryApiBlockingStub resourceRegistryApiBlockingStub(GrpcChannelFactory channels) {
+        return ResourceRegistryApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
     }
 
     @Bean

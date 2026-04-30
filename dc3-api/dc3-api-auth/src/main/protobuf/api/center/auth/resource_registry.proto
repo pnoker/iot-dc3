@@ -1,0 +1,93 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package api.common.auth;
+
+import "api/common/r.proto";
+
+// Configuration options for code generation
+option java_package = "io.github.pnoker.api.center.auth";
+option java_outer_classname = "ResourceRegistryProto";
+option objc_class_prefix = "Auth";
+option java_multiple_files = true;
+
+// Service interface for registering center service API endpoints into the auth resource tables.
+service ResourceRegistryApi {
+  // Sync the full API endpoint list of a service. The server performs a three-way diff
+  // (insert / update / soft-delete) against dc3_api and the matching dc3_resource rows.
+  rpc Sync (GrpcSyncRequest) returns (GrpcRSyncResult);
+}
+
+// Sync request carrying the complete API endpoint list of a single service.
+message GrpcSyncRequest {
+  // Owning service name, e.g. dc3-center-manager. Must be stable across restarts.
+  string service_name = 1;
+
+  // Tenant ID the resources are registered under. Use 0 for system-level resources.
+  int64 tenant_id = 2;
+
+  // When true, endpoints that exist in the DB but are absent from the current scan
+  // are soft-deleted (deleted=1). When false, such endpoints are left untouched.
+  bool delete_missing = 3;
+
+  // Complete list of endpoints discovered by the registrar on the calling service.
+  repeated GrpcScannedApiDTO apis = 4;
+}
+
+// A single scanned HTTP endpoint.
+message GrpcScannedApiDTO {
+  // HTTP method: GET / POST / PUT / DELETE.
+  string method = 1;
+
+  // Full path (post gateway strip), e.g. /device/add.
+  string path = 2;
+
+  // Human-readable name, typically ClassSimpleName.methodName.
+  string api_name = 3;
+
+  // Short title, usually the controller method name.
+  string title = 4;
+
+  // Optional description.
+  string remark = 5;
+}
+
+// Response wrapper for the sync result.
+message GrpcRSyncResult {
+  // Common result wrapper containing status code, message, etc.
+  GrpcR result = 1;
+
+  // Registration counters.
+  GrpcSyncResultDTO data = 2;
+}
+
+// Counters summarizing what the server did during the sync.
+message GrpcSyncResultDTO {
+  // Number of APIs newly inserted.
+  int32 inserted = 1;
+
+  // Number of APIs whose metadata was updated.
+  int32 updated = 2;
+
+  // Number of APIs that were soft-deleted.
+  int32 deleted = 3;
+
+  // Number of APIs left unchanged.
+  int32 unchanged = 4;
+}
