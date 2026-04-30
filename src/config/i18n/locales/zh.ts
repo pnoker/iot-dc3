@@ -50,6 +50,7 @@ export default {
     settingsUser: '用户管理',
     settingsRole: '角色管理',
     settingsResource: '资源管理',
+    settingsApi: 'API 接口',
   },
   status: {
     online: '在线',
@@ -432,6 +433,20 @@ export default {
       entityIdPlaceholder: '请输入实体ID',
       confirmDelete: '是否确定删除该资源? 该操作不可恢复!',
       empty: '暂无资源数据!',
+    },
+    api: {
+      title: 'API 接口',
+      serviceName: '所属服务',
+      apiName: '接口名称',
+      apiCode: '接口编码',
+      apiType: '请求类型',
+      addTitle: '新增接口',
+      editTitle: '编辑接口',
+      serviceNamePlaceholder: '请输入所属服务名',
+      apiNamePlaceholder: '请输入接口名称',
+      apiCodePlaceholder: '请输入接口编码',
+      confirmDelete: '是否确定删除该接口? 该操作不可恢复!',
+      empty: '暂无接口数据!',
     },
   },
 };

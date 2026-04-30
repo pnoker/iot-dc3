@@ -31,6 +31,10 @@
             <el-icon><Files /></el-icon>
             <span>{{ t('nav.settingsResource') }}</span>
           </el-menu-item>
+          <el-menu-item index="settingsApi">
+            <el-icon><Link /></el-icon>
+            <span>{{ t('nav.settingsApi') }}</span>
+          </el-menu-item>
         </el-menu>
       </el-card>
     </el-aside>
@@ -44,7 +48,7 @@
   import { computed } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
-  import { Avatar, Files, User } from '@element-plus/icons-vue';
+  import { Avatar, Files, Link, User } from '@element-plus/icons-vue';
 
   const { t } = useI18n();
   const route = useRoute();

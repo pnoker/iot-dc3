@@ -45,6 +45,12 @@ const settingsRouter: RouteRecordRaw = {
           meta: { title: 'Resources' },
           component: () => import('@/views/settings/resource/Resource.vue'),
         },
+        {
+          name: 'settingsApi',
+          path: 'api',
+          meta: { title: 'APIs' },
+          component: () => import('@/views/settings/api/Api.vue'),
+        },
       ],
     },
   ],

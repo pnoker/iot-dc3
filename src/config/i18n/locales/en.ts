@@ -50,6 +50,7 @@ export default {
     settingsUser: 'Users',
     settingsRole: 'Roles',
     settingsResource: 'Resources',
+    settingsApi: 'API',
   },
   status: {
     online: 'Online',
@@ -432,6 +433,20 @@ export default {
       entityIdPlaceholder: 'Enter entity id',
       confirmDelete: 'Are you sure to delete this resource? This action cannot be undone!',
       empty: 'No resource data!',
+    },
+    api: {
+      title: 'API',
+      serviceName: 'Service',
+      apiName: 'API Name',
+      apiCode: 'API Code',
+      apiType: 'Method',
+      addTitle: 'Add API',
+      editTitle: 'Edit API',
+      serviceNamePlaceholder: 'Enter service name',
+      apiNamePlaceholder: 'Enter API name',
+      apiCodePlaceholder: 'Enter API code',
+      confirmDelete: 'Are you sure to delete this API? This action cannot be undone!',
+      empty: 'No API data!',
     },
   },
 };
