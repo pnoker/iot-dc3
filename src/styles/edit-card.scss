@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// 详情/编辑页外壳通用样式。表单统一为 label-position="top",不再固定 label 宽度。
+
 .edit-card {
   margin-top: 1px;
 }
@@ -52,18 +54,5 @@
     :deep(.el-form-item__content) {
       justify-content: center;
     }
-  }
-}
-
-:deep(.el-form-item__label) {
-  display: block;
-  width: 100px;
-  height: 32px;
-  text-align: justify;
-
-  &::after {
-    display: inline-block;
-    width: 100%;
-    content: '';
   }
 }

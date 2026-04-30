@@ -1,0 +1,89 @@
+/*!
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// 卡片通用外壳样式。
+// header / footer 的视觉由 ThingsCardHeader / ThingsCardActions 组件内聚；
+// 不使用这两个组件的特殊卡片(如 PointValueCard / Dashboard / Application)在自己的 scoped style 内补齐。
+
+@mixin text-ellipsis {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.things-card {
+  margin: 0 3px 6px;
+  border-radius: 4px;
+  box-sizing: border-box;
+
+  .things-card-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .things-card__body {
+    display: flex;
+    flex-direction: column;
+
+    ul {
+      padding-inline-start: 5px;
+      list-style: none;
+
+      li {
+        font-size: 13px;
+        margin-top: 8px;
+      }
+    }
+
+    .things-card-body-content {
+      display: flex;
+      justify-content: space-around;
+
+      p.nowrap-description {
+        text-align: center;
+      }
+    }
+  }
+
+  .nowrap-name {
+    @include text-ellipsis;
+    width: 200px;
+  }
+
+  .nowrap-item {
+    @include text-ellipsis;
+    width: 300px;
+  }
+
+  .nowrap-description {
+    @include text-ellipsis;
+    width: 350px;
+  }
+
+  .el-card {
+    width: 100%;
+    min-width: 300px;
+    min-height: 230px;
+    box-sizing: border-box;
+  }
+
+  .el-card__body {
+    padding: 10px;
+  }
+}

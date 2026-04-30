@@ -67,7 +67,24 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/components/card/styles/things-card.scss';
+  @use '@/styles/things-card.scss';
+
+  // DashboardCard 内联了一个 title 式 footer,不使用 ThingsCardActions。
+  .things-card__footer {
+    height: 35px;
+    margin-top: 2px;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #dcdfe6;
+
+    .things-card-footer-title {
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+      width: 100%;
+      margin-top: 5px;
+    }
+  }
 
   .things-card-dashboard {
     width: 300px;

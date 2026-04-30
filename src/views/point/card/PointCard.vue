@@ -163,5 +163,10 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/components/card/styles/things-card.scss';
+  @use '@/styles/things-card.scss';
+
+  // PointCard 用双栏列表展示字段,200px 固定宽度是为了和卡片尺寸匹配。
+  .things-body-content-item-column-2 {
+    width: 200px;
+  }
 </style>

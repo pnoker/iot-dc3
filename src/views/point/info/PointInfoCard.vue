@@ -72,5 +72,46 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/components/card/styles/things-card.scss';
+  @use '@/styles/things-card.scss';
+
+  // PointInfoCard 内联了一个简化的 header(无状态标签),不使用 ThingsCardHeader,在此补齐样式。
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  .things-card__header {
+    width: 100%;
+    height: 55px;
+    display: flex;
+
+    .things-card-header-icon {
+      width: 48px;
+      height: 48px;
+      margin-right: 12px;
+      border-radius: 4px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .things-card-header-name {
+      height: 48px;
+      line-height: 48px;
+      font-size: 14px;
+      font-weight: bold;
+      color: rgba(0, 0, 0, 0.85);
+    }
+  }
+
+  .header-enable {
+    border-bottom: 1px solid #c2e7b0;
+  }
+
+  .header-disable {
+    border-bottom: 1px solid #fbc4c4;
+  }
 </style>

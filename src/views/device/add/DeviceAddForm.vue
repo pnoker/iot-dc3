@@ -98,5 +98,5 @@
 <script lang="ts" src="./index.ts" />
 
 <style lang="scss" scoped>
-  @use '@/components/dialog/styles/things-dialog';
+  @use '@/styles/things-dialog.scss';
 </style>

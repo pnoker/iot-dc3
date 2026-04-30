@@ -226,5 +226,115 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/components/card/styles/things-card';
+  @use '@/styles/things-card.scss';
+
+  // PointValueCard 内联了 header / footer / 实时数值展示区,不使用 ThingsCardHeader / ThingsCardActions,
+  // 因此在此补齐对应样式。`header-enable` / `header-disable` 语义不同:基于 data.interval 表示延时是否正常。
+
+  .things-card__header {
+    width: 100%;
+    height: 55px;
+    display: flex;
+
+    .things-card-header-icon {
+      width: 48px;
+      height: 48px;
+      margin-right: 12px;
+      border-radius: 4px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .things-card-header-name {
+      height: 48px;
+      line-height: 48px;
+      font-size: 14px;
+      font-weight: bold;
+      color: rgba(0, 0, 0, 0.85);
+      cursor: pointer;
+
+      &:hover {
+        color: #1890ff;
+      }
+    }
+
+    .things-card-header-status {
+      height: 48px;
+      line-height: 48px;
+      text-align: right;
+      flex: 1;
+
+      :deep(.el-tag) {
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .header-enable {
+    border-bottom: 1px solid #c2e7b0;
+  }
+
+  .header-disable {
+    border-bottom: 1px solid #fbc4c4;
+  }
+
+  .things-card__body {
+    .things-card-body-content-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .things-card-body-content-value {
+      display: flex;
+      flex-direction: column;
+      list-style: none;
+      text-align: center;
+      margin-top: 20px;
+
+      .value {
+        font-weight: bold;
+        font-size: xx-large;
+        animation: hue 1s ease-in;
+        cursor: pointer;
+      }
+
+      .value-point {
+        height: 17px;
+      }
+    }
+
+    .things-card-body-content-time {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  .things-card__footer {
+    height: 35px;
+    margin-top: 2px;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #dcdfe6;
+
+    .things-card-footer-operation {
+      height: 35px;
+      display: flex;
+    }
+  }
+
+  @keyframes hue {
+    0% {
+      color: #409eff;
+    }
+    50% {
+      color: #f3f4fe;
+    }
+    100% {
+      color: #409eff;
+    }
+  }
 </style>

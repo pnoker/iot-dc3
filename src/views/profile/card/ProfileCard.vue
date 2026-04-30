@@ -97,5 +97,5 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/components/card/styles/things-card.scss';
+  @use '@/styles/things-card.scss';
 </style>

@@ -105,6 +105,20 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/components/card/styles/things-card.scss';
+  @use '@/styles/things-card.scss';
   @use '@/views/driver/card/style.scss';
+
+  // DriverCard 的 footer 只有单个 detail 按钮,不使用 ThingsCardActions,在此补齐样式。
+  .things-card__footer {
+    height: 35px;
+    margin-top: 2px;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #dcdfe6;
+
+    .things-card-footer-operation {
+      height: 35px;
+      display: flex;
+    }
+  }
 </style>
