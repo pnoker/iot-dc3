@@ -75,8 +75,11 @@ public class PointValueReceiver {
             } else {
                 // Save point value to schedule
                 PointValueJob.VALUE_LOCK.writeLock().lock();
-                PointValueJob.addPointValues(pointValueBO);
-                PointValueJob.VALUE_LOCK.writeLock().unlock();
+                try {
+                    PointValueJob.addPointValues(pointValueBO);
+                } finally {
+                    PointValueJob.VALUE_LOCK.writeLock().unlock();
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

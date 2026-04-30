@@ -92,14 +92,21 @@ public class PointValueJob extends QuartzJobBean {
             log.debug("Point value receiver speed: {} /s, value size: {}, interval: {}", speed, getPointValuesSize(), interval);
         }
 
-        // Save point value array to Redis & PostgreSQL
-        virtualThreadExecutor.execute(() -> {
-            VALUE_LOCK.writeLock().lock();
-            if (!POINT_VALUE_LIST.isEmpty()) {
-                pointValueService.save(POINT_VALUE_LIST);
-                clearPointValues();
+        // Swap out the accumulated buffer under the lock; run the save on a private
+        // snapshot outside the lock so concurrent addPointValues callers are not blocked
+        // by DB I/O.
+        List<PointValueBO> snapshot;
+        VALUE_LOCK.writeLock().lock();
+        try {
+            if (POINT_VALUE_LIST.isEmpty()) {
+                return;
             }
+            snapshot = new ArrayList<>(POINT_VALUE_LIST);
+            POINT_VALUE_LIST.clear();
+        } finally {
             VALUE_LOCK.writeLock().unlock();
-        });
+        }
+
+        virtualThreadExecutor.execute(() -> pointValueService.save(snapshot));
     }
 }
