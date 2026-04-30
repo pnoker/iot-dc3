@@ -1,0 +1,65 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package io.github.pnoker.common.facade.local.config;
+
+import io.github.pnoker.common.facade.local.DeviceLocalFacade;
+import io.github.pnoker.common.facade.local.builder.FacadeDeviceBuilder;
+import io.github.pnoker.common.facade.local.builder.FacadeDriverBuilder;
+import io.github.pnoker.common.facade.local.builder.FacadePointBuilder;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+
+/**
+ * Auto-configuration for the manager-domain local facade implementations.
+ * Active only when {@code dc3.facade.mode=local}. Scans the facade-local package
+ * but restricts registration to the manager-domain classes carried by this
+ * module so it remains deterministic alongside the auth-domain module.
+ * MapStruct-generated {@code *BuilderImpl} classes are picked up via their
+ * interfaces (AssignableTypeFilter matches concrete implementations).
+ *
+ * @author pnoker
+ * @since 2026.4.30
+ */
+@AutoConfiguration
+@ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")
+@ComponentScan(
+        basePackages = "io.github.pnoker.common.facade.local",
+        useDefaultFilters = false,
+        includeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = {
+                        io.github.pnoker.common.facade.local.DeviceLocalFacade.class,
+                        io.github.pnoker.common.facade.local.DriverLocalFacade.class,
+                        io.github.pnoker.common.facade.local.PointLocalFacade.class,
+                        FacadeDeviceBuilder.class,
+                        FacadeDriverBuilder.class,
+                        FacadePointBuilder.class,
+                }
+        )
+)
+public class LocalFacadeManagerAutoConfiguration {
+
+    /**
+     * Referenced only to ensure the {@link DeviceLocalFacade} symbol is linked against this
+     * module's compiled classes at AutoConfiguration load time.
+     */
+    @SuppressWarnings("unused")
+    private static final Class<?> CANARY = DeviceLocalFacade.class;
+}

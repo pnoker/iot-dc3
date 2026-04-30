@@ -21,56 +21,33 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-common</artifactId>
+        <artifactId>dc3-common-facade</artifactId>
         <version>2026.4.30</version>
     </parent>
 
     <name>${project.artifactId}</name>
-    <artifactId>dc3-common-facade-grpc</artifactId>
+    <artifactId>dc3-common-facade-local-manager</artifactId>
     <version>2026.4.30</version>
     <packaging>jar</packaging>
 
     <inceptionYear>2016</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        gRPC implementation of the Facade API, selected when dc3.facade.mode=grpc (default).
-        Holds BlockingStubs and translates between Facade BO/Query and protobuf DTOs.
+        Local (in-process) Facade implementations for the manager domain: Device / Driver /
+        Point. Activated when dc3.facade.mode=local. Transitively pulls in dc3-common-manager
+        and its dependencies (including dc3-common-rabbitmq for command dispatch).
     </description>
 
     <dependencies>
 
-        <!-- Spring gRPC Starter (client + server) -->
-        <dependency>
-            <groupId>org.springframework.grpc</groupId>
-            <artifactId>spring-grpc-spring-boot-starter</artifactId>
-        </dependency>
-
-        <!-- DC3 Api Related -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-auth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-api-manager</artifactId>
-        </dependency>
-
         <!-- DC3 Common Related -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-exception</artifactId>
-        </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-facade-api</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-public</artifactId>
+            <artifactId>dc3-common-manager</artifactId>
         </dependency>
 
     </dependencies>
