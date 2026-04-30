@@ -115,7 +115,7 @@ public class ResourceServiceImpl implements ResourceService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getResourceCode()), ResourceDO::getResourceCode, entityQuery.getResourceCode());
         wrapper.eq(Objects.nonNull(entityQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, entityQuery.getResourceTypeFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag, entityQuery.getEnableFlag());
-        wrapper.eq(ResourceDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), ResourceDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

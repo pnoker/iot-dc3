@@ -125,7 +125,7 @@ public class RoleServiceImpl implements RoleService {
         LambdaQueryWrapper<RoleDO> wrapper = Wrappers.<RoleDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getRoleName()), RoleDO::getRoleName, entityQuery.getRoleName());
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getRoleCode()), RoleDO::getRoleCode, entityQuery.getRoleCode());
-        wrapper.eq(RoleDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RoleDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

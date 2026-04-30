@@ -33,9 +33,14 @@ public class AuthConstant {
      */
     public static final String SERVICE_NAME = "dc3-center-auth";
     public static final String USER_URL_PREFIX = "/user";
+    public static final String USER_PROFILE_URL_PREFIX = "/user-profile";
     public static final String TENANT_URL_PREFIX = "/tenant";
     public static final String TOKEN_URL_PREFIX = "/token";
     public static final String DICTIONARY_URL_PREFIX = "/dictionary";
+    public static final String ROLE_URL_PREFIX = "/role";
+    public static final String RESOURCE_URL_PREFIX = "/resource";
+    public static final String ROLE_USER_URL_PREFIX = "/role-user";
+    public static final String ROLE_RESOURCE_URL_PREFIX = "/role-resource";
 
     private AuthConstant() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);

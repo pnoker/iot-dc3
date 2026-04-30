@@ -138,9 +138,9 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
      */
     private LambdaQueryWrapper<RoleResourceBindDO> fuzzyQuery(RoleResourceBindQuery entityQuery) {
         LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
-        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleResourceBindDO::getResourceId, entityQuery.getRoleId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleResourceBindDO::getRoleId, entityQuery.getRoleId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getResourceId()), RoleResourceBindDO::getResourceId, entityQuery.getResourceId());
-        wrapper.eq(RoleResourceBindDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RoleResourceBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
