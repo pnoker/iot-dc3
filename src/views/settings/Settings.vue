@@ -15,29 +15,31 @@
   -->
 
 <template>
-  <div class="settings-wrapper">
-    <el-container class="settings-container">
-      <el-aside width="220px" class="settings-aside">
-        <el-menu :default-active="activeMenu" @select="onSelect">
-          <el-menu-item index="settingsUser">
-            <el-icon><User /></el-icon>
-            <span>{{ t('nav.settingsUser') }}</span>
-          </el-menu-item>
-          <el-menu-item index="settingsRole">
-            <el-icon><Avatar /></el-icon>
-            <span>{{ t('nav.settingsRole') }}</span>
-          </el-menu-item>
-          <el-menu-item index="settingsResource">
-            <el-icon><Files /></el-icon>
-            <span>{{ t('nav.settingsResource') }}</span>
-          </el-menu-item>
-        </el-menu>
-      </el-aside>
-      <el-main class="settings-main">
-        <router-view />
-      </el-main>
-    </el-container>
-  </div>
+  <el-container class="settings-container">
+    <el-aside width="220px" class="settings-aside">
+      <div class="tool-card">
+        <el-card shadow="never">
+          <el-menu :default-active="activeMenu" @select="onSelect">
+            <el-menu-item index="settingsUser">
+              <el-icon><User /></el-icon>
+              <span>{{ t('nav.settingsUser') }}</span>
+            </el-menu-item>
+            <el-menu-item index="settingsRole">
+              <el-icon><Avatar /></el-icon>
+              <span>{{ t('nav.settingsRole') }}</span>
+            </el-menu-item>
+            <el-menu-item index="settingsResource">
+              <el-icon><Files /></el-icon>
+              <span>{{ t('nav.settingsResource') }}</span>
+            </el-menu-item>
+          </el-menu>
+        </el-card>
+      </div>
+    </el-aside>
+    <el-main class="settings-main">
+      <router-view />
+    </el-main>
+  </el-container>
 </template>
 
 <script lang="ts" setup>
@@ -58,25 +60,33 @@
 </script>
 
 <style lang="scss" scoped>
-  .settings-wrapper {
-    padding: 16px;
-  }
+  @use '@/components/card/styles/tool-card.scss';
 
   .settings-container {
-    min-height: calc(100vh - 160px);
-    background: #fff;
-    border-radius: 6px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
+    align-items: stretch;
+    gap: 4px;
+    min-height: calc(100vh - 120px);
   }
 
   .settings-aside {
-    background: #fafbfc;
-    border-right: 1px solid var(--el-border-color-lighter);
+    .tool-card {
+      height: 100%;
+
+      :deep(.el-card) {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      :deep(.el-card__body) {
+        flex: 1;
+        padding: 0;
+      }
+    }
 
     :deep(.el-menu) {
+      height: 100%;
       border-right: none;
-      background: transparent;
     }
 
     :deep(.el-menu-item) {
@@ -87,6 +97,6 @@
   }
 
   .settings-main {
-    padding: 20px;
+    padding: 0;
   }
 </style>

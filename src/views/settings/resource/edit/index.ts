@@ -44,6 +44,7 @@ export default defineComponent({
       mode: 'add' as FormMode,
       submitting: false,
       form: createEmptyForm(),
+      originalForm: createEmptyForm(),
     });
 
     const rules: FormRules = {
@@ -55,23 +56,26 @@ export default defineComponent({
     };
 
     const reset = () => {
-      reactiveData.form = createEmptyForm();
+      reactiveData.form = reactiveData.mode === 'edit' ? { ...reactiveData.originalForm } : createEmptyForm();
       reactiveData.submitting = false;
       formRef.value?.clearValidate();
     };
 
     const show = () => {
       reactiveData.mode = 'add';
+      reactiveData.originalForm = createEmptyForm();
       reactiveData.form = createEmptyForm();
       reactiveData.visible = true;
     };
 
     const showEdit = (row: any) => {
       reactiveData.mode = 'edit';
-      reactiveData.form = {
+      const initial = {
         ...createEmptyForm(),
         ...row,
       };
+      reactiveData.originalForm = { ...initial };
+      reactiveData.form = { ...initial };
       reactiveData.visible = true;
     };
 

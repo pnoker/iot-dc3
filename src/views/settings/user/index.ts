@@ -21,12 +21,18 @@ import { addUser, deleteUser, getUserList, updateUser } from '@/api/user';
 import { bindRoleUser, unbindRoleUser } from '@/api/roleUserBind';
 import { successMessage } from '@/utils/NotificationUtil';
 
+import type { Order } from '@/config/entity';
+
+import userTool from './tool/UserTool.vue';
 import userEditForm from './edit/UserEditForm.vue';
 import userAssignRoles from './assign/UserAssignRoles.vue';
+import BlankCard from '@/components/card/blank/BlankCard.vue';
 
 export default defineComponent({
   name: 'SettingsUser',
   components: {
+    BlankCard,
+    userTool,
     userEditForm,
     userAssignRoles,
   },
@@ -40,10 +46,12 @@ export default defineComponent({
       loading: false,
       listData: [] as any[],
       query: {} as Record<string, any>,
+      order: false,
       page: {
         total: 0,
-        size: 20,
+        size: 12,
         current: 1,
+        orders: [] as Order[],
       },
     });
 
@@ -63,7 +71,8 @@ export default defineComponent({
         });
     };
 
-    const search = () => {
+    const search = (params: any) => {
+      reactiveData.query = params || {};
       reactiveData.page.current = 1;
       load();
     };
@@ -74,17 +83,17 @@ export default defineComponent({
       load();
     };
 
-    const openAdd = () => {
-      editRef.value?.show();
+    const refresh = () => load();
+
+    const sort = () => {
+      reactiveData.order = !reactiveData.order;
+      reactiveData.page.orders = [{ column: 'create_time', asc: reactiveData.order }];
+      load();
     };
 
-    const openEdit = (row: any) => {
-      editRef.value?.showEdit(row);
-    };
-
-    const openAssignRoles = (row: any) => {
-      assignRef.value?.show(row);
-    };
+    const openAdd = () => editRef.value?.show();
+    const openEdit = (row: any) => editRef.value?.showEdit(row);
+    const openAssignRoles = (row: any) => assignRef.value?.show(row);
 
     const onAdd = (form: any, done: () => void) => {
       addUser(form)
@@ -134,14 +143,13 @@ export default defineComponent({
         });
     };
 
-    const currentChange = (current: number) => {
-      reactiveData.page.current = current;
+    const sizeChange = (size: number) => {
+      reactiveData.page.size = size;
       load();
     };
 
-    const sizeChange = (size: number) => {
-      reactiveData.page.size = size;
-      reactiveData.page.current = 1;
+    const currentChange = (current: number) => {
+      reactiveData.page.current = current;
       load();
     };
 
@@ -154,6 +162,8 @@ export default defineComponent({
       reactiveData,
       search,
       reset,
+      refresh,
+      sort,
       openAdd,
       openEdit,
       openAssignRoles,
@@ -161,8 +171,8 @@ export default defineComponent({
       onUpdate,
       onAssignRoles,
       remove,
-      currentChange,
       sizeChange,
+      currentChange,
     };
   },
 });

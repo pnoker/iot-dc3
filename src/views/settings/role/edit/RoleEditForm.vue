@@ -17,22 +17,38 @@
 <template>
   <el-dialog
     v-model="reactiveData.visible"
-    :title="reactiveData.mode === 'add' ? t('settings.role.addTitle') : t('settings.role.editTitle')"
-    width="560px"
+    :append-to-body="true"
     :close-on-click-modal="false"
+    :close-on-press-escape="false"
+    :show-close="false"
+    class="things-dialog"
+    draggable
+    :title="reactiveData.mode === 'add' ? t('settings.role.addTitle') : t('settings.role.editTitle')"
     @closed="reset"
   >
-    <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-width="90px">
+    <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-position="top">
       <el-form-item :label="t('settings.role.parentRoleId')" prop="parentRoleId">
-        <el-input v-model="reactiveData.form.parentRoleId" :placeholder="t('settings.role.parentRoleIdPlaceholder')" />
+        <el-input
+          v-model="reactiveData.form.parentRoleId"
+          clearable
+          :placeholder="t('settings.role.parentRoleIdPlaceholder')"
+        />
       </el-form-item>
       <el-form-item :label="t('settings.role.roleName')" prop="roleName">
-        <el-input v-model="reactiveData.form.roleName" :placeholder="t('settings.role.roleNamePlaceholder')" />
+        <el-input
+          v-model="reactiveData.form.roleName"
+          clearable
+          :placeholder="t('settings.role.roleNamePlaceholder')"
+        />
       </el-form-item>
       <el-form-item :label="t('settings.role.roleCode')" prop="roleCode">
-        <el-input v-model="reactiveData.form.roleCode" :placeholder="t('settings.role.roleCodePlaceholder')" />
+        <el-input
+          v-model="reactiveData.form.roleCode"
+          clearable
+          :placeholder="t('settings.role.roleCodePlaceholder')"
+        />
       </el-form-item>
-      <el-form-item :label="t('common.enable')" prop="enableFlag">
+      <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
         <el-switch
           v-model="reactiveData.form.enableFlag"
           active-value="ENABLE"
@@ -42,16 +58,21 @@
         />
       </el-form-item>
       <el-form-item :label="t('common.remark')" prop="remark">
-        <el-input v-model="reactiveData.form.remark" type="textarea" :rows="3" />
+        <el-input v-model="reactiveData.form.remark" clearable maxlength="300" show-word-limit type="textarea" />
       </el-form-item>
     </el-form>
-    <template #footer>
+    <div class="things-dialog-footer">
       <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
+      <el-button plain type="success" @click="reset">{{ t('common.reset') }}</el-button>
       <el-button type="primary" :loading="reactiveData.submitting" @click="submit">
-        {{ t('common.save') }}
+        {{ t('common.confirm') }}
       </el-button>
-    </template>
+    </div>
   </el-dialog>
 </template>
 
 <script lang="ts" src="./index.ts"></script>
+
+<style lang="scss" scoped>
+  @use '@/components/dialog/styles/things-dialog';
+</style>

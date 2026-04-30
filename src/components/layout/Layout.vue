@@ -138,7 +138,7 @@
     } else if (name.startsWith('point')) {
       items.push({ path: '/point_value', title: t('nav.data') });
     } else if (name.startsWith('settings')) {
-      items.push({ path: '/settings', title: t('nav.settings') });
+      items.push({ path: '/settings/user', title: t('nav.settings') });
     }
     if (!['home', 'driver', 'profile', 'device', 'pointValue', 'settings'].includes(name)) {
       items.push({ path: route.path, title });
