@@ -16,39 +16,29 @@
 # limitations under the License.
 #
 
-set -e
+set -euo pipefail
 
-type=""
+branch=$(git rev-parse --abbrev-ref HEAD)
 
-# shellcheck disable=SC2092
-# shellcheck disable=SC2006
-if `git status | grep "develop" &>/dev/null`; then
-    type="develop"
-fi
-
-# shellcheck disable=SC2092
-# shellcheck disable=SC2006
-if `git status | grep "release" &>/dev/null`; then
-    type="release"
-fi
-
-# shellcheck disable=SC2092
-# shellcheck disable=SC2006
-if `git status | grep "main" &>/dev/null`; then
-    type="release"
-fi
-
-if [[ ${type} == "" ]]; then
-    echo -e "This branch doesn't support tagging, please switch to the \033[31mdevelop\033[0m or \033[31mrelease\033[0m branch."
-    exit
-fi
+case "${branch}" in
+    develop)
+        type="develop"
+        ;;
+    main | master | release | release/*)
+        type="release"
+        ;;
+    *)
+        echo -e "This branch doesn't support tagging, please switch to the \033[31mdevelop\033[0m or \033[31mrelease\033[0m branch."
+        exit 1
+        ;;
+esac
 
 git pull --tags
 
-# shellcheck disable=SC2046
-# shellcheck disable=SC2116
-tag=$(echo dc3.${type}.$(date +'%Y%m%d').$(git tag -l "dc3.${type}.$(date +'%Y%m%d').*" | wc -l | xargs printf '%02d'))
+date=$(date +'%Y%m%d')
+count=$(git tag -l "dc3.${type}.${date}.*" | wc -l | xargs printf '%02d')
+tag="dc3.${type}.${date}.${count}"
+
 echo "${tag}"
 git tag "${tag}"
-
-git push origin --tags
+git push origin "${tag}"
