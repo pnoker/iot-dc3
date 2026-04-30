@@ -21,6 +21,7 @@ import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import commonRouters from './common';
 import operateRouters from './operate';
+import settingsRouters from './settings';
 import viewsRouters from './views';
 import { getStorage } from '@/utils/StorageUtil';
 import { isNull } from '@/utils/ValidationUtil';
@@ -47,7 +48,7 @@ NProgress.configure(NPROGRESS_CONFIG);
  */
 const router = createRouter({
   history: createWebHashHistory(),
-  routes: [...commonRouters, viewsRouters, ...operateRouters],
+  routes: [...commonRouters, viewsRouters, settingsRouters, ...operateRouters],
 });
 
 /**

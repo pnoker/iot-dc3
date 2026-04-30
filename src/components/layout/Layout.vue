@@ -64,7 +64,8 @@
                 <span class="lang-text">中文</span>
                 <el-icon v-if="locale === 'zh'" class="lang-check"><Check /></el-icon>
               </el-dropdown-item>
-              <el-dropdown-item divided command="help">{{ t('layout.about') }}</el-dropdown-item>
+              <el-dropdown-item divided command="settings">{{ t('layout.settings') }}</el-dropdown-item>
+              <el-dropdown-item command="help">{{ t('layout.about') }}</el-dropdown-item>
               <el-dropdown-item command="logout">{{ t('layout.logout') }}</el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -116,6 +117,10 @@
     pointEdit: 'nav.pointEdit',
     dashboard: 'nav.dashboard',
     application: 'nav.application',
+    settings: 'nav.settings',
+    settingsUser: 'nav.settingsUser',
+    settingsRole: 'nav.settingsRole',
+    settingsResource: 'nav.settingsResource',
   };
 
   const breadcrumbItems = computed(() => {
@@ -132,8 +137,10 @@
       items.push({ path: '/profile', title: t('nav.profile') });
     } else if (name.startsWith('point')) {
       items.push({ path: '/point_value', title: t('nav.data') });
+    } else if (name.startsWith('settings')) {
+      items.push({ path: '/settings', title: t('nav.settings') });
     }
-    if (!['home', 'driver', 'profile', 'device', 'pointValue'].includes(name)) {
+    if (!['home', 'driver', 'profile', 'device', 'pointValue', 'settings'].includes(name)) {
       items.push({ path: route.path, title });
     }
     return items;
@@ -159,6 +166,8 @@
       const lang = command.slice(5);
       locale.value = lang;
       localStorage.setItem('locale', lang);
+    } else if (command === 'settings') {
+      await router.push({ name: 'settingsUser' });
     } else if (command === 'logout') {
       await authStore.logout();
       await router.push({ name: 'login' });
