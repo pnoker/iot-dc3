@@ -36,7 +36,7 @@
           </div>
           <div class="things-card-header-status" :title="$t('pointValue.card.rwType')">
             <el-tag v-if="data.rwFlag === 'R'" effect="plain" type="warning">{{ $t('status.readOnly') }}</el-tag>
-            <el-tag v-else-if="data.rwFlagrw === 'W'" effect="plain" type="info">{{ $t('status.writeOnly') }}</el-tag>
+            <el-tag v-else-if="data.rwFlag === 'W'" effect="plain" type="info">{{ $t('status.writeOnly') }}</el-tag>
             <el-tag v-else-if="data.rwFlag === 'RW'" effect="plain" type="success">{{ $t('status.readWrite') }}</el-tag>
           </div>
         </div>
