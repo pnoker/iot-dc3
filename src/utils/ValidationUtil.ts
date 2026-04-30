@@ -31,7 +31,7 @@ export function isUrl(url: any) {
  * @returns {boolean} Whether string is an email
  */
 export function isEmail(email: any) {
-  return /^([a-zA-Z0-9_\\.-])+\\@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$/.test(email);
+  return /^([a-zA-Z0-9_.-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(email);
 }
 
 /**
@@ -41,7 +41,7 @@ export function isEmail(email: any) {
  * @returns {boolean} Whether string is a phone number
  */
 export function isPhone(phone: any) {
-  return /^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\\d{8}$/.test(phone);
+  return /^(13[0-9]|14[5|7]|15[0|1|2|3|4|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/.test(phone);
 }
 
 /**

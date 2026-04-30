@@ -57,11 +57,14 @@ const JSONBigIntStr = JSONBigInt({ storeAsString: true });
  * @param data Raw response data
  * @returns Parsed data
  */
-function transformResponse(data: string): any {
+function transformResponse(data: any): any {
+  if (typeof data !== 'string' || data === '') {
+    return data;
+  }
   try {
     return JSONBigIntStr.parse(data);
   } catch {
-    return { data };
+    return data;
   }
 }
 
@@ -114,7 +117,7 @@ request.interceptors.request.use(
  */
 request.interceptors.response.use(
   (response: AxiosResponse) => {
-    const ok = response.data.ok || false;
+    const ok = response.data?.ok || false;
     const status = response.status || AXIOS_CONFIG.UNAUTHORIZED_STATUS;
     const responseType = response.config.responseType;
 
@@ -131,8 +134,12 @@ request.interceptors.response.use(
     // Handle unauthorized access
     if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
       warnMessage(ERROR_MESSAGES.UNAUTHORIZED, ERROR_MESSAGES.UNAUTHORIZED_TITLE);
+      // Clear storage and redirect to login
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.hash = '#/login';
     } else {
-      failMessage(ERROR_MESSAGES.REQUEST_ERROR, response.data.code, response.data);
+      failMessage(ERROR_MESSAGES.REQUEST_ERROR, response.data?.code, response.data);
     }
     // Reject with the server payload so callers can inspect code/message if needed.
     // Existing no-op `.catch(() => {})` sites remain valid because they ignore the argument.

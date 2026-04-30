@@ -26,9 +26,6 @@ import viewsRouters from './views';
 import { getStorage } from '@/utils/StorageUtil';
 import { isNull } from '@/utils/ValidationUtil';
 import { AUTH_HEADERS } from '@/config/constant/common';
-import { checkTokenValid } from '@/api/token';
-import type { Login } from '@/config/entity';
-import { logout } from '@/utils/CommonUtil';
 
 /**
  * NProgress configuration
@@ -54,51 +51,32 @@ const router = createRouter({
 /**
  * Navigation guard to handle authentication and page title
  */
-router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+router.beforeEach((to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
   NProgress.start();
 
   // Skip authentication check for login page
-  if (from.name === 'login' || to.name === 'login') {
+  if (to.name === 'login') {
     next();
     return;
   }
 
-  // Check if user is authenticated
+  // Check if user is authenticated locally
   const tenant = getStorage(AUTH_HEADERS.TENANT);
   const user = getStorage(AUTH_HEADERS.LOGIN);
   const token = getStorage(AUTH_HEADERS.TOKEN);
+
   if (isNull(tenant) || isNull(user) || isNull(token)) {
-    next({ path: '/login' });
+    next({ name: 'login' });
     return;
   }
 
-  // Validate token
-  const login: Login = {
-    tenant: tenant,
-    name: user,
-    ...token,
-  };
+  // Update page title
+  const meta: RouteMeta = to.meta || {};
+  if (meta.title) {
+    document.title = meta.title as string;
+  }
 
-  checkTokenValid(login)
-    .then((res) => {
-      if (!res.data) {
-        next({ path: '/login' });
-        logout();
-        return;
-      }
-
-      // Update page title
-      const meta: RouteMeta = to.meta || {};
-      if (meta.title) {
-        document.title = to.meta.title as string;
-      }
-
-      next();
-    })
-    .catch(() => {
-      next({ path: '/login' });
-      logout();
-    });
+  next();
 });
 
 /**

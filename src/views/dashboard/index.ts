@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { decode } from 'js-base64';
+import { isUrl } from '@/utils/ValidationUtil';
 
 export default defineComponent({
   props: {
@@ -25,10 +26,20 @@ export default defineComponent({
       default: 'http://zhb_nyx.gitee.io/data-view',
     },
   },
-  setup() {
+  setup(props) {
     const route = useRoute();
 
-    const iframeUrl = decode(route.query.id as string);
+    const iframeUrl = computed(() => {
+      const id = route.query.id as string;
+      if (!id) return props.url;
+
+      try {
+        const decodedUrl = decode(id);
+        return isUrl(decodedUrl) ? decodedUrl : props.url;
+      } catch {
+        return props.url;
+      }
+    });
 
     return {
       iframeUrl,
