@@ -17,58 +17,43 @@
 
 package io.github.pnoker.common.auth.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseBO;
-import io.github.pnoker.common.entity.ext.ApiExt;
-import io.github.pnoker.common.enums.ApiTypeFlagEnum;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.*;
 
+import java.util.List;
+
 /**
- * Api BO
+ * Command driving a resource-registry sync call.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.4.30
+ * @since 2026.4.30
  */
 @Getter
 @Setter
+@Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
-public class ApiBO extends BaseBO {
+public class ResourceRegistrySyncCommand {
 
     /**
-     * Owning service name, populated by resource registrar
+     * Owning service name, e.g. dc3-center-manager.
      */
     private String serviceName;
 
     /**
-     * ApiType
-     */
-    private ApiTypeFlagEnum apiTypeFlag;
-
-    /**
-     * ApiName
-     */
-    private String apiName;
-
-    /**
-     * ApiCode, URLMD5
-     */
-    private String apiCode;
-
-    /**
-     * Api
-     */
-    private ApiExt apiExt;
-
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
-
-    /**
-     * Tenant ID
+     * Tenant ID the resources are registered under. Use 0 for system-level resources.
      */
     private Long tenantId;
+
+    /**
+     * When true, endpoints that exist in the DB but are absent from the current scan
+     * are soft-deleted. When false, such endpoints are left untouched.
+     */
+    private boolean deleteMissing;
+
+    /**
+     * Complete list of endpoints discovered by the registrar on the calling service.
+     */
+    private List<ResourceRegistryScannedApi> apis;
 }

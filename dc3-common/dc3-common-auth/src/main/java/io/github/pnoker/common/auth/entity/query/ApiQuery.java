@@ -51,6 +51,11 @@ public class ApiQuery implements Serializable {
     // 
 
     /**
+     * Owning service name, populated by resource registrar
+     */
+    private String serviceName;
+
+    /**
      * ApiType
      */
     private ApiTypeFlagEnum apiTypeFlag;

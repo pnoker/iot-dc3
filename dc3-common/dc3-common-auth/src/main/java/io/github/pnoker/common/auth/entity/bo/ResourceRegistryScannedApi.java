@@ -17,58 +17,45 @@
 
 package io.github.pnoker.common.auth.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseBO;
-import io.github.pnoker.common.entity.ext.ApiExt;
-import io.github.pnoker.common.enums.ApiTypeFlagEnum;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.*;
 
 /**
- * Api BO
+ * A single HTTP endpoint discovered by the resource registrar scanner.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.4.30
+ * @since 2026.4.30
  */
 @Getter
 @Setter
+@Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
-public class ApiBO extends BaseBO {
+public class ResourceRegistryScannedApi {
 
     /**
-     * Owning service name, populated by resource registrar
+     * HTTP method: GET / POST / PUT / DELETE.
      */
-    private String serviceName;
+    private String method;
 
     /**
-     * ApiType
+     * Full path (post gateway strip), e.g. /device/add.
      */
-    private ApiTypeFlagEnum apiTypeFlag;
+    private String path;
 
     /**
-     * ApiName
+     * Human-readable name, typically ClassSimpleName.methodName.
      */
     private String apiName;
 
     /**
-     * ApiCode, URLMD5
+     * Short title, usually the controller method name.
      */
-    private String apiCode;
+    private String title;
 
     /**
-     * Api
+     * Optional description.
      */
-    private ApiExt apiExt;
-
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
-
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+    private String remark;
 }
