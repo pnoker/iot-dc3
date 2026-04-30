@@ -20,14 +20,16 @@ package io.github.pnoker.common.data.controller;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DeviceStatusService;
-import io.github.pnoker.common.data.entity.bo.DeviceRunBO;
-import io.github.pnoker.common.data.entity.builder.DeviceDurationBuilder;
 import io.github.pnoker.common.data.entity.query.DeviceQuery;
-import io.github.pnoker.common.data.entity.vo.DeviceRunVO;
 import io.github.pnoker.common.entity.R;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -45,11 +47,9 @@ import java.util.Map;
 public class DeviceStatusController implements BaseController {
 
     private final DeviceStatusService deviceStatusService;
-    private final DeviceDurationBuilder deviceDurationBuilder;
 
-    public DeviceStatusController(DeviceStatusService deviceStatusService, DeviceDurationBuilder deviceDurationBuilder) {
+    public DeviceStatusController(DeviceStatusService deviceStatusService) {
         this.deviceStatusService = deviceStatusService;
-        this.deviceDurationBuilder = deviceDurationBuilder;
     }
 
     /**
@@ -105,42 +105,6 @@ public class DeviceStatusController implements BaseController {
         try {
             Map<Long, String> statuses = deviceStatusService.selectByProfileId(profileId);
             return Mono.just(R.ok(statuses));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
-
-    /**
-     * Query device online total duration
-     *
-     * @param deviceId Device ID
-     * @return DeviceRunVO
-     */
-    @GetMapping("/deviceOnline/{deviceId}")
-    public Mono<R<DeviceRunVO>> selectOnlineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
-        try {
-            DeviceRunBO duration = deviceStatusService.selectOnlineByDeviceId(deviceId);
-            DeviceRunVO result = deviceDurationBuilder.buildVOByBOList(duration);
-            return Mono.just(R.ok(result));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
-    }
-
-    /**
-     * Query device offline total duration
-     *
-     * @param deviceId Device ID
-     * @return DeviceRunVO
-     */
-    @GetMapping("/deviceOffline/{deviceId}")
-    public Mono<R<DeviceRunVO>> selectOfflineByDriverId(@NotNull @PathVariable(value = "deviceId") Long deviceId) {
-        try {
-            DeviceRunBO duration = deviceStatusService.selectOfflineByDeviceId(deviceId);
-            DeviceRunVO result = deviceDurationBuilder.buildVOByBOList(duration);
-            return Mono.just(R.ok(result));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return Mono.just(R.fail(e.getMessage()));

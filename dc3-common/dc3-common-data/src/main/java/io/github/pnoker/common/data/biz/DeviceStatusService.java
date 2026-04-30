@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.biz;
 
-import io.github.pnoker.common.data.entity.bo.DeviceRunBO;
 import io.github.pnoker.common.data.entity.query.DeviceQuery;
 
 import java.util.Map;
@@ -46,8 +45,4 @@ public interface DeviceStatusService {
      * @return Map Long:String, where Long is the device ID and String is the device status
      */
     Map<Long, String> selectByProfileId(Long profileId);
-
-    DeviceRunBO selectOnlineByDeviceId(Long deviceId);
-
-    DeviceRunBO selectOfflineByDeviceId(Long deviceId);
 }

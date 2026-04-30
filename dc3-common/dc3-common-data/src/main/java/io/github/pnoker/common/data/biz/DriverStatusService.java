@@ -18,7 +18,6 @@
 package io.github.pnoker.common.data.biz;
 
 
-import io.github.pnoker.common.data.entity.bo.DriverRunBO;
 import io.github.pnoker.common.data.entity.query.DriverQuery;
 
 import java.util.Map;
@@ -41,34 +40,18 @@ public interface DriverStatusService {
     Map<Long, String> selectByPage(DriverQuery driverQuery);
 
     /**
-     * Query driver status by driver ID
+     * Count of currently online devices under the driver.
      *
      * @param driverId Driver ID
-     * @return DriverRunBO, including driver status
-     */
-    DriverRunBO selectOnlineByDriverId(Long driverId);
-
-    /**
-     * Query driver status by driver ID
-     *
-     * @param driverId Driver ID
-     * @return DriverRunBO, including driver status
-     */
-    DriverRunBO selectOfflineByDriverId(Long driverId);
-
-    /**
-     * Query device status by driver ID
-     *
-     * @param driverId Driver ID
-     * @return String, device status
+     * @return Number of online devices, as a string
      */
     String getDeviceOnlineByDriverId(Long driverId);
 
     /**
-     * Query device status by driver ID
+     * Count of currently offline devices under the driver.
      *
      * @param driverId Driver ID
-     * @return String, device status
+     * @return Number of offline devices, as a string
      */
     String getDeviceOfflineByDriverId(Long driverId);
 }
