@@ -45,6 +45,11 @@ import lombok.*;
 public class ApiVO extends BaseVO {
 
     /**
+     * Owning service name, populated by resource registrar
+     */
+    private String serviceName;
+
+    /**
      * ApiType
      */
     private ApiTypeFlagEnum apiTypeFlag;

@@ -17,58 +17,25 @@
 
 package io.github.pnoker.common.auth.entity.bo;
 
-import io.github.pnoker.common.entity.base.BaseBO;
-import io.github.pnoker.common.entity.ext.ApiExt;
-import io.github.pnoker.common.enums.ApiTypeFlagEnum;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.*;
 
 /**
- * Api BO
+ * Counters summarizing a resource-registry sync run.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.4.30
+ * @since 2026.4.30
  */
 @Getter
 @Setter
+@Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
-public class ApiBO extends BaseBO {
+public class ResourceRegistrySyncResult {
 
-    /**
-     * Owning service name, populated by resource registrar
-     */
-    private String serviceName;
-
-    /**
-     * ApiType
-     */
-    private ApiTypeFlagEnum apiTypeFlag;
-
-    /**
-     * ApiName
-     */
-    private String apiName;
-
-    /**
-     * ApiCode, URLMD5
-     */
-    private String apiCode;
-
-    /**
-     * Api
-     */
-    private ApiExt apiExt;
-
-    /**
-     * Enable flag
-     */
-    private EnableFlagEnum enableFlag;
-
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
+    private int inserted;
+    private int updated;
+    private int deleted;
+    private int unchanged;
 }
