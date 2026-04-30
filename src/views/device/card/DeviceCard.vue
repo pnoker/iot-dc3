@@ -18,105 +18,99 @@
   <div class="things-card">
     <el-card shadow="hover">
       <div class="things-card-content">
-        <div
-          :class="{
-            'header-enable': 'ENABLE' === data.enableFlag,
-            'header-disable': 'ENABLE' !== data.enableFlag,
-          }"
-          class="things-card__header"
+        <things-card-header
+          :name="data.deviceName"
+          :icon="icon"
+          :enabled="data.enableFlag === 'ENABLE'"
+          :status-title="$t('common.enableFlag')"
+          @copy-id="copy(data.id, 'Device ID')"
         >
-          <div class="things-card-header-icon">
-            <img :alt="data.deviceName" :src="icon" />
-          </div>
-          <div class="things-card-header-name nowrap-name" @click="copyId(data.id, 'Device ID')">
-            {{ data.deviceName }}
-          </div>
-          <div class="things-card-header-status" :title="$t('common.enableFlag')">
-            <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
-            <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">{{ $t('status.maintain') }}</el-tag>
-            <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">{{ $t('status.fault') }}</el-tag>
-            <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">{{ $t('status.disable') }}</el-tag>
-            <el-tag v-else effect="plain" type="info">{{ $t('status.offline') }}</el-tag>
-          </div>
-        </div>
+          <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
+          <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">{{ $t('status.maintain') }}</el-tag>
+          <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">{{ $t('status.fault') }}</el-tag>
+          <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">{{ $t('status.disable') }}</el-tag>
+          <el-tag v-else effect="plain" type="info">{{ $t('status.offline') }}</el-tag>
+        </things-card-header>
         <div class="things-card__body">
           <div class="things-card-body-content">
             <ul>
               <li class="nowrap-item">
-                <el-icon>
-                  <Promotion />
-                </el-icon>
+                <el-icon><Promotion /></el-icon>
                 {{ $t('device.card.driver') }}: {{ driver.driverName }}
               </li>
               <li class="nowrap-item">
-                <el-icon>
-                  <Edit />
-                </el-icon>
+                <el-icon><Edit /></el-icon>
                 {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime) }}
               </li>
               <li class="nowrap-item">
-                <el-icon>
-                  <Sunset />
-                </el-icon>
+                <el-icon><Sunset /></el-icon>
                 {{ $t('common.createTime') }}: {{ timestamp(data.createTime) }}
               </li>
             </ul>
           </div>
           <div class="things-card-body-content" :title="$t('device.card.remarkTitle')">
             <p class="nowrap-description">
-              {{ data.remark ? data.remark : $t('common.noDescription') }}
+              {{ data.remark || $t('common.noDescription') }}
             </p>
           </div>
         </div>
-        <div v-if="!embedded" class="things-card__footer">
-          <div class="things-card-footer-operation">
-            <el-popconfirm
-              :icon="SwitchButton"
-              icon-color="#e6a23c"
-              placement="top"
-              :title="$t('device.card.confirmDisable')"
-              @confirm="disableThing"
-            >
-              <template #reference>
-                <el-button :disabled="'ENABLE' !== data.enableFlag" link type="primary">{{
-                  $t('common.disable')
-                }}</el-button>
-              </template>
-            </el-popconfirm>
-            <el-popconfirm
-              :icon="CircleCheck"
-              icon-color="#67c23a"
-              placement="top"
-              :title="$t('device.card.confirmEnable')"
-              @confirm="enableThing"
-            >
-              <template #reference>
-                <el-button :disabled="'ENABLE' === data.enableFlag" link type="primary">{{
-                  $t('common.enable')
-                }}</el-button>
-              </template>
-            </el-popconfirm>
-            <el-popconfirm
-              :icon="CircleClose"
-              icon-color="#f56c6c"
-              placement="top"
-              :title="$t('device.card.confirmDelete')"
-              @confirm="deleteThing"
-            >
-              <template #reference>
-                <el-button link type="primary">{{ $t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
-            <el-button link type="primary" @click="edit">{{ $t('common.edit') }}</el-button>
-            <el-button link type="primary" @click="detail">{{ $t('common.detail') }}</el-button>
-          </div>
-        </div>
+        <things-card-actions
+          v-if="!embedded"
+          :enabled="data.enableFlag === 'ENABLE'"
+          :disable-title="$t('device.card.confirmDisable')"
+          :enable-title="$t('device.card.confirmEnable')"
+          :delete-title="$t('device.card.confirmDelete')"
+          @disable="emitToggle('disable-thing')"
+          @enable="emitToggle('enable-thing')"
+          @delete="emitDelete"
+          @edit="edit"
+          @detail="detail"
+        />
       </div>
     </el-card>
   </div>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import type { PropType } from 'vue';
+  import { Edit, Promotion, Sunset } from '@element-plus/icons-vue';
+  import router from '@/config/router';
+  import { copy } from '@/utils/CommonUtil';
+  import { timestamp } from '@/utils/DateUtil';
+  import { successMessage } from '@/utils/NotificationUtil';
+  import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
+  import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
+
+  const props = defineProps({
+    embedded: { type: Boolean, default: false },
+    status: { type: String, default: '' },
+    data: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
+    driver: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
+    icon: { type: String, default: 'images/common/device.png' },
+  });
+
+  const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing']);
+
+  const emitToggle = (name: 'disable-thing' | 'enable-thing') => {
+    emit(name, props.data.id, props.data.driverId, () => successMessage());
+  };
+
+  const emitDelete = () => {
+    emit('delete-thing', props.data.id, () => successMessage());
+  };
+
+  const edit = () => {
+    router.push({ name: 'deviceEdit', query: { id: props.data.id, active: '0' } }).catch(() => {
+      // nothing to do
+    });
+  };
+
+  const detail = () => {
+    router.push({ name: 'deviceDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
+      // nothing to do
+    });
+  };
+</script>
 
 <style lang="scss" scoped>
   @use '@/components/card/styles/things-card.scss';

@@ -18,133 +18,149 @@
   <div class="things-card">
     <el-card shadow="hover">
       <div class="things-card-content">
-        <div
-          :class="{
-            'header-enable': 'ENABLE' === data.enableFlag,
-            'header-disable': 'ENABLE' !== data.enableFlag,
-          }"
-          class="things-card__header"
-        >
-          <div class="things-card-header-icon">
-            <img :alt="data.pointName" :src="icon" />
-          </div>
-          <div class="things-card-header-name nowrap-name" @click="copyId(data.id, $t('point.card.profile'))">
-            {{ data.pointName }}
-          </div>
-          <div class="things-card-header-status" :title="$t('common.name')"></div>
-        </div>
+        <things-card-header
+          :name="data.pointName"
+          :icon="icon"
+          :enabled="data.enableFlag === 'ENABLE'"
+          :status-title="$t('common.name')"
+          @copy-id="copy(data.id, $t('point.card.profile'))"
+        />
         <div class="things-card__body">
           <div class="things-card-body-content">
             <ul class="things-body-content-item-column-2">
               <li class="nowrap-item">
                 <span
-                  ><el-icon><List /></el-icon> {{ $t('point.card.profile') }}: </span
-                >{{ profile.profileName }}
+                  ><el-icon><List /></el-icon> {{ $t('point.card.profile') }}:
+                </span>
+                {{ profile.profileName }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> {{ $t('point.card.ratio') }}: </span
-                >{{ data.multiple }}
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.ratio') }}:
+                </span>
+                {{ data.multiple }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> {{ $t('point.card.accuracy') }}: </span
-                >{{ data.valueDecimal }}
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.accuracy') }}:
+                </span>
+                {{ data.valueDecimal }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> {{ $t('point.card.unit') }}: </span
-                >{{ data.unit }}
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.unit') }}:
+                </span>
+                {{ data.unit }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Edit /></el-icon> {{ $t('common.operationTime') }}: </span
-                >{{ timestamp(data.operateTime) }}
+                  ><el-icon><Edit /></el-icon> {{ $t('common.operationTime') }}:
+                </span>
+                {{ timestamp(data.operateTime) }}
               </li>
             </ul>
             <ul class="things-body-content-item-column-2">
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> {{ $t('point.card.dataType') }}: </span
-                >{{ pointTypeFlag }}
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.dataType') }}:
+                </span>
+                {{ $t(pointTypeKey(data.pointTypeFlag)) }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> {{ $t('point.card.baseValue') }}: </span
-                >{{ data.baseValue }}
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.baseValue') }}:
+                </span>
+                {{ data.baseValue }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> {{ $t('pointValue.card.processedValue') }}: </span
-                >Y = {{ data.multiple }}X + {{ data.baseValue }}, {{ data.valueDecimal }}
+                  ><el-icon><Location /></el-icon> {{ $t('pointValue.card.processedValue') }}:
+                </span>
+                Y = {{ data.multiple }}X + {{ data.baseValue }}, {{ data.valueDecimal }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Location /></el-icon> {{ $t('point.card.rw') }}: </span
-                >{{ rwFlag }}
+                  ><el-icon><Location /></el-icon> {{ $t('point.card.rw') }}:
+                </span>
+                {{ $t(rwFlagKey(data.rwFlag)) }}
               </li>
               <li class="nowrap-item">
                 <span
-                  ><el-icon><Sunset /></el-icon> {{ $t('common.createTime') }}: </span
-                >{{ timestamp(data.createTime) }}
+                  ><el-icon><Sunset /></el-icon> {{ $t('common.createTime') }}:
+                </span>
+                {{ timestamp(data.createTime) }}
               </li>
             </ul>
           </div>
           <div class="things-card-body-content" :title="$t('point.add.description')">
             <p class="nowrap-description">
-              {{ data.remark ? data.remark : $t('common.noDescription') }}
+              {{ data.remark || $t('common.noDescription') }}
             </p>
           </div>
         </div>
-        <div v-if="!embedded" class="things-card__footer">
-          <div class="things-card-footer-operation">
-            <el-popconfirm
-              :icon="SwitchButton"
-              icon-color="#e6a23c"
-              placement="top"
-              :title="$t('point.card.confirmDisable')"
-              @confirm="disableThing"
-            >
-              <template #reference>
-                <el-button :disabled="'ENABLE' !== data.enableFlag" link type="primary">{{
-                  $t('common.disable')
-                }}</el-button>
-              </template>
-            </el-popconfirm>
-            <el-popconfirm
-              :icon="CircleCheck"
-              icon-color="#67c23a"
-              placement="top"
-              :title="$t('point.card.confirmEnable')"
-              @confirm="enableThing"
-            >
-              <template #reference>
-                <el-button :disabled="'ENABLE' === data.enableFlag" link type="primary">{{
-                  $t('common.enable')
-                }}</el-button>
-              </template>
-            </el-popconfirm>
-            <el-popconfirm
-              :icon="CircleClose"
-              icon-color="#f56c6c"
-              placement="top"
-              :title="$t('point.card.confirmDelete')"
-              @confirm="deleteThing"
-            >
-              <template #reference>
-                <el-button link type="primary">{{ $t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
-            <el-button link type="primary" @click="edit">{{ $t('common.edit') }}</el-button>
-            <el-button disabled link type="primary" @click="detail">{{ $t('common.detail') }}</el-button>
-          </div>
-        </div>
+        <things-card-actions
+          v-if="!embedded"
+          :enabled="data.enableFlag === 'ENABLE'"
+          :disable-title="$t('point.card.confirmDisable')"
+          :enable-title="$t('point.card.confirmEnable')"
+          :delete-title="$t('point.card.confirmDelete')"
+          detail-disabled
+          @disable="emitToggle('disable-thing')"
+          @enable="emitToggle('enable-thing')"
+          @delete="emitDelete"
+          @edit="edit"
+          @detail="detail"
+        />
       </div>
     </el-card>
   </div>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import type { PropType } from 'vue';
+  import { Edit, List, Location, Sunset } from '@element-plus/icons-vue';
+  import router from '@/config/router';
+  import { copy } from '@/utils/CommonUtil';
+  import { timestamp } from '@/utils/DateUtil';
+  import { successMessage } from '@/utils/NotificationUtil';
+  import { pointTypeKey, rwFlagKey } from '@/utils/PointFormatUtil';
+  import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
+  import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
+
+  const props = defineProps({
+    embedded: { type: Boolean, default: false },
+    data: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
+    profile: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
+    icon: { type: String, default: 'images/common/point.png' },
+  });
+
+  const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing']);
+
+  const emitToggle = (name: 'disable-thing' | 'enable-thing') => {
+    emit(name, props.data.id, props.data.profileId, () => successMessage());
+  };
+
+  const emitDelete = () => {
+    emit('delete-thing', props.data.id, () => successMessage());
+  };
+
+  const edit = () => {
+    router
+      .push({
+        name: 'pointEdit',
+        query: { id: props.data.id, profileId: props.data.profileId, active: '0' },
+      })
+      .catch(() => {
+        // nothing to do
+      });
+  };
+
+  const detail = () => {
+    router.push({ name: 'pointDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
+      // nothing to do
+    });
+  };
+</script>
 
 <style lang="scss" scoped>
   @use '@/components/card/styles/things-card.scss';

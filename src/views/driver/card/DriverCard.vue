@@ -15,71 +15,55 @@
   -->
 
 <template>
-  <div class="things-card" @click="select">
+  <div class="things-card" @click="$emit('select-change', data)">
     <el-card shadow="hover">
       <div class="things-card-content">
-        <div
-          :class="{
-            'header-enable': 'ENABLE' === data.enableFlag,
-            'header-disable': 'ENABLE' !== data.enableFlag,
-          }"
-          class="things-card__header"
+        <things-card-header
+          :name="data.driverName"
+          :icon="icon"
+          :enabled="data.enableFlag === 'ENABLE'"
+          :status-title="$t('common.name')"
+          @copy-id="copy(data.id, 'Driver ID')"
         >
-          <div class="things-card-header-icon">
-            <img :alt="data.driverName" :src="icon" />
-          </div>
-          <div class="things-card-header-name nowrap-name" @click="copyId(data.id, 'Driver ID')">
-            {{ data.driverName }}
-          </div>
-          <div class="things-card-header-status" title="Status">
-            <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
-            <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">{{ $t('status.maintain') }}</el-tag>
-            <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">{{ $t('status.fault') }}</el-tag>
-            <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">{{ $t('status.disable') }}</el-tag>
-            <el-tag v-else-if="status === 'REGISTERING'" effect="plain" type="info">{{
-              $t('status.registering')
-            }}</el-tag>
-            <el-tag v-else effect="plain" type="info">{{ $t('status.offline') }}</el-tag>
-          </div>
-        </div>
+          <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
+          <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">{{ $t('status.maintain') }}</el-tag>
+          <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">{{ $t('status.fault') }}</el-tag>
+          <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">{{ $t('status.disable') }}</el-tag>
+          <el-tag v-else-if="status === 'REGISTERING'" effect="plain" type="info">
+            {{ $t('status.registering') }}
+          </el-tag>
+          <el-tag v-else effect="plain" type="info">{{ $t('status.offline') }}</el-tag>
+        </things-card-header>
         <div class="things-card__body">
           <div class="things-card-body-content">
             <ul>
               <li class="nowrap-item">
-                <el-icon>
-                  <Monitor />
-                </el-icon>
+                <el-icon><Monitor /></el-icon>
                 {{ $t('driver.card.host') }}: {{ data.serviceHost }}
               </li>
               <li class="nowrap-item">
-                <el-icon>
-                  <Promotion />
-                </el-icon>
+                <el-icon><Promotion /></el-icon>
                 {{ $t('driver.card.driverService') }}: {{ data.serviceName }}
               </li>
               <li class="nowrap-item">
-                <el-icon>
-                  <Edit />
-                </el-icon>
+                <el-icon><Edit /></el-icon>
                 {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime) }}
               </li>
               <li class="nowrap-item">
-                <el-icon>
-                  <Sunset />
-                </el-icon>
+                <el-icon><Sunset /></el-icon>
                 {{ $t('common.createTime') }}: {{ timestamp(data.createTime) }}
               </li>
             </ul>
           </div>
-          <div :title="data.remark ? data.remark : $t('driver.card.remarkTitle')" class="things-card-body-content">
+          <div class="things-card-body-content" :title="data.remark || $t('driver.card.remarkTitle')">
             <p class="nowrap-description">
-              {{ data.remark ? data.remark : $t('common.noDescription') }}
+              {{ data.remark || $t('common.noDescription') }}
             </p>
           </div>
         </div>
         <div v-if="!footer" class="things-card__footer">
           <div class="things-card-footer-operation">
-            <el-button link type="primary" @click="detail">{{ $t('common.detail') }}</el-button>
+            <el-button link type="primary" @click.stop="detail">{{ $t('common.detail') }}</el-button>
           </div>
         </div>
       </div>
@@ -87,7 +71,38 @@
   </div>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import type { PropType } from 'vue';
+  import { computed } from 'vue';
+  import { Edit, Monitor, Promotion, Sunset } from '@element-plus/icons-vue';
+  import router from '@/config/router';
+  import { copy } from '@/utils/CommonUtil';
+  import { timestamp } from '@/utils/DateUtil';
+  import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
+
+  const props = defineProps({
+    icon: { type: String, default: 'images/common/driver.png' },
+    statusTable: { type: Object as PropType<Record<string, string>>, default: () => ({}) },
+    data: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
+    footer: { type: Boolean, default: false },
+  });
+
+  defineEmits(['select-change']);
+
+  const status = computed(() => {
+    const id = props.data.id;
+    return id && props.statusTable[id] ? props.statusTable[id] : '';
+  });
+
+  const detail = () => {
+    const id = props.data.id;
+    if (id) {
+      router.push({ name: 'driverDetail', query: { id, active: 'detail' } }).catch(() => {
+        // nothing to do
+      });
+    }
+  };
+</script>
 
 <style lang="scss" scoped>
   @use '@/components/card/styles/things-card.scss';

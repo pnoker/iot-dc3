@@ -18,93 +18,83 @@
   <div class="things-card">
     <el-card shadow="hover">
       <div class="things-card-content">
-        <div
-          :class="{
-            'header-enable': 'ENABLE' === data.enableFlag,
-            'header-disable': 'ENABLE' !== data.enableFlag,
-          }"
-          class="things-card__header"
-        >
-          <div class="things-card-header-icon">
-            <img :alt="data.profileName" :src="icon" />
-          </div>
-          <div class="things-card-header-name nowrap-name" @click="copyId(data.id, $t('profile.card.profileId'))">
-            {{ data.profileName }}
-          </div>
-          <div class="things-card-header-status" :title="$t('common.name')"></div>
-        </div>
+        <things-card-header
+          :name="data.profileName"
+          :icon="icon"
+          :enabled="data.enableFlag === 'ENABLE'"
+          :status-title="$t('common.name')"
+          @copy-id="copy(data.id, $t('profile.card.profileId'))"
+        />
         <div class="things-card__body">
           <div class="things-card-body-content">
             <ul>
               <li class="nowrap-item">
-                <el-icon>
-                  <Edit />
-                </el-icon>
+                <el-icon><Edit /></el-icon>
                 {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime) }}
               </li>
               <li class="nowrap-item">
-                <el-icon>
-                  <Sunset />
-                </el-icon>
+                <el-icon><Sunset /></el-icon>
                 {{ $t('common.createTime') }}: {{ timestamp(data.createTime) }}
               </li>
             </ul>
           </div>
           <div class="things-card-body-content" :title="$t('profile.card.remarkTitle')">
             <p class="nowrap-description">
-              {{ data.remark ? data.remark : $t('common.noDescription') }}
+              {{ data.remark || $t('common.noDescription') }}
             </p>
           </div>
         </div>
-        <div v-if="!embedded" class="things-card__footer">
-          <div class="things-card-footer-operation">
-            <el-popconfirm
-              :icon="SwitchButton"
-              icon-color="#e6a23c"
-              placement="top"
-              :title="$t('profile.card.confirmDisable')"
-              @confirm="disableThing"
-            >
-              <template #reference>
-                <el-button :disabled="'ENABLE' !== data.enableFlag" link type="primary">{{
-                  $t('common.disable')
-                }}</el-button>
-              </template>
-            </el-popconfirm>
-            <el-popconfirm
-              :icon="CircleCheck"
-              icon-color="#67c23a"
-              placement="top"
-              :title="$t('profile.card.confirmEnable')"
-              @confirm="enableThing"
-            >
-              <template #reference>
-                <el-button :disabled="'ENABLE' === data.enableFlag" link type="primary">{{
-                  $t('common.enable')
-                }}</el-button>
-              </template>
-            </el-popconfirm>
-            <el-popconfirm
-              :icon="CircleClose"
-              icon-color="#f56c6c"
-              placement="top"
-              :title="$t('profile.card.confirmDelete')"
-              @confirm="deleteThing"
-            >
-              <template #reference>
-                <el-button link type="primary">{{ $t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
-            <el-button link type="primary" @click="edit">{{ $t('common.edit') }}</el-button>
-            <el-button link type="primary" @click="detail">{{ $t('common.detail') }}</el-button>
-          </div>
-        </div>
+        <things-card-actions
+          v-if="!embedded"
+          :enabled="data.enableFlag === 'ENABLE'"
+          :disable-title="$t('profile.card.confirmDisable')"
+          :enable-title="$t('profile.card.confirmEnable')"
+          :delete-title="$t('profile.card.confirmDelete')"
+          @disable="emitAction('disable-thing')"
+          @enable="emitAction('enable-thing')"
+          @delete="emitAction('delete-thing')"
+          @edit="edit"
+          @detail="detail"
+        />
       </div>
     </el-card>
   </div>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import type { PropType } from 'vue';
+  import { Edit, Sunset } from '@element-plus/icons-vue';
+  import router from '@/config/router';
+  import { copy } from '@/utils/CommonUtil';
+  import { timestamp } from '@/utils/DateUtil';
+  import { successMessage } from '@/utils/NotificationUtil';
+  import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
+  import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
+
+  const props = defineProps({
+    embedded: { type: Boolean, default: false },
+    data: { type: Object as PropType<Record<string, any>>, default: () => ({}) },
+    icon: { type: String, default: 'images/common/profile.png' },
+  });
+
+  const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing']);
+
+  const emitAction = (name: 'disable-thing' | 'enable-thing' | 'delete-thing') => {
+    emit(name, props.data.id, () => successMessage());
+  };
+
+  const edit = () => {
+    router.push({ name: 'profileEdit', query: { id: props.data.id, active: '0' } }).catch(() => {
+      // nothing to do
+    });
+  };
+
+  const detail = () => {
+    router.push({ name: 'profileDetail', query: { id: props.data.id, active: 'detail' } }).catch(() => {
+      // nothing to do
+    });
+  };
+</script>
 
 <style lang="scss" scoped>
   @use '@/components/card/styles/things-card.scss';

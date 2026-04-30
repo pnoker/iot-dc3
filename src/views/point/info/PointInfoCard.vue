@@ -15,16 +15,10 @@
   -->
 
 <template>
-  <div class="things-card cursor-pointer" @click="select(data)">
+  <div class="things-card cursor-pointer" @click="$emit('select', data)">
     <el-card :shadow="data.shadow">
       <div class="things-card-content">
-        <div
-          :class="{
-            'header-enable': isConfig,
-            'header-disable': !isConfig,
-          }"
-          class="things-card__header"
-        >
+        <div :class="['things-card__header', isConfig ? 'header-enable' : 'header-disable']">
           <div class="things-card-header-icon">
             <img :alt="data.attributeName" :src="isSelect" />
           </div>
@@ -34,9 +28,7 @@
           <div class="things-card-body-content">
             <ul>
               <li v-for="attribute in attributes" :key="attribute.id" class="nowrap-item">
-                <el-icon>
-                  <Goblet />
-                </el-icon>
+                <el-icon><Goblet /></el-icon>
                 {{ attribute.attributeName }}: {{ data[attribute.attributeCode].configValue }}
               </li>
             </ul>
@@ -47,7 +39,37 @@
   </div>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import type { PropType } from 'vue';
+  import { computed } from 'vue';
+  import { Goblet } from '@element-plus/icons-vue';
+  import type { Attribute } from '@/config/entity';
+
+  const props = defineProps({
+    data: {
+      type: Object as PropType<Record<string, any>>,
+      default: () => ({}),
+    },
+    attributes: {
+      type: Array as PropType<Attribute[]>,
+      default: () => [],
+    },
+    icon: {
+      type: String,
+      default: 'images/common/point-info-disable.png',
+    },
+  });
+
+  defineEmits(['select']);
+
+  const isConfig = computed(() =>
+    props.attributes.every((attr: any) => props.data[attr.attributeCode]?.configValue !== '')
+  );
+
+  const isSelect = computed(() =>
+    props.data.shadow === 'always' ? 'images/common/point-info.png' : 'images/common/point-info-disable.png'
+  );
+</script>
 
 <style lang="scss" scoped>
   @use '@/components/card/styles/things-card.scss';
