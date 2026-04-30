@@ -76,8 +76,9 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     @Override
-    public List<String> selectHistoryPointValue(Long deviceId, Long pointId, int count) {
+    public List<String> selectHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count) {
         LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
+        wrapper.eq(PointValueDO::getTenantId, tenantId);
         wrapper.eq(PointValueDO::getDeviceId, deviceId);
         wrapper.eq(PointValueDO::getPointId, pointId);
         wrapper.orderByDesc(PointValueDO::getCreateTime);
@@ -88,8 +89,9 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     @Override
-    public PointValueBO selectLatestPointValue(Long deviceId, Long pointId) {
+    public PointValueBO selectLatestPointValue(Long tenantId, Long deviceId, Long pointId) {
         LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
+        wrapper.eq(PointValueDO::getTenantId, tenantId);
         wrapper.eq(PointValueDO::getDeviceId, deviceId);
         wrapper.eq(PointValueDO::getPointId, pointId);
         wrapper.orderByDesc(PointValueDO::getCreateTime);
@@ -100,8 +102,10 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
     }
 
     @Override
-    public List<PointValueBO> selectLatestPointValues(Long deviceId, List<Long> pointIds) {
-        return null;
+    public List<PointValueBO> selectLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds) {
+        throw new UnsupportedOperationException(
+                "selectLatestPointValues is not implemented; callers should use selectLatestPointValue in a loop "
+                        + "or the PointValueLocalCacheService batch API until a real batch query is wired up.");
     }
 
     @Override
@@ -121,6 +125,7 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
      */
     private LambdaQueryWrapper<PointValueDO> fuzzyQuery(PointValueQuery entityQuery) {
         LambdaQueryWrapper<PointValueDO> wrapper = Wrappers.<PointValueDO>query().lambda();
+        wrapper.eq(PointValueDO::getTenantId, entityQuery.getTenantId());
         wrapper.eq(PointValueDO::getDeviceId, entityQuery.getDeviceId());
         wrapper.eq(PointValueDO::getPointId, entityQuery.getPointId());
         return wrapper;

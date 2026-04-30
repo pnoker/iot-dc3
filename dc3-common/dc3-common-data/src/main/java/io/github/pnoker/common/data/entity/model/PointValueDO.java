@@ -76,6 +76,12 @@ public class PointValueDO implements Serializable {
     private Long driverId;
 
     /**
+     * Tenant ID
+     */
+    @TableField("tenant_id")
+    private Long tenantId;
+
+    /**
      * Create Time
      */
     @TableField("create_time")

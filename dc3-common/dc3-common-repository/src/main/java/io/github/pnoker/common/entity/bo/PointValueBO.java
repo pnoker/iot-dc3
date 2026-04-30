@@ -72,6 +72,11 @@ public class PointValueBO implements Serializable {
     private Long driverId;
 
     /**
+     * Tenant ID the data belongs to
+     */
+    private Long tenantId;
+
+    /**
      * Timestamp when the value was created
      */
     private LocalDateTime createTime;

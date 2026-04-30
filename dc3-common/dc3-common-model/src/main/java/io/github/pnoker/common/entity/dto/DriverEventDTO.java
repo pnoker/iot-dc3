@@ -86,6 +86,11 @@ public class DriverEventDTO implements Serializable {
         private Long driverId;
 
         /**
+         * Tenant ID the driver belongs to. Populated by the sender.
+         */
+        private Long tenantId;
+
+        /**
          * Status
          */
         private DriverStatusEnum status;

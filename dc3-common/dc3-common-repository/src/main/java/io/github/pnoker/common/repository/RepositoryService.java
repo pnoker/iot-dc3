@@ -58,32 +58,35 @@ public interface RepositoryService {
     void savePointValues(List<PointValueBO> entityBOList) throws IOException;
 
     /**
-     * Get historical PointValue
+     * Get historical PointValue within the tenant scope.
      *
+     * @param tenantId Tenant ID (required for tenant isolation)
      * @param deviceId Device ID
      * @param pointId  Point ID
      * @param count    Count
      * @return History Value Array
      */
-    List<String> selectHistoryPointValue(Long deviceId, Long pointId, int count);
+    List<String> selectHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count);
 
     /**
-     * Query latest PointValue
+     * Query latest PointValue within the tenant scope.
      *
+     * @param tenantId Tenant ID (required for tenant isolation)
      * @param deviceId Device ID
      * @param pointId  Point ID
-     * @return PointValueBO Array
+     * @return PointValueBO
      */
-    PointValueBO selectLatestPointValue(Long deviceId, Long pointId);
+    PointValueBO selectLatestPointValue(Long tenantId, Long deviceId, Long pointId);
 
     /**
-     * Query latest PointValue list
+     * Query latest PointValue list within the tenant scope.
      *
+     * @param tenantId Tenant ID (required for tenant isolation)
      * @param deviceId Device ID
      * @param pointIds Point ID list
      * @return PointValueBO Array
      */
-    List<PointValueBO> selectLatestPointValues(Long deviceId, List<Long> pointIds);
+    List<PointValueBO> selectLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds);
 
     /**
      * Page query PointValue

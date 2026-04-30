@@ -46,6 +46,16 @@ public class PointValue implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Driver ID that collected the data. Populated by the sender before the message is published.
+     */
+    private Long driverId;
+
+    /**
+     * Tenant ID the data belongs to. Populated by the sender before the message is published.
+     */
+    private Long tenantId;
+
+    /**
      * Device ID
      */
     private Long deviceId;
