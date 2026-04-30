@@ -124,7 +124,7 @@ public class LabelServiceImpl implements LabelService {
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getLabelName()), LabelDO::getLabelName, entityQuery.getLabelName());
         wrapper.eq(Objects.nonNull(entityQuery.getEntityTypeFlag()), LabelDO::getEntityTypeFlag, entityQuery.getEntityTypeFlag());
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getColor()), LabelDO::getLabelColor, entityQuery.getColor());
-        wrapper.eq(LabelDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), LabelDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

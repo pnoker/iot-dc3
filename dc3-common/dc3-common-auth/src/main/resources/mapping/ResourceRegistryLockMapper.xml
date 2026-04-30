@@ -26,7 +26,7 @@
       callers; we only need the side effect of acquiring the lock.
     -->
     <select id="advisoryLock" resultType="java.lang.String">
-        SELECT pg_advisory_xact_lock(hashtext(#{key}))::text
+        SELECT pg_advisory_xact_lock(hashtext(#{key})) ::text
     </select>
 
 </mapper>

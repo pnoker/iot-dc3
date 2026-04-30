@@ -399,7 +399,7 @@ public class PointServiceImpl implements PointService {
         wrapper.eq(Objects.nonNull(entityQuery.getRwFlag()), "dp.rw_flag", entityQuery.getRwFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), "dp.profile_id", entityQuery.getProfileId());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), "dp.enable_flag", entityQuery.getEnableFlag());
-        wrapper.eq("dp.tenant_id", entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), "dp.tenant_id", entityQuery.getTenantId());
         return wrapper.lambda();
     }
 

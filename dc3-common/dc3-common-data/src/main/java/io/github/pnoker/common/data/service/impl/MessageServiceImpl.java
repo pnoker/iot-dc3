@@ -121,7 +121,7 @@ public class MessageServiceImpl implements MessageService {
     private LambdaQueryWrapper<MessageDO> fuzzyQuery(MessageQuery entityQuery) {
         LambdaQueryWrapper<MessageDO> wrapper = Wrappers.<MessageDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getAlarmMessageTitle()), MessageDO::getMessageName, entityQuery.getAlarmMessageTitle());
-        wrapper.eq(MessageDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), MessageDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

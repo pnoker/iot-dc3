@@ -181,7 +181,7 @@ public class DriverServiceImpl implements DriverService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceHost()), DriverDO::getServiceHost, entityQuery.getServiceHost());
         wrapper.eq(Objects.nonNull(entityQuery.getDriverTypeFlag()), DriverDO::getDriverTypeFlag, entityQuery.getDriverTypeFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), DriverDO::getEnableFlag, entityQuery.getEnableFlag());
-        wrapper.eq(DriverDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), DriverDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

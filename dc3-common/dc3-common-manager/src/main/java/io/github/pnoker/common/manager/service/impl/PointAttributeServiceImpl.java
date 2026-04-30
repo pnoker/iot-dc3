@@ -134,7 +134,7 @@ public class PointAttributeServiceImpl implements PointAttributeService {
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeName, entityQuery.getAttributeName());
         wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag, entityQuery.getAttributeTypeFlag());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), PointAttributeDO::getDriverId, entityQuery.getDriverId());
-        wrapper.eq(PointAttributeDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointAttributeDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 

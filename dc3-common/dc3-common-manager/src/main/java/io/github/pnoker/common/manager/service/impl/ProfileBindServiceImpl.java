@@ -156,7 +156,7 @@ public class ProfileBindServiceImpl implements ProfileBindService {
         LambdaQueryWrapper<ProfileBindDO> wrapper = Wrappers.<ProfileBindDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getProfileId()), ProfileBindDO::getProfileId, entityQuery.getProfileId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), ProfileBindDO::getDeviceId, entityQuery.getDeviceId());
-        wrapper.eq(ProfileBindDO::getTenantId, entityQuery.getTenantId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), ProfileBindDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
