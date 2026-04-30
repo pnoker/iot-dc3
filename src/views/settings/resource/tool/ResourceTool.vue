@@ -15,73 +15,76 @@
   -->
 
 <template>
-  <div class="tool-card">
-    <el-card shadow="never">
-      <el-form ref="formDataRef" :inline="true" :model="reactiveData.formData" class="tool-card__body">
-        <div class="tool-card-body-form">
-          <el-form-item :label="$t('settings.resource.resourceName')" prop="resourceName">
-            <el-input
-              v-model="reactiveData.formData.resourceName"
-              class="edit-form-default"
-              clearable
-              :placeholder="$t('settings.resource.resourceNamePlaceholder')"
-              @keyup.enter="search"
-            />
-          </el-form-item>
-          <el-form-item :label="$t('settings.resource.resourceCode')" prop="resourceCode">
-            <el-input
-              v-model="reactiveData.formData.resourceCode"
-              class="edit-form-default"
-              clearable
-              :placeholder="$t('settings.resource.resourceCodePlaceholder')"
-              @keyup.enter="search"
-            />
-          </el-form-item>
-          <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-            <el-segmented
-              v-model="reactiveData.formData.enableFlag"
-              :options="[
-                { label: $t('common.all'), value: '' },
-                { label: $t('common.enable'), value: 'ENABLE' },
-                { label: $t('common.disable'), value: 'DISABLE' },
-              ]"
-            />
-          </el-form-item>
-        </div>
-        <el-form-item class="tool-card-body-button">
-          <el-button :icon="Search" type="primary" @click="search">{{ $t('common.search') }}</el-button>
-          <el-button :icon="RefreshRight" @click="reset">{{ $t('common.reset') }}</el-button>
-        </el-form-item>
-      </el-form>
-      <div class="tool-card__footer">
-        <div class="tool-card-footer-button">
-          <el-button :icon="Plus" type="success" @click="add">{{ $t('common.add') }}</el-button>
-        </div>
-        <div class="tool-card-footer-page">
-          <el-pagination
-            :current-page="+page.current"
-            :page-size="+page.size"
-            :page-sizes="[6, 12, 24, 36, 48, 96]"
-            :total="+page.total"
-            background
-            layout="total, prev, pager, next, sizes"
-            @size-change="sizeChange"
-            @current-change="currentChange"
-          />
-          <el-tooltip class="item" :content="$t('common.refresh')" effect="dark" placement="top">
-            <el-button :icon="Refresh" circle @click="refresh" />
-          </el-tooltip>
-          <el-tooltip class="item" :content="$t('common.sort')" effect="dark" placement="top">
-            <el-button :icon="Sort" circle @click="sort" />
-          </el-tooltip>
-        </div>
-      </div>
-    </el-card>
-  </div>
+  <tool-card
+    :form-model="formData"
+    :page="page"
+    @search="onSearch"
+    @reset="onReset"
+    @refresh="$emit('refresh')"
+    @sort="$emit('sort')"
+    @size-change="$emit('size-change', $event)"
+    @current-change="$emit('current-change', $event)"
+  >
+    <template #filters>
+      <el-form-item :label="$t('settings.resource.resourceName')" prop="resourceName">
+        <el-input
+          v-model="formData.resourceName"
+          class="edit-form-default"
+          clearable
+          :placeholder="$t('settings.resource.resourceNamePlaceholder')"
+        />
+      </el-form-item>
+      <el-form-item :label="$t('settings.resource.resourceCode')" prop="resourceCode">
+        <el-input
+          v-model="formData.resourceCode"
+          class="edit-form-default"
+          clearable
+          :placeholder="$t('settings.resource.resourceCodePlaceholder')"
+        />
+      </el-form-item>
+      <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+        <el-segmented
+          v-model="formData.enableFlag"
+          :options="[
+            { label: $t('common.all'), value: '' },
+            { label: $t('common.enable'), value: 'ENABLE' },
+            { label: $t('common.disable'), value: 'DISABLE' },
+          ]"
+        />
+      </el-form-item>
+    </template>
+    <template #actions>
+      <el-button :icon="Plus" type="success" @click="$emit('add')">
+        {{ $t('common.add') }}
+      </el-button>
+    </template>
+  </tool-card>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import { reactive } from 'vue';
+  import { Plus } from '@element-plus/icons-vue';
+  import ToolCard from '@/components/card/tool/ToolCard.vue';
 
-<style lang="scss" scoped>
-  @use '@/components/card/styles/tool-card.scss';
-</style>
+  defineProps({
+    page: {
+      type: Object,
+      required: true,
+    },
+  });
+
+  const emit = defineEmits(['search', 'reset', 'refresh', 'sort', 'add', 'size-change', 'current-change']);
+
+  const formData = reactive<Record<string, any>>({});
+
+  const onSearch = (data: Record<string, any>) => {
+    const params = { ...data };
+    if (!params.enableFlag) delete params.enableFlag;
+    emit('search', params);
+  };
+
+  const onReset = () => {
+    Object.keys(formData).forEach((k) => delete formData[k]);
+    emit('reset');
+  };
+</script>

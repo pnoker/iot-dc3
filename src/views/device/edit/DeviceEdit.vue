@@ -224,7 +224,6 @@
 
 <style lang="scss" scoped>
   @use '@/components/card/styles/edit-card';
-  @use '@/components/card/styles/tool-card';
 
   // label-position="top" 模式下 label 应该左对齐、宽度自适应,覆盖 edit-card.scss 中 100px 固定宽度的规则
   :deep(.el-form--label-top .el-form-item__label) {

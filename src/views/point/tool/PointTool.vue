@@ -15,104 +15,150 @@
   -->
 
 <template>
-  <div class="tool-card">
-    <el-card shadow="never">
-      <el-form
-        ref="formDataRef"
-        :inline="true"
-        :model="reactiveData.formData"
-        :rules="formRule"
-        class="tool-card__body"
+  <tool-card
+    :form-model="formData"
+    :rules="formRule"
+    :page="page"
+    @search="$emit('search', $event)"
+    @reset="$emit('reset')"
+    @refresh="$emit('refresh')"
+    @sort="$emit('sort')"
+    @size-change="$emit('size-change', $event)"
+    @current-change="$emit('current-change', $event)"
+  >
+    <template #filters>
+      <el-form-item :label="$t('point.tool.pointName')" prop="pointName">
+        <el-input
+          v-model="formData.pointName"
+          class="edit-form-default"
+          clearable
+          :placeholder="$t('point.tool.pointNamePlaceholder')"
+        />
+      </el-form-item>
+      <el-form-item
+        v-if="embedded !== 'profile' && embedded !== 'edit'"
+        :label="$t('point.tool.profile')"
+        prop="profileId"
       >
-        <div class="tool-card-body-form">
-          <el-form-item :label="$t('point.tool.pointName')" prop="pointName">
-            <el-input
-              v-model="reactiveData.formData.pointName"
-              class="edit-form-default"
-              clearable
-              :placeholder="$t('point.tool.pointNamePlaceholder')"
-              @keyup.enter="search"
-            ></el-input>
-          </el-form-item>
-          <el-form-item
-            v-if="embedded != 'profile' && embedded != 'edit'"
-            :label="$t('point.tool.profile')"
-            prop="profileId"
-          >
-            <el-select
-              v-model="reactiveData.formData.profileId"
-              class="edit-form-special"
-              clearable
-              filterable
-              remote
-              reserve-keyword
-              :placeholder="$t('point.tool.profilePlaceholder')"
-              :remote-method="profileDictionary"
-              :loading="reactiveData.profileLoading"
-              @visible-change="profileDictionaryVisible"
-            >
-              <el-option
-                v-for="dictionary in reactiveData.profileDictionary"
-                :key="dictionary.value"
-                :label="dictionary.label"
-                :value="dictionary.value"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-            <el-segmented
-              v-model="reactiveData.formData.enableFlag"
-              :options="[
-                { label: $t('common.all'), value: '' },
-                { label: $t('common.enable'), value: 'ENABLE' },
-                { label: $t('common.disable'), value: 'DISABLE' },
-              ]"
-            />
-          </el-form-item>
-        </div>
-        <el-form-item class="tool-card-body-button">
-          <el-button v-if="pre" :icon="Back" plain type="success" @click="preHandle">{{
-            $t('common.previous')
-          }}</el-button>
-          <el-button :icon="Search" type="primary" @click="search">{{ $t('common.search') }}</el-button>
-          <el-button :icon="RefreshLeft" @click="reset">{{ $t('common.reset') }}</el-button>
-          <el-button v-if="pre" :icon="Check" plain type="warning" @click="nextHandle">{{
-            $t('common.next')
-          }}</el-button>
-        </el-form-item>
-      </el-form>
-      <div class="tool-card__footer">
-        <div class="tool-card-footer-button">
-          <el-button v-if="embedded == '' || embedded == 'edit'" :icon="Plus" type="success" @click="showAdd">
-            {{ $t('common.add') }}
-          </el-button>
-        </div>
-        <div class="tool-card-footer-page">
-          <el-pagination
-            :current-page="+page.current"
-            :page-size="+page.size"
-            :page-sizes="[6, 12, 24, 36, 48, 96]"
-            :total="+page.total"
-            background
-            layout="total, prev, pager, next, sizes"
-            @size-change="sizeChange"
-            @current-change="currentChange"
-          >
-          </el-pagination>
-          <el-tooltip class="item" :content="$t('common.refresh')" effect="dark" placement="top">
-            <el-button :icon="Refresh" circle @click="refresh"></el-button>
-          </el-tooltip>
-          <el-tooltip class="item" :content="$t('common.sort')" effect="dark" placement="top">
-            <el-button :icon="Sort" circle @click="sort"></el-button>
-          </el-tooltip>
-        </div>
-      </div>
-    </el-card>
-  </div>
+        <el-select
+          v-model="formData.profileId"
+          class="edit-form-special"
+          clearable
+          filterable
+          remote
+          reserve-keyword
+          :placeholder="$t('point.tool.profilePlaceholder')"
+          :remote-method="profileDictionary"
+          :loading="profileLoading"
+          @visible-change="profileDictionaryVisible"
+        >
+          <el-option
+            v-for="dictionary in profileDictionaries"
+            :key="dictionary.value"
+            :label="dictionary.label"
+            :value="dictionary.value"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+        <el-segmented
+          v-model="formData.enableFlag"
+          :options="[
+            { label: $t('common.all'), value: '' },
+            { label: $t('common.enable'), value: 'ENABLE' },
+            { label: $t('common.disable'), value: 'DISABLE' },
+          ]"
+        />
+      </el-form-item>
+    </template>
+    <template #buttons="{ search, reset }">
+      <el-button v-if="pre" :icon="Back" plain type="success" @click="$emit('pre-handle')">
+        {{ $t('common.previous') }}
+      </el-button>
+      <el-button :icon="Search" type="primary" @click="search">{{ $t('common.search') }}</el-button>
+      <el-button :icon="RefreshLeft" @click="reset">{{ $t('common.reset') }}</el-button>
+      <el-button v-if="pre" :icon="Check" plain type="warning" @click="$emit('next-handle')">
+        {{ $t('common.next') }}
+      </el-button>
+    </template>
+    <template #actions>
+      <el-button v-if="embedded === '' || embedded === 'edit'" :icon="Plus" type="success" @click="$emit('show-add')">
+        {{ $t('common.add') }}
+      </el-button>
+    </template>
+  </tool-card>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import { reactive, ref } from 'vue';
+  import type { FormRules } from 'element-plus';
+  import { Back, Check, Plus, RefreshLeft, Search } from '@element-plus/icons-vue';
+  import { useI18n } from 'vue-i18n';
+  import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import type { Dictionary } from '@/config/entity';
+  import { getProfileDictionary } from '@/api/dictionary';
 
-<style lang="scss" scoped>
-  @use '@/components/card/styles/tool-card.scss';
-</style>
+  defineProps({
+    embedded: {
+      type: String,
+      default: '',
+    },
+    page: {
+      type: Object,
+      required: true,
+    },
+    pre: {
+      type: Boolean,
+      default: false,
+    },
+    next: {
+      type: Boolean,
+      default: false,
+    },
+  });
+
+  defineEmits([
+    'search',
+    'reset',
+    'show-add',
+    'refresh',
+    'sort',
+    'size-change',
+    'current-change',
+    'pre-handle',
+    'next-handle',
+  ]);
+
+  const { t } = useI18n();
+
+  const formData = reactive<Record<string, any>>({});
+  const formRule = reactive<FormRules>({
+    port: [{ type: 'number', message: t('common.name') }],
+  });
+
+  const profileDictionaries = ref<Dictionary[]>([]);
+  const profileLoading = ref(false);
+
+  const profileDictionary = (query?: string) => {
+    profileLoading.value = true;
+    getProfileDictionary({
+      page: { size: 50, current: 1 },
+      label: query || '',
+    })
+      .then((res) => {
+        profileDictionaries.value = res.data.records;
+      })
+      .catch(() => {
+        // nothing to do
+      })
+      .finally(() => {
+        profileLoading.value = false;
+      });
+  };
+
+  const profileDictionaryVisible = (visible: boolean) => {
+    if (visible) profileDictionary('');
+  };
+
+  profileDictionary();
+</script>

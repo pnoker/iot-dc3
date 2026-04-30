@@ -17,24 +17,22 @@
 <template>
   <el-container class="settings-container">
     <el-aside width="220px" class="settings-aside">
-      <div class="tool-card">
-        <el-card shadow="never">
-          <el-menu :default-active="activeMenu" @select="onSelect">
-            <el-menu-item index="settingsUser">
-              <el-icon><User /></el-icon>
-              <span>{{ t('nav.settingsUser') }}</span>
-            </el-menu-item>
-            <el-menu-item index="settingsRole">
-              <el-icon><Avatar /></el-icon>
-              <span>{{ t('nav.settingsRole') }}</span>
-            </el-menu-item>
-            <el-menu-item index="settingsResource">
-              <el-icon><Files /></el-icon>
-              <span>{{ t('nav.settingsResource') }}</span>
-            </el-menu-item>
-          </el-menu>
-        </el-card>
-      </div>
+      <el-card class="settings-aside-card" shadow="never">
+        <el-menu :default-active="activeMenu" @select="onSelect">
+          <el-menu-item index="settingsUser">
+            <el-icon><User /></el-icon>
+            <span>{{ t('nav.settingsUser') }}</span>
+          </el-menu-item>
+          <el-menu-item index="settingsRole">
+            <el-icon><Avatar /></el-icon>
+            <span>{{ t('nav.settingsRole') }}</span>
+          </el-menu-item>
+          <el-menu-item index="settingsResource">
+            <el-icon><Files /></el-icon>
+            <span>{{ t('nav.settingsResource') }}</span>
+          </el-menu-item>
+        </el-menu>
+      </el-card>
     </el-aside>
     <el-main class="settings-main">
       <router-view />
@@ -60,8 +58,6 @@
 </script>
 
 <style lang="scss" scoped>
-  @use '@/components/card/styles/tool-card.scss';
-
   .settings-container {
     align-items: stretch;
     gap: 4px;
@@ -69,14 +65,11 @@
   }
 
   .settings-aside {
-    .tool-card {
+    .settings-aside-card {
       height: 100%;
-
-      :deep(.el-card) {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-      }
+      border: 0;
+      display: flex;
+      flex-direction: column;
 
       :deep(.el-card__body) {
         flex: 1;

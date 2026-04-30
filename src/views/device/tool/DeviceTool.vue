@@ -15,96 +15,110 @@
   -->
 
 <template>
-  <div class="tool-card">
-    <el-card shadow="never">
-      <el-form
-        ref="formDataRef"
-        :inline="true"
-        :model="reactiveData.formData"
-        :rules="formRule"
-        class="tool-card__body"
-      >
-        <div class="tool-card-body-form">
-          <el-form-item :label="$t('device.tool.deviceName')" prop="deviceName">
-            <el-input
-              v-model="reactiveData.formData.deviceName"
-              class="edit-form-default"
-              clearable
-              :placeholder="$t('device.tool.deviceNamePlaceholder')"
-              @keyup.enter="search"
-            />
-          </el-form-item>
-          <el-form-item v-if="embedded != 'driver'" :label="$t('device.tool.driver')" prop="driverId">
-            <el-select
-              v-model="reactiveData.formData.driverId"
-              class="edit-form-special"
-              clearable
-              filterable
-              remote
-              reserve-keyword
-              :placeholder="$t('device.tool.driverPlaceholder')"
-              :remote-method="driverDictionary"
-              :loading="reactiveData.driverLoading"
-              @visible-change="driverDictionaryVisible"
-            >
-              <el-option
-                v-for="dictionary in reactiveData.driverDictionary"
-                :key="dictionary.value"
-                :label="dictionary.label"
-                :value="dictionary.value"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-            <el-segmented
-              v-model="reactiveData.formData.enableFlag"
-              :options="[
-                { label: $t('common.all'), value: '' },
-                { label: $t('common.enable'), value: 'ENABLE' },
-                { label: $t('common.disable'), value: 'DISABLE' },
-              ]"
-            />
-          </el-form-item>
-        </div>
-        <el-form-item class="tool-card-body-button">
-          <el-button :icon="Search" type="primary" @click="search">{{ $t('common.search') }}</el-button>
-          <el-button :icon="RefreshRight" @click="reset">{{ $t('common.reset') }}</el-button>
-        </el-form-item>
-      </el-form>
-      <div class="tool-card__footer">
-        <div class="tool-card-footer-button">
-          <el-button v-if="embedded == ''" :icon="Plus" type="success" @click="showAdd">{{
-            $t('common.add')
-          }}</el-button>
-          <el-button v-if="embedded == ''" :icon="Upload" type="primary" @click="showImport">{{
-            $t('common.import')
-          }}</el-button>
-        </div>
-        <div class="tool-card-footer-page">
-          <el-pagination
-            :current-page="+page.current"
-            :page-size="+page.size"
-            :page-sizes="[6, 12, 24, 36, 48, 96]"
-            :total="+page.total"
-            background
-            layout="total, prev, pager, next, sizes"
-            @size-change="sizeChange"
-            @current-change="currentChange"
-          ></el-pagination>
-          <el-tooltip class="item" :content="$t('common.refresh')" effect="dark" placement="top">
-            <el-button :icon="Refresh" circle @click="refresh"></el-button>
-          </el-tooltip>
-          <el-tooltip class="item" :content="$t('common.sort')" effect="dark" placement="top">
-            <el-button :icon="Sort" circle @click="sort"></el-button>
-          </el-tooltip>
-        </div>
-      </div>
-    </el-card>
-  </div>
+  <tool-card
+    :form-model="formData"
+    :page="page"
+    @search="$emit('search', $event)"
+    @reset="$emit('reset')"
+    @refresh="$emit('refresh')"
+    @sort="$emit('sort')"
+    @size-change="$emit('size-change', $event)"
+    @current-change="$emit('current-change', $event)"
+  >
+    <template #filters>
+      <el-form-item :label="$t('device.tool.deviceName')" prop="deviceName">
+        <el-input
+          v-model="formData.deviceName"
+          class="edit-form-default"
+          clearable
+          :placeholder="$t('device.tool.deviceNamePlaceholder')"
+        />
+      </el-form-item>
+      <el-form-item v-if="embedded !== 'driver'" :label="$t('device.tool.driver')" prop="driverId">
+        <el-select
+          v-model="formData.driverId"
+          class="edit-form-special"
+          clearable
+          filterable
+          remote
+          reserve-keyword
+          :placeholder="$t('device.tool.driverPlaceholder')"
+          :remote-method="driverDictionary"
+          :loading="driverLoading"
+          @visible-change="driverDictionaryVisible"
+        >
+          <el-option
+            v-for="dictionary in driverDictionaries"
+            :key="dictionary.value"
+            :label="dictionary.label"
+            :value="dictionary.value"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
+        <el-segmented
+          v-model="formData.enableFlag"
+          :options="[
+            { label: $t('common.all'), value: '' },
+            { label: $t('common.enable'), value: 'ENABLE' },
+            { label: $t('common.disable'), value: 'DISABLE' },
+          ]"
+        />
+      </el-form-item>
+    </template>
+    <template #actions>
+      <el-button v-if="embedded === ''" :icon="Plus" type="success" @click="$emit('show-add')">
+        {{ $t('common.add') }}
+      </el-button>
+      <el-button v-if="embedded === ''" :icon="Upload" type="primary" @click="$emit('show-import')">
+        {{ $t('common.import') }}
+      </el-button>
+    </template>
+  </tool-card>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" setup>
+  import { reactive, ref } from 'vue';
+  import { Plus, Upload } from '@element-plus/icons-vue';
+  import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import type { Dictionary } from '@/config/entity';
+  import { getDriverDictionary } from '@/api/dictionary';
 
-<style lang="scss" scoped>
-  @use '@/components/card/styles/tool-card';
-</style>
+  defineProps({
+    embedded: {
+      type: String,
+      default: '',
+    },
+    page: {
+      type: Object,
+      required: true,
+    },
+  });
+
+  defineEmits(['search', 'reset', 'show-add', 'show-import', 'refresh', 'sort', 'size-change', 'current-change']);
+
+  const formData = reactive<Record<string, any>>({});
+  const driverDictionaries = ref<Dictionary[]>([]);
+  const driverLoading = ref(false);
+
+  const driverDictionary = (query?: string) => {
+    driverLoading.value = true;
+    getDriverDictionary({
+      page: { size: 50, current: 1 },
+      label: query || '',
+    })
+      .then((res) => {
+        driverDictionaries.value = res.data.records;
+      })
+      .catch(() => {
+        // nothing to do
+      })
+      .finally(() => {
+        driverLoading.value = false;
+      });
+  };
+
+  const driverDictionaryVisible = (visible: boolean) => {
+    if (visible) driverDictionary('');
+  };
+</script>
