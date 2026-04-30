@@ -18,8 +18,6 @@
 # Server configuration
 server:
   port: 8000
-  servlet:
-    context-path: /
 
 # Spring application configuration
 spring:

@@ -15,6 +15,5 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.pnoker.common.init.GatewayInitRunner
 org.springframework.boot.EnvironmentPostProcessor=\
   io.github.pnoker.common.config.ActiveGatewayProfileConfig

@@ -108,7 +108,12 @@ public class FilterServiceImpl implements FilterService {
     @Override
     public void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeUserLoginBO userLogin) {
         String token = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
-        RequestHeader.TokenHeader header = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
+        RequestHeader.TokenHeader header;
+        try {
+            header = JsonUtil.parseObject(token, RequestHeader.TokenHeader.class);
+        } catch (Exception e) {
+            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+        }
         if (Objects.isNull(header) || StringUtils.isAnyEmpty(header.getSalt(), header.getToken())) {
             throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
         }
