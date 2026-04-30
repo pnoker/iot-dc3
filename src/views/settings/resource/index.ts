@@ -16,8 +16,13 @@
 
 import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import { addResource, deleteResource, getResourceList, updateResource } from '@/api/resource';
+import { getDriverByIds } from '@/api/driver';
+import { getDeviceByIds } from '@/api/device';
+import { getPointByIds } from '@/api/point';
+import { getProfileByIds } from '@/api/profile';
 import { successMessage } from '@/utils/NotificationUtil';
 
 import type { Order } from '@/config/entity';
@@ -51,13 +56,149 @@ export default defineComponent({
       },
     });
 
+    const resourceNameMap: Record<string, string> = {};
+    const entityNameMap: Record<string, string> = {};
+
+    const formatParentResource = (id: any) => {
+      if (id === undefined || id === null || String(id) === '0') {
+        return 'Root';
+      }
+      return resourceNameMap[String(id)] || `ID: ${id}`;
+    };
+
+    const formatEntityId = (id: any) => {
+      if (id === undefined || id === null || String(id) === '0') {
+        return '—';
+      }
+      return entityNameMap[String(id)] || `${id}`;
+    };
+
+    const router = useRouter();
+
+    const LINKABLE_TYPES = ['DRIVER', 'DEVICE', 'POINT', 'PROFILE', 'API'];
+
+    const ENTITY_ROUTE_MAP: Record<string, string> = {
+      DRIVER: 'driverDetail',
+      DEVICE: 'deviceDetail',
+      POINT: 'pointDetail',
+      PROFILE: 'profileDetail',
+      API: 'settingsApi',
+    };
+
+    const isEntityLinkable = (row: any) => {
+      const id = row.entityId;
+      if (!id || String(id) === '0') return false;
+      return LINKABLE_TYPES.includes(row.resourceTypeFlag);
+    };
+
+    const goEntityDetail = (row: any) => {
+      const routeName = ENTITY_ROUTE_MAP[row.resourceTypeFlag];
+      if (!routeName) return;
+      router.push({ name: routeName, query: { id: String(row.entityId), active: 'detail' } });
+    };
+
+    const resolveEntityNames = (records: any[]) => {
+      const driverIds: string[] = [];
+      const deviceIds: string[] = [];
+      const pointIds: string[] = [];
+      const profileIds: string[] = [];
+
+      records.forEach((r) => {
+        const id = r.entityId;
+        if (!id || String(id) === '0') return;
+        switch (r.resourceTypeFlag) {
+          case 'DRIVER':
+            driverIds.push(String(id));
+            break;
+          case 'DEVICE':
+            deviceIds.push(String(id));
+            break;
+          case 'POINT':
+            pointIds.push(String(id));
+            break;
+          case 'PROFILE':
+            profileIds.push(String(id));
+            break;
+        }
+      });
+
+      const promises: Promise<void>[] = [];
+
+      const mapDriverNames = (res: any) => {
+        const data = res.data || {};
+        driverIds.forEach((id) => {
+          const item = data[id];
+          if (item) entityNameMap[id] = item.driverName || id;
+        });
+      };
+      const mapDeviceNames = (res: any) => {
+        const data = res.data || {};
+        deviceIds.forEach((id) => {
+          const item = data[id];
+          if (item) entityNameMap[id] = item.deviceName || id;
+        });
+      };
+      const mapPointNames = (res: any) => {
+        const data = res.data || {};
+        pointIds.forEach((id) => {
+          const item = data[id];
+          if (item) entityNameMap[id] = item.pointName || id;
+        });
+      };
+      const mapProfileNames = (res: any) => {
+        const data = res.data || {};
+        profileIds.forEach((id) => {
+          const item = data[id];
+          if (item) entityNameMap[id] = item.profileName || id;
+        });
+      };
+
+      if (driverIds.length > 0) {
+        promises.push(
+          getDriverByIds(driverIds)
+            .then(mapDriverNames)
+            .catch(() => {})
+        );
+      }
+      if (deviceIds.length > 0) {
+        promises.push(
+          getDeviceByIds(deviceIds)
+            .then(mapDeviceNames)
+            .catch(() => {})
+        );
+      }
+      if (pointIds.length > 0) {
+        promises.push(
+          getPointByIds(pointIds)
+            .then(mapPointNames)
+            .catch(() => {})
+        );
+      }
+      if (profileIds.length > 0) {
+        promises.push(
+          getProfileByIds(profileIds)
+            .then(mapProfileNames)
+            .catch(() => {})
+        );
+      }
+
+      return Promise.all(promises);
+    };
+
     const load = () => {
       reactiveData.loading = true;
       getResourceList({ page: reactiveData.page, ...reactiveData.query })
         .then((res: any) => {
           const data = res.data || {};
-          reactiveData.listData = data.records || [];
+          const records = data.records || [];
+          reactiveData.listData = records;
           reactiveData.page.total = data.total || 0;
+          records.forEach((r: any) => {
+            if (r.id) {
+              resourceNameMap[String(r.id)] = r.resourceName || r.resourceCode || String(r.id);
+            }
+          });
+          return resolveEntityNames(records);
         })
         .catch(() => {
           // handled globally
@@ -141,6 +282,10 @@ export default defineComponent({
       t,
       editRef,
       reactiveData,
+      formatParentResource,
+      formatEntityId,
+      isEntityLinkable,
+      goEntityDetail,
       search,
       reset,
       refresh,

@@ -32,8 +32,21 @@
         <el-table-column prop="resourceName" :label="t('settings.resource.resourceName')" min-width="160" />
         <el-table-column prop="resourceCode" :label="t('settings.resource.resourceCode')" min-width="160" />
         <el-table-column prop="resourceTypeFlag" :label="t('settings.resource.resourceType')" min-width="120" />
-        <el-table-column prop="parentResourceId" :label="t('settings.resource.parentResourceId')" min-width="140" />
-        <el-table-column prop="entityId" :label="t('settings.resource.entityId')" min-width="140" />
+        <el-table-column prop="resourceScopeFlag" :label="t('settings.resource.resourceScope')" min-width="100" />
+        <el-table-column :label="t('settings.resource.parentResourceId')" min-width="160">
+          <template #default="{ row }">
+            {{ formatParentResource(row.parentResourceId) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="t('settings.resource.entityId')" min-width="140">
+          <template #default="{ row }">
+            <el-button v-if="isEntityLinkable(row)" link type="primary" @click="goEntityDetail(row)">
+              {{ formatEntityId(row.entityId) }}
+            </el-button>
+            <span v-else>{{ formatEntityId(row.entityId) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="remark" :label="t('common.remark')" min-width="140" show-overflow-tooltip />
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
             <el-tag :type="String(row.enableFlag) === 'ENABLE' || Number(row.enableFlag) === 0 ? 'success' : 'info'">
@@ -46,6 +59,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" :label="t('common.createTime')" width="180" />
+        <el-table-column prop="operateTime" :label="t('common.operationTime')" width="180" />
         <el-table-column :label="t('common.operation')" width="180" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
