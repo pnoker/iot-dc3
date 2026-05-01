@@ -70,6 +70,11 @@ public class ApiVO extends BaseVO {
     private String apiCode;
 
     /**
+     * API grouping, usually the owning controller simple class name
+     */
+    private String apiGroup;
+
+    /**
      * Api
      */
     private ApiExt apiExt;

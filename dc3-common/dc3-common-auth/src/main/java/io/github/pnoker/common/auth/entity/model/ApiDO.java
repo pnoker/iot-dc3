@@ -77,6 +77,12 @@ public class ApiDO implements Serializable {
     private String apiCode;
 
     /**
+     * API grouping, usually the owning controller simple class name
+     */
+    @TableField("api_group")
+    private String apiGroup;
+
+    /**
      *
      */
     @TableField(value = "api_ext", typeHandler = JacksonTypeHandler.class)

@@ -55,6 +55,7 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
                     .apiName(dto.getApiName())
                     .title(dto.getTitle())
                     .remark(dto.getRemark())
+                    .apiGroup(dto.getApiGroup())
                     .build());
         }
         return apis;

@@ -66,6 +66,11 @@ public class ApiQuery implements Serializable {
     private String apiCode;
 
     /**
+     * API grouping, usually the owning controller simple class name
+     */
+    private String apiGroup;
+
+    /**
      * Enable flag
      */
     private EnableFlagEnum enableFlag;

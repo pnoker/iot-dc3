@@ -58,4 +58,11 @@ public class ResourceRegistryScannedApi {
      * Optional description.
      */
     private String remark;
+
+    /**
+     * API grouping label — usually the owning controller's simple class name,
+     * e.g. "ApiController". Endpoints sharing the same apiGroup become siblings
+     * under the same resource-tree node.
+     */
+    private String apiGroup;
 }

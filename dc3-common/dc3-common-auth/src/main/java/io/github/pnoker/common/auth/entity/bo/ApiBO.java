@@ -58,6 +58,11 @@ public class ApiBO extends BaseBO {
     private String apiCode;
 
     /**
+     * API grouping, usually the owning controller simple class name
+     */
+    private String apiGroup;
+
+    /**
      * Api
      */
     private ApiExt apiExt;
