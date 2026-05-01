@@ -205,6 +205,7 @@
 
       tinyArea
         .area()
+        .data([])
         .encode('x', (_: any, i: number) => i)
         .encode('y', (v: any) => v)
         .encode('shape', 'smooth')
