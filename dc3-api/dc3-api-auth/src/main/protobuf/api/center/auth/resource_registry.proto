@@ -39,15 +39,12 @@ message GrpcSyncRequest {
   // Owning service name, e.g. dc3-center-manager. Must be stable across restarts.
   string service_name = 1;
 
-  // Tenant ID the resources are registered under. Use 0 for system-level resources.
-  int64 tenant_id = 2;
-
   // When true, endpoints that exist in the DB but are absent from the current scan
   // are soft-deleted (deleted=1). When false, such endpoints are left untouched.
-  bool delete_missing = 3;
+  bool delete_missing = 2;
 
   // Complete list of endpoints discovered by the registrar on the calling service.
-  repeated GrpcScannedApiDTO apis = 4;
+  repeated GrpcScannedApiDTO apis = 3;
 }
 
 // A single scanned HTTP endpoint.

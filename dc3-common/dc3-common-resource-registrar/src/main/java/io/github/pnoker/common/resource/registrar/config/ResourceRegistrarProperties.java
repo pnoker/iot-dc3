@@ -46,11 +46,6 @@ public class ResourceRegistrarProperties {
     private String serviceName;
 
     /**
-     * Tenant ID to register under. 0 for system-level resources.
-     */
-    private Long tenantId = 0L;
-
-    /**
      * When true, endpoints that exist in the DB but are absent from the current scan
      * are soft-deleted. Leave false in production to avoid accidental wipes during rolling
      * deploys of older binaries.

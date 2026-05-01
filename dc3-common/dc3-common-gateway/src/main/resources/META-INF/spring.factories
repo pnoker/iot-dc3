@@ -14,6 +14,5 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 org.springframework.boot.EnvironmentPostProcessor=\
   io.github.pnoker.common.config.ActiveGatewayProfileConfig

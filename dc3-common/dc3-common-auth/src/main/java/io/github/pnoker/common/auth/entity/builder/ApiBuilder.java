@@ -54,7 +54,6 @@ public interface ApiBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
-    @Mapping(target = "tenantId", ignore = true)
     ApiBO buildBOByVO(ApiVO entityVO);
 
     /**

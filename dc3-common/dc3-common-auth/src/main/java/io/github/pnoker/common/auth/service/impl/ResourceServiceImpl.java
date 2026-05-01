@@ -115,7 +115,6 @@ public class ResourceServiceImpl implements ResourceService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getResourceCode()), ResourceDO::getResourceCode, entityQuery.getResourceCode());
         wrapper.eq(Objects.nonNull(entityQuery.getResourceTypeFlag()), ResourceDO::getResourceTypeFlag, entityQuery.getResourceTypeFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ResourceDO::getEnableFlag, entityQuery.getEnableFlag());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), ResourceDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -134,7 +133,6 @@ public class ResourceServiceImpl implements ResourceService {
         wrapper.eq(ResourceDO::getResourceTypeFlag, entityBO.getResourceTypeFlag());
         wrapper.eq(ResourceDO::getResourceScopeFlag, entityBO.getResourceScopeFlag());
         wrapper.eq(ResourceDO::getEntityId, entityBO.getEntityId());
-        wrapper.eq(ResourceDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ResourceDO one = resourceManager.getOne(wrapper);
         if (Objects.isNull(one)) {

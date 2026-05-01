@@ -68,7 +68,6 @@ public class ResourceRegistryLocalFacade implements ResourceRegistryFacade {
     public FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command) {
         ResourceRegistrySyncCommand cmd = ResourceRegistrySyncCommand.builder()
                 .serviceName(command.getServiceName())
-                .tenantId(command.getTenantId())
                 .deleteMissing(command.isDeleteMissing())
                 .apis(toScannedApis(command.getApis()))
                 .build();

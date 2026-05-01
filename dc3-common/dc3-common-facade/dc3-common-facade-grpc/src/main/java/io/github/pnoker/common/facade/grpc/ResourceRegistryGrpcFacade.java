@@ -50,7 +50,6 @@ public class ResourceRegistryGrpcFacade implements ResourceRegistryFacade {
     public FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command) {
         GrpcSyncRequest.Builder request = GrpcSyncRequest.newBuilder()
                 .setServiceName(Objects.requireNonNullElse(command.getServiceName(), ""))
-                .setTenantId(Objects.requireNonNullElse(command.getTenantId(), 0L))
                 .setDeleteMissing(command.isDeleteMissing());
         List<FacadeScannedApiBO> apis = command.getApis();
         if (apis != null) {

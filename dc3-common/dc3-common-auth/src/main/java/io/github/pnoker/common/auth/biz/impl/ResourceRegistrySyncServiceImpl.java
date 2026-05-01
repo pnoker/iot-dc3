@@ -101,12 +101,11 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             throw new IllegalArgumentException("serviceName is required");
         }
         String serviceName = command.getServiceName();
-        long tenantId = Objects.requireNonNullElse(command.getTenantId(), 0L);
         List<ResourceRegistryScannedApi> scanned = Objects.requireNonNullElse(command.getApis(), List.of());
 
         resourceRegistryLockMapper.advisoryLock(serviceName);
 
-        Map<String, ApiDO> existingByCode = loadExisting(serviceName, tenantId);
+        Map<String, ApiDO> existingByCode = loadExisting(serviceName);
         Map<String, ResourceRegistryScannedApi> scannedByCode = indexScanned(scanned, serviceName);
 
         int inserted = 0;
@@ -125,7 +124,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             ResourceRegistryScannedApi spec = entry.getValue();
             ApiDO existing = existingByCode.remove(apiCode);
             if (Objects.isNull(existing)) {
-                ApiDO newApi = buildApiDO(spec, apiCode, serviceName, tenantId);
+                ApiDO newApi = buildApiDO(spec, apiCode, serviceName);
                 apisToInsert.add(newApi);
                 continue;
             }
@@ -140,7 +139,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         if (!apisToInsert.isEmpty()) {
             apiManager.saveBatch(apisToInsert);
             for (ApiDO api : apisToInsert) {
-                resourcesToInsert.add(buildResourceDO(api, tenantId));
+                resourcesToInsert.add(buildResourceDO(api));
             }
             resourceManager.saveBatch(resourcesToInsert);
             inserted = apisToInsert.size();
@@ -149,12 +148,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         if (!apisToUpdate.isEmpty()) {
             apiManager.updateBatchById(apisToUpdate);
             Map<Long, ResourceDO> resourceByEntityId = loadResourcesByEntityIds(
-                    apisToUpdate.stream().map(ApiDO::getId).toList(), tenantId);
+                    apisToUpdate.stream().map(ApiDO::getId).toList());
             List<ResourceDO> resourcesToBackfill = new ArrayList<>();
             for (ApiDO api : apisToUpdate) {
                 ResourceDO resourceDO = resourceByEntityId.get(api.getId());
                 if (Objects.isNull(resourceDO)) {
-                    resourcesToBackfill.add(buildResourceDO(api, tenantId));
+                    resourcesToBackfill.add(buildResourceDO(api));
                 } else {
                     applyResourceUpdates(resourceDO, api);
                     resourcesToUpdate.add(resourceDO);
@@ -176,7 +175,6 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             apiManager.removeByIds(apiIdsToDelete);
             List<Long> resourceIds = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
                             .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.API.getIndex())
-                            .eq(ResourceDO::getTenantId, tenantId)
                             .in(ResourceDO::getEntityId, apiIdsToDelete))
                     .stream().map(ResourceDO::getId).toList();
             if (!resourceIds.isEmpty()) {
@@ -196,10 +194,9 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
                 .build();
     }
 
-    private Map<String, ApiDO> loadExisting(String serviceName, long tenantId) {
+    private Map<String, ApiDO> loadExisting(String serviceName) {
         List<ApiDO> existing = apiManager.list(Wrappers.<ApiDO>lambdaQuery()
-                .eq(ApiDO::getServiceName, serviceName)
-                .eq(ApiDO::getTenantId, tenantId));
+                .eq(ApiDO::getServiceName, serviceName));
         Map<String, ApiDO> map = new HashMap<>(existing.size());
         for (ApiDO api : existing) {
             map.put(api.getApiCode(), api);
@@ -207,13 +204,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return map;
     }
 
-    private Map<Long, ResourceDO> loadResourcesByEntityIds(List<Long> entityIds, long tenantId) {
+    private Map<Long, ResourceDO> loadResourcesByEntityIds(List<Long> entityIds) {
         if (entityIds.isEmpty()) {
             return Map.of();
         }
         List<ResourceDO> rows = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
                 .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.API.getIndex())
-                .eq(ResourceDO::getTenantId, tenantId)
                 .in(ResourceDO::getEntityId, entityIds));
         Map<Long, ResourceDO> map = new HashMap<>(rows.size());
         for (ResourceDO row : rows) {
@@ -231,7 +227,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return map;
     }
 
-    private ApiDO buildApiDO(ResourceRegistryScannedApi spec, String apiCode, String serviceName, long tenantId) {
+    private ApiDO buildApiDO(ResourceRegistryScannedApi spec, String apiCode, String serviceName) {
         ApiDO api = new ApiDO();
         api.setServiceName(serviceName);
         api.setApiTypeFlag(methodToTypeFlag(spec.getMethod()).getIndex());
@@ -239,12 +235,11 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         api.setApiCode(apiCode);
         api.setApiExt(buildApiExt(spec));
         api.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
-        api.setTenantId(tenantId);
         api.setRemark(Objects.requireNonNullElse(spec.getRemark(), ""));
         return api;
     }
 
-    private ResourceDO buildResourceDO(ApiDO api, long tenantId) {
+    private ResourceDO buildResourceDO(ApiDO api) {
         ResourceDO resource = new ResourceDO();
         resource.setParentResourceId(0L);
         resource.setResourceName(api.getApiName());
@@ -254,7 +249,6 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         resource.setEntityId(api.getId());
         resource.setResourceExt(new JsonExt());
         resource.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
-        resource.setTenantId(tenantId);
         resource.setRemark(Objects.requireNonNullElse(api.getRemark(), ""));
         return resource;
     }
