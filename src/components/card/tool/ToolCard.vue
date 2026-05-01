@@ -55,6 +55,7 @@
             @size-change="onSizeChange"
             @current-change="onCurrentChange"
           />
+          <span class="tool-card-footer-divider" aria-hidden="true" />
           <el-tooltip :content="t('common.refresh')" effect="dark" placement="top">
             <el-button :icon="Refresh" circle @click="onRefresh" />
           </el-tooltip>
@@ -212,6 +213,17 @@
         display: flex;
         align-items: center;
         gap: 8px;
+
+        // Vertical divider between the pagination sizer dropdown and the
+        // refresh / sort circles, so the two groups read as separate
+        // controls instead of running into each other.
+        .tool-card-footer-divider {
+          display: inline-block;
+          width: 1px;
+          height: 18px;
+          margin: 0 4px;
+          background: var(--el-border-color);
+        }
       }
     }
 
