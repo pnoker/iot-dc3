@@ -15,11 +15,54 @@
  */
 
 import type { App } from 'vue';
-import { Connection, Hide, Histogram, List, Management, Promotion, View } from '@element-plus/icons-vue';
+import {
+  Connection,
+  Cpu,
+  DataAnalysis,
+  Hide,
+  Histogram,
+  HomeFilled,
+  House,
+  Key,
+  Link,
+  List,
+  Management,
+  Menu as MenuIcon,
+  Monitor,
+  Promotion,
+  Setting,
+  Tickets,
+  User,
+  UserFilled,
+  View,
+} from '@element-plus/icons-vue';
 import 'element-plus/dist/index.css';
 import './element-variables.scss';
 
-const ICONS = [Hide, Histogram, List, Management, Promotion, View, Connection] as const;
+// Global icon registry — referenced both by legacy templates that pass an icon
+// class name string (`:is="'Promotion'"`) and by the backend-driven menu where
+// menu_ext.content.icon stores the icon class name.
+const ICONS = [
+  Hide,
+  Histogram,
+  List,
+  Management,
+  Promotion,
+  View,
+  Connection,
+  House,
+  HomeFilled,
+  Cpu,
+  Tickets,
+  Monitor,
+  DataAnalysis,
+  Setting,
+  User,
+  UserFilled,
+  Key,
+  Link,
+  MenuIcon,
+] as const;
 
 export default function setupElementPlus(app: App): void {
   ICONS.forEach((icon) => {

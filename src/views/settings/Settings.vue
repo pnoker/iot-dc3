@@ -49,7 +49,9 @@
   const menuStore = useMenuStore();
 
   onMounted(() => {
-    menuStore.fetchTree();
+    // Force a refetch so the sidebar always reflects the latest menu tree
+    // when entering Settings (the Layout-level fetch is cached once loaded).
+    menuStore.fetchTree(true);
   });
 
   interface SidebarItem {
@@ -71,11 +73,14 @@
     const settings = menuStore.findByCode('settings');
     const children = settings?.children || [];
     if (!children.length) return fallback;
-    return children.map((child) => ({
-      name: child.menuCode,
-      title: child.menuExt?.content?.title || child.menuName,
-      icon: resolveIcon(child.menuExt?.content?.icon),
-    }));
+    return children
+      .slice()
+      .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0))
+      .map((child) => ({
+        name: child.menuCode,
+        title: child.menuExt?.content?.title || child.menuName,
+        icon: resolveIcon(child.menuExt?.content?.icon),
+      }));
   });
 
   const activeMenu = computed(() => String(route.name || 'settingsUser'));

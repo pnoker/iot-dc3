@@ -159,10 +159,14 @@
     return items;
   });
 
-  // Top-level menus come from the backend (dc3_menu), minus Home which is rendered
-  // separately as the leftmost entry with its own fixed icon.
+  // Top-level menus come from the backend (dc3_menu). Home is rendered separately
+  // as the leftmost entry with its own fixed icon; Settings is reached from the
+  // avatar dropdown, not the header bar.
   const topLevelMenus = computed(() => {
-    return (menuStore.tree || []).filter((n) => n.menuCode !== 'home');
+    return (menuStore.tree || [])
+      .filter((n) => n.menuCode !== 'home' && n.menuCode !== 'settings')
+      .slice()
+      .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0));
   });
 
   const handleMenuEnter = (index: string) => {
