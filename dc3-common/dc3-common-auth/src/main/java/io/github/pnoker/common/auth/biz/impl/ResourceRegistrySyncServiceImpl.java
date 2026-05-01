@@ -52,10 +52,23 @@ import java.util.*;
 public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncService {
 
     /**
-     * dc3_resource.resource_code prefix that brands rows owned by the API registrar.
+     * dc3_resource.resource_code prefix for API leaf rows (one per dc3_api row).
      * Other resource types should use their own prefixes (e.g. {@code menu:}).
      */
     private static final String RESOURCE_CODE_PREFIX = "api:";
+
+    /**
+     * Resource code prefix for the virtual service-grouping node — one per serviceName,
+     * parent = 0, entity_id = 0. Exists only to give the Resource tree a root per service.
+     */
+    private static final String SERVICE_NODE_CODE_PREFIX = "api:service:";
+
+    /**
+     * Resource code prefix for the virtual apiGroup-grouping node — one per
+     * (serviceName, apiGroup) pair, parent = the corresponding service node,
+     * entity_id = 0. Clusters sibling endpoints under their owning controller.
+     */
+    private static final String GROUP_NODE_CODE_PREFIX = "api:group:";
 
     @Resource
     private ApiManager apiManager;
@@ -108,6 +121,19 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         Map<String, ApiDO> existingByCode = loadExisting(serviceName);
         Map<String, ResourceRegistryScannedApi> scannedByCode = indexScanned(scanned, serviceName);
 
+        // Ensure the service + apiGroup virtual grouping nodes exist before writing leaves,
+        // so the leaf rows can set parent_resource_id to the right ancestor.
+        Set<String> targetGroups = new LinkedHashSet<>();
+        for (ResourceRegistryScannedApi spec : scannedByCode.values()) {
+            targetGroups.add(Objects.requireNonNullElse(spec.getApiGroup(), ""));
+        }
+        Long serviceNodeId = null;
+        Map<String, Long> groupNodeIds = Map.of();
+        if (!targetGroups.isEmpty()) {
+            serviceNodeId = ensureServiceNode(serviceName);
+            groupNodeIds = ensureGroupNodes(serviceName, serviceNodeId, targetGroups);
+        }
+
         int inserted = 0;
         int updated = 0;
         int deletedCount = 0;
@@ -139,7 +165,8 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         if (!apisToInsert.isEmpty()) {
             apiManager.saveBatch(apisToInsert);
             for (ApiDO api : apisToInsert) {
-                resourcesToInsert.add(buildResourceDO(api));
+                Long groupNodeId = groupNodeIds.get(Objects.requireNonNullElse(api.getApiGroup(), ""));
+                resourcesToInsert.add(buildLeafResourceDO(api, groupNodeId));
             }
             resourceManager.saveBatch(resourcesToInsert);
             inserted = apisToInsert.size();
@@ -151,11 +178,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
                     apisToUpdate.stream().map(ApiDO::getId).toList());
             List<ResourceDO> resourcesToBackfill = new ArrayList<>();
             for (ApiDO api : apisToUpdate) {
+                Long groupNodeId = groupNodeIds.get(Objects.requireNonNullElse(api.getApiGroup(), ""));
                 ResourceDO resourceDO = resourceByEntityId.get(api.getId());
                 if (Objects.isNull(resourceDO)) {
-                    resourcesToBackfill.add(buildResourceDO(api));
+                    resourcesToBackfill.add(buildLeafResourceDO(api, groupNodeId));
                 } else {
-                    applyResourceUpdates(resourceDO, api);
+                    applyLeafResourceUpdates(resourceDO, api, groupNodeId);
                     resourcesToUpdate.add(resourceDO);
                 }
             }
@@ -183,8 +211,11 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
             deletedCount = apiIdsToDelete.size();
         }
 
-        log.info("Resource registry sync [{}]: inserted={}, updated={}, deleted={}, unchanged={}",
-                serviceName, inserted, updated, deletedCount, unchanged);
+        // Sweep orphaned apiGroup / service virtual nodes that no longer cover any leaf.
+        int removedGroupNodes = cleanupOrphanGroupingNodes(serviceName);
+
+        log.info("Resource registry sync [{}]: inserted={}, updated={}, deleted={}, unchanged={}, prunedGroupingNodes={}",
+                serviceName, inserted, updated, deletedCount, unchanged, removedGroupNodes);
 
         return ResourceRegistrySyncResult.builder()
                 .inserted(inserted)
@@ -208,9 +239,11 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         if (entityIds.isEmpty()) {
             return Map.of();
         }
+        // Exclude grouping nodes (entity_id=0) so the caller only sees real leaves.
         List<ResourceDO> rows = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
                 .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.API.getIndex())
-                .in(ResourceDO::getEntityId, entityIds));
+                .in(ResourceDO::getEntityId, entityIds)
+                .ne(ResourceDO::getEntityId, 0L));
         Map<Long, ResourceDO> map = new HashMap<>(rows.size());
         for (ResourceDO row : rows) {
             map.put(row.getEntityId(), row);
@@ -240,9 +273,9 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return api;
     }
 
-    private ResourceDO buildResourceDO(ApiDO api) {
+    private ResourceDO buildLeafResourceDO(ApiDO api, Long groupNodeId) {
         ResourceDO resource = new ResourceDO();
-        resource.setParentResourceId(0L);
+        resource.setParentResourceId(Objects.requireNonNullElse(groupNodeId, 0L));
         resource.setResourceName(api.getApiName());
         resource.setResourceCode(RESOURCE_CODE_PREFIX + api.getApiCode());
         resource.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
@@ -292,12 +325,103 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         existing.setOperateTime(null);
     }
 
-    private void applyResourceUpdates(ResourceDO resource, ApiDO api) {
+    private void applyLeafResourceUpdates(ResourceDO resource, ApiDO api, Long groupNodeId) {
+        resource.setParentResourceId(Objects.requireNonNullElse(groupNodeId, 0L));
         resource.setResourceName(api.getApiName());
         resource.setResourceCode(RESOURCE_CODE_PREFIX + api.getApiCode());
         resource.setResourceScopeFlag(methodToScopeFlag(api.getApiTypeFlag()).getIndex());
         resource.setRemark(Objects.requireNonNullElse(api.getRemark(), ""));
         resource.setOperateTime(null);
+    }
+
+    private Long ensureServiceNode(String serviceName) {
+        String code = SERVICE_NODE_CODE_PREFIX + serviceName;
+        ResourceDO existing = findByResourceCode(code);
+        if (existing != null) {
+            return existing.getId();
+        }
+        ResourceDO node = new ResourceDO();
+        node.setParentResourceId(0L);
+        node.setResourceName(serviceName);
+        node.setResourceCode(code);
+        node.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
+        node.setResourceScopeFlag(ResourceScopeFlagEnum.LIST.getIndex());
+        node.setEntityId(0L);
+        node.setResourceExt(new JsonExt());
+        node.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
+        node.setRemark("Service grouping node (auto-registered)");
+        resourceManager.save(node);
+        return node.getId();
+    }
+
+    private Map<String, Long> ensureGroupNodes(String serviceName, Long serviceNodeId, Set<String> targetGroups) {
+        Map<String, Long> result = new HashMap<>(targetGroups.size());
+        for (String group : targetGroups) {
+            String code = GROUP_NODE_CODE_PREFIX + serviceName + ":" + group;
+            ResourceDO existing = findByResourceCode(code);
+            if (existing == null) {
+                ResourceDO node = new ResourceDO();
+                node.setParentResourceId(serviceNodeId);
+                node.setResourceName(group.isEmpty() ? "(ungrouped)" : group);
+                node.setResourceCode(code);
+                node.setResourceTypeFlag(ResourceTypeFlagEnum.API.getIndex());
+                node.setResourceScopeFlag(ResourceScopeFlagEnum.LIST.getIndex());
+                node.setEntityId(0L);
+                node.setResourceExt(new JsonExt());
+                node.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
+                node.setRemark("API grouping node (auto-registered)");
+                resourceManager.save(node);
+                result.put(group, node.getId());
+            } else {
+                if (!Objects.equals(existing.getParentResourceId(), serviceNodeId)) {
+                    existing.setParentResourceId(serviceNodeId);
+                    existing.setOperateTime(null);
+                    resourceManager.updateById(existing);
+                }
+                result.put(group, existing.getId());
+            }
+        }
+        return result;
+    }
+
+    private ResourceDO findByResourceCode(String code) {
+        return resourceManager.getOne(Wrappers.<ResourceDO>lambdaQuery()
+                .eq(ResourceDO::getResourceCode, code)
+                .last("LIMIT 1"));
+    }
+
+    /**
+     * Soft-delete apiGroup nodes that no longer have any leaf, then the service node
+     * itself if it ends up with no remaining group children. Bounded to the given
+     * serviceName so concurrent sync of sibling services is unaffected.
+     */
+    private int cleanupOrphanGroupingNodes(String serviceName) {
+        int removed = 0;
+        List<ResourceDO> groupNodes = resourceManager.list(Wrappers.<ResourceDO>lambdaQuery()
+                .likeRight(ResourceDO::getResourceCode, GROUP_NODE_CODE_PREFIX + serviceName + ":")
+                .eq(ResourceDO::getEntityId, 0L));
+        List<Long> idsToDrop = new ArrayList<>();
+        for (ResourceDO node : groupNodes) {
+            long children = resourceManager.count(Wrappers.<ResourceDO>lambdaQuery()
+                    .eq(ResourceDO::getParentResourceId, node.getId()));
+            if (children == 0) {
+                idsToDrop.add(node.getId());
+            }
+        }
+        if (!idsToDrop.isEmpty()) {
+            resourceManager.removeByIds(idsToDrop);
+            removed += idsToDrop.size();
+        }
+        ResourceDO serviceNode = findByResourceCode(SERVICE_NODE_CODE_PREFIX + serviceName);
+        if (serviceNode != null) {
+            long children = resourceManager.count(Wrappers.<ResourceDO>lambdaQuery()
+                    .eq(ResourceDO::getParentResourceId, serviceNode.getId()));
+            if (children == 0) {
+                resourceManager.removeById(serviceNode.getId());
+                removed++;
+            }
+        }
+        return removed;
     }
 
     private JsonExt buildApiExt(ResourceRegistryScannedApi spec) {
