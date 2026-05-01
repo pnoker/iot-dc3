@@ -34,6 +34,7 @@ public class DataConstant {
     public static final String SERVICE_NAME = "dc3-center-data";
     public static final String POINT_VALUE_URL_PREFIX = "/point_value";
     public static final String POINT_VALUE_COMMAND_URL_PREFIX = "/point_value_command";
+    public static final String DASHBOARD_URL_PREFIX = "/dashboard";
     public static final String DRIVER_STATUS_URL_PREFIX = "/driver/status";
     public static final String DRIVER_EVENT_URL_PREFIX = "/driver/event";
     public static final String DEVICE_STATUS_URL_PREFIX = "/device/status";
