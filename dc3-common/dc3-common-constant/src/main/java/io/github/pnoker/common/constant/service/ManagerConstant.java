@@ -40,6 +40,7 @@ public class ManagerConstant {
     public static final String POINT_URL_PREFIX = "/point";
     public static final String GROUP_URL_PREFIX = "/group";
     public static final String DEVICE_URL_PREFIX = "/device";
+    public static final String DASHBOARD_URL_PREFIX = "/dashboard";
     public static final String AUTO_URL_PREFIX = "/auto";
     public static final String POINT_ATTRIBUTE_CONFIG_URL_PREFIX = "/point_attribute_config";
     public static final String DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX = "/driver_attribute_config";
