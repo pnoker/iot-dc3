@@ -31,24 +31,24 @@
           <template v-for="node in topLevelMenus" :key="`menu-${node.id}`">
             <el-sub-menu v-if="node.children && node.children.length > 0" :index="`node-${node.id}`">
               <template #title>
-                <el-icon v-if="node.menuExt?.content?.icon">
-                  <component :is="node.menuExt.content.icon" />
+                <el-icon v-if="node.menuIcon">
+                  <component :is="node.menuIcon" />
                 </el-icon>
-                {{ node.menuExt?.content?.title || node.menuName }}
+                {{ node.menuTitle || node.menuName }}
               </template>
               <el-menu-item
                 v-for="child in node.children"
                 :key="`menu-child-${child.id}`"
-                :index="child.menuExt?.content?.url || `/${child.menuCode}`"
+                :index="child.menuUrl || `/${child.menuCode}`"
               >
-                {{ child.menuExt?.content?.title || child.menuName }}
+                {{ child.menuTitle || child.menuName }}
               </el-menu-item>
             </el-sub-menu>
-            <el-menu-item v-else :index="node.menuExt?.content?.url || `/${node.menuCode}`">
-              <el-icon v-if="node.menuExt?.content?.icon">
-                <component :is="node.menuExt.content.icon" />
+            <el-menu-item v-else :index="node.menuUrl || `/${node.menuCode}`">
+              <el-icon v-if="node.menuIcon">
+                <component :is="node.menuIcon" />
               </el-icon>
-              {{ node.menuExt?.content?.title || node.menuName }}
+              {{ node.menuTitle || node.menuName }}
             </el-menu-item>
           </template>
         </el-menu>

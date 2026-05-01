@@ -26,6 +26,11 @@ export interface MenuNode {
   menuTypeFlag?: string;
   menuLevel?: string;
   menuIndex?: number;
+  // Flattened by backend MenuController.toTreeVO out of menuExt.content so the
+  // frontend doesn't have to read through the nested JsonExt wrapper.
+  menuIcon?: string;
+  menuUrl?: string;
+  menuTitle?: string;
   menuExt?: {
     content?: {
       title?: string;

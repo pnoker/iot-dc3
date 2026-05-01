@@ -77,8 +77,8 @@
       .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0))
       .map((child) => ({
         name: child.menuCode,
-        title: child.menuExt?.content?.title || child.menuName,
-        icon: child.menuExt?.content?.icon,
+        title: child.menuTitle || child.menuName,
+        icon: child.menuIcon,
       }));
   });
 
