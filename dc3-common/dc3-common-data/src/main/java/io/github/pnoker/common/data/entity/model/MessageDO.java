@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_message")
+@TableName(value = "dc3_message", autoResultMap = true)
 public class MessageDO implements Serializable {
 
     @Serial

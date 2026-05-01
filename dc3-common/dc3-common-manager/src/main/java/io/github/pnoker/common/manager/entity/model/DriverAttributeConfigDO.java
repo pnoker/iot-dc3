@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_driver_attribute_config")
+@TableName(value = "dc3_driver_attribute_config", autoResultMap = true)
 public class DriverAttributeConfigDO implements Serializable {
 
     @Serial

@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_notify")
+@TableName(value = "dc3_notify", autoResultMap = true)
 public class NotifyDO implements Serializable {
 
     @Serial

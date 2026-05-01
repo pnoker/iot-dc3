@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_profile")
+@TableName(value = "dc3_profile", autoResultMap = true)
 public class ProfileDO implements Serializable {
 
     @Serial
