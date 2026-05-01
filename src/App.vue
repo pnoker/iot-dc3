@@ -39,7 +39,9 @@
   #app {
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    // Don't clip horizontally — body has min-width: 1280px in global.scss,
+    // so when the viewport narrows we want a page-level scroll bar that
+    // carries the header + body together instead of hiding the right edge.
   }
 
   #nprogress .bar {

@@ -129,16 +129,60 @@
     .tool-card__body {
       display: flex;
       flex-direction: column;
+      gap: 8px;
 
+      // Filter row: equal-width wrapping grid. Each el-form-item inside the
+      // filters slot occupies 1/4 of the tool card width, so 4 per row by
+      // default. Items wrap to the next row once the filter count exceeds
+      // four, instead of squeezing into a single horizontal strip.
       .tool-card-body-form {
         display: flex;
-        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+
+        :deep(.el-form-item) {
+          flex: 1 1 calc(25% - 12px);
+          min-width: 220px;
+          margin: 0;
+
+          .el-form-item__content {
+            flex-wrap: nowrap;
+          }
+
+          // Force every common input surface to honour the cell width so
+          // rows line up. The extra .edit-form-* overrides are here because
+          // element-variables.scss pins those helper classes to fixed px
+          // widths (used for standalone forms); in the toolbar grid we need
+          // them to stretch.
+          .el-input,
+          .el-input.edit-form-small,
+          .el-input.edit-form-medium,
+          .el-input.edit-form-default,
+          .el-input.edit-form-special,
+          .el-input.edit-form-large,
+          .el-select,
+          .el-select.edit-form-small,
+          .el-select.edit-form-medium,
+          .el-select.edit-form-default,
+          .el-select.edit-form-special,
+          .el-select.edit-form-large,
+          .el-tree-select,
+          .el-date-editor,
+          .el-input-number,
+          .el-cascader,
+          .el-segmented {
+            width: 100%;
+          }
+        }
       }
 
       .tool-card-body-button {
+        align-self: flex-end;
+        margin: 0;
+
         :deep(.el-form-item__content) {
           display: flex;
-          justify-content: center;
+          gap: 8px;
         }
       }
     }
@@ -146,13 +190,18 @@
     .tool-card__footer {
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
 
       .tool-card-footer-button {
         display: flex;
+        gap: 8px;
       }
 
       .tool-card-footer-page {
         display: flex;
+        align-items: center;
+        gap: 8px;
       }
     }
 

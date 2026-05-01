@@ -21,13 +21,13 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"
-    class="things-dialog"
+    class="things-dialog things-dialog--wide"
     draggable
     :title="reactiveData.mode === 'add' ? t('settings.menu.addTitle') : t('settings.menu.editTitle')"
     @closed="reset"
   >
-    <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-position="top">
-      <el-form-item :label="t('settings.menu.parentMenuId')" prop="parentMenuId">
+    <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-position="top" class="things-form-grid">
+      <el-form-item class="things-form-grid__span-2" :label="t('settings.menu.parentMenuId')" prop="parentMenuId">
         <el-tree-select
           v-model="reactiveData.form.parentMenuId"
           :data="parentTreeOptions"
@@ -80,7 +80,7 @@
           :inactive-text="t('common.disable')"
         />
       </el-form-item>
-      <el-form-item :label="t('common.remark')" prop="remark">
+      <el-form-item class="things-form-grid__span-2" :label="t('common.remark')" prop="remark">
         <el-input v-model="reactiveData.form.remark" clearable maxlength="300" show-word-limit type="textarea" />
       </el-form-item>
     </el-form>

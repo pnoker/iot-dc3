@@ -14,10 +14,53 @@
  * limitations under the License.
  */
 
+// Vertically centre things-dialog + cap its height so tall forms scroll
+// inside the dialog rather than bleed past the viewport bottom. Applied
+// via the wrapper .el-overlay-dialog because el-dialog teleports to body
+// and its direct container controls vertical alignment.
+.el-overlay-dialog:has(.things-dialog) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .things-dialog {
   &.el-dialog {
-    width: 520px;
+    width: 640px;
     max-width: calc(100% - 40px);
+    max-height: calc(100vh - 80px);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .el-dialog__body {
+    overflow-y: auto;
+    flex: 1 1 auto;
+  }
+
+  // Opt-in helper: put `class="things-dialog things-dialog--wide"` on a
+  // dialog whose form has many fields, then give the <el-form> the class
+  // `things-form-grid` — every direct el-form-item becomes a half-width
+  // cell, with `.things-form-grid__span-2` for full-width rows.
+  &.things-dialog--wide {
+    &.el-dialog {
+      width: 880px;
+    }
+  }
+
+  .things-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+
+    .el-form-item {
+      margin-bottom: 18px;
+    }
+
+    .things-form-grid__span-2 {
+      grid-column: 1 / -1;
+    }
   }
 
   .things-dialog-form-item {

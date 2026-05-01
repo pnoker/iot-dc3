@@ -73,9 +73,9 @@
                 <span class="lang-text">中文</span>
                 <el-icon v-if="locale === 'zh'" class="lang-check"><Check /></el-icon>
               </el-dropdown-item>
-              <el-dropdown-item divided command="settings">{{ t('layout.settings') }}</el-dropdown-item>
-              <el-dropdown-item command="help">{{ t('layout.about') }}</el-dropdown-item>
-              <el-dropdown-item command="logout">{{ t('layout.logout') }}</el-dropdown-item>
+              <el-dropdown-item divided command="settings" :icon="Setting">{{ t('layout.settings') }}</el-dropdown-item>
+              <el-dropdown-item command="help" :icon="QuestionFilled">{{ t('layout.about') }}</el-dropdown-item>
+              <el-dropdown-item command="logout" :icon="SwitchButton">{{ t('layout.logout') }}</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -99,7 +99,7 @@
 
 <script lang="ts" setup>
   import router from '@/config/router';
-  import { Check, HomeFilled } from '@element-plus/icons-vue';
+  import { Check, HomeFilled, QuestionFilled, Setting, SwitchButton } from '@element-plus/icons-vue';
   import { computed, onMounted } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
@@ -274,8 +274,9 @@
           }
 
           .user_name {
-            color: #909399;
+            color: #303133;
             font-size: 14px;
+            font-weight: 500;
           }
         }
 
@@ -291,6 +292,7 @@
       right: 0;
       left: 0;
       bottom: 0;
+      min-width: 1280px;
       padding: 5px 0 5px 0;
       position: absolute;
       background: #f6f7f9;
