@@ -15,7 +15,7 @@
  */
 
 import { createRouter, createWebHashHistory } from 'vue-router';
-import type { NavigationGuardNext, RouteLocationNormalized, RouteMeta } from 'vue-router';
+import type { RouteLocationNormalized, RouteMeta } from 'vue-router';
 
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
@@ -49,15 +49,16 @@ const router = createRouter({
 });
 
 /**
- * Navigation guard to handle authentication and page title
+ * Navigation guard to handle authentication and page title.
+ * Vue Router 4 deprecated the next() callback — we return the target
+ * (or true/false) directly instead.
  */
-router.beforeEach((to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+router.beforeEach((to: RouteLocationNormalized) => {
   NProgress.start();
 
   // Skip authentication check for login page
   if (to.name === 'login') {
-    next();
-    return;
+    return true;
   }
 
   // Check if user is authenticated locally
@@ -66,8 +67,7 @@ router.beforeEach((to: RouteLocationNormalized, _from: RouteLocationNormalized, 
   const token = getStorage(AUTH_HEADERS.TOKEN);
 
   if (isNull(tenant) || isNull(user) || isNull(token)) {
-    next({ name: 'login' });
-    return;
+    return { name: 'login' };
   }
 
   // Update page title
@@ -76,7 +76,7 @@ router.beforeEach((to: RouteLocationNormalized, _from: RouteLocationNormalized, 
     document.title = meta.title as string;
   }
 
-  next();
+  return true;
 });
 
 /**
