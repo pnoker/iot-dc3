@@ -16,14 +16,14 @@
 
 import { httpGet, httpPost } from '@/api/common';
 
-export const addResource = (resource: any) => httpPost('api/v3/auth/resource/add', resource);
+export const addMenu = (menu: any) => httpPost('api/v3/auth/menu/add', menu);
 
-export const deleteResource = (id: string) => httpPost(`api/v3/auth/resource/delete/${id}`);
+export const deleteMenu = (id: string) => httpPost(`api/v3/auth/menu/delete/${id}`);
 
-export const updateResource = (resource: any) => httpPost('api/v3/auth/resource/update', resource);
+export const updateMenu = (menu: any) => httpPost('api/v3/auth/menu/update', menu);
 
-export const getResourceById = (id: string) => httpGet(`api/v3/auth/resource/id/${id}`);
+export const getMenuById = (id: string) => httpGet(`api/v3/auth/menu/id/${id}`);
 
-export const getResourceList = (query: any) => httpPost('api/v3/auth/resource/list', query);
+export const getMenuList = (query: any) => httpPost('api/v3/auth/menu/list', query);
 
-export const getResourceTree = (query: any = {}) => httpPost('api/v3/auth/resource/tree', query);
+export const getMenuTree = (query: any = {}) => httpPost('api/v3/auth/menu/tree', query);

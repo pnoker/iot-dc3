@@ -137,6 +137,51 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: '/settings/api',
+    component: Layout,
+    children: [
+      {
+        name: 'settingsApiDetail',
+        path: '/settings/api/detail',
+        meta: {
+          icon: 'el-icon-link',
+          title: 'API Detail',
+        },
+        component: () => import('@/views/settings/api/detail/ApiDetail.vue'),
+      },
+    ],
+  },
+  {
+    path: '/settings/resource',
+    component: Layout,
+    children: [
+      {
+        name: 'settingsResourceDetail',
+        path: '/settings/resource/detail',
+        meta: {
+          icon: 'el-icon-key',
+          title: 'Resource Detail',
+        },
+        component: () => import('@/views/settings/resource/detail/ResourceDetail.vue'),
+      },
+    ],
+  },
+  {
+    path: '/settings/menu',
+    component: Layout,
+    children: [
+      {
+        name: 'settingsMenuDetail',
+        path: '/settings/menu/detail',
+        meta: {
+          icon: 'el-icon-menu',
+          title: 'Menu Detail',
+        },
+        component: () => import('@/views/settings/menu/detail/MenuDetail.vue'),
+      },
+    ],
+  },
 ];
 
 export default routes;

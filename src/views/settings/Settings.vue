@@ -19,21 +19,11 @@
     <el-aside width="220px" class="settings-aside">
       <el-card class="settings-aside-card" shadow="never">
         <el-menu :default-active="activeMenu" @select="onSelect">
-          <el-menu-item index="settingsUser">
-            <el-icon><User /></el-icon>
-            <span>{{ t('nav.settingsUser') }}</span>
-          </el-menu-item>
-          <el-menu-item index="settingsRole">
-            <el-icon><Avatar /></el-icon>
-            <span>{{ t('nav.settingsRole') }}</span>
-          </el-menu-item>
-          <el-menu-item index="settingsResource">
-            <el-icon><Files /></el-icon>
-            <span>{{ t('nav.settingsResource') }}</span>
-          </el-menu-item>
-          <el-menu-item index="settingsApi">
-            <el-icon><Link /></el-icon>
-            <span>{{ t('nav.settingsApi') }}</span>
+          <el-menu-item v-for="item in sidebarItems" :key="item.name" :index="item.name">
+            <el-icon v-if="item.icon">
+              <component :is="item.icon" />
+            </el-icon>
+            <span>{{ item.title }}</span>
           </el-menu-item>
         </el-menu>
       </el-card>
@@ -45,14 +35,48 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed } from 'vue';
+  import { computed, onMounted } from 'vue';
+  import type { Component } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
-  import { Avatar, Files, Link, User } from '@element-plus/icons-vue';
+
+  import { useMenuStore } from '@/store';
+  import { resolveIcon } from '@/config/constant/icons';
 
   const { t } = useI18n();
   const route = useRoute();
   const router = useRouter();
+  const menuStore = useMenuStore();
+
+  onMounted(() => {
+    menuStore.fetchTree();
+  });
+
+  interface SidebarItem {
+    name: string;
+    title: string;
+    icon?: Component;
+  }
+
+  // Static fallback shown when the menu API is unreachable or still loading.
+  const fallback: SidebarItem[] = [
+    { name: 'settingsUser', title: t('nav.settingsUser'), icon: resolveIcon('User') },
+    { name: 'settingsRole', title: t('nav.settingsRole'), icon: resolveIcon('UserFilled') },
+    { name: 'settingsResource', title: t('nav.settingsResource'), icon: resolveIcon('Key') },
+    { name: 'settingsApi', title: t('nav.settingsApi'), icon: resolveIcon('Link') },
+    { name: 'settingsMenu', title: t('nav.settingsMenu'), icon: resolveIcon('Menu') },
+  ];
+
+  const sidebarItems = computed<SidebarItem[]>(() => {
+    const settings = menuStore.findByCode('settings');
+    const children = settings?.children || [];
+    if (!children.length) return fallback;
+    return children.map((child) => ({
+      name: child.menuCode,
+      title: child.menuExt?.content?.title || child.menuName,
+      icon: resolveIcon(child.menuExt?.content?.icon),
+    }));
+  });
 
   const activeMenu = computed(() => String(route.name || 'settingsUser'));
 

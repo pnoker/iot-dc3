@@ -15,55 +15,27 @@
   -->
 
 <template>
-  <tool-card
-    :form-model="formData"
-    :page="page"
-    @search="onSearch"
-    @reset="onReset"
-    @refresh="$emit('refresh')"
-    @sort="$emit('sort')"
-    @size-change="$emit('size-change', $event)"
-    @current-change="$emit('current-change', $event)"
-  >
+  <tool-card :form-model="formData" :page="page" @search="onSearch" @reset="onReset" @refresh="$emit('refresh')">
     <template #filters>
-      <el-form-item :label="$t('settings.api.apiName')" prop="apiName">
+      <el-form-item :label="$t('settings.menu.menuName')" prop="menuName">
         <el-input
-          v-model="formData.apiName"
+          v-model="formData.menuName"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.api.apiNamePlaceholder')"
+          :placeholder="$t('settings.menu.menuNamePlaceholder')"
         />
       </el-form-item>
-      <el-form-item :label="$t('settings.api.apiCode')" prop="apiCode">
+      <el-form-item :label="$t('settings.menu.menuCode')" prop="menuCode">
         <el-input
-          v-model="formData.apiCode"
+          v-model="formData.menuCode"
           class="edit-form-default"
           clearable
-          :placeholder="$t('settings.api.apiCodePlaceholder')"
+          :placeholder="$t('settings.menu.menuCodePlaceholder')"
         />
       </el-form-item>
-      <el-form-item :label="$t('settings.api.apiGroup')" prop="apiGroup">
-        <el-input
-          v-model="formData.apiGroup"
-          class="edit-form-default"
-          clearable
-          :placeholder="$t('settings.api.apiGroupPlaceholder')"
-        />
-      </el-form-item>
-      <el-form-item :label="$t('settings.api.serviceName')" prop="serviceName">
-        <el-input
-          v-model="formData.serviceName"
-          class="edit-form-default"
-          clearable
-          :placeholder="$t('settings.api.serviceNamePlaceholder')"
-        />
-      </el-form-item>
-      <el-form-item :label="$t('settings.api.apiType')" prop="apiTypeFlag">
-        <el-select v-model="formData.apiTypeFlag" clearable :placeholder="$t('common.all')">
-          <el-option label="GET" value="GET" />
-          <el-option label="POST" value="POST" />
-          <el-option label="PUT" value="PUT" />
-          <el-option label="DELETE" value="DELETE" />
+      <el-form-item :label="$t('settings.menu.menuType')" prop="menuTypeFlag">
+        <el-select v-model="formData.menuTypeFlag" clearable class="edit-form-default" :placeholder="$t('common.all')">
+          <el-option v-for="opt in MENU_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
@@ -89,6 +61,7 @@
   import { reactive } from 'vue';
   import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import { MENU_TYPE_OPTIONS } from '@/config/constant/enums';
 
   defineProps({
     page: {
@@ -97,14 +70,14 @@
     },
   });
 
-  const emit = defineEmits(['search', 'reset', 'refresh', 'sort', 'add', 'size-change', 'current-change']);
+  const emit = defineEmits(['search', 'reset', 'refresh', 'add']);
 
   const formData = reactive<Record<string, any>>({});
 
   const onSearch = (data: Record<string, any>) => {
     const params = { ...data };
     if (!params.enableFlag) delete params.enableFlag;
-    if (!params.apiTypeFlag) delete params.apiTypeFlag;
+    if (!params.menuTypeFlag) delete params.menuTypeFlag;
     emit('search', params);
   };
 

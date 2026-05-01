@@ -29,9 +29,10 @@
 
     <blank-card>
       <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" stripe class="settings-table">
-        <el-table-column prop="serviceName" :label="t('settings.api.serviceName')" min-width="160" />
         <el-table-column prop="apiName" :label="t('settings.api.apiName')" min-width="160" />
         <el-table-column prop="apiCode" :label="t('settings.api.apiCode')" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="apiGroup" :label="t('settings.api.apiGroup')" min-width="160" />
+        <el-table-column prop="serviceName" :label="t('settings.api.serviceName')" min-width="160" />
         <el-table-column prop="apiTypeFlag" :label="t('settings.api.apiType')" min-width="100" />
         <el-table-column :label="t('common.enable')" width="90">
           <template #default="{ row }">
@@ -47,8 +48,9 @@
         <el-table-column prop="remark" :label="t('common.remark')" min-width="140" show-overflow-tooltip />
         <el-table-column prop="createTime" :label="t('common.createTime')" width="180" />
         <el-table-column prop="operateTime" :label="t('common.operationTime')" width="180" />
-        <el-table-column :label="t('common.operation')" width="180" fixed="right">
+        <el-table-column :label="t('common.operation')" width="240" fixed="right">
           <template #default="{ row }">
+            <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
             <el-popconfirm
               :title="t('settings.api.confirmDelete')"

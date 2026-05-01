@@ -42,6 +42,32 @@
           :placeholder="$t('settings.resource.resourceCodePlaceholder')"
         />
       </el-form-item>
+      <el-form-item :label="$t('settings.resource.resourceType')" prop="resourceTypeFlags">
+        <el-select
+          v-model="formData.resourceTypeFlags"
+          multiple
+          collapse-tags
+          collapse-tags-tooltip
+          clearable
+          class="edit-form-default"
+          :placeholder="$t('common.all')"
+        >
+          <el-option v-for="opt in RESOURCE_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('settings.resource.resourceScope')" prop="resourceScopeFlags">
+        <el-select
+          v-model="formData.resourceScopeFlags"
+          multiple
+          collapse-tags
+          collapse-tags-tooltip
+          clearable
+          class="edit-form-default"
+          :placeholder="$t('common.all')"
+        >
+          <el-option v-for="opt in RESOURCE_SCOPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
+        </el-select>
+      </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
         <el-segmented
           v-model="formData.enableFlag"
@@ -65,6 +91,7 @@
   import { reactive } from 'vue';
   import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import { RESOURCE_SCOPE_OPTIONS, RESOURCE_TYPE_OPTIONS } from '@/config/constant/enums';
 
   defineProps({
     page: {
@@ -80,6 +107,12 @@
   const onSearch = (data: Record<string, any>) => {
     const params = { ...data };
     if (!params.enableFlag) delete params.enableFlag;
+    if (Array.isArray(params.resourceTypeFlags) && params.resourceTypeFlags.length === 0) {
+      delete params.resourceTypeFlags;
+    }
+    if (Array.isArray(params.resourceScopeFlags) && params.resourceScopeFlags.length === 0) {
+      delete params.resourceScopeFlags;
+    }
     emit('search', params);
   };
 

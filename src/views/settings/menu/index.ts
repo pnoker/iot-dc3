@@ -18,48 +18,45 @@ import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { addApi, deleteApi, getApiList, updateApi } from '@/api/api';
+import { addMenu, deleteMenu, getMenuTree, updateMenu } from '@/api/menu';
 import { successMessage } from '@/utils/NotificationUtil';
 
-import type { Order } from '@/config/entity';
-
 import BlankCard from '@/components/card/blank/BlankCard.vue';
-import apiTool from './tool/ApiTool.vue';
-import apiEditForm from './edit/ApiEditForm.vue';
+import menuTool from './tool/MenuTool.vue';
+import menuEditForm from './edit/MenuEditForm.vue';
 
 export default defineComponent({
-  name: 'SettingsApi',
+  name: 'SettingsMenu',
   components: {
     BlankCard,
-    apiTool,
-    apiEditForm,
+    menuTool,
+    menuEditForm,
   },
   setup() {
     const { t } = useI18n();
     const router = useRouter();
 
-    const editRef = ref<InstanceType<typeof apiEditForm>>();
+    const editRef = ref<InstanceType<typeof menuEditForm>>();
 
     const reactiveData = reactive({
       loading: false,
       listData: [] as any[],
       query: {} as Record<string, any>,
-      order: false,
       page: {
         total: 0,
         size: 12,
         current: 1,
-        orders: [] as Order[],
+        orders: [] as any[],
       },
     });
 
     const load = () => {
       reactiveData.loading = true;
-      getApiList({ page: reactiveData.page, ...reactiveData.query })
+      getMenuTree(reactiveData.query)
         .then((res: any) => {
-          const data = res.data || {};
-          reactiveData.listData = data.records || [];
-          reactiveData.page.total = data.total || 0;
+          const tree = res.data || [];
+          reactiveData.listData = tree;
+          reactiveData.page.total = tree.length;
         })
         .catch(() => {
           // handled globally
@@ -71,34 +68,26 @@ export default defineComponent({
 
     const search = (params: any) => {
       reactiveData.query = params || {};
-      reactiveData.page.current = 1;
       load();
     };
 
     const reset = () => {
       reactiveData.query = {};
-      reactiveData.page.current = 1;
       load();
     };
 
     const refresh = () => load();
 
-    const sort = () => {
-      reactiveData.order = !reactiveData.order;
-      reactiveData.page.orders = [{ column: 'create_time', asc: reactiveData.order }];
-      load();
-    };
-
     const openAdd = () => editRef.value?.show();
     const openEdit = (row: any) => editRef.value?.showEdit(row);
     const openDetail = (row: any) => {
-      router.push({ name: 'settingsApiDetail', query: { id: String(row.id) } }).catch(() => {
+      router.push({ name: 'settingsMenuDetail', query: { id: String(row.id) } }).catch(() => {
         // handled globally
       });
     };
 
     const onAdd = (form: any, done: () => void) => {
-      addApi(form)
+      addMenu(form)
         .then(() => {
           successMessage();
           load();
@@ -110,7 +99,7 @@ export default defineComponent({
     };
 
     const onUpdate = (form: any, done: () => void) => {
-      updateApi(form)
+      updateMenu(form)
         .then(() => {
           successMessage();
           load();
@@ -122,7 +111,7 @@ export default defineComponent({
     };
 
     const remove = (id: string) => {
-      deleteApi(id)
+      deleteMenu(id)
         .then(() => {
           successMessage();
           load();
@@ -130,16 +119,6 @@ export default defineComponent({
         .catch(() => {
           // handled globally
         });
-    };
-
-    const sizeChange = (size: number) => {
-      reactiveData.page.size = size;
-      load();
-    };
-
-    const currentChange = (current: number) => {
-      reactiveData.page.current = current;
-      load();
     };
 
     load();
@@ -151,15 +130,12 @@ export default defineComponent({
       search,
       reset,
       refresh,
-      sort,
       openAdd,
       openEdit,
       openDetail,
       onAdd,
       onUpdate,
       remove,
-      sizeChange,
-      currentChange,
     };
   },
 });

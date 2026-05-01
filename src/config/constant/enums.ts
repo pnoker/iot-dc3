@@ -1,0 +1,67 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Shared enum option lists mirrored from backend enums (dc3-common-constant).
+ * Keep label/value in sync with the Java side so requests serialise cleanly.
+ */
+
+export interface EnumOption {
+  label: string;
+  value: string;
+}
+
+export const RESOURCE_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'DRIVER', value: 'DRIVER' },
+  { label: 'PROFILE', value: 'PROFILE' },
+  { label: 'POINT', value: 'POINT' },
+  { label: 'DEVICE', value: 'DEVICE' },
+  { label: 'DATA', value: 'DATA' },
+  { label: 'MENU', value: 'MENU' },
+  { label: 'API', value: 'API' },
+];
+
+export const RESOURCE_SCOPE_OPTIONS: EnumOption[] = [
+  { label: 'ADD', value: 'ADD' },
+  { label: 'DELETE', value: 'DELETE' },
+  { label: 'UPDATE', value: 'UPDATE' },
+  { label: 'LIST', value: 'LIST' },
+];
+
+export const API_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'GET', value: 'GET' },
+  { label: 'POST', value: 'POST' },
+  { label: 'PUT', value: 'PUT' },
+  { label: 'DELETE', value: 'DELETE' },
+];
+
+export const ENABLE_FLAG_OPTIONS: EnumOption[] = [
+  { label: 'ENABLE', value: 'ENABLE' },
+  { label: 'DISABLE', value: 'DISABLE' },
+];
+
+export const MENU_TYPE_OPTIONS: EnumOption[] = [
+  { label: 'TITLE', value: 'TITLE' },
+  { label: 'COMMON', value: 'COMMON' },
+];
+
+export const MENU_LEVEL_OPTIONS: EnumOption[] = [
+  { label: 'ROOT', value: 'ROOT' },
+  { label: 'C1', value: 'C1' },
+  { label: 'C2', value: 'C2' },
+  { label: 'C3', value: 'C3' },
+  { label: 'C4', value: 'C4' },
+];

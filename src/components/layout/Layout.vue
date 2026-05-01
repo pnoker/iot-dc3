@@ -28,18 +28,27 @@
             </el-icon>
             {{ t('nav.home') }}
           </el-menu-item>
-          <template v-for="menusItem in menus">
-            <el-sub-menu v-if="menusItem.children" :key="`${menusItem.path}-submenu`" :index="menusItem.path">
-              <template #title>{{ menusItem.meta?.title }}</template>
-              <el-menu-item v-for="item in menusItem.children" :key="item.path" :index="item.path">
-                {{ item.meta?.title }}
+          <template v-for="node in topLevelMenus" :key="`menu-${node.id}`">
+            <el-sub-menu v-if="node.children && node.children.length > 0" :index="`node-${node.id}`">
+              <template #title>
+                <el-icon v-if="resolveIcon(node.menuExt?.content?.icon)">
+                  <component :is="resolveIcon(node.menuExt?.content?.icon)" />
+                </el-icon>
+                {{ node.menuExt?.content?.title || node.menuName }}
+              </template>
+              <el-menu-item
+                v-for="child in node.children"
+                :key="`menu-child-${child.id}`"
+                :index="child.menuExt?.content?.url || `/${child.menuCode}`"
+              >
+                {{ child.menuExt?.content?.title || child.menuName }}
               </el-menu-item>
             </el-sub-menu>
-            <el-menu-item v-else :key="`${menusItem.path}-menuitem`" :index="menusItem.path">
-              <el-icon>
-                <component :is="menusItem.meta?.icon"></component>
+            <el-menu-item v-else :index="node.menuExt?.content?.url || `/${node.menuCode}`">
+              <el-icon v-if="resolveIcon(node.menuExt?.content?.icon)">
+                <component :is="resolveIcon(node.menuExt?.content?.icon)" />
               </el-icon>
-              {{ menusItem.meta?.title }}
+              {{ node.menuExt?.content?.title || node.menuName }}
             </el-menu-item>
           </template>
         </el-menu>
@@ -90,17 +99,21 @@
 
 <script lang="ts" setup>
   import router from '@/config/router';
-  import menu from '@/config/router/views';
   import { Check, HomeFilled } from '@element-plus/icons-vue';
-  import { computed } from 'vue';
+  import { computed, onMounted } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
-  import { useAuthStore } from '@/store';
-  import type { RouteRecordRaw } from 'vue-router';
+  import { useAuthStore, useMenuStore } from '@/store';
+  import { resolveIcon } from '@/config/constant/icons';
 
   const { t, locale } = useI18n();
   const route = useRoute();
   const authStore = useAuthStore();
+  const menuStore = useMenuStore();
+
+  onMounted(() => {
+    menuStore.fetchTree();
+  });
 
   const nameMap: Record<string, string> = {
     home: 'nav.home',
@@ -146,9 +159,10 @@
     return items;
   });
 
-  const menus = computed(() => {
-    const children: RouteRecordRaw[] = menu?.children || [];
-    return children.filter((view) => view.path !== '/home');
+  // Top-level menus come from the backend (dc3_menu), minus Home which is rendered
+  // separately as the leftmost entry with its own fixed icon.
+  const topLevelMenus = computed(() => {
+    return (menuStore.tree || []).filter((n) => n.menuCode !== 'home');
   });
 
   const handleMenuEnter = (index: string) => {

@@ -14,27 +14,39 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref } from 'vue';
+import { computed, defineComponent, reactive, ref } from 'vue';
+import type { PropType } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
+
+import { MENU_LEVEL_OPTIONS, MENU_TYPE_OPTIONS } from '@/config/constant/enums';
 
 type FormMode = 'add' | 'edit';
 
 const createEmptyForm = () => ({
   id: '' as string,
-  serviceName: '',
-  apiName: '',
-  apiCode: '',
-  apiGroup: '',
-  apiTypeFlag: '' as string,
+  parentMenuId: 0 as number | string,
+  menuName: '',
+  menuCode: '',
+  menuTypeFlag: 'COMMON' as string,
+  menuLevel: 'C1' as string,
+  menuIndex: 0 as number,
+  icon: '',
+  url: '',
   enableFlag: 'ENABLE' as string,
   remark: '',
 });
 
 export default defineComponent({
-  name: 'ApiEditForm',
+  name: 'MenuEditForm',
+  props: {
+    treeData: {
+      type: Array as PropType<any[]>,
+      default: () => [],
+    },
+  },
   emits: ['add-thing', 'update-thing'],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const { t } = useI18n();
 
     const formRef = ref<FormInstance>();
@@ -48,10 +60,13 @@ export default defineComponent({
     });
 
     const rules: FormRules = {
-      apiName: [{ required: true, message: t('settings.api.apiNamePlaceholder'), trigger: 'blur' }],
-      apiCode: [{ required: true, message: t('settings.api.apiCodePlaceholder'), trigger: 'blur' }],
-      serviceName: [{ required: true, message: t('settings.api.serviceNamePlaceholder'), trigger: 'blur' }],
+      menuName: [{ required: true, message: t('settings.menu.menuNamePlaceholder'), trigger: 'blur' }],
+      menuCode: [{ required: true, message: t('settings.menu.menuCodePlaceholder'), trigger: 'blur' }],
+      menuTypeFlag: [{ required: true, trigger: 'change' }],
+      menuLevel: [{ required: true, trigger: 'change' }],
     };
+
+    const parentTreeOptions = computed(() => [{ id: 0, menuName: 'Root', children: props.treeData || [] }]);
 
     const reset = () => {
       reactiveData.form = reactiveData.mode === 'edit' ? { ...reactiveData.originalForm } : createEmptyForm();
@@ -68,9 +83,14 @@ export default defineComponent({
 
     const showEdit = (row: any) => {
       reactiveData.mode = 'edit';
+      const content = row?.menuExt?.content || {};
       const initial = {
         ...createEmptyForm(),
         ...row,
+        parentMenuId: row?.parentMenuId ?? 0,
+        menuIndex: row?.menuIndex ?? 0,
+        icon: content.icon || '',
+        url: content.url || '',
       };
       reactiveData.originalForm = { ...initial };
       reactiveData.form = { ...initial };
@@ -86,10 +106,22 @@ export default defineComponent({
       const valid = await formRef.value?.validate().catch(() => false);
       if (!valid) return;
       reactiveData.submitting = true;
+      const { icon, url, ...rest } = reactiveData.form;
+      const payload: Record<string, any> = {
+        ...rest,
+        menuExt: {
+          content: {
+            title: rest.menuName,
+            icon: icon || '',
+            url: url || '',
+            remark: rest.remark || '',
+          },
+        },
+      };
       if (reactiveData.mode === 'add') {
-        emit('add-thing', { ...reactiveData.form }, done);
+        emit('add-thing', payload, done);
       } else {
-        emit('update-thing', { ...reactiveData.form }, done);
+        emit('update-thing', payload, done);
       }
     };
 
@@ -98,6 +130,9 @@ export default defineComponent({
       formRef,
       reactiveData,
       rules,
+      parentTreeOptions,
+      MENU_TYPE_OPTIONS,
+      MENU_LEVEL_OPTIONS,
       reset,
       show,
       showEdit,

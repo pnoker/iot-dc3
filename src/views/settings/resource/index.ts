@@ -18,14 +18,12 @@ import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { addResource, deleteResource, getResourceList, updateResource } from '@/api/resource';
+import { addResource, deleteResource, getResourceTree, updateResource } from '@/api/resource';
 import { getDriverByIds } from '@/api/driver';
 import { getDeviceByIds } from '@/api/device';
 import { getPointByIds } from '@/api/point';
 import { getProfileByIds } from '@/api/profile';
 import { successMessage } from '@/utils/NotificationUtil';
-
-import type { Order } from '@/config/entity';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import resourceTool from './tool/ResourceTool.vue';
@@ -40,6 +38,7 @@ export default defineComponent({
   },
   setup() {
     const { t } = useI18n();
+    const router = useRouter();
 
     const editRef = ref<InstanceType<typeof resourceEditForm>>();
 
@@ -47,54 +46,66 @@ export default defineComponent({
       loading: false,
       listData: [] as any[],
       query: {} as Record<string, any>,
-      order: false,
       page: {
         total: 0,
         size: 12,
         current: 1,
-        orders: [] as Order[],
+        orders: [] as any[],
       },
     });
 
-    const resourceNameMap: Record<string, string> = {};
-    const entityNameMap: Record<string, string> = {};
+    const entityNameMap = reactive<Record<string, string>>({});
 
-    const formatParentResource = (id: any) => {
-      if (id === undefined || id === null || String(id) === '0') {
-        return 'Root';
-      }
-      return resourceNameMap[String(id)] || `ID: ${id}`;
+    const isGroupingNode = (row: any): boolean => {
+      // Virtual grouping nodes registered by ResourceRegistrySync carry entity_id=0.
+      return !row.entityId || String(row.entityId) === '0';
     };
 
-    const formatEntityId = (id: any) => {
-      if (id === undefined || id === null || String(id) === '0') {
-        return '—';
-      }
-      return entityNameMap[String(id)] || `${id}`;
+    const formatEntityId = (row: any) => {
+      if (isGroupingNode(row)) return '—';
+      const id = String(row.entityId);
+      return entityNameMap[id] || id;
     };
 
-    const router = useRouter();
-
-    const LINKABLE_TYPES = ['DRIVER', 'DEVICE', 'POINT', 'PROFILE', 'API'];
+    const LINKABLE_TYPES = ['DRIVER', 'DEVICE', 'POINT', 'PROFILE', 'API', 'MENU'];
 
     const ENTITY_ROUTE_MAP: Record<string, string> = {
       DRIVER: 'driverDetail',
       DEVICE: 'deviceDetail',
       POINT: 'pointDetail',
       PROFILE: 'profileDetail',
-      API: 'settingsApi',
+      API: 'settingsApiDetail',
+      MENU: 'settingsMenuDetail',
     };
 
     const isEntityLinkable = (row: any) => {
-      const id = row.entityId;
-      if (!id || String(id) === '0') return false;
+      if (isGroupingNode(row)) return false;
       return LINKABLE_TYPES.includes(row.resourceTypeFlag);
     };
 
     const goEntityDetail = (row: any) => {
       const routeName = ENTITY_ROUTE_MAP[row.resourceTypeFlag];
       if (!routeName) return;
-      router.push({ name: routeName, query: { id: String(row.entityId), active: 'detail' } });
+      router.push({ name: routeName, query: { id: String(row.entityId) } }).catch(() => {
+        // handled globally
+      });
+    };
+
+    const openDetail = (row: any) => {
+      router.push({ name: 'settingsResourceDetail', query: { id: String(row.id) } }).catch(() => {
+        // handled globally
+      });
+    };
+
+    // Flatten tree rows into a list for post-load entity-name resolution.
+    const flatten = (nodes: any[], acc: any[] = []): any[] => {
+      for (const n of nodes || []) {
+        acc.push(n);
+        if (n.children && n.children.length > 0) {
+          flatten(n.children, acc);
+        }
+      }
+      return acc;
     };
 
     const resolveEntityNames = (records: any[]) => {
@@ -102,103 +113,69 @@ export default defineComponent({
       const deviceIds: string[] = [];
       const pointIds: string[] = [];
       const profileIds: string[] = [];
-
-      records.forEach((r) => {
-        const id = r.entityId;
-        if (!id || String(id) === '0') return;
+      for (const r of records) {
+        if (isGroupingNode(r)) continue;
+        const id = String(r.entityId);
         switch (r.resourceTypeFlag) {
           case 'DRIVER':
-            driverIds.push(String(id));
+            driverIds.push(id);
             break;
           case 'DEVICE':
-            deviceIds.push(String(id));
+            deviceIds.push(id);
             break;
           case 'POINT':
-            pointIds.push(String(id));
+            pointIds.push(id);
             break;
           case 'PROFILE':
-            profileIds.push(String(id));
+            profileIds.push(id);
             break;
         }
-      });
+      }
+
+      const fill = (ids: string[], res: any, nameKey: string) => {
+        const data = res.data || {};
+        ids.forEach((id) => {
+          const item = data[id];
+          if (item) entityNameMap[id] = item[nameKey] || id;
+        });
+      };
 
       const promises: Promise<void>[] = [];
-
-      const mapDriverNames = (res: any) => {
-        const data = res.data || {};
-        driverIds.forEach((id) => {
-          const item = data[id];
-          if (item) entityNameMap[id] = item.driverName || id;
-        });
-      };
-      const mapDeviceNames = (res: any) => {
-        const data = res.data || {};
-        deviceIds.forEach((id) => {
-          const item = data[id];
-          if (item) entityNameMap[id] = item.deviceName || id;
-        });
-      };
-      const mapPointNames = (res: any) => {
-        const data = res.data || {};
-        pointIds.forEach((id) => {
-          const item = data[id];
-          if (item) entityNameMap[id] = item.pointName || id;
-        });
-      };
-      const mapProfileNames = (res: any) => {
-        const data = res.data || {};
-        profileIds.forEach((id) => {
-          const item = data[id];
-          if (item) entityNameMap[id] = item.profileName || id;
-        });
-      };
-
-      if (driverIds.length > 0) {
+      if (driverIds.length)
         promises.push(
           getDriverByIds(driverIds)
-            .then(mapDriverNames)
+            .then((r) => fill(driverIds, r, 'driverName'))
             .catch(() => {})
         );
-      }
-      if (deviceIds.length > 0) {
+      if (deviceIds.length)
         promises.push(
           getDeviceByIds(deviceIds)
-            .then(mapDeviceNames)
+            .then((r) => fill(deviceIds, r, 'deviceName'))
             .catch(() => {})
         );
-      }
-      if (pointIds.length > 0) {
+      if (pointIds.length)
         promises.push(
           getPointByIds(pointIds)
-            .then(mapPointNames)
+            .then((r) => fill(pointIds, r, 'pointName'))
             .catch(() => {})
         );
-      }
-      if (profileIds.length > 0) {
+      if (profileIds.length)
         promises.push(
           getProfileByIds(profileIds)
-            .then(mapProfileNames)
+            .then((r) => fill(profileIds, r, 'profileName'))
             .catch(() => {})
         );
-      }
-
       return Promise.all(promises);
     };
 
     const load = () => {
       reactiveData.loading = true;
-      getResourceList({ page: reactiveData.page, ...reactiveData.query })
+      getResourceTree(reactiveData.query)
         .then((res: any) => {
-          const data = res.data || {};
-          const records = data.records || [];
-          reactiveData.listData = records;
-          reactiveData.page.total = data.total || 0;
-          records.forEach((r: any) => {
-            if (r.id) {
-              resourceNameMap[String(r.id)] = r.resourceName || r.resourceCode || String(r.id);
-            }
-          });
-          return resolveEntityNames(records);
+          const tree = res.data || [];
+          reactiveData.listData = tree;
+          reactiveData.page.total = tree.length;
+          return resolveEntityNames(flatten(tree));
         })
         .catch(() => {
           // handled globally
@@ -210,21 +187,18 @@ export default defineComponent({
 
     const search = (params: any) => {
       reactiveData.query = params || {};
-      reactiveData.page.current = 1;
       load();
     };
 
     const reset = () => {
       reactiveData.query = {};
-      reactiveData.page.current = 1;
       load();
     };
 
     const refresh = () => load();
 
     const sort = () => {
-      reactiveData.order = !reactiveData.order;
-      reactiveData.page.orders = [{ column: 'create_time', asc: reactiveData.order }];
+      // Tree is assembled on the server side with a deterministic order; noop here.
       load();
     };
 
@@ -266,15 +240,8 @@ export default defineComponent({
         });
     };
 
-    const sizeChange = (size: number) => {
-      reactiveData.page.size = size;
-      load();
-    };
-
-    const currentChange = (current: number) => {
-      reactiveData.page.current = current;
-      load();
-    };
+    const sizeChange = () => load();
+    const currentChange = () => load();
 
     load();
 
@@ -282,10 +249,11 @@ export default defineComponent({
       t,
       editRef,
       reactiveData,
-      formatParentResource,
+      isGroupingNode,
       formatEntityId,
       isEntityLinkable,
       goEntityDetail,
+      openDetail,
       search,
       reset,
       refresh,

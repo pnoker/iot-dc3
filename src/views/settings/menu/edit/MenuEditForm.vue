@@ -23,33 +23,53 @@
     :show-close="false"
     class="things-dialog"
     draggable
-    :title="reactiveData.mode === 'add' ? t('settings.api.addTitle') : t('settings.api.editTitle')"
+    :title="reactiveData.mode === 'add' ? t('settings.menu.addTitle') : t('settings.menu.editTitle')"
     @closed="reset"
   >
     <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-position="top">
-      <el-form-item :label="t('settings.api.serviceName')" prop="serviceName">
-        <el-input
-          v-model="reactiveData.form.serviceName"
+      <el-form-item :label="t('settings.menu.parentMenuId')" prop="parentMenuId">
+        <el-tree-select
+          v-model="reactiveData.form.parentMenuId"
+          :data="parentTreeOptions"
+          :props="{ label: 'menuName', children: 'children' }"
+          :placeholder="t('settings.menu.parentMenuIdPlaceholder')"
           clearable
-          :placeholder="t('settings.api.serviceNamePlaceholder')"
+          check-strictly
+          node-key="id"
         />
       </el-form-item>
-      <el-form-item :label="t('settings.api.apiName')" prop="apiName">
-        <el-input v-model="reactiveData.form.apiName" clearable :placeholder="t('settings.api.apiNamePlaceholder')" />
+      <el-form-item :label="t('settings.menu.menuName')" prop="menuName">
+        <el-input
+          v-model="reactiveData.form.menuName"
+          clearable
+          :placeholder="t('settings.menu.menuNamePlaceholder')"
+        />
       </el-form-item>
-      <el-form-item :label="t('settings.api.apiCode')" prop="apiCode">
-        <el-input v-model="reactiveData.form.apiCode" clearable :placeholder="t('settings.api.apiCodePlaceholder')" />
+      <el-form-item :label="t('settings.menu.menuCode')" prop="menuCode">
+        <el-input
+          v-model="reactiveData.form.menuCode"
+          clearable
+          :placeholder="t('settings.menu.menuCodePlaceholder')"
+        />
       </el-form-item>
-      <el-form-item :label="t('settings.api.apiGroup')" prop="apiGroup">
-        <el-input v-model="reactiveData.form.apiGroup" clearable :placeholder="t('settings.api.apiGroupPlaceholder')" />
-      </el-form-item>
-      <el-form-item :label="t('settings.api.apiType')" prop="apiTypeFlag">
-        <el-select v-model="reactiveData.form.apiTypeFlag" clearable>
-          <el-option label="GET" value="GET" />
-          <el-option label="POST" value="POST" />
-          <el-option label="PUT" value="PUT" />
-          <el-option label="DELETE" value="DELETE" />
+      <el-form-item :label="t('settings.menu.menuType')" prop="menuTypeFlag">
+        <el-select v-model="reactiveData.form.menuTypeFlag">
+          <el-option v-for="opt in MENU_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
         </el-select>
+      </el-form-item>
+      <el-form-item :label="t('settings.menu.menuLevel')" prop="menuLevel">
+        <el-select v-model="reactiveData.form.menuLevel">
+          <el-option v-for="opt in MENU_LEVEL_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="t('settings.menu.menuIndex')" prop="menuIndex">
+        <el-input-number v-model="reactiveData.form.menuIndex" :min="0" :max="999" />
+      </el-form-item>
+      <el-form-item :label="t('settings.menu.menuIcon')" prop="icon">
+        <el-input v-model="reactiveData.form.icon" clearable :placeholder="t('settings.menu.menuIconPlaceholder')" />
+      </el-form-item>
+      <el-form-item :label="t('settings.menu.menuUrl')" prop="url">
+        <el-input v-model="reactiveData.form.url" clearable :placeholder="t('settings.menu.menuUrlPlaceholder')" />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
         <el-switch
