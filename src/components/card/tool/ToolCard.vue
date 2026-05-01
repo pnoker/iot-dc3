@@ -35,10 +35,12 @@
       <div class="tool-card__footer">
         <div class="tool-card-footer-button">
           <slot name="actions" />
-          <!-- Divider only appears when both groups are populated (an actions
-               slot *and* the default Search/Reset pair). Otherwise we'd leave
-               a stray vertical bar next to nothing. -->
-          <span v-if="$slots.actions && !$slots.buttons" class="tool-card-footer-divider" aria-hidden="true" />
+          <!-- Divider sits between any actions-slot buttons and the default
+               Search/Reset pair. It is hidden via CSS (:first-child rule in
+               the styles below) when the actions slot renders nothing —
+               e.g. DriverTool templates an Add button behind v-if="add"
+               which evaluates to false by default. -->
+          <span v-if="!$slots.buttons" class="tool-card-footer-divider" aria-hidden="true" />
           <template v-if="!$slots.buttons">
             <el-button :icon="Search" type="primary" @click="search">
               {{ t('common.search') }}
@@ -229,6 +231,16 @@
         height: 18px;
         margin: 0 4px;
         background: var(--el-border-color);
+      }
+
+      // If the `actions` slot renders nothing (pages like Driver template an
+      // Add button behind v-if="add", so the slot is "used" but the DOM is
+      // empty) the divider ends up as the first element and should hide
+      // instead of dangling next to nothing. :first-child ignores Vue's
+      // comment-node placeholders, so this covers both "no slot supplied"
+      // and "slot supplied but all its buttons are v-if'd out".
+      .tool-card-footer-button > .tool-card-footer-divider:first-child {
+        display: none;
       }
     }
 
