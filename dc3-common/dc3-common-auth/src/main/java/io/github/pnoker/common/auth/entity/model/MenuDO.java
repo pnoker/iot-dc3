@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_menu")
+@TableName(value = "dc3_menu", autoResultMap = true)
 public class MenuDO implements Serializable {
 
     @Serial

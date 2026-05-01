@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_role")
+@TableName(value = "dc3_role", autoResultMap = true)
 public class RoleDO implements Serializable {
 
     @Serial

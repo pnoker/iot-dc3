@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_api")
+@TableName(value = "dc3_api", autoResultMap = true)
 public class ApiDO implements Serializable {
 
     @Serial
