@@ -19,11 +19,13 @@ package io.github.pnoker.common.auth.entity.query;
 
 import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.ResourceScopeFlagEnum;
 import io.github.pnoker.common.enums.ResourceTypeFlagEnum;
 import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author linys
@@ -61,6 +63,11 @@ public class ResourceQuery implements Serializable {
     private ResourceTypeFlagEnum resourceTypeFlag;
 
     /**
+     * Type multi-select — takes precedence over {@link #resourceTypeFlag} when non-empty.
+     */
+    private List<ResourceTypeFlagEnum> resourceTypeFlags;
+
+    /**
      * , : ResourceScopeFlagEnum
      * <ul>
      *   <li>0x01: </li>
@@ -71,6 +78,16 @@ public class ResourceQuery implements Serializable {
      *
      */
     private Byte resourceScopeFlag;
+
+    /**
+     * Scope multi-select — takes precedence over {@link #resourceScopeFlag} when non-empty.
+     */
+    private List<ResourceScopeFlagEnum> resourceScopeFlags;
+
+    /**
+     * Parent resource id filter (optional).
+     */
+    private Long parentResourceId;
 
     /**
      * Enable flag

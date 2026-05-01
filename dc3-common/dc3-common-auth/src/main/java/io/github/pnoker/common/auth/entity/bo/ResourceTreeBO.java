@@ -1,0 +1,76 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package io.github.pnoker.common.auth.entity.bo;
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Tree-shaped variant of {@link ResourceBO} — adds a nested children collection so the
+ * Resource tree can be serialized into a single payload for the frontend's tree table.
+ *
+ * @author pnoker
+ * @version 2026.4.30
+ * @since 2026.4.30
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class ResourceTreeBO extends ResourceBO {
+
+    private List<ResourceTreeBO> children = new ArrayList<>();
+
+    public void addChild(ResourceTreeBO child) {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+        children.add(child);
+    }
+
+    /**
+     * Copy shared fields from a flat {@link ResourceBO} into a new tree node.
+     */
+    public static ResourceTreeBO fromBO(ResourceBO source) {
+        ResourceTreeBO node = new ResourceTreeBO();
+        node.setId(source.getId());
+        node.setParentResourceId(source.getParentResourceId());
+        node.setResourceName(source.getResourceName());
+        node.setResourceCode(source.getResourceCode());
+        node.setResourceTypeFlag(source.getResourceTypeFlag());
+        node.setResourceScopeFlag(source.getResourceScopeFlag());
+        node.setEntityId(source.getEntityId());
+        node.setResourceExt(source.getResourceExt());
+        node.setEnableFlag(source.getEnableFlag());
+        node.setRemark(source.getRemark());
+        node.setCreatorId(source.getCreatorId());
+        node.setCreatorName(source.getCreatorName());
+        node.setCreateTime(source.getCreateTime());
+        node.setOperatorId(source.getOperatorId());
+        node.setOperatorName(source.getOperatorName());
+        node.setOperateTime(source.getOperateTime());
+        return node;
+    }
+}
