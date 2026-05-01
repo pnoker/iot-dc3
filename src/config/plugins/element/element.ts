@@ -43,6 +43,7 @@ import {
   User,
   UserFilled,
   View,
+  WalletFilled,
 } from '@element-plus/icons-vue';
 import 'element-plus/dist/index.css';
 import './element-variables.scss';
@@ -77,6 +78,7 @@ const ICONS = [
   MessageBox,
   TrendCharts,
   Discount,
+  WalletFilled,
   MenuIcon,
 ] as const;
 
