@@ -15,59 +15,68 @@
   -->
 
 <template>
-  <div>
-    <blank-card class="home-statistic">
-      <el-row :gutter="16">
-        <el-col :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <el-card class="statistic-card statistic-device" shadow="hover">
-            <div class="statistic-card-inner">
-              <div class="statistic-icon">
-                <el-icon :size="36"><Management /></el-icon>
-              </div>
-              <el-statistic :title="$t('home.deviceCount')" :value="reactiveData.deviceCount" />
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <el-card class="statistic-card statistic-point" shadow="hover">
-            <div class="statistic-card-inner">
-              <div class="statistic-icon">
-                <el-icon :size="36"><CollectionTag /></el-icon>
-              </div>
-              <el-statistic :title="$t('home.pointCount')" :value="reactiveData.pointCount" />
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <el-card class="statistic-card statistic-profile" shadow="hover">
-            <div class="statistic-card-inner">
-              <div class="statistic-icon">
-                <el-icon :size="36"><List /></el-icon>
-              </div>
-              <el-statistic :title="$t('home.profileCount')" :value="reactiveData.profileCount" />
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <el-card class="statistic-card statistic-driver" shadow="hover">
-            <div class="statistic-card-inner">
-              <div class="statistic-icon">
-                <el-icon :size="36"><Promotion /></el-icon>
-              </div>
-              <el-statistic :title="$t('home.driverCount')" :value="reactiveData.driverCount" />
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </blank-card>
-    <title-card class="home-count">
-      <div id="count-data" ref="countDataChartRef"></div>
-    </title-card>
+  <div class="home">
+    <!-- Row 1: indicator strip (5 cards) -->
+    <el-row :gutter="12" class="home__row">
+      <el-col v-for="c in cards" :key="c.key" :xl="5" :lg="8" :md="12" :sm="12" :xs="24" class="home__col">
+        <stat-card
+          :title="c.title"
+          :value="c.value"
+          :subtitle="c.subtitle"
+          :icon="c.icon"
+          :tone="c.tone"
+          :trend="c.trend"
+          :sparkline="c.sparkline"
+          @click="c.onClick"
+        />
+      </el-col>
+    </el-row>
+
+    <!-- Row 2: tabbed analytics (placeholder for D2) + live data feed -->
+    <el-row :gutter="12" class="home__row">
+      <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="home__col">
+        <el-card class="home__placeholder" shadow="never">
+          <div class="home__placeholder-inner">{{ $t('home.tabs.deviceStatus') }} · coming next</div>
+        </el-card>
+      </el-col>
+      <el-col :xl="8" :lg="8" :md="24" :sm="24" :xs="24" class="home__col">
+        <live-data-feed :size="20" />
+      </el-col>
+    </el-row>
   </div>
 </template>
 
-<script lang="ts" src="./index.ts" />
+<script lang="ts" src="./index.ts"></script>
 
 <style lang="scss" scoped>
-  @use '@/views/home/style.scss';
+  .home {
+    padding: 0 4px;
+
+    .home__row {
+      margin-bottom: 12px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .home__col {
+      margin-bottom: 12px;
+    }
+
+    .home__placeholder {
+      height: 420px;
+      border-radius: 10px;
+      border: 1px dashed var(--el-border-color);
+      background: #fafafa;
+    }
+
+    .home__placeholder-inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--el-text-color-secondary);
+    }
+  }
 </style>
