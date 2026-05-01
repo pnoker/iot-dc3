@@ -187,6 +187,7 @@ export default {
       driverPlaceholder: 'Select driver',
       descriptionPlaceholder: 'Enter device description',
       driverConfigTip: 'Configure basic parameters required to connect to this device.',
+      driverConfigEmpty: 'This driver has no configurable attributes — continue to the next step.',
       pointConfigTip: 'Configure basic parameters for collecting data from this point.',
       completeTitle: 'Configuration Complete',
       completeSubTitle: 'You can go back for the next step',

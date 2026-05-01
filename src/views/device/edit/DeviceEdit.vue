@@ -107,10 +107,7 @@
         </el-form>
       </el-card>
 
-      <el-card
-        v-if="reactiveData.active === 1 && reactiveData.driverAttributes && reactiveData.driverAttributes.length > 0"
-        shadow="hover"
-      >
+      <el-card v-if="reactiveData.active === 1" shadow="hover">
         <el-divider content-position="left">{{ $t('device.edit.driverConfig') }}</el-divider>
         <el-alert
           :closable="false"
@@ -119,7 +116,7 @@
           type="success"
         />
         <el-form
-          v-if="reactiveData.driverFormData.length > 0"
+          v-if="hasDriverAttributes"
           ref="driverFormRef"
           label-position="top"
           :model="reactiveData.driverFormData"
@@ -139,12 +136,15 @@
               @keyup.enter="driverUpdate"
             />
           </el-form-item>
-          <el-form-item class="edit-form-button">
-            <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
-            <el-button :icon="RefreshLeft" @click="driverInfoReset">{{ $t('common.reset') }}</el-button>
-            <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
-          </el-form-item>
         </el-form>
+        <el-empty v-else :description="$t('device.edit.driverConfigEmpty')" />
+        <el-form-item class="edit-form-button">
+          <el-button :icon="Back" plain type="success" @click="pre">{{ $t('common.previous') }}</el-button>
+          <el-button v-if="hasDriverAttributes" :icon="RefreshLeft" @click="driverInfoReset">
+            {{ $t('common.reset') }}
+          </el-button>
+          <el-button :icon="Right" plain type="warning" @click="next">{{ $t('common.next') }}</el-button>
+        </el-form-item>
       </el-card>
 
       <el-card v-if="reactiveData.active === 2" shadow="hover">

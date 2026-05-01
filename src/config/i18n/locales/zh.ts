@@ -187,6 +187,7 @@ export default {
       driverPlaceholder: '请选择所属驱动',
       descriptionPlaceholder: '请输入设备描述',
       driverConfigTip: '驱动属性配置用于配置连接到该设备所需的基本参数信息。',
+      driverConfigEmpty: '当前驱动无需配置驱动属性,可直接进入下一步。',
       pointConfigTip: '位号属性配置用于配置采集设备该位号的数据所需的基本参数信息。',
       completeTitle: '配置完成',
       completeSubTitle: '您可以返回进行下一步操作',

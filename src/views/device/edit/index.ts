@@ -142,6 +142,13 @@ export default defineComponent({
       return !isNull(reactiveData.pointFormData);
     });
 
+    // Some drivers don't expose any configurable attributes. In that case we
+    // still want to render step 2 (with prev / next buttons + an empty hint)
+    // instead of blanking the whole card, which used to trap the user.
+    const hasDriverAttributes = computed(() => {
+      return Array.isArray(reactiveData.driverAttributes) && reactiveData.driverAttributes.length > 0;
+    });
+
     const driverDictionary = (query?: string) => {
       reactiveData.driverLoading = true;
       getDriverDictionary({
@@ -509,6 +516,7 @@ export default defineComponent({
       deviceFormRule,
       reactiveData,
       hasPointFormData,
+      hasDriverAttributes,
       driverDictionary,
       driverDictionaryVisible,
       profileDictionary,
