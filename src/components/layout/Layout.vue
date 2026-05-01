@@ -133,6 +133,25 @@
     settingsUser: 'nav.settingsUser',
     settingsRole: 'nav.settingsRole',
     settingsResource: 'nav.settingsResource',
+    settingsApi: 'nav.settingsApi',
+    settingsMenu: 'nav.settingsMenu',
+    settingsUserDetail: 'nav.settingsUserDetail',
+    settingsRoleDetail: 'nav.settingsRoleDetail',
+    settingsResourceDetail: 'nav.settingsResourceDetail',
+    settingsApiDetail: 'nav.settingsApiDetail',
+    settingsMenuDetail: 'nav.settingsMenuDetail',
+  };
+
+  // For a settings detail page we want the breadcrumb to read
+  //   Home / Settings / <list> / <detail>
+  // instead of stopping at Home / Settings. Map each detail route to the list
+  // route it descends from.
+  const settingsDetailParent: Record<string, { path: string; titleKey: string }> = {
+    settingsUserDetail: { path: '/settings/user', titleKey: 'nav.settingsUser' },
+    settingsRoleDetail: { path: '/settings/role', titleKey: 'nav.settingsRole' },
+    settingsResourceDetail: { path: '/settings/resource', titleKey: 'nav.settingsResource' },
+    settingsApiDetail: { path: '/settings/api', titleKey: 'nav.settingsApi' },
+    settingsMenuDetail: { path: '/settings/menu', titleKey: 'nav.settingsMenu' },
   };
 
   const breadcrumbItems = computed(() => {
@@ -151,11 +170,16 @@
       items.push({ path: '/point_value', title: t('nav.data') });
     } else if (name.startsWith('settings')) {
       items.push({ path: '/settings/user', title: t('nav.settings') });
+      // Detail pages get an extra mid-level crumb pointing at the list view.
+      const mid = settingsDetailParent[name];
+      if (mid) {
+        items.push({ path: mid.path, title: t(mid.titleKey) });
+      }
     }
-    // Only add the current-page crumb if its path differs from the parent we
-    // just pushed — otherwise Vue complains about duplicate keys in the
-    // el-breadcrumb's v-for. Settings lands on /settings/user by default so
-    // the parent crumb and current-page crumb collide.
+    // Append the current-page crumb unless it would duplicate the crumb we
+    // just pushed (e.g. opening /settings/user clicks through to the same
+    // path as the Settings parent landing) — el-breadcrumb warns on
+    // duplicate :key otherwise.
     if (!['home', 'driver', 'profile', 'device', 'pointValue', 'settings'].includes(name)) {
       const last = items[items.length - 1];
       if (!last || last.path !== route.path) {

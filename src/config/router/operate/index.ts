@@ -182,6 +182,36 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: '/settings/user',
+    component: Layout,
+    children: [
+      {
+        name: 'settingsUserDetail',
+        path: '/settings/user/detail',
+        meta: {
+          icon: 'el-icon-user',
+          title: 'User Detail',
+        },
+        component: () => import('@/views/settings/user/detail/UserDetail.vue'),
+      },
+    ],
+  },
+  {
+    path: '/settings/role',
+    component: Layout,
+    children: [
+      {
+        name: 'settingsRoleDetail',
+        path: '/settings/role/detail',
+        meta: {
+          icon: 'el-icon-user-filled',
+          title: 'Role Detail',
+        },
+        component: () => import('@/views/settings/role/detail/RoleDetail.vue'),
+      },
+    ],
+  },
 ];
 
 export default routes;

@@ -44,8 +44,9 @@
         </el-table-column>
         <el-table-column prop="remark" :label="t('common.remark')" min-width="200" show-overflow-tooltip />
         <el-table-column prop="createTime" :label="t('common.createTime')" width="180" />
-        <el-table-column :label="t('common.operation')" width="260" fixed="right">
+        <el-table-column :label="t('common.operation')" width="320" fixed="right">
           <template #default="{ row }">
+            <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
             <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
             <el-button link type="primary" @click="openAssignResources(row)">
               {{ t('settings.role.assignResources') }}

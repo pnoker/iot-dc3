@@ -1,0 +1,93 @@
+<!--
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -      https://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
+<template>
+  <div>
+    <base-card>
+      <el-tabs v-model="reactiveData.active">
+        <el-tab-pane :label="$t('settings.user.detailTitle')" name="detail">
+          <detail-card>
+            <el-descriptions :column="2" border>
+              <el-descriptions-item :label="$t('settings.user.nickName')">
+                {{ reactiveData.data.nickName || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('settings.user.userName')">
+                {{ reactiveData.data.userName || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('settings.user.phone')">
+                {{ reactiveData.data.phone || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('settings.user.email')">
+                {{ reactiveData.data.email || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('common.enable')">
+                <el-tag :type="Number(reactiveData.data.enableFlag) === 0 ? 'success' : 'info'">
+                  {{ Number(reactiveData.data.enableFlag) === 0 ? $t('common.enable') : $t('common.disable') }}
+                </el-tag>
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('common.remark')">
+                {{ reactiveData.data.remark || '-' }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('common.createTime')">
+                {{ reactiveData.data.createTime }}
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('common.operationTime')">
+                {{ reactiveData.data.operateTime }}
+              </el-descriptions-item>
+            </el-descriptions>
+          </detail-card>
+        </el-tab-pane>
+      </el-tabs>
+    </base-card>
+  </div>
+</template>
+
+<script lang="ts" setup>
+  import { onMounted, reactive } from 'vue';
+  import { useRoute } from 'vue-router';
+
+  import { getUserById } from '@/api/user';
+
+  import baseCard from '@/components/card/base/BaseCard.vue';
+  import detailCard from '@/components/card/detail/DetailCard.vue';
+
+  const route = useRoute();
+
+  const reactiveData = reactive({
+    id: route.query.id as string,
+    active: (route.query.active as string) || 'detail',
+    data: {} as Record<string, any>,
+  });
+
+  const load = () => {
+    if (!reactiveData.id) return;
+    getUserById(reactiveData.id)
+      .then((res: any) => {
+        reactiveData.data = res.data || {};
+      })
+      .catch(() => {
+        // handled globally
+      });
+  };
+
+  onMounted(() => {
+    load();
+  });
+</script>
+
+<style lang="scss" scoped>
+  @use '@/styles/things-card.scss';
+</style>

@@ -16,6 +16,7 @@
 
 import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import { addUser, deleteUser, getUserList, updateUser } from '@/api/user';
 import { bindRoleUser, unbindRoleUser } from '@/api/roleUserBind';
@@ -38,6 +39,7 @@ export default defineComponent({
   },
   setup() {
     const { t } = useI18n();
+    const router = useRouter();
 
     const editRef = ref<InstanceType<typeof userEditForm>>();
     const assignRef = ref<InstanceType<typeof userAssignRoles>>();
@@ -94,6 +96,11 @@ export default defineComponent({
     const openAdd = () => editRef.value?.show();
     const openEdit = (row: any) => editRef.value?.showEdit(row);
     const openAssignRoles = (row: any) => assignRef.value?.show(row);
+    const openDetail = (row: any) => {
+      router.push({ name: 'settingsUserDetail', query: { id: String(row.id) } }).catch(() => {
+        // handled globally
+      });
+    };
 
     const onAdd = (form: any, done: () => void) => {
       addUser(form)
@@ -166,6 +173,7 @@ export default defineComponent({
       sort,
       openAdd,
       openEdit,
+      openDetail,
       openAssignRoles,
       onAdd,
       onUpdate,

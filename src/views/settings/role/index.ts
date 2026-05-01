@@ -16,6 +16,7 @@
 
 import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 import { addRole, deleteRole, getRoleList, updateRole } from '@/api/role';
 import { bindRoleResource, unbindRoleResource } from '@/api/roleResourceBind';
@@ -38,6 +39,7 @@ export default defineComponent({
   },
   setup() {
     const { t } = useI18n();
+    const router = useRouter();
 
     const editRef = ref<InstanceType<typeof roleEditForm>>();
     const assignRef = ref<InstanceType<typeof roleAssignResources>>();
@@ -94,6 +96,11 @@ export default defineComponent({
     const openAdd = () => editRef.value?.show();
     const openEdit = (row: any) => editRef.value?.showEdit(row);
     const openAssignResources = (row: any) => assignRef.value?.show(row);
+    const openDetail = (row: any) => {
+      router.push({ name: 'settingsRoleDetail', query: { id: String(row.id) } }).catch(() => {
+        // handled globally
+      });
+    };
 
     const onAdd = (form: any, done: () => void) => {
       addRole(form)
@@ -166,6 +173,7 @@ export default defineComponent({
       sort,
       openAdd,
       openEdit,
+      openDetail,
       openAssignResources,
       onAdd,
       onUpdate,
