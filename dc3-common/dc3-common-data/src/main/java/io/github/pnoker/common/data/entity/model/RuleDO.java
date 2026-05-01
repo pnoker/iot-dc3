@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_rule")
+@TableName(value = "dc3_rule", autoResultMap = true)
 public class RuleDO implements Serializable {
 
     @Serial

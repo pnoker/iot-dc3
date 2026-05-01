@@ -40,7 +40,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_point_attribute")
+@TableName(value = "dc3_point_attribute", autoResultMap = true)
 public class PointAttributeDO implements Serializable {
 
     @Serial
