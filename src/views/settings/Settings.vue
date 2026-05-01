@@ -36,12 +36,10 @@
 
 <script lang="ts" setup>
   import { computed, onMounted } from 'vue';
-  import type { Component } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
 
   import { useMenuStore } from '@/store';
-  import { resolveIcon } from '@/config/constant/icons';
 
   const { t } = useI18n();
   const route = useRoute();
@@ -57,16 +55,17 @@
   interface SidebarItem {
     name: string;
     title: string;
-    icon?: Component;
+    icon?: string;
   }
 
   // Static fallback shown when the menu API is unreachable or still loading.
+  // `icon` holds the globally-registered element-plus icon component name.
   const fallback: SidebarItem[] = [
-    { name: 'settingsUser', title: t('nav.settingsUser'), icon: resolveIcon('User') },
-    { name: 'settingsRole', title: t('nav.settingsRole'), icon: resolveIcon('UserFilled') },
-    { name: 'settingsResource', title: t('nav.settingsResource'), icon: resolveIcon('Key') },
-    { name: 'settingsApi', title: t('nav.settingsApi'), icon: resolveIcon('Link') },
-    { name: 'settingsMenu', title: t('nav.settingsMenu'), icon: resolveIcon('Menu') },
+    { name: 'settingsUser', title: t('nav.settingsUser'), icon: 'User' },
+    { name: 'settingsRole', title: t('nav.settingsRole'), icon: 'UserFilled' },
+    { name: 'settingsResource', title: t('nav.settingsResource'), icon: 'Key' },
+    { name: 'settingsApi', title: t('nav.settingsApi'), icon: 'Link' },
+    { name: 'settingsMenu', title: t('nav.settingsMenu'), icon: 'Menu' },
   ];
 
   const sidebarItems = computed<SidebarItem[]>(() => {
@@ -79,7 +78,7 @@
       .map((child) => ({
         name: child.menuCode,
         title: child.menuExt?.content?.title || child.menuName,
-        icon: resolveIcon(child.menuExt?.content?.icon),
+        icon: child.menuExt?.content?.icon,
       }));
   });
 

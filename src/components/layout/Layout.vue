@@ -31,8 +31,8 @@
           <template v-for="node in topLevelMenus" :key="`menu-${node.id}`">
             <el-sub-menu v-if="node.children && node.children.length > 0" :index="`node-${node.id}`">
               <template #title>
-                <el-icon v-if="resolveIcon(node.menuExt?.content?.icon)">
-                  <component :is="resolveIcon(node.menuExt?.content?.icon)" />
+                <el-icon v-if="node.menuExt?.content?.icon">
+                  <component :is="node.menuExt.content.icon" />
                 </el-icon>
                 {{ node.menuExt?.content?.title || node.menuName }}
               </template>
@@ -45,8 +45,8 @@
               </el-menu-item>
             </el-sub-menu>
             <el-menu-item v-else :index="node.menuExt?.content?.url || `/${node.menuCode}`">
-              <el-icon v-if="resolveIcon(node.menuExt?.content?.icon)">
-                <component :is="resolveIcon(node.menuExt?.content?.icon)" />
+              <el-icon v-if="node.menuExt?.content?.icon">
+                <component :is="node.menuExt.content.icon" />
               </el-icon>
               {{ node.menuExt?.content?.title || node.menuName }}
             </el-menu-item>
@@ -104,7 +104,6 @@
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
   import { useAuthStore, useMenuStore } from '@/store';
-  import { resolveIcon } from '@/config/constant/icons';
 
   const { t, locale } = useI18n();
   const route = useRoute();
