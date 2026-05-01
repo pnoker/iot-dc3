@@ -15,29 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.auth.service;
+package io.github.pnoker.common.auth.entity.vo;
 
-import io.github.pnoker.common.auth.entity.bo.MenuBO;
-import io.github.pnoker.common.auth.entity.bo.MenuTreeBO;
-import io.github.pnoker.common.auth.entity.query.MenuQuery;
-import io.github.pnoker.common.base.service.BaseService;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Menu Interface
+ * Tree-shaped variant of {@link MenuVO} — used by GET /menu/tree so the frontend
+ * can render directly into el-table / sidebar trees without re-assembling flat rows.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.4.30
+ * @since 2026.4.30
  */
-public interface MenuService extends BaseService<MenuBO, MenuQuery> {
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+public class MenuTreeVO extends MenuVO {
 
-    /**
-     * Return menus matching the filter, assembled into a parent/child tree ordered by menuIndex.
-     *
-     * @param entityQuery filter conditions; null disables filtering
-     * @return tree roots
-     */
-    List<MenuTreeBO> selectTree(MenuQuery entityQuery);
+    private List<MenuTreeVO> children = new ArrayList<>();
 }
