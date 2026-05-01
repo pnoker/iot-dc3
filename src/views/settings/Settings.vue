@@ -16,7 +16,7 @@
 
 <template>
   <el-container class="settings-container">
-    <el-aside width="220px" class="settings-aside">
+    <el-aside class="settings-aside" width="220px">
       <el-card class="settings-aside-card" shadow="never">
         <el-menu :default-active="activeMenu" @select="onSelect">
           <el-menu-item v-for="item in sidebarItems" :key="item.name" :index="item.name">
@@ -97,6 +97,8 @@
   }
 
   .settings-aside {
+    margin-top: 1px;
+
     .settings-aside-card {
       height: 100%;
       border: 0;
