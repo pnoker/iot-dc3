@@ -152,8 +152,15 @@
     } else if (name.startsWith('settings')) {
       items.push({ path: '/settings/user', title: t('nav.settings') });
     }
+    // Only add the current-page crumb if its path differs from the parent we
+    // just pushed — otherwise Vue complains about duplicate keys in the
+    // el-breadcrumb's v-for. Settings lands on /settings/user by default so
+    // the parent crumb and current-page crumb collide.
     if (!['home', 'driver', 'profile', 'device', 'pointValue', 'settings'].includes(name)) {
-      items.push({ path: route.path, title });
+      const last = items[items.length - 1];
+      if (!last || last.path !== route.path) {
+        items.push({ path: route.path, title });
+      }
     }
     return items;
   });
