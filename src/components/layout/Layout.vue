@@ -299,7 +299,7 @@
 
       .breadcrumb {
         padding: 12px 20px;
-        margin-bottom: 0;
+        margin-bottom: 5px;
         background: #fff;
         border-radius: 4px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
