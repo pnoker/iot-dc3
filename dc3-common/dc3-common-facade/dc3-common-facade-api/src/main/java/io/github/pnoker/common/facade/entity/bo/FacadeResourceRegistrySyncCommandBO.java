@@ -37,8 +37,6 @@ public class FacadeResourceRegistrySyncCommandBO {
 
     private String serviceName;
 
-    private Long tenantId;
-
     private boolean deleteMissing;
 
     private List<FacadeScannedApiBO> apis;

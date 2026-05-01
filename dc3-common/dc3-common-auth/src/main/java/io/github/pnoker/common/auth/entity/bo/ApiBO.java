@@ -67,8 +67,4 @@ public class ApiBO extends BaseBO {
      */
     private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
 }

@@ -67,7 +67,6 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
         try {
             ResourceRegistrySyncCommand command = ResourceRegistrySyncCommand.builder()
                     .serviceName(request.getServiceName())
-                    .tenantId(request.getTenantId())
                     .deleteMissing(request.getDeleteMissing())
                     .apis(toScannedApis(request.getApisList()))
                     .build();

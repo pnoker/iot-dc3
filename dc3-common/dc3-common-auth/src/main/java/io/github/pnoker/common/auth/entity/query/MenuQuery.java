@@ -43,12 +43,7 @@ public class MenuQuery implements Serializable {
 
     private Pages page;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
-
-    // 
+    //
 
     /**
      * Type
