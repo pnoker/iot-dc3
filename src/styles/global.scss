@@ -27,9 +27,19 @@ body {
 
 // el-dropdown-menu 通过 teleport 挂到 body,不在任何组件的 scope 里。
 .el-dropdown-menu {
+  // 让 emoji 国旗占一个和 el-icon 同尺寸的方格,与同级走 :icon 属性的
+  // 设置 / 关于 / 退出项在同一条基线上。em 单位跟随 dropdown-item 字号,
+  // 在高 DPI 下也保持稳定。
   .lang-flag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1em;
+    height: 1em;
     margin-right: 8px;
-    font-size: 16px;
+    font-size: 1em;
+    line-height: 1;
+    vertical-align: -0.15em;
   }
 
   .lang-text {
