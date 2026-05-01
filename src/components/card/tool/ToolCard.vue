@@ -199,7 +199,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 8px;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--el-border-color-lighter);
 
       .tool-card-footer-button {
         display: flex;
