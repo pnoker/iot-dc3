@@ -17,7 +17,6 @@
 <template>
   <el-dialog
     v-model="reactiveData.formVisible"
-    v-loading="reactiveData.formLoading"
     :append-to-body="true"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -26,7 +25,13 @@
     draggable
     :title="$t('device.import.title')"
   >
-    <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" label-position="top">
+    <el-form
+      ref="formDataRef"
+      v-loading="reactiveData.formLoading"
+      :model="reactiveData.formData"
+      :rules="formRule"
+      label-position="top"
+    >
       <el-alert :closable="false" class="things-dialog-form-alert" show-icon type="warning">
         <p>{{ $t('device.import.instruction1') }}</p>
         <p>{{ $t('device.import.instruction2') }}</p>
