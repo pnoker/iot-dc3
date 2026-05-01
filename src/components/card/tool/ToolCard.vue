@@ -21,20 +21,28 @@
         <div class="tool-card-body-form">
           <slot name="filters" :form-data="formModel" :search="search" />
         </div>
-        <el-form-item class="tool-card-body-button">
-          <slot name="buttons" :search="search" :reset="reset">
+        <!--
+          Body-level button row only renders when a caller explicitly overrides
+          the `buttons` slot (e.g. PointTool needs pre/next inline with the
+          filters). Otherwise the default Search / Reset pair moves down to sit
+          next to Add / Import in the footer — every toolbar ends up with one
+          button row instead of two stacked rows.
+        -->
+        <el-form-item v-if="$slots.buttons" class="tool-card-body-button">
+          <slot name="buttons" :search="search" :reset="reset" />
+        </el-form-item>
+      </el-form>
+      <div class="tool-card__footer">
+        <div class="tool-card-footer-button">
+          <slot name="actions" />
+          <template v-if="!$slots.buttons">
             <el-button :icon="Search" type="primary" @click="search">
               {{ t('common.search') }}
             </el-button>
             <el-button :icon="RefreshRight" @click="reset">
               {{ t('common.reset') }}
             </el-button>
-          </slot>
-        </el-form-item>
-      </el-form>
-      <div class="tool-card__footer">
-        <div class="tool-card-footer-button">
-          <slot name="actions" />
+          </template>
         </div>
         <div class="tool-card-footer-page">
           <el-pagination
