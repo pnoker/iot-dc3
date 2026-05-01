@@ -106,14 +106,17 @@ public class DriverAttributeController implements BaseController {
      */
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeVO entityVO) {
-        try {
-            DriverAttributeBO entityBO = driverAttributeBuilder.buildBOByVO(entityVO);
-            driverAttributeService.update(entityBO);
-            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverAttributeBO entityBO = driverAttributeBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                driverAttributeService.update(entityBO);
+                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**

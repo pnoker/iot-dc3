@@ -106,14 +106,17 @@ public class PointAttributeController implements BaseController {
      */
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
-        try {
-            PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
-            pointAttributeService.update(entityBO);
-            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                pointAttributeService.update(entityBO);
+                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     /**

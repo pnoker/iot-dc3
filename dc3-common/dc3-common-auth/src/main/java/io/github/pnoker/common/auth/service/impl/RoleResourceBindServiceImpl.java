@@ -21,12 +21,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.dal.ResourceManager;
+import io.github.pnoker.common.auth.dal.RoleManager;
 import io.github.pnoker.common.auth.dal.RoleResourceBindManager;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.auth.entity.builder.ResourceBuilder;
 import io.github.pnoker.common.auth.entity.builder.RoleResourceBindBuilder;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
+import io.github.pnoker.common.auth.entity.model.RoleDO;
 import io.github.pnoker.common.auth.entity.model.RoleResourceBindDO;
 import io.github.pnoker.common.auth.entity.query.RoleResourceBindQuery;
 import io.github.pnoker.common.auth.service.RoleResourceBindService;
@@ -62,6 +64,8 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     private RoleResourceBindManager roleResourceBindManager;
     @Resource
     private ResourceManager resourceManager;
+    @Resource
+    private RoleManager roleManager;
 
     @Override
     public void save(RoleResourceBindBO entityBO) {
@@ -107,10 +111,15 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
     @Override
     public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery) {
+        return selectByPage(entityQuery, null);
+    }
+
+    @Override
+    public Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery, Long tenantId) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        Page<RoleResourceBindDO> entityPageDO = roleResourceBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<RoleResourceBindDO> entityPageDO = roleResourceBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery, tenantId));
         return roleResourceBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
@@ -136,11 +145,21 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
      * @param entityQuery {@link RoleResourceBindQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<RoleResourceBindDO> fuzzyQuery(RoleResourceBindQuery entityQuery) {
+    private LambdaQueryWrapper<RoleResourceBindDO> fuzzyQuery(RoleResourceBindQuery entityQuery, Long tenantId) {
         LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleResourceBindDO::getRoleId, entityQuery.getRoleId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getResourceId()), RoleResourceBindDO::getResourceId, entityQuery.getResourceId());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RoleResourceBindDO::getTenantId, entityQuery.getTenantId());
+        if (Objects.nonNull(tenantId)) {
+            LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
+            roleWrapper.eq(RoleDO::getTenantId, tenantId);
+            roleWrapper.select(RoleDO::getId);
+            List<Long> roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
+            if (CollectionUtils.isEmpty(roleIds)) {
+                wrapper.apply("1 = 0");
+            } else {
+                wrapper.in(RoleResourceBindDO::getRoleId, roleIds);
+            }
+        }
         return wrapper;
     }
 
@@ -155,7 +174,6 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         LambdaQueryWrapper<RoleResourceBindDO> wrapper = Wrappers.<RoleResourceBindDO>query().lambda();
         wrapper.eq(RoleResourceBindDO::getRoleId, entityBO.getRoleId());
         wrapper.eq(RoleResourceBindDO::getResourceId, entityBO.getResourceId());
-        wrapper.eq(RoleResourceBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RoleResourceBindDO one = roleResourceBindManager.getOne(wrapper);
         if (Objects.isNull(one)) {

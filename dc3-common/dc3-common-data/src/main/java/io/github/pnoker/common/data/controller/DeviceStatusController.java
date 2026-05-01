@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Device Status Controller
@@ -58,8 +59,9 @@ public class DeviceStatusController implements BaseController {
     public Mono<R<Map<Long, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
         return getTenantId().flatMap(tenantId -> {
             try {
-                deviceQuery.setTenantId(tenantId);
-                Map<Long, String> statuses = deviceStatusService.selectByPage(deviceQuery);
+                DeviceQuery query = Objects.isNull(deviceQuery) ? new DeviceQuery() : deviceQuery;
+                query.setTenantId(tenantId);
+                Map<Long, String> statuses = deviceStatusService.selectByPage(query);
                 return Mono.just(R.ok(statuses));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);

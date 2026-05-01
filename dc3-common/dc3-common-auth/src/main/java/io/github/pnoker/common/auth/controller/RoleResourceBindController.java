@@ -66,14 +66,16 @@ public class RoleResourceBindController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleResourceBindVO entityVO) {
-        try {
-            RoleResourceBindBO entityBO = roleResourceBindBuilder.buildBOByVO(entityVO);
-            roleResourceBindService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                RoleResourceBindBO entityBO = roleResourceBindBuilder.buildBOByVO(entityVO);
+                roleResourceBindService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     @PostMapping("/delete/{id}")
@@ -89,17 +91,17 @@ public class RoleResourceBindController implements BaseController {
 
     @PostMapping("/list")
     public Mono<R<Page<RoleResourceBindVO>>> list(@RequestBody(required = false) RoleResourceBindQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new RoleResourceBindQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                RoleResourceBindQuery query = Objects.isNull(entityQuery) ? new RoleResourceBindQuery() : entityQuery;
+                Page<RoleResourceBindBO> entityPageBO = roleResourceBindService.selectByPage(query, tenantId);
+                Page<RoleResourceBindVO> entityPageVO = roleResourceBindBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            Page<RoleResourceBindBO> entityPageBO = roleResourceBindService.selectByPage(entityQuery);
-            Page<RoleResourceBindVO> entityPageVO = roleResourceBindBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
     @GetMapping("/list-resource-by-role/{roleId}")

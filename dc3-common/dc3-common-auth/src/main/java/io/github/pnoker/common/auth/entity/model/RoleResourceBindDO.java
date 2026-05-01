@@ -63,12 +63,6 @@ public class RoleResourceBindDO implements Serializable {
     private Long resourceId;
 
     /**
-     * Tenant ID
-     */
-    @TableField("tenant_id")
-    private Long tenantId;
-
-    /**
      * Description
      */
     @TableField("remark")

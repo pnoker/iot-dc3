@@ -105,10 +105,15 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
 
     @Override
     public Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery) {
+        return selectByPage(entityQuery, null);
+    }
+
+    @Override
+    public Page<RoleUserBindBO> selectByPage(RoleUserBindQuery entityQuery, Long tenantId) {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        Page<RoleUserBindDO> entityPageDO = roleUserBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        Page<RoleUserBindDO> entityPageDO = roleUserBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery, tenantId));
         return roleUserBindBuilder.buildBOPageByDOPage(entityPageDO);
     }
 
@@ -135,11 +140,21 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
      * @param entityQuery {@link RoleUserBindQuery}
      * @return {@link LambdaQueryWrapper}
      */
-    private LambdaQueryWrapper<RoleUserBindDO> fuzzyQuery(RoleUserBindQuery entityQuery) {
+    private LambdaQueryWrapper<RoleUserBindDO> fuzzyQuery(RoleUserBindQuery entityQuery, Long tenantId) {
         LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getUserId()), RoleUserBindDO::getUserId, entityQuery.getUserId());
         wrapper.eq(FieldUtil.isValidIdField(entityQuery.getRoleId()), RoleUserBindDO::getRoleId, entityQuery.getRoleId());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), RoleUserBindDO::getTenantId, entityQuery.getTenantId());
+        if (Objects.nonNull(tenantId)) {
+            LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
+            roleWrapper.eq(RoleDO::getTenantId, tenantId);
+            roleWrapper.select(RoleDO::getId);
+            List<Long> roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
+            if (CollectionUtils.isEmpty(roleIds)) {
+                wrapper.apply("1 = 0");
+            } else {
+                wrapper.in(RoleUserBindDO::getRoleId, roleIds);
+            }
+        }
         return wrapper;
     }
 
@@ -155,7 +170,6 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
         wrapper.eq(RoleUserBindDO::getRoleId, entityBO.getRoleId());
         wrapper.eq(RoleUserBindDO::getUserId, entityBO.getUserId());
-        wrapper.eq(RoleUserBindDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         RoleUserBindDO one = roleUserBindManager.getOne(wrapper);
         if (Objects.isNull(one)) {
