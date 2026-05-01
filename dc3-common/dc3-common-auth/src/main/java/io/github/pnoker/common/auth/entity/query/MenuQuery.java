@@ -46,6 +46,11 @@ public class MenuQuery implements Serializable {
     //
 
     /**
+     * Parent menu id filter (optional).
+     */
+    private Long parentMenuId;
+
+    /**
      * Type
      */
     private MenuTypeFlagEnum menuTypeFlag;

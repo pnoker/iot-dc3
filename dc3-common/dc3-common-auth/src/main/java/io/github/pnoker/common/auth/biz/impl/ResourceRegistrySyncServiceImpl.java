@@ -25,6 +25,7 @@ import io.github.pnoker.common.auth.entity.bo.ResourceRegistryScannedApi;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncCommand;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncResult;
 import io.github.pnoker.common.auth.entity.model.ApiDO;
+import io.github.pnoker.common.auth.entity.model.MenuDO;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
 import io.github.pnoker.common.auth.mapper.ResourceRegistryLockMapper;
 import io.github.pnoker.common.entity.ext.ApiExt;
@@ -69,6 +70,12 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
      * entity_id = 0. Clusters sibling endpoints under their owning controller.
      */
     private static final String GROUP_NODE_CODE_PREFIX = "api:group:";
+
+    /**
+     * Resource code prefix for MENU-type leaves. Each dc3_menu row owns one
+     * dc3_resource row; parent_resource_id mirrors the parent menu's resource.
+     */
+    private static final String MENU_RESOURCE_CODE_PREFIX = "menu:";
 
     @Resource
     private ApiManager apiManager;
@@ -453,5 +460,69 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         return Objects.equals(a.getTitle(), b.getTitle())
                 && Objects.equals(a.getUrl(), b.getUrl())
                 && Objects.equals(a.getRemark(), b.getRemark());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void syncMenuResource(MenuDO menu) {
+        if (menu == null || menu.getId() == null) {
+            return;
+        }
+        String code = MENU_RESOURCE_CODE_PREFIX + Objects.requireNonNullElse(menu.getMenuCode(), "");
+        // Prefer lookup by entity_id so a menu_code rename still resolves the mirror.
+        ResourceDO existing = resourceManager.getOne(Wrappers.<ResourceDO>lambdaQuery()
+                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.MENU.getIndex())
+                .eq(ResourceDO::getEntityId, menu.getId())
+                .last("LIMIT 1"));
+        Long parentResourceId = resolveMenuParentResourceId(menu.getParentMenuId());
+
+        if (existing == null) {
+            ResourceDO mirror = new ResourceDO();
+            mirror.setParentResourceId(parentResourceId);
+            mirror.setResourceName(Objects.requireNonNullElse(menu.getMenuName(), ""));
+            mirror.setResourceCode(code);
+            mirror.setResourceTypeFlag(ResourceTypeFlagEnum.MENU.getIndex());
+            mirror.setResourceScopeFlag(ResourceScopeFlagEnum.LIST.getIndex());
+            mirror.setEntityId(menu.getId());
+            mirror.setResourceExt(new JsonExt());
+            mirror.setEnableFlag(Objects.requireNonNullElse(menu.getEnableFlag(), EnableFlagEnum.ENABLE.getIndex()));
+            mirror.setRemark(Objects.requireNonNullElse(menu.getRemark(), ""));
+            resourceManager.save(mirror);
+            log.info("Menu resource mirror inserted: menuId={}, code={}", menu.getId(), code);
+        } else {
+            existing.setParentResourceId(parentResourceId);
+            existing.setResourceName(Objects.requireNonNullElse(menu.getMenuName(), ""));
+            existing.setResourceCode(code);
+            existing.setEnableFlag(Objects.requireNonNullElse(menu.getEnableFlag(), EnableFlagEnum.ENABLE.getIndex()));
+            existing.setRemark(Objects.requireNonNullElse(menu.getRemark(), ""));
+            existing.setOperateTime(null);
+            resourceManager.updateById(existing);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeMenuResource(Long menuId) {
+        if (menuId == null) {
+            return;
+        }
+        ResourceDO existing = resourceManager.getOne(Wrappers.<ResourceDO>lambdaQuery()
+                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.MENU.getIndex())
+                .eq(ResourceDO::getEntityId, menuId)
+                .last("LIMIT 1"));
+        if (existing != null) {
+            resourceManager.removeById(existing.getId());
+        }
+    }
+
+    private Long resolveMenuParentResourceId(Long parentMenuId) {
+        if (parentMenuId == null || parentMenuId == 0L) {
+            return 0L;
+        }
+        ResourceDO parent = resourceManager.getOne(Wrappers.<ResourceDO>lambdaQuery()
+                .eq(ResourceDO::getResourceTypeFlag, ResourceTypeFlagEnum.MENU.getIndex())
+                .eq(ResourceDO::getEntityId, parentMenuId)
+                .last("LIMIT 1"));
+        return parent == null ? 0L : parent.getId();
     }
 }
