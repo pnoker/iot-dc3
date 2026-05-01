@@ -19,8 +19,10 @@ package io.github.pnoker.common.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
+import io.github.pnoker.common.auth.entity.bo.ResourceTreeBO;
 import io.github.pnoker.common.auth.entity.builder.ResourceBuilder;
 import io.github.pnoker.common.auth.entity.query.ResourceQuery;
+import io.github.pnoker.common.auth.entity.vo.ResourceTreeVO;
 import io.github.pnoker.common.auth.entity.vo.ResourceVO;
 import io.github.pnoker.common.auth.service.ResourceService;
 import io.github.pnoker.common.base.BaseController;
@@ -35,6 +37,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -117,6 +121,50 @@ public class ResourceController implements BaseController {
             log.error(e.getMessage(), e);
             return Mono.just(R.fail(e.getMessage()));
         }
+    }
+
+    @PostMapping("/tree")
+    public Mono<R<List<ResourceTreeVO>>> tree(@RequestBody(required = false) ResourceQuery entityQuery) {
+        try {
+            List<ResourceTreeBO> entityBOList = resourceService.selectTree(entityQuery);
+            List<ResourceTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
+            for (ResourceTreeBO node : entityBOList) {
+                entityVOList.add(toTreeVO(node));
+            }
+            return Mono.just(R.ok(entityVOList));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
+
+    private ResourceTreeVO toTreeVO(ResourceTreeBO node) {
+        ResourceVO flat = resourceBuilder.buildVOByBO(node);
+        ResourceTreeVO out = new ResourceTreeVO();
+        out.setId(flat.getId());
+        out.setParentResourceId(flat.getParentResourceId());
+        out.setResourceName(flat.getResourceName());
+        out.setResourceCode(flat.getResourceCode());
+        out.setResourceTypeFlag(flat.getResourceTypeFlag());
+        out.setResourceScopeFlag(flat.getResourceScopeFlag());
+        out.setEntityId(flat.getEntityId());
+        out.setResourceExt(flat.getResourceExt());
+        out.setEnableFlag(flat.getEnableFlag());
+        out.setRemark(flat.getRemark());
+        out.setCreatorId(flat.getCreatorId());
+        out.setCreatorName(flat.getCreatorName());
+        out.setCreateTime(flat.getCreateTime());
+        out.setOperatorId(flat.getOperatorId());
+        out.setOperatorName(flat.getOperatorName());
+        out.setOperateTime(flat.getOperateTime());
+        if (node.getChildren() != null) {
+            List<ResourceTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
+            for (ResourceTreeBO child : node.getChildren()) {
+                childVOs.add(toTreeVO(child));
+            }
+            out.setChildren(childVOs);
+        }
+        return out;
     }
 
 }
