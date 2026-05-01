@@ -43,16 +43,5 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MenuTreeVO extends MenuVO {
 
-    /**
-     * Flattened convenience fields copied out of menuExt.content so the frontend
-     * can read them directly without dealing with the nested JsonExt wrapper and
-     * Jackson's NON_DEFAULT quirks around nested objects.
-     */
-    private String menuIcon;
-
-    private String menuUrl;
-
-    private String menuTitle;
-
     private List<MenuTreeVO> children = new ArrayList<>();
 }

@@ -28,7 +28,6 @@ import io.github.pnoker.common.auth.service.MenuService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.ext.MenuExt;
 import io.github.pnoker.common.enums.ResponseEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
@@ -158,15 +157,6 @@ public class MenuController implements BaseController {
         out.setOperatorId(flat.getOperatorId());
         out.setOperatorName(flat.getOperatorName());
         out.setOperateTime(flat.getOperateTime());
-        // Flatten menuExt.content so the frontend can read icon/url/title from the
-        // top level without dealing with Jackson's nested-object quirks.
-        MenuExt ext = flat.getMenuExt();
-        MenuExt.Content content = ext == null ? null : ext.getContent();
-        if (content != null) {
-            out.setMenuIcon(content.getIcon());
-            out.setMenuUrl(content.getUrl());
-            out.setMenuTitle(content.getTitle());
-        }
         if (node.getChildren() != null) {
             List<MenuTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
             for (MenuTreeBO child : node.getChildren()) {
