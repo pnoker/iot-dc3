@@ -85,8 +85,4 @@ public class ResourceBO extends BaseBO {
      */
     private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
 }

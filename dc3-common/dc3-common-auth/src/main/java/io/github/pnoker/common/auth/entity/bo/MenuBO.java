@@ -78,8 +78,4 @@ public class MenuBO extends BaseBO {
      */
     private EnableFlagEnum enableFlag;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
 }

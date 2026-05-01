@@ -42,11 +42,6 @@ public class ResourceRegistrySyncCommand {
     private String serviceName;
 
     /**
-     * Tenant ID the resources are registered under. Use 0 for system-level resources.
-     */
-    private Long tenantId;
-
-    /**
      * When true, endpoints that exist in the DB but are absent from the current scan
      * are soft-deleted. When false, such endpoints are left untouched.
      */

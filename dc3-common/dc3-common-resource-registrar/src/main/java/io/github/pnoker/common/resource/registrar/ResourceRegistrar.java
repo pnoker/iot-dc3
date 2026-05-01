@@ -76,7 +76,6 @@ public class ResourceRegistrar {
             List<FacadeScannedApiBO> apis = scanner.scan();
             FacadeResourceRegistrySyncCommandBO command = FacadeResourceRegistrySyncCommandBO.builder()
                     .serviceName(serviceName)
-                    .tenantId(properties.getTenantId())
                     .deleteMissing(properties.isDeleteMissing())
                     .apis(apis)
                     .build();

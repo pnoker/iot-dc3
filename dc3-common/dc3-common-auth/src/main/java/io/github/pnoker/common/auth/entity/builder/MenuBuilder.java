@@ -55,7 +55,6 @@ public interface MenuBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
-    @Mapping(target = "tenantId", ignore = true)
     MenuBO buildBOByVO(MenuVO entityVO);
 
     /**

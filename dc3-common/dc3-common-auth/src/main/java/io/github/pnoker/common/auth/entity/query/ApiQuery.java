@@ -43,12 +43,7 @@ public class ApiQuery implements Serializable {
 
     private Pages page;
 
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
-
-    // 
+    //
 
     /**
      * Owning service name, populated by resource registrar

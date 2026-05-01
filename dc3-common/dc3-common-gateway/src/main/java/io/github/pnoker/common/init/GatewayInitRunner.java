@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.init;
 
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 

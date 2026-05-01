@@ -89,12 +89,6 @@ public class ApiDO implements Serializable {
     private Byte enableFlag;
 
     /**
-     * Tenant ID
-     */
-    @TableField("tenant_id")
-    private Long tenantId;
-
-    /**
      * Description
      */
     @TableField("remark")

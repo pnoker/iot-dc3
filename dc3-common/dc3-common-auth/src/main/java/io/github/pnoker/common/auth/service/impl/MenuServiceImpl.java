@@ -120,7 +120,6 @@ public class MenuServiceImpl implements MenuService {
     private LambdaQueryWrapper<MenuDO> fuzzyQuery(MenuQuery entityQuery) {
         LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getMenuName()), MenuDO::getMenuName, entityQuery.getMenuName());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), MenuDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -138,7 +137,6 @@ public class MenuServiceImpl implements MenuService {
         wrapper.eq(MenuDO::getMenuTypeFlag, entityBO.getMenuTypeFlag());
         wrapper.eq(MenuDO::getMenuName, entityBO.getMenuName());
         wrapper.eq(MenuDO::getMenuCode, entityBO.getMenuCode());
-        wrapper.eq(MenuDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         MenuDO one = menuManager.getOne(wrapper);
         if (Objects.isNull(one)) {

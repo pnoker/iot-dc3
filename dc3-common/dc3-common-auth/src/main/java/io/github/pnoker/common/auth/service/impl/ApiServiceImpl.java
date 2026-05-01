@@ -120,7 +120,6 @@ public class ApiServiceImpl implements ApiService {
         wrapper.eq(StringUtils.isNotEmpty(entityQuery.getServiceName()), ApiDO::getServiceName, entityQuery.getServiceName());
         wrapper.eq(Objects.nonNull(entityQuery.getApiTypeFlag()), ApiDO::getApiTypeFlag, entityQuery.getApiTypeFlag());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), ApiDO::getEnableFlag, entityQuery.getEnableFlag());
-        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), ApiDO::getTenantId, entityQuery.getTenantId());
         return wrapper;
     }
 
@@ -137,7 +136,6 @@ public class ApiServiceImpl implements ApiService {
         wrapper.eq(ApiDO::getApiTypeFlag, entityBO.getApiTypeFlag());
         wrapper.eq(ApiDO::getApiName, entityBO.getApiName());
         wrapper.eq(ApiDO::getApiCode, entityBO.getApiCode());
-        wrapper.eq(ApiDO::getTenantId, entityBO.getTenantId());
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         ApiDO one = apiManager.getOne(wrapper);
         if (Objects.isNull(one)) {
