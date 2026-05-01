@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.auth.entity.query.RoleResourceBindQuery;
@@ -32,6 +33,15 @@ import java.util.List;
  * @since 2022.1.0
  */
 public interface RoleResourceBindService extends BaseService<RoleResourceBindBO, RoleResourceBindQuery> {
+
+    /**
+     * Paginated query filtered by tenant: only bindings whose role belongs to the given tenant.
+     *
+     * @param entityQuery Query conditions
+     * @param tenantId    Tenant ID, null means no tenant filtering
+     * @return Paginated bindings
+     */
+    Page<RoleResourceBindBO> selectByPage(RoleResourceBindQuery entityQuery, Long tenantId);
 
     /**
      * TenantIdUserId
