@@ -21,8 +21,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.common.auth.biz.ResourceRegistrySyncService;
 import io.github.pnoker.common.auth.dal.MenuManager;
 import io.github.pnoker.common.auth.entity.bo.MenuBO;
+import io.github.pnoker.common.auth.entity.bo.MenuTreeBO;
 import io.github.pnoker.common.auth.entity.builder.MenuBuilder;
 import io.github.pnoker.common.auth.entity.model.MenuDO;
 import io.github.pnoker.common.auth.entity.query.MenuQuery;
@@ -33,9 +35,16 @@ import io.github.pnoker.common.exception.*;
 import io.github.pnoker.common.utils.PageUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -57,7 +66,11 @@ public class MenuServiceImpl implements MenuService {
     @Resource
     private MenuManager menuManager;
 
+    @Resource
+    private ResourceRegistrySyncService resourceRegistrySyncService;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void save(MenuBO entityBO) {
         checkDuplicate(entityBO, false, true);
 
@@ -65,13 +78,15 @@ public class MenuServiceImpl implements MenuService {
         if (!menuManager.save(entityDO)) {
             throw new AddException("Failed to create menu");
         }
+        resourceRegistrySyncService.syncMenuResource(entityDO);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void remove(Long id) {
         getDOById(id, true);
 
-        // 
+        //
         LambdaQueryChainWrapper<MenuDO> wrapper = menuManager.lambdaQuery().eq(MenuDO::getParentMenuId, id);
         long count = wrapper.count();
         if (count > 0) {
@@ -81,9 +96,11 @@ public class MenuServiceImpl implements MenuService {
         if (!menuManager.removeById(id)) {
             throw new DeleteException("Failed to remove menu");
         }
+        resourceRegistrySyncService.removeMenuResource(id);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void update(MenuBO entityBO) {
         getDOById(entityBO.getId(), true);
 
@@ -94,6 +111,9 @@ public class MenuServiceImpl implements MenuService {
         if (!menuManager.updateById(entityDO)) {
             throw new UpdateException("Failed to update menu");
         }
+        // Re-read to pick up any DB-side mutations (trigger-updated operate_time, etc).
+        MenuDO latest = menuManager.getById(entityBO.getId());
+        resourceRegistrySyncService.syncMenuResource(latest != null ? latest : entityDO);
     }
 
     @Override
@@ -120,7 +140,55 @@ public class MenuServiceImpl implements MenuService {
     private LambdaQueryWrapper<MenuDO> fuzzyQuery(MenuQuery entityQuery) {
         LambdaQueryWrapper<MenuDO> wrapper = Wrappers.<MenuDO>query().lambda();
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getMenuName()), MenuDO::getMenuName, entityQuery.getMenuName());
+        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getMenuCode()), MenuDO::getMenuCode, entityQuery.getMenuCode());
+        wrapper.eq(Objects.nonNull(entityQuery.getMenuTypeFlag()), MenuDO::getMenuTypeFlag,
+                entityQuery.getMenuTypeFlag() == null ? null : entityQuery.getMenuTypeFlag().getIndex());
+        wrapper.eq(Objects.nonNull(entityQuery.getParentMenuId()), MenuDO::getParentMenuId, entityQuery.getParentMenuId());
+        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), MenuDO::getEnableFlag,
+                entityQuery.getEnableFlag() == null ? null : entityQuery.getEnableFlag().getIndex());
         return wrapper;
+    }
+
+    @Override
+    public List<MenuTreeBO> selectTree(MenuQuery entityQuery) {
+        MenuQuery effective = Objects.requireNonNullElseGet(entityQuery, MenuQuery::new);
+        List<MenuDO> rows = menuManager.list(fuzzyQuery(effective));
+        return assembleTree(rows);
+    }
+
+    private List<MenuTreeBO> assembleTree(List<MenuDO> rows) {
+        if (CollectionUtils.isEmpty(rows)) {
+            return List.of();
+        }
+        Map<Long, MenuTreeBO> byId = new HashMap<>(rows.size());
+        for (MenuDO row : rows) {
+            byId.put(row.getId(), MenuTreeBO.fromBO(menuBuilder.buildBOByDO(row)));
+        }
+        List<MenuTreeBO> roots = new ArrayList<>();
+        for (MenuTreeBO node : byId.values()) {
+            Long parentId = node.getParentMenuId();
+            MenuTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
+            if (parent == null) {
+                roots.add(node);
+            } else {
+                parent.addChild(node);
+            }
+        }
+        Comparator<MenuTreeBO> order = Comparator
+                .comparing(MenuTreeBO::getMenuIndex, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(MenuTreeBO::getMenuName, Comparator.nullsLast(Comparator.naturalOrder()));
+        sortRecursive(roots, order);
+        return roots;
+    }
+
+    private void sortRecursive(List<MenuTreeBO> nodes, Comparator<MenuTreeBO> order) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return;
+        }
+        nodes.sort(order);
+        for (MenuTreeBO node : nodes) {
+            sortRecursive(node.getChildren(), order);
+        }
     }
 
     /**

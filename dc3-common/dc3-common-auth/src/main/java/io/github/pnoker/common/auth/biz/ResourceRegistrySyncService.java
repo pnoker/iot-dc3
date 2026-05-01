@@ -19,6 +19,7 @@ package io.github.pnoker.common.auth.biz;
 
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncCommand;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncResult;
+import io.github.pnoker.common.auth.entity.model.MenuDO;
 
 /**
  * Reconciles the full set of HTTP endpoints discovered by a calling center service
@@ -40,4 +41,21 @@ public interface ResourceRegistrySyncService {
      * @return counters describing what was changed
      */
     ResourceRegistrySyncResult sync(ResourceRegistrySyncCommand command);
+
+    /**
+     * Mirror a single menu row into dc3_resource as a MENU-type leaf. Called by
+     * MenuServiceImpl on save/update so the Resource tree always tracks menu state.
+     * Idempotent — updates the existing resource row if one already exists for the menu.
+     *
+     * @param menu the menu row that was just inserted or updated
+     */
+    void syncMenuResource(MenuDO menu);
+
+    /**
+     * Soft-delete the resource row mirroring the given menu, if any.
+     * No-op when no mirror exists.
+     *
+     * @param menuId the id of the menu being removed
+     */
+    void removeMenuResource(Long menuId);
 }

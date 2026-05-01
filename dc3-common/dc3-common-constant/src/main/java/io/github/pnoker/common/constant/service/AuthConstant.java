@@ -42,6 +42,7 @@ public class AuthConstant {
     public static final String ROLE_USER_URL_PREFIX = "/role-user";
     public static final String ROLE_RESOURCE_URL_PREFIX = "/role-resource";
     public static final String API_URL_PREFIX = "/api";
+    public static final String MENU_URL_PREFIX = "/menu";
 
     private AuthConstant() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
