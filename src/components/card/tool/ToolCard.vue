@@ -35,6 +35,10 @@
       <div class="tool-card__footer">
         <div class="tool-card-footer-button">
           <slot name="actions" />
+          <!-- Divider only appears when both groups are populated (an actions
+               slot *and* the default Search/Reset pair). Otherwise we'd leave
+               a stray vertical bar next to nothing. -->
+          <span v-if="$slots.actions && !$slots.buttons" class="tool-card-footer-divider" aria-hidden="true" />
           <template v-if="!$slots.buttons">
             <el-button :icon="Search" type="primary" @click="search">
               {{ t('common.search') }}
@@ -206,6 +210,7 @@
 
       .tool-card-footer-button {
         display: flex;
+        align-items: center;
         gap: 8px;
       }
 
@@ -213,17 +218,17 @@
         display: flex;
         align-items: center;
         gap: 8px;
+      }
 
-        // Vertical divider between the pagination sizer dropdown and the
-        // refresh / sort circles, so the two groups read as separate
-        // controls instead of running into each other.
-        .tool-card-footer-divider {
-          display: inline-block;
-          width: 1px;
-          height: 18px;
-          margin: 0 4px;
-          background: var(--el-border-color);
-        }
+      // Vertical divider, reused both between actions / search-reset in the
+      // left cluster and between pagination / refresh-sort in the right
+      // cluster. Keeps the two adjacent button groups visually distinct.
+      .tool-card-footer-divider {
+        display: inline-block;
+        width: 1px;
+        height: 18px;
+        margin: 0 4px;
+        background: var(--el-border-color);
       }
     }
 
