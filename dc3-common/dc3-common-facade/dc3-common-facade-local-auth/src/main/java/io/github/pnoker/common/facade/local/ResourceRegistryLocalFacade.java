@@ -59,6 +59,7 @@ public class ResourceRegistryLocalFacade implements ResourceRegistryFacade {
                     .apiName(bo.getApiName())
                     .title(bo.getTitle())
                     .remark(bo.getRemark())
+                    .apiGroup(bo.getApiGroup())
                     .build());
         }
         return out;

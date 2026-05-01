@@ -42,4 +42,9 @@ public class FacadeScannedApiBO {
     private String title;
 
     private String remark;
+
+    /**
+     * API grouping label — usually the owning controller's simple class name.
+     */
+    private String apiGroup;
 }

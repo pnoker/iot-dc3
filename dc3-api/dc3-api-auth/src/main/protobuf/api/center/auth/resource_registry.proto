@@ -63,6 +63,11 @@ message GrpcScannedApiDTO {
 
   // Optional description.
   string remark = 5;
+
+  // API grouping label — usually the owning controller's simple class name,
+  // e.g. "ApiController". Used to cluster sibling endpoints under the same
+  // tree node on the permission resource page.
+  string api_group = 6;
 }
 
 // Response wrapper for the sync result.
