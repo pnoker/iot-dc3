@@ -43,9 +43,4 @@ public class RoleUserBindBO extends BaseBO {
      * ID
      */
     private Long userId;
-
-    /**
-     * Tenant ID
-     */
-    private Long tenantId;
 }

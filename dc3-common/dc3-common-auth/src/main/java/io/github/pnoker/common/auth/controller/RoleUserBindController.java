@@ -66,14 +66,16 @@ public class RoleUserBindController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleUserBindVO entityVO) {
-        try {
-            RoleUserBindBO entityBO = roleUserBindBuilder.buildBOByVO(entityVO);
-            roleUserBindService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                RoleUserBindBO entityBO = roleUserBindBuilder.buildBOByVO(entityVO);
+                roleUserBindService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     @PostMapping("/delete/{id}")
@@ -89,17 +91,17 @@ public class RoleUserBindController implements BaseController {
 
     @PostMapping("/list")
     public Mono<R<Page<RoleUserBindVO>>> list(@RequestBody(required = false) RoleUserBindQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new RoleUserBindQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                RoleUserBindQuery query = Objects.isNull(entityQuery) ? new RoleUserBindQuery() : entityQuery;
+                Page<RoleUserBindBO> entityPageBO = roleUserBindService.selectByPage(query, tenantId);
+                Page<RoleUserBindVO> entityPageVO = roleUserBindBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            Page<RoleUserBindBO> entityPageBO = roleUserBindService.selectByPage(entityQuery);
-            Page<RoleUserBindVO> entityPageVO = roleUserBindBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
     @GetMapping("/list-role-by-user/{userId}")

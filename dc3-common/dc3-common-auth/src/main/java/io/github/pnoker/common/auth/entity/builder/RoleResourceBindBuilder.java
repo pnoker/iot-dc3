@@ -43,7 +43,6 @@ public interface RoleResourceBindBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
-    @Mapping(target = "tenantId", ignore = true)
     RoleResourceBindBO buildBOByVO(RoleResourceBindVO entityVO);
 
     /**
