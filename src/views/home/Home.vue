@@ -32,15 +32,20 @@
       </el-col>
     </el-row>
 
-    <!-- Row 2: tabbed analytics (placeholder for D2) + live data feed -->
+    <!-- Row 2: 6-tab analytics (distribution + top-N) + live data feed -->
     <el-row :gutter="12" class="home__row">
       <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="home__col">
-        <el-card class="home__placeholder" shadow="never">
-          <div class="home__placeholder-inner">{{ $t('home.tabs.deviceStatus') }} · coming next</div>
-        </el-card>
+        <analytics-tabs />
       </el-col>
       <el-col :xl="8" :lg="8" :md="24" :sm="24" :xs="24" class="home__col">
         <live-data-feed :size="20" />
+      </el-col>
+    </el-row>
+
+    <!-- Row 3: data ingestion trend chart -->
+    <el-row :gutter="12" class="home__row">
+      <el-col :span="24" class="home__col">
+        <trend-chart />
       </el-col>
     </el-row>
   </div>
@@ -62,21 +67,6 @@
 
     .home__col {
       margin-bottom: 12px;
-    }
-
-    .home__placeholder {
-      height: 420px;
-      border-radius: 10px;
-      border: 1px dashed var(--el-border-color);
-      background: #fafafa;
-    }
-
-    .home__placeholder-inner {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--el-text-color-secondary);
     }
   }
 </style>

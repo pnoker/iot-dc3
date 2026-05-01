@@ -45,3 +45,10 @@ export const statsTop = (
 };
 
 export const streamLatest = (size = 20) => httpGet(`${BASE}/stream?size=${size}`);
+
+// Manager-side dashboard aggregates (driver/device distribution tabs).
+const MANAGER_BASE = 'api/v3/manager/dashboard';
+
+export const driverStats = () => httpGet(`${MANAGER_BASE}/driver/stats`);
+
+export const deviceStats = (topN = 10) => httpGet(`${MANAGER_BASE}/device/stats?topN=${topN}`);

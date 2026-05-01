@@ -28,6 +28,8 @@ import { statsTimeseries, statsToday } from '@/api/dashboard';
 
 import StatCard from './components/StatCard.vue';
 import LiveDataFeed from './components/LiveDataFeed.vue';
+import AnalyticsTabs from './components/AnalyticsTabs.vue';
+import TrendChart from './components/TrendChart.vue';
 
 type Tone = 'blue' | 'green' | 'orange' | 'purple' | 'red';
 
@@ -45,7 +47,7 @@ interface CardModel {
 
 export default defineComponent({
   name: 'Home',
-  components: { StatCard, LiveDataFeed },
+  components: { StatCard, LiveDataFeed, AnalyticsTabs, TrendChart },
   setup() {
     const { t } = useI18n();
     const router = useRouter();
