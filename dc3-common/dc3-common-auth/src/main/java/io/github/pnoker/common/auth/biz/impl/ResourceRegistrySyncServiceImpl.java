@@ -233,6 +233,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         api.setApiTypeFlag(methodToTypeFlag(spec.getMethod()).getIndex());
         api.setApiName(spec.getApiName());
         api.setApiCode(apiCode);
+        api.setApiGroup(Objects.requireNonNullElse(spec.getApiGroup(), ""));
         api.setApiExt(buildApiExt(spec));
         api.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
         api.setRemark(Objects.requireNonNullElse(spec.getRemark(), ""));
@@ -267,6 +268,10 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         if (!Objects.equals(existing.getApiCode(), apiCode)) {
             return true;
         }
+        String expectedGroup = Objects.requireNonNullElse(spec.getApiGroup(), "");
+        if (!Objects.equals(Objects.requireNonNullElse(existing.getApiGroup(), ""), expectedGroup)) {
+            return true;
+        }
         ApiExt.Content expectedContent = buildContent(spec);
         ApiExt.Content currentContent = parseContent(existing.getApiExt());
         if (!equalsContent(currentContent, expectedContent)) {
@@ -279,6 +284,7 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
     private void applyApiUpdates(ApiDO existing, ResourceRegistryScannedApi spec, String apiCode, String serviceName) {
         existing.setServiceName(serviceName);
         existing.setApiCode(apiCode);
+        existing.setApiGroup(Objects.requireNonNullElse(spec.getApiGroup(), ""));
         existing.setApiTypeFlag(methodToTypeFlag(spec.getMethod()).getIndex());
         existing.setApiName(spec.getApiName());
         existing.setApiExt(buildApiExt(spec));

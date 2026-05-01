@@ -60,6 +60,7 @@ public class ResourceRegistryGrpcFacade implements ResourceRegistryFacade {
                         .setApiName(Objects.requireNonNullElse(api.getApiName(), ""))
                         .setTitle(Objects.requireNonNullElse(api.getTitle(), ""))
                         .setRemark(Objects.requireNonNullElse(api.getRemark(), ""))
+                        .setApiGroup(Objects.requireNonNullElse(api.getApiGroup(), ""))
                         .build());
             }
         }

@@ -102,6 +102,7 @@ public class ApiEndpointScanner {
                         .apiName(buildApiName(handler))
                         .title(handler.getMethod().getName())
                         .remark("")
+                        .apiGroup(handler.getBeanType().getSimpleName())
                         .build());
             }
         }
