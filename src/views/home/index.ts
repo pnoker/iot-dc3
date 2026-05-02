@@ -77,21 +77,14 @@ export default defineComponent({
       alertUnconfirmed: 0,
     });
 
-    // Each stat endpoint doubles as a liveness probe — if the request succeeds
-    // the center service is responding. No dedicated /health endpoint needed.
-    const serviceStatus = reactive({ auth: true, data: true, manager: true });
-
+    // HomeBanner polls /dashboard/system/health on its own; index.ts no longer
+    // derives service status from stat-request success.
     const emptyPage = { current: 1, size: 1 };
 
     const loadTotals = () => {
       getDriverList({ page: emptyPage })
-        .then((r: any) => {
-          state.driverCount = r?.data?.total ?? 0;
-          serviceStatus.manager = true;
-        })
-        .catch(() => {
-          serviceStatus.manager = false;
-        });
+        .then((r: any) => (state.driverCount = r?.data?.total ?? 0))
+        .catch(() => {});
       getDeviceList({ page: emptyPage })
         .then((r: any) => (state.deviceCount = r?.data?.total ?? 0))
         .catch(() => {});
@@ -108,9 +101,8 @@ export default defineComponent({
         const res: any = await statsToday();
         state.todayCount = res?.data?.today ?? 0;
         state.todayPercentChange = res?.data?.percentChange ?? 0;
-        serviceStatus.data = true;
       } catch {
-        serviceStatus.data = false;
+        // handled globally
       }
     };
 
@@ -208,6 +200,6 @@ export default defineComponent({
       },
     ]);
 
-    return { cards, serviceStatus };
+    return { cards };
   },
 });

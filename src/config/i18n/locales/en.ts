@@ -183,6 +183,10 @@ export default {
       serviceAuth: 'Auth',
       serviceData: 'Data',
       serviceManager: 'Manager',
+      serviceDatabase: 'DB',
+      serviceMq: 'MQ',
+      serviceGateway: 'Gateway',
+      group: { center: 'Center', infra: 'Infra', drivers: 'Drivers' },
     },
   },
   layout: {

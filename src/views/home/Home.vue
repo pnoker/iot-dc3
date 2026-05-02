@@ -19,7 +19,7 @@
     <!-- Row 0: greeting + clock + service status -->
     <el-row :gutter="12" class="home__row">
       <el-col :span="24" class="home__col">
-        <home-banner :status="serviceStatus" />
+        <home-banner />
       </el-col>
     </el-row>
 

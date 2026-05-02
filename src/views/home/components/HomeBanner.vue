@@ -29,9 +29,31 @@
     </div>
 
     <div class="home-banner__right">
-      <div v-for="s in services" :key="s.key" class="home-banner__service">
-        <span :class="['home-banner__dot', `home-banner__dot--${s.status}`]"></span>
-        <span class="home-banner__service-label">{{ s.label }}</span>
+      <div class="home-banner__group">
+        <span class="home-banner__group-label">{{ $t('home.banner.group.center') }}</span>
+        <span v-for="s in centerServices" :key="s.key" class="home-banner__service" :title="s.label">
+          <span :class="['home-banner__dot', `home-banner__dot--${s.status}`]"></span>
+          <span>{{ s.label }}</span>
+        </span>
+      </div>
+      <div class="home-banner__group">
+        <span class="home-banner__group-label">{{ $t('home.banner.group.infra') }}</span>
+        <span v-for="s in infraServices" :key="s.key" class="home-banner__service" :title="s.label">
+          <span :class="['home-banner__dot', `home-banner__dot--${s.status}`]"></span>
+          <span>{{ s.label }}</span>
+        </span>
+      </div>
+      <div class="home-banner__group">
+        <span class="home-banner__group-label">{{ $t('home.banner.group.drivers') }}</span>
+        <span class="home-banner__service">
+          <span
+            :class="[
+              'home-banner__dot',
+              `home-banner__dot--${drivers.total > 0 && drivers.online === drivers.total ? 'up' : drivers.online > 0 ? 'partial' : 'down'}`,
+            ]"
+          ></span>
+          <span>{{ drivers.online }} / {{ drivers.total }}</span>
+        </span>
       </div>
     </div>
   </el-card>
@@ -41,13 +63,13 @@
   import { computed, onMounted, onUnmounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useAuthStore } from '@/store/modules/auth';
+  import { systemHealth } from '@/api/dashboard';
 
-  const props = defineProps({
-    status: {
-      type: Object as () => { auth: boolean; data: boolean; manager: boolean },
-      default: () => ({ auth: true, data: true, manager: true }),
-    },
-  });
+  interface ServiceRow {
+    key: string;
+    label: string;
+    status: 'up' | 'down';
+  }
 
   const { t } = useI18n();
   const authStore = useAuthStore();
@@ -64,22 +86,29 @@
     return t('home.banner.greetingEvening');
   });
 
-  const services = computed(() => [
-    {
-      key: 'auth',
-      label: t('home.banner.serviceAuth'),
-      status: props.status.auth ? 'up' : 'down',
-    },
-    {
-      key: 'data',
-      label: t('home.banner.serviceData'),
-      status: props.status.data ? 'up' : 'down',
-    },
-    {
-      key: 'manager',
-      label: t('home.banner.serviceManager'),
-      status: props.status.manager ? 'up' : 'down',
-    },
+  // Defaults to all-up so the banner doesn't flash "down" during the first
+  // request. If /system/health fails we leave everything up (probably the
+  // browser's offline — the user can tell from the broken requests below).
+  const center = ref<Record<string, string>>({ auth: 'up', data: 'up', manager: 'up' });
+  const infra = ref<Record<string, string>>({ database: 'up', mq: 'up', gateway: 'up' });
+  const drivers = ref<{ total: number; online: number }>({ total: 0, online: 0 });
+
+  const buildRow = (key: string, labelKey: string, value: string | undefined): ServiceRow => ({
+    key,
+    label: t(labelKey),
+    status: value === 'up' ? 'up' : 'down',
+  });
+
+  const centerServices = computed<ServiceRow[]>(() => [
+    buildRow('auth', 'home.banner.serviceAuth', center.value.auth),
+    buildRow('data', 'home.banner.serviceData', center.value.data),
+    buildRow('manager', 'home.banner.serviceManager', center.value.manager),
+  ]);
+
+  const infraServices = computed<ServiceRow[]>(() => [
+    buildRow('database', 'home.banner.serviceDatabase', infra.value.database),
+    buildRow('mq', 'home.banner.serviceMq', infra.value.mq),
+    buildRow('gateway', 'home.banner.serviceGateway', infra.value.gateway),
   ]);
 
   const tick = () => {
@@ -88,13 +117,31 @@
     date.value = d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
   };
 
-  let timer: ReturnType<typeof setInterval> | null = null;
+  const refreshHealth = async () => {
+    try {
+      const res: any = await systemHealth();
+      const data = res?.data;
+      if (!data) return;
+      if (data.center) center.value = data.center;
+      if (data.infra) infra.value = data.infra;
+      if (data.drivers) drivers.value = { total: data.drivers.total ?? 0, online: data.drivers.online ?? 0 };
+    } catch {
+      // handled globally
+    }
+  };
+
+  let clockTimer: ReturnType<typeof setInterval> | null = null;
+  let healthTimer: ReturnType<typeof setInterval> | null = null;
   onMounted(() => {
     tick();
-    timer = setInterval(tick, 1000);
+    clockTimer = setInterval(tick, 1000);
+    refreshHealth();
+    // Poll every 30s so the banner reflects dependency failures without a reload.
+    healthTimer = setInterval(refreshHealth, 30_000);
   });
   onUnmounted(() => {
-    if (timer) clearInterval(timer);
+    if (clockTimer) clearInterval(clockTimer);
+    if (healthTimer) clearInterval(healthTimer);
   });
 </script>
 
@@ -110,7 +157,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 24px;
-      min-height: 86px;
+      min-height: 94px;
     }
 
     .home-banner__left {
@@ -136,7 +183,7 @@
 
     .home-banner__middle {
       text-align: center;
-      padding: 0 12px;
+      padding: 0 14px;
       border-left: 1px solid rgba(255, 255, 255, 0.25);
       border-right: 1px solid rgba(255, 255, 255, 0.25);
 
@@ -158,13 +205,27 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
+      font-size: 12px;
+    }
+
+    .home-banner__group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .home-banner__group-label {
+      width: 48px;
+      opacity: 0.7;
+      flex-shrink: 0;
     }
 
     .home-banner__service {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      font-size: 12px;
-      gap: 6px;
+      gap: 4px;
+      opacity: 0.92;
     }
 
     .home-banner__dot {
@@ -183,10 +244,11 @@
         background: #f56c6c;
         box-shadow: 0 0 6px rgba(245, 108, 108, 0.6);
       }
-    }
 
-    .home-banner__service-label {
-      opacity: 0.92;
+      &--partial {
+        background: #e6a23c;
+        box-shadow: 0 0 6px rgba(230, 162, 60, 0.6);
+      }
     }
   }
 </style>
