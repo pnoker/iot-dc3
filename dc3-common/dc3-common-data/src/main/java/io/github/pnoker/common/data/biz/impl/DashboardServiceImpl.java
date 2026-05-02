@@ -342,6 +342,7 @@ public class DashboardServiceImpl implements DashboardService {
             vo.setEventTypeFlag(toInt(row.get("event_type_flag")));
             vo.setConfirmFlag(toInt(row.get("confirm_flag")));
             vo.setCreateTime(toLocalDateTime(row.get("create_time")));
+            vo.setMessage(asString(row.get("message")));
             out.add(vo);
         }
         return out;
