@@ -66,7 +66,7 @@ export default defineComponent({
           trigger: 'blur',
         },
         {
-          pattern: /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥-_]*$/,
+          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
           message: t('common.nameFormat'),
         },
       ],
