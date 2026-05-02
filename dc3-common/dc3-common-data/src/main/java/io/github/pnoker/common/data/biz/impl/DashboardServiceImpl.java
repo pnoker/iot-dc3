@@ -54,6 +54,9 @@ public class DashboardServiceImpl implements DashboardService {
 
     private static final Set<String> GRANULARITY = Set.of("hour", "day");
 
+    /** Whitelist for the alert source parameter. */
+    private static final Set<String> ALERT_SOURCES = Set.of("device", "driver");
+
     @Resource
     private DashboardMapper dashboardMapper;
 
@@ -109,6 +112,48 @@ public class DashboardServiceImpl implements DashboardService {
             }
         }
         return out;
+    }
+
+    @Override
+    public Map<String, Object> alertPage(Long tenantId, String source, Integer eventTypeFlag,
+                                         Integer confirmFlag, long current, long size) {
+        String src = source == null || source.isBlank() ? null
+                : (ALERT_SOURCES.contains(source) ? source : null);
+        long clampedCurrent = Math.max(1L, current);
+        long clampedSize = Math.max(1L, Math.min(size, 200L));
+        long offset = (clampedCurrent - 1L) * clampedSize;
+
+        long total = alertMapper.countFiltered(tenantId, src, eventTypeFlag, confirmFlag);
+        List<Map<String, Object>> rows = alertMapper.listPaged(
+                tenantId, src, eventTypeFlag, confirmFlag, offset, clampedSize);
+        List<AlertItemVO> records = new ArrayList<>(rows.size());
+        for (Map<String, Object> row : rows) {
+            AlertItemVO vo = new AlertItemVO();
+            vo.setId(toLong(row.get("id")));
+            vo.setSource(asString(row.get("source")));
+            vo.setSourceId(toLong(row.get("source_id")));
+            vo.setPointId(toLong(row.get("point_id")));
+            vo.setEventTypeFlag(toInt(row.get("event_type_flag")));
+            vo.setConfirmFlag(toInt(row.get("confirm_flag")));
+            vo.setCreateTime(toLocalDateTime(row.get("create_time")));
+            vo.setMessage(asString(row.get("message")));
+            records.add(vo);
+        }
+        Map<String, Object> out = new java.util.HashMap<>();
+        out.put("current", clampedCurrent);
+        out.put("size", clampedSize);
+        out.put("total", total);
+        out.put("pages", clampedSize == 0 ? 0 : (total + clampedSize - 1) / clampedSize);
+        out.put("records", records);
+        return out;
+    }
+
+    @Override
+    public boolean confirmAlert(Long tenantId, String source, Long id) {
+        if (source == null || !ALERT_SOURCES.contains(source) || id == null) {
+            return false;
+        }
+        return alertMapper.confirmOne(tenantId, source, id) > 0;
     }
 
     private static int toInt(Object v) {

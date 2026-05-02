@@ -193,4 +193,39 @@ public class DashboardController implements BaseController {
             return Mono.just(R.fail(e.getMessage()));
         }
     }
+
+    @org.springframework.web.bind.annotation.PostMapping("/alert/page")
+    public Mono<R<Map<String, Object>>> alertPage(
+            @org.springframework.web.bind.annotation.RequestBody(required = false) Map<String, Object> body) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                Map<String, Object> b = body == null ? new HashMap<>() : body;
+                String source = b.get("source") == null ? null : b.get("source").toString();
+                Integer typeFlag = b.get("eventTypeFlag") == null ? null :
+                        Integer.parseInt(b.get("eventTypeFlag").toString());
+                Integer confirmFlag = b.get("confirmFlag") == null ? null :
+                        Integer.parseInt(b.get("confirmFlag").toString());
+                long current = b.get("current") == null ? 1L : Long.parseLong(b.get("current").toString());
+                long size = b.get("size") == null ? 20L : Long.parseLong(b.get("size").toString());
+                return Mono.just(R.ok(dashboardService.alertPage(tenantId, source, typeFlag, confirmFlag, current, size)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/alert/confirm/{source}/{id}")
+    public Mono<R<Boolean>> alertConfirm(
+            @org.springframework.web.bind.annotation.PathVariable String source,
+            @org.springframework.web.bind.annotation.PathVariable Long id) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.confirmAlert(tenantId, source, id)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 }

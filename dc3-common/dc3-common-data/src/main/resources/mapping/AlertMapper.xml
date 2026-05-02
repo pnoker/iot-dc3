@@ -92,6 +92,15 @@
     </select>
 
     <!--
+        Common projection for a single event row. Included from the paging /
+        latest selects so both return the same shape (id, source, sourceId,
+        pointId, event_type_flag, confirm_flag, create_time, message).
+        message comes out of event_ext JSON via the "content" key; SQL reads
+        (event_ext->>'content') which works for both the new JsonExt layout
+        and a bare {"content": ...} wrapper.
+    -->
+
+    <!--
         Per-hour event count since {from}. date_trunc('hour') buckets events
         at hour boundaries; service layer then spreads rows into a fixed-
         length sparkline array anchored to "now - 24h".
@@ -108,5 +117,95 @@
          GROUP BY bucket
          ORDER BY bucket ASC
     </select>
+
+    <!--
+        Paged event list. source='device' or 'driver' restricts to one
+        table (faster); otherwise UNION ALL across both with consistent
+        shape. Inner LIMIT keeps each branch bounded before UNION.
+    -->
+    <select id="listPaged" resultType="map">
+        SELECT * FROM (
+        <choose>
+            <when test="source == 'device'">
+                SELECT id, 'device' AS source, device_id AS source_id, point_id,
+                       event_type_flag, confirm_flag, create_time,
+                       COALESCE(event_ext->>'content', '') AS message
+                  FROM dc3_device_event
+                 WHERE deleted = 0 AND tenant_id = #{tenantId}
+                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+            </when>
+            <when test="source == 'driver'">
+                SELECT id, 'driver' AS source, driver_id AS source_id, 0 AS point_id,
+                       event_type_flag, confirm_flag, create_time,
+                       COALESCE(event_ext->>'content', '') AS message
+                  FROM dc3_driver_event
+                 WHERE deleted = 0 AND tenant_id = #{tenantId}
+                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+            </when>
+            <otherwise>
+                (SELECT id, 'device' AS source, device_id AS source_id, point_id,
+                        event_type_flag, confirm_flag, create_time,
+                        COALESCE(event_ext->>'content', '') AS message
+                   FROM dc3_device_event
+                  WHERE deleted = 0 AND tenant_id = #{tenantId}
+                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
+                UNION ALL
+                (SELECT id, 'driver' AS source, driver_id AS source_id, 0 AS point_id,
+                        event_type_flag, confirm_flag, create_time,
+                        COALESCE(event_ext->>'content', '') AS message
+                   FROM dc3_driver_event
+                  WHERE deleted = 0 AND tenant_id = #{tenantId}
+                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
+            </otherwise>
+        </choose>
+        ) rows
+        ORDER BY create_time DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countFiltered" resultType="long">
+        <choose>
+            <when test="source == 'device'">
+                SELECT COUNT(*) FROM dc3_device_event
+                 WHERE deleted = 0 AND tenant_id = #{tenantId}
+                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+            </when>
+            <when test="source == 'driver'">
+                SELECT COUNT(*) FROM dc3_driver_event
+                 WHERE deleted = 0 AND tenant_id = #{tenantId}
+                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+            </when>
+            <otherwise>
+                SELECT
+                  (SELECT COUNT(*) FROM dc3_device_event
+                    WHERE deleted = 0 AND tenant_id = #{tenantId}
+                    <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
+                    <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
+                + (SELECT COUNT(*) FROM dc3_driver_event
+                    WHERE deleted = 0 AND tenant_id = #{tenantId}
+                    <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
+                    <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
+            </otherwise>
+        </choose>
+    </select>
+
+    <update id="confirmOne">
+        <choose>
+            <when test="source == 'device'">
+                UPDATE dc3_device_event SET confirm_flag = 1
+                 WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
+            </when>
+            <when test="source == 'driver'">
+                UPDATE dc3_driver_event SET confirm_flag = 1
+                 WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
+            </when>
+        </choose>
+    </update>
 
 </mapper>

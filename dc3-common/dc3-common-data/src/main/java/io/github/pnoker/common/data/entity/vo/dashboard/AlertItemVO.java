@@ -54,4 +54,10 @@ public class AlertItemVO implements Serializable {
     private Integer confirmFlag;
 
     private LocalDateTime createTime;
+
+    /**
+     * Human-readable message extracted from event_ext->>'content'.
+     * Populated by the paging / list endpoints; latest(size=N) leaves it null.
+     */
+    private String message;
 }
