@@ -110,4 +110,16 @@ public interface DashboardService {
      * was actually updated (id + tenant match), false otherwise.
      */
     boolean confirmAlert(Long tenantId, String source, Long id);
+
+    /** Flip confirm_flag back to 0 — undo a previous confirm. */
+    boolean unconfirmAlert(Long tenantId, String source, Long id);
+
+    /**
+     * Bulk confirm / unconfirm. {@code confirm} chooses the direction
+     * (true = set to 1, false = set to 0). Returns the number of rows
+     * actually changed across all entries.
+     */
+    int bulkConfirmAlert(Long tenantId,
+                         java.util.List<java.util.Map<String, Object>> items,
+                         boolean confirm);
 }

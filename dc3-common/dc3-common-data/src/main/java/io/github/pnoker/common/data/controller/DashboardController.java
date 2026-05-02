@@ -180,18 +180,20 @@ public class DashboardController implements BaseController {
     }
 
     /**
-     * System-wide health snapshot for the home banner. Not tenant-scoped
-     * because the status of shared infra (DB / MQ / gateway) and sibling
-     * services is a platform-wide concern.
+     * System-wide health snapshot for the home banner. Infra / center probes
+     * are platform-wide but driver / device fleet summaries are tenant-scoped,
+     * so we thread tenantId through to match the gRPC facades' tenant filter.
      */
     @GetMapping("/system/health")
     public Mono<R<SystemHealthVO>> systemHealth() {
-        try {
-            return Mono.just(R.ok(systemHealthService.snapshot()));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(systemHealthService.snapshot(tenantId)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     @org.springframework.web.bind.annotation.PostMapping("/alert/page")
@@ -222,6 +224,42 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> {
             try {
                 return Mono.just(R.ok(dashboardService.confirmAlert(tenantId, source, id)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/alert/unconfirm/{source}/{id}")
+    public Mono<R<Boolean>> alertUnconfirm(
+            @org.springframework.web.bind.annotation.PathVariable String source,
+            @org.springframework.web.bind.annotation.PathVariable Long id) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.unconfirmAlert(tenantId, source, id)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    /**
+     * Bulk confirm or unconfirm. Body = { confirm: true|false, items:
+     * [{source, id}, ...] }. Returns the number of rows actually changed.
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/alert/bulk-confirm")
+    public Mono<R<Integer>> alertBulkConfirm(
+            @org.springframework.web.bind.annotation.RequestBody Map<String, Object> body) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> items = (List<Map<String, Object>>)
+                        body.getOrDefault("items", java.util.Collections.emptyList());
+                boolean confirm = body.get("confirm") == null
+                        || Boolean.parseBoolean(body.get("confirm").toString());
+                return Mono.just(R.ok(dashboardService.bulkConfirmAlert(tenantId, items, confirm)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));

@@ -208,4 +208,17 @@
         </choose>
     </update>
 
+    <update id="unconfirmOne">
+        <choose>
+            <when test="source == 'device'">
+                UPDATE dc3_device_event SET confirm_flag = 0
+                 WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
+            </when>
+            <when test="source == 'driver'">
+                UPDATE dc3_driver_event SET confirm_flag = 0
+                 WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
+            </when>
+        </choose>
+    </update>
+
 </mapper>
