@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2016-present the IoT DC3 original author or authors.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.pnoker.common.data.mapper.DashboardMapper">
+
+    <select id="countInRange" resultType="long">
+        SELECT COUNT(*)
+          FROM v_dc3_point_value_all
+         WHERE create_time &gt;= #{from}
+           AND create_time &lt;  #{to}
+           AND (#{tenantId} IS NULL OR tenant_id = #{tenantId})
+    </select>
+
+    <!--
+        CAST(#{bucket} AS interval) instead of #{bucket}::interval:
+        Postgres JDBC can't infer a type for the '?' placeholder before the
+        cast operator, which fails with "could not determine data type of
+        parameter". CAST(... AS ...) binds the value first.
+    -->
+    <select id="timeseries" resultType="map">
+        SELECT time_bucket(CAST(#{bucket} AS interval), create_time) AS bucket,
+               COUNT(*)                                              AS count
+          FROM v_dc3_point_value_all
+         WHERE create_time &gt;= #{from}
+           AND create_time &lt;  #{to}
+           AND (#{tenantId} IS NULL OR tenant_id = #{tenantId})
+         GROUP BY bucket
+         ORDER BY bucket ASC
+    </select>
+
+    <!--
+        ${dimension} is interpolated directly. Service layer must validate it
+        against a whitelist (device_id / point_id / driver_id) — never accept
+        user input.
+    -->
+    <select id="top" resultType="map">
+        SELECT ${dimension} AS entity_id,
+               COUNT(*)     AS count
+          FROM v_dc3_point_value_all
+         WHERE create_time &gt;= #{from}
+           AND create_time &lt;  #{to}
+           AND (#{tenantId} IS NULL OR tenant_id = #{tenantId})
+         GROUP BY ${dimension}
+         ORDER BY count DESC
+         LIMIT #{limit}
+    </select>
+
+    <!--
+        Each branch has its own ORDER BY / LIMIT, so the subqueries must be
+        wrapped in parentheses to participate in UNION ALL (Postgres rule).
+        Inner LIMITs cap per-type reads so we never scan a full hypertable.
+    -->
+    <select id="latestStream" resultType="map">
+        SELECT * FROM (
+            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
+                    raw_value::text AS raw_value,
+                    cal_value::text AS cal_value,
+                    'STRING'        AS value_type
+               FROM dc3_point_value
+              WHERE (#{tenantId} IS NULL OR tenant_id = #{tenantId})
+              ORDER BY create_time DESC LIMIT #{limit})
+            UNION ALL
+            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
+                    raw_value::text, cal_value::text, 'INT'
+               FROM dc3_point_value_int
+              WHERE (#{tenantId} IS NULL OR tenant_id = #{tenantId})
+              ORDER BY create_time DESC LIMIT #{limit})
+            UNION ALL
+            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
+                    raw_value::text, cal_value::text, 'LONG'
+               FROM dc3_point_value_long
+              WHERE (#{tenantId} IS NULL OR tenant_id = #{tenantId})
+              ORDER BY create_time DESC LIMIT #{limit})
+            UNION ALL
+            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
+                    raw_value::text, cal_value::text, 'BOOL'
+               FROM dc3_point_value_bool
+              WHERE (#{tenantId} IS NULL OR tenant_id = #{tenantId})
+              ORDER BY create_time DESC LIMIT #{limit})
+            UNION ALL
+            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
+                    raw_value::text, cal_value::text, 'FLOAT'
+               FROM dc3_point_value_float
+              WHERE (#{tenantId} IS NULL OR tenant_id = #{tenantId})
+              ORDER BY create_time DESC LIMIT #{limit})
+            UNION ALL
+            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
+                    raw_value::text, cal_value::text, 'DOUBLE'
+               FROM dc3_point_value_double
+              WHERE (#{tenantId} IS NULL OR tenant_id = #{tenantId})
+              ORDER BY create_time DESC LIMIT #{limit})
+            UNION ALL
+            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
+                    raw_value::text, cal_value::text, 'JSON'
+               FROM dc3_point_value_json
+              WHERE (#{tenantId} IS NULL OR tenant_id = #{tenantId})
+              ORDER BY create_time DESC LIMIT #{limit})
+        ) unioned
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>
