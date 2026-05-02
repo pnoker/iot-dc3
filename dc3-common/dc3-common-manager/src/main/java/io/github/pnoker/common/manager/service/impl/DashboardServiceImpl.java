@@ -22,12 +22,16 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.manager.entity.vo.dashboard.BucketVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DeviceStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DriverStatsVO;
+import io.github.pnoker.common.manager.entity.vo.dashboard.GrowthVO;
 import io.github.pnoker.common.manager.mapper.DashboardMapper;
 import io.github.pnoker.common.manager.service.DashboardService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -118,6 +122,49 @@ public class DashboardServiceImpl implements DashboardService {
         out.setByProfile(byProfile);
         out.setTotal(byEnable.stream().mapToLong(BucketVO::getCount).sum());
         return out;
+    }
+
+    @Override
+    public GrowthVO dailyGrowth(Long tenantId, int days) {
+        int clamped = Math.max(1, Math.min(days, 90));
+        LocalDate today = LocalDate.now();
+        LocalDateTime from = today.minusDays(clamped - 1L).atStartOfDay();
+        LocalDateTime to = today.plusDays(1).atStartOfDay();
+
+        GrowthVO out = new GrowthVO();
+        out.setDriver(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_driver", from, to), today, clamped));
+        out.setDevice(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_device", from, to), today, clamped));
+        out.setPoint(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_point", from, to), today, clamped));
+        out.setProfile(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_profile", from, to), today, clamped));
+        return out;
+    }
+
+    /**
+     * Pads a sparse (day, count) row set into a fixed-length series ending on
+     * {@code today}. JDBC returns DATE as java.sql.Date or LocalDate depending
+     * on the driver, so handle both.
+     */
+    private static List<Long> fillSeries(List<Map<String, Object>> rows, LocalDate today, int length) {
+        long[] series = new long[length];
+        LocalDate anchor = today.minusDays(length - 1L);
+        for (Map<String, Object> row : rows) {
+            LocalDate day = toLocalDate(row.get("day"));
+            if (day == null) continue;
+            int idx = (int) (day.toEpochDay() - anchor.toEpochDay());
+            if (idx >= 0 && idx < length) {
+                series[idx] = toLong(row.get("count"));
+            }
+        }
+        List<Long> out = new ArrayList<>(length);
+        for (long v : series) out.add(v);
+        return out;
+    }
+
+    private static LocalDate toLocalDate(Object v) {
+        if (v == null) return null;
+        if (v instanceof LocalDate ld) return ld;
+        if (v instanceof Date d) return d.toLocalDate();
+        return LocalDate.parse(v.toString());
     }
 
     @FunctionalInterface

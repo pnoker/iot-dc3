@@ -21,6 +21,7 @@ import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DeviceStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DriverStatsVO;
+import io.github.pnoker.common.manager.entity.vo.dashboard.GrowthVO;
 import io.github.pnoker.common.manager.service.DashboardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,6 +71,25 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> {
             try {
                 return Mono.just(R.ok(dashboardService.deviceStats(tenantId, topN)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    /**
+     * Daily new-row counts for driver / device / point / profile tables over
+     * the last {@code days} days. Backs the stat-card sparklines. Returns
+     * fixed-length zero-padded arrays so the frontend never has to reason
+     * about missing days.
+     */
+    @GetMapping("/growth")
+    public Mono<R<GrowthVO>> dailyGrowth(
+            @RequestParam(value = "days", defaultValue = "7") int days) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.dailyGrowth(tenantId, days)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));
