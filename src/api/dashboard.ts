@@ -46,6 +46,7 @@ export interface AlertPageQuery {
   source?: 'device' | 'driver' | null;
   eventTypeFlag?: number | null;
   confirmFlag?: number | null;
+  rangeHours?: number | null;
   current?: number;
   size?: number;
 }

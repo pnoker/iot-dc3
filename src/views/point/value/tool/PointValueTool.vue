@@ -68,6 +68,17 @@
           />
         </el-select>
       </el-form-item>
+      <el-form-item :label="$t('settings.event.timeRange')" prop="rangeHours">
+        <el-segmented
+          v-model="formData.rangeHours"
+          :options="[
+            { label: $t('common.all'), value: '' },
+            { label: $t('common.ranges.h24'), value: 24 },
+            { label: $t('common.ranges.d7'), value: 168 },
+            { label: $t('common.ranges.d30'), value: 720 },
+          ]"
+        />
+      </el-form-item>
       <el-form-item v-if="embedded === 'device'" :label="$t('pointValue.tool.pointName')" prop="pointName">
         <el-input
           v-model="formData.pointName"
@@ -115,7 +126,7 @@
 
   defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change']);
 
-  const formData = reactive<Record<string, any>>({ enableFlag: '' });
+  const formData = reactive<Record<string, any>>({ enableFlag: '', rangeHours: '' });
   const deviceDictionaries = ref<Dictionary[]>([]);
   const deviceLoading = ref(false);
   const pointDictionaries = ref<Dictionary[]>([]);

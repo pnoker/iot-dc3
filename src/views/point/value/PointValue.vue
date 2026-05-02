@@ -177,7 +177,11 @@
   };
 
   const search = (params: any) => {
-    reactiveData.query = params;
+    const cleaned: Record<string, any> = {};
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== '' && v != null) cleaned[k] = v;
+    }
+    reactiveData.query = cleaned;
     list();
   };
 

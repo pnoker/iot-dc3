@@ -42,8 +42,19 @@
             v-model="fd.confirmFlag"
             :options="[
               { label: $t('common.all'), value: '' },
-              { label: $t('settings.event.unconfirmed'), value: 0 },
-              { label: $t('settings.event.confirmed'), value: 1 },
+              { label: $t('common.unconfirmed'), value: 0 },
+              { label: $t('common.confirmed'), value: 1 },
+            ]"
+          />
+        </el-form-item>
+        <el-form-item :label="$t('settings.event.timeRange')" prop="rangeHours">
+          <el-segmented
+            v-model="fd.rangeHours"
+            :options="[
+              { label: $t('common.all'), value: '' },
+              { label: $t('common.ranges.h24'), value: 24 },
+              { label: $t('common.ranges.d7'), value: 168 },
+              { label: $t('common.ranges.d30'), value: 720 },
             ]"
           />
         </el-form-item>
@@ -106,7 +117,7 @@
         <el-table-column :label="$t('settings.event.confirmFlag')" width="110">
           <template #default="{ row }">
             <el-tag :type="row.confirmFlag === 1 ? 'success' : 'warning'" size="small">
-              {{ row.confirmFlag === 1 ? $t('settings.event.confirmed') : $t('settings.event.unconfirmed') }}
+              {{ row.confirmFlag === 1 ? $t('common.confirmed') : $t('common.unconfirmed') }}
             </el-tag>
           </template>
         </el-table-column>
@@ -179,9 +190,10 @@
   const rows = ref<Row[]>([]);
   const nameMap = reactive<Record<string, string>>({});
 
-  const formData = reactive<{ eventTypeFlag: number | ''; confirmFlag: number | '' }>({
+  const formData = reactive<{ eventTypeFlag: number | ''; confirmFlag: number | ''; rangeHours: number | '' }>({
     eventTypeFlag: '',
     confirmFlag: '',
+    rangeHours: '',
   });
   const page = reactive({ current: 1, size: 20, total: 0 });
 
@@ -196,6 +208,7 @@
         source: props.source,
         eventTypeFlag: formData.eventTypeFlag === '' ? null : Number(formData.eventTypeFlag),
         confirmFlag: formData.confirmFlag === '' ? null : Number(formData.confirmFlag),
+        rangeHours: formData.rangeHours === '' ? null : Number(formData.rangeHours),
         current: page.current,
         size: page.size,
       });
@@ -237,6 +250,7 @@
   const onReset = () => {
     formData.eventTypeFlag = '';
     formData.confirmFlag = '';
+    formData.rangeHours = '';
     page.current = 1;
     load();
   };
