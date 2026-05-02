@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { httpGet } from '@/api/common';
+import { httpGet, httpPost } from '@/api/common';
 import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 
 export const statsToday = () => httpGet(`${API_DATA_BASE}/dashboard/stats/today`);
@@ -41,6 +41,19 @@ export const statsActivity = (rangeHours = 168) =>
 export const systemHealth = () => httpGet(`${API_DATA_BASE}/dashboard/system/health`);
 
 export const dailyGrowth = (days = 7) => httpGet(`${API_MANAGER_BASE}/dashboard/growth`, { params: { days } });
+
+export interface AlertPageQuery {
+  source?: 'device' | 'driver' | null;
+  eventTypeFlag?: number | null;
+  confirmFlag?: number | null;
+  current?: number;
+  size?: number;
+}
+
+export const alertPage = (body: AlertPageQuery = {}) => httpPost(`${API_DATA_BASE}/dashboard/alert/page`, body);
+
+export const alertConfirm = (source: 'device' | 'driver', id: string | number) =>
+  httpPost(`${API_DATA_BASE}/dashboard/alert/confirm/${source}/${id}`);
 
 export const driverStats = () => httpGet(`${API_MANAGER_BASE}/dashboard/driver/stats`);
 
