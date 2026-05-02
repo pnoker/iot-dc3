@@ -69,9 +69,11 @@ public class DashboardController implements BaseController {
             try {
                 long today = dashboardService.countToday(tenantId);
                 long yesterday = dashboardService.countYesterday(tenantId);
+                long total = dashboardService.countTotal(tenantId);
                 Map<String, Object> out = new HashMap<>();
                 out.put("today", today);
                 out.put("yesterday", yesterday);
+                out.put("total", total);
                 // Convenience delta for the UI: +12% (positive) / -3% (negative) / 0.
                 if (yesterday > 0) {
                     out.put("percentChange", Math.round(((double) (today - yesterday) * 100.0) / yesterday));

@@ -52,6 +52,14 @@ public class AlertStatsVO implements Serializable {
 
     private long driverUnconfirmed;
 
+    private long todayDeviceAlarms;
+
+    private long todayDriverAlarms;
+
+    private long todayDeviceUnconfirmed;
+
+    private long todayDriverUnconfirmed;
+
     private List<BucketVO> byType;
 
     /**

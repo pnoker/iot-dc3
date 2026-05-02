@@ -243,6 +243,41 @@
         </choose>
     </select>
 
+    <!--
+        Today's ALARM counts per source (event_type_flag = 1, create_time >= start of today).
+    -->
+    <select id="todayBySource" resultType="map">
+        SELECT 'device'                        AS source,
+               (SELECT COUNT(*)
+                FROM dc3_device_event
+                WHERE deleted = 0
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag = 1
+                  AND create_time &gt;= #{from}) AS total,
+               (SELECT COUNT(*)
+                FROM dc3_device_event
+                WHERE deleted = 0
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag = 1
+                  AND confirm_flag = 0
+                  AND create_time &gt;= #{from}) AS unconfirmed
+        UNION ALL
+        SELECT 'driver'                        AS source,
+               (SELECT COUNT(*)
+                FROM dc3_driver_event
+                WHERE deleted = 0
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag = 1
+                  AND create_time &gt;= #{from}) AS total,
+               (SELECT COUNT(*)
+                FROM dc3_driver_event
+                WHERE deleted = 0
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag = 1
+                  AND confirm_flag = 0
+                  AND create_time &gt;= #{from}) AS unconfirmed
+    </select>
+
     <update id="confirmOne">
         <choose>
             <when test="source == 'device'">
