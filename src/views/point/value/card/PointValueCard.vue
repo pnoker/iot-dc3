@@ -82,7 +82,7 @@
               </ul>
             </div>
           </div>
-          <div v-if="embedded != ''" :id="data.pointId" class="things-card-body-content-time"></div>
+          <div v-if="embedded != ''" ref="chartRef" class="things-card-body-content-time"></div>
         </div>
         <div v-if="embedded == ''" class="things-card__footer">
           <div class="things-card-footer-operation">
@@ -106,7 +106,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, watch } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue';
   import { useI18n } from 'vue-i18n';
 
@@ -163,6 +163,7 @@
     copy(JSON.stringify(content, null, 2), t('pointValue.card.pointValueId'));
   };
 
+  const chartRef = ref<HTMLElement>();
   let tinyArea: Chart;
   const history = () => {
     getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
@@ -196,13 +197,16 @@
   onMounted(() => {
     window.dispatchEvent(new Event('resize'));
 
-    if (props.embedded != '') {
+    if (props.embedded != '' && chartRef.value) {
       tinyArea = new Chart({
-        container: props.data.pointId,
+        container: chartRef.value,
         autoFit: true,
         height: 80,
       });
 
+      // G2 v5 expects gradients as CSS-style strings, not descriptor objects
+      // (the legacy { type:'linear', stops:[...] } shape throws
+      // `colorStr.indexOf is not a function` inside the style-value registry).
       tinyArea
         .area()
         .data([])
@@ -210,8 +214,8 @@
         .encode('y', (v: any) => v)
         .encode('shape', 'smooth')
         .scale('y', { zero: true })
-        .style('fill', 'linear-gradient(-90deg, white 0%, darkgreen 100%)')
-        .style('fillOpacity', 0.6)
+        .style('fill', 'linear-gradient(90deg, rgba(255,255,255,0) 0%, #409eff 100%)')
+        .style('fillOpacity', 0.3)
         .animate('enter', { type: 'fadeIn' })
         .axis(false);
 

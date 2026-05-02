@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+  import { computed, onUnmounted, ref, watch } from 'vue';
   import type { Component, PropType } from 'vue';
   import { CaretBottom, CaretTop, Minus, Refresh } from '@element-plus/icons-vue';
   import { Chart } from '@antv/g2';
@@ -112,44 +112,63 @@
   const drawSparkline = () => {
     const el = sparkRef.value;
     if (!el || !props.sparkline || props.sparkline.length === 0) return;
-    const points = props.sparkline.map((y, i) => ({ x: i, y }));
-    chart?.destroy();
-    chart = new Chart({
-      container: el,
-      autoFit: true,
-      height: 40,
-      paddingTop: 2,
-      paddingBottom: 2,
-      paddingLeft: 2,
-      paddingRight: 2,
+    // G2 autoFit reads the container's layout width at construction time;
+    // defer to the next animation frame so Vue's DOM patch and the browser
+    // layout pass both complete before we measure. Without this the very
+    // first render on the home page can pick up a 0-width container
+    // (especially under grid layouts) and silently paint nothing.
+    requestAnimationFrame(() => {
+      const node = sparkRef.value;
+      if (!node) return;
+      const points = props.sparkline.map((y, i) => ({ x: i, y }));
+      const accent = getComputedStyle(node).getPropertyValue('--stat-card-accent').trim() || '#409eff';
+      chart?.destroy();
+      chart = new Chart({
+        container: node,
+        autoFit: true,
+        height: 40,
+        paddingTop: 2,
+        paddingBottom: 2,
+        paddingLeft: 2,
+        paddingRight: 2,
+      });
+      // G2 v5 expects gradients as CSS-style strings, not descriptor objects.
+      // Passing an object throws `colorStr.indexOf is not a function` inside
+      // the style-value registry. The 90° direction mirrors the x1=1/x2=0 /
+      // y1=0/y2=0 axis used by the original descriptor so the accent colour
+      // still emerges from the right edge.
+      const fillGradient = `linear-gradient(90deg, rgba(255,255,255,0) 0%, ${accent} 100%)`;
+      chart
+        .area()
+        .data(points)
+        .encode('x', 'x')
+        .encode('y', 'y')
+        .encode('shape', 'smooth')
+        .style('fill', fillGradient)
+        .style('fillOpacity', 0.3)
+        .axis(false)
+        .legend(false)
+        .tooltip(false);
+      chart
+        .line()
+        .data(points)
+        .encode('x', 'x')
+        .encode('y', 'y')
+        .encode('shape', 'smooth')
+        .style('stroke', accent)
+        .style('lineWidth', 2)
+        .axis(false)
+        .legend(false)
+        .tooltip(false);
+      chart.render();
     });
-    chart
-      .area()
-      .data(points)
-      .encode('x', 'x')
-      .encode('y', 'y')
-      .encode('shape', 'smooth')
-      .style('fill', `var(--stat-card-accent)`)
-      .style('fillOpacity', 0.35)
-      .axis(false)
-      .legend(false)
-      .tooltip(false);
-    chart
-      .line()
-      .data(points)
-      .encode('x', 'x')
-      .encode('y', 'y')
-      .encode('shape', 'smooth')
-      .style('stroke', `var(--stat-card-accent)`)
-      .style('lineWidth', 1.5)
-      .axis(false)
-      .legend(false)
-      .tooltip(false);
-    chart.render();
   };
 
-  onMounted(drawSparkline);
-  watch(() => props.sparkline, drawSparkline, { deep: true });
+  // flush: 'post' delays the callback until after Vue has patched the DOM,
+  // so the container div exists before we touch it. immediate: true covers
+  // the case where the parent already has the sparkline data at mount time
+  // (navigations back into a page that cached the dashboard response).
+  watch(() => props.sparkline, drawSparkline, { deep: true, flush: 'post', immediate: true });
   onUnmounted(() => chart?.destroy());
 </script>
 
