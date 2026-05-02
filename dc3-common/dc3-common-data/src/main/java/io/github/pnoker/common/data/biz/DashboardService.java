@@ -130,4 +130,14 @@ public interface DashboardService {
     int bulkConfirmAlert(Long tenantId,
                          java.util.List<java.util.Map<String, Object>> items,
                          boolean confirm);
+
+    /**
+     * Daily event trend for the last {@code days} days, split by device/driver source.
+     */
+    List<AlertTrendVO> alertTrend(Long tenantId, int days);
+
+    /**
+     * Top N event sources by alarm count in the last {@code days} days.
+     */
+    List<AlertTopSourceVO> alertTopSources(Long tenantId, int days, int limit);
 }

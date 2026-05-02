@@ -272,4 +272,31 @@ public class DashboardController implements BaseController {
             }
         });
     }
+
+    @GetMapping("/alert/trend")
+    public Mono<R<List<AlertTrendVO>>> alertTrend(
+            @RequestParam(value = "days", defaultValue = "30") int days) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertTrend(tenantId, days)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/alert/top-sources")
+    public Mono<R<List<AlertTopSourceVO>>> alertTopSources(
+            @RequestParam(value = "days", defaultValue = "30") int days,
+            @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertTopSources(tenantId, days, limit)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 }
