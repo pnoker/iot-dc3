@@ -49,12 +49,11 @@
         >
           <div class="live-feed__item">
             <div class="live-feed__line">
-              <el-tag v-if="driverName(row.driverId)" size="small" type="info" class="live-feed__driver-tag">
-                {{ driverName(row.driverId) }}
-              </el-tag>
-              <span class="live-feed__device">{{ deviceName(row.deviceId) }}</span>
+              <span class="live-feed__driver">{{ displayDriver(row) }}</span>
               <span class="live-feed__sep">/</span>
-              <span class="live-feed__point">{{ pointName(row.pointId) }}</span>
+              <span class="live-feed__device">{{ displayDevice(row) }}</span>
+              <span class="live-feed__sep">/</span>
+              <span class="live-feed__point">{{ displayPoint(row) }}</span>
             </div>
             <div class="live-feed__value-line">
               <span class="live-feed__tag" :class="`live-feed__tag--${row.valueType?.toLowerCase() || 'string'}`">
@@ -76,18 +75,21 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+  import { onMounted, onUnmounted, ref, watch } from 'vue';
   import { Refresh } from '@element-plus/icons-vue';
 
   import { streamLatest } from '@/api/dashboard';
-  import { getDeviceByIds } from '@/api/device';
-  import { getDriverByIds } from '@/api/driver';
-  import { getPointByIds } from '@/api/point';
 
   interface Row {
     deviceId: number | string;
     pointId: number | string;
     driverId?: number | string;
+    // driverName / deviceName / pointName are populated server-side by
+    // DashboardServiceImpl.latestStream via the metadata facades, so the
+    // feed can render the full tuple without a separate lookup round-trip.
+    driverName?: string;
+    deviceName?: string;
+    pointName?: string;
     rawValue?: string;
     calValue?: string;
     valueType?: string;
@@ -102,9 +104,6 @@
   const rows = ref<Row[]>([]);
   const lastRefreshed = ref<string>('');
   const intervalMs = ref(0);
-  const deviceMap = reactive<Record<string, string>>({});
-  const driverMap = reactive<Record<string, string>>({});
-  const pointMap = reactive<Record<string, string>>({});
 
   let timer: ReturnType<typeof setInterval> | null = null;
 
@@ -115,7 +114,6 @@
       const data: Row[] = res?.data ?? [];
       rows.value = data;
       lastRefreshed.value = new Date().toISOString();
-      await resolveNames(data);
     } catch {
       // handled globally
     } finally {
@@ -123,58 +121,12 @@
     }
   };
 
-  const resolveNames = async (batch: Row[]) => {
-    const devIds = Array.from(new Set(batch.map((r) => String(r.deviceId)).filter((id) => id && !deviceMap[id])));
-    const driverIds = Array.from(
-      new Set(batch.map((r) => String(r.driverId)).filter((id) => id && id !== '0' && !driverMap[id]))
-    );
-    const pointIds = Array.from(new Set(batch.map((r) => String(r.pointId)).filter((id) => id && !pointMap[id])));
-    const jobs: Promise<void>[] = [];
-    if (devIds.length) {
-      jobs.push(
-        getDeviceByIds(devIds)
-          .then((r: any) => {
-            const data = r?.data || {};
-            for (const id of devIds) {
-              if (data[id]) deviceMap[id] = data[id].deviceName || id;
-            }
-          })
-          .catch(() => {})
-      );
-    }
-    if (driverIds.length) {
-      jobs.push(
-        getDriverByIds(driverIds)
-          .then((r: any) => {
-            const data = r?.data || {};
-            for (const id of driverIds) {
-              if (data[id]) driverMap[id] = data[id].driverName || id;
-            }
-          })
-          .catch(() => {})
-      );
-    }
-    if (pointIds.length) {
-      jobs.push(
-        getPointByIds(pointIds)
-          .then((r: any) => {
-            const data = r?.data || {};
-            for (const id of pointIds) {
-              if (data[id]) pointMap[id] = data[id].pointName || id;
-            }
-          })
-          .catch(() => {})
-      );
-    }
-    await Promise.all(jobs);
-  };
-
-  const deviceName = (id: Row['deviceId']) => deviceMap[String(id)] || String(id);
-  const driverName = (id?: Row['driverId']) => {
-    if (!id || String(id) === '0') return '';
-    return driverMap[String(id)] || '';
-  };
-  const pointName = (id: Row['pointId']) => pointMap[String(id)] || String(id);
+  // Show the name when the server resolved it, otherwise fall back to the
+  // raw ID so deleted-but-historical rows remain legible.
+  const displayDriver = (r: Row) =>
+    r.driverName || (r.driverId && String(r.driverId) !== '0' ? String(r.driverId) : '-');
+  const displayDevice = (r: Row) => r.deviceName || String(r.deviceId);
+  const displayPoint = (r: Row) => r.pointName || String(r.pointId);
 
   const rowKey = (r: Row) => `${r.deviceId}-${r.pointId}-${r.createTime}`;
 
@@ -265,11 +217,11 @@
       text-overflow: ellipsis;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
 
-    .live-feed__driver-tag {
-      flex-shrink: 0;
+    .live-feed__driver {
+      color: #606266;
     }
 
     .live-feed__device {

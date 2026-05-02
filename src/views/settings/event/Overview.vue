@@ -25,10 +25,19 @@
         :subtitle="c.subtitle"
         :icon="c.icon"
         :tone="c.tone"
+        :sparkline="c.sparkline"
+        :trend="c.trend"
         :on-refresh="c.onRefresh"
         @click="c.onClick"
       />
     </div>
+
+    <div class="event-overview__charts">
+      <event-trend-chart class="event-overview__chart-main" />
+      <top-sources-chart class="event-overview__chart-side" />
+    </div>
+
+    <recent-unconfirmed />
   </div>
 </template>
 
@@ -39,10 +48,18 @@
   import type { Component } from 'vue';
   import { Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
 
-  import { alertPage } from '@/api/dashboard';
+  import { alertPage, alertStats } from '@/api/dashboard';
   import StatCard from '@/components/card/stat/StatCard.vue';
+  import EventTrendChart from './components/EventTrendChart.vue';
+  import TopSourcesChart from './components/TopSourcesChart.vue';
+  import RecentUnconfirmed from './components/RecentUnconfirmed.vue';
 
   type Tone = 'blue' | 'purple' | 'orange' | 'red';
+
+  interface Trend {
+    direction: 'up' | 'down' | 'flat';
+    label: string;
+  }
 
   interface Card {
     key: string;
@@ -51,6 +68,8 @@
     subtitle: string;
     icon: Component;
     tone: Tone;
+    sparkline: number[];
+    trend: Trend | null;
     onClick: () => void;
     onRefresh: () => Promise<void>;
   }
@@ -64,6 +83,7 @@
     deviceUnconfirmed: 0,
     driverTotal: 0,
     driverUnconfirmed: 0,
+    sparkline: [] as number[],
   });
 
   const fetchCount = async (source: 'device' | 'driver', confirmFlag: number | null) => {
@@ -78,19 +98,41 @@
   const load = async () => {
     loading.value = true;
     try {
-      const [dt, du, rt, ru] = await Promise.all([
+      const [dt, du, rt, ru, stats] = await Promise.all([
         fetchCount('device', null),
         fetchCount('device', 0),
         fetchCount('driver', null),
         fetchCount('driver', 0),
+        alertStats().catch(() => null),
       ]);
       state.deviceTotal = dt;
       state.deviceUnconfirmed = du;
       state.driverTotal = rt;
       state.driverUnconfirmed = ru;
+      state.sparkline = (stats as any)?.data?.sparkline24h ?? [];
     } finally {
       loading.value = false;
     }
+  };
+
+  const sparkTrend = (data: number[]): Trend | null => {
+    if (data.length < 2) return null;
+    const prev = data[data.length - 2] ?? 0;
+    const curr = data[data.length - 1] ?? 0;
+    if (prev === 0 && curr === 0) return null;
+    const pct = prev === 0 ? 100 : Math.round(((curr - prev) / prev) * 100);
+    if (pct > 0) return { direction: 'up', label: `+${pct}%` };
+    if (pct < 0) return { direction: 'down', label: `${pct}%` };
+    return { direction: 'flat', label: '0%' };
+  };
+
+  // Share the same 24-hour sparkline across all four cards so the row
+  // lines up at the same height and the "floating total" cards don't look
+  // visually hollow next to the "unconfirmed" ones.
+  const unconfirmedSubtitle = (unconfirmed: number, total: number) => {
+    if (total === 0) return '';
+    const pct = Math.round((unconfirmed / total) * 100);
+    return t('settings.event.overview.unconfirmedRatio', { unconfirmed, total, pct });
   };
 
   const cards = computed<Card[]>(() => [
@@ -101,16 +143,8 @@
       subtitle: t('settings.event.overview.goToDevice'),
       icon: Management,
       tone: 'blue',
-      onClick: () => router.push({ name: 'settingsDeviceEvent' }),
-      onRefresh: load,
-    },
-    {
-      key: 'device-unconfirmed',
-      title: t('settings.event.overview.deviceUnconfirmed'),
-      value: state.deviceUnconfirmed,
-      subtitle: '',
-      icon: Warning,
-      tone: 'orange',
+      sparkline: state.sparkline,
+      trend: sparkTrend(state.sparkline),
       onClick: () => router.push({ name: 'settingsDeviceEvent' }),
       onRefresh: load,
     },
@@ -121,16 +155,32 @@
       subtitle: t('settings.event.overview.goToDriver'),
       icon: Promotion,
       tone: 'purple',
+      sparkline: state.sparkline,
+      trend: sparkTrend(state.sparkline),
       onClick: () => router.push({ name: 'settingsDriverEvent' }),
+      onRefresh: load,
+    },
+    {
+      key: 'device-unconfirmed',
+      title: t('settings.event.overview.deviceUnconfirmed'),
+      value: state.deviceUnconfirmed,
+      subtitle: unconfirmedSubtitle(state.deviceUnconfirmed, state.deviceTotal),
+      icon: Warning,
+      tone: 'orange',
+      sparkline: state.sparkline,
+      trend: sparkTrend(state.sparkline),
+      onClick: () => router.push({ name: 'settingsDeviceEvent' }),
       onRefresh: load,
     },
     {
       key: 'driver-unconfirmed',
       title: t('settings.event.overview.driverUnconfirmed'),
       value: state.driverUnconfirmed,
-      subtitle: '',
+      subtitle: unconfirmedSubtitle(state.driverUnconfirmed, state.driverTotal),
       icon: WarningFilled,
       tone: 'red',
+      sparkline: state.sparkline,
+      trend: sparkTrend(state.sparkline),
       onClick: () => router.push({ name: 'settingsDriverEvent' }),
       onRefresh: load,
     },
@@ -141,6 +191,10 @@
 
 <style lang="scss" scoped>
   .event-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
     .event-overview__cards {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -152,6 +206,21 @@
       @media (max-width: 640px) {
         grid-template-columns: 1fr;
       }
+    }
+
+    .event-overview__charts {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+
+      @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .event-overview__chart-main,
+    .event-overview__chart-side {
+      min-height: 340px;
     }
   }
 </style>

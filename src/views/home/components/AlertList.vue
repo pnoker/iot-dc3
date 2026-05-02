@@ -20,6 +20,8 @@
       <div class="alert-list__header">
         <span class="alert-list__title">
           {{ $t('home.alertList.title') }}
+          <!-- Badge mirrors the actual rendered list length so the badge
+               number and what the user sees below it never drift apart. -->
           <el-badge v-if="rows.length > 0" :value="rows.length" :max="99" type="danger" class="alert-list__badge" />
         </span>
         <el-button :icon="Refresh" :loading="loading" circle size="small" @click="refresh" />
@@ -46,7 +48,7 @@
                 <el-tag :type="tagType(row.eventTypeFlag)" size="small">
                   {{ levelLabel(row.eventTypeFlag) }}
                 </el-tag>
-                <el-tag :type="row.source === 'device' ? 'primary' : 'info'" size="small">
+                <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
                   {{ sourceLabel(row) }}
                 </el-tag>
                 <span class="alert-list__name">{{ nameFor(row) }}</span>

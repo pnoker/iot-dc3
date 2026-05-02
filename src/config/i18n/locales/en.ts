@@ -2,6 +2,7 @@ export default {
   common: {
     all: 'All',
     ranges: {
+      today: 'Today',
       h24: 'Last 24 hours',
       d7: 'Last 7 days',
       d30: 'Last 30 days',
@@ -165,9 +166,9 @@ export default {
       settings: 'Settings',
     },
     alertList: {
-      title: 'Recent Alerts',
+      title: 'Recent Alarms',
       viewAll: 'View all',
-      empty: 'No alerts',
+      empty: 'No alarms',
       sourceDevice: 'Device',
       sourceDriver: 'Driver',
     },
@@ -457,7 +458,6 @@ export default {
   settings: {
     about: {
       platformTitle: 'Platform',
-      healthTitle: 'Service Health',
       name: 'Name',
       version: 'Version',
       license: 'License',
@@ -508,6 +508,11 @@ export default {
         driverUnconfirmed: 'Driver unconfirmed',
         goToDevice: 'Open device events →',
         goToDriver: 'Open driver events →',
+        trendTitle: '30-Day Event Trend',
+        topSourcesTitle: 'Top 10 Event Sources',
+        unconfirmedTitle: 'Recent Unconfirmed Events',
+        noUnconfirmed: 'No unconfirmed events',
+        unconfirmedRatio: '{unconfirmed}/{total} unhandled · {pct}%',
       },
       title: 'Events',
       source: 'Source',
@@ -615,6 +620,8 @@ export default {
       menuIndex: 'Order',
       menuIcon: 'Icon',
       menuUrl: 'Path',
+      titleZh: 'Chinese Title',
+      titleEn: 'English Title',
       parentMenuId: 'Parent',
       addTitle: 'Add Menu',
       editTitle: 'Edit Menu',
@@ -623,6 +630,8 @@ export default {
       menuCodePlaceholder: 'Enter menu code',
       menuIconPlaceholder: 'Element icon name (e.g. House)',
       menuUrlPlaceholder: 'Route path (e.g. /home)',
+      titleZhPlaceholder: 'Enter Chinese display title',
+      titleEnPlaceholder: 'Enter English display title',
       parentMenuIdPlaceholder: 'Optional, default top-level',
       confirmDelete: 'Are you sure to delete this menu? This action cannot be undone!',
       empty: 'No menu data!',

@@ -28,6 +28,7 @@
                 <span>{{ item.title }}</span>
               </template>
               <el-menu-item v-for="child in item.children" :key="child.name" :index="child.name">
+                <el-icon v-if="child.icon"><component :is="child.icon" /></el-icon>
                 <span>{{ child.title }}</span>
               </el-menu-item>
             </el-sub-menu>
@@ -53,6 +54,7 @@
   import { useRoute, useRouter } from 'vue-router';
 
   import { useMenuStore } from '@/store';
+  import { resolveMenuTitle } from '@/utils/MenuUtil';
 
   const { t } = useI18n();
   const route = useRoute();
@@ -85,16 +87,16 @@
       title: t('nav.settingsEvent'),
       icon: 'Bell',
       children: [
-        { name: 'settingsEvent', title: t('nav.settingsEventOverview') },
-        { name: 'settingsDriverEvent', title: t('nav.settingsDriverEvent') },
-        { name: 'settingsDeviceEvent', title: t('nav.settingsDeviceEvent') },
+        { name: 'settingsEvent', title: t('nav.settingsEventOverview'), icon: 'DataLine' },
+        { name: 'settingsDriverEvent', title: t('nav.settingsDriverEvent'), icon: 'Promotion' },
+        { name: 'settingsDeviceEvent', title: t('nav.settingsDeviceEvent'), icon: 'Management' },
       ],
     },
   ];
 
   const mapMenuNode = (node: any): SidebarItem => ({
     name: node.menuCode,
-    title: node.menuExt?.content?.title || node.menuName,
+    title: resolveMenuTitle(node),
     icon: node.menuExt?.content?.icon,
     children: node.children?.length
       ? node.children
@@ -153,7 +155,8 @@
       border-right: none;
     }
 
-    :deep(.el-menu-item) {
+    :deep(.el-menu-item),
+    :deep(.el-sub-menu__title) {
       display: flex;
       align-items: center;
       gap: 8px;

@@ -42,10 +42,10 @@
                which evaluates to false by default. -->
           <span v-if="!$slots.buttons" class="tool-card-footer-divider" aria-hidden="true" />
           <template v-if="!$slots.buttons">
-            <el-button :icon="Search" type="primary" @click="search">
+            <el-button :icon="Search" plain type="primary" @click="search">
               {{ t('common.search') }}
             </el-button>
-            <el-button :icon="RefreshRight" @click="reset">
+            <el-button :icon="RefreshRight" plain @click="reset">
               {{ t('common.reset') }}
             </el-button>
           </template>

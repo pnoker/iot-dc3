@@ -2,6 +2,7 @@ export default {
   common: {
     all: '全部',
     ranges: {
+      today: '今日',
       h24: '最近 24 小时',
       d7: '最近 7 天',
       d30: '最近 30 天',
@@ -457,7 +458,6 @@ export default {
   settings: {
     about: {
       platformTitle: '平台信息',
-      healthTitle: '服务状态',
       name: '名称',
       version: '版本',
       license: '许可协议',
@@ -499,6 +499,11 @@ export default {
         driverUnconfirmed: '驱动未确认',
         goToDevice: '查看设备事件 →',
         goToDriver: '查看驱动事件 →',
+        trendTitle: '30天事件趋势',
+        topSourcesTitle: '高频事件源 TOP 10',
+        unconfirmedTitle: '最近未确认事件',
+        noUnconfirmed: '暂无未确认事件',
+        unconfirmedRatio: '{unconfirmed}/{total} 未处理 · {pct}%',
       },
       title: '事件',
       source: '来源',
@@ -606,6 +611,8 @@ export default {
       menuIndex: '排序',
       menuIcon: '图标',
       menuUrl: '路径',
+      titleZh: '中文名称',
+      titleEn: '英文名称',
       parentMenuId: '父菜单',
       addTitle: '新增菜单',
       editTitle: '编辑菜单',
@@ -614,6 +621,8 @@ export default {
       menuCodePlaceholder: '请输入菜单编码',
       menuIconPlaceholder: '请输入图标名称 (如 House)',
       menuUrlPlaceholder: '请输入路由路径 (如 /home)',
+      titleZhPlaceholder: '请输入中文显示名称',
+      titleEnPlaceholder: '请输入英文显示名称',
       parentMenuIdPlaceholder: '选填, 默认顶级菜单',
       confirmDelete: '是否确定删除该菜单? 该操作不可恢复!',
       empty: '暂无菜单数据!',

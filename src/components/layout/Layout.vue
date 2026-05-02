@@ -34,21 +34,21 @@
                 <el-icon v-if="node.menuExt?.content?.icon">
                   <component :is="node.menuExt.content.icon" />
                 </el-icon>
-                {{ node.menuExt?.content?.title || node.menuName }}
+                {{ resolveMenuTitle(node) }}
               </template>
               <el-menu-item
                 v-for="child in node.children"
                 :key="`menu-child-${child.id}`"
                 :index="child.menuExt?.content?.url || `/${child.menuCode}`"
               >
-                {{ child.menuExt?.content?.title || child.menuName }}
+                {{ resolveMenuTitle(child) }}
               </el-menu-item>
             </el-sub-menu>
             <el-menu-item v-else :index="node.menuExt?.content?.url || `/${node.menuCode}`">
               <el-icon v-if="node.menuExt?.content?.icon">
                 <component :is="node.menuExt.content.icon" />
               </el-icon>
-              {{ node.menuExt?.content?.title || node.menuName }}
+              {{ resolveMenuTitle(node) }}
             </el-menu-item>
           </template>
         </el-menu>
@@ -63,31 +63,17 @@
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item :icon="Operation" @click.prevent="langExpanded = !langExpanded">
-                {{ t('layout.language') }}
-                <el-icon class="lang-arrow" :class="{ 'is-expanded': langExpanded }"><ArrowRight /></el-icon>
+              <!-- Inline language switch. @click.stop keeps the dropdown
+                   open while the user toggles locales; the native
+                   <el-dropdown-item> variants would close the menu on
+                   every click. -->
+              <li class="user_lang_row" @click.stop>
+                <span class="user_lang_label">{{ t('layout.language') }}</span>
+                <el-segmented v-model="langModel" :options="langOptions" size="small" />
+              </li>
+              <el-dropdown-item divided command="settings" :icon="Setting">
+                {{ t('layout.settings') }}
               </el-dropdown-item>
-              <div v-show="langExpanded" class="lang-inline">
-                <div
-                  class="lang-inline__item"
-                  :class="{ 'is-active': locale === 'en' }"
-                  @click="handleCommand('lang-en')"
-                >
-                  <span class="lang-flag">🇺🇸</span>
-                  <span>English</span>
-                  <el-icon v-if="locale === 'en'" class="lang-check"><Check /></el-icon>
-                </div>
-                <div
-                  class="lang-inline__item"
-                  :class="{ 'is-active': locale === 'zh' }"
-                  @click="handleCommand('lang-zh')"
-                >
-                  <span class="lang-flag">🇨🇳</span>
-                  <span>中文</span>
-                  <el-icon v-if="locale === 'zh'" class="lang-check"><Check /></el-icon>
-                </div>
-              </div>
-              <el-dropdown-item divided command="settings" :icon="Setting">{{ t('layout.settings') }}</el-dropdown-item>
               <el-dropdown-item command="help" :icon="QuestionFilled">{{ t('layout.about') }}</el-dropdown-item>
               <el-dropdown-item command="logout" :icon="SwitchButton">{{ t('layout.logout') }}</el-dropdown-item>
             </el-dropdown-menu>
@@ -100,7 +86,12 @@
         <div v-if="breadcrumbItems.length > 1" class="breadcrumb">
           <el-breadcrumb separator="/">
             <el-breadcrumb-item v-for="item in breadcrumbItems" :key="item.path" :to="item.path">
-              {{ item.title }}
+              <span class="breadcrumb__item">
+                <el-icon v-if="item.icon" class="breadcrumb__icon">
+                  <component :is="item.icon" />
+                </el-icon>
+                <span>{{ item.title }}</span>
+              </span>
             </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
@@ -113,25 +104,29 @@
 
 <script lang="ts" setup>
   import router from '@/config/router';
-  import {
-    ArrowRight,
-    Check,
-    HomeFilled,
-    Operation,
-    QuestionFilled,
-    Setting,
-    SwitchButton,
-  } from '@element-plus/icons-vue';
-  import { computed, onMounted, ref } from 'vue';
+  import { HomeFilled, QuestionFilled, Setting, SwitchButton } from '@element-plus/icons-vue';
+  import { computed, onMounted } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
   import { useAuthStore, useMenuStore } from '@/store';
+  import { resolveMenuTitle } from '@/utils/MenuUtil';
 
   const { t, locale } = useI18n();
   const route = useRoute();
   const authStore = useAuthStore();
   const menuStore = useMenuStore();
-  const langExpanded = ref(false);
+
+  const langOptions = [
+    { label: 'EN', value: 'en' },
+    { label: '中', value: 'zh' },
+  ];
+  const langModel = computed({
+    get: () => locale.value,
+    set: (val: string) => {
+      locale.value = val;
+      localStorage.setItem('locale', val);
+    },
+  });
 
   onMounted(() => {
     menuStore.fetchTree();
@@ -173,46 +168,83 @@
   //   Home / Settings / <list> / <detail>
   // instead of stopping at Home / Settings. Map each detail route to the list
   // route it descends from.
-  const settingsDetailParent: Record<string, { path: string; titleKey: string }> = {
-    settingsUserDetail: { path: '/settings/user', titleKey: 'nav.settingsUser' },
-    settingsRoleDetail: { path: '/settings/role', titleKey: 'nav.settingsRole' },
-    settingsResourceDetail: { path: '/settings/resource', titleKey: 'nav.settingsResource' },
-    settingsApiDetail: { path: '/settings/api', titleKey: 'nav.settingsApi' },
-    settingsMenuDetail: { path: '/settings/menu', titleKey: 'nav.settingsMenu' },
-    settingsDeviceEvent: { path: '/settings/event', titleKey: 'nav.settingsEvent' },
-    settingsDriverEvent: { path: '/settings/event', titleKey: 'nav.settingsEvent' },
+  const settingsDetailParent: Record<string, { path: string; titleKey: string; code: string }> = {
+    settingsUserDetail: { path: '/settings/user', titleKey: 'nav.settingsUser', code: 'settingsUser' },
+    settingsRoleDetail: { path: '/settings/role', titleKey: 'nav.settingsRole', code: 'settingsRole' },
+    settingsResourceDetail: { path: '/settings/resource', titleKey: 'nav.settingsResource', code: 'settingsResource' },
+    settingsApiDetail: { path: '/settings/api', titleKey: 'nav.settingsApi', code: 'settingsApi' },
+    settingsMenuDetail: { path: '/settings/menu', titleKey: 'nav.settingsMenu', code: 'settingsMenu' },
+    settingsDeviceEvent: { path: '/settings/event', titleKey: 'nav.settingsEvent', code: 'settingsEvent' },
+    settingsDriverEvent: { path: '/settings/event', titleKey: 'nav.settingsEvent', code: 'settingsEvent' },
+  };
+
+  // Static icon fallback for route names the backend menu tree does not yet
+  // describe (detail pages, legacy routes). The top-level nav entries defer
+  // to `menuStore.findByCode(...).menuExt.content.icon` first; this map only
+  // kicks in for crumbs the backend has no row for.
+  const FALLBACK_ICON: Record<string, string> = {
+    home: 'HomeFilled',
+    driver: 'Promotion',
+    profile: 'List',
+    device: 'Management',
+    pointValue: 'TrendCharts',
+    settings: 'Setting',
+    settingsUser: 'User',
+    settingsRole: 'UserFilled',
+    settingsResource: 'Key',
+    settingsApi: 'Link',
+    settingsMenu: 'Menu',
+    settingsEvent: 'Bell',
+    settingsEventOverview: 'DataLine',
+    settingsDeviceEvent: 'Management',
+    settingsDriverEvent: 'Promotion',
+    settingsAbout: 'InfoFilled',
+    driverDetail: 'Promotion',
+    deviceDetail: 'Management',
+    deviceEdit: 'Management',
+    profileDetail: 'List',
+    profileEdit: 'List',
+    pointDetail: 'TrendCharts',
+    pointEdit: 'TrendCharts',
+    settingsUserDetail: 'User',
+    settingsRoleDetail: 'UserFilled',
+    settingsResourceDetail: 'Key',
+    settingsApiDetail: 'Link',
+    settingsMenuDetail: 'Menu',
+  };
+
+  const iconForCode = (code: string): string | undefined => {
+    const node = menuStore.findByCode(code);
+    return node?.menuExt?.content?.icon || FALLBACK_ICON[code];
   };
 
   const breadcrumbItems = computed(() => {
-    const items: { path: string; title: string }[] = [{ path: '/home', title: t('nav.home') }];
+    const items: { path: string; title: string; icon?: string }[] = [
+      { path: '/home', title: t('nav.home'), icon: iconForCode('home') },
+    ];
     const name = route.name as string;
     if (!name || name === 'home') return items;
 
     const title = nameMap[name] ? t(nameMap[name]) : name;
     if (name.startsWith('driver')) {
-      items.push({ path: '/driver', title: t('nav.driver') });
+      items.push({ path: '/driver', title: t('nav.driver'), icon: iconForCode('driver') });
     } else if (name.startsWith('device')) {
-      items.push({ path: '/device', title: t('nav.device') });
+      items.push({ path: '/device', title: t('nav.device'), icon: iconForCode('device') });
     } else if (name.startsWith('profile')) {
-      items.push({ path: '/profile', title: t('nav.profile') });
+      items.push({ path: '/profile', title: t('nav.profile'), icon: iconForCode('profile') });
     } else if (name.startsWith('point')) {
-      items.push({ path: '/point_value', title: t('nav.pointValue') });
+      items.push({ path: '/point_value', title: t('nav.pointValue'), icon: iconForCode('pointValue') });
     } else if (name.startsWith('settings')) {
-      items.push({ path: '/settings/user', title: t('nav.settings') });
-      // Detail pages get an extra mid-level crumb pointing at the list view.
+      items.push({ path: '/settings/user', title: t('nav.settings'), icon: iconForCode('settings') });
       const mid = settingsDetailParent[name];
       if (mid) {
-        items.push({ path: mid.path, title: t(mid.titleKey) });
+        items.push({ path: mid.path, title: t(mid.titleKey), icon: iconForCode(mid.code) });
       }
     }
-    // Append the current-page crumb unless it would duplicate the crumb we
-    // just pushed (e.g. opening /settings/user clicks through to the same
-    // path as the Settings parent landing) — el-breadcrumb warns on
-    // duplicate :key otherwise.
     if (!['home', 'driver', 'profile', 'device', 'pointValue', 'settings'].includes(name)) {
       const last = items[items.length - 1];
       if (!last || last.path !== route.path) {
-        items.push({ path: route.path, title });
+        items.push({ path: route.path, title, icon: iconForCode(name) });
       }
     }
     return items;
@@ -239,11 +271,7 @@
   };
 
   const handleCommand = async (command: string) => {
-    if (command.startsWith('lang-')) {
-      const lang = command.slice(5);
-      locale.value = lang;
-      localStorage.setItem('locale', lang);
-    } else if (command === 'settings') {
+    if (command === 'settings') {
       await router.push({ name: 'settingsUser' });
     } else if (command === 'logout') {
       await authStore.logout();
@@ -308,11 +336,6 @@
             font-weight: 500;
           }
         }
-
-        .lang-flag {
-          margin-right: 8px;
-          font-size: 16px;
-        }
       }
     }
 
@@ -332,55 +355,39 @@
         background: #fff;
         border-radius: 4px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+        .breadcrumb__item {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .breadcrumb__icon {
+          font-size: 14px;
+        }
       }
     }
   }
 </style>
 
-<!-- Non-scoped: dropdown is teleported to <body> so scoped styles can't reach it -->
+<!--
+  Element Plus teleports el-dropdown's popper to <body>, which puts it
+  outside this component's scoped-CSS boundary. The language-switch row
+  lives inside that popper, so its styles need to be non-scoped to
+  actually land on the rendered DOM.
+-->
 <style lang="scss">
-  .lang-arrow {
-    margin-left: auto;
-    font-size: 12px;
-    transition: transform 0.2s;
-
-    &.is-expanded {
-      transform: rotate(90deg);
-    }
-  }
-
-  .lang-inline {
-    padding: 4px 0;
-    border-bottom: 1px solid var(--el-border-color-lighter);
-  }
-
-  .lang-inline__item {
+  .user_lang_row {
+    list-style: none;
     display: flex;
     align-items: center;
-    padding: 8px 32px;
-    font-size: 14px;
-    color: #606266;
-    cursor: pointer;
-    white-space: nowrap;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 16px 8px;
 
-    &:hover {
-      background: #ecf5ff;
-      color: #409eff;
-    }
-
-    &.is-active {
-      color: #409eff;
-      font-weight: 500;
-    }
-
-    .lang-flag {
-      margin-right: 8px;
-      font-size: 16px;
-    }
-
-    .lang-check {
-      margin-left: auto;
-      font-size: 12px;
+    .user_lang_label {
+      font-size: 13px;
+      color: #606266;
     }
   }
 </style>
