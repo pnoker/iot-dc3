@@ -72,13 +72,14 @@ public interface DashboardService {
 
     /**
      * Aggregate counters for the alert indicator card (total, unconfirmed, by
-     * event-type). Event tables don't carry tenant_id; this is global.
+     * event-type), scoped to one tenant.
      */
-    AlertStatsVO alertStats();
+    AlertStatsVO alertStats(Long tenantId);
 
     /**
-     * Most recent N alert rows across device + driver event tables. Used by
-     * the alert list panel on the home page. {@code size} clamped 1..50.
+     * Most recent N alert rows across device + driver event tables for the
+     * given tenant. Used by the alert list panel on the home page.
+     * {@code size} clamped 1..50.
      */
-    List<AlertItemVO> alertLatest(int size);
+    List<AlertItemVO> alertLatest(Long tenantId, int size);
 }
