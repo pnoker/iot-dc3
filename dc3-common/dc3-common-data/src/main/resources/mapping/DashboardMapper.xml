@@ -163,23 +163,20 @@
         labels (&lt;100ms, 100-500ms, 500ms-1s, 1-5s, 5-30s, &gt;=30s).
     -->
     <select id="latencyHistogram" resultType="map">
-        SELECT bin, COUNT(*) AS count FROM (
-            SELECT CASE
-                     WHEN diff_ms &lt;   100   THEN 0
-                     WHEN diff_ms &lt;   500   THEN 1
-                     WHEN diff_ms &lt;  1000   THEN 2
-                     WHEN diff_ms &lt;  5000   THEN 3
-                     WHEN diff_ms &lt; 30000   THEN 4
-                     ELSE 5
-                   END AS bin
-              FROM (
-                SELECT EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000 AS diff_ms
-                  FROM v_dc3_point_value_all
-                 WHERE create_time &gt;= #{from}
-                   AND create_time &lt;  #{to}
-                   AND tenant_id = #{tenantId}
-              ) deltas
-        ) bucketed
+        SELECT bin, COUNT(*) AS count
+        FROM (SELECT CASE
+                         WHEN diff_ms &lt; 100 THEN 0
+                         WHEN diff_ms &lt; 500 THEN 1
+                         WHEN diff_ms &lt; 1000 THEN 2
+                         WHEN diff_ms &lt; 5000 THEN 3
+                         WHEN diff_ms &lt; 30000 THEN 4
+                         ELSE 5
+                         END AS bin
+              FROM (SELECT EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000 AS diff_ms
+                    FROM v_dc3_point_value_all
+                    WHERE create_time &gt;= #{from}
+                      AND create_time &lt; #{to}
+                      AND tenant_id = #{tenantId}) deltas) bucketed
         GROUP BY bin
         ORDER BY bin ASC
     </select>
@@ -190,15 +187,13 @@
         the missing cells as zero.
     -->
     <select id="hourlyActivity" resultType="map">
-        SELECT EXTRACT(DOW  FROM create_time)::int AS dow,
-               EXTRACT(HOUR FROM create_time)::int AS hour,
-               COUNT(*)                            AS count
-          FROM v_dc3_point_value_all
-         WHERE create_time &gt;= #{from}
-           AND create_time &lt;  #{to}
-           AND tenant_id = #{tenantId}
-         GROUP BY dow, hour
-         ORDER BY dow ASC, hour ASC
+        SELECT EXTRACT(DOW FROM create_time)::int AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS count
+        FROM v_dc3_point_value_all
+        WHERE create_time &gt;= #{from}
+          AND create_time &lt; #{to}
+          AND tenant_id = #{tenantId}
+        GROUP BY dow, hour
+        ORDER BY dow ASC, hour ASC
     </select>
 
 </mapper>

@@ -49,6 +49,12 @@ public interface AlertMapper {
     List<Map<String, Object>> countByType(@Param("tenantId") Long tenantId);
 
     /**
+     * Per-source (device / driver) alert counts, scoped to one tenant.
+     * Returns rows with (source, total, unconfirmed).
+     */
+    List<Map<String, Object>> countBySource(@Param("tenantId") Long tenantId);
+
+    /**
      * Most recent N events across device + driver tables, flagged with source.
      */
     List<Map<String, Object>> latest(@Param("tenantId") Long tenantId, @Param("limit") int limit);
@@ -83,7 +89,9 @@ public interface AlertMapper {
                    @Param("source") String source,
                    @Param("id") Long id);
 
-    /** Flip confirm_flag back to 0 (undo). Same scoping as {@link #confirmOne}. */
+    /**
+     * Flip confirm_flag back to 0 (undo). Same scoping as {@link #confirmOne}.
+     */
     int unconfirmOne(@Param("tenantId") Long tenantId,
                      @Param("source") String source,
                      @Param("id") Long id);

@@ -99,11 +99,11 @@ public interface DashboardService {
      * {@code current}, {@code size}, {@code records}.
      */
     java.util.Map<String, Object> alertPage(Long tenantId,
-                                             String source,
-                                             Integer eventTypeFlag,
-                                             Integer confirmFlag,
-                                             long current,
-                                             long size);
+                                            String source,
+                                            Integer eventTypeFlag,
+                                            Integer confirmFlag,
+                                            long current,
+                                            long size);
 
     /**
      * Flip confirm_flag = 1 on a single event row. Returns true when the row
@@ -111,7 +111,9 @@ public interface DashboardService {
      */
     boolean confirmAlert(Long tenantId, String source, Long id);
 
-    /** Flip confirm_flag back to 0 — undo a previous confirm. */
+    /**
+     * Flip confirm_flag back to 0 — undo a previous confirm.
+     */
     boolean unconfirmAlert(Long tenantId, String source, Long id);
 
     /**
