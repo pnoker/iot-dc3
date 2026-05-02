@@ -24,7 +24,7 @@ import { getDeviceList } from '@/api/device';
 import { getPointList } from '@/api/point';
 import { getProfileList } from '@/api/profile';
 import { getDriverList } from '@/api/driver';
-import { alertStats, statsTimeseries, statsToday } from '@/api/dashboard';
+import { alertStats, dailyGrowth, statsTimeseries, statsToday } from '@/api/dashboard';
 
 import StatCard from './components/StatCard.vue';
 import LiveDataFeed from './components/LiveDataFeed.vue';
@@ -75,6 +75,10 @@ export default defineComponent({
       todaySparkline: [] as number[],
       alertCount: 0,
       alertUnconfirmed: 0,
+      driverSparkline: [] as number[],
+      deviceSparkline: [] as number[],
+      pointSparkline: [] as number[],
+      alertSparkline: [] as number[],
     });
 
     // HomeBanner polls /dashboard/system/health on its own; index.ts no longer
@@ -121,6 +125,18 @@ export default defineComponent({
         const res: any = await alertStats();
         state.alertCount = res?.data?.total ?? 0;
         state.alertUnconfirmed = res?.data?.unconfirmed ?? 0;
+        state.alertSparkline = Array.isArray(res?.data?.sparkline24h) ? res.data.sparkline24h.map(Number) : [];
+      } catch {
+        // handled globally
+      }
+    };
+
+    const loadGrowth = async () => {
+      try {
+        const res: any = await dailyGrowth(7);
+        state.driverSparkline = (res?.data?.driver ?? []).map(Number);
+        state.deviceSparkline = (res?.data?.device ?? []).map(Number);
+        state.pointSparkline = (res?.data?.point ?? []).map(Number);
       } catch {
         // handled globally
       }
@@ -131,6 +147,7 @@ export default defineComponent({
       loadToday();
       loadSparkline();
       loadAlerts();
+      loadGrowth();
     });
 
     const percentTrend = computed(() => {
@@ -149,7 +166,7 @@ export default defineComponent({
         icon: Promotion,
         tone: 'blue',
         trend: null,
-        sparkline: [],
+        sparkline: state.driverSparkline,
         onClick: () => router.push({ name: 'driver' }),
       },
       {
@@ -160,7 +177,7 @@ export default defineComponent({
         icon: Management,
         tone: 'purple',
         trend: null,
-        sparkline: [],
+        sparkline: state.deviceSparkline,
         onClick: () => router.push({ name: 'device' }),
       },
       {
@@ -171,7 +188,7 @@ export default defineComponent({
         icon: List,
         tone: 'orange',
         trend: null,
-        sparkline: [],
+        sparkline: state.pointSparkline,
         onClick: () => router.push({ name: 'profile' }),
       },
       {
@@ -193,7 +210,7 @@ export default defineComponent({
         icon: Bell,
         tone: 'red',
         trend: null,
-        sparkline: [],
+        sparkline: state.alertSparkline,
         onClick: () => {
           // Alerts are shown inline in the AlertList panel below; nothing to navigate yet.
         },

@@ -40,6 +40,8 @@ export const statsActivity = (rangeHours = 168) =>
 
 export const systemHealth = () => httpGet(`${API_DATA_BASE}/dashboard/system/health`);
 
+export const dailyGrowth = (days = 7) => httpGet(`${API_MANAGER_BASE}/dashboard/growth`, { params: { days } });
+
 export const driverStats = () => httpGet(`${API_MANAGER_BASE}/dashboard/driver/stats`);
 
 export const deviceStats = (topN = 10) => httpGet(`${API_MANAGER_BASE}/dashboard/device/stats`, { params: { topN } });
