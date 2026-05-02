@@ -18,9 +18,12 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.DashboardService;
+import io.github.pnoker.common.data.entity.vo.dashboard.AlertItemVO;
+import io.github.pnoker.common.data.entity.vo.dashboard.AlertStatsVO;
 import io.github.pnoker.common.data.entity.vo.dashboard.LatestPointValueVO;
 import io.github.pnoker.common.data.entity.vo.dashboard.TimeseriesPointVO;
 import io.github.pnoker.common.data.entity.vo.dashboard.TopEntityVO;
+import io.github.pnoker.common.data.mapper.AlertMapper;
 import io.github.pnoker.common.data.mapper.DashboardMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +60,9 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Resource
     private DashboardMapper dashboardMapper;
+
+    @Resource
+    private AlertMapper alertMapper;
 
     @Override
     public long countToday(Long tenantId) {
@@ -130,6 +136,51 @@ public class DashboardServiceImpl implements DashboardService {
             out.add(vo);
         }
         return out;
+    }
+
+    @Override
+    public AlertStatsVO alertStats() {
+        AlertStatsVO vo = new AlertStatsVO();
+        Map<String, Object> totals = alertMapper.countAll();
+        if (totals != null) {
+            vo.setTotal(toLong(totals.get("total")));
+            vo.setUnconfirmed(toLong(totals.get("unconfirmed")));
+        }
+        List<Map<String, Object>> rows = alertMapper.countByType();
+        List<AlertStatsVO.BucketVO> buckets = new ArrayList<>(rows.size());
+        for (Map<String, Object> row : rows) {
+            AlertStatsVO.BucketVO b = new AlertStatsVO.BucketVO();
+            b.setKey(asString(row.get("key")));
+            b.setCount(toLong(row.get("count")));
+            buckets.add(b);
+        }
+        vo.setByType(buckets);
+        return vo;
+    }
+
+    @Override
+    public List<AlertItemVO> alertLatest(int size) {
+        int clamped = Math.max(1, Math.min(size, 50));
+        List<Map<String, Object>> rows = alertMapper.latest(clamped);
+        List<AlertItemVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> row : rows) {
+            AlertItemVO vo = new AlertItemVO();
+            vo.setId(toLong(row.get("id")));
+            vo.setSource(asString(row.get("source")));
+            vo.setSourceId(toLong(row.get("source_id")));
+            vo.setPointId(toLong(row.get("point_id")));
+            vo.setEventTypeFlag(toInt(row.get("event_type_flag")));
+            vo.setConfirmFlag(toInt(row.get("confirm_flag")));
+            vo.setCreateTime(toLocalDateTime(row.get("create_time")));
+            out.add(vo);
+        }
+        return out;
+    }
+
+    private static int toInt(Object v) {
+        if (v == null) return 0;
+        if (v instanceof Number n) return n.intValue();
+        return Integer.parseInt(v.toString());
     }
 
     private static long toLong(Object v) {
