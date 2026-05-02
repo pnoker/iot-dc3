@@ -20,26 +20,38 @@ package io.github.pnoker.common.data.cache;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
- * In-process key-value cache backed by Caffeine.
- * <p>
- * Drop-in replacement for the legacy Redis-based KV service: preserves the same method
- * surface (setKey/getKey with optional TTL, batch variants) so call sites only need to
- * swap the injected type. Variable per-entry TTL is honored via a custom {@link Expiry}.
- * </p>
+ * Thin Caffeine wrapper with a Redis-like surface (setKey/getKey with optional
+ * TTL, batch variants) so call sites only need to swap the injected type.
+ * Variable per-entry TTL is honored via a custom {@link Expiry}.
+ *
+ * <p>Exposes {@link #onExpire(ExpireListener)} so callers can react when an
+ * entry is evicted because its TTL elapsed — e.g. the driver / device status
+ * keys use this to synthesise OFFLINE alarm rows without a scanning thread.</p>
  */
+@Slf4j
 @Component
 public class LocalCacheService {
 
     private Cache<String, Entry> cache;
+
+    /**
+     * Hooks fired exclusively on TTL-driven evictions. Copy-on-write list so
+     * registration from different modules (data biz, dashboards, …) is safe
+     * without locking.
+     */
+    private final List<ExpireListener> expireListeners = new CopyOnWriteArrayList<>();
 
     @PostConstruct
     public void init() {
@@ -62,6 +74,19 @@ public class LocalCacheService {
                     @SuppressWarnings("NullableProblems")
                     public long expireAfterRead(String key, Entry value, long currentTime, long currentDuration) {
                         return currentDuration;
+                    }
+                })
+                .removalListener((String key, Entry value, RemovalCause cause) -> {
+                    // Only fire listeners for natural TTL expiries. Explicit
+                    // cache.invalidate() / size-based eviction aren't
+                    // "the key went offline" semantically.
+                    if (cause != RemovalCause.EXPIRED || key == null || value == null) return;
+                    for (ExpireListener listener : expireListeners) {
+                        try {
+                            listener.onExpire(key, value.value);
+                        } catch (Exception e) {
+                            log.warn("Expire listener failed for key {}: {}", key, e.getMessage());
+                        }
                     }
                 })
                 .build();
@@ -98,6 +123,20 @@ public class LocalCacheService {
             result.add(getKey(key));
         }
         return result;
+    }
+
+    /**
+     * Register a callback that fires when an entry expires due to its TTL.
+     * The callback runs on Caffeine's removal executor (default: same thread
+     * that triggered the expiry read / write); keep the handler short.
+     */
+    public void onExpire(ExpireListener listener) {
+        if (listener != null) expireListeners.add(listener);
+    }
+
+    @FunctionalInterface
+    public interface ExpireListener {
+        void onExpire(String key, Object lastValue);
     }
 
     private record Entry(Object value, long ttlNanos) {
