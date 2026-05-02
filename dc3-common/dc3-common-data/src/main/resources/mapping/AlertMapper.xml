@@ -48,7 +48,35 @@
                       WHERE deleted = 0
                         AND tenant_id = #{tenantId}
                         AND event_type_flag &gt;= 1
-                        AND confirm_flag = 0)     AS unconfirmed
+                        AND confirm_flag = 0)        AS unconfirmed
+    </select>
+
+    <select id="countBySource" resultType="map">
+        SELECT 'device'                        AS source,
+               (SELECT COUNT(*)
+                FROM dc3_device_event
+                WHERE deleted = 0
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag &gt;= 1) AS total,
+               (SELECT COUNT(*)
+                FROM dc3_device_event
+                WHERE deleted = 0
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag &gt;= 1
+                  AND confirm_flag = 0)        AS unconfirmed
+        UNION ALL
+        SELECT 'driver'                        AS source,
+               (SELECT COUNT(*)
+                FROM dc3_driver_event
+                WHERE deleted = 0
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag &gt;= 1) AS total,
+               (SELECT COUNT(*)
+                FROM dc3_driver_event
+                WHERE deleted = 0
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag &gt;= 1
+                  AND confirm_flag = 0)        AS unconfirmed
     </select>
 
     <select id="countByType" resultType="map">
@@ -74,13 +102,13 @@
     <select id="latest" resultType="map">
         SELECT *
         FROM ((SELECT id,
-                      'device'                               AS source,
-                      device_id                              AS source_id,
+                      'device'                              AS source,
+                      device_id                             AS source_id,
                       point_id,
                       event_type_flag,
                       confirm_flag,
                       create_time,
-                      COALESCE(event_ext->>'content', '')    AS message
+                      COALESCE(event_ext ->> 'content', '') AS message
                FROM dc3_device_event
                WHERE deleted = 0
                  AND tenant_id = #{tenantId}
@@ -89,13 +117,13 @@
                LIMIT #{limit})
               UNION ALL
               (SELECT id,
-                      'driver'                               AS source,
-                      driver_id                              AS source_id,
+                      'driver'                              AS source,
+                      driver_id                             AS source_id,
                       0,
                       event_type_flag,
                       confirm_flag,
                       create_time,
-                      COALESCE(event_ext->>'content', '')    AS message
+                      COALESCE(event_ext ->> 'content', '') AS message
                FROM dc3_driver_event
                WHERE deleted = 0
                  AND tenant_id = #{tenantId}
@@ -122,17 +150,21 @@
     -->
     <select id="hourlyCounts" resultType="map">
         SELECT date_trunc('hour', create_time) AS bucket, COUNT(*) AS count
-          FROM (
-              SELECT create_time FROM dc3_device_event
-               WHERE deleted = 0 AND tenant_id = #{tenantId}
-                 AND event_type_flag &gt;= 1 AND create_time &gt;= #{from}
+        FROM (SELECT create_time
+              FROM dc3_device_event
+              WHERE deleted = 0
+                AND tenant_id = #{tenantId}
+                AND event_type_flag &gt;= 1
+                AND create_time &gt;= #{from}
               UNION ALL
-              SELECT create_time FROM dc3_driver_event
-               WHERE deleted = 0 AND tenant_id = #{tenantId}
-                 AND event_type_flag &gt;= 1 AND create_time &gt;= #{from}
-          ) merged
-         GROUP BY bucket
-         ORDER BY bucket ASC
+              SELECT create_time
+              FROM dc3_driver_event
+              WHERE deleted = 0
+                AND tenant_id = #{tenantId}
+                AND event_type_flag &gt;= 1
+                AND create_time &gt;= #{from}) merged
+        GROUP BY bucket
+        ORDER BY bucket ASC
     </select>
 
     <!--
@@ -145,36 +177,36 @@
         <choose>
             <when test="source == 'device'">
                 SELECT id, 'device' AS source, device_id AS source_id, point_id,
-                       event_type_flag, confirm_flag, create_time,
-                       COALESCE(event_ext->>'content', '') AS message
-                  FROM dc3_device_event
-                 WHERE deleted = 0 AND tenant_id = #{tenantId}
+                event_type_flag, confirm_flag, create_time,
+                COALESCE(event_ext->>'content', '') AS message
+                FROM dc3_device_event
+                WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
                 <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
             </when>
             <when test="source == 'driver'">
                 SELECT id, 'driver' AS source, driver_id AS source_id, 0 AS point_id,
-                       event_type_flag, confirm_flag, create_time,
-                       COALESCE(event_ext->>'content', '') AS message
-                  FROM dc3_driver_event
-                 WHERE deleted = 0 AND tenant_id = #{tenantId}
+                event_type_flag, confirm_flag, create_time,
+                COALESCE(event_ext->>'content', '') AS message
+                FROM dc3_driver_event
+                WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
                 <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
             </when>
             <otherwise>
                 (SELECT id, 'device' AS source, device_id AS source_id, point_id,
-                        event_type_flag, confirm_flag, create_time,
-                        COALESCE(event_ext->>'content', '') AS message
-                   FROM dc3_device_event
-                  WHERE deleted = 0 AND tenant_id = #{tenantId}
+                event_type_flag, confirm_flag, create_time,
+                COALESCE(event_ext->>'content', '') AS message
+                FROM dc3_device_event
+                WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
                 <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
                 UNION ALL
                 (SELECT id, 'driver' AS source, driver_id AS source_id, 0 AS point_id,
-                        event_type_flag, confirm_flag, create_time,
-                        COALESCE(event_ext->>'content', '') AS message
-                   FROM dc3_driver_event
-                  WHERE deleted = 0 AND tenant_id = #{tenantId}
+                event_type_flag, confirm_flag, create_time,
+                COALESCE(event_ext->>'content', '') AS message
+                FROM dc3_driver_event
+                WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
                 <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
             </otherwise>
@@ -188,26 +220,26 @@
         <choose>
             <when test="source == 'device'">
                 SELECT COUNT(*) FROM dc3_device_event
-                 WHERE deleted = 0 AND tenant_id = #{tenantId}
+                WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
                 <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
             </when>
             <when test="source == 'driver'">
                 SELECT COUNT(*) FROM dc3_driver_event
-                 WHERE deleted = 0 AND tenant_id = #{tenantId}
+                WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
                 <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
             </when>
             <otherwise>
                 SELECT
-                  (SELECT COUNT(*) FROM dc3_device_event
-                    WHERE deleted = 0 AND tenant_id = #{tenantId}
-                    <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                    <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
+                (SELECT COUNT(*) FROM dc3_device_event
+                WHERE deleted = 0 AND tenant_id = #{tenantId}
+                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
                 + (SELECT COUNT(*) FROM dc3_driver_event
-                    WHERE deleted = 0 AND tenant_id = #{tenantId}
-                    <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                    <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
+                WHERE deleted = 0 AND tenant_id = #{tenantId}
+                <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
             </otherwise>
         </choose>
     </select>
@@ -216,11 +248,11 @@
         <choose>
             <when test="source == 'device'">
                 UPDATE dc3_device_event SET confirm_flag = 1
-                 WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
+                WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
             </when>
             <when test="source == 'driver'">
                 UPDATE dc3_driver_event SET confirm_flag = 1
-                 WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
+                WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
             </when>
         </choose>
     </update>
@@ -229,11 +261,11 @@
         <choose>
             <when test="source == 'device'">
                 UPDATE dc3_device_event SET confirm_flag = 0
-                 WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
+                WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
             </when>
             <when test="source == 'driver'">
                 UPDATE dc3_driver_event SET confirm_flag = 0
-                 WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
+                WHERE id = #{id} AND tenant_id = #{tenantId} AND deleted = 0
             </when>
         </choose>
     </update>

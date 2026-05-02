@@ -80,6 +80,34 @@ public class DashboardServiceImpl implements DashboardService {
         return e == null ? "UNKNOWN" : e.name();
     }
 
+    /**
+     * Pads a sparse (day, count) row set into a fixed-length series ending on
+     * {@code today}. JDBC returns DATE as java.sql.Date or LocalDate depending
+     * on the driver, so handle both.
+     */
+    private static List<Long> fillSeries(List<Map<String, Object>> rows, LocalDate today, int length) {
+        long[] series = new long[length];
+        LocalDate anchor = today.minusDays(length - 1L);
+        for (Map<String, Object> row : rows) {
+            LocalDate day = toLocalDate(row.get("day"));
+            if (day == null) continue;
+            int idx = (int) (day.toEpochDay() - anchor.toEpochDay());
+            if (idx >= 0 && idx < length) {
+                series[idx] = toLong(row.get("count"));
+            }
+        }
+        List<Long> out = new ArrayList<>(length);
+        for (long v : series) out.add(v);
+        return out;
+    }
+
+    private static LocalDate toLocalDate(Object v) {
+        if (v == null) return null;
+        if (v instanceof LocalDate ld) return ld;
+        if (v instanceof Date d) return d.toLocalDate();
+        return LocalDate.parse(v.toString());
+    }
+
     @Override
     public DriverStatsVO driverStats(Long tenantId) {
         DriverStatsVO out = new DriverStatsVO();
@@ -137,34 +165,6 @@ public class DashboardServiceImpl implements DashboardService {
         out.setPoint(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_point", from, to), today, clamped));
         out.setProfile(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_profile", from, to), today, clamped));
         return out;
-    }
-
-    /**
-     * Pads a sparse (day, count) row set into a fixed-length series ending on
-     * {@code today}. JDBC returns DATE as java.sql.Date or LocalDate depending
-     * on the driver, so handle both.
-     */
-    private static List<Long> fillSeries(List<Map<String, Object>> rows, LocalDate today, int length) {
-        long[] series = new long[length];
-        LocalDate anchor = today.minusDays(length - 1L);
-        for (Map<String, Object> row : rows) {
-            LocalDate day = toLocalDate(row.get("day"));
-            if (day == null) continue;
-            int idx = (int) (day.toEpochDay() - anchor.toEpochDay());
-            if (idx >= 0 && idx < length) {
-                series[idx] = toLong(row.get("count"));
-            }
-        }
-        List<Long> out = new ArrayList<>(length);
-        for (long v : series) out.add(v);
-        return out;
-    }
-
-    private static LocalDate toLocalDate(Object v) {
-        if (v == null) return null;
-        if (v instanceof LocalDate ld) return ld;
-        if (v instanceof Date d) return d.toLocalDate();
-        return LocalDate.parse(v.toString());
     }
 
     @FunctionalInterface

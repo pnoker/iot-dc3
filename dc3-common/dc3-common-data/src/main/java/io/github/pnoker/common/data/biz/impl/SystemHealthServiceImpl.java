@@ -92,6 +92,41 @@ public class SystemHealthServiceImpl implements SystemHealthService {
     @Resource
     private LocalCacheService localCacheService;
 
+    private static Pages firstPage(int size) {
+        Pages p = new Pages();
+        p.setCurrent(1L);
+        p.setSize((long) size);
+        return p;
+    }
+
+    /**
+     * Runs a truthy probe on the common ForkJoinPool with a hard timeout.
+     * Any exception, false return, or timeout maps to "down".
+     */
+    private static String probe(Probe probe) {
+        CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                return probe.check();
+            } catch (Exception e) {
+                log.debug("Probe failed: {}", e.getMessage());
+                return false;
+            }
+        });
+        try {
+            return future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS) ? UP : DOWN;
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            log.debug("Probe timed out after {}ms", PROBE_TIMEOUT_MS);
+            return DOWN;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return DOWN;
+        } catch (ExecutionException e) {
+            log.debug("Probe execution failed: {}", e.getMessage());
+            return DOWN;
+        }
+    }
+
     @Override
     public SystemHealthVO snapshot(Long tenantId) {
         SystemHealthVO vo = new SystemHealthVO();
@@ -191,41 +226,6 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         summary.setTotal(devices.size());
         summary.setOnline(online);
         return summary;
-    }
-
-    private static Pages firstPage(int size) {
-        Pages p = new Pages();
-        p.setCurrent(1L);
-        p.setSize((long) size);
-        return p;
-    }
-
-    /**
-     * Runs a truthy probe on the common ForkJoinPool with a hard timeout.
-     * Any exception, false return, or timeout maps to "down".
-     */
-    private static String probe(Probe probe) {
-        CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() -> {
-            try {
-                return probe.check();
-            } catch (Exception e) {
-                log.debug("Probe failed: {}", e.getMessage());
-                return false;
-            }
-        });
-        try {
-            return future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS) ? UP : DOWN;
-        } catch (TimeoutException e) {
-            future.cancel(true);
-            log.debug("Probe timed out after {}ms", PROBE_TIMEOUT_MS);
-            return DOWN;
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return DOWN;
-        } catch (ExecutionException e) {
-            log.debug("Probe execution failed: {}", e.getMessage());
-            return DOWN;
-        }
     }
 
     @FunctionalInterface

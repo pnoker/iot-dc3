@@ -44,14 +44,13 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class LocalCacheService {
 
-    private Cache<String, Entry> cache;
-
     /**
      * Hooks fired exclusively on TTL-driven evictions. Copy-on-write list so
      * registration from different modules (data biz, dashboards, …) is safe
      * without locking.
      */
     private final List<ExpireListener> expireListeners = new CopyOnWriteArrayList<>();
+    private Cache<String, Entry> cache;
 
     @PostConstruct
     public void init() {

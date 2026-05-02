@@ -54,7 +54,9 @@ public class DashboardServiceImpl implements DashboardService {
 
     private static final Set<String> GRANULARITY = Set.of("hour", "day");
 
-    /** Whitelist for the alert source parameter. */
+    /**
+     * Whitelist for the alert source parameter.
+     */
     private static final Set<String> ALERT_SOURCES = Set.of("device", "driver");
 
     @Resource
@@ -62,6 +64,37 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Resource
     private AlertMapper alertMapper;
+
+    private static int toInt(Object v) {
+        if (v == null) return 0;
+        if (v instanceof Number n) return n.intValue();
+        return Integer.parseInt(v.toString());
+    }
+
+    private static long toLong(Object v) {
+        if (v == null) return 0L;
+        if (v instanceof Number n) return n.longValue();
+        return Long.parseLong(v.toString());
+    }
+
+    private static String asString(Object v) {
+        return v == null ? null : v.toString();
+    }
+
+    private static LocalDateTime toLocalDateTime(Object v) {
+        if (v == null) return null;
+        if (v instanceof LocalDateTime ldt) return ldt;
+        if (v instanceof Timestamp ts) return ts.toLocalDateTime();
+        // Fallback for JDBC drivers that return java.time.OffsetDateTime etc.
+        if (v instanceof java.time.OffsetDateTime odt) return odt.toLocalDateTime();
+        return LocalDateTime.parse(v.toString());
+    }
+
+    // Kept for reference — zero-arg unused reference suppressing unused-import warning.
+    @SuppressWarnings("unused")
+    private static LocalDateTime startOfDay() {
+        return LocalDate.now().atTime(LocalTime.MIN);
+    }
 
     @Override
     public List<LatencyBucketVO> latencyHistogram(Long tenantId, int rangeHours) {
@@ -187,37 +220,6 @@ public class DashboardServiceImpl implements DashboardService {
         return changed;
     }
 
-    private static int toInt(Object v) {
-        if (v == null) return 0;
-        if (v instanceof Number n) return n.intValue();
-        return Integer.parseInt(v.toString());
-    }
-
-    private static long toLong(Object v) {
-        if (v == null) return 0L;
-        if (v instanceof Number n) return n.longValue();
-        return Long.parseLong(v.toString());
-    }
-
-    private static String asString(Object v) {
-        return v == null ? null : v.toString();
-    }
-
-    private static LocalDateTime toLocalDateTime(Object v) {
-        if (v == null) return null;
-        if (v instanceof LocalDateTime ldt) return ldt;
-        if (v instanceof Timestamp ts) return ts.toLocalDateTime();
-        // Fallback for JDBC drivers that return java.time.OffsetDateTime etc.
-        if (v instanceof java.time.OffsetDateTime odt) return odt.toLocalDateTime();
-        return LocalDateTime.parse(v.toString());
-    }
-
-    // Kept for reference — zero-arg unused reference suppressing unused-import warning.
-    @SuppressWarnings("unused")
-    private static LocalDateTime startOfDay() {
-        return LocalDate.now().atTime(LocalTime.MIN);
-    }
-
     @Override
     public long countToday(Long tenantId) {
         LocalDateTime from = LocalDate.now().atStartOfDay();
@@ -309,6 +311,19 @@ public class DashboardServiceImpl implements DashboardService {
             buckets.add(b);
         }
         vo.setByType(buckets);
+
+        for (Map<String, Object> row : alertMapper.countBySource(tenantId)) {
+            String src = asString(row.get("source"));
+            long srcTotal = toLong(row.get("total"));
+            long srcUnconfirmed = toLong(row.get("unconfirmed"));
+            if ("device".equals(src)) {
+                vo.setDeviceAlerts(srcTotal);
+                vo.setDeviceUnconfirmed(srcUnconfirmed);
+            } else if ("driver".equals(src)) {
+                vo.setDriverAlerts(srcTotal);
+                vo.setDriverUnconfirmed(srcUnconfirmed);
+            }
+        }
 
         // 24-hour hourly sparkline, anchored to top-of-hour now-23.
         LocalDateTime anchor = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0).minusHours(23);
