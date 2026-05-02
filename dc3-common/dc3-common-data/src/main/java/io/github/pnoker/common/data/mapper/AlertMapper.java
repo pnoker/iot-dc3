@@ -82,4 +82,9 @@ public interface AlertMapper {
     int confirmOne(@Param("tenantId") Long tenantId,
                    @Param("source") String source,
                    @Param("id") Long id);
+
+    /** Flip confirm_flag back to 0 (undo). Same scoping as {@link #confirmOne}. */
+    int unconfirmOne(@Param("tenantId") Long tenantId,
+                     @Param("source") String source,
+                     @Param("id") Long id);
 }

@@ -21,11 +21,15 @@ import io.github.pnoker.common.data.biz.SystemHealthService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
 import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.enums.DriverStatusEnum;
+import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.TenantFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -46,12 +50,13 @@ import java.util.concurrent.TimeoutException;
 /**
  * Probes each dependency with a bounded, catch-all wrapper so a single flaky
  * dependency doesn't break the whole snapshot. Each probe returns "up" or
- * "down" — ambiguous states are treated as "down" to err on the alarming side.
+ * "down" — ambiguous states are treated as "down".
  *
- * <p>Why this lives in dc3-common-data instead of auth: the driver
- * online/offline state is only cached in this service's {@link LocalCacheService},
- * and walking out to fetch it from a sibling would defeat the whole "one
- * aggregated probe" point.</p>
+ * <p>Driver / device summaries have to live in this service: the
+ * online-status cache in {@link LocalCacheService} is populated by the
+ * heartbeat receivers here, not in manager. The fleet facades are called
+ * with a tenantId so the manager-side query filters to the caller's tenant
+ * (leaving it null routes through gRPC as 0 and matches no rows).</p>
  *
  * @author pnoker
  * @since 2026.5.2
@@ -82,14 +87,18 @@ public class SystemHealthServiceImpl implements SystemHealthService {
     private DriverFacade driverFacade;
 
     @Resource
+    private DeviceFacade deviceFacade;
+
+    @Resource
     private LocalCacheService localCacheService;
 
     @Override
-    public SystemHealthVO snapshot() {
+    public SystemHealthVO snapshot(Long tenantId) {
         SystemHealthVO vo = new SystemHealthVO();
         vo.setCenter(probeCenter());
         vo.setInfra(probeInfra());
-        vo.setDrivers(summariseDrivers());
+        vo.setDrivers(summariseDrivers(tenantId));
+        vo.setDevices(summariseDevices(tenantId));
         return vo;
     }
 
@@ -120,10 +129,13 @@ public class SystemHealthServiceImpl implements SystemHealthService {
         return out;
     }
 
-    private SystemHealthVO.DriverSummary summariseDrivers() {
-        SystemHealthVO.DriverSummary summary = new SystemHealthVO.DriverSummary();
+    private SystemHealthVO.FleetSummary summariseDrivers(Long tenantId) {
+        SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
         CompletableFuture<List<FacadeDriverBO>> future = CompletableFuture.supplyAsync(() -> {
-            FacadeDriverQuery q = FacadeDriverQuery.builder().page(firstPage(1000)).build();
+            FacadeDriverQuery q = FacadeDriverQuery.builder()
+                    .page(firstPage(1000))
+                    .tenantId(tenantId)
+                    .build();
             FacadePage<FacadeDriverBO> page = driverFacade.selectByPage(q);
             return page != null ? page.getRecords() : List.<FacadeDriverBO>of();
         });
@@ -136,24 +148,48 @@ public class SystemHealthServiceImpl implements SystemHealthService {
             return summary;
         }
         int online = 0;
-        int missingCache = 0;
         String onlineCode = DriverStatusEnum.ONLINE.getCode();
         for (FacadeDriverBO d : drivers) {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + d.getId();
             String status = localCacheService.getKey(key);
-            if (status == null) missingCache++;
             if (Objects.equals(status, onlineCode)) {
                 online++;
             }
         }
         summary.setTotal(drivers.size());
         summary.setOnline(online);
-        // Surfaces the common failure modes without needing to bump the log
-        // level: either the facade returned zero drivers (gRPC mis-wired or
-        // tenant filter too aggressive) or the status cache is cold (no
-        // heartbeat has reached data since startup).
-        log.info("System health drivers: total={}, online={}, missingStatusCache={}",
-                drivers.size(), online, missingCache);
+        return summary;
+    }
+
+    private SystemHealthVO.FleetSummary summariseDevices(Long tenantId) {
+        SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
+        CompletableFuture<List<FacadeDeviceBO>> future = CompletableFuture.supplyAsync(() -> {
+            FacadeDeviceQuery q = FacadeDeviceQuery.builder()
+                    .page(firstPage(5000))
+                    .tenantId(tenantId)
+                    .build();
+            FacadePage<FacadeDeviceBO> page = deviceFacade.selectByPage(q);
+            return page != null ? page.getRecords() : List.<FacadeDeviceBO>of();
+        });
+        List<FacadeDeviceBO> devices;
+        try {
+            devices = future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            future.cancel(true);
+            log.warn("Device summary failed: {}", e.getMessage(), e);
+            return summary;
+        }
+        int online = 0;
+        String onlineCode = DeviceStatusEnum.ONLINE.getCode();
+        for (FacadeDeviceBO d : devices) {
+            String key = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + d.getId();
+            String status = localCacheService.getKey(key);
+            if (Objects.equals(status, onlineCode)) {
+                online++;
+            }
+        }
+        summary.setTotal(devices.size());
+        summary.setOnline(online);
         return summary;
     }
 

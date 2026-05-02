@@ -156,6 +156,37 @@ public class DashboardServiceImpl implements DashboardService {
         return alertMapper.confirmOne(tenantId, source, id) > 0;
     }
 
+    @Override
+    public boolean unconfirmAlert(Long tenantId, String source, Long id) {
+        if (source == null || !ALERT_SOURCES.contains(source) || id == null) {
+            return false;
+        }
+        return alertMapper.unconfirmOne(tenantId, source, id) > 0;
+    }
+
+    @Override
+    public int bulkConfirmAlert(Long tenantId, List<Map<String, Object>> items, boolean confirm) {
+        if (items == null || items.isEmpty()) return 0;
+        int changed = 0;
+        for (Map<String, Object> item : items) {
+            Object srcRaw = item.get("source");
+            Object idRaw = item.get("id");
+            if (srcRaw == null || idRaw == null) continue;
+            String source = srcRaw.toString();
+            if (!ALERT_SOURCES.contains(source)) continue;
+            long id;
+            try {
+                id = Long.parseLong(idRaw.toString());
+            } catch (NumberFormatException ignore) {
+                continue;
+            }
+            changed += confirm
+                    ? alertMapper.confirmOne(tenantId, source, id)
+                    : alertMapper.unconfirmOne(tenantId, source, id);
+        }
+        return changed;
+    }
+
     private static int toInt(Object v) {
         if (v == null) return 0;
         if (v instanceof Number n) return n.intValue();
