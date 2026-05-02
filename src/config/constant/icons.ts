@@ -14,86 +14,28 @@
  * limitations under the License.
  */
 
-import {
-  Bell,
-  Box,
-  Calendar,
-  Cpu,
-  DataAnalysis,
-  Discount,
-  Connection,
-  Expand,
-  Folder,
-  Goods,
-  HomeFilled,
-  House,
-  Key,
-  Link,
-  List,
-  Lock,
-  Management,
-  Menu,
-  Monitor,
-  Odometer,
-  Operation,
-  PieChart,
-  Platform,
-  Promotion,
-  Setting,
-  Share,
-  Stopwatch,
-  Tickets,
-  Tools,
-  TrendCharts,
-  User,
-  UserFilled,
-  WalletFilled,
-} from '@element-plus/icons-vue';
+import * as ElementIcons from '@element-plus/icons-vue';
 import type { Component } from 'vue';
 
 /**
- * Name → component lookup used to render server-driven menu icons.
- * Add additional element-plus icons here as new menus reference them.
+ * Full name → component lookup for every icon shipped by
+ * `@element-plus/icons-vue` (~280 icons). Used by the menu edit picker and
+ * anywhere a menu references an icon by string.
+ *
+ * We pull in the whole namespace because this is an internal admin UI where
+ * bundle size is less important than letting operators pick any icon without
+ * having to touch code. Tree-shakers still drop unused icons outside this
+ * file; inside it, the lookup is O(1) by name.
+ *
+ * Entries are filtered to capitalized names referring to actual components,
+ * so stray module-level exports (e.g. `__esModule`) don't leak through.
  */
-export const iconMap: Record<string, Component> = {
-  Bell,
-  Box,
-  Calendar,
-  Connection,
-  Cpu,
-  DataAnalysis,
-  Discount,
-  Expand,
-  Folder,
-  Goods,
-  HomeFilled,
-  House,
-  Key,
-  Link,
-  List,
-  Lock,
-  Management,
-  Menu,
-  Monitor,
-  Odometer,
-  Operation,
-  PieChart,
-  Platform,
-  Promotion,
-  Setting,
-  Share,
-  Stopwatch,
-  Tickets,
-  Tools,
-  TrendCharts,
-  User,
-  UserFilled,
-  WalletFilled,
-};
+export const iconMap: Record<string, Component> = Object.fromEntries(
+  Object.entries(ElementIcons).filter(([name, comp]) => /^[A-Z]/.test(name) && comp != null && typeof comp === 'object')
+) as Record<string, Component>;
 
 /**
- * Ordered list of icon names — used by menu-edit pickers to show a stable
- * order (object key order isn't contractually stable across engines).
+ * Alphabetically sorted list of icon names for UI pickers (stable order).
  */
 export const iconNames: string[] = Object.keys(iconMap).sort((a, b) => a.localeCompare(b));
 
