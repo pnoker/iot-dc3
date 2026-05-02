@@ -47,16 +47,8 @@
             ]"
           />
         </el-form-item>
-        <el-form-item :label="$t('settings.event.timeRange')" prop="rangeHours">
-          <el-segmented
-            v-model="fd.rangeHours"
-            :options="[
-              { label: $t('common.all'), value: '' },
-              { label: $t('common.ranges.h24'), value: 24 },
-              { label: $t('common.ranges.d7'), value: 168 },
-              { label: $t('common.ranges.d30'), value: 720 },
-            ]"
-          />
+        <el-form-item :label="$t('settings.event.timeRange')" prop="rangeKey">
+          <range-segmented v-model="fd.rangeKey" include-all />
         </el-form-item>
       </template>
       <template v-if="selection.length > 0" #actions>
@@ -102,7 +94,6 @@
         <el-table-column :label="entityLabel" min-width="180" show-overflow-tooltip>
           <template #default="{ row }">
             <span>{{ nameFor(row) }}</span>
-            <span class="settings-table__sub">({{ row.sourceId }})</span>
           </template>
         </el-table-column>
         <el-table-column v-if="source === 'device'" :label="$t('settings.event.pointId')" prop="pointId" width="140" />
@@ -166,6 +157,8 @@
   import { successMessage } from '@/utils/NotificationUtil';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
+  import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
 
   interface Row {
     id: number | string;
@@ -190,10 +183,10 @@
   const rows = ref<Row[]>([]);
   const nameMap = reactive<Record<string, string>>({});
 
-  const formData = reactive<{ eventTypeFlag: number | ''; confirmFlag: number | ''; rangeHours: number | '' }>({
+  const formData = reactive<{ eventTypeFlag: number | ''; confirmFlag: number | ''; rangeKey: RangeKey }>({
     eventTypeFlag: '',
     confirmFlag: '',
-    rangeHours: '',
+    rangeKey: '',
   });
   const page = reactive({ current: 1, size: 20, total: 0 });
 
@@ -208,7 +201,7 @@
         source: props.source,
         eventTypeFlag: formData.eventTypeFlag === '' ? null : Number(formData.eventTypeFlag),
         confirmFlag: formData.confirmFlag === '' ? null : Number(formData.confirmFlag),
-        rangeHours: formData.rangeHours === '' ? null : Number(formData.rangeHours),
+        rangeKey: formData.rangeKey || null,
         current: page.current,
         size: page.size,
       });
@@ -250,7 +243,7 @@
   const onReset = () => {
     formData.eventTypeFlag = '';
     formData.confirmFlag = '';
-    formData.rangeHours = '';
+    formData.rangeKey = '';
     page.current = 1;
     load();
   };

@@ -20,16 +20,7 @@
       <div class="trend-chart__header">
         <span class="trend-chart__title">{{ $t('home.trendTitle') }}</span>
         <div class="trend-chart__actions">
-          <el-segmented
-            v-model="rangeKey"
-            :options="[
-              { label: $t('common.ranges.h24'), value: 'h24' },
-              { label: $t('common.ranges.d7'), value: 'd7' },
-              { label: $t('common.ranges.d30'), value: 'd30' },
-            ]"
-            size="small"
-            @change="load"
-          />
+          <range-segmented v-model="rangeKey" size="small" @update:model-value="load" />
           <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
         </div>
       </div>
@@ -44,10 +35,10 @@
   import { Refresh } from '@element-plus/icons-vue';
 
   import { statsTimeseries } from '@/api/dashboard';
+  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
+  import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
 
-  type RangeKey = 'h24' | 'd7' | 'd30';
-
-  const rangeKey = ref<RangeKey>('h24');
+  const rangeKey = ref<RangeKey>('24h');
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
   let chart: Chart | undefined;
@@ -84,16 +75,22 @@
     chart.render();
   };
 
+  // Backend resolves rangeKey → from-timestamp itself (TimeRangeUtil);
+  // we still pass a granularity hint because hourly buckets over a 30-day
+  // span would be too dense to render. Short ranges (today / 24h) use
+  // hourly buckets, longer ones (7d / 30d) use daily buckets.
+  const granularityFor = (key: RangeKey): 'hour' | 'day' => {
+    if (key === 'today' || key === '24h' || key === '') return 'hour';
+    return 'day';
+  };
+
   const load = async () => {
-    const params: { granularity: 'hour' | 'day'; rangeHours: number } =
-      rangeKey.value === 'h24'
-        ? { granularity: 'hour', rangeHours: 24 }
-        : rangeKey.value === 'd7'
-          ? { granularity: 'day', rangeHours: 168 }
-          : { granularity: 'day', rangeHours: 720 };
     loading.value = true;
     try {
-      const res: any = await statsTimeseries(params);
+      const res: any = await statsTimeseries({
+        granularity: granularityFor(rangeKey.value),
+        rangeKey: rangeKey.value,
+      });
       const points = (res?.data ?? []).map((p: any) => ({ bucket: p.bucket, count: Number(p.count) || 0 }));
       await nextTick();
       render(points);

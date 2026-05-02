@@ -22,17 +22,7 @@
           <el-tab-pane v-for="t in tabs" :key="t.key" :label="t.label" :name="t.key" />
         </el-tabs>
         <div class="analytics-tabs__actions">
-          <el-segmented
-            v-if="isTopTab"
-            v-model="rangeHours"
-            :options="[
-              { label: $t('common.ranges.h24'), value: 24 },
-              { label: $t('common.ranges.d7'), value: 168 },
-              { label: $t('common.ranges.d30'), value: 720 },
-            ]"
-            size="small"
-            @change="load"
-          />
+          <range-segmented v-if="isTopTab" v-model="rangeKey" size="small" @update:model-value="load" />
           <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
         </div>
       </div>
@@ -58,6 +48,8 @@
   import { getDriverByIds } from '@/api/driver';
   import { getPointByIds } from '@/api/point';
   import { getProfileByIds } from '@/api/profile';
+  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
+  import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
 
   type TabKey = 'deviceStatus' | 'protocol' | 'profile' | 'topDevice' | 'topPoint' | 'topDriver';
 
@@ -73,7 +65,7 @@
   ]);
 
   const activeTab = ref<TabKey>('deviceStatus');
-  const rangeHours = ref(24);
+  const rangeKey = ref<RangeKey>('24h');
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
   const empty = ref(false);
@@ -218,7 +210,7 @@
       topDriver: 'driver',
     };
     const dim = dimMap[activeTab.value as keyof typeof dimMap];
-    const res: any = await statsTop({ dimension: dim, rangeHours: rangeHours.value, limit: 10 });
+    const res: any = await statsTop({ dimension: dim, rangeKey: rangeKey.value, limit: 10 });
     const rows: { entityId: number; count: number }[] = res?.data || [];
     const ids = rows.map((r) => String(r.entityId));
     await resolveNames(dim, ids);

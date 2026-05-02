@@ -19,11 +19,14 @@ import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 
 export const statsToday = () => httpGet(`${API_DATA_BASE}/dashboard/stats/today`);
 
-export const statsTimeseries = (params: { granularity?: 'hour' | 'day'; rangeHours?: number } = {}) =>
-  httpGet(`${API_DATA_BASE}/dashboard/stats/timeseries`, { params });
+// rangeKey ("today" | "24h" | "7d" | "30d") wins over rangeHours server-side;
+// the legacy rangeHours integer is kept for callers that haven't migrated yet.
+export const statsTimeseries = (
+  params: { granularity?: 'hour' | 'day'; rangeHours?: number; rangeKey?: string } = {}
+) => httpGet(`${API_DATA_BASE}/dashboard/stats/timeseries`, { params });
 
 export const statsTop = (
-  params: { dimension?: 'device' | 'point' | 'driver'; rangeHours?: number; limit?: number } = {}
+  params: { dimension?: 'device' | 'point' | 'driver'; rangeHours?: number; rangeKey?: string; limit?: number } = {}
 ) => httpGet(`${API_DATA_BASE}/dashboard/top`, { params });
 
 export const streamLatest = (size = 20) => httpGet(`${API_DATA_BASE}/dashboard/stream`, { params: { size } });
@@ -32,11 +35,11 @@ export const alertStats = () => httpGet(`${API_DATA_BASE}/dashboard/alert/stats`
 
 export const alertLatest = (size = 10) => httpGet(`${API_DATA_BASE}/dashboard/alert/latest`, { params: { size } });
 
-export const statsLatency = (rangeHours = 24) =>
-  httpGet(`${API_DATA_BASE}/dashboard/stats/latency`, { params: { rangeHours } });
+export const statsLatency = (params: { rangeHours?: number; rangeKey?: string } = { rangeHours: 24 }) =>
+  httpGet(`${API_DATA_BASE}/dashboard/stats/latency`, { params });
 
-export const statsActivity = (rangeHours = 168) =>
-  httpGet(`${API_DATA_BASE}/dashboard/stats/activity`, { params: { rangeHours } });
+export const statsActivity = (params: { rangeHours?: number; rangeKey?: string } = { rangeHours: 168 }) =>
+  httpGet(`${API_DATA_BASE}/dashboard/stats/activity`, { params });
 
 export const systemHealth = () => httpGet(`${API_DATA_BASE}/dashboard/system/health`);
 
@@ -47,6 +50,10 @@ export interface AlertPageQuery {
   eventTypeFlag?: number | null;
   confirmFlag?: number | null;
   rangeHours?: number | null;
+  // Preferred time-range selector. Backend TimeRangeUtil turns this into a
+  // concrete `from` timestamp (TODAY maps to local-midnight; 24h/7d/30d are
+  // rolling windows). When both rangeKey and rangeHours are set, rangeKey wins.
+  rangeKey?: string | null;
   current?: number;
   size?: number;
 }
@@ -67,3 +74,8 @@ export const alertBulkConfirm = (
 export const driverStats = () => httpGet(`${API_MANAGER_BASE}/dashboard/driver/stats`);
 
 export const deviceStats = (topN = 10) => httpGet(`${API_MANAGER_BASE}/dashboard/device/stats`, { params: { topN } });
+
+export const alertTrend = (days = 30) => httpGet(`${API_DATA_BASE}/dashboard/alert/trend`, { params: { days } });
+
+export const alertTopSources = (days = 30, limit = 10) =>
+  httpGet(`${API_DATA_BASE}/dashboard/alert/top-sources`, { params: { days, limit } });

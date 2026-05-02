@@ -20,16 +20,7 @@
       <div class="latency-chart__header">
         <span class="latency-chart__title">{{ $t('home.latency.title') }}</span>
         <div class="latency-chart__actions">
-          <el-segmented
-            v-model="rangeKey"
-            :options="[
-              { label: $t('common.ranges.h24'), value: 'h24' },
-              { label: $t('common.ranges.d7'), value: 'd7' },
-              { label: $t('common.ranges.d30'), value: 'd30' },
-            ]"
-            size="small"
-            @change="load"
-          />
+          <range-segmented v-model="rangeKey" size="small" @update:model-value="load" />
           <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
         </div>
       </div>
@@ -45,11 +36,11 @@
   import { Refresh } from '@element-plus/icons-vue';
 
   import { statsLatency } from '@/api/dashboard';
-
-  type RangeKey = 'h24' | 'd7' | 'd30';
+  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
+  import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
 
   const { t } = useI18n();
-  const rangeKey = ref<RangeKey>('h24');
+  const rangeKey = ref<RangeKey>('24h');
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
   let chart: Chart | undefined;
@@ -85,10 +76,9 @@
   };
 
   const load = async () => {
-    const hours = rangeKey.value === 'h24' ? 24 : rangeKey.value === 'd7' ? 168 : 720;
     loading.value = true;
     try {
-      const res: any = await statsLatency(hours);
+      const res: any = await statsLatency({ rangeKey: rangeKey.value });
       const rows = (res?.data ?? []) as { bin: number; count: number }[];
       await nextTick();
       render(rows);

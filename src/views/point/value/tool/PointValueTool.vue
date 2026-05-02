@@ -68,17 +68,6 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item :label="$t('settings.event.timeRange')" prop="rangeHours">
-        <el-segmented
-          v-model="formData.rangeHours"
-          :options="[
-            { label: $t('common.all'), value: '' },
-            { label: $t('common.ranges.h24'), value: 24 },
-            { label: $t('common.ranges.d7'), value: 168 },
-            { label: $t('common.ranges.d30'), value: 720 },
-          ]"
-        />
-      </el-form-item>
       <el-form-item v-if="embedded === 'device'" :label="$t('pointValue.tool.pointName')" prop="pointName">
         <el-input
           v-model="formData.pointName"
@@ -97,6 +86,9 @@
           ]"
         />
       </el-form-item>
+      <el-form-item :label="$t('settings.event.timeRange')" prop="rangeKey">
+        <range-segmented v-model="formData.rangeKey" include-all />
+      </el-form-item>
     </template>
     <template #actions>
       <el-button v-if="embedded === ''" :icon="Plus" disabled type="success">
@@ -110,6 +102,7 @@
   import { reactive, ref } from 'vue';
   import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
+  import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { Dictionary } from '@/config/entity';
   import { getDeviceDictionary, getPointDictionary } from '@/api/dictionary';
 
@@ -126,7 +119,7 @@
 
   defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change']);
 
-  const formData = reactive<Record<string, any>>({ enableFlag: '', rangeHours: '' });
+  const formData = reactive<Record<string, any>>({ enableFlag: '', rangeKey: '' });
   const deviceDictionaries = ref<Dictionary[]>([]);
   const deviceLoading = ref(false);
   const pointDictionaries = ref<Dictionary[]>([]);
