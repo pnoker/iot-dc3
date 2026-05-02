@@ -22,6 +22,7 @@
         <el-segmented
           v-model="rangeKey"
           :options="[
+            { label: $t('home.ranges.h24'), value: 'h24' },
             { label: $t('home.ranges.d7'), value: 'd7' },
             { label: $t('home.ranges.d30'), value: 'd30' },
           ]"
@@ -41,7 +42,7 @@
 
   import { statsActivity } from '@/api/dashboard';
 
-  type RangeKey = 'd7' | 'd30';
+  type RangeKey = 'h24' | 'd7' | 'd30';
 
   const { t } = useI18n();
   const rangeKey = ref<RangeKey>('d7');
@@ -95,7 +96,7 @@
   };
 
   const load = async () => {
-    const hours = rangeKey.value === 'd7' ? 168 : 720;
+    const hours = rangeKey.value === 'h24' ? 24 : rangeKey.value === 'd7' ? 168 : 720;
     loading.value = true;
     try {
       const res: any = await statsActivity(hours);

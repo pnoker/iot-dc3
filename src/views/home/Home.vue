@@ -23,23 +23,23 @@
       </el-col>
     </el-row>
 
-    <!-- Row 1: indicator strip (5 cards) -->
-    <el-row :gutter="12" class="home__row">
-      <el-col v-for="c in cards" :key="c.key" :xl="5" :lg="8" :md="12" :sm="12" :xs="24" class="home__col">
-        <stat-card
-          :title="c.title"
-          :value="c.value"
-          :subtitle="c.subtitle"
-          :icon="c.icon"
-          :tone="c.tone"
-          :trend="c.trend"
-          :sparkline="c.sparkline"
-          @click="c.onClick"
-        />
-      </el-col>
-    </el-row>
+    <!-- Row 1: 5 indicator cards, always 5-wide via CSS grid -->
+    <div class="home__stats">
+      <stat-card
+        v-for="c in cards"
+        :key="c.key"
+        :title="c.title"
+        :value="c.value"
+        :subtitle="c.subtitle"
+        :icon="c.icon"
+        :tone="c.tone"
+        :trend="c.trend"
+        :sparkline="c.sparkline"
+        @click="c.onClick"
+      />
+    </div>
 
-    <!-- Row 2: 6-tab analytics (distribution + top-N) + live data feed -->
+    <!-- Row 2: 6-tab analytics + live data feed -->
     <el-row :gutter="12" class="home__row">
       <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="home__col">
         <analytics-tabs />
@@ -49,21 +49,17 @@
       </el-col>
     </el-row>
 
-    <!-- Row 3: recent alerts -->
+    <!-- Row 3: trend chart + recent alerts -->
     <el-row :gutter="12" class="home__row">
-      <el-col :span="24" class="home__col">
+      <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="home__col">
+        <trend-chart />
+      </el-col>
+      <el-col :xl="8" :lg="8" :md="24" :sm="24" :xs="24" class="home__col">
         <alert-list :size="10" />
       </el-col>
     </el-row>
 
-    <!-- Row 4: data ingestion trend chart -->
-    <el-row :gutter="12" class="home__row">
-      <el-col :span="24" class="home__col">
-        <trend-chart />
-      </el-col>
-    </el-row>
-
-    <!-- Row 5: latency histogram + hourly activity heatmap -->
+    <!-- Row 4: latency histogram + hourly activity heatmap -->
     <el-row :gutter="12" class="home__row">
       <el-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24" class="home__col">
         <latency-chart />
@@ -91,6 +87,25 @@
 
     .home__col {
       margin-bottom: 12px;
+    }
+
+    // Stat indicators: always fit the strip on one line, regardless of how
+    // many cards the cards computed property ends up with. Below 1280px
+    // (tablet / mobile) fall back to 2 cols so cards don't squeeze below
+    // their minimum usable width.
+    .home__stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+
+      @media (max-width: 1280px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+      }
     }
   }
 </style>
