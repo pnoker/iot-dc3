@@ -36,7 +36,7 @@ export default {
     driver: '驱动管理',
     profile: '模板管理',
     device: '设备管理',
-    data: '数据管理',
+    pointValue: '位号数据',
     driverDetail: '驱动详情',
     deviceDetail: '设备详情',
     deviceEdit: '设备配置',

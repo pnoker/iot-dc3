@@ -119,7 +119,7 @@
     driver: 'nav.driver',
     profile: 'nav.profile',
     device: 'nav.device',
-    pointValue: 'nav.data',
+    pointValue: 'nav.pointValue',
     driverDetail: 'nav.driverDetail',
     deviceDetail: 'nav.deviceDetail',
     deviceEdit: 'nav.deviceEdit',
@@ -167,7 +167,7 @@
     } else if (name.startsWith('profile')) {
       items.push({ path: '/profile', title: t('nav.profile') });
     } else if (name.startsWith('point')) {
-      items.push({ path: '/point_value', title: t('nav.data') });
+      items.push({ path: '/point_value', title: t('nav.pointValue') });
     } else if (name.startsWith('settings')) {
       items.push({ path: '/settings/user', title: t('nav.settings') });
       // Detail pages get an extra mid-level crumb pointing at the list view.

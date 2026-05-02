@@ -20,6 +20,7 @@ import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
 import { MENU_LEVEL_OPTIONS, MENU_TYPE_OPTIONS } from '@/config/constant/enums';
+import { iconMap, iconNames, resolveIcon } from '@/config/constant/icons';
 
 type FormMode = 'add' | 'edit';
 
@@ -133,6 +134,9 @@ export default defineComponent({
       parentTreeOptions,
       MENU_TYPE_OPTIONS,
       MENU_LEVEL_OPTIONS,
+      iconNames,
+      iconMap,
+      resolveIcon,
       reset,
       show,
       showEdit,

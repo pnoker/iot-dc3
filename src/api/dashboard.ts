@@ -17,42 +17,24 @@
 import { httpGet } from '@/api/common';
 
 // Matches backend dc3-center-data /dashboard endpoints.
-const BASE = 'api/v3/data/dashboard';
+const DATA_BASE = 'api/v3/data/dashboard';
+const MANAGER_BASE = 'api/v3/manager/dashboard';
 
-export const statsToday = () => httpGet(`${BASE}/stats/today`);
+export const statsToday = () => httpGet(`${DATA_BASE}/stats/today`);
 
-export const statsTimeseries = (params: { granularity?: 'hour' | 'day'; rangeHours?: number } = {}) => {
-  const search = new URLSearchParams();
-  if (params.granularity) search.set('granularity', params.granularity);
-  if (params.rangeHours != null) search.set('rangeHours', String(params.rangeHours));
-  const qs = search.toString();
-  return httpGet(`${BASE}/stats/timeseries${qs ? `?${qs}` : ''}`);
-};
+export const statsTimeseries = (params: { granularity?: 'hour' | 'day'; rangeHours?: number } = {}) =>
+  httpGet(`${DATA_BASE}/stats/timeseries`, { params });
 
 export const statsTop = (
-  params: {
-    dimension?: 'device' | 'point' | 'driver';
-    rangeHours?: number;
-    limit?: number;
-  } = {}
-) => {
-  const search = new URLSearchParams();
-  if (params.dimension) search.set('dimension', params.dimension);
-  if (params.rangeHours != null) search.set('rangeHours', String(params.rangeHours));
-  if (params.limit != null) search.set('limit', String(params.limit));
-  const qs = search.toString();
-  return httpGet(`${BASE}/top${qs ? `?${qs}` : ''}`);
-};
+  params: { dimension?: 'device' | 'point' | 'driver'; rangeHours?: number; limit?: number } = {}
+) => httpGet(`${DATA_BASE}/top`, { params });
 
-export const streamLatest = (size = 20) => httpGet(`${BASE}/stream?size=${size}`);
+export const streamLatest = (size = 20) => httpGet(`${DATA_BASE}/stream`, { params: { size } });
 
-export const alertStats = () => httpGet(`${BASE}/alert/stats`);
+export const alertStats = () => httpGet(`${DATA_BASE}/alert/stats`);
 
-export const alertLatest = (size = 10) => httpGet(`${BASE}/alert/latest?size=${size}`);
-
-// Manager-side dashboard aggregates (driver/device distribution tabs).
-const MANAGER_BASE = 'api/v3/manager/dashboard';
+export const alertLatest = (size = 10) => httpGet(`${DATA_BASE}/alert/latest`, { params: { size } });
 
 export const driverStats = () => httpGet(`${MANAGER_BASE}/driver/stats`);
 
-export const deviceStats = (topN = 10) => httpGet(`${MANAGER_BASE}/device/stats?topN=${topN}`);
+export const deviceStats = (topN = 10) => httpGet(`${MANAGER_BASE}/device/stats`, { params: { topN } });

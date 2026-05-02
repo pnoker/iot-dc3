@@ -15,18 +15,39 @@
  */
 
 import {
+  Bell,
+  Box,
+  Calendar,
   Cpu,
   DataAnalysis,
+  Discount,
+  Connection,
+  Expand,
+  Folder,
+  Goods,
   HomeFilled,
   House,
   Key,
   Link,
+  List,
+  Lock,
+  Management,
   Menu,
   Monitor,
+  Odometer,
+  Operation,
+  PieChart,
+  Platform,
+  Promotion,
   Setting,
+  Share,
+  Stopwatch,
   Tickets,
+  Tools,
+  TrendCharts,
   User,
   UserFilled,
+  WalletFilled,
 } from '@element-plus/icons-vue';
 import type { Component } from 'vue';
 
@@ -35,19 +56,46 @@ import type { Component } from 'vue';
  * Add additional element-plus icons here as new menus reference them.
  */
 export const iconMap: Record<string, Component> = {
-  House,
-  HomeFilled,
+  Bell,
+  Box,
+  Calendar,
+  Connection,
   Cpu,
-  Tickets,
-  Monitor,
   DataAnalysis,
-  Setting,
-  User,
-  UserFilled,
+  Discount,
+  Expand,
+  Folder,
+  Goods,
+  HomeFilled,
+  House,
   Key,
   Link,
+  List,
+  Lock,
+  Management,
   Menu,
+  Monitor,
+  Odometer,
+  Operation,
+  PieChart,
+  Platform,
+  Promotion,
+  Setting,
+  Share,
+  Stopwatch,
+  Tickets,
+  Tools,
+  TrendCharts,
+  User,
+  UserFilled,
+  WalletFilled,
 };
+
+/**
+ * Ordered list of icon names — used by menu-edit pickers to show a stable
+ * order (object key order isn't contractually stable across engines).
+ */
+export const iconNames: string[] = Object.keys(iconMap).sort((a, b) => a.localeCompare(b));
 
 export const resolveIcon = (name?: string): Component | undefined => {
   if (!name) return undefined;

@@ -40,7 +40,13 @@
         </el-table-column>
         <el-table-column :label="t('settings.menu.menuIcon')" width="110">
           <template #default="{ row }">
-            {{ row.menuExt?.content?.icon || '-' }}
+            <span v-if="row.menuExt?.content?.icon" class="menu-icon-cell">
+              <el-icon :size="18">
+                <component :is="resolveIcon(row.menuExt.content.icon) || MenuIcon" />
+              </el-icon>
+              <span class="menu-icon-cell__name">{{ row.menuExt.content.icon }}</span>
+            </span>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column :label="t('common.enable')" width="90">
@@ -86,5 +92,16 @@
   .settings-table {
     margin-top: 1px;
     border-radius: 4px;
+  }
+
+  .menu-icon-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    .menu-icon-cell__name {
+      font-size: 12px;
+      color: #606266;
+    }
   }
 </style>

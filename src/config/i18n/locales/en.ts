@@ -36,7 +36,7 @@ export default {
     driver: 'Driver',
     profile: 'Profile',
     device: 'Device',
-    data: 'Data',
+    pointValue: 'PointValue',
     driverDetail: 'Driver Detail',
     deviceDetail: 'Device Detail',
     deviceEdit: 'Device Config',

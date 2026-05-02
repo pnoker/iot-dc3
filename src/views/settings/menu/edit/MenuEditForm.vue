@@ -66,7 +66,24 @@
         <el-input-number v-model="reactiveData.form.menuIndex" :min="0" :max="999" />
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuIcon')" prop="icon">
-        <el-input v-model="reactiveData.form.icon" clearable :placeholder="t('settings.menu.menuIconPlaceholder')" />
+        <el-select
+          v-model="reactiveData.form.icon"
+          clearable
+          filterable
+          :placeholder="t('settings.menu.menuIconPlaceholder')"
+        >
+          <template #prefix>
+            <el-icon v-if="reactiveData.form.icon" :size="16">
+              <component :is="resolveIcon(reactiveData.form.icon)" />
+            </el-icon>
+          </template>
+          <el-option v-for="name in iconNames" :key="name" :label="name" :value="name">
+            <span class="icon-option">
+              <el-icon :size="16"><component :is="iconMap[name]" /></el-icon>
+              <span>{{ name }}</span>
+            </span>
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item :label="t('settings.menu.menuUrl')" prop="url">
         <el-input v-model="reactiveData.form.url" clearable :placeholder="t('settings.menu.menuUrlPlaceholder')" />
@@ -98,4 +115,10 @@
 
 <style lang="scss" scoped>
   @use '@/styles/things-dialog.scss';
+
+  .icon-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
 </style>

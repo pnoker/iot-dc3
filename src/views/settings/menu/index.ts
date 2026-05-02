@@ -17,8 +17,10 @@
 import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { Menu as MenuIcon } from '@element-plus/icons-vue';
 
 import { addMenu, deleteMenu, getMenuTree, updateMenu } from '@/api/menu';
+import { resolveIcon } from '@/config/constant/icons';
 import { successMessage } from '@/utils/NotificationUtil';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
@@ -136,6 +138,8 @@ export default defineComponent({
       onAdd,
       onUpdate,
       remove,
+      resolveIcon,
+      MenuIcon,
     };
   },
 });
