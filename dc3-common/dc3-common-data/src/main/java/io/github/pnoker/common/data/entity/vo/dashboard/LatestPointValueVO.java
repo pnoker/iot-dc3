@@ -46,6 +46,23 @@ public class LatestPointValueVO implements Serializable {
 
     private Long driverId;
 
+    /**
+     * Display name for the device, resolved via {@code DeviceFacade}. May be
+     * {@code null} when the device has been deleted but historical point
+     * values still reference it.
+     */
+    private String deviceName;
+
+    /**
+     * Display name for the point.
+     */
+    private String pointName;
+
+    /**
+     * Display name for the driver that owns the device.
+     */
+    private String driverName;
+
     private String rawValue;
 
     private String calValue;
