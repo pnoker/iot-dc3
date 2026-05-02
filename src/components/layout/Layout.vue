@@ -63,16 +63,30 @@
           </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item :class="{ 'is-active': locale === 'en' }" command="lang-en">
-                <span class="lang-flag">🇺🇸</span>
-                <span class="lang-text">English</span>
-                <el-icon v-if="locale === 'en'" class="lang-check"><Check /></el-icon>
+              <el-dropdown-item :icon="Operation" @click.prevent="langExpanded = !langExpanded">
+                {{ t('layout.language') }}
+                <el-icon class="lang-arrow" :class="{ 'is-expanded': langExpanded }"><ArrowRight /></el-icon>
               </el-dropdown-item>
-              <el-dropdown-item :class="{ 'is-active': locale === 'zh' }" command="lang-zh">
-                <span class="lang-flag">🇨🇳</span>
-                <span class="lang-text">中文</span>
-                <el-icon v-if="locale === 'zh'" class="lang-check"><Check /></el-icon>
-              </el-dropdown-item>
+              <div v-show="langExpanded" class="lang-inline">
+                <div
+                  class="lang-inline__item"
+                  :class="{ 'is-active': locale === 'en' }"
+                  @click="handleCommand('lang-en')"
+                >
+                  <span class="lang-flag">🇺🇸</span>
+                  <span>English</span>
+                  <el-icon v-if="locale === 'en'" class="lang-check"><Check /></el-icon>
+                </div>
+                <div
+                  class="lang-inline__item"
+                  :class="{ 'is-active': locale === 'zh' }"
+                  @click="handleCommand('lang-zh')"
+                >
+                  <span class="lang-flag">🇨🇳</span>
+                  <span>中文</span>
+                  <el-icon v-if="locale === 'zh'" class="lang-check"><Check /></el-icon>
+                </div>
+              </div>
               <el-dropdown-item divided command="settings" :icon="Setting">{{ t('layout.settings') }}</el-dropdown-item>
               <el-dropdown-item command="help" :icon="QuestionFilled">{{ t('layout.about') }}</el-dropdown-item>
               <el-dropdown-item command="logout" :icon="SwitchButton">{{ t('layout.logout') }}</el-dropdown-item>
@@ -99,8 +113,16 @@
 
 <script lang="ts" setup>
   import router from '@/config/router';
-  import { Check, HomeFilled, QuestionFilled, Setting, SwitchButton } from '@element-plus/icons-vue';
-  import { computed, onMounted } from 'vue';
+  import {
+    ArrowRight,
+    Check,
+    HomeFilled,
+    Operation,
+    QuestionFilled,
+    Setting,
+    SwitchButton,
+  } from '@element-plus/icons-vue';
+  import { computed, onMounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute } from 'vue-router';
   import { useAuthStore, useMenuStore } from '@/store';
@@ -109,6 +131,7 @@
   const route = useRoute();
   const authStore = useAuthStore();
   const menuStore = useMenuStore();
+  const langExpanded = ref(false);
 
   onMounted(() => {
     menuStore.fetchTree();
@@ -156,6 +179,8 @@
     settingsResourceDetail: { path: '/settings/resource', titleKey: 'nav.settingsResource' },
     settingsApiDetail: { path: '/settings/api', titleKey: 'nav.settingsApi' },
     settingsMenuDetail: { path: '/settings/menu', titleKey: 'nav.settingsMenu' },
+    settingsDeviceEvent: { path: '/settings/event', titleKey: 'nav.settingsEvent' },
+    settingsDriverEvent: { path: '/settings/event', titleKey: 'nav.settingsEvent' },
   };
 
   const breadcrumbItems = computed(() => {
@@ -308,6 +333,54 @@
         border-radius: 4px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
       }
+    }
+  }
+</style>
+
+<!-- Non-scoped: dropdown is teleported to <body> so scoped styles can't reach it -->
+<style lang="scss">
+  .lang-arrow {
+    margin-left: auto;
+    font-size: 12px;
+    transition: transform 0.2s;
+
+    &.is-expanded {
+      transform: rotate(90deg);
+    }
+  }
+
+  .lang-inline {
+    padding: 4px 0;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+  }
+
+  .lang-inline__item {
+    display: flex;
+    align-items: center;
+    padding: 8px 32px;
+    font-size: 14px;
+    color: #606266;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      background: #ecf5ff;
+      color: #409eff;
+    }
+
+    &.is-active {
+      color: #409eff;
+      font-weight: 500;
+    }
+
+    .lang-flag {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .lang-check {
+      margin-left: auto;
+      font-size: 12px;
     }
   }
 </style>

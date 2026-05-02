@@ -19,12 +19,25 @@
     <el-aside class="settings-aside" width="220px">
       <el-card class="settings-aside-card" shadow="never">
         <el-menu :default-active="activeMenu" @select="onSelect">
-          <el-menu-item v-for="item in sidebarItems" :key="item.name" :index="item.name">
-            <el-icon v-if="item.icon">
-              <component :is="item.icon" />
-            </el-icon>
-            <span>{{ item.title }}</span>
-          </el-menu-item>
+          <template v-for="item in sidebarItems" :key="item.name">
+            <el-sub-menu v-if="item.children?.length" :index="item.name">
+              <template #title>
+                <el-icon v-if="item.icon">
+                  <component :is="item.icon" />
+                </el-icon>
+                <span>{{ item.title }}</span>
+              </template>
+              <el-menu-item v-for="child in item.children" :key="child.name" :index="child.name">
+                <span>{{ child.title }}</span>
+              </el-menu-item>
+            </el-sub-menu>
+            <el-menu-item v-else :index="item.name">
+              <el-icon v-if="item.icon">
+                <component :is="item.icon" />
+              </el-icon>
+              <span>{{ item.title }}</span>
+            </el-menu-item>
+          </template>
         </el-menu>
       </el-card>
     </el-aside>
@@ -56,6 +69,7 @@
     name: string;
     title: string;
     icon?: string;
+    children?: SidebarItem[];
   }
 
   // Static fallback shown when the menu API is unreachable or still loading.
@@ -66,7 +80,29 @@
     { name: 'settingsResource', title: t('nav.settingsResource'), icon: 'Key' },
     { name: 'settingsApi', title: t('nav.settingsApi'), icon: 'Link' },
     { name: 'settingsMenu', title: t('nav.settingsMenu'), icon: 'Menu' },
+    {
+      name: 'settingsEvent',
+      title: t('nav.settingsEvent'),
+      icon: 'Bell',
+      children: [
+        { name: 'settingsEvent', title: t('nav.settingsEventOverview') },
+        { name: 'settingsDriverEvent', title: t('nav.settingsDriverEvent') },
+        { name: 'settingsDeviceEvent', title: t('nav.settingsDeviceEvent') },
+      ],
+    },
   ];
+
+  const mapMenuNode = (node: any): SidebarItem => ({
+    name: node.menuCode,
+    title: node.menuExt?.content?.title || node.menuName,
+    icon: node.menuExt?.content?.icon,
+    children: node.children?.length
+      ? node.children
+          .slice()
+          .sort((a: any, b: any) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0))
+          .map(mapMenuNode)
+      : undefined,
+  });
 
   const sidebarItems = computed<SidebarItem[]>(() => {
     const settings = menuStore.findByCode('settings');
@@ -75,17 +111,18 @@
     return children
       .slice()
       .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0))
-      .map((child) => ({
-        name: child.menuCode,
-        title: child.menuExt?.content?.title || child.menuName,
-        icon: child.menuExt?.content?.icon,
-      }));
+      .map(mapMenuNode);
   });
 
   const activeMenu = computed(() => String(route.name || 'settingsUser'));
 
+  // Map API-tree menuCodes that don't match a vue-router route name.
+  const ROUTE_ALIAS: Record<string, string> = {
+    settingsEventOverview: 'settingsEvent',
+  };
+
   const onSelect = (name: string) => {
-    router.push({ name });
+    router.push({ name: ROUTE_ALIAS[name] || name });
   };
 </script>
 

@@ -15,20 +15,19 @@
   -->
 
 <template>
-  <div v-loading="loading" class="event-overview">
+  <div class="event-overview">
     <div class="event-overview__cards">
-      <el-card v-for="c in cards" :key="c.key" shadow="never" class="event-overview__card" @click="c.onClick">
-        <div class="event-overview__card-row">
-          <div :class="['event-overview__icon', `event-overview__icon--${c.tone}`]">
-            <el-icon :size="24"><component :is="c.icon" /></el-icon>
-          </div>
-          <div class="event-overview__body">
-            <div class="event-overview__title">{{ c.title }}</div>
-            <div class="event-overview__value">{{ c.value.toLocaleString() }}</div>
-            <div v-if="c.subtitle" class="event-overview__subtitle">{{ c.subtitle }}</div>
-          </div>
-        </div>
-      </el-card>
+      <stat-card
+        v-for="c in cards"
+        :key="c.key"
+        :title="c.title"
+        :value="c.value"
+        :subtitle="c.subtitle"
+        :icon="c.icon"
+        :tone="c.tone"
+        :on-refresh="c.onRefresh"
+        @click="c.onClick"
+      />
     </div>
   </div>
 </template>
@@ -41,6 +40,7 @@
   import { Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
 
   import { alertPage } from '@/api/dashboard';
+  import StatCard from '@/components/card/stat/StatCard.vue';
 
   type Tone = 'blue' | 'purple' | 'orange' | 'red';
 
@@ -52,6 +52,7 @@
     icon: Component;
     tone: Tone;
     onClick: () => void;
+    onRefresh: () => Promise<void>;
   }
 
   const { t } = useI18n();
@@ -101,6 +102,7 @@
       icon: Management,
       tone: 'blue',
       onClick: () => router.push({ name: 'settingsDeviceEvent' }),
+      onRefresh: load,
     },
     {
       key: 'device-unconfirmed',
@@ -110,6 +112,7 @@
       icon: Warning,
       tone: 'orange',
       onClick: () => router.push({ name: 'settingsDeviceEvent' }),
+      onRefresh: load,
     },
     {
       key: 'driver-total',
@@ -119,6 +122,7 @@
       icon: Promotion,
       tone: 'purple',
       onClick: () => router.push({ name: 'settingsDriverEvent' }),
+      onRefresh: load,
     },
     {
       key: 'driver-unconfirmed',
@@ -128,6 +132,7 @@
       icon: WarningFilled,
       tone: 'red',
       onClick: () => router.push({ name: 'settingsDriverEvent' }),
+      onRefresh: load,
     },
   ]);
 
@@ -147,67 +152,6 @@
       @media (max-width: 640px) {
         grid-template-columns: 1fr;
       }
-    }
-
-    .event-overview__card {
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.15s ease;
-
-      &:hover {
-        transform: translateY(-2px);
-      }
-    }
-
-    .event-overview__card-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .event-overview__icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-
-      &--blue {
-        background: rgba(64, 158, 255, 0.1);
-        color: #409eff;
-      }
-      &--purple {
-        background: rgba(144, 89, 246, 0.1);
-        color: #9059f6;
-      }
-      &--orange {
-        background: rgba(230, 162, 60, 0.1);
-        color: #e6a23c;
-      }
-      &--red {
-        background: rgba(245, 108, 108, 0.1);
-        color: #f56c6c;
-      }
-    }
-
-    .event-overview__title {
-      font-size: 13px;
-      color: #909399;
-    }
-
-    .event-overview__value {
-      font-size: 24px;
-      font-weight: 600;
-      color: #303133;
-      line-height: 1.3;
-    }
-
-    .event-overview__subtitle {
-      font-size: 12px;
-      color: #909399;
-      margin-top: 2px;
     }
   }
 </style>

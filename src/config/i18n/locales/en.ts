@@ -47,14 +47,15 @@ export default {
     dashboard: 'Dashboard',
     application: 'Application',
     settings: 'Settings',
-    settingsUser: 'Users',
-    settingsRole: 'Roles',
-    settingsResource: 'Resources',
+    settingsUser: 'User',
+    settingsRole: 'Role',
+    settingsResource: 'Resource',
     settingsApi: 'Api',
-    settingsMenu: 'Menus',
-    settingsEvent: 'Events',
-    settingsDeviceEvent: 'Device Events',
-    settingsDriverEvent: 'Driver Events',
+    settingsMenu: 'Menu',
+    settingsEvent: 'Event',
+    settingsEventOverview: 'Overview',
+    settingsDeviceEvent: 'Device Event',
+    settingsDriverEvent: 'Driver Event',
     settingsAbout: 'About',
     settingsUserDetail: 'User Detail',
     settingsRoleDetail: 'Role Detail',
@@ -112,8 +113,9 @@ export default {
     driverCount: 'Total Drivers',
     dataVolume: 'Data Volume',
     todayData: "Today's Point Value",
-    alerts: 'Total Alerts',
+    alerts: 'Driver Alerts',
     alertUnconfirmed: '{n} unconfirmed',
+    deviceAlerts: 'Device Alerts',
     vsYesterday: 'vs yesterday',
     trendTitle: 'Data Ingestion Trend',
     liveFeed: {
@@ -482,6 +484,39 @@ export default {
       copyright: 'Copyright',
       up: 'Up',
       down: 'Down',
+      introTitle: 'Platform Introduction',
+      intro:
+        'IoT DC3 is a fully open-source, distributed Internet of Things (IoT) platform built on Spring Cloud. It accelerates IoT solution delivery and simplifies full-lifecycle device management with a comprehensive architecture for robust, production-ready IoT systems. It is AI-ready, enabling seamless integration of intelligent connectivity, automation, and data-driven operations.',
+      architectureTitle: 'Architecture Overview',
+      architecture: {
+        driver:
+          'Driver Layer — SDKs for rapid driver development and seamless device connectivity through standard or proprietary protocols',
+        data: 'Data Layer — Reliable collection, storage, and retrieval of device data with real-time and historical services',
+        management:
+          'Management Layer — Core hub for distributed microservice collaboration: service registration, device/driver management, command orchestration',
+        application:
+          'Application Layer — Data openness, scheduling, alarms, messaging, logging, third-party integrations, and AI-enhanced automation',
+      },
+      objectivesTitle: 'Design Objectives',
+      objectives: {
+        scalability:
+          'Scalability — Horizontal scaling with Spring Cloud for distributed, high-throughput IoT workloads',
+        resilience:
+          'Resilience — Interchangeable service nodes and fault-tolerant design to minimize single-point-of-failure risk',
+        performance: 'Performance — Large-scale device access and telemetry workloads for demanding IoT scenarios',
+        extensibility:
+          'Extensibility — Rapid integration of new protocols and custom drivers through SDK and service registration',
+        deployment:
+          'Deployment Flexibility — Private cloud, public cloud, and edge environments with Java compatibility',
+        security:
+          'Security & Multi-Tenancy — Encrypted communication, namespace isolation, and tenant-level separation',
+        cloudNative:
+          'Cloud-Native Delivery — Optimized for Kubernetes and containerized with Docker for consistent deployments',
+        aiReady: 'AI-Ready — Integration of intelligent automation and data-driven operational workflows',
+      },
+      licenseTitle: 'License',
+      licenseDetail:
+        'This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). Any use, modification, or distribution of this software must preserve the original copyright notice and comply with the AGPL-3.0 terms.',
     },
     event: {
       device: 'Device',

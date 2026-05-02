@@ -40,6 +40,57 @@
 
     <el-card shadow="never" class="about__card">
       <template #header>
+        <span class="about__title">{{ t('settings.about.introTitle') }}</span>
+      </template>
+      <p class="about__intro">{{ t('settings.about.intro') }}</p>
+    </el-card>
+
+    <el-card shadow="never" class="about__card">
+      <template #header>
+        <span class="about__title">{{ t('settings.about.architectureTitle') }}</span>
+      </template>
+      <el-descriptions :column="1" border>
+        <el-descriptions-item label="Driver Layer">
+          {{ t('settings.about.architecture.driver') }}
+        </el-descriptions-item>
+        <el-descriptions-item label="Data Layer">
+          {{ t('settings.about.architecture.data') }}
+        </el-descriptions-item>
+        <el-descriptions-item label="Management Layer">
+          {{ t('settings.about.architecture.management') }}
+        </el-descriptions-item>
+        <el-descriptions-item label="Application Layer">
+          {{ t('settings.about.architecture.application') }}
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-card>
+
+    <el-card shadow="never" class="about__card">
+      <template #header>
+        <span class="about__title">{{ t('settings.about.objectivesTitle') }}</span>
+      </template>
+      <ul class="about__objectives">
+        <li v-for="key in objectiveKeys" :key="key">{{ t(`settings.about.objectives.${key}`) }}</li>
+      </ul>
+    </el-card>
+
+    <el-card shadow="never" class="about__card">
+      <template #header>
+        <span class="about__title">{{ t('settings.about.licenseTitle') }}</span>
+      </template>
+      <p class="about__intro">{{ t('settings.about.licenseDetail') }}</p>
+      <el-link
+        class="about__license-link"
+        type="primary"
+        href="https://www.gnu.org/licenses/agpl-3.0.html"
+        target="_blank"
+      >
+        AGPL-3.0 Full Text
+      </el-link>
+    </el-card>
+
+    <el-card shadow="never" class="about__card">
+      <template #header>
         <div class="about__header">
           <span class="about__title">{{ t('settings.about.healthTitle') }}</span>
           <el-button :icon="Refresh" :loading="loading" circle size="small" @click="refresh" />
@@ -112,6 +163,17 @@
   const { t } = useI18n();
   const version = pkg.version;
 
+  const objectiveKeys = [
+    'scalability',
+    'resilience',
+    'performance',
+    'extensibility',
+    'deployment',
+    'security',
+    'cloudNative',
+    'aiReady',
+  ];
+
   const loading = ref(false);
   const center = ref<Record<string, string>>({});
   const infra = ref<Record<string, string>>({});
@@ -182,6 +244,29 @@
     .about__title {
       font-weight: 600;
       color: #303133;
+    }
+
+    .about__intro {
+      font-size: 14px;
+      color: #606266;
+      line-height: 1.8;
+      margin: 0;
+    }
+
+    .about__objectives {
+      margin: 0;
+      padding-left: 20px;
+
+      li {
+        font-size: 14px;
+        color: #606266;
+        line-height: 2;
+      }
+    }
+
+    .about__license-link {
+      margin-top: 8px;
+      display: inline-block;
     }
 
     .about__health {
