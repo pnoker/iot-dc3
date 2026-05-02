@@ -113,9 +113,10 @@ export default {
     driverCount: 'Total Drivers',
     dataVolume: 'Data Volume',
     todayData: "Today's Point Value",
-    alerts: 'Driver Alerts',
+    todayTotal: 'Total {n}',
+    driverAlarms: "Today's Driver Alarms",
     alertUnconfirmed: '{n} unconfirmed',
-    deviceAlerts: 'Device Alerts',
+    deviceAlarms: "Today's Device Alarms",
     vsYesterday: 'vs yesterday',
     trendTitle: 'Data Ingestion Trend',
     liveFeed: {

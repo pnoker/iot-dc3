@@ -113,9 +113,10 @@ export default {
     driverCount: '驱动总数',
     dataVolume: '数据量',
     todayData: '今日位号数据',
-    alerts: '驱动告警',
+    todayTotal: '累计 {n} 条',
+    driverAlarms: '今日驱动告警',
     alertUnconfirmed: '未处理 {n} 条',
-    deviceAlerts: '设备告警',
+    deviceAlarms: '今日设备告警',
     vsYesterday: '较昨日',
     trendTitle: '数据采集趋势',
     liveFeed: {

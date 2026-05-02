@@ -74,12 +74,17 @@ export default defineComponent({
       todayCount: 0,
       todayPercentChange: 0,
       todaySparkline: [] as number[],
+      totalCount: 0,
       alertCount: 0,
       alertUnconfirmed: 0,
       deviceAlertCount: 0,
       driverAlertCount: 0,
       deviceUnconfirmed: 0,
       driverUnconfirmed: 0,
+      todayDeviceAlarms: 0,
+      todayDriverAlarms: 0,
+      todayDeviceUnconfirmed: 0,
+      todayDriverUnconfirmed: 0,
       driverSparkline: [] as number[],
       deviceSparkline: [] as number[],
       pointSparkline: [] as number[],
@@ -111,6 +116,7 @@ export default defineComponent({
         const res: any = await statsToday();
         state.todayCount = res?.data?.today ?? 0;
         state.todayPercentChange = res?.data?.percentChange ?? 0;
+        state.totalCount = res?.data?.total ?? 0;
       } catch {
         // handled globally
       }
@@ -135,6 +141,10 @@ export default defineComponent({
         state.driverAlertCount = res?.data?.driverAlerts ?? 0;
         state.deviceUnconfirmed = res?.data?.deviceUnconfirmed ?? 0;
         state.driverUnconfirmed = res?.data?.driverUnconfirmed ?? 0;
+        state.todayDeviceAlarms = res?.data?.todayDeviceAlarms ?? 0;
+        state.todayDriverAlarms = res?.data?.todayDriverAlarms ?? 0;
+        state.todayDeviceUnconfirmed = res?.data?.todayDeviceUnconfirmed ?? 0;
+        state.todayDriverUnconfirmed = res?.data?.todayDriverUnconfirmed ?? 0;
         state.alertSparkline = Array.isArray(res?.data?.sparkline24h) ? res.data.sparkline24h.map(Number) : [];
       } catch {
         // handled globally
@@ -232,7 +242,7 @@ export default defineComponent({
         key: 'data',
         title: t('home.todayData'),
         value: state.todayCount,
-        subtitle: '',
+        subtitle: state.totalCount > 0 ? t('home.todayTotal', { n: state.totalCount }) : '',
         icon: TrendCharts,
         tone: 'green',
         trend: percentTrend.value,
@@ -242,9 +252,10 @@ export default defineComponent({
       },
       {
         key: 'alert',
-        title: t('home.alerts'),
-        value: state.driverAlertCount,
-        subtitle: state.driverUnconfirmed > 0 ? t('home.alertUnconfirmed', { n: state.driverUnconfirmed }) : '',
+        title: t('home.driverAlarms'),
+        value: state.todayDriverAlarms,
+        subtitle:
+          state.todayDriverUnconfirmed > 0 ? t('home.alertUnconfirmed', { n: state.todayDriverUnconfirmed }) : '',
         icon: Bell,
         tone: 'red',
         trend: sparkTrend(state.alertSparkline),
@@ -254,9 +265,10 @@ export default defineComponent({
       },
       {
         key: 'deviceAlert',
-        title: t('home.deviceAlerts'),
-        value: state.deviceAlertCount,
-        subtitle: state.deviceUnconfirmed > 0 ? t('home.alertUnconfirmed', { n: state.deviceUnconfirmed }) : '',
+        title: t('home.deviceAlarms'),
+        value: state.todayDeviceAlarms,
+        subtitle:
+          state.todayDeviceUnconfirmed > 0 ? t('home.alertUnconfirmed', { n: state.todayDeviceUnconfirmed }) : '',
         icon: Warning,
         tone: 'orange',
         trend: sparkTrend(state.alertSparkline),
