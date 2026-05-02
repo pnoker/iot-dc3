@@ -55,9 +55,12 @@ import java.util.Map;
 public class DashboardController implements BaseController {
 
     private final DashboardService dashboardService;
+    private final io.github.pnoker.common.data.biz.SystemHealthService systemHealthService;
 
-    public DashboardController(DashboardService dashboardService) {
+    public DashboardController(DashboardService dashboardService,
+                               io.github.pnoker.common.data.biz.SystemHealthService systemHealthService) {
         this.dashboardService = dashboardService;
+        this.systemHealthService = systemHealthService;
     }
 
     @GetMapping("/stats/today")
@@ -174,5 +177,20 @@ public class DashboardController implements BaseController {
                 return Mono.just(R.fail(e.getMessage()));
             }
         });
+    }
+
+    /**
+     * System-wide health snapshot for the home banner. Not tenant-scoped
+     * because the status of shared infra (DB / MQ / gateway) and sibling
+     * services is a platform-wide concern.
+     */
+    @GetMapping("/system/health")
+    public Mono<R<SystemHealthVO>> systemHealth() {
+        try {
+            return Mono.just(R.ok(systemHealthService.snapshot()));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
     }
 }
