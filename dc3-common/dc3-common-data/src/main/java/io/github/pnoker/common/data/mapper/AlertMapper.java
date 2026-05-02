@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -51,4 +52,12 @@ public interface AlertMapper {
      * Most recent N events across device + driver tables, flagged with source.
      */
     List<Map<String, Object>> latest(@Param("tenantId") Long tenantId, @Param("limit") int limit);
+
+    /**
+     * Event counts grouped by the hour bucket they fall into, over a window
+     * starting at {@code from}. Service layer aligns the returned rows to a
+     * fixed-length sparkline array.
+     */
+    List<Map<String, Object>> hourlyCounts(@Param("tenantId") Long tenantId,
+                                           @Param("from") LocalDateTime from);
 }

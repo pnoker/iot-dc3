@@ -67,4 +67,21 @@
         LIMIT #{limit}
     </select>
 
+    <!--
+        Daily new-row count over the given window. ${table} is inlined
+        (service layer whitelists to dc3_driver / dc3_device / dc3_point).
+        Missing days are filled with zero on the service side so the
+        frontend sparkline always gets a fixed-length array.
+    -->
+    <select id="dailyGrowth" resultType="map">
+        SELECT DATE(create_time) AS day, COUNT(*) AS count
+        FROM ${table}
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+          AND create_time &lt;  #{to}
+        GROUP BY DATE(create_time)
+        ORDER BY day ASC
+    </select>
+
 </mapper>

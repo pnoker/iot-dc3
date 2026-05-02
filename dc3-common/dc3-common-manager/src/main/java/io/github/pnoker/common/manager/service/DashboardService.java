@@ -19,6 +19,7 @@ package io.github.pnoker.common.manager.service;
 
 import io.github.pnoker.common.manager.entity.vo.dashboard.DeviceStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DriverStatsVO;
+import io.github.pnoker.common.manager.entity.vo.dashboard.GrowthVO;
 
 /**
  * Manager-side dashboard aggregate service — powers the home page's
@@ -32,4 +33,12 @@ public interface DashboardService {
     DriverStatsVO driverStats(Long tenantId);
 
     DeviceStatsVO deviceStats(Long tenantId, int topN);
+
+    /**
+     * Daily new-row counts for driver / device / point / profile tables over
+     * the last {@code days} days. Used to back the stat-card sparklines on
+     * the home page. Arrays are fixed length = {@code days} with zero-padded
+     * missing days, oldest first.
+     */
+    GrowthVO dailyGrowth(Long tenantId, int days);
 }

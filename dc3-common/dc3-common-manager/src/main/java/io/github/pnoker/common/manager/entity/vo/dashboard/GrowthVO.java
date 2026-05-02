@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.pnoker.common.data.entity.vo.dashboard;
+package io.github.pnoker.common.manager.entity.vo.dashboard;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +26,8 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Aggregate alert counters for the home page alert card.
+ * Daily new-row counts for each stat-card entity, fixed length = days. Used
+ * by the home page sparklines. Zero-padded missing days, oldest first.
  *
  * @author pnoker
  * @since 2026.5.2
@@ -35,34 +36,16 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-public class AlertStatsVO implements Serializable {
+public class GrowthVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private long total;
+    private List<Long> driver;
 
-    private long unconfirmed;
+    private List<Long> device;
 
-    private List<BucketVO> byType;
+    private List<Long> point;
 
-    /**
-     * 24-element hourly count series for the alert indicator card sparkline,
-     * oldest first. Always length 24 — service zero-pads missing hours.
-     */
-    private List<Long> sparkline24h;
-
-    @Getter
-    @Setter
-    @ToString
-    @NoArgsConstructor
-    public static class BucketVO implements Serializable {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
-
-        private String key;
-
-        private long count;
-    }
+    private List<Long> profile;
 }

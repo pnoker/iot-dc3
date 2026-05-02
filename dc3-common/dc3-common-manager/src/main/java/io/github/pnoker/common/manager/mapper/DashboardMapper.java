@@ -20,6 +20,7 @@ package io.github.pnoker.common.manager.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -65,4 +66,15 @@ public interface DashboardMapper {
      */
     List<Map<String, Object>> countDeviceByProfile(@Param("tenantId") Long tenantId,
                                                    @Param("limit") int limit);
+
+    /**
+     * Daily new-row count for the given entity table. {@code table} is
+     * interpolated (must be one of dc3_driver / dc3_device / dc3_point —
+     * service layer whitelists it). Returns rows like {@code {day: 2026-05-01,
+     * count: 12}} ordered ascending.
+     */
+    List<Map<String, Object>> dailyGrowth(@Param("tenantId") Long tenantId,
+                                          @Param("table") String table,
+                                          @Param("from") LocalDateTime from,
+                                          @Param("to") LocalDateTime to);
 }

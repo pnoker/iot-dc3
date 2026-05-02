@@ -233,6 +233,22 @@ public class DashboardServiceImpl implements DashboardService {
             buckets.add(b);
         }
         vo.setByType(buckets);
+
+        // 24-hour hourly sparkline, anchored to top-of-hour now-23.
+        LocalDateTime anchor = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0).minusHours(23);
+        long[] series = new long[24];
+        for (Map<String, Object> row : alertMapper.hourlyCounts(tenantId, anchor)) {
+            LocalDateTime bucket = toLocalDateTime(row.get("bucket"));
+            if (bucket == null) continue;
+            long diffHours = java.time.Duration.between(anchor, bucket).toHours();
+            int idx = (int) diffHours;
+            if (idx >= 0 && idx < series.length) {
+                series[idx] = toLong(row.get("count"));
+            }
+        }
+        List<Long> sparkline = new ArrayList<>(series.length);
+        for (long v : series) sparkline.add(v);
+        vo.setSparkline24h(sparkline);
         return vo;
     }
 
