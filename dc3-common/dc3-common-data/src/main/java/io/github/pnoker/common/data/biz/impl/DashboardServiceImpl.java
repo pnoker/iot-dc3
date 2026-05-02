@@ -149,16 +149,16 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public Map<String, Object> alertPage(Long tenantId, String source, Integer eventTypeFlag,
-                                         Integer confirmFlag, long current, long size) {
+                                         Integer confirmFlag, LocalDateTime from, long current, long size) {
         String src = source == null || source.isBlank() ? null
                 : (ALERT_SOURCES.contains(source) ? source : null);
         long clampedCurrent = Math.max(1L, current);
         long clampedSize = Math.max(1L, Math.min(size, 200L));
         long offset = (clampedCurrent - 1L) * clampedSize;
 
-        long total = alertMapper.countFiltered(tenantId, src, eventTypeFlag, confirmFlag);
+        long total = alertMapper.countFiltered(tenantId, src, eventTypeFlag, confirmFlag, from);
         List<Map<String, Object>> rows = alertMapper.listPaged(
-                tenantId, src, eventTypeFlag, confirmFlag, offset, clampedSize);
+                tenantId, src, eventTypeFlag, confirmFlag, from, offset, clampedSize);
         List<AlertItemVO> records = new ArrayList<>(rows.size());
         for (Map<String, Object> row : rows) {
             AlertItemVO vo = new AlertItemVO();

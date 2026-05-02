@@ -77,13 +77,15 @@ public interface AlertMapper {
                                         @Param("source") String source,
                                         @Param("eventTypeFlag") Integer eventTypeFlag,
                                         @Param("confirmFlag") Integer confirmFlag,
+                                        @Param("from") LocalDateTime from,
                                         @Param("offset") long offset,
                                         @Param("size") long size);
 
     long countFiltered(@Param("tenantId") Long tenantId,
                        @Param("source") String source,
                        @Param("eventTypeFlag") Integer eventTypeFlag,
-                       @Param("confirmFlag") Integer confirmFlag);
+                       @Param("confirmFlag") Integer confirmFlag,
+                       @Param("from") LocalDateTime from);
 
     /**
      * Today's ALARM counts per source (device / driver), scoped to one tenant.

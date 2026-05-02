@@ -182,6 +182,7 @@
                 WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
                 <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+                <if test="from != null">AND create_time &gt;= #{from}</if>
             </when>
             <when test="source == 'driver'">
                 SELECT id, 'driver' AS source, driver_id AS source_id, 0 AS point_id,
@@ -191,6 +192,7 @@
                 WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
                 <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+                <if test="from != null">AND create_time &gt;= #{from}</if>
             </when>
             <otherwise>
                 (SELECT id, 'device' AS source, device_id AS source_id, point_id,
@@ -199,7 +201,8 @@
                 FROM dc3_device_event
                 WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+                <if test="from != null">AND create_time &gt;= #{from}</if>)
                 UNION ALL
                 (SELECT id, 'driver' AS source, driver_id AS source_id, 0 AS point_id,
                 event_type_flag, confirm_flag, create_time,
@@ -207,7 +210,8 @@
                 FROM dc3_driver_event
                 WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+                <if test="from != null">AND create_time &gt;= #{from}</if>)
             </otherwise>
         </choose>
         ) rows
@@ -222,23 +226,27 @@
                 WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
                 <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+                <if test="from != null">AND create_time &gt;= #{from}</if>
             </when>
             <when test="source == 'driver'">
                 SELECT COUNT(*) FROM dc3_driver_event
                 WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
                 <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+                <if test="from != null">AND create_time &gt;= #{from}</if>
             </when>
             <otherwise>
                 SELECT
                 (SELECT COUNT(*) FROM dc3_device_event
                 WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+                <if test="from != null">AND create_time &gt;= #{from}</if>)
                 + (SELECT COUNT(*) FROM dc3_driver_event
                 WHERE deleted = 0 AND tenant_id = #{tenantId}
                 <if test="eventTypeFlag != null">AND event_type_flag = #{eventTypeFlag}</if>
-                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>)
+                <if test="confirmFlag != null">AND confirm_flag = #{confirmFlag}</if>
+                <if test="from != null">AND create_time &gt;= #{from}</if>)
             </otherwise>
         </choose>
     </select>

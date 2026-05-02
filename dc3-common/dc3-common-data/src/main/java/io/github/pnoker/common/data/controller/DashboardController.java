@@ -209,9 +209,13 @@ public class DashboardController implements BaseController {
                         Integer.parseInt(b.get("eventTypeFlag").toString());
                 Integer confirmFlag = b.get("confirmFlag") == null ? null :
                         Integer.parseInt(b.get("confirmFlag").toString());
+                Integer rangeHours = b.get("rangeHours") == null ? null :
+                        Integer.parseInt(b.get("rangeHours").toString());
+                java.time.LocalDateTime from = rangeHours != null && rangeHours > 0
+                        ? java.time.LocalDateTime.now().minusHours(rangeHours) : null;
                 long current = b.get("current") == null ? 1L : Long.parseLong(b.get("current").toString());
                 long size = b.get("size") == null ? 20L : Long.parseLong(b.get("size").toString());
-                return Mono.just(R.ok(dashboardService.alertPage(tenantId, source, typeFlag, confirmFlag, current, size)));
+                return Mono.just(R.ok(dashboardService.alertPage(tenantId, source, typeFlag, confirmFlag, from, current, size)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));

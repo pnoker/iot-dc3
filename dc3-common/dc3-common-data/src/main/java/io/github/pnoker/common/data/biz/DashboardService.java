@@ -107,6 +107,7 @@ public interface DashboardService {
                                             String source,
                                             Integer eventTypeFlag,
                                             Integer confirmFlag,
+                                            java.time.LocalDateTime from,
                                             long current,
                                             long size);
 
