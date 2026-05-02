@@ -91,4 +91,22 @@
         LIMIT #{limit}
     </select>
 
+    <!--
+        Per-hour event count since {from}. date_trunc('hour') buckets events
+        at hour boundaries; service layer then spreads rows into a fixed-
+        length sparkline array anchored to "now - 24h".
+    -->
+    <select id="hourlyCounts" resultType="map">
+        SELECT date_trunc('hour', create_time) AS bucket, COUNT(*) AS count
+          FROM (
+              SELECT create_time FROM dc3_device_event
+               WHERE deleted = 0 AND tenant_id = #{tenantId} AND create_time &gt;= #{from}
+              UNION ALL
+              SELECT create_time FROM dc3_driver_event
+               WHERE deleted = 0 AND tenant_id = #{tenantId} AND create_time &gt;= #{from}
+          ) merged
+         GROUP BY bucket
+         ORDER BY bucket ASC
+    </select>
+
 </mapper>
