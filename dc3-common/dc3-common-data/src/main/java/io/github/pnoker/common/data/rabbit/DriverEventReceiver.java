@@ -67,6 +67,7 @@ public class DriverEventReceiver {
                     driverEventService.heartbeatEvent(entityDTO);
                     break;
                 case ALARM:
+                    driverEventService.alarmEvent(entityDTO);
                     break;
                 default:
                     log.error("Invalid event type, {}", entityDTO.getType());
