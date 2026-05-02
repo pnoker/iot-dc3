@@ -55,11 +55,12 @@
                 <el-tag :type="row.source === 'device' ? 'primary' : 'info'" size="small">
                   {{ sourceLabel(row) }}
                 </el-tag>
+                <span class="alert-list__name">{{ nameFor(row) }}</span>
                 <el-tag v-if="row.confirmFlag === 1" type="success" size="small" effect="plain">
                   {{ $t('home.alertList.confirmed') }}
                 </el-tag>
               </div>
-              <div class="alert-list__name">{{ nameFor(row) }}</div>
+              <div v-if="row.message" class="alert-list__message" :title="row.message">{{ row.message }}</div>
             </div>
           </el-timeline-item>
         </el-timeline>
@@ -85,6 +86,7 @@
     eventTypeFlag: number;
     confirmFlag: number;
     createTime: string;
+    message?: string;
   }
 
   const props = defineProps({
@@ -300,6 +302,17 @@
     .alert-list__name {
       font-size: 13px;
       color: #606266;
+    }
+
+    .alert-list__message {
+      font-size: 12px;
+      color: #909399;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-word;
     }
 
     .alert-list__empty {
