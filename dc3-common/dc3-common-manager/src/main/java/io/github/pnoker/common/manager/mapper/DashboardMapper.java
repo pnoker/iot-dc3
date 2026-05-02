@@ -19,7 +19,6 @@ package io.github.pnoker.common.manager.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,8 @@ import java.util.Map;
  * Manager-side aggregate queries backing the home-page breakdowns
  * (drivers by protocol / enable status, devices by enable status /
  * profile distribution).
+ *
+ * <p>SQL lives in {@code resources/mapping/DashboardMapper.xml}.</p>
  *
  * @author pnoker
  * @since 2026.5.2
@@ -38,48 +39,22 @@ public interface DashboardMapper {
     /**
      * Driver counts grouped by enable_flag (0 = enabled, 1 = disabled).
      */
-    @Select({
-            "SELECT enable_flag AS enable_flag, COUNT(*) AS count",
-            "  FROM dc3_driver",
-            " WHERE deleted = 0 AND tenant_id = #{tenantId}",
-            " GROUP BY enable_flag"
-    })
     List<Map<String, Object>> countDriverByEnable(@Param("tenantId") Long tenantId);
 
     /**
      * Driver counts grouped by driver_type_flag (0=client, 1=server, 2=gateway, 3=connect).
      */
-    @Select({
-            "SELECT driver_type_flag AS driver_type_flag, COUNT(*) AS count",
-            "  FROM dc3_driver",
-            " WHERE deleted = 0 AND tenant_id = #{tenantId}",
-            " GROUP BY driver_type_flag"
-    })
     List<Map<String, Object>> countDriverByType(@Param("tenantId") Long tenantId);
 
     /**
      * Device counts grouped by enable_flag.
      */
-    @Select({
-            "SELECT enable_flag AS enable_flag, COUNT(*) AS count",
-            "  FROM dc3_device",
-            " WHERE deleted = 0 AND tenant_id = #{tenantId}",
-            " GROUP BY enable_flag"
-    })
     List<Map<String, Object>> countDeviceByEnable(@Param("tenantId") Long tenantId);
 
     /**
      * Device counts grouped by driver_id (top-N binding) — drives the
      * "devices per driver" breakdown on the dashboard.
      */
-    @Select({
-            "SELECT driver_id AS driver_id, COUNT(*) AS count",
-            "  FROM dc3_device",
-            " WHERE deleted = 0 AND tenant_id = #{tenantId}",
-            " GROUP BY driver_id",
-            " ORDER BY count DESC",
-            " LIMIT #{limit}"
-    })
     List<Map<String, Object>> countDeviceByDriver(@Param("tenantId") Long tenantId,
                                                   @Param("limit") int limit);
 
@@ -88,14 +63,6 @@ public interface DashboardMapper {
      * active bindings. Top-N profile-bind counts — one device can bind to
      * multiple profiles, so totals can exceed device count.
      */
-    @Select({
-            "SELECT b.profile_id AS profile_id, COUNT(*) AS count",
-            "  FROM dc3_profile_bind b",
-            " WHERE b.deleted = 0 AND b.tenant_id = #{tenantId}",
-            " GROUP BY b.profile_id",
-            " ORDER BY count DESC",
-            " LIMIT #{limit}"
-    })
     List<Map<String, Object>> countDeviceByProfile(@Param("tenantId") Long tenantId,
                                                    @Param("limit") int limit);
 }
