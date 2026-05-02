@@ -132,20 +132,28 @@ public class SystemHealthServiceImpl implements SystemHealthService {
             drivers = future.get(PROBE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             future.cancel(true);
-            log.warn("Driver summary failed: {}", e.getMessage());
+            log.warn("Driver summary failed: {}", e.getMessage(), e);
             return summary;
         }
         int online = 0;
+        int missingCache = 0;
         String onlineCode = DriverStatusEnum.ONLINE.getCode();
         for (FacadeDriverBO d : drivers) {
             String key = PrefixConstant.DRIVER_STATUS_KEY_PREFIX + d.getId();
             String status = localCacheService.getKey(key);
+            if (status == null) missingCache++;
             if (Objects.equals(status, onlineCode)) {
                 online++;
             }
         }
         summary.setTotal(drivers.size());
         summary.setOnline(online);
+        // Surfaces the common failure modes without needing to bump the log
+        // level: either the facade returned zero drivers (gRPC mis-wired or
+        // tenant filter too aggressive) or the status cache is cold (no
+        // heartbeat has reached data since startup).
+        log.info("System health drivers: total={}, online={}, missingStatusCache={}",
+                drivers.size(), online, missingCache);
         return summary;
     }
 
