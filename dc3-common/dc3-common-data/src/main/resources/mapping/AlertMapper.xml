@@ -312,4 +312,64 @@
         </choose>
     </update>
 
+    <!--
+        Daily event trend: per-day counts split by source, over a window
+        starting at {from}. Returns (date, device_count, driver_count).
+    -->
+    <select id="dailyTrend" resultType="map">
+        SELECT date::text AS date,
+               device_count,
+               driver_count
+        FROM (SELECT d.day AS date,
+                     COALESCE(dev.cnt, 0) AS device_count,
+                     COALESCE(drv.cnt, 0) AS driver_count
+              FROM (SELECT generate_series(date_trunc('day', #{from})::date,
+                                           CURRENT_DATE, '1 day')::date AS day) d
+                       LEFT JOIN (SELECT date_trunc('day', create_time)::date AS day, COUNT(*) AS cnt
+                                  FROM dc3_device_event
+                                  WHERE deleted = 0
+                                    AND tenant_id = #{tenantId}
+                                    AND event_type_flag = 1
+                                    AND create_time &gt;= #{from}
+                                  GROUP BY day) dev ON d.day = dev.day
+                       LEFT JOIN (SELECT date_trunc('day', create_time)::date AS day, COUNT(*) AS cnt
+                                  FROM dc3_driver_event
+                                  WHERE deleted = 0
+                                    AND tenant_id = #{tenantId}
+                                    AND event_type_flag = 1
+                                    AND create_time &gt;= #{from}
+                                  GROUP BY day) drv ON d.day = drv.day) result
+        ORDER BY date ASC
+    </select>
+
+    <!--
+        Top event sources by alarm count, across device + driver tables.
+        Returns (source, source_id, count) ordered by count DESC.
+    -->
+    <select id="topSources" resultType="map">
+        SELECT * FROM (
+            (SELECT 'device' AS source, device_id AS source_id, COUNT(*) AS count
+             FROM dc3_device_event
+             WHERE deleted = 0
+               AND tenant_id = #{tenantId}
+               AND event_type_flag = 1
+               AND create_time &gt;= #{from}
+             GROUP BY device_id
+             ORDER BY count DESC
+             LIMIT #{limit})
+            UNION ALL
+            (SELECT 'driver' AS source, driver_id AS source_id, COUNT(*) AS count
+             FROM dc3_driver_event
+             WHERE deleted = 0
+               AND tenant_id = #{tenantId}
+               AND event_type_flag = 1
+               AND create_time &gt;= #{from}
+             GROUP BY driver_id
+             ORDER BY count DESC
+             LIMIT #{limit})
+        ) unioned
+        ORDER BY count DESC
+        LIMIT #{limit}
+    </select>
+
 </mapper>

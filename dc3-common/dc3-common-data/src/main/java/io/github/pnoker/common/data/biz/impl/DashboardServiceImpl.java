@@ -382,4 +382,37 @@ public class DashboardServiceImpl implements DashboardService {
         }
         return out;
     }
+
+    @Override
+    public List<AlertTrendVO> alertTrend(Long tenantId, int days) {
+        int clamped = Math.max(1, Math.min(days, 90));
+        LocalDateTime from = LocalDate.now().minusDays(clamped).atTime(LocalTime.MIN);
+        List<Map<String, Object>> rows = alertMapper.dailyTrend(tenantId, from);
+        List<AlertTrendVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> row : rows) {
+            AlertTrendVO vo = new AlertTrendVO();
+            vo.setDate(asString(row.get("date")));
+            vo.setDeviceCount(toLong(row.get("device_count")));
+            vo.setDriverCount(toLong(row.get("driver_count")));
+            out.add(vo);
+        }
+        return out;
+    }
+
+    @Override
+    public List<AlertTopSourceVO> alertTopSources(Long tenantId, int days, int limit) {
+        int clampedDays = Math.max(1, Math.min(days, 90));
+        int clampedLimit = Math.max(1, Math.min(limit, 50));
+        LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
+        List<Map<String, Object>> rows = alertMapper.topSources(tenantId, from, clampedLimit);
+        List<AlertTopSourceVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> row : rows) {
+            AlertTopSourceVO vo = new AlertTopSourceVO();
+            vo.setSource(asString(row.get("source")));
+            vo.setSourceId(toLong(row.get("source_id")));
+            vo.setCount(toLong(row.get("count")));
+            out.add(vo);
+        }
+        return out;
+    }
 }

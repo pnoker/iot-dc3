@@ -104,4 +104,19 @@ public interface AlertMapper {
     int unconfirmOne(@Param("tenantId") Long tenantId,
                      @Param("source") String source,
                      @Param("id") Long id);
+
+    /**
+     * Daily event counts split by device/driver source, starting from {@code from}.
+     * Returns rows with (date, device_count, driver_count).
+     */
+    List<Map<String, Object>> dailyTrend(@Param("tenantId") Long tenantId,
+                                         @Param("from") LocalDateTime from);
+
+    /**
+     * Top N event sources by alarm count, starting from {@code from}.
+     * Returns rows with (source, source_id, count).
+     */
+    List<Map<String, Object>> topSources(@Param("tenantId") Long tenantId,
+                                         @Param("from") LocalDateTime from,
+                                         @Param("limit") int limit);
 }
