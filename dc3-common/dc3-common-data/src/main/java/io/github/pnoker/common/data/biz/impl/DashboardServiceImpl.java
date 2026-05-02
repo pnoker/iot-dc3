@@ -235,6 +235,11 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public long countTotal(Long tenantId) {
+        return dashboardMapper.countTotal(tenantId);
+    }
+
+    @Override
     public List<TimeseriesPointVO> timeseries(Long tenantId, String granularity, int rangeHours) {
         String g = GRANULARITY.contains(granularity) ? granularity : "hour";
         int hours = Math.max(1, Math.min(rangeHours, 24 * 90));
@@ -322,6 +327,21 @@ public class DashboardServiceImpl implements DashboardService {
             } else if ("driver".equals(src)) {
                 vo.setDriverAlerts(srcTotal);
                 vo.setDriverUnconfirmed(srcUnconfirmed);
+            }
+        }
+
+        // Today's ALARM counts per source
+        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+        for (Map<String, Object> row : alertMapper.todayBySource(tenantId, todayStart)) {
+            String src = asString(row.get("source"));
+            long srcTotal = toLong(row.get("total"));
+            long srcUnconfirmed = toLong(row.get("unconfirmed"));
+            if ("device".equals(src)) {
+                vo.setTodayDeviceAlarms(srcTotal);
+                vo.setTodayDeviceUnconfirmed(srcUnconfirmed);
+            } else if ("driver".equals(src)) {
+                vo.setTodayDriverAlarms(srcTotal);
+                vo.setTodayDriverUnconfirmed(srcUnconfirmed);
             }
         }
 

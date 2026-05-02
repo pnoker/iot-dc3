@@ -45,6 +45,11 @@ public interface DashboardService {
     long countYesterday(Long tenantId);
 
     /**
+     * Total point-value rows across all time for the tenant.
+     */
+    long countTotal(Long tenantId);
+
+    /**
      * Time-bucketed series of point-value row counts. {@code granularity} is
      * either {@code "hour"} (24-hour default) or {@code "day"} (7/30-day).
      * {@code rangeHours} controls how far back to look.
