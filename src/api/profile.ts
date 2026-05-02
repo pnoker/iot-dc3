@@ -15,17 +15,18 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_MANAGER_BASE } from '@/config/constant/api';
 
-export const addProfile = (profile: any) => httpPost('api/v3/manager/profile/add', profile);
+export const addProfile = (profile: any) => httpPost(`${API_MANAGER_BASE}/profile/add`, profile);
 
-export const deleteProfile = (id: string) => httpPost(`api/v3/manager/profile/delete/${id}`);
+export const deleteProfile = (id: string) => httpPost(`${API_MANAGER_BASE}/profile/delete/${id}`);
 
-export const updateProfile = (profile: any) => httpPost('api/v3/manager/profile/update', profile);
+export const updateProfile = (profile: any) => httpPost(`${API_MANAGER_BASE}/profile/update`, profile);
 
-export const getProfileById = (id: string) => httpGet(`api/v3/manager/profile/id/${id}`);
+export const getProfileById = (id: string) => httpGet(`${API_MANAGER_BASE}/profile/id/${id}`);
 
-export const getProfileByIds = (profileIds: any) => httpPost('api/v3/manager/profile/ids', profileIds);
+export const getProfileByIds = (profileIds: any) => httpPost(`${API_MANAGER_BASE}/profile/ids`, profileIds);
 
-export const getProfileByDeviceId = (deviceId: string) => httpGet(`api/v3/manager/profile/device_id/${deviceId}`);
+export const getProfileByDeviceId = (deviceId: string) => httpGet(`${API_MANAGER_BASE}/profile/device_id/${deviceId}`);
 
-export const getProfileList = (profile: any) => httpPost('api/v3/manager/profile/list', profile);
+export const getProfileList = (profile: any) => httpPost(`${API_MANAGER_BASE}/profile/list`, profile);

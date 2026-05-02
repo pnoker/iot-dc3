@@ -15,12 +15,13 @@
  */
 
 import { httpPost } from '@/api/common';
+import { API_AUTH_BASE } from '@/config/constant/api';
 import type { Login } from '@/config/entity';
 
-export const generateSalt = (login: Login) => httpPost('api/v3/auth/token/salt', login);
+export const generateSalt = (login: Login) => httpPost(`${API_AUTH_BASE}/token/salt`, login);
 
-export const generateToken = (login: Login) => httpPost('api/v3/auth/token/generate', login);
+export const generateToken = (login: Login) => httpPost(`${API_AUTH_BASE}/token/generate`, login);
 
-export const cancelToken = (login: Login) => httpPost('api/v3/auth/token/cancel', login);
+export const cancelToken = (login: Login) => httpPost(`${API_AUTH_BASE}/token/cancel`, login);
 
-export const checkTokenValid = (login: Login) => httpPost('api/v3/auth/token/check', login);
+export const checkTokenValid = (login: Login) => httpPost(`${API_AUTH_BASE}/token/check`, login);

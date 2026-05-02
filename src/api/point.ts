@@ -15,36 +15,37 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 
-export const pointAddApi = (point: any) => httpPost('api/v3/manager/point/add', point);
+export const pointAddApi = (point: any) => httpPost(`${API_MANAGER_BASE}/point/add`, point);
 
-export const pointDeleteApi = (id: string) => httpPost(`api/v3/manager/point/delete/${id}`);
+export const pointDeleteApi = (id: string) => httpPost(`${API_MANAGER_BASE}/point/delete/${id}`);
 
-export const getPointUpdate = (point: any) => httpPost('api/v3/manager/point/update', point);
+export const getPointUpdate = (point: any) => httpPost(`${API_MANAGER_BASE}/point/update`, point);
 
-export const getPointById = (id: string) => httpGet(`api/v3/manager/point/id/${id}`);
+export const getPointById = (id: string) => httpGet(`${API_MANAGER_BASE}/point/id/${id}`);
 
-export const getPointByIds = (pointIds: any) => httpPost('api/v3/manager/point/ids', pointIds);
+export const getPointByIds = (pointIds: any) => httpPost(`${API_MANAGER_BASE}/point/ids`, pointIds);
 
-export const getPointList = (point: any) => httpPost('api/v3/manager/point/list', point);
+export const getPointList = (point: any) => httpPost(`${API_MANAGER_BASE}/point/list`, point);
 
-export const getPointUnit = (pointIds: any) => httpPost('api/v3/manager/point/unit', pointIds);
+export const getPointUnit = (pointIds: any) => httpPost(`${API_MANAGER_BASE}/point/unit`, pointIds);
 
-export const getPointByProfileId = (profileId: string) => httpGet(`api/v3/manager/point/profile_id/${profileId}`);
+export const getPointByProfileId = (profileId: string) => httpGet(`${API_MANAGER_BASE}/point/profile_id/${profileId}`);
 
-export const getPointByDeviceId = (deviceId: string) => httpGet(`api/v3/manager/point/device_id/${deviceId}`);
+export const getPointByDeviceId = (deviceId: string) => httpGet(`${API_MANAGER_BASE}/point/device_id/${deviceId}`);
 
-export const getPointValueLatest = (pointValue: any) => httpPost('api/v3/data/point_value/latest', pointValue);
+export const getPointValueLatest = (pointValue: any) => httpPost(`${API_DATA_BASE}/point_value/latest`, pointValue);
 
-export const getPointValueList = (pointValue: any) => httpPost('api/v3/data/point_value/list', pointValue);
+export const getPointValueList = (pointValue: any) => httpPost(`${API_DATA_BASE}/point_value/list`, pointValue);
 
 export const getPointValueHistory = (deviceId: number, pointId: number, count: number = 100) =>
-  httpGet(`api/v3/data/point_value/history/device_id/${deviceId}/point_id/${pointId}`, {
+  httpGet(`${API_DATA_BASE}/point_value/history/device_id/${deviceId}/point_id/${pointId}`, {
     params: { count },
   });
 
 export const readPointValue = (pointValueReadVO: any) =>
-  httpPost('api/v3/data/point_value_command/read', pointValueReadVO);
+  httpPost(`${API_DATA_BASE}/point_value_command/read`, pointValueReadVO);
 
 export const writePointValue = (pointValueWriteVO: any) =>
-  httpPost('api/v3/data/point_value_command/write', pointValueWriteVO);
+  httpPost(`${API_DATA_BASE}/point_value_command/write`, pointValueWriteVO);

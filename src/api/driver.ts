@@ -15,11 +15,12 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 
-export const getDriverById = (id: string) => httpGet(`api/v3/manager/driver/id/${id}`);
+export const getDriverById = (id: string) => httpGet(`${API_MANAGER_BASE}/driver/id/${id}`);
 
-export const getDriverByIds = (driverIds: any) => httpPost('api/v3/manager/driver/ids', driverIds);
+export const getDriverByIds = (driverIds: any) => httpPost(`${API_MANAGER_BASE}/driver/ids`, driverIds);
 
-export const getDriverList = (driver: any) => httpPost('api/v3/manager/driver/list', driver);
+export const getDriverList = (driver: any) => httpPost(`${API_MANAGER_BASE}/driver/list`, driver);
 
-export const getDriverStatus = (driver: any) => httpPost('api/v3/data/driver/status/driver', driver);
+export const getDriverStatus = (driver: any) => httpPost(`${API_DATA_BASE}/driver/status/driver`, driver);

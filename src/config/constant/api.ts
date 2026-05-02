@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-import { httpGet } from '@/api/common';
-import { API_MANAGER_BASE } from '@/config/constant/api';
-
-export const getDriverAttributeByDriverId = (id: string) =>
-  httpGet(`${API_MANAGER_BASE}/driver_attribute/driver_id/${id}`);
-
-export const getPointAttributeByDriverId = (id: string) =>
-  httpGet(`${API_MANAGER_BASE}/point_attribute/driver_id/${id}`);
+/**
+ * Gateway-prefixed base paths for every `src/api/*.ts` module.
+ * The gateway (dc3-gateway) strips the `/api/v3` prefix and routes the
+ * remainder to the matching center service (auth / data / manager).
+ *
+ * Keep these in sync with:
+ *   - dc3-gateway/src/main/resources/application-*.yml (StripPrefix=2)
+ *   - dc3-common-constant/.../service/{Auth,Data,Manager}Constant.java
+ *     (SERVICE_NAME + URL_PREFIX fragments)
+ */
+export const API_AUTH_BASE = 'api/v3/auth';
+export const API_DATA_BASE = 'api/v3/data';
+export const API_MANAGER_BASE = 'api/v3/manager';

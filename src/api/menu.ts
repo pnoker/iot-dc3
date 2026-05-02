@@ -15,15 +15,16 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_AUTH_BASE } from '@/config/constant/api';
 
-export const addMenu = (menu: any) => httpPost('api/v3/auth/menu/add', menu);
+export const addMenu = (menu: any) => httpPost(`${API_AUTH_BASE}/menu/add`, menu);
 
-export const deleteMenu = (id: string) => httpPost(`api/v3/auth/menu/delete/${id}`);
+export const deleteMenu = (id: string) => httpPost(`${API_AUTH_BASE}/menu/delete/${id}`);
 
-export const updateMenu = (menu: any) => httpPost('api/v3/auth/menu/update', menu);
+export const updateMenu = (menu: any) => httpPost(`${API_AUTH_BASE}/menu/update`, menu);
 
-export const getMenuById = (id: string) => httpGet(`api/v3/auth/menu/id/${id}`);
+export const getMenuById = (id: string) => httpGet(`${API_AUTH_BASE}/menu/id/${id}`);
 
-export const getMenuList = (query: any) => httpPost('api/v3/auth/menu/list', query);
+export const getMenuList = (query: any) => httpPost(`${API_AUTH_BASE}/menu/list`, query);
 
-export const getMenuTree = (query: any = {}) => httpPost('api/v3/auth/menu/tree', query);
+export const getMenuTree = (query: any = {}) => httpPost(`${API_AUTH_BASE}/menu/tree`, query);

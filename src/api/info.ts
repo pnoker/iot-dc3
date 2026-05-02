@@ -15,24 +15,27 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_MANAGER_BASE } from '@/config/constant/api';
 
-export const addDriverInfo = (driverInfo: any) => httpPost('api/v3/manager/driver_attribute_config/add', driverInfo);
+export const addDriverInfo = (driverInfo: any) =>
+  httpPost(`${API_MANAGER_BASE}/driver_attribute_config/add`, driverInfo);
 
 export const updateDriverInfo = (driverInfo: any) =>
-  httpPost('api/v3/manager/driver_attribute_config/update', driverInfo);
+  httpPost(`${API_MANAGER_BASE}/driver_attribute_config/update`, driverInfo);
 
 export const getDriverInfoByDeviceIdAndAttributeId = (deviceId: string, attributeId: string) =>
-  httpGet(`api/v3/manager/driver_attribute_config/device_id/${deviceId}/attribute_id/${attributeId}`);
+  httpGet(`${API_MANAGER_BASE}/driver_attribute_config/device_id/${deviceId}/attribute_id/${attributeId}`);
 
 export const getDriverInfoByDeviceId = (deviceId: string) =>
-  httpGet(`api/v3/manager/driver_attribute_config/device_id/${deviceId}`);
+  httpGet(`${API_MANAGER_BASE}/driver_attribute_config/device_id/${deviceId}`);
 
-export const addPointInfo = (pointInfo: any) => httpPost('api/v3/manager/point_attribute_config/add', pointInfo);
+export const addPointInfo = (pointInfo: any) => httpPost(`${API_MANAGER_BASE}/point_attribute_config/add`, pointInfo);
 
-export const updatePointInfo = (pointInfo: any) => httpPost('api/v3/manager/point_attribute_config/update', pointInfo);
+export const updatePointInfo = (pointInfo: any) =>
+  httpPost(`${API_MANAGER_BASE}/point_attribute_config/update`, pointInfo);
 
 export const getPointInfoByDeviceIdAndPointId = (deviceId: string, pointId: string) =>
-  httpGet(`api/v3/manager/point_attribute_config/device_id/${deviceId}/point_id/${pointId}`);
+  httpGet(`${API_MANAGER_BASE}/point_attribute_config/device_id/${deviceId}/point_id/${pointId}`);
 
 export const getPointInfoByDeviceId = (deviceId: string) =>
-  httpGet(`api/v3/manager/point_attribute_config/device_id/${deviceId}`);
+  httpGet(`${API_MANAGER_BASE}/point_attribute_config/device_id/${deviceId}`);

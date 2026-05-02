@@ -15,15 +15,16 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_AUTH_BASE } from '@/config/constant/api';
 
-export const addUser = (user: any) => httpPost('api/v3/auth/user-profile/add', user);
+export const addUser = (user: any) => httpPost(`${API_AUTH_BASE}/user-profile/add`, user);
 
-export const deleteUser = (id: string) => httpPost(`api/v3/auth/user-profile/delete/${id}`);
+export const deleteUser = (id: string) => httpPost(`${API_AUTH_BASE}/user-profile/delete/${id}`);
 
-export const updateUser = (user: any) => httpPost('api/v3/auth/user-profile/update', user);
+export const updateUser = (user: any) => httpPost(`${API_AUTH_BASE}/user-profile/update`, user);
 
-export const getUserById = (id: string) => httpGet(`api/v3/auth/user-profile/id/${id}`);
+export const getUserById = (id: string) => httpGet(`${API_AUTH_BASE}/user-profile/id/${id}`);
 
-export const getUserByName = (name: string) => httpGet(`api/v3/auth/user-profile/name/${name}`);
+export const getUserByName = (name: string) => httpGet(`${API_AUTH_BASE}/user-profile/name/${name}`);
 
-export const getUserList = (query: any) => httpPost('api/v3/auth/user-profile/list', query);
+export const getUserList = (query: any) => httpPost(`${API_AUTH_BASE}/user-profile/list`, query);

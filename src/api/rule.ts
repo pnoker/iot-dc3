@@ -15,5 +15,6 @@
  */
 
 import { httpPost } from '@/api/common';
+import { API_MANAGER_BASE } from '@/config/constant/api';
 
-export const getFlowsList = (flowsQuery: any) => httpPost('api/v3/manager/ruleengine/flowsList', flowsQuery);
+export const getFlowsList = (flowsQuery: any) => httpPost(`${API_MANAGER_BASE}/ruleengine/flowsList`, flowsQuery);

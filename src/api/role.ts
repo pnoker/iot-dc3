@@ -15,13 +15,14 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_AUTH_BASE } from '@/config/constant/api';
 
-export const addRole = (role: any) => httpPost('api/v3/auth/role/add', role);
+export const addRole = (role: any) => httpPost(`${API_AUTH_BASE}/role/add`, role);
 
-export const deleteRole = (id: string) => httpPost(`api/v3/auth/role/delete/${id}`);
+export const deleteRole = (id: string) => httpPost(`${API_AUTH_BASE}/role/delete/${id}`);
 
-export const updateRole = (role: any) => httpPost('api/v3/auth/role/update', role);
+export const updateRole = (role: any) => httpPost(`${API_AUTH_BASE}/role/update`, role);
 
-export const getRoleById = (id: string) => httpGet(`api/v3/auth/role/id/${id}`);
+export const getRoleById = (id: string) => httpGet(`${API_AUTH_BASE}/role/id/${id}`);
 
-export const getRoleList = (query: any) => httpPost('api/v3/auth/role/list', query);
+export const getRoleList = (query: any) => httpPost(`${API_AUTH_BASE}/role/list`, query);

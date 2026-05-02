@@ -15,15 +15,16 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_AUTH_BASE } from '@/config/constant/api';
 
-export const bindRoleUser = (body: any) => httpPost('api/v3/auth/role-user/add', body);
+export const bindRoleUser = (body: any) => httpPost(`${API_AUTH_BASE}/role-user/add`, body);
 
-export const unbindRoleUser = (id: string) => httpPost(`api/v3/auth/role-user/delete/${id}`);
+export const unbindRoleUser = (id: string) => httpPost(`${API_AUTH_BASE}/role-user/delete/${id}`);
 
-export const getRoleUserList = (query: any) => httpPost('api/v3/auth/role-user/list', query);
+export const getRoleUserList = (query: any) => httpPost(`${API_AUTH_BASE}/role-user/list`, query);
 
 export const listRoleByUserId = (userId: string, tenantId?: string | number) => {
   // Only append numeric tenantId; string tenant names would cause Long type-mismatch on the backend.
   const query = typeof tenantId === 'number' ? `?tenantId=${tenantId}` : '';
-  return httpGet(`api/v3/auth/role-user/list-role-by-user/${userId}${query}`);
+  return httpGet(`${API_AUTH_BASE}/role-user/list-role-by-user/${userId}${query}`);
 };

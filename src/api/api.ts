@@ -15,13 +15,14 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_AUTH_BASE } from '@/config/constant/api';
 
-export const addApi = (api: any) => httpPost('api/v3/auth/api/add', api);
+export const addApi = (api: any) => httpPost(`${API_AUTH_BASE}/api/add`, api);
 
-export const deleteApi = (id: string) => httpPost(`api/v3/auth/api/delete/${id}`);
+export const deleteApi = (id: string) => httpPost(`${API_AUTH_BASE}/api/delete/${id}`);
 
-export const updateApi = (api: any) => httpPost('api/v3/auth/api/update', api);
+export const updateApi = (api: any) => httpPost(`${API_AUTH_BASE}/api/update`, api);
 
-export const getApiById = (id: string) => httpGet(`api/v3/auth/api/id/${id}`);
+export const getApiById = (id: string) => httpGet(`${API_AUTH_BASE}/api/id/${id}`);
 
-export const getApiList = (query: any) => httpPost('api/v3/auth/api/list', query);
+export const getApiList = (query: any) => httpPost(`${API_AUTH_BASE}/api/list`, query);

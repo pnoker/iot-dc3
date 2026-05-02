@@ -15,15 +15,16 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_AUTH_BASE } from '@/config/constant/api';
 
-export const addResource = (resource: any) => httpPost('api/v3/auth/resource/add', resource);
+export const addResource = (resource: any) => httpPost(`${API_AUTH_BASE}/resource/add`, resource);
 
-export const deleteResource = (id: string) => httpPost(`api/v3/auth/resource/delete/${id}`);
+export const deleteResource = (id: string) => httpPost(`${API_AUTH_BASE}/resource/delete/${id}`);
 
-export const updateResource = (resource: any) => httpPost('api/v3/auth/resource/update', resource);
+export const updateResource = (resource: any) => httpPost(`${API_AUTH_BASE}/resource/update`, resource);
 
-export const getResourceById = (id: string) => httpGet(`api/v3/auth/resource/id/${id}`);
+export const getResourceById = (id: string) => httpGet(`${API_AUTH_BASE}/resource/id/${id}`);
 
-export const getResourceList = (query: any) => httpPost('api/v3/auth/resource/list', query);
+export const getResourceList = (query: any) => httpPost(`${API_AUTH_BASE}/resource/list`, query);
 
-export const getResourceTree = (query: any = {}) => httpPost('api/v3/auth/resource/tree', query);
+export const getResourceTree = (query: any = {}) => httpPost(`${API_AUTH_BASE}/resource/tree`, query);

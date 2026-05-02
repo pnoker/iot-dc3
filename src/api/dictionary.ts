@@ -15,11 +15,13 @@
  */
 
 import { httpPost } from '@/api/common';
+import { API_MANAGER_BASE } from '@/config/constant/api';
 
-export const getDriverDictionary = (dictionary: any) => httpPost('api/v3/manager/dictionary/driver', dictionary);
+export const getDriverDictionary = (dictionary: any) => httpPost(`${API_MANAGER_BASE}/dictionary/driver`, dictionary);
 
-export const getDeviceDictionary = (dictionary: any) => httpPost('api/v3/manager/dictionary/device', dictionary);
+export const getDeviceDictionary = (dictionary: any) => httpPost(`${API_MANAGER_BASE}/dictionary/device`, dictionary);
 
-export const getProfileDictionary = (dictionary: any) => httpPost('api/v3/manager/dictionary/profile', dictionary);
+export const getProfileDictionary = (dictionary: any) => httpPost(`${API_MANAGER_BASE}/dictionary/profile`, dictionary);
 
-export const getPointDictionary = (dictionary: any) => httpPost('api/v3/manager/dictionary/device_point', dictionary);
+export const getPointDictionary = (dictionary: any) =>
+  httpPost(`${API_MANAGER_BASE}/dictionary/device_point`, dictionary);

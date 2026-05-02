@@ -15,26 +15,23 @@
  */
 
 import { httpGet } from '@/api/common';
+import { API_DATA_BASE, API_MANAGER_BASE } from '@/config/constant/api';
 
-// Matches backend dc3-center-data /dashboard endpoints.
-const DATA_BASE = 'api/v3/data/dashboard';
-const MANAGER_BASE = 'api/v3/manager/dashboard';
-
-export const statsToday = () => httpGet(`${DATA_BASE}/stats/today`);
+export const statsToday = () => httpGet(`${API_DATA_BASE}/dashboard/stats/today`);
 
 export const statsTimeseries = (params: { granularity?: 'hour' | 'day'; rangeHours?: number } = {}) =>
-  httpGet(`${DATA_BASE}/stats/timeseries`, { params });
+  httpGet(`${API_DATA_BASE}/dashboard/stats/timeseries`, { params });
 
 export const statsTop = (
   params: { dimension?: 'device' | 'point' | 'driver'; rangeHours?: number; limit?: number } = {}
-) => httpGet(`${DATA_BASE}/top`, { params });
+) => httpGet(`${API_DATA_BASE}/dashboard/top`, { params });
 
-export const streamLatest = (size = 20) => httpGet(`${DATA_BASE}/stream`, { params: { size } });
+export const streamLatest = (size = 20) => httpGet(`${API_DATA_BASE}/dashboard/stream`, { params: { size } });
 
-export const alertStats = () => httpGet(`${DATA_BASE}/alert/stats`);
+export const alertStats = () => httpGet(`${API_DATA_BASE}/dashboard/alert/stats`);
 
-export const alertLatest = (size = 10) => httpGet(`${DATA_BASE}/alert/latest`, { params: { size } });
+export const alertLatest = (size = 10) => httpGet(`${API_DATA_BASE}/dashboard/alert/latest`, { params: { size } });
 
-export const driverStats = () => httpGet(`${MANAGER_BASE}/driver/stats`);
+export const driverStats = () => httpGet(`${API_MANAGER_BASE}/dashboard/driver/stats`);
 
-export const deviceStats = (topN = 10) => httpGet(`${MANAGER_BASE}/device/stats`, { params: { topN } });
+export const deviceStats = (topN = 10) => httpGet(`${API_MANAGER_BASE}/dashboard/device/stats`, { params: { topN } });

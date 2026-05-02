@@ -15,12 +15,13 @@
  */
 
 import { httpGet, httpPost } from '@/api/common';
+import { API_AUTH_BASE } from '@/config/constant/api';
 
-export const bindRoleResource = (body: any) => httpPost('api/v3/auth/role-resource/add', body);
+export const bindRoleResource = (body: any) => httpPost(`${API_AUTH_BASE}/role-resource/add`, body);
 
-export const unbindRoleResource = (id: string) => httpPost(`api/v3/auth/role-resource/delete/${id}`);
+export const unbindRoleResource = (id: string) => httpPost(`${API_AUTH_BASE}/role-resource/delete/${id}`);
 
-export const getRoleResourceList = (query: any) => httpPost('api/v3/auth/role-resource/list', query);
+export const getRoleResourceList = (query: any) => httpPost(`${API_AUTH_BASE}/role-resource/list`, query);
 
 export const listResourceByRoleId = (roleId: string) =>
-  httpGet(`api/v3/auth/role-resource/list-resource-by-role/${roleId}`);
+  httpGet(`${API_AUTH_BASE}/role-resource/list-resource-by-role/${roleId}`);
