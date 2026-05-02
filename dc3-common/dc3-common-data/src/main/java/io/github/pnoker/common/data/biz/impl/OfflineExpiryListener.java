@@ -74,6 +74,15 @@ public class OfflineExpiryListener {
     @Resource
     private DeviceEventManager deviceEventManager;
 
+    private static Long parseIdSuffix(String key, String prefix) {
+        try {
+            return Long.parseLong(key.substring(prefix.length()));
+        } catch (Exception e) {
+            log.debug("Unexpected status key '{}': {}", key, e.getMessage());
+            return null;
+        }
+    }
+
     @PostConstruct
     void register() {
         localCacheService.onExpire(this::onExpire);
@@ -153,14 +162,5 @@ public class OfflineExpiryListener {
         deviceEventManager.save(entity);
 
         localCacheService.setKey(key, DeviceStatusEnum.OFFLINE.getCode(), 1, TimeUnit.DAYS);
-    }
-
-    private static Long parseIdSuffix(String key, String prefix) {
-        try {
-            return Long.parseLong(key.substring(prefix.length()));
-        } catch (Exception e) {
-            log.debug("Unexpected status key '{}': {}", key, e.getMessage());
-            return null;
-        }
     }
 }

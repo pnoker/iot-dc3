@@ -44,16 +44,24 @@ public class SystemHealthVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /** Center service reachability (auth, data, manager). */
+    /**
+     * Center service reachability (auth, data, manager).
+     */
     private Map<String, String> center;
 
-    /** Infrastructure reachability (database, mq, gateway). */
+    /**
+     * Infrastructure reachability (database, mq, gateway).
+     */
     private Map<String, String> infra;
 
-    /** Driver population summary. */
+    /**
+     * Driver population summary.
+     */
     private FleetSummary drivers;
 
-    /** Device population summary. */
+    /**
+     * Device population summary.
+     */
     private FleetSummary devices;
 
     /**
@@ -75,7 +83,9 @@ public class SystemHealthVO implements Serializable {
         private int online;
     }
 
-    /** Backwards-compat alias — drivers used to be typed as DriverSummary. */
+    /**
+     * Backwards-compat alias — drivers used to be typed as DriverSummary.
+     */
     public static class DriverSummary extends FleetSummary {
     }
 }

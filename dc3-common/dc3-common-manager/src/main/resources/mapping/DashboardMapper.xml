@@ -79,7 +79,7 @@
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
           AND create_time &gt;= #{from}
-          AND create_time &lt;  #{to}
+          AND create_time &lt; #{to}
         GROUP BY DATE(create_time)
         ORDER BY day ASC
     </select>
