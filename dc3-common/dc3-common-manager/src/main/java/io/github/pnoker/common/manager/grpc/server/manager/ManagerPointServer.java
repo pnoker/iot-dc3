@@ -21,7 +21,9 @@ package io.github.pnoker.common.manager.grpc.server.manager;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.GrpcPagePointDTO;
 import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
+import io.github.pnoker.api.center.manager.GrpcPointQuery;
 import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
+import io.github.pnoker.api.center.manager.GrpcRPointDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointDTO;
@@ -85,6 +87,29 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
             pagePointBuilder.addAllData(entityGrpcDTOList);
 
             builder.setData(pagePointBuilder);
+        }
+
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void selectById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
+        GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
+
+        PointBO entityBO = pointService.selectById(request.getPointId());
+        if (Objects.isNull(entityBO)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
+
+            builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
         }
 
         builder.setResult(rBuilder);
