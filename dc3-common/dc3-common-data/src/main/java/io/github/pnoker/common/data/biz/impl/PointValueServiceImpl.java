@@ -155,9 +155,12 @@ public class PointValueServiceImpl implements PointValueService {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
-        if (entityQuery.getRangeHours() != null && entityQuery.getRangeHours() > 0
-                && entityQuery.getCreateTimeFrom() == null) {
-            entityQuery.setCreateTimeFrom(java.time.LocalDateTime.now().minusHours(entityQuery.getRangeHours()));
+        if (entityQuery.getCreateTimeFrom() == null) {
+            java.time.LocalDateTime from = io.github.pnoker.common.utils.TimeRangeUtil
+                    .resolveFrom(entityQuery.getRangeKey(), entityQuery.getRangeHours());
+            if (from != null) {
+                entityQuery.setCreateTimeFrom(from);
+            }
         }
 
         RepositoryService repositoryService = getFirstRepositoryService();
