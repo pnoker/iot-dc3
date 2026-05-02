@@ -41,6 +41,7 @@ import { isNull } from '@/utils/ValidationUtil';
 import { getDriverById } from '@/api/driver';
 import { getProfileByIds } from '@/api/profile';
 import { getPointByDeviceId } from '@/api/point';
+import { nameRules, remarkRules } from '@/utils/FormRuleUtil';
 import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
@@ -91,23 +92,7 @@ export default defineComponent({
 
     // 定义表单校验规则
     const deviceFormRule = reactive<FormRules>({
-      deviceName: [
-        {
-          required: true,
-          message: () => t('common.nameRequired', { name: '设备' }),
-          trigger: 'blur',
-        },
-        {
-          min: 2,
-          max: 32,
-          message: () => t('common.nameLength'),
-          trigger: 'blur',
-        },
-        {
-          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-          message: () => t('common.nameFormat'),
-        },
-      ],
+      deviceName: nameRules(t, '设备'),
       driverId: [
         {
           required: true,
@@ -129,13 +114,7 @@ export default defineComponent({
           trigger: 'change',
         },
       ],
-      remark: [
-        {
-          max: 300,
-          message: () => t('common.remarkLength'),
-          trigger: 'blur',
-        },
-      ],
+      remark: remarkRules(t),
     });
 
     const hasPointFormData = computed(() => {

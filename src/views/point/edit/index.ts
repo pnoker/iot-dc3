@@ -17,6 +17,7 @@
 import { defineComponent, reactive, ref, unref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { Back, Edit, RefreshLeft, Right } from '@element-plus/icons-vue';
+import { nameRules, remarkRules } from '@/utils/FormRuleUtil';
 import { useI18n } from 'vue-i18n';
 
 import router from '@/config/router';
@@ -53,23 +54,7 @@ export default defineComponent({
 
     // 定义表单校验规则
     const pointFormRule = reactive<FormRules>({
-      pointName: [
-        {
-          required: true,
-          message: t('common.nameRequired', { name: '位号' }),
-          trigger: 'blur',
-        },
-        {
-          min: 2,
-          max: 32,
-          message: t('common.nameLength'),
-          trigger: 'blur',
-        },
-        {
-          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-          message: t('common.nameFormat'),
-        },
-      ],
+      pointName: nameRules(t, '位号'),
       enable: [
         {
           required: true,
@@ -77,13 +62,7 @@ export default defineComponent({
           trigger: 'change',
         },
       ],
-      remark: [
-        {
-          max: 300,
-          message: t('common.remarkLength'),
-          trigger: 'blur',
-        },
-      ],
+      remark: remarkRules(t),
     });
 
     const point = () => {

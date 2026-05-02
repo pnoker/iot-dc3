@@ -15,6 +15,7 @@
  */
 
 import { successMessage } from '@/utils/NotificationUtil';
+import { DECIMAL_PATTERN, nameRules, remarkRules } from '@/utils/FormRuleUtil';
 import { defineComponent, reactive, ref, unref } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
@@ -52,23 +53,7 @@ export default defineComponent({
 
     // 定义表单校验规则
     const formRule = reactive<FormRules>({
-      pointName: [
-        {
-          required: true,
-          message: t('common.nameRequired', { name: '位号' }),
-          trigger: 'blur',
-        },
-        {
-          min: 2,
-          max: 32,
-          message: t('common.nameLength'),
-          trigger: 'blur',
-        },
-        {
-          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-          message: t('common.nameFormat'),
-        },
-      ],
+      pointName: nameRules(t, '位号'),
       pointTypeFlag: [
         {
           required: true,
@@ -85,13 +70,13 @@ export default defineComponent({
       ],
       baseValue: [
         {
-          pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
+          pattern: DECIMAL_PATTERN,
           message: t('point.add.baseValueFormat'),
         },
       ],
       multiple: [
         {
-          pattern: /^-?(([0-9]*(\.[0-9]{1,3})$)|([0-9]+$))/,
+          pattern: DECIMAL_PATTERN,
           message: t('point.add.ratioFormat'),
         },
       ],
@@ -102,13 +87,7 @@ export default defineComponent({
           trigger: 'blur',
         },
       ],
-      remark: [
-        {
-          max: 300,
-          message: t('common.remarkLength'),
-          trigger: 'blur',
-        },
-      ],
+      remark: remarkRules(t),
     });
 
     const show = () => {

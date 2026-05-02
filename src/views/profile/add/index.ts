@@ -19,6 +19,7 @@ import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
 import { successMessage } from '@/utils/NotificationUtil';
+import { nameRules, remarkRules } from '@/utils/FormRuleUtil';
 
 export default defineComponent({
   name: 'ProfileAddForm',
@@ -31,30 +32,8 @@ export default defineComponent({
 
     // 定义表单校验规则
     const formRule = reactive<FormRules>({
-      profileName: [
-        {
-          required: true,
-          message: t('common.nameRequired', { name: '模板' }),
-          trigger: 'blur',
-        },
-        {
-          min: 2,
-          max: 32,
-          message: t('common.nameLength'),
-          trigger: 'blur',
-        },
-        {
-          pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-          message: t('common.nameFormat'),
-        },
-      ],
-      remark: [
-        {
-          max: 300,
-          message: t('common.remarkLength'),
-          trigger: 'blur',
-        },
-      ],
+      profileName: nameRules(t, '模板'),
+      remark: remarkRules(t),
     });
 
     // 定义响应式数据
