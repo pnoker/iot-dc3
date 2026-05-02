@@ -19,6 +19,8 @@ package io.github.pnoker.common.data.controller;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DashboardService;
+import io.github.pnoker.common.data.entity.vo.dashboard.AlertItemVO;
+import io.github.pnoker.common.data.entity.vo.dashboard.AlertStatsVO;
 import io.github.pnoker.common.data.entity.vo.dashboard.LatestPointValueVO;
 import io.github.pnoker.common.data.entity.vo.dashboard.TimeseriesPointVO;
 import io.github.pnoker.common.data.entity.vo.dashboard.TopEntityVO;
@@ -44,6 +46,8 @@ import java.util.Map;
  *   <li>{@code /stats/timeseries?granularity=hour|day&rangeHours=24}</li>
  *   <li>{@code /top?dimension=device|point|driver&rangeHours=24&limit=10}</li>
  *   <li>{@code /stream?size=20} — most recent rows (user-triggered refresh)</li>
+ *   <li>{@code /alert/stats} — total + unconfirmed + by-type breakdown</li>
+ *   <li>{@code /alert/latest?size=10} — most recent alerts</li>
  * </ul>
  *
  * @author pnoker
@@ -123,5 +127,26 @@ public class DashboardController implements BaseController {
                 return Mono.just(R.fail(e.getMessage()));
             }
         });
+    }
+
+    @GetMapping("/alert/stats")
+    public Mono<R<AlertStatsVO>> alertStats() {
+        try {
+            return Mono.just(R.ok(dashboardService.alertStats()));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/alert/latest")
+    public Mono<R<List<AlertItemVO>>> alertLatest(
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        try {
+            return Mono.just(R.ok(dashboardService.alertLatest(size)));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
     }
 }
