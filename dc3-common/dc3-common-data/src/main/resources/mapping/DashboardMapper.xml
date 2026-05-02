@@ -21,10 +21,10 @@
 
     <select id="countInRange" resultType="long">
         SELECT COUNT(*)
-          FROM v_dc3_point_value_all
-         WHERE create_time &gt;= #{from}
-           AND create_time &lt;  #{to}
-           AND tenant_id = #{tenantId}
+        FROM v_dc3_point_value_all
+        WHERE create_time &gt;= #{from}
+          AND create_time &lt; #{to}
+          AND tenant_id = #{tenantId}
     </select>
 
     <!--
@@ -44,12 +44,12 @@
     <select id="timeseries" resultType="map">
         SELECT public.time_bucket(INTERVAL '${bucket}', create_time) AS bucket,
                COUNT(*)                                              AS count
-          FROM v_dc3_point_value_all
-         WHERE create_time &gt;= #{from}
-           AND create_time &lt;  #{to}
-           AND tenant_id = #{tenantId}
-         GROUP BY bucket
-         ORDER BY bucket ASC
+        FROM v_dc3_point_value_all
+        WHERE create_time &gt;= #{from}
+          AND create_time &lt; #{to}
+          AND tenant_id = #{tenantId}
+        GROUP BY bucket
+        ORDER BY bucket ASC
     </select>
 
     <!--
@@ -60,13 +60,13 @@
     <select id="top" resultType="map">
         SELECT ${dimension} AS entity_id,
                COUNT(*)     AS count
-          FROM v_dc3_point_value_all
-         WHERE create_time &gt;= #{from}
-           AND create_time &lt;  #{to}
-           AND tenant_id = #{tenantId}
-         GROUP BY ${dimension}
-         ORDER BY count DESC
-         LIMIT #{limit}
+        FROM v_dc3_point_value_all
+        WHERE create_time &gt;= #{from}
+          AND create_time &lt; #{to}
+          AND tenant_id = #{tenantId}
+        GROUP BY ${dimension}
+        ORDER BY count DESC
+        LIMIT #{limit}
     </select>
 
     <!--
@@ -75,51 +75,83 @@
         Inner LIMITs cap per-type reads so we never scan a full hypertable.
     -->
     <select id="latestStream" resultType="map">
-        SELECT * FROM (
-            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
-                    raw_value::text AS raw_value,
-                    cal_value::text AS cal_value,
-                    'STRING'        AS value_type
+        SELECT *
+        FROM ((SELECT tenant_id,
+                      device_id,
+                      point_id,
+                      driver_id,
+                      create_time,
+                      raw_value::text AS raw_value, cal_value::text AS cal_value, 'STRING' AS value_type
                FROM dc3_point_value
-              WHERE tenant_id = #{tenantId}
-              ORDER BY create_time DESC LIMIT #{limit})
-            UNION ALL
-            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
-                    raw_value::text, cal_value::text, 'INT'
+               WHERE tenant_id = #{tenantId}
+               ORDER BY create_time DESC
+               LIMIT #{limit})
+              UNION ALL
+              (SELECT tenant_id,
+                      device_id,
+                      point_id,
+                      driver_id,
+                      create_time,
+                      raw_value::text, cal_value::text, 'INT'
                FROM dc3_point_value_int
-              WHERE tenant_id = #{tenantId}
-              ORDER BY create_time DESC LIMIT #{limit})
-            UNION ALL
-            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
-                    raw_value::text, cal_value::text, 'LONG'
+               WHERE tenant_id = #{tenantId}
+               ORDER BY create_time DESC
+               LIMIT #{limit})
+              UNION ALL
+              (SELECT tenant_id,
+                      device_id,
+                      point_id,
+                      driver_id,
+                      create_time,
+                      raw_value::text, cal_value::text, 'LONG'
                FROM dc3_point_value_long
-              WHERE tenant_id = #{tenantId}
-              ORDER BY create_time DESC LIMIT #{limit})
-            UNION ALL
-            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
-                    raw_value::text, cal_value::text, 'BOOL'
+               WHERE tenant_id = #{tenantId}
+               ORDER BY create_time DESC
+               LIMIT #{limit})
+              UNION ALL
+              (SELECT tenant_id,
+                      device_id,
+                      point_id,
+                      driver_id,
+                      create_time,
+                      raw_value::text, cal_value::text, 'BOOL'
                FROM dc3_point_value_bool
-              WHERE tenant_id = #{tenantId}
-              ORDER BY create_time DESC LIMIT #{limit})
-            UNION ALL
-            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
-                    raw_value::text, cal_value::text, 'FLOAT'
+               WHERE tenant_id = #{tenantId}
+               ORDER BY create_time DESC
+               LIMIT #{limit})
+              UNION ALL
+              (SELECT tenant_id,
+                      device_id,
+                      point_id,
+                      driver_id,
+                      create_time,
+                      raw_value::text, cal_value::text, 'FLOAT'
                FROM dc3_point_value_float
-              WHERE tenant_id = #{tenantId}
-              ORDER BY create_time DESC LIMIT #{limit})
-            UNION ALL
-            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
-                    raw_value::text, cal_value::text, 'DOUBLE'
+               WHERE tenant_id = #{tenantId}
+               ORDER BY create_time DESC
+               LIMIT #{limit})
+              UNION ALL
+              (SELECT tenant_id,
+                      device_id,
+                      point_id,
+                      driver_id,
+                      create_time,
+                      raw_value::text, cal_value::text, 'DOUBLE'
                FROM dc3_point_value_double
-              WHERE tenant_id = #{tenantId}
-              ORDER BY create_time DESC LIMIT #{limit})
-            UNION ALL
-            (SELECT tenant_id, device_id, point_id, driver_id, create_time,
-                    raw_value::text, cal_value::text, 'JSON'
+               WHERE tenant_id = #{tenantId}
+               ORDER BY create_time DESC
+               LIMIT #{limit})
+              UNION ALL
+              (SELECT tenant_id,
+                      device_id,
+                      point_id,
+                      driver_id,
+                      create_time,
+                      raw_value::text, cal_value::text, 'JSON'
                FROM dc3_point_value_json
-              WHERE tenant_id = #{tenantId}
-              ORDER BY create_time DESC LIMIT #{limit})
-        ) unioned
+               WHERE tenant_id = #{tenantId}
+               ORDER BY create_time DESC
+               LIMIT #{limit})) unioned
         ORDER BY create_time DESC
         LIMIT #{limit}
     </select>

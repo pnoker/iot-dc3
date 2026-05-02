@@ -54,6 +54,19 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     @Resource
     private DeviceEventManager deviceEventManager;
 
+    /**
+     * Flip between the online family (ONLINE / MAINTAIN) and the unavailable
+     * family (OFFLINE / FAULT) is a user-visible transition worth a derived
+     * ALARM. Within-family flips (e.g. ONLINE -> MAINTAIN) are not.
+     */
+    private static boolean isFlip(String prev, String current) {
+        return online(prev) != online(current);
+    }
+
+    private static boolean online(String code) {
+        return DeviceStatusEnum.ONLINE.getCode().equals(code) || DeviceStatusEnum.MAINTAIN.getCode().equals(code);
+    }
+
     @Override
     public void heartbeatEvent(DeviceEventDTO entityDTO) {
         DeviceEventDTO.DeviceStatus payload = JsonUtil.parseObject(entityDTO.getContent(), DeviceEventDTO.DeviceStatus.class);
@@ -99,18 +112,5 @@ public class DeviceEventServiceImpl implements DeviceEventService {
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(payload.getTenantId() != null ? payload.getTenantId() : 0L);
         deviceEventManager.save(entity);
-    }
-
-    /**
-     * Flip between the online family (ONLINE / MAINTAIN) and the unavailable
-     * family (OFFLINE / FAULT) is a user-visible transition worth a derived
-     * ALARM. Within-family flips (e.g. ONLINE -> MAINTAIN) are not.
-     */
-    private static boolean isFlip(String prev, String current) {
-        return online(prev) != online(current);
-    }
-
-    private static boolean online(String code) {
-        return DeviceStatusEnum.ONLINE.getCode().equals(code) || DeviceStatusEnum.MAINTAIN.getCode().equals(code);
     }
 }

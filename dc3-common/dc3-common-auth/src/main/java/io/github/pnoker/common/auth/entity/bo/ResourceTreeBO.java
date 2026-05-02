@@ -17,11 +17,7 @@
 
 package io.github.pnoker.common.auth.entity.bo;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +38,6 @@ import java.util.List;
 public class ResourceTreeBO extends ResourceBO {
 
     private List<ResourceTreeBO> children = new ArrayList<>();
-
-    public void addChild(ResourceTreeBO child) {
-        if (children == null) {
-            children = new ArrayList<>();
-        }
-        children.add(child);
-    }
 
     /**
      * Copy shared fields from a flat {@link ResourceBO} into a new tree node.
@@ -72,5 +61,12 @@ public class ResourceTreeBO extends ResourceBO {
         node.setOperatorName(source.getOperatorName());
         node.setOperateTime(source.getOperateTime());
         return node;
+    }
+
+    public void addChild(ResourceTreeBO child) {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+        children.add(child);
     }
 }

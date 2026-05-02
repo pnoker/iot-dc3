@@ -57,6 +57,14 @@ public class DriverEventServiceImpl implements DriverEventService {
     @Resource
     private DriverEventManager driverEventManager;
 
+    private static boolean isFlip(String prev, String current) {
+        return online(prev) != online(current);
+    }
+
+    private static boolean online(String code) {
+        return DriverStatusEnum.ONLINE.getCode().equals(code) || DriverStatusEnum.MAINTAIN.getCode().equals(code);
+    }
+
     @Override
     public void heartbeatEvent(DriverEventDTO entityDTO) {
         DriverEventDTO.DriverStatus payload = JsonUtil.parseObject(entityDTO.getContent(), DriverEventDTO.DriverStatus.class);
@@ -98,13 +106,5 @@ public class DriverEventServiceImpl implements DriverEventService {
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(payload.getTenantId() != null ? payload.getTenantId() : 0L);
         driverEventManager.save(entity);
-    }
-
-    private static boolean isFlip(String prev, String current) {
-        return online(prev) != online(current);
-    }
-
-    private static boolean online(String code) {
-        return DriverStatusEnum.ONLINE.getCode().equals(code) || DriverStatusEnum.MAINTAIN.getCode().equals(code);
     }
 }
