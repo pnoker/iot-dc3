@@ -19,16 +19,19 @@
     <template #header>
       <div class="latency-chart__header">
         <span class="latency-chart__title">{{ $t('home.latency.title') }}</span>
-        <el-segmented
-          v-model="rangeKey"
-          :options="[
-            { label: $t('home.ranges.h24'), value: 'h24' },
-            { label: $t('home.ranges.d7'), value: 'd7' },
-            { label: $t('home.ranges.d30'), value: 'd30' },
-          ]"
-          size="small"
-          @change="load"
-        />
+        <div class="latency-chart__actions">
+          <el-segmented
+            v-model="rangeKey"
+            :options="[
+              { label: $t('home.ranges.h24'), value: 'h24' },
+              { label: $t('home.ranges.d7'), value: 'd7' },
+              { label: $t('home.ranges.d30'), value: 'd30' },
+            ]"
+            size="small"
+            @change="load"
+          />
+          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
+        </div>
       </div>
     </template>
     <div ref="chartRef" v-loading="loading" class="latency-chart__canvas"></div>
@@ -39,6 +42,7 @@
   import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Chart } from '@antv/g2';
+  import { Refresh } from '@element-plus/icons-vue';
 
   import { statsLatency } from '@/api/dashboard';
 
@@ -117,6 +121,12 @@
     .latency-chart__title {
       font-weight: 600;
       color: #303133;
+    }
+
+    .latency-chart__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .latency-chart__canvas {

@@ -19,16 +19,19 @@
     <template #header>
       <div class="activity-heatmap__header">
         <span class="activity-heatmap__title">{{ $t('home.activity.title') }}</span>
-        <el-segmented
-          v-model="rangeKey"
-          :options="[
-            { label: $t('home.ranges.h24'), value: 'h24' },
-            { label: $t('home.ranges.d7'), value: 'd7' },
-            { label: $t('home.ranges.d30'), value: 'd30' },
-          ]"
-          size="small"
-          @change="load"
-        />
+        <div class="activity-heatmap__actions">
+          <el-segmented
+            v-model="rangeKey"
+            :options="[
+              { label: $t('home.ranges.h24'), value: 'h24' },
+              { label: $t('home.ranges.d7'), value: 'd7' },
+              { label: $t('home.ranges.d30'), value: 'd30' },
+            ]"
+            size="small"
+            @change="load"
+          />
+          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
+        </div>
       </div>
     </template>
     <div ref="chartRef" v-loading="loading" class="activity-heatmap__canvas"></div>
@@ -39,13 +42,14 @@
   import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Chart } from '@antv/g2';
+  import { Refresh } from '@element-plus/icons-vue';
 
   import { statsActivity } from '@/api/dashboard';
 
   type RangeKey = 'h24' | 'd7' | 'd30';
 
   const { t } = useI18n();
-  const rangeKey = ref<RangeKey>('d7');
+  const rangeKey = ref<RangeKey>('h24');
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
   let chart: Chart | undefined;
@@ -132,6 +136,12 @@
     .activity-heatmap__title {
       font-weight: 600;
       color: #303133;
+    }
+
+    .activity-heatmap__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .activity-heatmap__canvas {

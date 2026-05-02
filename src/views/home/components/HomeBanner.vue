@@ -71,8 +71,12 @@
     status: 'up' | 'down';
   }
 
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const authStore = useAuthStore();
+
+  // Map vue-i18n locale strings to browser BCP-47 tags; fall back to the
+  // browser default if the app is in an unexpected locale.
+  const bcp47 = () => (locale.value === 'zh' ? 'zh-CN' : locale.value === 'en' ? 'en-US' : undefined);
 
   const now = ref('');
   const date = ref('');
@@ -113,8 +117,9 @@
 
   const tick = () => {
     const d = new Date();
-    now.value = d.toLocaleTimeString('zh-CN', { hour12: false });
-    date.value = d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+    const tag = bcp47();
+    now.value = d.toLocaleTimeString(tag, { hour12: false });
+    date.value = d.toLocaleDateString(tag, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
   };
 
   const refreshHealth = async () => {

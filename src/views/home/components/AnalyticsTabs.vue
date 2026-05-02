@@ -21,11 +21,20 @@
         <el-tabs v-model="activeTab" class="analytics-tabs__bar" @tab-change="onTabChange">
           <el-tab-pane v-for="t in tabs" :key="t.key" :label="t.label" :name="t.key" />
         </el-tabs>
-        <el-select v-if="isTopTab" v-model="rangeHours" class="analytics-tabs__range" size="small" @change="load">
-          <el-option :label="$t('home.ranges.h24')" :value="24" />
-          <el-option :label="$t('home.ranges.d7')" :value="168" />
-          <el-option :label="$t('home.ranges.d30')" :value="720" />
-        </el-select>
+        <div class="analytics-tabs__actions">
+          <el-segmented
+            v-if="isTopTab"
+            v-model="rangeHours"
+            :options="[
+              { label: $t('home.ranges.h24'), value: 24 },
+              { label: $t('home.ranges.d7'), value: 168 },
+              { label: $t('home.ranges.d30'), value: 720 },
+            ]"
+            size="small"
+            @change="load"
+          />
+          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
+        </div>
       </div>
     </template>
 
@@ -42,6 +51,7 @@
   import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Chart } from '@antv/g2';
+  import { Refresh } from '@element-plus/icons-vue';
 
   import { deviceStats, driverStats, statsTop } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
@@ -249,7 +259,7 @@
     border-radius: 10px;
 
     :deep(.el-card__header) {
-      padding: 4px 12px 0;
+      padding: 12px 16px;
     }
 
     :deep(.el-card__body) {
@@ -260,11 +270,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-right: 12px;
+      gap: 12px;
     }
 
     .analytics-tabs__bar {
       flex: 1;
+      min-width: 0;
 
       :deep(.el-tabs__nav-wrap::after) {
         display: none;
@@ -275,8 +286,10 @@
       }
     }
 
-    .analytics-tabs__range {
-      width: 140px;
+    .analytics-tabs__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       flex-shrink: 0;
     }
 

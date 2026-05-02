@@ -19,16 +19,19 @@
     <template #header>
       <div class="trend-chart__header">
         <span class="trend-chart__title">{{ $t('home.trendTitle') }}</span>
-        <el-segmented
-          v-model="rangeKey"
-          :options="[
-            { label: $t('home.ranges.h24'), value: 'h24' },
-            { label: $t('home.ranges.d7'), value: 'd7' },
-            { label: $t('home.ranges.d30'), value: 'd30' },
-          ]"
-          size="small"
-          @change="load"
-        />
+        <div class="trend-chart__actions">
+          <el-segmented
+            v-model="rangeKey"
+            :options="[
+              { label: $t('home.ranges.h24'), value: 'h24' },
+              { label: $t('home.ranges.d7'), value: 'd7' },
+              { label: $t('home.ranges.d30'), value: 'd30' },
+            ]"
+            size="small"
+            @change="load"
+          />
+          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
+        </div>
       </div>
     </template>
     <div ref="chartRef" v-loading="loading" class="trend-chart__canvas"></div>
@@ -38,6 +41,7 @@
 <script lang="ts" setup>
   import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
   import { Chart } from '@antv/g2';
+  import { Refresh } from '@element-plus/icons-vue';
 
   import { statsTimeseries } from '@/api/dashboard';
 
@@ -122,6 +126,12 @@
     .trend-chart__title {
       font-weight: 600;
       color: #303133;
+    }
+
+    .trend-chart__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .trend-chart__canvas {
