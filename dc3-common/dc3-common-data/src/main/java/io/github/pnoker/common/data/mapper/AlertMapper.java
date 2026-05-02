@@ -60,4 +60,26 @@ public interface AlertMapper {
      */
     List<Map<String, Object>> hourlyCounts(@Param("tenantId") Long tenantId,
                                            @Param("from") LocalDateTime from);
+
+    /**
+     * Paged event list across device + driver event tables, filterable by
+     * source / event type / confirm flag. Backs the settings / events page.
+     * {@code source} is {@code null} (both tables), {@code "device"}, or
+     * {@code "driver"}. Service layer whitelists it before the call.
+     */
+    List<Map<String, Object>> listPaged(@Param("tenantId") Long tenantId,
+                                        @Param("source") String source,
+                                        @Param("eventTypeFlag") Integer eventTypeFlag,
+                                        @Param("confirmFlag") Integer confirmFlag,
+                                        @Param("offset") long offset,
+                                        @Param("size") long size);
+
+    long countFiltered(@Param("tenantId") Long tenantId,
+                       @Param("source") String source,
+                       @Param("eventTypeFlag") Integer eventTypeFlag,
+                       @Param("confirmFlag") Integer confirmFlag);
+
+    int confirmOne(@Param("tenantId") Long tenantId,
+                   @Param("source") String source,
+                   @Param("id") Long id);
 }

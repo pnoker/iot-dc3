@@ -92,4 +92,22 @@ public interface DashboardService {
      * fully-filled grid.
      */
     List<ActivityCellVO> hourlyActivity(Long tenantId, int rangeHours);
+
+    /**
+     * Paged event/alarm list. {@code source} is null (both tables), "device",
+     * or "driver" (service whitelists). Returns a Map with {@code total},
+     * {@code current}, {@code size}, {@code records}.
+     */
+    java.util.Map<String, Object> alertPage(Long tenantId,
+                                             String source,
+                                             Integer eventTypeFlag,
+                                             Integer confirmFlag,
+                                             long current,
+                                             long size);
+
+    /**
+     * Flip confirm_flag = 1 on a single event row. Returns true when the row
+     * was actually updated (id + tenant match), false otherwise.
+     */
+    boolean confirmAlert(Long tenantId, String source, Long id);
 }
