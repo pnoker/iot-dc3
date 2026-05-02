@@ -21,6 +21,7 @@ import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DashboardService;
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
 import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.utils.TimeRangeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,10 +92,12 @@ public class DashboardController implements BaseController {
     @GetMapping("/stats/timeseries")
     public Mono<R<List<TimeseriesPointVO>>> timeseries(
             @RequestParam(value = "granularity", defaultValue = "hour") String granularity,
-            @RequestParam(value = "rangeHours", defaultValue = "24") int rangeHours) {
+            @RequestParam(value = "rangeHours", defaultValue = "24") int rangeHours,
+            @RequestParam(value = "rangeKey", required = false) String rangeKey) {
+        int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
         return getTenantId().flatMap(tenantId -> {
             try {
-                return Mono.just(R.ok(dashboardService.timeseries(tenantId, granularity, rangeHours)));
+                return Mono.just(R.ok(dashboardService.timeseries(tenantId, granularity, effectiveHours)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -106,10 +109,12 @@ public class DashboardController implements BaseController {
     public Mono<R<List<TopEntityVO>>> top(
             @RequestParam(value = "dimension", defaultValue = "device") String dimension,
             @RequestParam(value = "rangeHours", defaultValue = "24") int rangeHours,
+            @RequestParam(value = "rangeKey", required = false) String rangeKey,
             @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
         return getTenantId().flatMap(tenantId -> {
             try {
-                return Mono.just(R.ok(dashboardService.top(tenantId, dimension, rangeHours, limit)));
+                return Mono.just(R.ok(dashboardService.top(tenantId, dimension, effectiveHours, limit)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -157,10 +162,12 @@ public class DashboardController implements BaseController {
 
     @GetMapping("/stats/latency")
     public Mono<R<List<LatencyBucketVO>>> latencyHistogram(
-            @RequestParam(value = "rangeHours", defaultValue = "24") int rangeHours) {
+            @RequestParam(value = "rangeHours", defaultValue = "24") int rangeHours,
+            @RequestParam(value = "rangeKey", required = false) String rangeKey) {
+        int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
         return getTenantId().flatMap(tenantId -> {
             try {
-                return Mono.just(R.ok(dashboardService.latencyHistogram(tenantId, rangeHours)));
+                return Mono.just(R.ok(dashboardService.latencyHistogram(tenantId, effectiveHours)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -170,10 +177,12 @@ public class DashboardController implements BaseController {
 
     @GetMapping("/stats/activity")
     public Mono<R<List<ActivityCellVO>>> hourlyActivity(
-            @RequestParam(value = "rangeHours", defaultValue = "168") int rangeHours) {
+            @RequestParam(value = "rangeHours", defaultValue = "168") int rangeHours,
+            @RequestParam(value = "rangeKey", required = false) String rangeKey) {
+        int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
         return getTenantId().flatMap(tenantId -> {
             try {
-                return Mono.just(R.ok(dashboardService.hourlyActivity(tenantId, rangeHours)));
+                return Mono.just(R.ok(dashboardService.hourlyActivity(tenantId, effectiveHours)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -211,8 +220,8 @@ public class DashboardController implements BaseController {
                         Integer.parseInt(b.get("confirmFlag").toString());
                 Integer rangeHours = b.get("rangeHours") == null ? null :
                         Integer.parseInt(b.get("rangeHours").toString());
-                java.time.LocalDateTime from = rangeHours != null && rangeHours > 0
-                        ? java.time.LocalDateTime.now().minusHours(rangeHours) : null;
+                String rangeKey = b.get("rangeKey") == null ? null : b.get("rangeKey").toString();
+                java.time.LocalDateTime from = TimeRangeUtil.resolveFrom(rangeKey, rangeHours);
                 long current = b.get("current") == null ? 1L : Long.parseLong(b.get("current").toString());
                 long size = b.get("size") == null ? 20L : Long.parseLong(b.get("size").toString());
                 return Mono.just(R.ok(dashboardService.alertPage(tenantId, source, typeFlag, confirmFlag, from, current, size)));
@@ -275,10 +284,12 @@ public class DashboardController implements BaseController {
 
     @GetMapping("/alert/trend")
     public Mono<R<List<AlertTrendVO>>> alertTrend(
-            @RequestParam(value = "days", defaultValue = "30") int days) {
+            @RequestParam(value = "days", defaultValue = "30") int days,
+            @RequestParam(value = "rangeKey", required = false) String rangeKey) {
+        int effectiveDays = resolveEffectiveDays(rangeKey, days);
         return getTenantId().flatMap(tenantId -> {
             try {
-                return Mono.just(R.ok(dashboardService.alertTrend(tenantId, days)));
+                return Mono.just(R.ok(dashboardService.alertTrend(tenantId, effectiveDays)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));
@@ -289,14 +300,37 @@ public class DashboardController implements BaseController {
     @GetMapping("/alert/top-sources")
     public Mono<R<List<AlertTopSourceVO>>> alertTopSources(
             @RequestParam(value = "days", defaultValue = "30") int days,
+            @RequestParam(value = "rangeKey", required = false) String rangeKey,
             @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        int effectiveDays = resolveEffectiveDays(rangeKey, days);
         return getTenantId().flatMap(tenantId -> {
             try {
-                return Mono.just(R.ok(dashboardService.alertTopSources(tenantId, days, limit)));
+                return Mono.just(R.ok(dashboardService.alertTopSources(tenantId, effectiveDays, limit)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));
             }
         });
+    }
+
+    /**
+     * Resolve the UI's {@code rangeKey} (preferred) against the legacy
+     * {@code rangeHours} integer. {@code TODAY} is mapped to the hours
+     * elapsed since local midnight so bucketed queries cover the full day
+     * so far; other keys use the canonical 24 / 168 / 720 hour spans.
+     */
+    private int resolveEffectiveHours(String rangeKey, int rangeHours) {
+        Integer resolved = TimeRangeUtil.resolveHours(rangeKey, rangeHours);
+        return resolved != null ? resolved : rangeHours;
+    }
+
+    /**
+     * Resolve the UI's {@code rangeKey} against the legacy {@code days}
+     * integer for day-bucketed endpoints. {@code TODAY} / {@code H24} both
+     * collapse to 1 day.
+     */
+    private int resolveEffectiveDays(String rangeKey, int days) {
+        Integer resolved = TimeRangeUtil.resolveDays(rangeKey, days);
+        return resolved != null ? resolved : days;
     }
 }
