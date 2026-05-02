@@ -131,7 +131,7 @@
 
   const { t } = useI18n();
 
-  const formData = reactive<Record<string, any>>({});
+  const formData = reactive<Record<string, any>>({ enableFlag: '' });
   const formRule = reactive<FormRules>({
     port: [{ type: 'number', message: t('common.name') }],
   });

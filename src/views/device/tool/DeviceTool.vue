@@ -97,7 +97,7 @@
 
   defineEmits(['search', 'reset', 'show-add', 'show-import', 'refresh', 'sort', 'size-change', 'current-change']);
 
-  const formData = reactive<Record<string, any>>({});
+  const formData = reactive<Record<string, any>>({ enableFlag: '' });
   const driverDictionaries = ref<Dictionary[]>([]);
   const driverLoading = ref(false);
 

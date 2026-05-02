@@ -75,7 +75,7 @@
 
   const emit = defineEmits(['search', 'reset', 'refresh', 'sort', 'add', 'size-change', 'current-change']);
 
-  const formData = reactive<Record<string, any>>({});
+  const formData = reactive<Record<string, any>>({ enableFlag: '' });
 
   const onSearch = (data: Record<string, any>) => {
     const params = { ...data };
@@ -85,6 +85,7 @@
 
   const onReset = () => {
     Object.keys(formData).forEach((k) => delete formData[k]);
+    formData.enableFlag = '';
     emit('reset');
   };
 </script>

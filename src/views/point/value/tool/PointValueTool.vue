@@ -115,7 +115,7 @@
 
   defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change']);
 
-  const formData = reactive<Record<string, any>>({});
+  const formData = reactive<Record<string, any>>({ enableFlag: '' });
   const deviceDictionaries = ref<Dictionary[]>([]);
   const deviceLoading = ref(false);
   const pointDictionaries = ref<Dictionary[]>([]);

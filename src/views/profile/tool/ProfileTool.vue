@@ -71,5 +71,5 @@
 
   defineEmits(['search', 'reset', 'show-add', 'refresh', 'sort', 'size-change', 'current-change']);
 
-  const formData = reactive<Record<string, any>>({});
+  const formData = reactive<Record<string, any>>({ enableFlag: '' });
 </script>

@@ -87,7 +87,7 @@
 
   defineEmits(['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change']);
 
-  const formData = reactive<Record<string, any>>({});
+  const formData = reactive<Record<string, any>>({ enableFlag: '' });
   const formRule = reactive<FormRules>({
     port: [{ type: 'number', message: 'Port must be a number' }],
   });
