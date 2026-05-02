@@ -85,6 +85,13 @@ public interface AlertMapper {
                        @Param("eventTypeFlag") Integer eventTypeFlag,
                        @Param("confirmFlag") Integer confirmFlag);
 
+    /**
+     * Today's ALARM counts per source (device / driver), scoped to one tenant.
+     * Returns rows with (source, total, unconfirmed).
+     */
+    List<Map<String, Object>> todayBySource(@Param("tenantId") Long tenantId,
+                                            @Param("from") LocalDateTime from);
+
     int confirmOne(@Param("tenantId") Long tenantId,
                    @Param("source") String source,
                    @Param("id") Long id);

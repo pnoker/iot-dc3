@@ -27,6 +27,12 @@
           AND tenant_id = #{tenantId}
     </select>
 
+    <select id="countTotal" resultType="long">
+        SELECT COUNT(*)
+        FROM v_dc3_point_value_all
+        WHERE tenant_id = #{tenantId}
+    </select>
+
     <!--
         bucket is inlined via ${} rather than bound as #{}:
         Postgres JDBC resolves the prepared statement's parameter types

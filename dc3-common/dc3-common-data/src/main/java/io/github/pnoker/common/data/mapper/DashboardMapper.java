@@ -53,6 +53,11 @@ public interface DashboardMapper {
                       @Param("to") LocalDateTime to);
 
     /**
+     * Total point-value count across all time for a tenant.
+     */
+    long countTotal(@Param("tenantId") Long tenantId);
+
+    /**
      * Time-bucketed count series for the trend chart. {@code bucket} is one of
      * {@code '1 hour'} or {@code '1 day'}. Returns rows like
      * {@code {bucket: 2026-05-02 10:00:00, count: 1234}} ordered ascending.
