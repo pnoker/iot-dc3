@@ -29,9 +29,18 @@ import io.github.pnoker.common.entity.dto.DeviceEventDTO;
 public interface DeviceEventService {
 
     /**
-     * Device heartbeat event
+     * Handle a device heartbeat event: refresh the in-memory online-status key
+     * and persist one row to {@code dc3_device_event}. Derives an ALARM event
+     * if the status flipped between ONLINE/MAINTAIN and OFFLINE.
      *
      * @param entityDTO DeviceEventDTO
      */
     void heartbeatEvent(DeviceEventDTO entityDTO);
+
+    /**
+     * Persist a device ALARM event to {@code dc3_device_event}.
+     *
+     * @param entityDTO DeviceEventDTO with type=ALARM
+     */
+    void alarmEvent(DeviceEventDTO entityDTO);
 }

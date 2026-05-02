@@ -18,6 +18,8 @@
 package io.github.pnoker.common.data.entity.model;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -38,7 +40,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_device_event")
+@TableName(value = "dc3_device_event", autoResultMap = true)
 public class DeviceEventDO implements Serializable {
 
     @Serial
@@ -71,8 +73,8 @@ public class DeviceEventDO implements Serializable {
     /**
      *
      */
-    @TableField("event_ext")
-    private Object eventExt;
+    @TableField(value = "event_ext", typeHandler = JacksonTypeHandler.class)
+    private JsonExt eventExt;
 
     /**
      * ,

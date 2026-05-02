@@ -20,7 +20,12 @@ package io.github.pnoker.common.data.biz.impl;
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.data.biz.DeviceEventService;
 import io.github.pnoker.common.data.cache.LocalCacheService;
+import io.github.pnoker.common.data.dal.DeviceEventManager;
+import io.github.pnoker.common.data.entity.model.DeviceEventDO;
 import io.github.pnoker.common.entity.dto.DeviceEventDTO;
+import io.github.pnoker.common.entity.ext.JsonExt;
+import io.github.pnoker.common.enums.DeviceEventTypeEnum;
+import io.github.pnoker.common.enums.DeviceStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +34,11 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 /**
- * DeviceService Impl
+ * DeviceEventService Impl. Persists heartbeat/alarm events to
+ * {@code dc3_device_event} and keeps the online-status key in {@link LocalCacheService}
+ * up to date. When a heartbeat flips the device status between ONLINE/MAINTAIN
+ * and OFFLINE/FAULT, a derived ALARM row is also written so the operator can
+ * see state transitions without relying on drivers to report them explicitly.
  *
  * @author pnoker
  * @version 2025.9.0
@@ -42,14 +51,66 @@ public class DeviceEventServiceImpl implements DeviceEventService {
     @Resource
     private LocalCacheService localCacheService;
 
+    @Resource
+    private DeviceEventManager deviceEventManager;
 
     @Override
     public void heartbeatEvent(DeviceEventDTO entityDTO) {
-        DeviceEventDTO.DeviceStatus deviceStatus = JsonUtil.parseObject(entityDTO.getContent(), DeviceEventDTO.DeviceStatus.class);
-        if (Objects.isNull(deviceStatus) || Objects.isNull(deviceStatus.getStatus())) {
+        DeviceEventDTO.DeviceStatus payload = JsonUtil.parseObject(entityDTO.getContent(), DeviceEventDTO.DeviceStatus.class);
+        if (Objects.isNull(payload) || Objects.isNull(payload.getDeviceId()) || Objects.isNull(payload.getStatus())) {
             return;
         }
-        localCacheService.setKey(PrefixConstant.DEVICE_STATUS_KEY_PREFIX + deviceStatus.getDeviceId(), deviceStatus.getStatus().getCode(), deviceStatus.getTimeOut(), deviceStatus.getTimeUnit());
+
+        String statusKey = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + payload.getDeviceId();
+        String prev = localCacheService.getKey(statusKey);
+        String current = payload.getStatus().getCode();
+
+        // Refresh the online-status cache so the dashboard's "online" badge reacts immediately.
+        localCacheService.setKey(statusKey, current, payload.getTimeOut(), payload.getTimeUnit());
+
+        // Persist one HEARTBEAT row for audit.
+        persist(payload, DeviceEventTypeEnum.HEARTBEAT, "device-heartbeat", entityDTO.getContent());
+
+        // Derive an ALARM row on state flips so operators see transitions in the alert list.
+        if (prev != null && !Objects.equals(prev, current) && isFlip(prev, current)) {
+            String message = String.format("Device status changed: %s -> %s", prev, current);
+            persist(payload, DeviceEventTypeEnum.ALARM, "device-state-flip", message);
+        }
     }
 
+    @Override
+    public void alarmEvent(DeviceEventDTO entityDTO) {
+        DeviceEventDTO.DeviceStatus payload = JsonUtil.parseObject(entityDTO.getContent(), DeviceEventDTO.DeviceStatus.class);
+        if (Objects.isNull(payload) || Objects.isNull(payload.getDeviceId())) {
+            log.warn("Drop device alarm without deviceId: {}", entityDTO.getContent());
+            return;
+        }
+        String msg = payload.getMessage() != null ? payload.getMessage() : entityDTO.getContent();
+        persist(payload, DeviceEventTypeEnum.ALARM, "device-alarm", msg);
+    }
+
+    private void persist(DeviceEventDTO.DeviceStatus payload, DeviceEventTypeEnum type, String extType, String extContent) {
+        DeviceEventDO entity = new DeviceEventDO();
+        entity.setDeviceId(payload.getDeviceId());
+        entity.setPointId(0L);
+        entity.setEventTypeFlag(type.getIndex());
+        entity.setEventExt(JsonExt.builder().type(extType).content(extContent).version(1).build());
+        entity.setExpiredTime(0L);
+        entity.setConfirmFlag((byte) 0);
+        entity.setTenantId(payload.getTenantId() != null ? payload.getTenantId() : 0L);
+        deviceEventManager.save(entity);
+    }
+
+    /**
+     * Flip between the online family (ONLINE / MAINTAIN) and the unavailable
+     * family (OFFLINE / FAULT) is a user-visible transition worth a derived
+     * ALARM. Within-family flips (e.g. ONLINE -> MAINTAIN) are not.
+     */
+    private static boolean isFlip(String prev, String current) {
+        return online(prev) != online(current);
+    }
+
+    private static boolean online(String code) {
+        return DeviceStatusEnum.ONLINE.getCode().equals(code) || DeviceStatusEnum.MAINTAIN.getCode().equals(code);
+    }
 }

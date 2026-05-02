@@ -115,6 +115,11 @@ public class DeviceEventDTO implements Serializable {
         private TimeUnit timeUnit = TimeUnit.MINUTES;
 
         /**
+         * Human-readable message. Populated for ALARM events; null for HEARTBEAT.
+         */
+        private String message;
+
+        /**
          * Create Time
          */
         private LocalDateTime createTime;

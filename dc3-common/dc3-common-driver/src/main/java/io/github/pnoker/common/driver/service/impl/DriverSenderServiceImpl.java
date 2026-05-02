@@ -27,6 +27,7 @@ import io.github.pnoker.common.entity.dto.DeviceEventDTO;
 import io.github.pnoker.common.entity.dto.DriverEventDTO;
 import io.github.pnoker.common.enums.DeviceEventTypeEnum;
 import io.github.pnoker.common.enums.DeviceStatusEnum;
+import io.github.pnoker.common.enums.DriverEventTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -112,6 +113,38 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     @Override
     public void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit) {
         sendDeviceStatus(deviceId, status, timeOut, timeUnit);
+    }
+
+    @Override
+    public void driverAlarmSender(String message) {
+        DriverBO driver = driverMetadata.getDriver();
+        if (Objects.isNull(driver)) {
+            log.warn("Driver not registered yet; drop alarm: {}", message);
+            return;
+        }
+        DriverEventDTO.DriverStatus payload = new DriverEventDTO.DriverStatus(driver.getId(), driverMetadata.getDriverStatus());
+        payload.setTenantId(driver.getTenantId());
+        payload.setMessage(message);
+        DriverEventDTO event = new DriverEventDTO(DriverEventTypeEnum.ALARM, JsonUtil.toJsonString(payload));
+        log.info("Report driver alarm: {}", message);
+        driverEventSender(event);
+    }
+
+    @Override
+    public void deviceAlarmSender(Long deviceId, String message) {
+        if (Objects.isNull(deviceId)) {
+            return;
+        }
+        DeviceEventDTO.DeviceStatus payload = new DeviceEventDTO.DeviceStatus(deviceId, null);
+        DriverBO driver = driverMetadata.getDriver();
+        if (Objects.nonNull(driver)) {
+            payload.setDriverId(driver.getId());
+            payload.setTenantId(driver.getTenantId());
+        }
+        payload.setMessage(message);
+        DeviceEventDTO event = new DeviceEventDTO(DeviceEventTypeEnum.ALARM, JsonUtil.toJsonString(payload));
+        log.info("Report device alarm: deviceId={}, message={}", deviceId, message);
+        deviceEventSender(event);
     }
 
     /**

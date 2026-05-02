@@ -29,9 +29,18 @@ import io.github.pnoker.common.entity.dto.DriverEventDTO;
 public interface DriverEventService {
 
     /**
-     * Driver heartbeat event
+     * Handle a driver heartbeat event: refresh the in-memory online-status key
+     * and persist one row to {@code dc3_driver_event}. Derives an ALARM event
+     * if the status flipped between ONLINE/MAINTAIN and OFFLINE.
      *
      * @param entityDTO DriverEventDTO
      */
     void heartbeatEvent(DriverEventDTO entityDTO);
+
+    /**
+     * Persist a driver ALARM event to {@code dc3_driver_event}.
+     *
+     * @param entityDTO DriverEventDTO with type=ALARM
+     */
+    void alarmEvent(DriverEventDTO entityDTO);
 }
