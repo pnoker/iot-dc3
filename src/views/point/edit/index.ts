@@ -56,18 +56,18 @@ export default defineComponent({
       pointName: [
         {
           required: true,
-          message: t('point.edit.nameRequired'),
+          message: t('common.nameRequired', { name: '位号' }),
           trigger: 'blur',
         },
         {
           min: 2,
           max: 32,
-          message: t('point.edit.nameLength'),
+          message: t('common.nameLength'),
           trigger: 'blur',
         },
         {
           pattern: /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥-_]*$/,
-          message: t('point.edit.nameFormat'),
+          message: t('common.nameFormat'),
         },
       ],
       enable: [
@@ -80,7 +80,7 @@ export default defineComponent({
       remark: [
         {
           max: 300,
-          message: t('point.edit.remarkLength'),
+          message: t('common.remarkLength'),
           trigger: 'blur',
         },
       ],

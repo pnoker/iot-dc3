@@ -94,18 +94,18 @@ export default defineComponent({
       deviceName: [
         {
           required: true,
-          message: () => t('device.edit.nameRequired'),
+          message: () => t('common.nameRequired', { name: '设备' }),
           trigger: 'blur',
         },
         {
           min: 2,
           max: 32,
-          message: () => t('device.edit.nameLength'),
+          message: () => t('common.nameLength'),
           trigger: 'blur',
         },
         {
           pattern: /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥-_]*$/,
-          message: () => t('device.edit.nameFormat'),
+          message: () => t('common.nameFormat'),
         },
       ],
       driverId: [
@@ -132,7 +132,7 @@ export default defineComponent({
       remark: [
         {
           max: 300,
-          message: () => t('device.edit.remarkLength'),
+          message: () => t('common.remarkLength'),
           trigger: 'blur',
         },
       ],

@@ -26,9 +26,9 @@
             v-if="isTopTab"
             v-model="rangeHours"
             :options="[
-              { label: $t('home.ranges.h24'), value: 24 },
-              { label: $t('home.ranges.d7'), value: 168 },
-              { label: $t('home.ranges.d30'), value: 720 },
+              { label: $t('common.ranges.h24'), value: 24 },
+              { label: $t('common.ranges.d7'), value: 168 },
+              { label: $t('common.ranges.d30'), value: 720 },
             ]"
             size="small"
             @change="load"

@@ -34,24 +34,24 @@ export default defineComponent({
       profileName: [
         {
           required: true,
-          message: t('profile.add.nameRequired'),
+          message: t('common.nameRequired', { name: '模板' }),
           trigger: 'blur',
         },
         {
           min: 2,
           max: 32,
-          message: t('profile.add.nameLength'),
+          message: t('common.nameLength'),
           trigger: 'blur',
         },
         {
           pattern: /^[A-Za-z0-9\u4e00-\u9fa5][A-Za-z0-9\u4e00-\u9fa5-_]*$/,
-          message: t('profile.add.nameFormat'),
+          message: t('common.nameFormat'),
         },
       ],
       remark: [
         {
           max: 300,
-          message: t('profile.add.remarkLength'),
+          message: t('common.remarkLength'),
           trigger: 'blur',
         },
       ],

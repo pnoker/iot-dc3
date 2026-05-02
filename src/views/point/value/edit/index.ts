@@ -56,7 +56,7 @@ export default defineComponent({
       remark: [
         {
           max: 300,
-          message: t('pointValue.edit.remarkLength'),
+          message: t('common.remarkLength'),
           trigger: 'blur',
         },
       ],

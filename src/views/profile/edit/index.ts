@@ -56,18 +56,18 @@ export default defineComponent({
       profileName: [
         {
           required: true,
-          message: t('profile.edit.nameRequired'),
+          message: t('common.nameRequired', { name: '模板' }),
           trigger: 'blur',
         },
         {
           min: 2,
           max: 32,
-          message: t('profile.edit.nameLength'),
+          message: t('common.nameLength'),
           trigger: 'blur',
         },
         {
           pattern: /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥-_]*$/,
-          message: t('profile.edit.nameFormat'),
+          message: t('common.nameFormat'),
         },
       ],
       enableFlag: [
@@ -80,7 +80,7 @@ export default defineComponent({
       remark: [
         {
           max: 300,
-          message: t('profile.edit.remarkLength'),
+          message: t('common.remarkLength'),
           trigger: 'blur',
         },
       ],

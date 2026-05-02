@@ -104,7 +104,7 @@
               <span :class="['about__dot', `about__dot--${row.status}`]"></span>
               <span>{{ row.label }}</span>
               <el-tag :type="row.status === 'up' ? 'success' : 'danger'" size="small">
-                {{ row.status === 'up' ? t('settings.about.up') : t('settings.about.down') }}
+                {{ row.status === 'up' ? t('status.online') : t('status.offline') }}
               </el-tag>
             </span>
           </div>
@@ -116,7 +116,7 @@
               <span :class="['about__dot', `about__dot--${row.status}`]"></span>
               <span>{{ row.label }}</span>
               <el-tag :type="row.status === 'up' ? 'success' : 'danger'" size="small">
-                {{ row.status === 'up' ? t('settings.about.up') : t('settings.about.down') }}
+                {{ row.status === 'up' ? t('status.online') : t('status.offline') }}
               </el-tag>
             </span>
           </div>

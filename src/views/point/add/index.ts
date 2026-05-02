@@ -55,18 +55,18 @@ export default defineComponent({
       pointName: [
         {
           required: true,
-          message: t('point.add.nameRequired'),
+          message: t('common.nameRequired', { name: '位号' }),
           trigger: 'blur',
         },
         {
           min: 2,
           max: 32,
-          message: t('point.add.nameLength'),
+          message: t('common.nameLength'),
           trigger: 'blur',
         },
         {
           pattern: /^[A-Za-z0-9一-龥][A-Za-z0-9一-龥-_]*$/,
-          message: t('point.add.nameFormat'),
+          message: t('common.nameFormat'),
         },
       ],
       pointTypeFlag: [
@@ -105,7 +105,7 @@ export default defineComponent({
       remark: [
         {
           max: 300,
-          message: t('point.add.remarkLength'),
+          message: t('common.remarkLength'),
           trigger: 'blur',
         },
       ],

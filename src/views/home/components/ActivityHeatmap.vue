@@ -23,9 +23,9 @@
           <el-segmented
             v-model="rangeKey"
             :options="[
-              { label: $t('home.ranges.h24'), value: 'h24' },
-              { label: $t('home.ranges.d7'), value: 'd7' },
-              { label: $t('home.ranges.d30'), value: 'd30' },
+              { label: $t('common.ranges.h24'), value: 'h24' },
+              { label: $t('common.ranges.d7'), value: 'd7' },
+              { label: $t('common.ranges.d30'), value: 'd30' },
             ]"
             size="small"
             @change="load"

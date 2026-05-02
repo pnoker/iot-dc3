@@ -51,7 +51,7 @@
                 </el-tag>
                 <span class="alert-list__name">{{ nameFor(row) }}</span>
                 <el-tag v-if="row.confirmFlag === 1" type="success" size="small" effect="plain">
-                  {{ $t('home.alertList.confirmed') }}
+                  {{ $t('common.confirmed') }}
                 </el-tag>
               </div>
               <div v-if="row.message" class="alert-list__message" :title="row.message">{{ row.message }}</div>
@@ -183,11 +183,11 @@
     switch (flag) {
       case 2:
       case 3:
-        return t('home.alertList.levelError');
+        return t('common.levelError');
       case 1:
-        return t('home.alertList.levelWarn');
+        return t('common.levelWarn');
       default:
-        return t('home.alertList.levelInfo');
+        return t('common.levelInfo');
     }
   };
 
