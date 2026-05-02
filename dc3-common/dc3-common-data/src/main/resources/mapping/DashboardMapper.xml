@@ -28,14 +28,16 @@
     </select>
 
     <!--
-        CAST(#{bucket} AS interval) instead of #{bucket}::interval:
-        Postgres JDBC can't infer a type for the '?' placeholder before the
-        cast operator, which fails with "could not determine data type of
-        parameter". CAST(... AS ...) binds the value first.
+        bucket is inlined via ${} rather than bound as #{}:
+        Postgres JDBC resolves the prepared statement's parameter types
+        before any CAST runs, and refuses "?::interval" / CAST(? AS interval)
+        because it can't infer a type for a bare '?'. The service layer
+        already whitelists bucket to '1 hour' or '1 day' (no user input),
+        so inlining it as a SQL literal is safe and sidesteps the issue.
     -->
     <select id="timeseries" resultType="map">
-        SELECT time_bucket(CAST(#{bucket} AS interval), create_time) AS bucket,
-               COUNT(*)                                              AS count
+        SELECT time_bucket(INTERVAL '${bucket}', create_time) AS bucket,
+               COUNT(*)                                       AS count
           FROM v_dc3_point_value_all
          WHERE create_time &gt;= #{from}
            AND create_time &lt;  #{to}
