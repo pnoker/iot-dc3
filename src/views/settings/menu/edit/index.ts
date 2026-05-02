@@ -32,6 +32,8 @@ const createEmptyForm = () => ({
   menuTypeFlag: 'COMMON' as string,
   menuLevel: 'C1' as string,
   menuIndex: 0 as number,
+  titleZh: '',
+  titleEn: '',
   icon: '',
   url: '',
   enableFlag: 'ENABLE' as string,
@@ -63,6 +65,8 @@ export default defineComponent({
     const rules: FormRules = {
       menuName: [{ required: true, message: t('settings.menu.menuNamePlaceholder'), trigger: 'blur' }],
       menuCode: [{ required: true, message: t('settings.menu.menuCodePlaceholder'), trigger: 'blur' }],
+      titleZh: [{ required: true, message: t('settings.menu.titleZhPlaceholder'), trigger: 'blur' }],
+      titleEn: [{ required: true, message: t('settings.menu.titleEnPlaceholder'), trigger: 'blur' }],
       menuTypeFlag: [{ required: true, trigger: 'change' }],
       menuLevel: [{ required: true, trigger: 'change' }],
     };
@@ -85,11 +89,20 @@ export default defineComponent({
     const showEdit = (row: any) => {
       reactiveData.mode = 'edit';
       const content = row?.menuExt?.content || {};
+      const titles = content.titles || {};
+      // Legacy rows may still carry content.title (an i18n key like
+      // "nav.home"). Keep the form usable on old data by falling back to
+      // the resolved i18n text, then to menuName, so editors never face a
+      // blank title input.
+      const legacyTitle =
+        typeof content.title === 'string' && content.title ? t(content.title, content.title) : row?.menuName || '';
       const initial = {
         ...createEmptyForm(),
         ...row,
         parentMenuId: row?.parentMenuId ?? 0,
         menuIndex: row?.menuIndex ?? 0,
+        titleZh: titles.zh || legacyTitle,
+        titleEn: titles.en || legacyTitle,
         icon: content.icon || '',
         url: content.url || '',
       };
@@ -107,12 +120,18 @@ export default defineComponent({
       const valid = await formRef.value?.validate().catch(() => false);
       if (!valid) return;
       reactiveData.submitting = true;
-      const { icon, url, ...rest } = reactiveData.form;
+      const { icon, url, titleZh, titleEn, ...rest } = reactiveData.form;
       const payload: Record<string, any> = {
         ...rest,
         menuExt: {
           content: {
-            title: rest.menuName,
+            // Authoritative locale → display-name map. Picked up by the
+            // sidebar / breadcrumb / header via content.titles[currentLocale]
+            // with fallback to content.titles.en.
+            titles: {
+              zh: titleZh,
+              en: titleEn,
+            },
             icon: icon || '',
             url: url || '',
             remark: rest.remark || '',

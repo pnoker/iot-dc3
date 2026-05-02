@@ -28,6 +28,13 @@ export interface MenuNode {
   menuIndex?: number;
   menuExt?: {
     content?: {
+      // Authoritative locale → display-name map. Backed by
+      // MenuExt.Content.titles on the server; populated via the menu CRUD
+      // form (Chinese Title / English Title inputs).
+      titles?: Record<string, string>;
+      // Legacy i18n key (e.g. "nav.home") retained for backwards
+      // compatibility with rows that pre-date the multilingual-titles
+      // migration. New UI should treat this as a final fallback only.
       title?: string;
       icon?: string;
       url?: string;

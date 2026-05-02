@@ -52,6 +52,12 @@
           :placeholder="t('settings.menu.menuCodePlaceholder')"
         />
       </el-form-item>
+      <el-form-item :label="t('settings.menu.titleZh')" prop="titleZh">
+        <el-input v-model="reactiveData.form.titleZh" clearable :placeholder="t('settings.menu.titleZhPlaceholder')" />
+      </el-form-item>
+      <el-form-item :label="t('settings.menu.titleEn')" prop="titleEn">
+        <el-input v-model="reactiveData.form.titleEn" clearable :placeholder="t('settings.menu.titleEnPlaceholder')" />
+      </el-form-item>
       <el-form-item :label="t('settings.menu.menuType')" prop="menuTypeFlag">
         <el-select v-model="reactiveData.form.menuTypeFlag">
           <el-option v-for="opt in MENU_TYPE_OPTIONS" :key="opt.value" :label="opt.label" :value="opt.value" />
