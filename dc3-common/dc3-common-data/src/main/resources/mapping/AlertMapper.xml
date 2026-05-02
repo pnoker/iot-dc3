@@ -63,28 +63,32 @@
     <select id="latest" resultType="map">
         SELECT *
         FROM ((SELECT id,
-                      'device'  AS source,
-                      device_id AS source_id,
+                      'device'                               AS source,
+                      device_id                              AS source_id,
                       point_id,
                       event_type_flag,
                       confirm_flag,
-                      create_time
+                      create_time,
+                      COALESCE(event_ext->>'content', '')    AS message
                FROM dc3_device_event
                WHERE deleted = 0
                  AND tenant_id = #{tenantId}
+                 AND event_type_flag &gt;= 1
                ORDER BY create_time DESC
                LIMIT #{limit})
               UNION ALL
               (SELECT id,
-                      'driver'  AS source,
-                      driver_id AS source_id,
+                      'driver'                               AS source,
+                      driver_id                              AS source_id,
                       0,
                       event_type_flag,
                       confirm_flag,
-                      create_time
+                      create_time,
+                      COALESCE(event_ext->>'content', '')    AS message
                FROM dc3_driver_event
                WHERE deleted = 0
                  AND tenant_id = #{tenantId}
+                 AND event_type_flag &gt;= 1
                ORDER BY create_time DESC
                LIMIT #{limit})) unioned
         ORDER BY create_time DESC
