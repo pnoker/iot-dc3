@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.data.biz;
 
+import io.github.pnoker.common.data.entity.vo.dashboard.AlertItemVO;
+import io.github.pnoker.common.data.entity.vo.dashboard.AlertStatsVO;
 import io.github.pnoker.common.data.entity.vo.dashboard.LatestPointValueVO;
 import io.github.pnoker.common.data.entity.vo.dashboard.TimeseriesPointVO;
 import io.github.pnoker.common.data.entity.vo.dashboard.TopEntityVO;
@@ -67,4 +69,16 @@ public interface DashboardService {
      * the dashboard's live feed panel. {@code size} clamped 1..100.
      */
     List<LatestPointValueVO> latestStream(Long tenantId, int size);
+
+    /**
+     * Aggregate counters for the alert indicator card (total, unconfirmed, by
+     * event-type). Event tables don't carry tenant_id; this is global.
+     */
+    AlertStatsVO alertStats();
+
+    /**
+     * Most recent N alert rows across device + driver event tables. Used by
+     * the alert list panel on the home page. {@code size} clamped 1..50.
+     */
+    List<AlertItemVO> alertLatest(int size);
 }
