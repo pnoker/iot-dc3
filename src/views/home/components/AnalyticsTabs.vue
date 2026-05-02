@@ -257,6 +257,8 @@
 <style lang="scss" scoped>
   .analytics-tabs {
     border-radius: 10px;
+    min-height: 440px;
+    height: 100%;
 
     :deep(.el-card__header) {
       padding: 12px 16px;

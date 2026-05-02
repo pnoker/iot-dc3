@@ -33,6 +33,16 @@
         </div>
         <div v-if="subtitle" class="stat-card__subtitle">{{ subtitle }}</div>
       </div>
+      <el-button
+        v-if="onRefresh"
+        class="stat-card__refresh"
+        :icon="Refresh"
+        :loading="refreshing"
+        circle
+        size="small"
+        text
+        @click.stop="doRefresh"
+      />
     </div>
     <!-- Sparkline slot is always rendered (empty cards get a transparent
          spacer) so every StatCard lines up at the same height. -->
@@ -43,7 +53,7 @@
 <script lang="ts" setup>
   import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
   import type { Component, PropType } from 'vue';
-  import { CaretBottom, CaretTop, Minus } from '@element-plus/icons-vue';
+  import { CaretBottom, CaretTop, Minus, Refresh } from '@element-plus/icons-vue';
   import { Chart } from '@antv/g2';
 
   interface Trend {
@@ -59,9 +69,27 @@
     tone: { type: String as PropType<'blue' | 'green' | 'orange' | 'purple' | 'red'>, default: 'blue' },
     trend: { type: Object as PropType<Trend | null>, default: null },
     sparkline: { type: Array as PropType<number[]>, default: () => [] },
+    /**
+     * Optional refresh handler. When provided, a small text button appears
+     * in the top-right of the card; clicking it invokes the handler without
+     * bubbling the card-level @click (so navigation isn't triggered by a
+     * refresh).
+     */
+    onRefresh: { type: Function as unknown as PropType<(() => Promise<void> | void) | null>, default: null },
   });
 
   const emit = defineEmits<{ (e: 'click'): void }>();
+
+  const refreshing = ref(false);
+  const doRefresh = async () => {
+    if (!props.onRefresh) return;
+    refreshing.value = true;
+    try {
+      await props.onRefresh();
+    } finally {
+      refreshing.value = false;
+    }
+  };
 
   const formattedValue = computed(() => {
     const v = Number(props.value);
@@ -174,8 +202,21 @@
 
     .stat-card__row {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 14px;
+      position: relative;
+    }
+
+    .stat-card__refresh {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      opacity: 0;
+      transition: opacity 120ms ease;
+    }
+
+    &:hover .stat-card__refresh {
+      opacity: 1;
     }
 
     .stat-card__icon {

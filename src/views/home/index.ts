@@ -47,6 +47,7 @@ interface CardModel {
   trend: { direction: 'up' | 'down' | 'flat'; label: string } | null;
   sparkline: number[];
   onClick: () => void;
+  onRefresh: () => Promise<void> | void;
 }
 
 export default defineComponent({
@@ -85,20 +86,21 @@ export default defineComponent({
     // derives service status from stat-request success.
     const emptyPage = { current: 1, size: 1 };
 
-    const loadTotals = () => {
-      getDriverList({ page: emptyPage })
-        .then((r: any) => (state.driverCount = r?.data?.total ?? 0))
-        .catch(() => {});
-      getDeviceList({ page: emptyPage })
-        .then((r: any) => (state.deviceCount = r?.data?.total ?? 0))
-        .catch(() => {});
-      getPointList({ page: emptyPage })
-        .then((r: any) => (state.pointCount = r?.data?.total ?? 0))
-        .catch(() => {});
-      getProfileList({ page: emptyPage })
-        .then((r: any) => (state.profileCount = r?.data?.total ?? 0))
-        .catch(() => {});
-    };
+    const loadTotals = () =>
+      Promise.all([
+        getDriverList({ page: emptyPage })
+          .then((r: any) => (state.driverCount = r?.data?.total ?? 0))
+          .catch(() => {}),
+        getDeviceList({ page: emptyPage })
+          .then((r: any) => (state.deviceCount = r?.data?.total ?? 0))
+          .catch(() => {}),
+        getPointList({ page: emptyPage })
+          .then((r: any) => (state.pointCount = r?.data?.total ?? 0))
+          .catch(() => {}),
+        getProfileList({ page: emptyPage })
+          .then((r: any) => (state.profileCount = r?.data?.total ?? 0))
+          .catch(() => {}),
+      ]);
 
     const loadToday = async () => {
       try {
@@ -157,6 +159,20 @@ export default defineComponent({
       return { direction: 'flat' as const, label: `0% ${t('home.vsYesterday')}` };
     });
 
+    // Each stat card gets its own refresh: counters + its sparkline are
+    // re-fetched so the user doesn't have to pick between "latest count" and
+    // "latest trend". loadTotals / loadGrowth both cover all four entities,
+    // so we reuse them for driver/device/point and combine for data/alert.
+    const refreshDriver = async () => {
+      await Promise.all([loadTotals(), loadGrowth()]);
+    };
+    const refreshDevice = refreshDriver;
+    const refreshPoint = refreshDriver;
+    const refreshData = async () => {
+      await Promise.all([loadToday(), loadSparkline()]);
+    };
+    const refreshAlert = loadAlerts;
+
     const cards = computed<CardModel[]>(() => [
       {
         key: 'driver',
@@ -168,6 +184,7 @@ export default defineComponent({
         trend: null,
         sparkline: state.driverSparkline,
         onClick: () => router.push({ name: 'driver' }),
+        onRefresh: refreshDriver,
       },
       {
         key: 'device',
@@ -179,6 +196,7 @@ export default defineComponent({
         trend: null,
         sparkline: state.deviceSparkline,
         onClick: () => router.push({ name: 'device' }),
+        onRefresh: refreshDevice,
       },
       {
         key: 'point',
@@ -190,6 +208,7 @@ export default defineComponent({
         trend: null,
         sparkline: state.pointSparkline,
         onClick: () => router.push({ name: 'profile' }),
+        onRefresh: refreshPoint,
       },
       {
         key: 'data',
@@ -201,6 +220,7 @@ export default defineComponent({
         trend: percentTrend.value,
         sparkline: state.todaySparkline,
         onClick: () => router.push({ name: 'pointValue' }),
+        onRefresh: refreshData,
       },
       {
         key: 'alert',
@@ -214,6 +234,7 @@ export default defineComponent({
         onClick: () => {
           // Alerts are shown inline in the AlertList panel below; nothing to navigate yet.
         },
+        onRefresh: refreshAlert,
       },
     ]);
 

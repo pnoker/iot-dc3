@@ -20,12 +20,16 @@
       <div class="live-feed__header">
         <span class="live-feed__title">{{ $t('home.liveFeed.title') }}</span>
         <div class="live-feed__actions">
-          <el-select v-model="intervalMs" class="live-feed__interval" size="small">
-            <el-option :label="$t('home.liveFeed.intervalOff')" :value="0" />
-            <el-option :label="'5s'" :value="5000" />
-            <el-option :label="'10s'" :value="10000" />
-            <el-option :label="'30s'" :value="30000" />
-          </el-select>
+          <el-segmented
+            v-model="intervalMs"
+            :options="[
+              { label: $t('home.liveFeed.intervalOff'), value: 0 },
+              { label: '5s', value: 5000 },
+              { label: '10s', value: 10000 },
+              { label: '30s', value: 30000 },
+            ]"
+            size="small"
+          />
           <el-button :icon="Refresh" :loading="loading" circle size="small" @click="refresh" />
         </div>
       </div>
@@ -171,6 +175,8 @@
 <style lang="scss" scoped>
   .live-feed {
     border-radius: 10px;
+    min-height: 440px;
+    height: 100%;
 
     :deep(.el-card__header) {
       padding: 12px 16px;
@@ -195,10 +201,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .live-feed__interval {
-      width: 82px;
     }
 
     .live-feed__row {

@@ -74,14 +74,19 @@
           <div class="about__health-label">{{ t('home.banner.group.drivers') }}</div>
           <div class="about__health-items">
             <span class="about__health-item">
-              <span
-                :class="[
-                  'about__dot',
-                  `about__dot--${drivers.total > 0 && drivers.online === drivers.total ? 'up' : drivers.online > 0 ? 'partial' : 'down'}`,
-                ]"
-              ></span>
+              <span :class="['about__dot', `about__dot--${fleetDotTone(drivers)}`]"></span>
               <span>{{ t('home.banner.group.drivers') }}</span>
               <el-tag size="small">{{ drivers.online }} / {{ drivers.total }}</el-tag>
+            </span>
+          </div>
+        </div>
+        <div class="about__health-group">
+          <div class="about__health-label">{{ t('home.banner.group.devices') }}</div>
+          <div class="about__health-items">
+            <span class="about__health-item">
+              <span :class="['about__dot', `about__dot--${fleetDotTone(devices)}`]"></span>
+              <span>{{ t('home.banner.group.devices') }}</span>
+              <el-tag size="small">{{ devices.online }} / {{ devices.total }}</el-tag>
             </span>
           </div>
         </div>
@@ -111,6 +116,13 @@
   const center = ref<Record<string, string>>({});
   const infra = ref<Record<string, string>>({});
   const drivers = ref<{ total: number; online: number }>({ total: 0, online: 0 });
+  const devices = ref<{ total: number; online: number }>({ total: 0, online: 0 });
+
+  const fleetDotTone = (f: { total: number; online: number }): 'up' | 'partial' | 'down' => {
+    if (f.total > 0 && f.online === f.total) return 'up';
+    if (f.online > 0) return 'partial';
+    return 'down';
+  };
 
   const toRow = (key: string, labelKey: string, status: string | undefined): HealthRow => ({
     key,
@@ -139,6 +151,7 @@
         center.value = data.center || {};
         infra.value = data.infra || {};
         drivers.value = { total: data.drivers?.total ?? 0, online: data.drivers?.online ?? 0 };
+        devices.value = { total: data.devices?.total ?? 0, online: data.devices?.online ?? 0 };
       }
     } catch {
       // handled globally
@@ -200,6 +213,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      min-width: 140px;
     }
 
     .about__dot {

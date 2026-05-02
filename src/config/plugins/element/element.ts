@@ -15,77 +15,22 @@
  */
 
 import type { App } from 'vue';
-import {
-  Avatar,
-  Connection,
-  Cpu,
-  DataAnalysis,
-  DataLine,
-  Discount,
-  Document,
-  Hide,
-  Histogram,
-  HomeFilled,
-  House,
-  Key,
-  Link,
-  List,
-  Lock,
-  Management,
-  Menu as MenuIcon,
-  MessageBox,
-  Monitor,
-  Promotion,
-  Setting,
-  Share,
-  Tickets,
-  TrendCharts,
-  User,
-  UserFilled,
-  View,
-  WalletFilled,
-} from '@element-plus/icons-vue';
+import * as ElementIcons from '@element-plus/icons-vue';
 import 'element-plus/dist/index.css';
 import './element-variables.scss';
 
-// Global icon registry — referenced both by legacy templates that pass an icon
-// class name string (`:is="'Promotion'"`) and by the backend-driven menu where
-// menu_ext.content.icon stores the icon class name.
-const ICONS = [
-  Hide,
-  Histogram,
-  List,
-  Management,
-  Promotion,
-  View,
-  Connection,
-  House,
-  HomeFilled,
-  Cpu,
-  Tickets,
-  Monitor,
-  DataAnalysis,
-  DataLine,
-  Document,
-  Setting,
-  Share,
-  User,
-  UserFilled,
-  Avatar,
-  Key,
-  Link,
-  Lock,
-  MessageBox,
-  TrendCharts,
-  Discount,
-  WalletFilled,
-  MenuIcon,
-] as const;
-
+/**
+ * Registers every icon exported by `@element-plus/icons-vue` globally so
+ * templates can use the icon class name as a string — both legacy call
+ * sites (`<component :is="'Promotion'">`) and the backend-driven menu, where
+ * `menu_ext.content.icon` stores the icon name, work without any per-icon
+ * allow-list. Adding a new icon to a seeded menu requires no code change
+ * here.
+ */
 export default function setupElementPlus(app: App): void {
-  ICONS.forEach((icon) => {
-    if (icon.name) {
-      app.component(icon.name, icon);
-    }
-  });
+  for (const [name, comp] of Object.entries(ElementIcons)) {
+    // Filter to capitalized component exports (skip `__esModule`, etc.).
+    if (!/^[A-Z]/.test(name) || !comp || typeof comp !== 'object') continue;
+    app.component(name, comp as any);
+  }
 }

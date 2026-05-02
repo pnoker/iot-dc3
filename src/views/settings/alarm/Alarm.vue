@@ -16,42 +16,76 @@
 
 <template>
   <div>
-    <blank-card class="settings-tool">
-      <el-form :inline="true" :model="query" class="alarm-tool">
-        <el-form-item :label="t('settings.event.source')">
-          <el-select
-            v-model="query.source"
-            clearable
-            size="small"
-            style="width: 140px"
-            :placeholder="t('settings.event.all')"
-          >
-            <el-option :label="t('settings.event.sourceDevice')" value="device" />
-            <el-option :label="t('settings.event.sourceDriver')" value="driver" />
-          </el-select>
+    <tool-card
+      :form-model="formData"
+      :page="page"
+      hide-sort
+      @search="onSearch"
+      @reset="onReset"
+      @refresh="load"
+      @size-change="sizeChange"
+      @current-change="currentChange"
+    >
+      <template #filters="{ formData: fd }">
+        <el-form-item :label="$t('settings.event.source')" prop="source">
+          <el-segmented
+            v-model="fd.source"
+            :options="[
+              { label: $t('common.all'), value: '' },
+              { label: $t('settings.event.sourceDevice'), value: 'device' },
+              { label: $t('settings.event.sourceDriver'), value: 'driver' },
+            ]"
+          />
         </el-form-item>
-        <el-form-item :label="t('settings.event.confirmFlag')">
-          <el-select
-            v-model="query.confirmFlag"
-            clearable
-            size="small"
-            style="width: 140px"
-            :placeholder="t('settings.event.all')"
-          >
-            <el-option :label="t('settings.alarm.unconfirmed')" :value="0" />
-            <el-option :label="t('settings.alarm.confirmed')" :value="1" />
-          </el-select>
+        <el-form-item :label="$t('settings.event.confirmFlag')" prop="confirmFlag">
+          <el-segmented
+            v-model="fd.confirmFlag"
+            :options="[
+              { label: $t('common.all'), value: '' },
+              { label: $t('settings.alarm.unconfirmed'), value: 0 },
+              { label: $t('settings.alarm.confirmed'), value: 1 },
+            ]"
+          />
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" size="small" @click="load">{{ t('common.search') }}</el-button>
-          <el-button size="small" @click="reset">{{ t('common.reset') }}</el-button>
-          <el-button :icon="Refresh" circle size="small" :loading="loading" @click="load" />
-        </el-form-item>
-      </el-form>
-    </blank-card>
+      </template>
+      <template v-if="selection.length > 0" #actions>
+        <el-popconfirm
+          :title="$t('settings.event.bulkConfirmTitle', { n: selection.length })"
+          :confirm-button-text="$t('common.confirm')"
+          :cancel-button-text="$t('common.cancel')"
+          @confirm="bulkConfirm(true)"
+        >
+          <template #reference>
+            <el-button type="primary" :loading="bulkRunning">
+              {{ $t('settings.event.bulkConfirm', { n: selection.length }) }}
+            </el-button>
+          </template>
+        </el-popconfirm>
+        <el-popconfirm
+          :title="$t('settings.event.bulkUnconfirmTitle', { n: selection.length })"
+          :confirm-button-text="$t('common.confirm')"
+          :cancel-button-text="$t('common.cancel')"
+          @confirm="bulkConfirm(false)"
+        >
+          <template #reference>
+            <el-button :loading="bulkRunning">
+              {{ $t('settings.event.bulkUnconfirm') }}
+            </el-button>
+          </template>
+        </el-popconfirm>
+      </template>
+    </tool-card>
 
     <blank-card>
-      <el-table v-loading="loading" :data="rows" stripe class="settings-table">
+      <el-table
+        v-loading="loading"
+        :data="rows"
+        stripe
+        class="settings-table"
+        :row-key="(row: Row) => `${row.source}:${row.id}`"
+        @selection-change="onSelectionChange"
+      >
+        <el-table-column type="selection" width="44" />
         <el-table-column :label="t('settings.event.source')" width="100">
           <template #default="{ row }">
             <el-tag :type="row.source === 'device' ? 'primary' : 'info'" size="small">
@@ -70,28 +104,36 @@
           </template>
         </el-table-column>
         <el-table-column :label="t('settings.event.createTime')" prop="createTime" width="180" />
-        <el-table-column :label="t('common.operation')" width="120" fixed="right">
+        <el-table-column :label="t('common.operation')" width="140" fixed="right">
           <template #default="{ row }">
-            <el-button v-if="row.confirmFlag !== 1" link type="primary" @click="confirmRow(row)">
-              {{ t('settings.alarm.confirm') }}
-            </el-button>
+            <el-popconfirm
+              v-if="row.confirmFlag !== 1"
+              :title="t('settings.event.confirmTitle')"
+              :confirm-button-text="t('common.confirm')"
+              :cancel-button-text="t('common.cancel')"
+              @confirm="confirmRow(row)"
+            >
+              <template #reference>
+                <el-button link type="primary">{{ t('settings.alarm.confirm') }}</el-button>
+              </template>
+            </el-popconfirm>
+            <el-popconfirm
+              v-else
+              :title="t('settings.event.unconfirmTitle')"
+              :confirm-button-text="t('common.confirm')"
+              :cancel-button-text="t('common.cancel')"
+              @confirm="unconfirmRow(row)"
+            >
+              <template #reference>
+                <el-button link type="warning">{{ t('settings.event.unconfirm') }}</el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
         <template #empty>
           <el-empty :description="t('settings.alarm.empty')" />
         </template>
       </el-table>
-      <el-pagination
-        class="settings-pagination"
-        :current-page="page.current"
-        :page-size="page.size"
-        :total="page.total"
-        :page-sizes="[10, 20, 50, 100]"
-        background
-        layout="total, sizes, prev, pager, next"
-        @current-change="onCurrent"
-        @size-change="onSize"
-      />
     </blank-card>
   </div>
 </template>
@@ -99,11 +141,11 @@
 <script lang="ts" setup>
   import { reactive, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { Refresh } from '@element-plus/icons-vue';
 
-  import { alertConfirm, alertPage } from '@/api/dashboard';
+  import { alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm } from '@/api/dashboard';
   import { successMessage } from '@/utils/NotificationUtil';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
+  import ToolCard from '@/components/card/tool/ToolCard.vue';
 
   interface Row {
     id: number | string;
@@ -119,12 +161,13 @@
   const { t } = useI18n();
 
   const loading = ref(false);
+  const bulkRunning = ref(false);
+  const selection = ref<Row[]>([]);
   const rows = ref<Row[]>([]);
-  // Alarm page pins eventTypeFlag=1 on every request; users only pick
-  // source / confirm state.
-  const query = reactive<{ source: string; confirmFlag: number | null }>({
+  // Alarm page always pins eventTypeFlag=1 so it's not part of formData.
+  const formData = reactive<{ source: string; confirmFlag: number | '' }>({
     source: '',
-    confirmFlag: null,
+    confirmFlag: '',
   });
   const page = reactive({ current: 1, size: 20, total: 0 });
 
@@ -132,9 +175,9 @@
     loading.value = true;
     try {
       const res: any = await alertPage({
-        source: (query.source || null) as any,
+        source: (formData.source || null) as 'device' | 'driver' | null,
         eventTypeFlag: 1,
-        confirmFlag: query.confirmFlag,
+        confirmFlag: formData.confirmFlag === '' ? null : Number(formData.confirmFlag),
         current: page.current,
         size: page.size,
       });
@@ -148,20 +191,26 @@
     }
   };
 
-  const reset = () => {
-    query.source = '';
-    query.confirmFlag = null;
+  const onSearch = () => {
     page.current = 1;
     load();
   };
 
-  const onCurrent = (v: number) => {
-    page.current = v;
+  const onReset = () => {
+    formData.source = '';
+    formData.confirmFlag = '';
+    page.current = 1;
     load();
   };
-  const onSize = (v: number) => {
+
+  const sizeChange = (v: number) => {
     page.size = v;
     page.current = 1;
+    load();
+  };
+
+  const currentChange = (v: number) => {
+    page.current = v;
     load();
   };
 
@@ -175,31 +224,42 @@
     }
   };
 
+  const unconfirmRow = async (row: Row) => {
+    try {
+      await alertUnconfirm(row.source, row.id);
+      successMessage();
+      load();
+    } catch {
+      // handled globally
+    }
+  };
+
+  const onSelectionChange = (rows: Row[]) => {
+    selection.value = rows;
+  };
+
+  const bulkConfirm = async (confirm: boolean) => {
+    if (selection.value.length === 0) return;
+    bulkRunning.value = true;
+    try {
+      const items = selection.value.map((r) => ({ source: r.source, id: r.id }));
+      await alertBulkConfirm(items, confirm);
+      successMessage();
+      selection.value = [];
+      load();
+    } catch {
+      // handled globally
+    } finally {
+      bulkRunning.value = false;
+    }
+  };
+
   load();
 </script>
 
 <style lang="scss" scoped>
-  .settings-tool {
-    margin-bottom: 12px;
-
-    :deep(.el-card__body) {
-      padding: 12px 16px 0;
-    }
-  }
-
-  .alarm-tool {
-    :deep(.el-form-item) {
-      margin-bottom: 12px;
-    }
-  }
-
   .settings-table {
     margin-top: 1px;
     border-radius: 4px;
-  }
-
-  .settings-pagination {
-    margin-top: 12px;
-    justify-content: flex-end;
   }
 </style>

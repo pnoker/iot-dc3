@@ -46,13 +46,15 @@
       <div class="home-banner__group">
         <span class="home-banner__group-label">{{ $t('home.banner.group.drivers') }}</span>
         <span class="home-banner__service">
-          <span
-            :class="[
-              'home-banner__dot',
-              `home-banner__dot--${drivers.total > 0 && drivers.online === drivers.total ? 'up' : drivers.online > 0 ? 'partial' : 'down'}`,
-            ]"
-          ></span>
+          <span :class="['home-banner__dot', `home-banner__dot--${fleetDotTone(drivers)}`]"></span>
           <span>{{ drivers.online }} / {{ drivers.total }}</span>
+        </span>
+      </div>
+      <div class="home-banner__group">
+        <span class="home-banner__group-label">{{ $t('home.banner.group.devices') }}</span>
+        <span class="home-banner__service">
+          <span :class="['home-banner__dot', `home-banner__dot--${fleetDotTone(devices)}`]"></span>
+          <span>{{ devices.online }} / {{ devices.total }}</span>
         </span>
       </div>
     </div>
@@ -96,6 +98,13 @@
   const center = ref<Record<string, string>>({ auth: 'up', data: 'up', manager: 'up' });
   const infra = ref<Record<string, string>>({ database: 'up', mq: 'up', gateway: 'up' });
   const drivers = ref<{ total: number; online: number }>({ total: 0, online: 0 });
+  const devices = ref<{ total: number; online: number }>({ total: 0, online: 0 });
+
+  const fleetDotTone = (f: { total: number; online: number }): 'up' | 'partial' | 'down' => {
+    if (f.total > 0 && f.online === f.total) return 'up';
+    if (f.online > 0) return 'partial';
+    return 'down';
+  };
 
   const buildRow = (key: string, labelKey: string, value: string | undefined): ServiceRow => ({
     key,
@@ -130,6 +139,7 @@
       if (data.center) center.value = data.center;
       if (data.infra) infra.value = data.infra;
       if (data.drivers) drivers.value = { total: data.drivers.total ?? 0, online: data.drivers.online ?? 0 };
+      if (data.devices) devices.value = { total: data.devices.total ?? 0, online: data.devices.online ?? 0 };
     } catch {
       // handled globally
     }
@@ -229,8 +239,9 @@
     .home-banner__service {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       opacity: 0.92;
+      min-width: 64px;
     }
 
     .home-banner__dot {

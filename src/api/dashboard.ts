@@ -55,6 +55,14 @@ export const alertPage = (body: AlertPageQuery = {}) => httpPost(`${API_DATA_BAS
 export const alertConfirm = (source: 'device' | 'driver', id: string | number) =>
   httpPost(`${API_DATA_BASE}/dashboard/alert/confirm/${source}/${id}`);
 
+export const alertUnconfirm = (source: 'device' | 'driver', id: string | number) =>
+  httpPost(`${API_DATA_BASE}/dashboard/alert/unconfirm/${source}/${id}`);
+
+export const alertBulkConfirm = (
+  items: Array<{ source: 'device' | 'driver'; id: string | number }>,
+  confirm: boolean
+) => httpPost(`${API_DATA_BASE}/dashboard/alert/bulk-confirm`, { items, confirm });
+
 export const driverStats = () => httpGet(`${API_MANAGER_BASE}/dashboard/driver/stats`);
 
 export const deviceStats = (topN = 10) => httpGet(`${API_MANAGER_BASE}/dashboard/device/stats`, { params: { topN } });

@@ -35,6 +35,7 @@
         :tone="c.tone"
         :trend="c.trend"
         :sparkline="c.sparkline"
+        :on-refresh="c.onRefresh"
         @click="c.onClick"
       />
     </div>
