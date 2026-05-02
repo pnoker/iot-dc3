@@ -43,6 +43,39 @@ public class DashboardServiceImpl implements DashboardService {
     @Resource
     private DashboardMapper dashboardMapper;
 
+    private static List<BucketVO> buckets(List<Map<String, Object>> rows, String keyCol, KeyFormatter fmt) {
+        List<BucketVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> row : rows) {
+            BucketVO vo = new BucketVO();
+            vo.setKey(fmt.format(row.get(keyCol)));
+            vo.setCount(toLong(row.get("count")));
+            out.add(vo);
+        }
+        return out;
+    }
+
+    private static long toLong(Object v) {
+        if (v == null) return 0L;
+        if (v instanceof Number n) return n.longValue();
+        return Long.parseLong(v.toString());
+    }
+
+    // ---- internal helpers -----------------------------------------------
+
+    private static String enableKey(Object raw) {
+        if (raw == null) return "UNKNOWN";
+        Byte b = raw instanceof Number n ? n.byteValue() : Byte.parseByte(raw.toString());
+        EnableFlagEnum e = EnableFlagEnum.ofIndex(b);
+        return e == null ? "UNKNOWN" : e.name();
+    }
+
+    private static String driverTypeKey(Object raw) {
+        if (raw == null) return "UNKNOWN";
+        Byte b = raw instanceof Number n ? n.byteValue() : Byte.parseByte(raw.toString());
+        DriverTypeFlagEnum e = DriverTypeFlagEnum.ofIndex(b);
+        return e == null ? "UNKNOWN" : e.name();
+    }
+
     @Override
     public DriverStatsVO driverStats(Long tenantId) {
         DriverStatsVO out = new DriverStatsVO();
@@ -87,41 +120,8 @@ public class DashboardServiceImpl implements DashboardService {
         return out;
     }
 
-    // ---- internal helpers -----------------------------------------------
-
     @FunctionalInterface
     private interface KeyFormatter {
         String format(Object raw);
-    }
-
-    private static List<BucketVO> buckets(List<Map<String, Object>> rows, String keyCol, KeyFormatter fmt) {
-        List<BucketVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
-            BucketVO vo = new BucketVO();
-            vo.setKey(fmt.format(row.get(keyCol)));
-            vo.setCount(toLong(row.get("count")));
-            out.add(vo);
-        }
-        return out;
-    }
-
-    private static long toLong(Object v) {
-        if (v == null) return 0L;
-        if (v instanceof Number n) return n.longValue();
-        return Long.parseLong(v.toString());
-    }
-
-    private static String enableKey(Object raw) {
-        if (raw == null) return "UNKNOWN";
-        Byte b = raw instanceof Number n ? n.byteValue() : Byte.parseByte(raw.toString());
-        EnableFlagEnum e = EnableFlagEnum.ofIndex(b);
-        return e == null ? "UNKNOWN" : e.name();
-    }
-
-    private static String driverTypeKey(Object raw) {
-        if (raw == null) return "UNKNOWN";
-        Byte b = raw instanceof Number n ? n.byteValue() : Byte.parseByte(raw.toString());
-        DriverTypeFlagEnum e = DriverTypeFlagEnum.ofIndex(b);
-        return e == null ? "UNKNOWN" : e.name();
     }
 }

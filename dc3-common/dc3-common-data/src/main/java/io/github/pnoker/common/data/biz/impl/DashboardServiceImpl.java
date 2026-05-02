@@ -18,11 +18,7 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.DashboardService;
-import io.github.pnoker.common.data.entity.vo.dashboard.AlertItemVO;
-import io.github.pnoker.common.data.entity.vo.dashboard.AlertStatsVO;
-import io.github.pnoker.common.data.entity.vo.dashboard.LatestPointValueVO;
-import io.github.pnoker.common.data.entity.vo.dashboard.TimeseriesPointVO;
-import io.github.pnoker.common.data.entity.vo.dashboard.TopEntityVO;
+import io.github.pnoker.common.data.entity.vo.dashboard.*;
 import io.github.pnoker.common.data.mapper.AlertMapper;
 import io.github.pnoker.common.data.mapper.DashboardMapper;
 import jakarta.annotation.Resource;
@@ -63,6 +59,37 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Resource
     private AlertMapper alertMapper;
+
+    private static int toInt(Object v) {
+        if (v == null) return 0;
+        if (v instanceof Number n) return n.intValue();
+        return Integer.parseInt(v.toString());
+    }
+
+    private static long toLong(Object v) {
+        if (v == null) return 0L;
+        if (v instanceof Number n) return n.longValue();
+        return Long.parseLong(v.toString());
+    }
+
+    private static String asString(Object v) {
+        return v == null ? null : v.toString();
+    }
+
+    private static LocalDateTime toLocalDateTime(Object v) {
+        if (v == null) return null;
+        if (v instanceof LocalDateTime ldt) return ldt;
+        if (v instanceof Timestamp ts) return ts.toLocalDateTime();
+        // Fallback for JDBC drivers that return java.time.OffsetDateTime etc.
+        if (v instanceof java.time.OffsetDateTime odt) return odt.toLocalDateTime();
+        return LocalDateTime.parse(v.toString());
+    }
+
+    // Kept for reference — zero-arg unused reference suppressing unused-import warning.
+    @SuppressWarnings("unused")
+    private static LocalDateTime startOfDay() {
+        return LocalDate.now().atTime(LocalTime.MIN);
+    }
 
     @Override
     public long countToday(Long tenantId) {
@@ -175,36 +202,5 @@ public class DashboardServiceImpl implements DashboardService {
             out.add(vo);
         }
         return out;
-    }
-
-    private static int toInt(Object v) {
-        if (v == null) return 0;
-        if (v instanceof Number n) return n.intValue();
-        return Integer.parseInt(v.toString());
-    }
-
-    private static long toLong(Object v) {
-        if (v == null) return 0L;
-        if (v instanceof Number n) return n.longValue();
-        return Long.parseLong(v.toString());
-    }
-
-    private static String asString(Object v) {
-        return v == null ? null : v.toString();
-    }
-
-    private static LocalDateTime toLocalDateTime(Object v) {
-        if (v == null) return null;
-        if (v instanceof LocalDateTime ldt) return ldt;
-        if (v instanceof Timestamp ts) return ts.toLocalDateTime();
-        // Fallback for JDBC drivers that return java.time.OffsetDateTime etc.
-        if (v instanceof java.time.OffsetDateTime odt) return odt.toLocalDateTime();
-        return LocalDateTime.parse(v.toString());
-    }
-
-    // Kept for reference — zero-arg unused reference suppressing unused-import warning.
-    @SuppressWarnings("unused")
-    private static LocalDateTime startOfDay() {
-        return LocalDate.now().atTime(LocalTime.MIN);
     }
 }
