@@ -21,6 +21,12 @@ import io.github.pnoker.common.data.biz.DashboardService;
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
 import io.github.pnoker.common.data.mapper.AlertMapper;
 import io.github.pnoker.common.data.mapper.DashboardMapper;
+import io.github.pnoker.common.facade.api.DeviceFacade;
+import io.github.pnoker.common.facade.api.DriverFacade;
+import io.github.pnoker.common.facade.api.PointFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
+import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,8 +36,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -64,6 +73,15 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Resource
     private AlertMapper alertMapper;
+
+    @Resource
+    private DeviceFacade deviceFacade;
+
+    @Resource
+    private PointFacade pointFacade;
+
+    @Resource
+    private DriverFacade driverFacade;
 
     private static int toInt(Object v) {
         if (v == null) return 0;
@@ -285,6 +303,9 @@ public class DashboardServiceImpl implements DashboardService {
         int clamped = Math.max(1, Math.min(size, 100));
         List<Map<String, Object>> rows = dashboardMapper.latestStream(tenantId, clamped);
         List<LatestPointValueVO> out = new ArrayList<>(rows.size());
+        Set<Long> deviceIds = new HashSet<>();
+        Set<Long> pointIds = new HashSet<>();
+        Set<Long> driverIds = new HashSet<>();
         for (Map<String, Object> row : rows) {
             LatestPointValueVO vo = new LatestPointValueVO();
             vo.setDeviceId(toLong(row.get("device_id")));
@@ -295,7 +316,40 @@ public class DashboardServiceImpl implements DashboardService {
             vo.setValueType(asString(row.get("value_type")));
             vo.setCreateTime(toLocalDateTime(row.get("create_time")));
             out.add(vo);
+            if (vo.getDeviceId() != null && vo.getDeviceId() > 0) deviceIds.add(vo.getDeviceId());
+            if (vo.getPointId() != null && vo.getPointId() > 0) pointIds.add(vo.getPointId());
+            if (vo.getDriverId() != null && vo.getDriverId() > 0) driverIds.add(vo.getDriverId());
         }
+
+        // Point-value tables live in the history data source; device / point /
+        // driver metadata lives in the master data source (and in remote
+        // Manager in distributed deployments), so we cannot JOIN them in SQL.
+        // Resolve names via the Facade once per distinct id — the live feed
+        // is a manual-refresh endpoint capped at 100 rows, so at most a few
+        // dozen facade calls per request. The Facade implementation (local
+        // or gRPC) already sits behind Manager's own caching.
+        Map<Long, String> deviceNames = new HashMap<>(deviceIds.size());
+        for (Long id : deviceIds) {
+            FacadeDeviceBO bo = deviceFacade.selectById(id);
+            if (Objects.nonNull(bo)) deviceNames.put(id, bo.getDeviceName());
+        }
+        Map<Long, String> pointNames = new HashMap<>(pointIds.size());
+        for (Long id : pointIds) {
+            FacadePointBO bo = pointFacade.selectById(id);
+            if (Objects.nonNull(bo)) pointNames.put(id, bo.getPointName());
+        }
+        Map<Long, String> driverNames = new HashMap<>(driverIds.size());
+        for (Long id : driverIds) {
+            FacadeDriverBO bo = driverFacade.selectById(id);
+            if (Objects.nonNull(bo)) driverNames.put(id, bo.getDriverName());
+        }
+
+        for (LatestPointValueVO vo : out) {
+            if (vo.getDeviceId() != null) vo.setDeviceName(deviceNames.get(vo.getDeviceId()));
+            if (vo.getPointId() != null) vo.setPointName(pointNames.get(vo.getPointId()));
+            if (vo.getDriverId() != null) vo.setDriverName(driverNames.get(vo.getDriverId()));
+        }
+
         return out;
     }
 
