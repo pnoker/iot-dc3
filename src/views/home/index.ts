@@ -31,7 +31,6 @@ import LiveDataFeed from './components/LiveDataFeed.vue';
 import AnalyticsTabs from './components/AnalyticsTabs.vue';
 import TrendChart from './components/TrendChart.vue';
 import HomeBanner from './components/HomeBanner.vue';
-import QuickActions from './components/QuickActions.vue';
 import AlertList from './components/AlertList.vue';
 
 type Tone = 'blue' | 'green' | 'orange' | 'purple' | 'red';
@@ -50,7 +49,7 @@ interface CardModel {
 
 export default defineComponent({
   name: 'Home',
-  components: { StatCard, LiveDataFeed, AnalyticsTabs, TrendChart, HomeBanner, QuickActions, AlertList },
+  components: { StatCard, LiveDataFeed, AnalyticsTabs, TrendChart, HomeBanner, AlertList },
   setup() {
     const { t } = useI18n();
     const router = useRouter();

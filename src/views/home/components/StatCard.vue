@@ -34,7 +34,9 @@
         <div v-if="subtitle" class="stat-card__subtitle">{{ subtitle }}</div>
       </div>
     </div>
-    <div v-if="sparkline && sparkline.length" ref="sparkRef" class="stat-card__spark"></div>
+    <!-- Sparkline slot is always rendered (empty cards get a transparent
+         spacer) so every StatCard lines up at the same height. -->
+    <div ref="sparkRef" class="stat-card__spark"></div>
   </el-card>
 </template>
 
@@ -130,6 +132,16 @@
     border-radius: 10px;
     cursor: pointer;
     transition: transform 0.15s ease;
+    height: 100%;
+    min-height: 132px;
+    display: flex;
+    flex-direction: column;
+
+    :deep(.el-card__body) {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
     &:hover {
       transform: translateY(-2px);
@@ -227,7 +239,8 @@
 
     .stat-card__spark {
       height: 40px;
-      margin-top: 8px;
+      margin-top: auto;
+      padding-top: 8px;
     }
   }
 </style>

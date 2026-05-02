@@ -49,12 +49,9 @@
       </el-col>
     </el-row>
 
-    <!-- Row 3: quick actions + recent alerts -->
+    <!-- Row 3: recent alerts -->
     <el-row :gutter="12" class="home__row">
-      <el-col :xl="8" :lg="10" :md="24" :sm="24" :xs="24" class="home__col">
-        <quick-actions />
-      </el-col>
-      <el-col :xl="16" :lg="14" :md="24" :sm="24" :xs="24" class="home__col">
+      <el-col :span="24" class="home__col">
         <alert-list :size="10" />
       </el-col>
     </el-row>
