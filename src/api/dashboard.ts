@@ -32,6 +32,12 @@ export const alertStats = () => httpGet(`${API_DATA_BASE}/dashboard/alert/stats`
 
 export const alertLatest = (size = 10) => httpGet(`${API_DATA_BASE}/dashboard/alert/latest`, { params: { size } });
 
+export const statsLatency = (rangeHours = 24) =>
+  httpGet(`${API_DATA_BASE}/dashboard/stats/latency`, { params: { rangeHours } });
+
+export const statsActivity = (rangeHours = 168) =>
+  httpGet(`${API_DATA_BASE}/dashboard/stats/activity`, { params: { rangeHours } });
+
 export const driverStats = () => httpGet(`${API_MANAGER_BASE}/dashboard/driver/stats`);
 
 export const deviceStats = (topN = 10) => httpGet(`${API_MANAGER_BASE}/dashboard/device/stats`, { params: { topN } });

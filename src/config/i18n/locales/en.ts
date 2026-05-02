@@ -158,6 +158,22 @@ export default {
       confirmed: 'Confirmed',
       unconfirmed: 'Unconfirmed',
     },
+    latency: {
+      title: 'Data Latency Distribution',
+      bin: {
+        under100ms: '<100ms',
+        '100to500ms': '100-500ms',
+        '500msto1s': '500ms-1s',
+        '1to5s': '1-5s',
+        '5to30s': '5-30s',
+        over30s: '≥30s',
+      },
+    },
+    activity: {
+      title: 'Hourly Data Activity',
+      count: 'Records',
+      dow: { sun: 'Sun', mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat' },
+    },
     banner: {
       welcome: 'Welcome to the IoT DC3 Industrial IoT Platform',
       greetingMorning: 'Good morning',

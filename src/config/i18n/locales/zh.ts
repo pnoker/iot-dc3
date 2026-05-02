@@ -158,6 +158,22 @@ export default {
       confirmed: '已确认',
       unconfirmed: '未确认',
     },
+    latency: {
+      title: '数据延迟分布',
+      bin: {
+        under100ms: '<100ms',
+        '100to500ms': '100-500ms',
+        '500msto1s': '500ms-1s',
+        '1to5s': '1-5s',
+        '5to30s': '5-30s',
+        over30s: '≥30s',
+      },
+    },
+    activity: {
+      title: '小时数据活跃度',
+      count: '数据条数',
+      dow: { sun: '周日', mon: '周一', tue: '周二', wed: '周三', thu: '周四', fri: '周五', sat: '周六' },
+    },
     banner: {
       welcome: '欢迎使用 IoT DC3 工业物联网平台',
       greetingMorning: '早上好',

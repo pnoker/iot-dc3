@@ -62,6 +62,16 @@
         <trend-chart />
       </el-col>
     </el-row>
+
+    <!-- Row 5: latency histogram + hourly activity heatmap -->
+    <el-row :gutter="12" class="home__row">
+      <el-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24" class="home__col">
+        <latency-chart />
+      </el-col>
+      <el-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24" class="home__col">
+        <activity-heatmap />
+      </el-col>
+    </el-row>
   </div>
 </template>
 

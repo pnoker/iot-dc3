@@ -32,6 +32,8 @@ import AnalyticsTabs from './components/AnalyticsTabs.vue';
 import TrendChart from './components/TrendChart.vue';
 import HomeBanner from './components/HomeBanner.vue';
 import AlertList from './components/AlertList.vue';
+import LatencyChart from './components/LatencyChart.vue';
+import ActivityHeatmap from './components/ActivityHeatmap.vue';
 
 type Tone = 'blue' | 'green' | 'orange' | 'purple' | 'red';
 
@@ -49,7 +51,16 @@ interface CardModel {
 
 export default defineComponent({
   name: 'Home',
-  components: { StatCard, LiveDataFeed, AnalyticsTabs, TrendChart, HomeBanner, AlertList },
+  components: {
+    StatCard,
+    LiveDataFeed,
+    AnalyticsTabs,
+    TrendChart,
+    HomeBanner,
+    AlertList,
+    LatencyChart,
+    ActivityHeatmap,
+  },
   setup() {
     const { t } = useI18n();
     const router = useRouter();
