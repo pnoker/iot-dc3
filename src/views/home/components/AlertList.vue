@@ -20,13 +20,7 @@
       <div class="alert-list__header">
         <span class="alert-list__title">
           {{ $t('home.alertList.title') }}
-          <el-badge
-            v-if="stats.unconfirmed > 0"
-            :value="stats.unconfirmed"
-            :max="99"
-            type="danger"
-            class="alert-list__badge"
-          />
+          <el-badge v-if="rows.length > 0" :value="rows.length" :max="99" type="danger" class="alert-list__badge" />
         </span>
         <el-button :icon="Refresh" :loading="loading" circle size="small" @click="refresh" />
       </div>
