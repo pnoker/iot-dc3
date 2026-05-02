@@ -61,7 +61,19 @@ const settingsRouter: RouteRecordRaw = {
           name: 'settingsEvent',
           path: 'event',
           meta: { title: 'Events' },
-          component: () => import('@/views/settings/event/Event.vue'),
+          component: () => import('@/views/settings/event/Overview.vue'),
+        },
+        {
+          name: 'settingsDeviceEvent',
+          path: 'event/device',
+          meta: { title: 'Device Events' },
+          component: () => import('@/views/settings/event/DeviceEvent.vue'),
+        },
+        {
+          name: 'settingsDriverEvent',
+          path: 'event/driver',
+          meta: { title: 'Driver Events' },
+          component: () => import('@/views/settings/event/DriverEvent.vue'),
         },
         {
           name: 'settingsAbout',

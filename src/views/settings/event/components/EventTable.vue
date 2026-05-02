@@ -27,16 +27,6 @@
       @current-change="currentChange"
     >
       <template #filters="{ formData: fd }">
-        <el-form-item :label="$t('settings.event.source')" prop="source">
-          <el-segmented
-            v-model="fd.source"
-            :options="[
-              { label: $t('common.all'), value: '' },
-              { label: $t('settings.event.sourceDevice'), value: 'device' },
-              { label: $t('settings.event.sourceDriver'), value: 'driver' },
-            ]"
-          />
-        </el-form-item>
         <el-form-item :label="$t('settings.event.eventType')" prop="eventTypeFlag">
           <el-segmented
             v-model="fd.eventTypeFlag"
@@ -96,57 +86,59 @@
         @selection-change="onSelectionChange"
       >
         <el-table-column type="selection" width="44" />
-        <el-table-column :label="t('settings.event.source')" width="100">
+        <!-- Entity column: for device tables we look up deviceName via /device/ids,
+             for driver tables via /driver/ids. Falls back to the raw id. -->
+        <el-table-column :label="entityLabel" min-width="180" show-overflow-tooltip>
           <template #default="{ row }">
-            <el-tag :type="row.source === 'device' ? 'primary' : 'info'" size="small">
-              {{ row.source === 'device' ? t('settings.event.sourceDevice') : t('settings.event.sourceDriver') }}
+            <span>{{ nameFor(row) }}</span>
+            <span class="settings-table__sub">({{ row.sourceId }})</span>
+          </template>
+        </el-table-column>
+        <el-table-column v-if="source === 'device'" :label="$t('settings.event.pointId')" prop="pointId" width="140" />
+        <el-table-column :label="$t('settings.event.eventType')" width="110">
+          <template #default="{ row }">
+            <el-tag :type="row.eventTypeFlag === 1 ? 'warning' : 'info'" size="small">
+              {{ row.eventTypeFlag === 1 ? 'ALARM' : 'HEARTBEAT' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="t('settings.event.sourceId')" prop="sourceId" width="140" />
-        <el-table-column :label="t('settings.event.pointId')" prop="pointId" width="140" />
-        <el-table-column :label="t('settings.event.eventType')" width="110">
-          <template #default="{ row }">
-            <span>{{ row.eventTypeFlag === 1 ? 'ALARM' : 'HEARTBEAT' }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column :label="t('settings.event.message')" prop="message" show-overflow-tooltip min-width="240" />
-        <el-table-column :label="t('settings.event.confirmFlag')" width="110">
+        <el-table-column :label="$t('settings.event.message')" prop="message" show-overflow-tooltip min-width="240" />
+        <el-table-column :label="$t('settings.event.confirmFlag')" width="110">
           <template #default="{ row }">
             <el-tag :type="row.confirmFlag === 1 ? 'success' : 'warning'" size="small">
-              {{ row.confirmFlag === 1 ? t('settings.event.confirmed') : t('settings.event.unconfirmed') }}
+              {{ row.confirmFlag === 1 ? $t('settings.event.confirmed') : $t('settings.event.unconfirmed') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="t('settings.event.createTime')" prop="createTime" width="180" />
-        <el-table-column :label="t('common.operation')" width="140" fixed="right">
+        <el-table-column :label="$t('settings.event.createTime')" prop="createTime" width="180" />
+        <el-table-column :label="$t('common.operation')" width="140" fixed="right">
           <template #default="{ row }">
             <el-popconfirm
               v-if="row.confirmFlag !== 1"
-              :title="t('settings.event.confirmTitle')"
-              :confirm-button-text="t('common.confirm')"
-              :cancel-button-text="t('common.cancel')"
+              :title="$t('settings.event.confirmTitle')"
+              :confirm-button-text="$t('common.confirm')"
+              :cancel-button-text="$t('common.cancel')"
               @confirm="confirmRow(row)"
             >
               <template #reference>
-                <el-button link type="primary">{{ t('settings.event.confirm') }}</el-button>
+                <el-button link type="primary">{{ $t('settings.event.confirm') }}</el-button>
               </template>
             </el-popconfirm>
             <el-popconfirm
               v-else
-              :title="t('settings.event.unconfirmTitle')"
-              :confirm-button-text="t('common.confirm')"
-              :cancel-button-text="t('common.cancel')"
+              :title="$t('settings.event.unconfirmTitle')"
+              :confirm-button-text="$t('common.confirm')"
+              :cancel-button-text="$t('common.cancel')"
               @confirm="unconfirmRow(row)"
             >
               <template #reference>
-                <el-button link type="warning">{{ t('settings.event.unconfirm') }}</el-button>
+                <el-button link type="warning">{{ $t('settings.event.unconfirm') }}</el-button>
               </template>
             </el-popconfirm>
           </template>
         </el-table-column>
         <template #empty>
-          <el-empty :description="t('settings.event.empty')" />
+          <el-empty :description="$t('settings.event.empty')" />
         </template>
       </el-table>
     </blank-card>
@@ -154,10 +146,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { computed, reactive, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
 
   import { alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm } from '@/api/dashboard';
+  import { getDeviceByIds } from '@/api/device';
+  import { getDriverByIds } from '@/api/driver';
   import { successMessage } from '@/utils/NotificationUtil';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
@@ -173,39 +167,42 @@
     message: string;
   }
 
+  const props = defineProps<{
+    source: 'device' | 'driver';
+  }>();
+
   const { t } = useI18n();
 
   const loading = ref(false);
   const bulkRunning = ref(false);
   const selection = ref<Row[]>([]);
   const rows = ref<Row[]>([]);
+  const nameMap = reactive<Record<string, string>>({});
 
-  // ToolCard binds its inputs to this exact object; empty-string is the
-  // "no filter" sentinel so el-segmented can represent it.
-  const formData = reactive<{ source: string; eventTypeFlag: number | ''; confirmFlag: number | '' }>({
-    source: '',
+  const formData = reactive<{ eventTypeFlag: number | ''; confirmFlag: number | '' }>({
     eventTypeFlag: '',
     confirmFlag: '',
   });
   const page = reactive({ current: 1, size: 20, total: 0 });
 
-  const normalizedQuery = () => ({
-    source: (formData.source || null) as 'device' | 'driver' | null,
-    eventTypeFlag: formData.eventTypeFlag === '' ? null : Number(formData.eventTypeFlag),
-    confirmFlag: formData.confirmFlag === '' ? null : Number(formData.confirmFlag),
-  });
+  const entityLabel = computed(() =>
+    props.source === 'device' ? t('settings.event.device') : t('settings.event.driver')
+  );
 
   const load = async () => {
     loading.value = true;
     try {
       const res: any = await alertPage({
-        ...normalizedQuery(),
+        source: props.source,
+        eventTypeFlag: formData.eventTypeFlag === '' ? null : Number(formData.eventTypeFlag),
+        confirmFlag: formData.confirmFlag === '' ? null : Number(formData.confirmFlag),
         current: page.current,
         size: page.size,
       });
       const data = res?.data ?? {};
       rows.value = data.records ?? [];
       page.total = Number(data.total ?? 0);
+      await resolveNames(rows.value);
     } catch {
       // handled globally
     } finally {
@@ -213,13 +210,31 @@
     }
   };
 
+  const resolveNames = async (batch: Row[]) => {
+    const ids = Array.from(new Set(batch.map((r) => String(r.sourceId)).filter((id) => id && !nameMap[id])));
+    if (ids.length === 0) return;
+    try {
+      const res: any = props.source === 'device' ? await getDeviceByIds(ids) : await getDriverByIds(ids);
+      const data = res?.data || {};
+      for (const id of ids) {
+        const item = data[id];
+        if (item) {
+          nameMap[id] = props.source === 'device' ? item.deviceName || id : item.driverName || id;
+        }
+      }
+    } catch {
+      // handled globally
+    }
+  };
+
+  const nameFor = (r: Row) => nameMap[String(r.sourceId)] || String(r.sourceId);
+
   const onSearch = () => {
     page.current = 1;
     load();
   };
 
   const onReset = () => {
-    formData.source = '';
     formData.eventTypeFlag = '';
     formData.confirmFlag = '';
     page.current = 1;
@@ -257,8 +272,8 @@
     }
   };
 
-  const onSelectionChange = (rows: Row[]) => {
-    selection.value = rows;
+  const onSelectionChange = (selected: Row[]) => {
+    selection.value = selected;
   };
 
   const bulkConfirm = async (confirm: boolean) => {
@@ -277,6 +292,14 @@
     }
   };
 
+  watch(
+    () => props.source,
+    () => {
+      page.current = 1;
+      load();
+    }
+  );
+
   load();
 </script>
 
@@ -284,5 +307,11 @@
   .settings-table {
     margin-top: 1px;
     border-radius: 4px;
+  }
+
+  .settings-table__sub {
+    margin-left: 6px;
+    color: #909399;
+    font-size: 12px;
   }
 </style>

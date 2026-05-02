@@ -136,6 +136,8 @@
     settingsApi: 'nav.settingsApi',
     settingsMenu: 'nav.settingsMenu',
     settingsEvent: 'nav.settingsEvent',
+    settingsDeviceEvent: 'nav.settingsDeviceEvent',
+    settingsDriverEvent: 'nav.settingsDriverEvent',
     settingsAbout: 'nav.settingsAbout',
     settingsUserDetail: 'nav.settingsUserDetail',
     settingsRoleDetail: 'nav.settingsRoleDetail',
