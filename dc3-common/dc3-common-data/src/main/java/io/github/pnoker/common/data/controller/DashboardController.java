@@ -131,22 +131,26 @@ public class DashboardController implements BaseController {
 
     @GetMapping("/alert/stats")
     public Mono<R<AlertStatsVO>> alertStats() {
-        try {
-            return Mono.just(R.ok(dashboardService.alertStats()));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertStats(tenantId)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     @GetMapping("/alert/latest")
     public Mono<R<List<AlertItemVO>>> alertLatest(
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        try {
-            return Mono.just(R.ok(dashboardService.alertLatest(size)));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertLatest(tenantId, size)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 }

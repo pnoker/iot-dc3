@@ -139,14 +139,14 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public AlertStatsVO alertStats() {
+    public AlertStatsVO alertStats(Long tenantId) {
         AlertStatsVO vo = new AlertStatsVO();
-        Map<String, Object> totals = alertMapper.countAll();
+        Map<String, Object> totals = alertMapper.countAll(tenantId);
         if (totals != null) {
             vo.setTotal(toLong(totals.get("total")));
             vo.setUnconfirmed(toLong(totals.get("unconfirmed")));
         }
-        List<Map<String, Object>> rows = alertMapper.countByType();
+        List<Map<String, Object>> rows = alertMapper.countByType(tenantId);
         List<AlertStatsVO.BucketVO> buckets = new ArrayList<>(rows.size());
         for (Map<String, Object> row : rows) {
             AlertStatsVO.BucketVO b = new AlertStatsVO.BucketVO();
@@ -159,9 +159,9 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<AlertItemVO> alertLatest(int size) {
+    public List<AlertItemVO> alertLatest(Long tenantId, int size) {
         int clamped = Math.max(1, Math.min(size, 50));
-        List<Map<String, Object>> rows = alertMapper.latest(clamped);
+        List<Map<String, Object>> rows = alertMapper.latest(tenantId, clamped);
         List<AlertItemVO> out = new ArrayList<>(rows.size());
         for (Map<String, Object> row : rows) {
             AlertItemVO vo = new AlertItemVO();

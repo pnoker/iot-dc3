@@ -24,13 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Alert aggregation queries. Runs against the master data source (default),
- * because {@code dc3_device_event} / {@code dc3_driver_event} are not
- * Timescale hypertables.
- *
- * <p>Both tables omit {@code tenant_id}, so these queries are tenant-agnostic.
- * If tenant scoping becomes a requirement, join {@code dc3_device} /
- * {@code dc3_driver} from the manager DB and filter there.</p>
+ * Alert aggregation queries over {@code dc3_device_event} and
+ * {@code dc3_driver_event}. Both tables live in the master data source (not
+ * Timescale hypertables) and carry a {@code tenant_id} column; all queries
+ * are tenant-scoped.
  *
  * @author pnoker
  * @since 2026.5.2
@@ -39,16 +36,20 @@ import java.util.Map;
 public interface AlertMapper {
 
     /**
-     * Overall counters for the alert stat card.
+     * Overall counters for the alert stat card, scoped to one tenant.
      */
     @Select({
             "SELECT",
-            "  (SELECT COUNT(*) FROM dc3_device_event WHERE deleted = 0) +",
-            "  (SELECT COUNT(*) FROM dc3_driver_event WHERE deleted = 0) AS total,",
-            "  (SELECT COUNT(*) FROM dc3_device_event WHERE deleted = 0 AND confirm_flag = 0) +",
-            "  (SELECT COUNT(*) FROM dc3_driver_event WHERE deleted = 0 AND confirm_flag = 0) AS unconfirmed"
+            "  (SELECT COUNT(*) FROM dc3_device_event",
+            "     WHERE deleted = 0 AND tenant_id = #{tenantId}) +",
+            "  (SELECT COUNT(*) FROM dc3_driver_event",
+            "     WHERE deleted = 0 AND tenant_id = #{tenantId}) AS total,",
+            "  (SELECT COUNT(*) FROM dc3_device_event",
+            "     WHERE deleted = 0 AND tenant_id = #{tenantId} AND confirm_flag = 0) +",
+            "  (SELECT COUNT(*) FROM dc3_driver_event",
+            "     WHERE deleted = 0 AND tenant_id = #{tenantId} AND confirm_flag = 0) AS unconfirmed"
     })
-    Map<String, Object> countAll();
+    Map<String, Object> countAll(@Param("tenantId") Long tenantId);
 
     /**
      * Per-type breakdown across both event tables. event_type_flag is a
@@ -57,14 +58,16 @@ public interface AlertMapper {
     @Select({
             "SELECT event_type_flag::text AS key, COUNT(*) AS count",
             "  FROM (",
-            "    SELECT event_type_flag FROM dc3_device_event WHERE deleted = 0",
+            "    SELECT event_type_flag FROM dc3_device_event",
+            "     WHERE deleted = 0 AND tenant_id = #{tenantId}",
             "    UNION ALL",
-            "    SELECT event_type_flag FROM dc3_driver_event WHERE deleted = 0",
+            "    SELECT event_type_flag FROM dc3_driver_event",
+            "     WHERE deleted = 0 AND tenant_id = #{tenantId}",
             "  ) merged",
             " GROUP BY event_type_flag",
             " ORDER BY count DESC"
     })
-    List<Map<String, Object>> countByType();
+    List<Map<String, Object>> countByType(@Param("tenantId") Long tenantId);
 
     /**
      * Most recent N events across device + driver tables, flagged with source.
@@ -74,17 +77,17 @@ public interface AlertMapper {
             "  SELECT id, 'device' AS source, device_id AS source_id, point_id,",
             "         event_type_flag, confirm_flag, create_time",
             "    FROM dc3_device_event",
-            "   WHERE deleted = 0",
+            "   WHERE deleted = 0 AND tenant_id = #{tenantId}",
             "   ORDER BY create_time DESC LIMIT #{limit}",
             "  UNION ALL",
             "  SELECT id, 'driver' AS source, driver_id AS source_id, 0,",
             "         event_type_flag, confirm_flag, create_time",
             "    FROM dc3_driver_event",
-            "   WHERE deleted = 0",
+            "   WHERE deleted = 0 AND tenant_id = #{tenantId}",
             "   ORDER BY create_time DESC LIMIT #{limit}",
             ") unioned",
             "ORDER BY create_time DESC",
             "LIMIT #{limit}"
     })
-    List<Map<String, Object>> latest(@Param("limit") int limit);
+    List<Map<String, Object>> latest(@Param("tenantId") Long tenantId, @Param("limit") int limit);
 }
