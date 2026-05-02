@@ -51,13 +51,21 @@ public class SystemHealthVO implements Serializable {
     private Map<String, String> infra;
 
     /** Driver population summary. */
-    private DriverSummary drivers;
+    private FleetSummary drivers;
 
+    /** Device population summary. */
+    private FleetSummary devices;
+
+    /**
+     * Population summary shared by drivers and devices: count of records in
+     * the DB, how many of them reported ONLINE to the status cache, and how
+     * many rows resolved to a cache miss (never heartbeated since startup).
+     */
     @Getter
     @Setter
     @ToString
     @NoArgsConstructor
-    public static class DriverSummary implements Serializable {
+    public static class FleetSummary implements Serializable {
 
         @Serial
         private static final long serialVersionUID = 1L;
@@ -65,5 +73,9 @@ public class SystemHealthVO implements Serializable {
         private int total;
 
         private int online;
+    }
+
+    /** Backwards-compat alias — drivers used to be typed as DriverSummary. */
+    public static class DriverSummary extends FleetSummary {
     }
 }
