@@ -155,6 +155,10 @@ public class PointValueServiceImpl implements PointValueService {
         if (Objects.isNull(entityQuery.getPage())) {
             entityQuery.setPage(new Pages());
         }
+        if (entityQuery.getRangeHours() != null && entityQuery.getRangeHours() > 0
+                && entityQuery.getCreateTimeFrom() == null) {
+            entityQuery.setCreateTimeFrom(java.time.LocalDateTime.now().minusHours(entityQuery.getRangeHours()));
+        }
 
         RepositoryService repositoryService = getFirstRepositoryService();
         return repositoryService.selectPagePointValue(entityQuery);

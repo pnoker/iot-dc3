@@ -128,6 +128,7 @@ public class PostgresRepositoryServiceImpl implements RepositoryService, Initial
         wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointValueDO::getTenantId, entityQuery.getTenantId());
         wrapper.eq(Objects.nonNull(entityQuery.getDeviceId()), PointValueDO::getDeviceId, entityQuery.getDeviceId());
         wrapper.eq(Objects.nonNull(entityQuery.getPointId()), PointValueDO::getPointId, entityQuery.getPointId());
+        wrapper.ge(Objects.nonNull(entityQuery.getCreateTimeFrom()), PointValueDO::getCreateTime, entityQuery.getCreateTimeFrom());
         return wrapper;
     }
 

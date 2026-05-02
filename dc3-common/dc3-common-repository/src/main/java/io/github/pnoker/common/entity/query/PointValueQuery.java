@@ -81,4 +81,15 @@ public class PointValueQuery implements Serializable {
      */
     private EnableFlagEnum enableFlag;
 
+    /**
+     * Optional lower bound for create_time filtering (time range feature).
+     */
+    private java.time.LocalDateTime createTimeFrom;
+
+    /**
+     * Convenience field: when set (e.g. 24, 168, 720), the service layer
+     * converts it to createTimeFrom = now - rangeHours.
+     */
+    private Integer rangeHours;
+
 }
