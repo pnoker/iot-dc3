@@ -96,6 +96,11 @@ public class DriverEventDTO implements Serializable {
         private DriverStatusEnum status;
 
         /**
+         * Human-readable message. Populated for ALARM events; null for HEARTBEAT.
+         */
+        private String message;
+
+        /**
          * Create Time
          */
         private LocalDateTime createTime;

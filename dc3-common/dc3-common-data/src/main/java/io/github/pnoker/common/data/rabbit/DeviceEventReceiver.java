@@ -62,11 +62,11 @@ public class DeviceEventReceiver {
             }
 
             switch (entityDTO.getType()) {
-                // Save device heartbeat to Redis
                 case HEARTBEAT:
                     deviceEventService.heartbeatEvent(entityDTO);
                     break;
                 case ALARM:
+                    deviceEventService.alarmEvent(entityDTO);
                     break;
                 default:
                     log.error("Invalid event type, {}", entityDTO.getType());
