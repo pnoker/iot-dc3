@@ -53,7 +53,6 @@ export default {
     settingsApi: 'Api',
     settingsMenu: 'Menus',
     settingsEvent: 'Events',
-    settingsAlarm: 'Alarms',
     settingsAbout: 'About',
     settingsUserDetail: 'User Detail',
     settingsRoleDetail: 'Role Detail',
@@ -510,14 +509,6 @@ export default {
       refresh: 'Refresh',
       all: 'All',
       onlyUnconfirmed: 'Only unconfirmed',
-    },
-    alarm: {
-      title: 'Alarms',
-      empty: 'No alarms',
-      confirm: 'Confirm',
-      confirmed: 'Confirmed',
-      unconfirmed: 'Unconfirmed',
-      confirmSuccess: 'Confirmed',
     },
     user: {
       title: 'Users',

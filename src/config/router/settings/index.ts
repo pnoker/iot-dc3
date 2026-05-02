@@ -64,12 +64,6 @@ const settingsRouter: RouteRecordRaw = {
           component: () => import('@/views/settings/event/Event.vue'),
         },
         {
-          name: 'settingsAlarm',
-          path: 'alarm',
-          meta: { title: 'Alarms' },
-          component: () => import('@/views/settings/alarm/Alarm.vue'),
-        },
-        {
           name: 'settingsAbout',
           path: 'about',
           meta: { title: 'About' },

@@ -136,7 +136,6 @@
     settingsApi: 'nav.settingsApi',
     settingsMenu: 'nav.settingsMenu',
     settingsEvent: 'nav.settingsEvent',
-    settingsAlarm: 'nav.settingsAlarm',
     settingsAbout: 'nav.settingsAbout',
     settingsUserDetail: 'nav.settingsUserDetail',
     settingsRoleDetail: 'nav.settingsRoleDetail',

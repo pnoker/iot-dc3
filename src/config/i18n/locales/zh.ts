@@ -53,7 +53,6 @@ export default {
     settingsApi: 'API 接口',
     settingsMenu: '菜单管理',
     settingsEvent: '事件',
-    settingsAlarm: '告警',
     settingsAbout: '关于',
     settingsUserDetail: '用户详情',
     settingsRoleDetail: '角色详情',
@@ -510,14 +509,6 @@ export default {
       refresh: '刷新',
       all: '全部',
       onlyUnconfirmed: '仅未确认',
-    },
-    alarm: {
-      title: '告警',
-      empty: '暂无告警',
-      confirm: '确认',
-      confirmed: '已确认',
-      unconfirmed: '未确认',
-      confirmSuccess: '已确认',
     },
     user: {
       title: '用户管理',
