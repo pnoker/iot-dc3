@@ -20,28 +20,38 @@
 <mapper namespace="io.github.pnoker.common.data.mapper.AlertMapper">
 
     <select id="countAll" resultType="map">
-        SELECT
-            (SELECT COUNT(*) FROM dc3_device_event
-              WHERE deleted = 0 AND tenant_id = #{tenantId})
-          + (SELECT COUNT(*) FROM dc3_driver_event
-              WHERE deleted = 0 AND tenant_id = #{tenantId}) AS total,
-            (SELECT COUNT(*) FROM dc3_device_event
-              WHERE deleted = 0 AND tenant_id = #{tenantId} AND confirm_flag = 0)
-          + (SELECT COUNT(*) FROM dc3_driver_event
-              WHERE deleted = 0 AND tenant_id = #{tenantId} AND confirm_flag = 0) AS unconfirmed
+        SELECT (SELECT COUNT(*)
+                FROM dc3_device_event
+                WHERE deleted = 0
+                  AND tenant_id = #{tenantId})
+                   + (SELECT COUNT(*)
+                      FROM dc3_driver_event
+                      WHERE deleted = 0
+                        AND tenant_id = #{tenantId}) AS total,
+               (SELECT COUNT(*)
+                FROM dc3_device_event
+                WHERE deleted = 0
+                  AND tenant_id = #{tenantId}
+                  AND confirm_flag = 0)
+                   + (SELECT COUNT(*)
+                      FROM dc3_driver_event
+                      WHERE deleted = 0
+                        AND tenant_id = #{tenantId}
+                        AND confirm_flag = 0)        AS unconfirmed
     </select>
 
     <select id="countByType" resultType="map">
         SELECT event_type_flag::text AS key, COUNT(*) AS count
-          FROM (
-              SELECT event_type_flag FROM dc3_device_event
-               WHERE deleted = 0 AND tenant_id = #{tenantId}
-              UNION ALL
-              SELECT event_type_flag FROM dc3_driver_event
-               WHERE deleted = 0 AND tenant_id = #{tenantId}
-          ) merged
-         GROUP BY event_type_flag
-         ORDER BY count DESC
+        FROM (
+            SELECT event_type_flag FROM dc3_device_event
+            WHERE deleted = 0 AND tenant_id = #{tenantId}
+            UNION ALL
+            SELECT event_type_flag FROM dc3_driver_event
+            WHERE deleted = 0 AND tenant_id = #{tenantId}
+            ) merged
+        GROUP BY event_type_flag
+        ORDER BY count
+        DESC
     </select>
 
     <!--
@@ -51,19 +61,32 @@
         device branch's schema.
     -->
     <select id="latest" resultType="map">
-        SELECT * FROM (
-            (SELECT id, 'device' AS source, device_id AS source_id, point_id,
-                    event_type_flag, confirm_flag, create_time
+        SELECT *
+        FROM ((SELECT id,
+                      'device'  AS source,
+                      device_id AS source_id,
+                      point_id,
+                      event_type_flag,
+                      confirm_flag,
+                      create_time
                FROM dc3_device_event
-              WHERE deleted = 0 AND tenant_id = #{tenantId}
-              ORDER BY create_time DESC LIMIT #{limit})
-            UNION ALL
-            (SELECT id, 'driver' AS source, driver_id AS source_id, 0,
-                    event_type_flag, confirm_flag, create_time
+               WHERE deleted = 0
+                 AND tenant_id = #{tenantId}
+               ORDER BY create_time DESC
+               LIMIT #{limit})
+              UNION ALL
+              (SELECT id,
+                      'driver'  AS source,
+                      driver_id AS source_id,
+                      0,
+                      event_type_flag,
+                      confirm_flag,
+                      create_time
                FROM dc3_driver_event
-              WHERE deleted = 0 AND tenant_id = #{tenantId}
-              ORDER BY create_time DESC LIMIT #{limit})
-        ) unioned
+               WHERE deleted = 0
+                 AND tenant_id = #{tenantId}
+               ORDER BY create_time DESC
+               LIMIT #{limit})) unioned
         ORDER BY create_time DESC
         LIMIT #{limit}
     </select>

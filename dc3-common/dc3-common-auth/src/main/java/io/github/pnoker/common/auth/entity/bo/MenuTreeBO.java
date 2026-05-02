@@ -17,11 +17,7 @@
 
 package io.github.pnoker.common.auth.entity.bo;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +38,6 @@ public class MenuTreeBO extends MenuBO {
 
     private List<MenuTreeBO> children = new ArrayList<>();
 
-    public void addChild(MenuTreeBO child) {
-        if (children == null) {
-            children = new ArrayList<>();
-        }
-        children.add(child);
-    }
-
     public static MenuTreeBO fromBO(MenuBO source) {
         MenuTreeBO node = new MenuTreeBO();
         node.setId(source.getId());
@@ -68,5 +57,12 @@ public class MenuTreeBO extends MenuBO {
         node.setOperatorName(source.getOperatorName());
         node.setOperateTime(source.getOperateTime());
         return node;
+    }
+
+    public void addChild(MenuTreeBO child) {
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+        children.add(child);
     }
 }

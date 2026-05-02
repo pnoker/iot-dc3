@@ -17,11 +17,7 @@
 
 package io.github.pnoker.common.data.biz;
 
-import io.github.pnoker.common.data.entity.vo.dashboard.AlertItemVO;
-import io.github.pnoker.common.data.entity.vo.dashboard.AlertStatsVO;
-import io.github.pnoker.common.data.entity.vo.dashboard.LatestPointValueVO;
-import io.github.pnoker.common.data.entity.vo.dashboard.TimeseriesPointVO;
-import io.github.pnoker.common.data.entity.vo.dashboard.TopEntityVO;
+import io.github.pnoker.common.data.entity.vo.dashboard.*;
 
 import java.util.List;
 
@@ -58,9 +54,9 @@ public interface DashboardService {
     /**
      * Top-N devices / points / drivers by point-value count.
      *
-     * @param dimension one of {@code device}, {@code point}, {@code driver}
+     * @param dimension  one of {@code device}, {@code point}, {@code driver}
      * @param rangeHours lookback window in hours (e.g. 24, 168, 720)
-     * @param limit max rows returned (clamped 1..50)
+     * @param limit      max rows returned (clamped 1..50)
      */
     List<TopEntityVO> top(Long tenantId, String dimension, int rangeHours, int limit);
 

@@ -21,32 +21,36 @@
 
     <select id="countDriverByEnable" resultType="map">
         SELECT enable_flag AS enable_flag, COUNT(*) AS count
-          FROM dc3_driver
-         WHERE deleted = 0 AND tenant_id = #{tenantId}
-         GROUP BY enable_flag
+        FROM dc3_driver
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+        GROUP BY enable_flag
     </select>
 
     <select id="countDriverByType" resultType="map">
         SELECT driver_type_flag AS driver_type_flag, COUNT(*) AS count
-          FROM dc3_driver
-         WHERE deleted = 0 AND tenant_id = #{tenantId}
-         GROUP BY driver_type_flag
+        FROM dc3_driver
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+        GROUP BY driver_type_flag
     </select>
 
     <select id="countDeviceByEnable" resultType="map">
         SELECT enable_flag AS enable_flag, COUNT(*) AS count
-          FROM dc3_device
-         WHERE deleted = 0 AND tenant_id = #{tenantId}
-         GROUP BY enable_flag
+        FROM dc3_device
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+        GROUP BY enable_flag
     </select>
 
     <select id="countDeviceByDriver" resultType="map">
         SELECT driver_id AS driver_id, COUNT(*) AS count
-          FROM dc3_device
-         WHERE deleted = 0 AND tenant_id = #{tenantId}
-         GROUP BY driver_id
-         ORDER BY count DESC
-         LIMIT #{limit}
+        FROM dc3_device
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+        GROUP BY driver_id
+        ORDER BY count DESC
+        LIMIT #{limit}
     </select>
 
     <!--
@@ -55,11 +59,12 @@
     -->
     <select id="countDeviceByProfile" resultType="map">
         SELECT b.profile_id AS profile_id, COUNT(*) AS count
-          FROM dc3_profile_bind b
-         WHERE b.deleted = 0 AND b.tenant_id = #{tenantId}
-         GROUP BY b.profile_id
-         ORDER BY count DESC
-         LIMIT #{limit}
+        FROM dc3_profile_bind b
+        WHERE b.deleted = 0
+          AND b.tenant_id = #{tenantId}
+        GROUP BY b.profile_id
+        ORDER BY count DESC
+        LIMIT #{limit}
     </select>
 
 </mapper>
