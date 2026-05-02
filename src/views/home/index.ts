@@ -24,12 +24,15 @@ import { getDeviceList } from '@/api/device';
 import { getPointList } from '@/api/point';
 import { getProfileList } from '@/api/profile';
 import { getDriverList } from '@/api/driver';
-import { statsTimeseries, statsToday } from '@/api/dashboard';
+import { alertStats, statsTimeseries, statsToday } from '@/api/dashboard';
 
 import StatCard from './components/StatCard.vue';
 import LiveDataFeed from './components/LiveDataFeed.vue';
 import AnalyticsTabs from './components/AnalyticsTabs.vue';
 import TrendChart from './components/TrendChart.vue';
+import HomeBanner from './components/HomeBanner.vue';
+import QuickActions from './components/QuickActions.vue';
+import AlertList from './components/AlertList.vue';
 
 type Tone = 'blue' | 'green' | 'orange' | 'purple' | 'red';
 
@@ -47,7 +50,7 @@ interface CardModel {
 
 export default defineComponent({
   name: 'Home',
-  components: { StatCard, LiveDataFeed, AnalyticsTabs, TrendChart },
+  components: { StatCard, LiveDataFeed, AnalyticsTabs, TrendChart, HomeBanner, QuickActions, AlertList },
   setup() {
     const { t } = useI18n();
     const router = useRouter();
@@ -61,14 +64,24 @@ export default defineComponent({
       todayPercentChange: 0,
       todaySparkline: [] as number[],
       alertCount: 0,
+      alertUnconfirmed: 0,
     });
+
+    // Each stat endpoint doubles as a liveness probe — if the request succeeds
+    // the center service is responding. No dedicated /health endpoint needed.
+    const serviceStatus = reactive({ auth: true, data: true, manager: true });
 
     const emptyPage = { current: 1, size: 1 };
 
     const loadTotals = () => {
       getDriverList({ page: emptyPage })
-        .then((r: any) => (state.driverCount = r?.data?.total ?? 0))
-        .catch(() => {});
+        .then((r: any) => {
+          state.driverCount = r?.data?.total ?? 0;
+          serviceStatus.manager = true;
+        })
+        .catch(() => {
+          serviceStatus.manager = false;
+        });
       getDeviceList({ page: emptyPage })
         .then((r: any) => (state.deviceCount = r?.data?.total ?? 0))
         .catch(() => {});
@@ -85,8 +98,9 @@ export default defineComponent({
         const res: any = await statsToday();
         state.todayCount = res?.data?.today ?? 0;
         state.todayPercentChange = res?.data?.percentChange ?? 0;
+        serviceStatus.data = true;
       } catch {
-        // handled globally
+        serviceStatus.data = false;
       }
     };
 
@@ -100,10 +114,21 @@ export default defineComponent({
       }
     };
 
+    const loadAlerts = async () => {
+      try {
+        const res: any = await alertStats();
+        state.alertCount = res?.data?.total ?? 0;
+        state.alertUnconfirmed = res?.data?.unconfirmed ?? 0;
+      } catch {
+        // handled globally
+      }
+    };
+
     onMounted(() => {
       loadTotals();
       loadToday();
       loadSparkline();
+      loadAlerts();
     });
 
     const percentTrend = computed(() => {
@@ -162,17 +187,17 @@ export default defineComponent({
         key: 'alert',
         title: t('home.alerts'),
         value: state.alertCount,
-        subtitle: '',
+        subtitle: state.alertUnconfirmed > 0 ? t('home.alertUnconfirmed', { n: state.alertUnconfirmed }) : '',
         icon: Bell,
         tone: 'red',
         trend: null,
         sparkline: [],
         onClick: () => {
-          // TODO wire to alert center route once added
+          // Alerts are shown inline in the AlertList panel below; nothing to navigate yet.
         },
       },
     ]);
 
-    return { cards };
+    return { cards, serviceStatus };
   },
 });

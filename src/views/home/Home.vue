@@ -16,6 +16,13 @@
 
 <template>
   <div class="home">
+    <!-- Row 0: greeting + clock + service status -->
+    <el-row :gutter="12" class="home__row">
+      <el-col :span="24" class="home__col">
+        <home-banner :status="serviceStatus" />
+      </el-col>
+    </el-row>
+
     <!-- Row 1: indicator strip (5 cards) -->
     <el-row :gutter="12" class="home__row">
       <el-col v-for="c in cards" :key="c.key" :xl="5" :lg="8" :md="12" :sm="12" :xs="24" class="home__col">
@@ -42,7 +49,17 @@
       </el-col>
     </el-row>
 
-    <!-- Row 3: data ingestion trend chart -->
+    <!-- Row 3: quick actions + recent alerts -->
+    <el-row :gutter="12" class="home__row">
+      <el-col :xl="8" :lg="10" :md="24" :sm="24" :xs="24" class="home__col">
+        <quick-actions />
+      </el-col>
+      <el-col :xl="16" :lg="14" :md="24" :sm="24" :xs="24" class="home__col">
+        <alert-list :size="10" />
+      </el-col>
+    </el-row>
+
+    <!-- Row 4: data ingestion trend chart -->
     <el-row :gutter="12" class="home__row">
       <el-col :span="24" class="home__col">
         <trend-chart />

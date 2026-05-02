@@ -46,6 +46,10 @@ export const statsTop = (
 
 export const streamLatest = (size = 20) => httpGet(`${BASE}/stream?size=${size}`);
 
+export const alertStats = () => httpGet(`${BASE}/alert/stats`);
+
+export const alertLatest = (size = 10) => httpGet(`${BASE}/alert/latest?size=${size}`);
+
 // Manager-side dashboard aggregates (driver/device distribution tabs).
 const MANAGER_BASE = 'api/v3/manager/dashboard';
 
