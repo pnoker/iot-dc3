@@ -81,4 +81,22 @@ public interface DashboardMapper {
      */
     List<Map<String, Object>> latestStream(@Param("tenantId") Long tenantId,
                                            @Param("limit") int limit);
+
+    /**
+     * Histogram of (operate_time - create_time) in milliseconds — i.e. the
+     * acquisition-to-storage latency for each point value. Buckets are fixed:
+     * 0=&lt;100ms, 1=100-500ms, 2=500ms-1s, 3=1-5s, 4=5-30s, 5=&gt;=30s.
+     */
+    List<Map<String, Object>> latencyHistogram(@Param("tenantId") Long tenantId,
+                                               @Param("from") LocalDateTime from,
+                                               @Param("to") LocalDateTime to);
+
+    /**
+     * Point-value counts grouped by (day-of-week, hour-of-day) over a time
+     * window, for the hourly-activity heatmap. Returns rows like
+     * {@code {dow: 1, hour: 14, count: 8234}} where dow is 0=Sunday..6=Saturday.
+     */
+    List<Map<String, Object>> hourlyActivity(@Param("tenantId") Long tenantId,
+                                             @Param("from") LocalDateTime from,
+                                             @Param("to") LocalDateTime to);
 }

@@ -62,7 +62,13 @@ public class PointValueServiceImpl implements PointValueService {
             return;
         }
 
-        pointValueBO.setOperateTime(pointValueBO.getCreateTime());
+        // create_time carries the driver's acquisition timestamp; operate_time
+        // is stamped at persistence. Keeping them distinct lets the dashboard
+        // measure the collect→store pipeline latency.
+        if (Objects.isNull(pointValueBO.getCreateTime())) {
+            pointValueBO.setCreateTime(LocalDateTimeUtil.now());
+        }
+        pointValueBO.setOperateTime(LocalDateTimeUtil.now());
         savePointValueToRepository(pointValueBO);
     }
 
@@ -77,7 +83,9 @@ public class PointValueServiceImpl implements PointValueService {
                     if (Objects.isNull(pointValue.getCreateTime())) {
                         pointValue.setCreateTime(LocalDateTimeUtil.now());
                     }
-                    pointValue.setOperateTime(pointValue.getCreateTime());
+                    // See single-row save() — operate_time is the persistence
+                    // timestamp, not a mirror of create_time.
+                    pointValue.setOperateTime(LocalDateTimeUtil.now());
                     return pointValue;
                 })
                 .collect(Collectors.groupingBy(PointValueBO::getDeviceId));

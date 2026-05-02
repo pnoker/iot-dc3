@@ -60,6 +60,57 @@ public class DashboardServiceImpl implements DashboardService {
     @Resource
     private AlertMapper alertMapper;
 
+    @Override
+    public List<LatencyBucketVO> latencyHistogram(Long tenantId, int rangeHours) {
+        int hours = Math.max(1, Math.min(rangeHours, 24 * 90));
+        LocalDateTime to = LocalDateTime.now();
+        LocalDateTime from = to.minusHours(hours);
+        List<Map<String, Object>> rows = dashboardMapper.latencyHistogram(tenantId, from, to);
+        // Pad missing bins with zero so the UI always gets six buckets.
+        long[] counts = new long[6];
+        for (Map<String, Object> row : rows) {
+            int bin = toInt(row.get("bin"));
+            if (bin >= 0 && bin < counts.length) {
+                counts[bin] = toLong(row.get("count"));
+            }
+        }
+        List<LatencyBucketVO> out = new ArrayList<>(counts.length);
+        for (int i = 0; i < counts.length; i++) {
+            LatencyBucketVO vo = new LatencyBucketVO();
+            vo.setBin(i);
+            vo.setCount(counts[i]);
+            out.add(vo);
+        }
+        return out;
+    }
+
+    @Override
+    public List<ActivityCellVO> hourlyActivity(Long tenantId, int rangeHours) {
+        int hours = Math.max(1, Math.min(rangeHours, 24 * 90));
+        LocalDateTime to = LocalDateTime.now();
+        LocalDateTime from = to.minusHours(hours);
+        List<Map<String, Object>> rows = dashboardMapper.hourlyActivity(tenantId, from, to);
+        long[][] grid = new long[7][24];
+        for (Map<String, Object> row : rows) {
+            int dow = toInt(row.get("dow"));
+            int hour = toInt(row.get("hour"));
+            if (dow >= 0 && dow < 7 && hour >= 0 && hour < 24) {
+                grid[dow][hour] = toLong(row.get("count"));
+            }
+        }
+        List<ActivityCellVO> out = new ArrayList<>(7 * 24);
+        for (int d = 0; d < 7; d++) {
+            for (int h = 0; h < 24; h++) {
+                ActivityCellVO vo = new ActivityCellVO();
+                vo.setDow(d);
+                vo.setHour(h);
+                vo.setCount(grid[d][h]);
+                out.add(vo);
+            }
+        }
+        return out;
+    }
+
     private static int toInt(Object v) {
         if (v == null) return 0;
         if (v instanceof Number n) return n.intValue();

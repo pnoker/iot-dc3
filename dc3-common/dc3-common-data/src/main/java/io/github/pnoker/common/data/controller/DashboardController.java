@@ -149,4 +149,30 @@ public class DashboardController implements BaseController {
             }
         });
     }
+
+    @GetMapping("/stats/latency")
+    public Mono<R<List<LatencyBucketVO>>> latencyHistogram(
+            @RequestParam(value = "rangeHours", defaultValue = "24") int rangeHours) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.latencyHistogram(tenantId, rangeHours)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/stats/activity")
+    public Mono<R<List<ActivityCellVO>>> hourlyActivity(
+            @RequestParam(value = "rangeHours", defaultValue = "168") int rangeHours) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.hourlyActivity(tenantId, rangeHours)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 }

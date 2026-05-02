@@ -78,4 +78,18 @@ public interface DashboardService {
      * {@code size} clamped 1..50.
      */
     List<AlertItemVO> alertLatest(Long tenantId, int size);
+
+    /**
+     * Acquisition-to-storage latency histogram across all point-value rows in
+     * the given lookback window. Returns exactly 6 rows (bins 0..5) even if a
+     * bin is empty — the service pads missing buckets with zero counts.
+     */
+    List<LatencyBucketVO> latencyHistogram(Long tenantId, int rangeHours);
+
+    /**
+     * Day-of-week × hour-of-day activity heatmap (7 × 24 = 168 cells). Missing
+     * (dow, hour) pairs are padded with zero so the frontend always gets a
+     * fully-filled grid.
+     */
+    List<ActivityCellVO> hourlyActivity(Long tenantId, int rangeHours);
 }
