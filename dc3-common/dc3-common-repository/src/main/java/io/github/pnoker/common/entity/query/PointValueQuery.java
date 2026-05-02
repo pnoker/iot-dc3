@@ -88,8 +88,17 @@ public class PointValueQuery implements Serializable {
 
     /**
      * Convenience field: when set (e.g. 24, 168, 720), the service layer
-     * converts it to createTimeFrom = now - rangeHours.
+     * converts it to createTimeFrom = now - rangeHours. Retained for
+     * backward compatibility; new callers should set {@link #rangeKey}.
      */
     private Integer rangeHours;
+
+    /**
+     * Preferred time-range selector. Accepts one of the {@link
+     * io.github.pnoker.common.enums.TimeRangeKeyEnum} codes ({@code today},
+     * {@code 24h}, {@code 7d}, {@code 30d}). Takes precedence over
+     * {@link #rangeHours} when both are supplied.
+     */
+    private String rangeKey;
 
 }
