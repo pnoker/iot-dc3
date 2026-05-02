@@ -18,7 +18,7 @@ import { computed, defineComponent, onMounted, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import type { Component } from 'vue';
-import { Bell, List, Management, Promotion, TrendCharts } from '@element-plus/icons-vue';
+import { Bell, List, Management, Promotion, TrendCharts, Warning } from '@element-plus/icons-vue';
 
 import { getDeviceList } from '@/api/device';
 import { getPointList } from '@/api/point';
@@ -26,7 +26,7 @@ import { getProfileList } from '@/api/profile';
 import { getDriverList } from '@/api/driver';
 import { alertStats, dailyGrowth, statsTimeseries, statsToday } from '@/api/dashboard';
 
-import StatCard from './components/StatCard.vue';
+import StatCard from '@/components/card/stat/StatCard.vue';
 import LiveDataFeed from './components/LiveDataFeed.vue';
 import AnalyticsTabs from './components/AnalyticsTabs.vue';
 import TrendChart from './components/TrendChart.vue';
@@ -76,6 +76,10 @@ export default defineComponent({
       todaySparkline: [] as number[],
       alertCount: 0,
       alertUnconfirmed: 0,
+      deviceAlertCount: 0,
+      driverAlertCount: 0,
+      deviceUnconfirmed: 0,
+      driverUnconfirmed: 0,
       driverSparkline: [] as number[],
       deviceSparkline: [] as number[],
       pointSparkline: [] as number[],
@@ -127,6 +131,10 @@ export default defineComponent({
         const res: any = await alertStats();
         state.alertCount = res?.data?.total ?? 0;
         state.alertUnconfirmed = res?.data?.unconfirmed ?? 0;
+        state.deviceAlertCount = res?.data?.deviceAlerts ?? 0;
+        state.driverAlertCount = res?.data?.driverAlerts ?? 0;
+        state.deviceUnconfirmed = res?.data?.deviceUnconfirmed ?? 0;
+        state.driverUnconfirmed = res?.data?.driverUnconfirmed ?? 0;
         state.alertSparkline = Array.isArray(res?.data?.sparkline24h) ? res.data.sparkline24h.map(Number) : [];
       } catch {
         // handled globally
@@ -173,6 +181,16 @@ export default defineComponent({
     };
     const refreshAlert = loadAlerts;
 
+    const sparkTrend = (spark: number[]): { direction: 'up' | 'down' | 'flat'; label: string } | null => {
+      if (spark.length < 2) return null;
+      const prev = spark[spark.length - 2] ?? 0;
+      const curr = spark[spark.length - 1] ?? 0;
+      const diff = curr - prev;
+      if (diff > 0) return { direction: 'up', label: `+${diff}` };
+      if (diff < 0) return { direction: 'down', label: `${diff}` };
+      return { direction: 'flat', label: '0' };
+    };
+
     const cards = computed<CardModel[]>(() => [
       {
         key: 'driver',
@@ -181,7 +199,7 @@ export default defineComponent({
         subtitle: '',
         icon: Promotion,
         tone: 'blue',
-        trend: null,
+        trend: sparkTrend(state.driverSparkline),
         sparkline: state.driverSparkline,
         onClick: () => router.push({ name: 'driver' }),
         onRefresh: refreshDriver,
@@ -193,7 +211,7 @@ export default defineComponent({
         subtitle: '',
         icon: Management,
         tone: 'purple',
-        trend: null,
+        trend: sparkTrend(state.deviceSparkline),
         sparkline: state.deviceSparkline,
         onClick: () => router.push({ name: 'device' }),
         onRefresh: refreshDevice,
@@ -205,7 +223,7 @@ export default defineComponent({
         subtitle: '',
         icon: List,
         tone: 'orange',
-        trend: null,
+        trend: sparkTrend(state.pointSparkline),
         sparkline: state.pointSparkline,
         onClick: () => router.push({ name: 'profile' }),
         onRefresh: refreshPoint,
@@ -225,15 +243,25 @@ export default defineComponent({
       {
         key: 'alert',
         title: t('home.alerts'),
-        value: state.alertCount,
-        subtitle: state.alertUnconfirmed > 0 ? t('home.alertUnconfirmed', { n: state.alertUnconfirmed }) : '',
+        value: state.driverAlertCount,
+        subtitle: state.driverUnconfirmed > 0 ? t('home.alertUnconfirmed', { n: state.driverUnconfirmed }) : '',
         icon: Bell,
         tone: 'red',
-        trend: null,
+        trend: sparkTrend(state.alertSparkline),
         sparkline: state.alertSparkline,
-        onClick: () => {
-          // Alerts are shown inline in the AlertList panel below; nothing to navigate yet.
-        },
+        onClick: () => router.push({ name: 'settingsDriverEvent' }),
+        onRefresh: refreshAlert,
+      },
+      {
+        key: 'deviceAlert',
+        title: t('home.deviceAlerts'),
+        value: state.deviceAlertCount,
+        subtitle: state.deviceUnconfirmed > 0 ? t('home.alertUnconfirmed', { n: state.deviceUnconfirmed }) : '',
+        icon: Warning,
+        tone: 'orange',
+        trend: sparkTrend(state.alertSparkline),
+        sparkline: state.alertSparkline,
+        onClick: () => router.push({ name: 'settingsDeviceEvent' }),
         onRefresh: refreshAlert,
       },
     ]);

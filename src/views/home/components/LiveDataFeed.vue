@@ -39,24 +39,32 @@
       <div v-if="!loading && rows.length === 0" class="live-feed__empty">
         <el-empty :description="$t('home.liveFeed.empty')" :image-size="80" />
       </div>
-      <div v-for="row in rows" :key="rowKey(row)" class="live-feed__row">
-        <div class="live-feed__tag" :class="`live-feed__tag--${row.valueType?.toLowerCase() || 'string'}`">
-          {{ row.valueType || 'STR' }}
-        </div>
-        <div class="live-feed__main">
-          <div class="live-feed__line">
-            <span class="live-feed__device">
-              {{ deviceName(row.deviceId) }}
-            </span>
-            <span class="live-feed__sep">·</span>
-            <span class="live-feed__point">{{ pointName(row.pointId) }}</span>
+      <el-timeline v-else>
+        <el-timeline-item
+          v-for="row in rows"
+          :key="rowKey(row)"
+          :timestamp="formatTime(row.createTime)"
+          placement="top"
+          :color="typeColor(row.valueType)"
+        >
+          <div class="live-feed__item">
+            <div class="live-feed__line">
+              <el-tag v-if="driverName(row.driverId)" size="small" type="info" class="live-feed__driver-tag">
+                {{ driverName(row.driverId) }}
+              </el-tag>
+              <span class="live-feed__device">{{ deviceName(row.deviceId) }}</span>
+              <span class="live-feed__sep">/</span>
+              <span class="live-feed__point">{{ pointName(row.pointId) }}</span>
+            </div>
+            <div class="live-feed__value-line">
+              <span class="live-feed__tag" :class="`live-feed__tag--${row.valueType?.toLowerCase() || 'string'}`">
+                {{ row.valueType || 'STR' }}
+              </span>
+              <span class="live-feed__value">{{ row.calValue ?? row.rawValue ?? '-' }}</span>
+            </div>
           </div>
-          <div class="live-feed__sub">
-            <span class="live-feed__value">{{ row.calValue ?? row.rawValue ?? '-' }}</span>
-            <span class="live-feed__time">{{ formatTime(row.createTime) }}</span>
-          </div>
-        </div>
-      </div>
+        </el-timeline-item>
+      </el-timeline>
     </el-scrollbar>
 
     <div class="live-feed__footer">
@@ -73,6 +81,7 @@
 
   import { streamLatest } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
+  import { getDriverByIds } from '@/api/driver';
   import { getPointByIds } from '@/api/point';
 
   interface Row {
@@ -94,6 +103,7 @@
   const lastRefreshed = ref<string>('');
   const intervalMs = ref(0);
   const deviceMap = reactive<Record<string, string>>({});
+  const driverMap = reactive<Record<string, string>>({});
   const pointMap = reactive<Record<string, string>>({});
 
   let timer: ReturnType<typeof setInterval> | null = null;
@@ -115,6 +125,9 @@
 
   const resolveNames = async (batch: Row[]) => {
     const devIds = Array.from(new Set(batch.map((r) => String(r.deviceId)).filter((id) => id && !deviceMap[id])));
+    const driverIds = Array.from(
+      new Set(batch.map((r) => String(r.driverId)).filter((id) => id && id !== '0' && !driverMap[id]))
+    );
     const pointIds = Array.from(new Set(batch.map((r) => String(r.pointId)).filter((id) => id && !pointMap[id])));
     const jobs: Promise<void>[] = [];
     if (devIds.length) {
@@ -124,6 +137,18 @@
             const data = r?.data || {};
             for (const id of devIds) {
               if (data[id]) deviceMap[id] = data[id].deviceName || id;
+            }
+          })
+          .catch(() => {})
+      );
+    }
+    if (driverIds.length) {
+      jobs.push(
+        getDriverByIds(driverIds)
+          .then((r: any) => {
+            const data = r?.data || {};
+            for (const id of driverIds) {
+              if (data[id]) driverMap[id] = data[id].driverName || id;
             }
           })
           .catch(() => {})
@@ -145,6 +170,10 @@
   };
 
   const deviceName = (id: Row['deviceId']) => deviceMap[String(id)] || String(id);
+  const driverName = (id?: Row['driverId']) => {
+    if (!id || String(id) === '0') return '';
+    return driverMap[String(id)] || '';
+  };
   const pointName = (id: Row['pointId']) => pointMap[String(id)] || String(id);
 
   const rowKey = (r: Row) => `${r.deviceId}-${r.pointId}-${r.createTime}`;
@@ -154,6 +183,15 @@
     const d = typeof v === 'string' ? new Date(v.replace(' ', 'T')) : v;
     if (Number.isNaN(d.getTime())) return String(v);
     return d.toLocaleTimeString('zh-CN', { hour12: false });
+  };
+
+  const typeColor = (vt?: string) => {
+    const t = (vt || '').toLowerCase();
+    if (t === 'int' || t === 'long') return '#409eff';
+    if (t === 'float' || t === 'double') return '#67c23a';
+    if (t === 'bool') return '#e6a23c';
+    if (t === 'json') return '#9059f6';
+    return '#909399';
   };
 
   watch(intervalMs, (ms) => {
@@ -203,25 +241,61 @@
       gap: 8px;
     }
 
-    .live-feed__row {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--el-border-color-lighter);
+    :deep(.el-timeline) {
+      padding: 8px 16px 0;
+    }
 
-      &:last-child {
-        border-bottom: 0;
-      }
+    :deep(.el-timeline-item__wrapper) {
+      padding-left: 16px;
+    }
+
+    :deep(.el-timeline-item__timestamp) {
+      font-size: 11px;
+    }
+
+    .live-feed__item {
+      padding-bottom: 4px;
+    }
+
+    .live-feed__line {
+      font-size: 13px;
+      color: #303133;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .live-feed__driver-tag {
+      flex-shrink: 0;
+    }
+
+    .live-feed__device {
+      font-weight: 600;
+    }
+
+    .live-feed__sep {
+      color: #c0c4cc;
+    }
+
+    .live-feed__point {
+      color: #606266;
+    }
+
+    .live-feed__value-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
     }
 
     .live-feed__tag {
       font-size: 10px;
       font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #ecf5ff;
-      color: #409eff;
+      padding: 1px 5px;
+      border-radius: 3px;
       white-space: nowrap;
 
       &--int,
@@ -244,45 +318,11 @@
       }
     }
 
-    .live-feed__main {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .live-feed__line {
-      font-size: 13px;
-      color: #303133;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .live-feed__device {
-      font-weight: 600;
-    }
-
-    .live-feed__sep {
-      margin: 0 4px;
-      color: #c0c4cc;
-    }
-
-    .live-feed__point {
-      color: #606266;
-    }
-
-    .live-feed__sub {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      color: #909399;
-      margin-top: 2px;
-    }
-
     .live-feed__value {
       font-family: 'Menlo', monospace;
       color: #303133;
       font-weight: 500;
+      font-size: 12px;
     }
 
     .live-feed__empty {

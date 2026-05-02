@@ -106,8 +106,8 @@
     loading.value = true;
     try {
       const [s, l]: any = await Promise.all([alertStats(), alertLatest(props.size)]);
-      stats.total = s?.data?.total ?? 0;
-      stats.unconfirmed = s?.data?.unconfirmed ?? 0;
+      stats.total = (s?.data?.driverAlerts ?? 0) + (s?.data?.deviceAlerts ?? 0);
+      stats.unconfirmed = (s?.data?.driverUnconfirmed ?? 0) + (s?.data?.deviceUnconfirmed ?? 0);
       const data: AlertRow[] = l?.data ?? [];
       rows.value = data;
       await resolveNames(data);

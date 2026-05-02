@@ -23,7 +23,7 @@
       </el-col>
     </el-row>
 
-    <!-- Row 1: 5 indicator cards, always 5-wide via CSS grid -->
+    <!-- Row 1: 6 indicator cards, always 6-wide via CSS grid -->
     <div class="home__stats">
       <stat-card
         v-for="c in cards"
@@ -81,6 +81,10 @@
     .home__row {
       margin-bottom: 12px;
 
+      &:first-child {
+        margin-bottom: 4px;
+      }
+
       &:last-child {
         margin-bottom: 0;
       }
@@ -96,12 +100,12 @@
     // their minimum usable width.
     .home__stats {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 12px;
 
       @media (max-width: 1280px) {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
       @media (max-width: 640px) {
