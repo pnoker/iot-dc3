@@ -19,24 +19,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.common.data.mapper.AlertMapper">
 
+    <!--
+        Alert stat queries count only ALARM rows (event_type_flag = 2).
+        HEARTBEAT (0) and WARN (1) are not "alerts" and are excluded from
+        the home-page stat cards, sparkline, and badge.
+    -->
+
     <select id="countAll" resultType="map">
         SELECT (SELECT COUNT(*)
                 FROM dc3_device_event
                 WHERE deleted = 0
-                  AND tenant_id = #{tenantId})
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag = 2)
                    + (SELECT COUNT(*)
                       FROM dc3_driver_event
                       WHERE deleted = 0
-                        AND tenant_id = #{tenantId}) AS total,
+                        AND tenant_id = #{tenantId}
+                        AND event_type_flag = 2) AS total,
                (SELECT COUNT(*)
                 FROM dc3_device_event
                 WHERE deleted = 0
                   AND tenant_id = #{tenantId}
+                  AND event_type_flag = 2
                   AND confirm_flag = 0)
                    + (SELECT COUNT(*)
                       FROM dc3_driver_event
                       WHERE deleted = 0
                         AND tenant_id = #{tenantId}
+                        AND event_type_flag = 2
                         AND confirm_flag = 0)        AS unconfirmed
     </select>
 
@@ -45,22 +55,26 @@
                (SELECT COUNT(*)
                 FROM dc3_device_event
                 WHERE deleted = 0
-                  AND tenant_id = #{tenantId}) AS total,
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag = 2) AS total,
                (SELECT COUNT(*)
                 FROM dc3_device_event
                 WHERE deleted = 0
                   AND tenant_id = #{tenantId}
+                  AND event_type_flag = 2
                   AND confirm_flag = 0)        AS unconfirmed
         UNION ALL
         SELECT 'driver'                        AS source,
                (SELECT COUNT(*)
                 FROM dc3_driver_event
                 WHERE deleted = 0
-                  AND tenant_id = #{tenantId}) AS total,
+                  AND tenant_id = #{tenantId}
+                  AND event_type_flag = 2) AS total,
                (SELECT COUNT(*)
                 FROM dc3_driver_event
                 WHERE deleted = 0
                   AND tenant_id = #{tenantId}
+                  AND event_type_flag = 2
                   AND confirm_flag = 0)        AS unconfirmed
     </select>
 
@@ -68,10 +82,10 @@
         SELECT event_type_flag::text AS key, COUNT(*) AS count
         FROM (
             SELECT event_type_flag FROM dc3_device_event
-            WHERE deleted = 0 AND tenant_id = #{tenantId}
+            WHERE deleted = 0 AND tenant_id = #{tenantId} AND event_type_flag = 2
             UNION ALL
             SELECT event_type_flag FROM dc3_driver_event
-            WHERE deleted = 0 AND tenant_id = #{tenantId}
+            WHERE deleted = 0 AND tenant_id = #{tenantId} AND event_type_flag = 2
             ) merged
         GROUP BY event_type_flag
         ORDER BY count
@@ -97,6 +111,7 @@
                FROM dc3_device_event
                WHERE deleted = 0
                  AND tenant_id = #{tenantId}
+                 AND event_type_flag = 2
                ORDER BY create_time DESC
                LIMIT #{limit})
               UNION ALL
@@ -111,6 +126,7 @@
                FROM dc3_driver_event
                WHERE deleted = 0
                  AND tenant_id = #{tenantId}
+                 AND event_type_flag = 2
                ORDER BY create_time DESC
                LIMIT #{limit})) unioned
         ORDER BY create_time DESC
@@ -137,12 +153,14 @@
               FROM dc3_device_event
               WHERE deleted = 0
                 AND tenant_id = #{tenantId}
+                AND event_type_flag = 2
                 AND create_time &gt;= #{from}
               UNION ALL
               SELECT create_time
               FROM dc3_driver_event
               WHERE deleted = 0
                 AND tenant_id = #{tenantId}
+                AND event_type_flag = 2
                 AND create_time &gt;= #{from}) merged
         GROUP BY bucket
         ORDER BY bucket ASC
