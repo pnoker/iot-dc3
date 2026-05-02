@@ -87,6 +87,12 @@ public class DeviceEventDO implements Serializable {
     private Byte confirmFlag;
 
     /**
+     * Tenant ID
+     */
+    @TableField("tenant_id")
+    private Long tenantId;
+
+    /**
      * Create Time
      */
     @TableField("create_time")
