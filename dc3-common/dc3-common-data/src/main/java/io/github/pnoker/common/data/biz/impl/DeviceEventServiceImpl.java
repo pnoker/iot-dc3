@@ -79,10 +79,11 @@ public class DeviceEventServiceImpl implements DeviceEventService {
         String current = payload.getStatus().getCode();
 
         // Refresh the online-status cache so the dashboard's "online" badge reacts immediately.
+        // Heartbeats do NOT write to dc3_device_event any more — they'd flood the table at
+        // the heartbeat rate (potentially per-second per device). The cache entry alone is
+        // enough to drive the online badge, and an ALARM row is still persisted on a real
+        // state flip below.
         localCacheService.setKey(statusKey, current, payload.getTimeOut(), payload.getTimeUnit());
-
-        // Persist one HEARTBEAT row for audit.
-        persist(payload, DeviceEventTypeEnum.HEARTBEAT, "device-heartbeat", entityDTO.getContent());
 
         // Derive an ALARM row on state flips so operators see transitions in the alert list.
         if (prev != null && !Objects.equals(prev, current) && isFlip(prev, current)) {

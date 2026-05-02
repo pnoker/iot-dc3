@@ -78,8 +78,10 @@ public class DriverEventServiceImpl implements DriverEventService {
 
         localCacheService.setKey(statusKey, current, STATUS_TTL_SECONDS, TimeUnit.SECONDS);
 
-        persist(payload, DriverEventTypeEnum.HEARTBEAT, "driver-heartbeat", entityDTO.getContent());
-
+        // Heartbeats no longer write to dc3_driver_event every tick — the cache TTL is the
+        // source of truth for "is the driver alive". An ALARM row lands on actual state
+        // flips below, and the matching removal hook (see OfflineExpiryListener) lands one
+        // when the TTL elapses without a fresh heartbeat.
         if (prev != null && !Objects.equals(prev, current) && isFlip(prev, current)) {
             String message = String.format("Driver status changed: %s -> %s", prev, current);
             persist(payload, DriverEventTypeEnum.ALARM, "driver-state-flip", message);
