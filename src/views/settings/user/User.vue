@@ -75,6 +75,6 @@
 
 <style lang="scss" scoped>
   .settings-table {
-    border-radius: 4px;
+    border-radius: 10px;
   }
 </style>

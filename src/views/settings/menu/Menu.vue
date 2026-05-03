@@ -91,7 +91,7 @@
 <style lang="scss" scoped>
   .settings-table {
     margin-top: 1px;
-    border-radius: 4px;
+    border-radius: 10px;
   }
 
   .menu-icon-cell {
