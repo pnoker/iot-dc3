@@ -32,35 +32,33 @@
       </div>
     </template>
 
-    <!-- `max-height` instead of `height`: when the list has ≤ a few
-         rows the scrollbar wrapper shrinks to fit the content so
-         wheel events bubble up to the outer <el-main>, keeping the
-         page scrollable. Once the list grows past the cap the
-         scrollbar kicks in and confines scrolling to the card. -->
-    <el-scrollbar :max-height="maxHeight">
-      <div v-if="!loading && rows.length === 0" class="recent-unconfirmed__empty">
-        <el-empty :description="$t('settings.event.overview.noUnconfirmed')" :image-size="60" />
-      </div>
-      <el-timeline v-else class="recent-unconfirmed__timeline">
-        <el-timeline-item
-          v-for="row in rows"
-          :key="`${row.source}:${row.id}`"
-          :timestamp="formatTime(row.createTime)"
-          :color="row.source === 'device' ? '#409eff' : '#e6a23c'"
-          placement="top"
-        >
-          <div class="recent-unconfirmed__item">
-            <div class="recent-unconfirmed__line">
-              <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
-                {{ row.source === 'device' ? $t('settings.event.device') : $t('settings.event.driver') }}
-              </el-tag>
-              <span class="recent-unconfirmed__name">{{ nameFor(row) }}</span>
-            </div>
-            <div v-if="row.message" class="recent-unconfirmed__message" :title="row.message">{{ row.message }}</div>
+    <!-- Flat list, no inner scrollable. A nested el-scrollbar would swallow
+         wheel events whenever the cursor hovered this card, locking the
+         page-level Layout scrollbar. Paired with a server-side size cap
+         (5) so five timeline items fit comfortably inside the diag-grid
+         min-height of 320px without needing an internal scrollbar. -->
+    <div v-if="!loading && rows.length === 0" class="recent-unconfirmed__empty">
+      <el-empty :description="$t('settings.event.overview.noUnconfirmed')" :image-size="60" />
+    </div>
+    <el-timeline v-else class="recent-unconfirmed__timeline">
+      <el-timeline-item
+        v-for="row in rows"
+        :key="`${row.source}:${row.id}`"
+        :timestamp="formatTime(row.createTime)"
+        :color="row.source === 'device' ? '#409eff' : '#e6a23c'"
+        placement="top"
+      >
+        <div class="recent-unconfirmed__item">
+          <div class="recent-unconfirmed__line">
+            <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
+              {{ row.source === 'device' ? $t('settings.event.device') : $t('settings.event.driver') }}
+            </el-tag>
+            <span class="recent-unconfirmed__name">{{ nameFor(row) }}</span>
           </div>
-        </el-timeline-item>
-      </el-timeline>
-    </el-scrollbar>
+          <div v-if="row.message" class="recent-unconfirmed__message" :title="row.message">{{ row.message }}</div>
+        </div>
+      </el-timeline-item>
+    </el-timeline>
   </el-card>
 </template>
 
@@ -80,15 +78,6 @@
     message?: string;
   }
 
-  withDefaults(
-    defineProps<{
-      maxHeight?: string;
-    }>(),
-    {
-      maxHeight: '320px',
-    }
-  );
-
   const loading = ref(false);
   const rows = ref<Row[]>([]);
   const nameMap = reactive<Record<string, string>>({});
@@ -96,7 +85,10 @@
   const load = async () => {
     loading.value = true;
     try {
-      const res: { data?: { records?: Row[] } } = await alertPage({ confirmFlag: 0, current: 1, size: 10 });
+      // Size capped at 5 so the rendered timeline never exceeds the card's
+      // natural height — no internal scrollbar needed, no wheel contention
+      // with the page scrollbar above.
+      const res: { data?: { records?: Row[] } } = await alertPage({ confirmFlag: 0, current: 1, size: 5 });
       const data: Row[] = res?.data?.records ?? [];
       rows.value = data;
       await resolveNames(data);
