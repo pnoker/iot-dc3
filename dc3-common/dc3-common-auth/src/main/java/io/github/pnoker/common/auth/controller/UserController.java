@@ -59,14 +59,20 @@ public class UserController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {
-        try {
-            UserBO entityBO = userBuilder.buildBOByVO(entityVO);
-            userService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getUserHeader().flatMap(header -> {
+            try {
+                UserBO entityBO = userBuilder.buildBOByVO(entityVO);
+                entityBO.setCreatorId(header.getUserId());
+                entityBO.setCreatorName(header.getNickName());
+                entityBO.setOperatorId(header.getUserId());
+                entityBO.setOperatorName(header.getNickName());
+                userService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     @PostMapping("/delete/{id}")
@@ -82,14 +88,18 @@ public class UserController implements BaseController {
 
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserVO entityVO) {
-        try {
-            UserBO entityBO = userBuilder.buildBOByVO(entityVO);
-            userService.update(entityBO);
-            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getUserHeader().flatMap(header -> {
+            try {
+                UserBO entityBO = userBuilder.buildBOByVO(entityVO);
+                entityBO.setOperatorId(header.getUserId());
+                entityBO.setOperatorName(header.getNickName());
+                userService.update(entityBO);
+                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     @GetMapping("/id/{id}")

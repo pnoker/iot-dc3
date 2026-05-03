@@ -59,10 +59,14 @@ public class RoleController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
+        return getUserHeader().flatMap(header -> {
             try {
                 RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
+                entityBO.setTenantId(header.getTenantId());
+                entityBO.setCreatorId(header.getUserId());
+                entityBO.setCreatorName(header.getNickName());
+                entityBO.setOperatorId(header.getUserId());
+                entityBO.setOperatorName(header.getNickName());
                 roleService.save(entityBO);
                 return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
             } catch (Exception e) {
@@ -85,10 +89,12 @@ public class RoleController implements BaseController {
 
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody RoleVO entityVO) {
-        return getTenantId().flatMap(tenantId -> {
+        return getUserHeader().flatMap(header -> {
             try {
                 RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
-                entityBO.setTenantId(tenantId);
+                entityBO.setTenantId(header.getTenantId());
+                entityBO.setOperatorId(header.getUserId());
+                entityBO.setOperatorName(header.getNickName());
                 roleService.update(entityBO);
                 return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
             } catch (Exception e) {
