@@ -81,10 +81,6 @@
     .home__row {
       margin-bottom: 12px;
 
-      &:first-child {
-        margin-bottom: 4px;
-      }
-
       &:last-child {
         margin-bottom: 0;
       }
