@@ -49,10 +49,10 @@
                 {{ reactiveData.data.remark || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')">
-                {{ reactiveData.data.createTime }}
+                {{ reactiveData.data.createTime ? timestamp(reactiveData.data.createTime) : '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')">
-                {{ reactiveData.data.operateTime }}
+                {{ reactiveData.data.operateTime ? timestamp(reactiveData.data.operateTime) : '-' }}
               </el-descriptions-item>
             </el-descriptions>
           </detail-card>
@@ -67,6 +67,7 @@
   import { useRoute } from 'vue-router';
 
   import { getRoleById } from '@/api/role';
+  import { timestamp } from '@/utils/DateUtil';
 
   import baseCard from '@/components/card/base/BaseCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';

@@ -23,6 +23,7 @@ import { getDriverByIds } from '@/api/driver';
 import { getDeviceByIds } from '@/api/device';
 import { getPointByIds } from '@/api/point';
 import { getProfileByIds } from '@/api/profile';
+import { timestampColumn } from '@/utils/DateUtil';
 import { successMessage } from '@/utils/NotificationUtil';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
@@ -265,6 +266,7 @@ export default defineComponent({
       remove,
       sizeChange,
       currentChange,
+      timestampColumn,
     };
   },
 });

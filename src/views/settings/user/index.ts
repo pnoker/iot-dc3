@@ -20,6 +20,7 @@ import { useRouter } from 'vue-router';
 
 import { addUser, deleteUser, getUserList, updateUser } from '@/api/user';
 import { bindRoleUser, unbindRoleUser } from '@/api/roleUserBind';
+import { timestampColumn } from '@/utils/DateUtil';
 import { successMessage } from '@/utils/NotificationUtil';
 
 import type { Order } from '@/config/entity';
@@ -181,6 +182,7 @@ export default defineComponent({
       remove,
       sizeChange,
       currentChange,
+      timestampColumn,
     };
   },
 });

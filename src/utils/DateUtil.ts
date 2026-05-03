@@ -25,6 +25,18 @@ export const timestamp = (timestamp: string): string => {
 };
 
 /**
+ * el-table-column formatter that renders a timestamp cell in the same
+ * `yyyy-MM-dd hh:mm:ss` shape the rest of the app uses (driver card /
+ * detail). Used as `:formatter="timestampColumn"` on a column whose
+ * {@code prop} already points at the ISO string. Blank cells fall
+ * through as empty strings so the table does not display "Invalid Date".
+ */
+export const timestampColumn = (_row: unknown, _col: unknown, cellValue: unknown): string => {
+  if (cellValue == null || cellValue === '') return '';
+  return timestamp(String(cellValue));
+};
+
+/**
  * Format date to string
  *
  * @param date Date object or string

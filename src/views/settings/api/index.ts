@@ -19,6 +19,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import { addApi, deleteApi, getApiList, updateApi } from '@/api/api';
+import { timestampColumn } from '@/utils/DateUtil';
 import { successMessage } from '@/utils/NotificationUtil';
 
 import type { Order } from '@/config/entity';
@@ -160,6 +161,7 @@ export default defineComponent({
       remove,
       sizeChange,
       currentChange,
+      timestampColumn,
     };
   },
 });

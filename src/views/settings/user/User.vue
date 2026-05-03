@@ -40,7 +40,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.createTime')" prop="createTime" width="180" />
+        <el-table-column :label="t('common.createTime')" prop="createTime" :formatter="timestampColumn" width="180" />
         <el-table-column :label="t('common.operation')" fixed="right" width="320">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
