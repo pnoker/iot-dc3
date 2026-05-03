@@ -134,6 +134,14 @@ export default {
     driverAlarms: "Today's Driver Alarms",
     alertUnconfirmed: '{n} unconfirmed',
     deviceAlarms: "Today's Device Alarms",
+    // Subtitles — second data point tied to each card's primary metric so
+    // the number never stands alone. Mirrors the event overview layout:
+    //   entity cards → "N cumulative alarms on this fleet"
+    //   point card → "spread across N profiles"
+    //   today data → "N cumulative" (already defined as todayTotal)
+    //   today alarm cards → "N unconfirmed" (alertUnconfirmed)
+    entityAlarms: '{n} cumulative alarms',
+    pointsAcrossProfiles: 'across {n} profiles',
     vsYesterday: 'vs yesterday',
     trendTitle: 'Data Ingestion Trend',
     liveFeed: {

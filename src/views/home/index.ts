@@ -201,12 +201,19 @@ export default defineComponent({
       return { direction: 'flat', label: '0' };
     };
 
+    // Every card gets a subtitle tied to its primary metric so the number
+    // never stands alone — matches the event-overview layout rhythm:
+    //   entity cards → how many alarms this fleet has accumulated
+    //   point card → how many profiles the points are organised under
+    //   data card → cumulative total (already defined via todayTotal)
+    //   alarm cards → today's unconfirmed count (always shown, even 0, so
+    //                 card heights stay equal across the grid)
     const cards = computed<CardModel[]>(() => [
       {
         key: 'driver',
         title: t('home.driverCount'),
         value: state.driverCount,
-        subtitle: '',
+        subtitle: t('home.entityAlarms', { n: state.driverAlertCount }),
         icon: Promotion,
         tone: 'blue',
         trend: sparkTrend(state.driverSparkline),
@@ -218,7 +225,7 @@ export default defineComponent({
         key: 'device',
         title: t('home.deviceCount'),
         value: state.deviceCount,
-        subtitle: '',
+        subtitle: t('home.entityAlarms', { n: state.deviceAlertCount }),
         icon: Management,
         tone: 'purple',
         trend: sparkTrend(state.deviceSparkline),
@@ -230,7 +237,7 @@ export default defineComponent({
         key: 'point',
         title: t('home.pointCount'),
         value: state.pointCount,
-        subtitle: '',
+        subtitle: t('home.pointsAcrossProfiles', { n: state.profileCount }),
         icon: List,
         tone: 'orange',
         trend: sparkTrend(state.pointSparkline),
@@ -254,8 +261,7 @@ export default defineComponent({
         key: 'alert',
         title: t('home.driverAlarms'),
         value: state.todayDriverAlarms,
-        subtitle:
-          state.todayDriverUnconfirmed > 0 ? t('home.alertUnconfirmed', { n: state.todayDriverUnconfirmed }) : '',
+        subtitle: t('home.alertUnconfirmed', { n: state.todayDriverUnconfirmed }),
         icon: Bell,
         tone: 'red',
         trend: sparkTrend(state.alertSparkline),
@@ -267,8 +273,7 @@ export default defineComponent({
         key: 'deviceAlert',
         title: t('home.deviceAlarms'),
         value: state.todayDeviceAlarms,
-        subtitle:
-          state.todayDeviceUnconfirmed > 0 ? t('home.alertUnconfirmed', { n: state.todayDeviceUnconfirmed }) : '',
+        subtitle: t('home.alertUnconfirmed', { n: state.todayDeviceUnconfirmed }),
         icon: Warning,
         tone: 'orange',
         trend: sparkTrend(state.alertSparkline),

@@ -134,6 +134,13 @@ export default {
     driverAlarms: '今日驱动告警',
     alertUnconfirmed: '未处理 {n} 条',
     deviceAlarms: '今日设备告警',
+    // 每张卡 subtitle 补充同数据域的另一面信息,和事件概览保持一致的排版节奏:
+    //   实体卡 → 累计告警数
+    //   位号卡 → 分布于多少模板
+    //   今日数据 → 累计条数(todayTotal 已有)
+    //   今日告警 → 未处理数(alertUnconfirmed 已有)
+    entityAlarms: '累计告警 {n} 条',
+    pointsAcrossProfiles: '分布于 {n} 个模板',
     vsYesterday: '较昨日',
     trendTitle: '数据采集趋势',
     liveFeed: {
