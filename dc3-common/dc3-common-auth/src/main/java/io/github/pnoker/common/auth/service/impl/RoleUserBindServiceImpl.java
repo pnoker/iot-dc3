@@ -22,12 +22,16 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.dal.RoleManager;
 import io.github.pnoker.common.auth.dal.RoleUserBindManager;
+import io.github.pnoker.common.auth.dal.UserManager;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleUserBindBO;
+import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.common.auth.entity.builder.RoleUserBindBuilder;
+import io.github.pnoker.common.auth.entity.builder.UserBuilder;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
 import io.github.pnoker.common.auth.entity.model.RoleUserBindDO;
+import io.github.pnoker.common.auth.entity.model.UserDO;
 import io.github.pnoker.common.auth.entity.query.RoleUserBindQuery;
 import io.github.pnoker.common.auth.service.RoleUserBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -41,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,12 +62,17 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
     private RoleUserBindBuilder roleUserBindBuilder;
     @Resource
     private RoleBuilder roleBuilder;
+    @Resource
+    private UserBuilder userBuilder;
 
     @Resource
     private RoleUserBindManager roleUserBindManager;
 
     @Resource
     private RoleManager roleManager;
+
+    @Resource
+    private UserManager userManager;
 
 
     @Override
@@ -115,6 +125,24 @@ public class RoleUserBindServiceImpl implements RoleUserBindService {
         }
         Page<RoleUserBindDO> entityPageDO = roleUserBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery, tenantId));
         return roleUserBindBuilder.buildBOPageByDOPage(entityPageDO);
+    }
+
+    @Override
+    public List<UserBO> listUserByRoleId(Long roleId) {
+        if (Objects.isNull(roleId)) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<RoleUserBindDO> wrapper = Wrappers.<RoleUserBindDO>query().lambda();
+        wrapper.eq(RoleUserBindDO::getRoleId, roleId);
+        wrapper.select(RoleUserBindDO::getUserId);
+        List<Long> userIds = roleUserBindManager.listObjs(wrapper, o -> (Long) o);
+        if (CollectionUtils.isEmpty(userIds)) {
+            return Collections.emptyList();
+        }
+        List<UserDO> enabled = userManager.listByIds(userIds).stream()
+                .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
+                .toList();
+        return userBuilder.buildBOListByDOList(enabled);
     }
 
     @Override

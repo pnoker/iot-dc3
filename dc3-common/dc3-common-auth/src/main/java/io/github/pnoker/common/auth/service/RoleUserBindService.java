@@ -20,6 +20,7 @@ package io.github.pnoker.common.auth.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleUserBindBO;
+import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.query.RoleUserBindQuery;
 import io.github.pnoker.common.base.service.BaseService;
 
@@ -51,4 +52,14 @@ public interface RoleUserBindService extends BaseService<RoleUserBindBO, RoleUse
      * @return Role list
      */
     List<RoleBO> listRoleByTenantIdAndUserId(Long tenantId, Long userId);
+
+    /**
+     * List enabled users bound to the given role. Mirror of
+     * {@link #listRoleByTenantIdAndUserId}: look up user_ids via
+     * dc3_role_user_bind, then fetch + enable-filter users.
+     *
+     * @param roleId role scope
+     * @return users bound to the role; empty list if none
+     */
+    List<UserBO> listUserByRoleId(Long roleId);
 }

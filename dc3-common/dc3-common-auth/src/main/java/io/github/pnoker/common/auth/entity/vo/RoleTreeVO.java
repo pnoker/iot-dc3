@@ -15,30 +15,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.auth.service;
+package io.github.pnoker.common.auth.entity.vo;
 
-import io.github.pnoker.common.auth.entity.bo.RoleBO;
-import io.github.pnoker.common.auth.entity.bo.RoleTreeBO;
-import io.github.pnoker.common.auth.entity.query.RoleQuery;
-import io.github.pnoker.common.base.service.BaseService;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Role Interface
+ * Tree-shaped variant of {@link RoleVO} — adds nested children so the
+ * frontend's el-tree-select can render the role hierarchy from a single
+ * response.
  *
  * @author pnoker
- * @version 2025.9.0
- * @since 2022.1.0
+ * @version 2026.4.30
+ * @since 2026.4.30
  */
-public interface RoleService extends BaseService<RoleBO, RoleQuery> {
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+public class RoleTreeVO extends RoleVO {
 
-    /**
-     * Assemble the tenant's role hierarchy as a single nested tree. Top-level
-     * roles (parent_role_id == 0 or null) land at the root.
-     *
-     * @param entityQuery optional filters (tenantId is populated by the controller)
-     * @return root nodes, each node carrying its children
-     */
-    List<RoleTreeBO> selectTree(RoleQuery entityQuery);
+    private List<RoleTreeVO> children = new ArrayList<>();
 }

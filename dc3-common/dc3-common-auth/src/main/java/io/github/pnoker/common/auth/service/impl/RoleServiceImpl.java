@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.dal.RoleManager;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
+import io.github.pnoker.common.auth.entity.bo.RoleTreeBO;
 import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
 import io.github.pnoker.common.auth.entity.query.RoleQuery;
@@ -35,7 +36,13 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -113,6 +120,55 @@ public class RoleServiceImpl implements RoleService {
         }
         Page<RoleDO> entityPageDO = roleManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
         return roleBuilder.buildBOPageByDOPage(entityPageDO);
+    }
+
+    @Override
+    public List<RoleTreeBO> selectTree(RoleQuery entityQuery) {
+        RoleQuery effective = Objects.requireNonNullElseGet(entityQuery, RoleQuery::new);
+        List<RoleDO> rows = roleManager.list(fuzzyQuery(effective));
+        return assembleTree(rows);
+    }
+
+    /**
+     * Build the role hierarchy from a flat list of DOs. Roles with
+     * {@code parent_role_id} null or 0 become roots; children are linked by
+     * their {@code parent_role_id}, and each level is ordered by role name.
+     */
+    private List<RoleTreeBO> assembleTree(List<RoleDO> rows) {
+        if (CollectionUtils.isEmpty(rows)) {
+            return new ArrayList<>();
+        }
+        Map<Long, RoleTreeBO> byId = new HashMap<>(rows.size());
+        Map<Long, Long> parentByChild = new HashMap<>(rows.size());
+        for (RoleDO row : rows) {
+            RoleTreeBO node = RoleTreeBO.fromBO(roleBuilder.buildBOByDO(row));
+            byId.put(row.getId(), node);
+            parentByChild.put(row.getId(), row.getParentRoleId());
+        }
+        List<RoleTreeBO> roots = new ArrayList<>();
+        for (Map.Entry<Long, RoleTreeBO> e : byId.entrySet()) {
+            Long parentId = parentByChild.get(e.getKey());
+            RoleTreeBO parent = parentId == null || parentId == 0L ? null : byId.get(parentId);
+            if (parent == null) {
+                roots.add(e.getValue());
+            } else {
+                parent.addChild(e.getValue());
+            }
+        }
+        Comparator<RoleTreeBO> order = Comparator.comparing(
+                RoleTreeBO::getRoleName, Comparator.nullsLast(Comparator.naturalOrder()));
+        sortRecursive(roots, order);
+        return roots;
+    }
+
+    private void sortRecursive(List<RoleTreeBO> nodes, Comparator<RoleTreeBO> order) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return;
+        }
+        nodes.sort(order);
+        for (RoleTreeBO node : nodes) {
+            sortRecursive(node.getChildren(), order);
+        }
     }
 
     /**
