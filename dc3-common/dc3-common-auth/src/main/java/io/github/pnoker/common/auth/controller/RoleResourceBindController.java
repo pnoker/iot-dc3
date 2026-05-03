@@ -19,12 +19,15 @@ package io.github.pnoker.common.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
+import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.auth.entity.builder.ResourceBuilder;
+import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.common.auth.entity.builder.RoleResourceBindBuilder;
 import io.github.pnoker.common.auth.entity.query.RoleResourceBindQuery;
 import io.github.pnoker.common.auth.entity.vo.ResourceVO;
 import io.github.pnoker.common.auth.entity.vo.RoleResourceBindVO;
+import io.github.pnoker.common.auth.entity.vo.RoleVO;
 import io.github.pnoker.common.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
@@ -55,13 +58,16 @@ public class RoleResourceBindController implements BaseController {
     private final RoleResourceBindBuilder roleResourceBindBuilder;
     private final RoleResourceBindService roleResourceBindService;
     private final ResourceBuilder resourceBuilder;
+    private final RoleBuilder roleBuilder;
 
     public RoleResourceBindController(RoleResourceBindBuilder roleResourceBindBuilder,
                                       RoleResourceBindService roleResourceBindService,
-                                      ResourceBuilder resourceBuilder) {
+                                      ResourceBuilder resourceBuilder,
+                                      RoleBuilder roleBuilder) {
         this.roleResourceBindBuilder = roleResourceBindBuilder;
         this.roleResourceBindService = roleResourceBindService;
         this.resourceBuilder = resourceBuilder;
+        this.roleBuilder = roleBuilder;
     }
 
     @PostMapping("/add")
@@ -122,6 +128,20 @@ public class RoleResourceBindController implements BaseController {
             try {
                 List<ResourceBO> entityBOList = roleResourceBindService.listResourceByUserId(userId, tenantId);
                 List<ResourceVO> entityVOList = resourceBuilder.buildVOListByBOList(entityBOList);
+                return Mono.just(R.ok(entityVOList));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/list-role-by-resource/{resourceId}")
+    public Mono<R<List<RoleVO>>> listRoleByResource(@NotNull @PathVariable(value = "resourceId") Long resourceId) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                List<RoleBO> entityBOList = roleResourceBindService.listRoleByResourceId(resourceId, tenantId);
+                List<RoleVO> entityVOList = roleBuilder.buildVOListByBOList(entityBOList);
                 return Mono.just(R.ok(entityVOList));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
