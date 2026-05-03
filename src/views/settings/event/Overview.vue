@@ -264,6 +264,12 @@
     display: flex;
     flex-direction: column;
     gap: $overview-gap;
+    // Dashboard-style page (like Home). Match the 4px left breathing
+    // room that .settings-container's gap gives between aside and main
+    // on the right, so the content reads symmetric like a board.
+    // Other settings sub-pages (User / Role / Api / ...) are form/table
+    // views and keep flush-right — only this overview needs the balance.
+    padding-right: 4px;
 
     // el-descriptions already paints the border/background; just round
     // the frame so it matches the rest of the page's cards.
