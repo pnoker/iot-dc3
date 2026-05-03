@@ -28,3 +28,5 @@ export const listRoleByUserId = (userId: string, tenantId?: string | number) => 
   const query = typeof tenantId === 'number' ? `?tenantId=${tenantId}` : '';
   return httpGet(`${API_AUTH_BASE}/role-user/list-role-by-user/${userId}${query}`);
 };
+
+export const listUserByRoleId = (roleId: string) => httpGet(`${API_AUTH_BASE}/role-user/list-user-by-role/${roleId}`);
