@@ -115,7 +115,12 @@
   .about {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    // Stay in sync with Home / Event Overview — 8px rhythm under the
+    // 4px el-card radius, plus a 4px right pad to balance the aside
+    // gap on the left (About is a board-style info page like Overview,
+    // not a form/table like the other settings sub-pages).
+    gap: 8px;
+    padding-right: 4px;
 
     .about__title {
       font-weight: 600;
