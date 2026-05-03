@@ -21,6 +21,23 @@ import { useI18n } from 'vue-i18n';
 
 type FormMode = 'add' | 'edit';
 
+// Ordered so the Parent picker always shows the same type ordering across
+// tenants — missing types are skipped in the computed.
+const TYPE_ORDER = ['MENU', 'API', 'DATA', 'DEVICE', 'POINT', 'PROFILE', 'DRIVER'];
+
+// Flatten the backend resource tree so we can regroup by type.
+const flattenTree = (nodes: any[]): any[] => {
+  const out: any[] = [];
+  const walk = (ns: any[]) => {
+    for (const n of ns || []) {
+      out.push(n);
+      if (n.children) walk(n.children);
+    }
+  };
+  walk(nodes || []);
+  return out;
+};
+
 const createEmptyForm = () => ({
   id: '' as string,
   parentResourceId: 0 as number | string,
@@ -62,11 +79,67 @@ export default defineComponent({
       entityId: [{ required: true, message: t('settings.resource.entityIdPlaceholder'), trigger: 'blur' }],
     };
 
-    // Synthesize a virtual "Root" so top-level resources remain pickable —
-    // same pattern as MenuEditForm / RoleEditForm.
-    const parentTreeOptions = computed(() => [
-      { id: 0, resourceName: t('settings.resource.rootResource'), children: props.treeData || [] },
-    ]);
+    // Parent picker layout: a virtual "Root" (id=0) that commits top-level,
+    // plus one disabled group node per resource type with that type's
+    // resources nested underneath. Mixing all 7 types into one flat tree
+    // made it impossible to tell MENU/API/DATA apart — grouping gives the
+    // same structure the role-assign dialog uses.
+    //
+    // Cross-type parent/child links in the source tree are dropped: a DATA
+    // node parented to a MENU becomes a root inside the DATA group. That
+    // matches the role-assign behavior and keeps each group's hierarchy
+    // to same-type nodes only.
+    const parentTreeOptions = computed(() => {
+      const flat = flattenTree(props.treeData || []);
+      const buckets: Record<string, any[]> = {};
+      for (const n of flat) {
+        const type = String(n.resourceTypeFlag || 'OTHER');
+        if (!buckets[type]) buckets[type] = [];
+        buckets[type].push({
+          id: n.id,
+          parentResourceId: n.parentResourceId,
+          resourceName: n.resourceName,
+          resourceCode: n.resourceCode,
+          resourceTypeFlag: type,
+          children: [],
+        });
+      }
+      const treesByType: Record<string, any[]> = {};
+      for (const [type, nodes] of Object.entries(buckets)) {
+        const byId = new Map<string, any>();
+        for (const n of nodes) byId.set(String(n.id), n);
+        const roots: any[] = [];
+        for (const n of nodes) {
+          const pid = n.parentResourceId != null ? String(n.parentResourceId) : null;
+          const parent = pid && byId.get(pid);
+          if (parent) parent.children.push(n);
+          else roots.push(n);
+        }
+        treesByType[type] = roots;
+      }
+      const present = Object.keys(treesByType);
+      const ordered = TYPE_ORDER.filter((x) => present.includes(x));
+      for (const x of present) if (!ordered.includes(x)) ordered.push(x);
+
+      const groups = ordered.map((type) => ({
+        // Prefix the id so it can't collide with a real BIGINT resource id
+        // coming back from the server. Disabled marks it unselectable — the
+        // user only picks real resources underneath.
+        id: `__group_${type}`,
+        resourceName: type,
+        disabled: true,
+        children: treesByType[type],
+      }));
+      return [{ id: 0, resourceName: t('settings.resource.rootResource') }, ...groups];
+    });
+
+    // Auto-expand all group nodes so resources surface on open. Users
+    // otherwise see a list of seven type folders and have to click each.
+    const defaultExpandedKeys = computed(() => {
+      return (parentTreeOptions.value || [])
+        .filter((n: any) => typeof n.id === 'string' && n.id.startsWith('__group_'))
+        .map((n: any) => n.id);
+    });
 
     const reset = () => {
       reactiveData.form = reactiveData.mode === 'edit' ? { ...reactiveData.originalForm } : createEmptyForm();
@@ -119,6 +192,7 @@ export default defineComponent({
       reactiveData,
       rules,
       parentTreeOptions,
+      defaultExpandedKeys,
       reset,
       show,
       showEdit,

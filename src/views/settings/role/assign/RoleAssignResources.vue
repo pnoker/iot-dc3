@@ -65,7 +65,6 @@
               :props="{ label: 'resourceName', children: 'children' }"
               node-key="id"
               show-checkbox
-              check-strictly
               :filter-node-method="filterNode"
               @check-change="onCheckChange"
             />

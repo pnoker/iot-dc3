@@ -31,10 +31,11 @@
         <el-tree-select
           v-model="reactiveData.form.parentResourceId"
           :data="parentTreeOptions"
-          :props="{ label: 'resourceName', children: 'children' }"
+          :props="{ label: 'resourceName', children: 'children', disabled: 'disabled' }"
           :placeholder="t('settings.resource.parentResourceIdPlaceholder')"
           clearable
           check-strictly
+          :default-expanded-keys="defaultExpandedKeys"
           node-key="id"
         />
       </el-form-item>
