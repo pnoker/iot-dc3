@@ -26,3 +26,5 @@ export const updateRole = (role: any) => httpPost(`${API_AUTH_BASE}/role/update`
 export const getRoleById = (id: string) => httpGet(`${API_AUTH_BASE}/role/id/${id}`);
 
 export const getRoleList = (query: any) => httpPost(`${API_AUTH_BASE}/role/list`, query);
+
+export const getRoleTree = (query: any = {}) => httpPost(`${API_AUTH_BASE}/role/tree`, query);

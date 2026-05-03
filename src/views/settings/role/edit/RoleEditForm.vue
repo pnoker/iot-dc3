@@ -28,10 +28,14 @@
   >
     <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-position="top">
       <el-form-item :label="t('settings.role.parentRoleId')" prop="parentRoleId">
-        <el-input
+        <el-tree-select
           v-model="reactiveData.form.parentRoleId"
-          clearable
+          :data="parentTreeOptions"
+          :props="{ label: 'roleName', children: 'children' }"
           :placeholder="t('settings.role.parentRoleIdPlaceholder')"
+          clearable
+          check-strictly
+          node-key="id"
         />
       </el-form-item>
       <el-form-item :label="t('settings.role.roleName')" prop="roleName">

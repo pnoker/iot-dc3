@@ -599,6 +599,8 @@ export default {
       empty: 'No role data!',
       resourcesOfRole: 'Role Resources',
       resourcesAll: 'All Resources',
+      rootRole: 'Root (top-level)',
+      usersOfRole: 'Assigned Users',
     },
     resource: {
       title: 'Resources',

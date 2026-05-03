@@ -590,6 +590,8 @@ export default {
       empty: '暂无角色数据!',
       resourcesOfRole: '当前角色资源',
       resourcesAll: '全部资源',
+      rootRole: '根节点(顶级)',
+      usersOfRole: '关联用户',
     },
     resource: {
       title: '资源管理',

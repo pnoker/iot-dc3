@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref } from 'vue';
+import { computed, defineComponent, reactive, ref } from 'vue';
+import type { PropType } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
@@ -22,7 +23,7 @@ type FormMode = 'add' | 'edit';
 
 const createEmptyForm = () => ({
   id: '' as string,
-  parentRoleId: '' as string | number,
+  parentRoleId: 0 as number | string,
   roleName: '',
   roleCode: '',
   enableFlag: 'ENABLE' as string,
@@ -31,8 +32,14 @@ const createEmptyForm = () => ({
 
 export default defineComponent({
   name: 'RoleEditForm',
+  props: {
+    treeData: {
+      type: Array as PropType<any[]>,
+      default: () => [],
+    },
+  },
   emits: ['add-thing', 'update-thing'],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const { t } = useI18n();
 
     const formRef = ref<FormInstance>();
@@ -47,8 +54,14 @@ export default defineComponent({
 
     const rules: FormRules = {
       roleName: [{ required: true, message: t('settings.role.roleNamePlaceholder'), trigger: 'blur' }],
-      parentRoleId: [{ required: true, message: t('settings.role.parentRoleIdPlaceholder'), trigger: 'blur' }],
+      parentRoleId: [{ required: true, message: t('settings.role.parentRoleIdPlaceholder'), trigger: 'change' }],
     };
+
+    // Synthesize a virtual "Root" row so top-level roles are reachable
+    // through the same tree UI — same pattern as MenuEditForm.
+    const parentTreeOptions = computed(() => [
+      { id: 0, roleName: t('settings.role.rootRole'), children: props.treeData || [] },
+    ]);
 
     const reset = () => {
       reactiveData.form = reactiveData.mode === 'edit' ? { ...reactiveData.originalForm } : createEmptyForm();
@@ -68,6 +81,7 @@ export default defineComponent({
       const initial = {
         ...createEmptyForm(),
         ...row,
+        parentRoleId: row?.parentRoleId ?? 0,
       };
       reactiveData.originalForm = { ...initial };
       reactiveData.form = { ...initial };
@@ -99,6 +113,7 @@ export default defineComponent({
       formRef,
       reactiveData,
       rules,
+      parentTreeOptions,
       reset,
       show,
       showEdit,

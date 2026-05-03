@@ -81,7 +81,7 @@
       </el-table>
     </blank-card>
 
-    <role-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate" />
+    <role-edit-form ref="editRef" :tree-data="reactiveData.roleTreeData" @add-thing="onAdd" @update-thing="onUpdate" />
     <role-assign-resources ref="assignRef" @save="onAssignResources" />
   </div>
 </template>

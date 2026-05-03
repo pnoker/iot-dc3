@@ -18,7 +18,7 @@ import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { addRole, deleteRole, getRoleList, updateRole } from '@/api/role';
+import { addRole, deleteRole, getRoleList, getRoleTree, updateRole } from '@/api/role';
 import { bindRoleResource, unbindRoleResource } from '@/api/roleResourceBind';
 import { timestampColumn } from '@/utils/DateUtil';
 import { successMessage } from '@/utils/NotificationUtil';
@@ -48,6 +48,7 @@ export default defineComponent({
     const reactiveData = reactive({
       loading: false,
       listData: [] as any[],
+      roleTreeData: [] as any[],
       query: {} as Record<string, any>,
       order: false,
       page: {
@@ -57,6 +58,16 @@ export default defineComponent({
         orders: [] as Order[],
       },
     });
+
+    const loadTree = () => {
+      getRoleTree()
+        .then((res: any) => {
+          reactiveData.roleTreeData = (res.data as any[]) || [];
+        })
+        .catch(() => {
+          // handled globally
+        });
+    };
 
     const load = () => {
       reactiveData.loading = true;
@@ -108,6 +119,7 @@ export default defineComponent({
         .then(() => {
           successMessage();
           load();
+          loadTree();
           done();
         })
         .catch(() => {
@@ -120,6 +132,7 @@ export default defineComponent({
         .then(() => {
           successMessage();
           load();
+          loadTree();
           done();
         })
         .catch(() => {
@@ -145,6 +158,7 @@ export default defineComponent({
         .then(() => {
           successMessage();
           load();
+          loadTree();
         })
         .catch(() => {
           // handled globally
@@ -162,6 +176,7 @@ export default defineComponent({
     };
 
     load();
+    loadTree();
 
     return {
       t,
