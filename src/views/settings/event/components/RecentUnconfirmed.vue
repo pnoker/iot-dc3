@@ -36,16 +36,25 @@
       <div v-if="!loading && rows.length === 0" class="recent-unconfirmed__empty">
         <el-empty :description="$t('settings.event.overview.noUnconfirmed')" :image-size="60" />
       </div>
-      <div v-for="row in rows" :key="`${row.source}:${row.id}`" class="recent-unconfirmed__item">
-        <div class="recent-unconfirmed__item-header">
-          <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
-            {{ row.source === 'device' ? $t('settings.event.device') : $t('settings.event.driver') }}
-          </el-tag>
-          <span class="recent-unconfirmed__name">{{ nameFor(row) }}</span>
-          <span class="recent-unconfirmed__time">{{ formatTime(row.createTime) }}</span>
-        </div>
-        <div v-if="row.message" class="recent-unconfirmed__message">{{ row.message }}</div>
-      </div>
+      <el-timeline v-else class="recent-unconfirmed__timeline">
+        <el-timeline-item
+          v-for="row in rows"
+          :key="`${row.source}:${row.id}`"
+          :timestamp="formatTime(row.createTime)"
+          :color="row.source === 'device' ? '#409eff' : '#e6a23c'"
+          placement="top"
+        >
+          <div class="recent-unconfirmed__item">
+            <div class="recent-unconfirmed__line">
+              <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
+                {{ row.source === 'device' ? $t('settings.event.device') : $t('settings.event.driver') }}
+              </el-tag>
+              <span class="recent-unconfirmed__name">{{ nameFor(row) }}</span>
+            </div>
+            <div v-if="row.message" class="recent-unconfirmed__message" :title="row.message">{{ row.message }}</div>
+          </div>
+        </el-timeline-item>
+      </el-timeline>
     </el-scrollbar>
   </el-card>
 </template>
@@ -77,7 +86,7 @@
   const load = async () => {
     loading.value = true;
     try {
-      const res: any = await alertPage({ confirmFlag: 0, current: 1, size: 10 });
+      const res: { data?: { records?: Row[] } } = await alertPage({ confirmFlag: 0, current: 1, size: 10 });
       const data: Row[] = res?.data?.records ?? [];
       rows.value = data;
       await resolveNames(data);
@@ -101,7 +110,7 @@
     if (devIds.length) {
       jobs.push(
         getDeviceByIds(devIds)
-          .then((r: any) => {
+          .then((r: { data?: Record<string, { deviceName?: string }> }) => {
             const d = r?.data || {};
             for (const id of devIds) {
               if (d[id]) nameMap[`d:${id}`] = d[id].deviceName || id;
@@ -113,7 +122,7 @@
     if (drvIds.length) {
       jobs.push(
         getDriverByIds(drvIds)
-          .then((r: any) => {
+          .then((r: { data?: Record<string, { driverName?: string }> }) => {
             const d = r?.data || {};
             for (const id of drvIds) {
               if (d[id]) nameMap[`r:${id}`] = d[id].driverName || id;
@@ -181,16 +190,31 @@
       }
     }
 
-    .recent-unconfirmed__item {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--el-border-color-lighter);
-
-      &:last-child {
-        border-bottom: none;
-      }
+    .recent-unconfirmed__timeline {
+      padding: 12px 16px 0;
     }
 
-    .recent-unconfirmed__item-header {
+    :deep(.el-timeline-item__timestamp) {
+      font-size: 12px;
+      color: #909399;
+      margin-bottom: 2px;
+    }
+
+    :deep(.el-timeline-item__tail) {
+      border-left-color: rgba(64, 158, 255, 0.25);
+    }
+
+    :deep(.el-timeline-item__node) {
+      box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.12);
+    }
+
+    .recent-unconfirmed__item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .recent-unconfirmed__line {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -198,27 +222,21 @@
 
     .recent-unconfirmed__name {
       font-size: 13px;
-      color: #606266;
-      flex: 1;
-      min-width: 0;
+      color: #303133;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-    }
-
-    .recent-unconfirmed__time {
-      font-size: 12px;
-      color: #909399;
-      flex-shrink: 0;
     }
 
     .recent-unconfirmed__message {
       font-size: 12px;
       color: #909399;
-      margin-top: 4px;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-word;
     }
 
     .recent-unconfirmed__empty {

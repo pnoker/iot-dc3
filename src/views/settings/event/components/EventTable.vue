@@ -112,7 +112,12 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('settings.event.createTime')" prop="createTime" width="180" />
+        <el-table-column
+          :label="$t('settings.event.createTime')"
+          prop="createTime"
+          :formatter="timestampColumn"
+          width="180"
+        />
         <el-table-column :label="$t('common.operation')" width="140" fixed="right">
           <template #default="{ row }">
             <el-popconfirm
@@ -150,10 +155,12 @@
 <script lang="ts" setup>
   import { computed, reactive, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { useRoute } from 'vue-router';
 
   import { alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
   import { getDriverByIds } from '@/api/driver';
+  import { timestampColumn } from '@/utils/DateUtil';
   import { successMessage } from '@/utils/NotificationUtil';
   import BlankCard from '@/components/card/blank/BlankCard.vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
@@ -176,6 +183,7 @@
   }>();
 
   const { t } = useI18n();
+  const route = useRoute();
 
   const loading = ref(false);
   const bulkRunning = ref(false);
@@ -183,10 +191,31 @@
   const rows = ref<Row[]>([]);
   const nameMap = reactive<Record<string, string>>({});
 
+  // Seed filter state from the URL so deep-links from Overview's quick
+  // actions / storm-source drill-in land with the right filter prefilled
+  // instead of needing the operator to compose it again.
+  const readQuery = () => {
+    const q = route.query;
+    const parseEnum = (v: unknown, pool: readonly (number | '')[]): number | '' => {
+      if (v == null) return '';
+      const n = Number(v);
+      return pool.includes(n as number) ? (n as number) : '';
+    };
+    const rangeCandidates = ['', 'today', '24h', '7d', '30d'] as const;
+    const rawRange = typeof q.rangeKey === 'string' ? q.rangeKey : '';
+    const rangeKey = (rangeCandidates as readonly string[]).includes(rawRange) ? (rawRange as RangeKey) : '';
+    return {
+      eventTypeFlag: parseEnum(q.eventTypeFlag, [0, 1]) as number | '',
+      confirmFlag: parseEnum(q.confirmFlag, [0, 1]) as number | '',
+      rangeKey,
+    };
+  };
+
+  const initial = readQuery();
   const formData = reactive<{ eventTypeFlag: number | ''; confirmFlag: number | ''; rangeKey: RangeKey }>({
-    eventTypeFlag: '',
-    confirmFlag: '',
-    rangeKey: '',
+    eventTypeFlag: initial.eventTypeFlag,
+    confirmFlag: initial.confirmFlag,
+    rangeKey: initial.rangeKey,
   });
   const page = reactive({ current: 1, size: 20, total: 0 });
 
@@ -307,13 +336,29 @@
     }
   );
 
+  // When the user deep-links in again with a different query (e.g. clicks
+  // another quick-action while already on the page), Vue Router reuses
+  // this component instead of remounting it — so watch the query keys
+  // the overview can prefill and resync the filter state.
+  watch(
+    () => [route.query.rangeKey, route.query.confirmFlag, route.query.eventTypeFlag],
+    () => {
+      const next = readQuery();
+      formData.eventTypeFlag = next.eventTypeFlag;
+      formData.confirmFlag = next.confirmFlag;
+      formData.rangeKey = next.rangeKey;
+      page.current = 1;
+      load();
+    }
+  );
+
   load();
 </script>
 
 <style lang="scss" scoped>
   .settings-table {
     margin-top: 1px;
-    border-radius: 4px;
+    border-radius: 10px;
   }
 
   .settings-table__sub {

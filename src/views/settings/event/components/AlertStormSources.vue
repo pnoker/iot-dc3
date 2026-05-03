@@ -21,10 +21,13 @@
         <span class="alert-storm__title">
           {{ t('settings.event.overview.stormTitle') }}
           <span class="alert-storm__subtitle">{{
-            t('settings.event.overview.stormSubtitle', { hours, min: minCount })
+            t('settings.event.overview.stormSubtitle', { hours: window.hours, min: window.minCount })
           }}</span>
         </span>
-        <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
+        <div class="alert-storm__actions">
+          <el-segmented v-model="windowKey" :options="windowOptions" size="small" />
+          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
+        </div>
       </div>
     </template>
     <div v-if="!loading && rows.length === 0" class="alert-storm__empty">
@@ -46,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref } from 'vue';
+  import { computed, onMounted, reactive, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import { Refresh, Warning } from '@element-plus/icons-vue';
@@ -62,13 +65,31 @@
   }
 
   const props = defineProps({
-    hours: { type: Number, default: 1 },
-    minCount: { type: Number, default: 10 },
     limit: { type: Number, default: 10 },
   });
 
   const { t } = useI18n();
   const router = useRouter();
+
+  // Storm is "high frequency within a short window", so the threshold has
+  // to scale with the window: a source hitting 10 alarms in 1h is noisy,
+  // but 10 in 24h is noise you'd ignore. Preset pairs below keep the
+  // relative severity consistent across the three spans.
+  type WindowKey = '1h' | '6h' | '24h';
+  const WINDOW_SPECS: Record<WindowKey, { hours: number; minCount: number }> = {
+    '1h': { hours: 1, minCount: 10 },
+    '6h': { hours: 6, minCount: 30 },
+    '24h': { hours: 24, minCount: 100 },
+  };
+  const windowOptions = [
+    { label: '1h', value: '1h' as WindowKey },
+    { label: '6h', value: '6h' as WindowKey },
+    { label: '24h', value: '24h' as WindowKey },
+  ];
+  // Default to 24h so the page is populated out of the box on fresh
+  // tenants — 1h would frequently be empty when the fleet is quiet.
+  const windowKey = ref<WindowKey>('24h');
+  const window = computed(() => WINDOW_SPECS[windowKey.value]);
 
   const loading = ref(false);
   const rows = ref<StormRow[]>([]);
@@ -77,7 +98,8 @@
   const load = async () => {
     loading.value = true;
     try {
-      const res: { data?: StormRow[] } = await alertStormSources(props.hours, props.minCount, props.limit);
+      const { hours, minCount } = window.value;
+      const res: { data?: StormRow[] } = await alertStormSources(hours, minCount, props.limit);
       rows.value = res?.data ?? [];
       await resolveNames(rows.value);
     } catch {
@@ -86,6 +108,8 @@
       loading.value = false;
     }
   };
+
+  watch(windowKey, load);
 
   const resolveNames = async (batch: StormRow[]) => {
     const devIds = batch
@@ -157,6 +181,14 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
+    }
+
+    .alert-storm__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
     .alert-storm__title {

@@ -16,44 +16,50 @@
 
 <template>
   <div class="event-overview">
-    <!-- Alert banner: pops up when the total unconfirmed count crosses the
-         operator-attention threshold. Clicking it drills into the unified
-         event list pre-filtered to "only unconfirmed". -->
-    <el-alert
-      v-if="unconfirmedTotal >= UNCONFIRMED_BANNER_THRESHOLD"
-      class="event-overview__banner"
-      type="error"
-      effect="dark"
-      show-icon
-      :closable="false"
-      @click="goToUnconfirmed"
-    >
-      <template #title>
-        {{ t('settings.event.overview.bannerUnhandled', { n: unconfirmedTotal }) }}
-      </template>
-      <template #default>
-        <span class="event-overview__banner-cta">{{ t('settings.event.overview.bannerCta') }}</span>
-      </template>
-    </el-alert>
-
-    <!-- Quick-action chips: jump straight to common filter combinations so
-         the operator doesn't have to compose them by hand from the event
-         page's filter bar. -->
-    <div class="event-overview__quick">
-      <span class="event-overview__quick-label">{{ t('settings.event.overview.quickActions') }}</span>
-      <el-button size="small" round :icon="Bell" @click="goToUnconfirmed">
-        {{ t('settings.event.overview.quickUnconfirmed') }}
-      </el-button>
-      <el-button size="small" round :icon="Management" @click="goToSource('device')">
-        {{ t('settings.event.overview.quickDevice') }}
-      </el-button>
-      <el-button size="small" round :icon="Promotion" @click="goToSource('driver')">
-        {{ t('settings.event.overview.quickDriver') }}
-      </el-button>
-      <el-button size="small" round :icon="Clock" @click="goToLastHour">
-        {{ t('settings.event.overview.quickLastHour') }}
-      </el-button>
-    </div>
+    <!-- Quick-actions: device / driver split into a two-column
+         el-descriptions so the two source lanes read side-by-side
+         instead of stacking. Every chip carries real query params
+         that EventTable picks up via route.query. -->
+    <el-descriptions class="event-overview__quick" :column="2" border>
+      <el-descriptions-item>
+        <template #label>
+          <span class="event-overview__quick-label">
+            <el-icon><Management /></el-icon>
+            {{ t('settings.event.device') }}
+          </span>
+        </template>
+        <div class="event-overview__quick-actions">
+          <el-button size="small" round @click="goto('device', {})">
+            {{ t('settings.event.overview.quickAll') }}
+          </el-button>
+          <el-button size="small" round type="warning" plain @click="goto('device', { confirmFlag: '0' })">
+            {{ t('settings.event.overview.quickUnconfirmed') }}
+          </el-button>
+          <el-button size="small" round plain @click="goto('device', { rangeKey: '24h' })">
+            {{ t('settings.event.overview.quickLast24h') }}
+          </el-button>
+        </div>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template #label>
+          <span class="event-overview__quick-label">
+            <el-icon><Promotion /></el-icon>
+            {{ t('settings.event.driver') }}
+          </span>
+        </template>
+        <div class="event-overview__quick-actions">
+          <el-button size="small" round @click="goto('driver', {})">
+            {{ t('settings.event.overview.quickAll') }}
+          </el-button>
+          <el-button size="small" round type="warning" plain @click="goto('driver', { confirmFlag: '0' })">
+            {{ t('settings.event.overview.quickUnconfirmed') }}
+          </el-button>
+          <el-button size="small" round plain @click="goto('driver', { rangeKey: '24h' })">
+            {{ t('settings.event.overview.quickLast24h') }}
+          </el-button>
+        </div>
+      </el-descriptions-item>
+    </el-descriptions>
 
     <div class="event-overview__cards">
       <stat-card
@@ -95,7 +101,7 @@
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import type { Component } from 'vue';
-  import { Bell, Clock, Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
+  import { Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
 
   import { alertPage, alertStats } from '@/api/dashboard';
   import StatCard from '@/components/card/stat/StatCard.vue';
@@ -129,12 +135,6 @@
   const { t } = useI18n();
   const router = useRouter();
 
-  // When unconfirmed alarms exceed this count, a prominent red banner
-  // appears at the top of the overview nudging the operator toward the
-  // unconfirmed-only event list. Chosen empirically — under 100 the
-  // operator typically keeps pace, over 100 they usually need a nudge.
-  const UNCONFIRMED_BANNER_THRESHOLD = 100;
-
   const loading = ref(false);
   const state = reactive({
     deviceTotal: 0,
@@ -143,8 +143,6 @@
     driverUnconfirmed: 0,
     sparkline: [] as number[],
   });
-
-  const unconfirmedTotal = computed(() => state.deviceUnconfirmed + state.driverUnconfirmed);
 
   const fetchCount = async (source: 'device' | 'driver', confirmFlag: number | null) => {
     try {
@@ -244,55 +242,60 @@
     },
   ]);
 
-  // Quick-action handlers. Each pre-applies a filter combination on the
-  // target event-list route so the operator lands with the query already
-  // narrowed instead of having to compose it from the filter bar.
-  const goToUnconfirmed = () =>
-    router.push({ name: 'settingsDeviceEvent', query: { confirmFlag: '0' } }).catch(() => {});
-  const goToSource = (source: 'device' | 'driver') => {
+  // Quick-action handler. Pre-applies a filter combination on the target
+  // event-list route (settings/event/{device,driver}) so the operator
+  // lands with the URL query already narrowed; EventTable reads
+  // route.query on mount and re-syncs on subsequent changes.
+  const goto = (source: 'device' | 'driver', query: Record<string, string>) => {
     const name = source === 'device' ? 'settingsDeviceEvent' : 'settingsDriverEvent';
-    router.push({ name }).catch(() => {});
+    router.push({ name, query }).catch(() => {});
   };
-  const goToLastHour = () => router.push({ name: 'settingsDeviceEvent', query: { rangeKey: '24h' } }).catch(() => {});
 
   onMounted(load);
 </script>
 
 <style lang="scss" scoped>
+  // Uniform 12px gap: vertical rhythm between sections, horizontal gap
+  // inside every grid row. Bumping one value here should propagate to
+  // the whole overview so the layout stays balanced.
+  $overview-gap: 12px;
+
   .event-overview {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: $overview-gap;
 
-    .event-overview__banner {
-      cursor: pointer;
-    }
-
-    .event-overview__banner-cta {
-      text-decoration: underline;
-    }
-
+    // el-descriptions already paints the border/background; just round
+    // the frame so it matches the rest of the page's cards.
     .event-overview__quick {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      :deep(.el-descriptions__body) {
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      :deep(.el-descriptions__label) {
+        width: 96px;
+      }
     }
 
     .event-overview__quick-label {
       font-size: 13px;
-      color: #909399;
-      margin-right: 4px;
+      color: #606266;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .event-overview__quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
     }
 
     .event-overview__cards {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
+      gap: $overview-gap;
 
       @media (max-width: 1280px) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -305,7 +308,7 @@
     .event-overview__charts {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 12px;
+      gap: $overview-gap;
 
       @media (max-width: 1024px) {
         grid-template-columns: 1fr;
@@ -320,7 +323,7 @@
     .event-overview__diagnostic {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: $overview-gap;
 
       @media (max-width: 1024px) {
         grid-template-columns: 1fr;
