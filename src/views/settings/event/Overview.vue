@@ -39,8 +39,15 @@
             <el-button size="small" round type="warning" plain @click="goto('device', { confirmFlag: '0' })">
               {{ t('settings.event.overview.quickUnconfirmed') }}
             </el-button>
-            <el-button size="small" round plain @click="goto('device', { rangeKey: '24h' })">
-              {{ t('settings.event.overview.quickLast24h') }}
+            <span class="event-overview__quick-divider" />
+            <el-button size="small" round plain @click="goto('device', { rangeKey: 'today' })">
+              {{ t('settings.event.overview.quickToday') }}
+            </el-button>
+            <el-button size="small" round plain @click="goto('device', { rangeKey: '7d' })">
+              {{ t('settings.event.overview.quick7d') }}
+            </el-button>
+            <el-button size="small" round plain @click="goto('device', { rangeKey: '30d' })">
+              {{ t('settings.event.overview.quick30d') }}
             </el-button>
           </div>
         </el-descriptions-item>
@@ -58,8 +65,15 @@
             <el-button size="small" round type="warning" plain @click="goto('driver', { confirmFlag: '0' })">
               {{ t('settings.event.overview.quickUnconfirmed') }}
             </el-button>
-            <el-button size="small" round plain @click="goto('driver', { rangeKey: '24h' })">
-              {{ t('settings.event.overview.quickLast24h') }}
+            <span class="event-overview__quick-divider" />
+            <el-button size="small" round plain @click="goto('driver', { rangeKey: 'today' })">
+              {{ t('settings.event.overview.quickToday') }}
+            </el-button>
+            <el-button size="small" round plain @click="goto('driver', { rangeKey: '7d' })">
+              {{ t('settings.event.overview.quick7d') }}
+            </el-button>
+            <el-button size="small" round plain @click="goto('driver', { rangeKey: '30d' })">
+              {{ t('settings.event.overview.quick30d') }}
             </el-button>
           </div>
         </el-descriptions-item>
@@ -106,7 +120,7 @@
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import type { Component } from 'vue';
-  import { Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
+  import { Bell, Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
 
   import { alertPage, alertStats } from '@/api/dashboard';
   import blankCard from '@/components/card/blank/BlankCard.vue';
@@ -147,6 +161,10 @@
     deviceUnconfirmed: 0,
     driverTotal: 0,
     driverUnconfirmed: 0,
+    // Today counts come from alertStats (backend already exposes them for
+    // Home's today-alert cards — no extra round-trip needed here).
+    todayDevice: 0,
+    todayDriver: 0,
     sparkline: [] as number[],
   });
 
@@ -173,8 +191,14 @@
       state.deviceUnconfirmed = du;
       state.driverTotal = rt;
       state.driverUnconfirmed = ru;
-      const statsData = (stats as { data?: { sparkline24h?: number[] } } | null)?.data;
+      const statsData = (
+        stats as {
+          data?: { sparkline24h?: number[]; todayDeviceAlarms?: number; todayDriverAlarms?: number };
+        } | null
+      )?.data;
       state.sparkline = statsData?.sparkline24h ?? [];
+      state.todayDevice = Number(statsData?.todayDeviceAlarms ?? 0);
+      state.todayDriver = Number(statsData?.todayDriverAlarms ?? 0);
     } finally {
       loading.value = false;
     }
@@ -197,7 +221,22 @@
     return t('settings.event.overview.unconfirmedRatio', { unconfirmed, total, pct });
   };
 
+  // Card order chosen deliberately: driver lane first (the one tenants run
+  // diagnostics off most), then device, split into totals → unconfirmed →
+  // today across two logical rows rendered by the CSS grid.
   const cards = computed<Card[]>(() => [
+    {
+      key: 'driver-total',
+      title: t('settings.event.overview.driverTotal'),
+      value: state.driverTotal,
+      subtitle: t('settings.event.overview.goToDriver'),
+      icon: Promotion,
+      tone: 'purple',
+      sparkline: state.sparkline,
+      trend: sparkTrend(state.sparkline),
+      onClick: () => router.push({ name: 'settingsDriverEvent' }),
+      onRefresh: load,
+    },
     {
       key: 'device-total',
       title: t('settings.event.overview.deviceTotal'),
@@ -211,15 +250,15 @@
       onRefresh: load,
     },
     {
-      key: 'driver-total',
-      title: t('settings.event.overview.driverTotal'),
-      value: state.driverTotal,
-      subtitle: t('settings.event.overview.goToDriver'),
-      icon: Promotion,
-      tone: 'purple',
+      key: 'driver-unconfirmed',
+      title: t('settings.event.overview.driverUnconfirmed'),
+      value: state.driverUnconfirmed,
+      subtitle: unconfirmedSubtitle(state.driverUnconfirmed, state.driverTotal),
+      icon: WarningFilled,
+      tone: 'red',
       sparkline: state.sparkline,
       trend: sparkTrend(state.sparkline),
-      onClick: () => router.push({ name: 'settingsDriverEvent' }),
+      onClick: () => router.push({ name: 'settingsDriverEvent', query: { confirmFlag: '0' } }),
       onRefresh: load,
     },
     {
@@ -235,15 +274,27 @@
       onRefresh: load,
     },
     {
-      key: 'driver-unconfirmed',
-      title: t('settings.event.overview.driverUnconfirmed'),
-      value: state.driverUnconfirmed,
-      subtitle: unconfirmedSubtitle(state.driverUnconfirmed, state.driverTotal),
-      icon: WarningFilled,
-      tone: 'red',
+      key: 'today-driver',
+      title: t('settings.event.overview.todayDriver'),
+      value: state.todayDriver,
+      subtitle: '',
+      icon: Bell,
+      tone: 'purple',
       sparkline: state.sparkline,
       trend: sparkTrend(state.sparkline),
-      onClick: () => router.push({ name: 'settingsDriverEvent', query: { confirmFlag: '0' } }),
+      onClick: () => router.push({ name: 'settingsDriverEvent', query: { rangeKey: 'today' } }),
+      onRefresh: load,
+    },
+    {
+      key: 'today-device',
+      title: t('settings.event.overview.todayDevice'),
+      value: state.todayDevice,
+      subtitle: '',
+      icon: Bell,
+      tone: 'blue',
+      sparkline: state.sparkline,
+      trend: sparkTrend(state.sparkline),
+      onClick: () => router.push({ name: 'settingsDeviceEvent', query: { rangeKey: 'today' } }),
       onRefresh: load,
     },
   ]);
@@ -300,13 +351,23 @@
       gap: 8px;
     }
 
+    // Visual divider between the confirmation-state chips (All / Unconfirmed)
+    // and the time-range chips (Today / 7d / 30d). Thin vertical line so the
+    // two semantic groups read as groups, not one long string of buttons.
+    .event-overview__quick-divider {
+      width: 1px;
+      align-self: stretch;
+      background: var(--el-border-color-light);
+      margin: 4px 2px;
+    }
+
     .event-overview__cards {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: $overview-gap;
 
       @media (max-width: 1280px) {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
       @media (max-width: 640px) {
         grid-template-columns: 1fr;

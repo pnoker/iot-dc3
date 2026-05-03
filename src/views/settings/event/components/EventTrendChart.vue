@@ -19,6 +19,7 @@
     <template #header>
       <div class="event-trend__header">
         <span class="event-trend__title">{{ $t('settings.event.overview.trendTitle') }}</span>
+        <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
       </div>
     </template>
     <div ref="chartRef" v-loading="loading" class="event-trend__chart"></div>
@@ -28,6 +29,7 @@
 <script lang="ts" setup>
   import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
   import { Chart } from '@antv/g2';
+  import { Refresh } from '@element-plus/icons-vue';
 
   import { alertTrend } from '@/api/dashboard';
 

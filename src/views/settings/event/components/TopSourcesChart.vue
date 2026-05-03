@@ -19,6 +19,7 @@
     <template #header>
       <div class="top-sources__header">
         <span class="top-sources__title">{{ $t('settings.event.overview.topSourcesTitle') }}</span>
+        <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
       </div>
     </template>
     <div ref="chartRef" v-loading="loading" class="top-sources__chart"></div>
@@ -28,6 +29,7 @@
 <script lang="ts" setup>
   import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
   import { Chart } from '@antv/g2';
+  import { Refresh } from '@element-plus/icons-vue';
 
   import { alertTopSources } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
