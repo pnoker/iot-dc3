@@ -35,6 +35,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -100,6 +102,17 @@ public class TenantBindServiceImpl implements TenantBindService {
         wrapper.last(QueryWrapperConstant.LIMIT_ONE);
         TenantBindDO entityDO = tenantBindManager.getOne(wrapper);
         return tenantBindBuilder.buildBOByDO(entityDO);
+    }
+
+    @Override
+    public List<Long> listUserIdsByTenantId(Long tenantId) {
+        if (Objects.isNull(tenantId)) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<TenantBindDO> wrapper = Wrappers.<TenantBindDO>query().lambda();
+        wrapper.eq(TenantBindDO::getTenantId, tenantId);
+        wrapper.select(TenantBindDO::getUserId);
+        return tenantBindManager.listObjs(wrapper, o -> (Long) o);
     }
 
     @Override

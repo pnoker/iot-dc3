@@ -131,17 +131,20 @@ public class UserController implements BaseController {
 
     @PostMapping("/list")
     public Mono<R<Page<UserVO>>> list(@RequestBody(required = false) UserQuery entityQuery) {
-        try {
-            if (Objects.isNull(entityQuery)) {
-                entityQuery = new UserQuery();
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                UserQuery query = Objects.isNull(entityQuery) ? new UserQuery() : entityQuery;
+                // Overwrite whatever the client sent. Tenant scope is a hard
+                // boundary, not a filter — a caller cannot reach across tenants.
+                query.setTenantId(tenantId);
+                Page<UserBO> entityPageBO = userService.selectByPage(query);
+                Page<UserVO> entityPageVO = userBuilder.buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
             }
-            Page<UserBO> entityPageBO = userService.selectByPage(entityQuery);
-            Page<UserVO> entityPageVO = userBuilder.buildVOPageByBOPage(entityPageBO);
-            return Mono.just(R.ok(entityPageVO));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        });
     }
 
 }

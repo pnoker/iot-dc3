@@ -26,6 +26,7 @@ import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.UserBuilder;
 import io.github.pnoker.common.auth.entity.model.UserDO;
 import io.github.pnoker.common.auth.entity.query.UserQuery;
+import io.github.pnoker.common.auth.service.TenantBindService;
 import io.github.pnoker.common.auth.service.UserService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.Pages;
@@ -35,7 +36,9 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -56,6 +59,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private UserManager userManager;
+
+    @Resource
+    private TenantBindService tenantBindService;
 
     @Override
     public void save(UserBO entityBO) {
@@ -188,6 +194,17 @@ public class UserServiceImpl implements UserService {
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getPhone()), UserDO::getPhone, entityQuery.getPhone());
         wrapper.like(StringUtils.isNotEmpty(entityQuery.getEmail()), UserDO::getEmail, entityQuery.getEmail());
         wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), UserDO::getEnableFlag, entityQuery.getEnableFlag());
+        // Tenant scope. Users have no tenant_id column — they're associated with
+        // tenants through dc3_tenant_bind. Resolve the bound user_ids for the
+        // controller-supplied tenant and constrain the list to that set.
+        if (Objects.nonNull(entityQuery.getTenantId())) {
+            List<Long> userIds = tenantBindService.listUserIdsByTenantId(entityQuery.getTenantId());
+            if (CollectionUtils.isEmpty(userIds)) {
+                wrapper.apply("1 = 0");
+            } else {
+                wrapper.in(UserDO::getId, userIds);
+            }
+        }
         return wrapper;
     }
 
