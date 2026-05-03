@@ -28,7 +28,7 @@
 
 <style lang="scss" scoped>
   .base-card {
-    border-radius: 4px;
+    border-radius: 10px;
     box-sizing: border-box;
 
     ul {

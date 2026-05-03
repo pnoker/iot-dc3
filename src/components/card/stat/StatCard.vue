@@ -171,7 +171,7 @@
     }
 
     :deep(.el-card__body) {
-      padding: 16px 18px;
+      padding: 16px;
     }
 
     .stat-card__row {

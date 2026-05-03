@@ -28,7 +28,7 @@
 
 <style lang="scss" scoped>
   .blank-card {
-    border-radius: 4px;
+    border-radius: 10px;
     box-sizing: border-box;
 
     ul {
@@ -50,7 +50,7 @@
     }
 
     :deep(.el-card__body) {
-      padding: 10px 5px 0;
+      padding: 16px;
     }
 
     :deep(.el-tabs__nav) {

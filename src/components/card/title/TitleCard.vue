@@ -38,7 +38,7 @@
 
 <style lang="scss" scoped>
   .title-card {
-    border-radius: 4px;
+    border-radius: 10px;
     box-sizing: border-box;
 
     :deep(.el-card) {
@@ -47,11 +47,11 @@
     }
 
     :deep(.el-card__header) {
-      padding: 10px;
+      padding: 12px 16px;
     }
 
     :deep(.el-card__body) {
-      padding: 10px 5px 0;
+      padding: 16px;
     }
 
     :deep(.el-tabs__nav) {
