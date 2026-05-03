@@ -372,4 +372,88 @@
         LIMIT #{limit}
     </select>
 
+    <!--
+        ALARM counts bucketed by (day-of-week, hour-of-day). Service zero-pads
+        missing cells so the UI always gets a fully-filled 7×24 grid.
+    -->
+    <select id="activityHeatmap" resultType="map">
+        SELECT dow, hour, SUM(count) AS count
+        FROM (SELECT EXTRACT(DOW FROM create_time)::int AS dow,
+                     EXTRACT(HOUR FROM create_time)::int AS hour,
+                     COUNT(*) AS count
+              FROM dc3_device_event
+              WHERE deleted = 0
+                AND tenant_id = #{tenantId}
+                AND event_type_flag = 1
+                AND create_time &gt;= #{from}
+              GROUP BY dow, hour
+              UNION ALL
+              SELECT EXTRACT(DOW FROM create_time)::int AS dow,
+                     EXTRACT(HOUR FROM create_time)::int AS hour,
+                     COUNT(*) AS count
+              FROM dc3_driver_event
+              WHERE deleted = 0
+                AND tenant_id = #{tenantId}
+                AND event_type_flag = 1
+                AND create_time &gt;= #{from}
+              GROUP BY dow, hour) u
+        GROUP BY dow, hour
+    </select>
+
+    <!--
+        ALARM counts grouped by the event_ext.type tag. Both event tables
+        store their type under the same JSON key (see DriverEventServiceImpl
+        and DeviceEventServiceImpl), so we can union them before grouping.
+    -->
+    <select id="typeDistribution" resultType="map">
+        SELECT type, SUM(count) AS count
+        FROM (SELECT event_ext->>'type' AS type, COUNT(*) AS count
+              FROM dc3_device_event
+              WHERE deleted = 0
+                AND tenant_id = #{tenantId}
+                AND event_type_flag = 1
+                AND create_time &gt;= #{from}
+              GROUP BY type
+              UNION ALL
+              SELECT event_ext->>'type' AS type, COUNT(*) AS count
+              FROM dc3_driver_event
+              WHERE deleted = 0
+                AND tenant_id = #{tenantId}
+                AND event_type_flag = 1
+                AND create_time &gt;= #{from}
+              GROUP BY type) u
+        WHERE type IS NOT NULL
+        GROUP BY type
+        ORDER BY count DESC
+    </select>
+
+    <!--
+        Sources that exceeded the storm threshold within the window. HAVING
+        COUNT(*) >= minCount filters out ordinary sources so the operator
+        only sees the ones deserving immediate attention.
+    -->
+    <select id="stormSources" resultType="map">
+        SELECT * FROM (
+            (SELECT 'device' AS source, device_id AS source_id, COUNT(*) AS count
+             FROM dc3_device_event
+             WHERE deleted = 0
+               AND tenant_id = #{tenantId}
+               AND event_type_flag = 1
+               AND create_time &gt;= #{from}
+             GROUP BY device_id
+             HAVING COUNT(*) &gt;= #{minCount})
+            UNION ALL
+            (SELECT 'driver' AS source, driver_id AS source_id, COUNT(*) AS count
+             FROM dc3_driver_event
+             WHERE deleted = 0
+               AND tenant_id = #{tenantId}
+               AND event_type_flag = 1
+               AND create_time &gt;= #{from}
+             GROUP BY driver_id
+             HAVING COUNT(*) &gt;= #{minCount})
+        ) unioned
+        ORDER BY count DESC
+        LIMIT #{limit}
+    </select>
+
 </mapper>

@@ -469,4 +469,64 @@ public class DashboardServiceImpl implements DashboardService {
         }
         return out;
     }
+
+    @Override
+    public List<AlertActivityCellVO> alertActivity(Long tenantId, int days) {
+        int clampedDays = Math.max(1, Math.min(days, 90));
+        LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
+        List<Map<String, Object>> rows = alertMapper.activityHeatmap(tenantId, from);
+        long[][] grid = new long[7][24];
+        for (Map<String, Object> row : rows) {
+            int dow = toInt(row.get("dow"));
+            int hour = toInt(row.get("hour"));
+            if (dow >= 0 && dow < 7 && hour >= 0 && hour < 24) {
+                grid[dow][hour] = toLong(row.get("count"));
+            }
+        }
+        // Zero-pad every cell so the UI always receives 7 × 24 = 168 rows.
+        List<AlertActivityCellVO> out = new ArrayList<>(7 * 24);
+        for (int d = 0; d < 7; d++) {
+            for (int h = 0; h < 24; h++) {
+                AlertActivityCellVO vo = new AlertActivityCellVO();
+                vo.setDow(d);
+                vo.setHour(h);
+                vo.setCount(grid[d][h]);
+                out.add(vo);
+            }
+        }
+        return out;
+    }
+
+    @Override
+    public List<AlertTypeBucketVO> alertTypeDistribution(Long tenantId, int days) {
+        int clampedDays = Math.max(1, Math.min(days, 90));
+        LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
+        List<Map<String, Object>> rows = alertMapper.typeDistribution(tenantId, from);
+        List<AlertTypeBucketVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> row : rows) {
+            AlertTypeBucketVO vo = new AlertTypeBucketVO();
+            vo.setType(asString(row.get("type")));
+            vo.setCount(toLong(row.get("count")));
+            out.add(vo);
+        }
+        return out;
+    }
+
+    @Override
+    public List<AlertTopSourceVO> alertStormSources(Long tenantId, int hours, int minCount, int limit) {
+        int clampedHours = Math.max(1, Math.min(hours, 24 * 30));
+        int clampedMin = Math.max(1, minCount);
+        int clampedLimit = Math.max(1, Math.min(limit, 50));
+        LocalDateTime from = LocalDateTime.now().minusHours(clampedHours);
+        List<Map<String, Object>> rows = alertMapper.stormSources(tenantId, from, clampedMin, clampedLimit);
+        List<AlertTopSourceVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> row : rows) {
+            AlertTopSourceVO vo = new AlertTopSourceVO();
+            vo.setSource(asString(row.get("source")));
+            vo.setSourceId(toLong(row.get("source_id")));
+            vo.setCount(toLong(row.get("count")));
+            out.add(vo);
+        }
+        return out;
+    }
 }
