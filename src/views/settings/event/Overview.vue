@@ -18,48 +18,53 @@
   <div class="event-overview">
     <!-- Quick-actions: device / driver split into a two-column
          el-descriptions so the two source lanes read side-by-side
-         instead of stacking. Every chip carries real query params
-         that EventTable picks up via route.query. -->
-    <el-descriptions class="event-overview__quick" :column="2" border>
-      <el-descriptions-item>
-        <template #label>
-          <span class="event-overview__quick-label">
-            <el-icon><Management /></el-icon>
-            {{ t('settings.event.device') }}
-          </span>
-        </template>
-        <div class="event-overview__quick-actions">
-          <el-button size="small" round @click="goto('device', {})">
-            {{ t('settings.event.overview.quickAll') }}
-          </el-button>
-          <el-button size="small" round type="warning" plain @click="goto('device', { confirmFlag: '0' })">
-            {{ t('settings.event.overview.quickUnconfirmed') }}
-          </el-button>
-          <el-button size="small" round plain @click="goto('device', { rangeKey: '24h' })">
-            {{ t('settings.event.overview.quickLast24h') }}
-          </el-button>
-        </div>
-      </el-descriptions-item>
-      <el-descriptions-item>
-        <template #label>
-          <span class="event-overview__quick-label">
-            <el-icon><Promotion /></el-icon>
-            {{ t('settings.event.driver') }}
-          </span>
-        </template>
-        <div class="event-overview__quick-actions">
-          <el-button size="small" round @click="goto('driver', {})">
-            {{ t('settings.event.overview.quickAll') }}
-          </el-button>
-          <el-button size="small" round type="warning" plain @click="goto('driver', { confirmFlag: '0' })">
-            {{ t('settings.event.overview.quickUnconfirmed') }}
-          </el-button>
-          <el-button size="small" round plain @click="goto('driver', { rangeKey: '24h' })">
-            {{ t('settings.event.overview.quickLast24h') }}
-          </el-button>
-        </div>
-      </el-descriptions-item>
-    </el-descriptions>
+         instead of stacking. Wrapped in BlankCard (border:0) so the
+         block sits flush under the breadcrumb like the rest of the
+         dashboard, matching About's Platform card treatment. Every
+         chip carries real query params that EventTable picks up via
+         route.query. -->
+    <blank-card>
+      <el-descriptions class="event-overview__quick" :column="2" border>
+        <el-descriptions-item>
+          <template #label>
+            <span class="event-overview__quick-label">
+              <el-icon><Management /></el-icon>
+              {{ t('settings.event.device') }}
+            </span>
+          </template>
+          <div class="event-overview__quick-actions">
+            <el-button size="small" round @click="goto('device', {})">
+              {{ t('settings.event.overview.quickAll') }}
+            </el-button>
+            <el-button size="small" round type="warning" plain @click="goto('device', { confirmFlag: '0' })">
+              {{ t('settings.event.overview.quickUnconfirmed') }}
+            </el-button>
+            <el-button size="small" round plain @click="goto('device', { rangeKey: '24h' })">
+              {{ t('settings.event.overview.quickLast24h') }}
+            </el-button>
+          </div>
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template #label>
+            <span class="event-overview__quick-label">
+              <el-icon><Promotion /></el-icon>
+              {{ t('settings.event.driver') }}
+            </span>
+          </template>
+          <div class="event-overview__quick-actions">
+            <el-button size="small" round @click="goto('driver', {})">
+              {{ t('settings.event.overview.quickAll') }}
+            </el-button>
+            <el-button size="small" round type="warning" plain @click="goto('driver', { confirmFlag: '0' })">
+              {{ t('settings.event.overview.quickUnconfirmed') }}
+            </el-button>
+            <el-button size="small" round plain @click="goto('driver', { rangeKey: '24h' })">
+              {{ t('settings.event.overview.quickLast24h') }}
+            </el-button>
+          </div>
+        </el-descriptions-item>
+      </el-descriptions>
+    </blank-card>
 
     <div class="event-overview__cards">
       <stat-card
@@ -104,6 +109,7 @@
   import { Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
 
   import { alertPage, alertStats } from '@/api/dashboard';
+  import blankCard from '@/components/card/blank/BlankCard.vue';
   import StatCard from '@/components/card/stat/StatCard.vue';
   import EventTrendChart from './components/EventTrendChart.vue';
   import TopSourcesChart from './components/TopSourcesChart.vue';
@@ -271,13 +277,9 @@
     // views and keep flush-right — only this overview needs the balance.
     padding-right: 4px;
 
-    // el-descriptions already paints the border/background; just round
-    // the frame so it matches the rest of the page's cards.
     .event-overview__quick {
-      :deep(.el-descriptions__body) {
-        border-radius: 4px;
-        overflow: hidden;
-      }
+      // Pin label column width so the left and right action groups
+      // line up. (BlankCard handles the outer border/radius now.)
       :deep(.el-descriptions__label) {
         width: 96px;
       }
