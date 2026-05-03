@@ -16,11 +16,14 @@
 
 <template>
   <div class="about">
-    <el-card shadow="never" class="about__card">
-      <template #header>
-        <span class="about__title">{{ t('settings.about.platformTitle') }}</span>
-      </template>
-      <el-descriptions :column="2" border>
+    <!-- Platform uses BlankCard instead of an el-card-with-header like
+         the others — BlankCard already enforces `border: 0`, so under
+         the breadcrumb (where any border reads as extra breathing
+         room) the first card sits visually flush. Title moves into
+         el-descriptions' built-in title prop so we don't need a
+         separate card-header slot. -->
+    <blank-card>
+      <el-descriptions :title="t('settings.about.platformTitle')" :column="2" border>
         <el-descriptions-item :label="t('settings.about.name')">IoT DC3</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.version')">v{{ version }}</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.license')">AGPL-3.0</el-descriptions-item>
@@ -36,7 +39,7 @@
           © 2016-present the IoT DC3 original author or authors
         </el-descriptions-item>
       </el-descriptions>
-    </el-card>
+    </blank-card>
 
     <el-card shadow="never" class="about__card">
       <template #header>
@@ -94,6 +97,7 @@
 <script lang="ts" setup>
   import { useI18n } from 'vue-i18n';
 
+  import blankCard from '@/components/card/blank/BlankCard.vue';
   import pkg from '../../../../package.json';
 
   const { t } = useI18n();
