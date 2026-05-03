@@ -82,7 +82,9 @@
               </ul>
             </div>
           </div>
-          <div v-if="embedded != ''" ref="chartRef" class="things-card-body-content-time"></div>
+          <div v-if="embedded != ''" class="things-card-body-content-time">
+            <mini-area-chart :data="historyData" :height="80" color="#409eff" :tooltip-unit="unit" animate />
+          </div>
         </div>
         <div v-if="embedded == ''" class="things-card__footer">
           <div class="things-card-footer-operation">
@@ -110,8 +112,7 @@
   import { CircleClose, Edit, Management, Sunrise, Sunset, Timer } from '@element-plus/icons-vue';
   import { useI18n } from 'vue-i18n';
 
-  import { Chart } from '@antv/g2';
-
+  import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
   import { copy } from '@/utils/CommonUtil';
   import { timestamp } from '@/utils/DateUtil';
   import { getPointValueHistory } from '@/api/point';
@@ -163,25 +164,25 @@
     copy(JSON.stringify(content, null, 2), t('pointValue.card.pointValueId'));
   };
 
-  const chartRef = ref<HTMLElement>();
-  let tinyArea: Chart;
+  // Numeric series fed into MiniAreaChart. BOOL points are coerced to 0/1,
+  // STRING points render as an empty chart (and the embedded timeline area
+  // collapses to the fallback spacer).
+  const historyData = ref<number[]>([]);
+
   const history = () => {
     getPointValueHistory(props.data.deviceId, props.data.pointId, 100)
       .then((res) => {
-        let historyData: number[];
-        const pointValueType = props.point.pointTypeFlag.toLowerCase();
+        const pointValueType = (props.point.pointTypeFlag || '').toLowerCase();
         if (pointValueType === 'string') {
-          historyData = [];
+          historyData.value = [];
         } else if (pointValueType === 'boolean') {
-          historyData = res.data.reverse().map((value: string) => (value === 'true' ? 1 : 0));
+          historyData.value = res.data.reverse().map((value: string) => (value === 'true' ? 1 : 0));
         } else {
-          historyData = res.data.reverse().map((value: string) => +value);
+          historyData.value = res.data.reverse().map((value: string) => +value);
         }
-
-        tinyArea.changeData(historyData);
       })
       .catch(() => {
-        // nothing to do
+        // handled globally
       });
   };
 
@@ -196,35 +197,7 @@
 
   onMounted(() => {
     window.dispatchEvent(new Event('resize'));
-
-    if (props.embedded != '' && chartRef.value) {
-      tinyArea = new Chart({
-        container: chartRef.value,
-        autoFit: true,
-        height: 80,
-      });
-
-      // G2 v5 expects gradients as CSS-style strings, not descriptor objects
-      // (the legacy { type:'linear', stops:[...] } shape throws
-      // `colorStr.indexOf is not a function` inside the style-value registry).
-      tinyArea
-        .area()
-        .data([])
-        .encode('x', (_: any, i: number) => i)
-        .encode('y', (v: any) => v)
-        .encode('shape', 'smooth')
-        .scale('y', { zero: true })
-        .style('fill', 'linear-gradient(90deg, rgba(255,255,255,0) 0%, #409eff 100%)')
-        .style('fillOpacity', 0.3)
-        .animate('enter', { type: 'fadeIn' })
-        .axis(false);
-
-      tinyArea.interaction('tooltip', {
-        render: (_e: any, { items }: any) => `${items[0].value} ${props.unit}`,
-      });
-
-      tinyArea.render();
-
+    if (props.embedded != '') {
       history();
     }
   });

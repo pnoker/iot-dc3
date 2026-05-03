@@ -44,17 +44,24 @@
         @click.stop="doRefresh"
       />
     </div>
-    <!-- Sparkline slot is always rendered (empty cards get a transparent
-         spacer) so every StatCard lines up at the same height. -->
-    <div ref="sparkRef" class="stat-card__spark"></div>
+    <!-- Sparkline area is always rendered so every StatCard lines up at
+         the same height; MiniAreaChart is kept mounted even when the
+         series is empty (it paints nothing until data arrives) so the
+         chart's lifecycle matches PointValueCard's — lazy mount under a
+         v-if would create a subtle race with the internal onMounted
+         draw and empty cards in the same row. -->
+    <div class="stat-card__spark">
+      <mini-area-chart :data="sparkline" :color="accentColor" :height="40" />
+    </div>
   </el-card>
 </template>
 
 <script lang="ts" setup>
-  import { computed, onUnmounted, ref, watch } from 'vue';
+  import { computed, ref } from 'vue';
   import type { Component, PropType } from 'vue';
   import { CaretBottom, CaretTop, Minus, Refresh } from '@element-plus/icons-vue';
-  import { Chart } from '@antv/g2';
+
+  import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
 
   interface Trend {
     direction: 'up' | 'down' | 'flat';
@@ -106,70 +113,18 @@
     return Minus;
   });
 
-  const sparkRef = ref<HTMLElement>();
-  let chart: Chart | undefined;
-
-  const drawSparkline = () => {
-    const el = sparkRef.value;
-    if (!el || !props.sparkline || props.sparkline.length === 0) return;
-    // G2 autoFit reads the container's layout width at construction time;
-    // defer to the next animation frame so Vue's DOM patch and the browser
-    // layout pass both complete before we measure. Without this the very
-    // first render on the home page can pick up a 0-width container
-    // (especially under grid layouts) and silently paint nothing.
-    requestAnimationFrame(() => {
-      const node = sparkRef.value;
-      if (!node) return;
-      const points = props.sparkline.map((y, i) => ({ x: i, y }));
-      const accent = getComputedStyle(node).getPropertyValue('--stat-card-accent').trim() || '#409eff';
-      chart?.destroy();
-      chart = new Chart({
-        container: node,
-        autoFit: true,
-        height: 40,
-        paddingTop: 2,
-        paddingBottom: 2,
-        paddingLeft: 2,
-        paddingRight: 2,
-      });
-      // G2 v5 expects gradients as CSS-style strings, not descriptor objects.
-      // Passing an object throws `colorStr.indexOf is not a function` inside
-      // the style-value registry. The 90° direction mirrors the x1=1/x2=0 /
-      // y1=0/y2=0 axis used by the original descriptor so the accent colour
-      // still emerges from the right edge.
-      const fillGradient = `linear-gradient(90deg, rgba(255,255,255,0) 0%, ${accent} 100%)`;
-      chart
-        .area()
-        .data(points)
-        .encode('x', 'x')
-        .encode('y', 'y')
-        .encode('shape', 'smooth')
-        .style('fill', fillGradient)
-        .style('fillOpacity', 0.3)
-        .axis(false)
-        .legend(false)
-        .tooltip(false);
-      chart
-        .line()
-        .data(points)
-        .encode('x', 'x')
-        .encode('y', 'y')
-        .encode('shape', 'smooth')
-        .style('stroke', accent)
-        .style('lineWidth', 2)
-        .axis(false)
-        .legend(false)
-        .tooltip(false);
-      chart.render();
-    });
+  // Map each tone to the accent colour so MiniAreaChart can stroke/fill
+  // the sparkline in the card's own palette. Kept in lock-step with the
+  // --stat-card-accent values declared in the scoped styles below so a
+  // palette change only needs updating in one place conceptually.
+  const TONE_ACCENT: Record<string, string> = {
+    blue: '#409eff',
+    green: '#67c23a',
+    orange: '#e6a23c',
+    purple: '#9059f6',
+    red: '#f56c6c',
   };
-
-  // flush: 'post' delays the callback until after Vue has patched the DOM,
-  // so the container div exists before we touch it. immediate: true covers
-  // the case where the parent already has the sparkline data at mount time
-  // (navigations back into a page that cached the dashboard response).
-  watch(() => props.sparkline, drawSparkline, { deep: true, flush: 'post', immediate: true });
-  onUnmounted(() => chart?.destroy());
+  const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
 </script>
 
 <style lang="scss" scoped>
