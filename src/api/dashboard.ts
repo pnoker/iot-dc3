@@ -79,3 +79,14 @@ export const alertTrend = (days = 30) => httpGet(`${API_DATA_BASE}/dashboard/ale
 
 export const alertTopSources = (days = 30, limit = 10) =>
   httpGet(`${API_DATA_BASE}/dashboard/alert/top-sources`, { params: { days, limit } });
+
+// ALARM hour × day-of-week heatmap. Service always returns 168 cells.
+export const alertActivity = (days = 7) => httpGet(`${API_DATA_BASE}/dashboard/alert/activity`, { params: { days } });
+
+// ALARM count by event_ext.type (driver-offline, driver-state-flip, ...).
+export const alertTypeDistribution = (days = 30) =>
+  httpGet(`${API_DATA_BASE}/dashboard/alert/type-distribution`, { params: { days } });
+
+// Sources that tripped the storm threshold in the last N hours.
+export const alertStormSources = (hours = 1, minCount = 10, limit = 10) =>
+  httpGet(`${API_DATA_BASE}/dashboard/alert/storm-sources`, { params: { hours, minCount, limit } });
