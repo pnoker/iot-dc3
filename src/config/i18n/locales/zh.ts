@@ -30,6 +30,8 @@ export default {
     enableFlag: '使能',
     operationTime: '修改日期',
     createTime: '创建日期',
+    creatorName: '创建人',
+    operatorName: '修改人',
     loading: '加载中...',
     noDescription: '无描述信息',
     operation: '操作',

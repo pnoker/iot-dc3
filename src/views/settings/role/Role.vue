@@ -43,7 +43,13 @@
           </template>
         </el-table-column>
         <el-table-column prop="remark" :label="t('common.remark')" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="creatorName" :label="t('common.creatorName')" min-width="110" show-overflow-tooltip>
+          <template #default="{ row }">{{ row.creatorName || '-' }}</template>
+        </el-table-column>
         <el-table-column prop="createTime" :label="t('common.createTime')" :formatter="timestampColumn" width="180" />
+        <el-table-column prop="operatorName" :label="t('common.operatorName')" min-width="110" show-overflow-tooltip>
+          <template #default="{ row }">{{ row.operatorName || '-' }}</template>
+        </el-table-column>
         <el-table-column
           prop="operateTime"
           :label="t('common.operationTime')"

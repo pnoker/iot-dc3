@@ -30,6 +30,8 @@ export default {
     enableFlag: 'Enable',
     operationTime: 'Modified',
     createTime: 'Created',
+    creatorName: 'Created By',
+    operatorName: 'Modified By',
     loading: 'Loading...',
     noDescription: 'No description',
     operation: 'Operation',
