@@ -116,4 +116,18 @@ public class RoleResourceBindController implements BaseController {
         }
     }
 
+    @GetMapping("/list-resource-by-user/{userId}")
+    public Mono<R<List<ResourceVO>>> listResourceByUser(@NotNull @PathVariable(value = "userId") Long userId) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                List<ResourceBO> entityBOList = roleResourceBindService.listResourceByUserId(userId, tenantId);
+                List<ResourceVO> entityVOList = resourceBuilder.buildVOListByBOList(entityBOList);
+                return Mono.just(R.ok(entityVOList));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
 }
