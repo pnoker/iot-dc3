@@ -503,18 +503,22 @@ export default {
       driver: 'Driver',
       overview: {
         deviceTotal: 'Total device events',
-        deviceUnconfirmed: 'Device unconfirmed',
+        deviceUnconfirmed: 'Total device unconfirmed',
         driverTotal: 'Total driver events',
-        driverUnconfirmed: 'Driver unconfirmed',
+        driverUnconfirmed: 'Total driver unconfirmed',
         todayDevice: 'Today device events',
         todayDriver: 'Today driver events',
-        goToDevice: 'Open device events →',
-        goToDriver: 'Open driver events →',
+        // Subtitles — all six cards get a second data point so the primary
+        // number is never alone. Total cards expose "how many are still open";
+        // unconfirmed cards expose "how large is the backlog vs total"; today
+        // cards expose today's open count.
+        subtitleTotalUnconfirmed: '{unconfirmed}/{total} unhandled · {pct}%',
+        subtitleUnconfirmedOfTotal: 'of {total} total · {pct}%',
+        subtitleTodayUnconfirmed: '{unconfirmed} unhandled',
         trendTitle: '30-Day Event Trend',
         topSourcesTitle: 'Top 10 Event Sources',
         unconfirmedTitle: 'Recent Unconfirmed Events',
         noUnconfirmed: 'No unconfirmed events',
-        unconfirmedRatio: '{unconfirmed}/{total} unhandled · {pct}%',
         activityTitle: 'Alarm Hour × Day Heatmap',
         alarmCount: 'Alarms',
         typeDistributionTitle: 'Alarm Type Distribution',

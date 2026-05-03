@@ -165,6 +165,8 @@
     // Home's today-alert cards — no extra round-trip needed here).
     todayDevice: 0,
     todayDriver: 0,
+    todayDeviceUnconfirmed: 0,
+    todayDriverUnconfirmed: 0,
     // 24h hourly bucket (overall) — used by the Today cards since "today"
     // is inherently about the current day's hourly activity.
     sparkline24h: [] as number[],
@@ -202,12 +204,20 @@
       state.driverUnconfirmed = ru;
       const statsData = (
         stats as {
-          data?: { sparkline24h?: number[]; todayDeviceAlarms?: number; todayDriverAlarms?: number };
+          data?: {
+            sparkline24h?: number[];
+            todayDeviceAlarms?: number;
+            todayDriverAlarms?: number;
+            todayDeviceUnconfirmed?: number;
+            todayDriverUnconfirmed?: number;
+          };
         } | null
       )?.data;
       state.sparkline24h = statsData?.sparkline24h ?? [];
       state.todayDevice = Number(statsData?.todayDeviceAlarms ?? 0);
       state.todayDriver = Number(statsData?.todayDriverAlarms ?? 0);
+      state.todayDeviceUnconfirmed = Number(statsData?.todayDeviceUnconfirmed ?? 0);
+      state.todayDriverUnconfirmed = Number(statsData?.todayDriverUnconfirmed ?? 0);
 
       const trendRows =
         ((trend as { data?: Array<{ deviceCount?: number; driverCount?: number }> } | null)?.data as Array<{
@@ -235,11 +245,22 @@
     return { direction: 'flat', label: '0' };
   };
 
+  // Subtitle builders — every card gets a second data point so the primary
+  // metric never stands alone. totalSubtitle supplies "how many open" on the
+  // total cards; unconfirmedSubtitle supplies "how large is the backlog vs
+  // cumulative total" on the unconfirmed cards; todaySubtitle supplies
+  // today's unconfirmed count on the today cards.
+  const totalSubtitle = (unconfirmed: number, total: number) => {
+    if (total === 0) return '';
+    const pct = Math.round((unconfirmed / total) * 100);
+    return t('settings.event.overview.subtitleTotalUnconfirmed', { unconfirmed, total, pct });
+  };
   const unconfirmedSubtitle = (unconfirmed: number, total: number) => {
     if (total === 0) return '';
     const pct = Math.round((unconfirmed / total) * 100);
-    return t('settings.event.overview.unconfirmedRatio', { unconfirmed, total, pct });
+    return t('settings.event.overview.subtitleUnconfirmedOfTotal', { total, pct });
   };
+  const todaySubtitle = (unconfirmed: number) => t('settings.event.overview.subtitleTodayUnconfirmed', { unconfirmed });
 
   // Card order chosen deliberately: driver lane first (the one tenants run
   // diagnostics off most), then device, split into totals → unconfirmed →
@@ -253,7 +274,7 @@
       key: 'driver-total',
       title: t('settings.event.overview.driverTotal'),
       value: state.driverTotal,
-      subtitle: t('settings.event.overview.goToDriver'),
+      subtitle: totalSubtitle(state.driverUnconfirmed, state.driverTotal),
       icon: Promotion,
       tone: 'purple',
       sparkline: state.driverDaily,
@@ -265,7 +286,7 @@
       key: 'device-total',
       title: t('settings.event.overview.deviceTotal'),
       value: state.deviceTotal,
-      subtitle: t('settings.event.overview.goToDevice'),
+      subtitle: totalSubtitle(state.deviceUnconfirmed, state.deviceTotal),
       icon: Management,
       tone: 'blue',
       sparkline: state.deviceDaily,
@@ -301,7 +322,7 @@
       key: 'today-driver',
       title: t('settings.event.overview.todayDriver'),
       value: state.todayDriver,
-      subtitle: '',
+      subtitle: todaySubtitle(state.todayDriverUnconfirmed),
       icon: Bell,
       tone: 'purple',
       sparkline: state.sparkline24h,
@@ -313,7 +334,7 @@
       key: 'today-device',
       title: t('settings.event.overview.todayDevice'),
       value: state.todayDevice,
-      subtitle: '',
+      subtitle: todaySubtitle(state.todayDeviceUnconfirmed),
       icon: Bell,
       tone: 'blue',
       sparkline: state.sparkline24h,
