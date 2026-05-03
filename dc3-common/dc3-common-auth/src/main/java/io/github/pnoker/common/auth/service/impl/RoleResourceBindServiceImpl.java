@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.dal.ResourceManager;
 import io.github.pnoker.common.auth.dal.RoleManager;
 import io.github.pnoker.common.auth.dal.RoleResourceBindManager;
+import io.github.pnoker.common.auth.dal.RoleUserBindManager;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.auth.entity.builder.ResourceBuilder;
@@ -30,6 +31,7 @@ import io.github.pnoker.common.auth.entity.builder.RoleResourceBindBuilder;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
 import io.github.pnoker.common.auth.entity.model.RoleResourceBindDO;
+import io.github.pnoker.common.auth.entity.model.RoleUserBindDO;
 import io.github.pnoker.common.auth.entity.query.RoleResourceBindQuery;
 import io.github.pnoker.common.auth.service.RoleResourceBindService;
 import io.github.pnoker.common.constant.common.QueryWrapperConstant;
@@ -43,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -66,6 +69,8 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
     private ResourceManager resourceManager;
     @Resource
     private RoleManager roleManager;
+    @Resource
+    private RoleUserBindManager roleUserBindManager;
 
     @Override
     public void save(RoleResourceBindBO entityBO) {
@@ -121,6 +126,47 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
         }
         Page<RoleResourceBindDO> entityPageDO = roleResourceBindManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery, tenantId));
         return roleResourceBindBuilder.buildBOPageByDOPage(entityPageDO);
+    }
+
+    @Override
+    public List<ResourceBO> listResourceByUserId(Long userId, Long tenantId) {
+        if (Objects.isNull(userId)) {
+            return Collections.emptyList();
+        }
+        // Step 1: roles the user is bound to.
+        LambdaQueryWrapper<RoleUserBindDO> userWrapper = Wrappers.<RoleUserBindDO>query().lambda();
+        userWrapper.eq(RoleUserBindDO::getUserId, userId);
+        userWrapper.select(RoleUserBindDO::getRoleId);
+        List<Long> roleIds = roleUserBindManager.listObjs(userWrapper, o -> (Long) o);
+        if (CollectionUtils.isEmpty(roleIds)) {
+            return Collections.emptyList();
+        }
+        // Step 2: narrow to the caller's tenant so a stale cross-tenant binding
+        // cannot leak resources outside the current scope.
+        if (Objects.nonNull(tenantId)) {
+            LambdaQueryWrapper<RoleDO> roleWrapper = Wrappers.<RoleDO>query().lambda();
+            roleWrapper.in(RoleDO::getId, roleIds);
+            roleWrapper.eq(RoleDO::getTenantId, tenantId);
+            roleWrapper.select(RoleDO::getId);
+            roleIds = roleManager.listObjs(roleWrapper, o -> (Long) o);
+            if (CollectionUtils.isEmpty(roleIds)) {
+                return Collections.emptyList();
+            }
+        }
+        // Step 3: role -> resource bindings.
+        LambdaQueryWrapper<RoleResourceBindDO> bindWrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+        bindWrapper.in(RoleResourceBindDO::getRoleId, roleIds);
+        bindWrapper.select(RoleResourceBindDO::getResourceId);
+        List<Long> resourceIds = roleResourceBindManager.listObjs(bindWrapper, o -> (Long) o)
+                .stream().distinct().toList();
+        if (CollectionUtils.isEmpty(resourceIds)) {
+            return Collections.emptyList();
+        }
+        // Step 4: fetch resources and drop disabled ones (same rule as listResourceByRoleId).
+        List<ResourceDO> resourceDOList = resourceManager.listByIds(resourceIds).stream()
+                .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
+                .toList();
+        return resourceBuilder.buildBOListByDOList(resourceDOList);
     }
 
     @Override
