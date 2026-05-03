@@ -20,11 +20,14 @@ package io.github.pnoker.common.auth.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleUserBindBO;
+import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.common.auth.entity.builder.RoleUserBindBuilder;
+import io.github.pnoker.common.auth.entity.builder.UserBuilder;
 import io.github.pnoker.common.auth.entity.query.RoleUserBindQuery;
 import io.github.pnoker.common.auth.entity.vo.RoleUserBindVO;
 import io.github.pnoker.common.auth.entity.vo.RoleVO;
+import io.github.pnoker.common.auth.entity.vo.UserVO;
 import io.github.pnoker.common.auth.service.RoleUserBindService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
@@ -55,13 +58,16 @@ public class RoleUserBindController implements BaseController {
     private final RoleUserBindBuilder roleUserBindBuilder;
     private final RoleUserBindService roleUserBindService;
     private final RoleBuilder roleBuilder;
+    private final UserBuilder userBuilder;
 
     public RoleUserBindController(RoleUserBindBuilder roleUserBindBuilder,
                                   RoleUserBindService roleUserBindService,
-                                  RoleBuilder roleBuilder) {
+                                  RoleBuilder roleBuilder,
+                                  UserBuilder userBuilder) {
         this.roleUserBindBuilder = roleUserBindBuilder;
         this.roleUserBindService = roleUserBindService;
         this.roleBuilder = roleBuilder;
+        this.userBuilder = userBuilder;
     }
 
     @PostMapping("/add")
@@ -110,6 +116,18 @@ public class RoleUserBindController implements BaseController {
         try {
             List<RoleBO> entityBOList = roleUserBindService.listRoleByTenantIdAndUserId(tenantId, userId);
             List<RoleVO> entityVOList = roleBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVOList));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/list-user-by-role/{roleId}")
+    public Mono<R<List<UserVO>>> listUserByRole(@NotNull @PathVariable(value = "roleId") Long roleId) {
+        try {
+            List<UserBO> entityBOList = roleUserBindService.listUserByRoleId(roleId);
+            List<UserVO> entityVOList = userBuilder.buildVOListByBOList(entityBOList);
             return Mono.just(R.ok(entityVOList));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
