@@ -43,7 +43,12 @@ public class UserQuery implements Serializable {
 
     private Pages page;
 
-    // 
+    /**
+     * Tenant scope. Populated by the controller from the request context;
+     * any value supplied by the client is overwritten so a caller cannot
+     * reach across tenants.
+     */
+    private Long tenantId;
 
     /**
      *

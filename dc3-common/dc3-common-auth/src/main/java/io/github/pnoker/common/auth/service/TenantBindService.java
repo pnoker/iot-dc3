@@ -21,6 +21,8 @@ import io.github.pnoker.common.auth.entity.bo.TenantBindBO;
 import io.github.pnoker.common.auth.entity.query.TenantBindQuery;
 import io.github.pnoker.common.base.service.BaseService;
 
+import java.util.List;
+
 /**
  * TenantBind Interface
  *
@@ -38,4 +40,12 @@ public interface TenantBindService extends BaseService<TenantBindBO, TenantBindQ
      * @return TenantBind
      */
     TenantBindBO selectByTenantIdAndUserId(Long tenantId, Long userId);
+
+    /**
+     * List active user IDs bound to the given tenant.
+     *
+     * @param tenantId tenant scope; must be non-null
+     * @return user IDs (empty if the tenant has no members yet)
+     */
+    List<Long> listUserIdsByTenantId(Long tenantId);
 }
