@@ -90,8 +90,21 @@
       }
     }
 
+    // el-row already carries the 12px vertical rhythm between rows. On wide
+    // screens the cols sit side-by-side so they don't need a bottom margin
+    // of their own — adding one stacked with .home__row margin-bottom,
+    // blowing the gap out to 24px. Only the narrow-screen breakpoint where
+    // cols collapse into a single column actually needs the extra spacer.
     .home__col {
-      margin-bottom: 12px;
+      margin-bottom: 0;
+
+      @media (max-width: 1024px) {
+        margin-bottom: 12px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
     }
 
     // Stat indicators: always fit the strip on one line, regardless of how
