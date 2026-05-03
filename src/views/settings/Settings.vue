@@ -175,12 +175,6 @@
   }
 
   .settings-main {
-    // Override the Element Plus CSS custom property too, not just the
-    // padding declaration — belt-and-braces in case any scoped-hash
-    // edge case lets the default `padding: var(--el-main-padding, 20px)`
-    // slip through. Most visible on About / Overview where there's no
-    // tool-card to visually absorb a stray 20px top pad.
-    --el-main-padding: 0;
     padding: 0;
   }
 </style>
