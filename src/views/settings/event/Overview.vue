@@ -255,10 +255,10 @@
 </script>
 
 <style lang="scss" scoped>
-  // Uniform 12px gap: vertical rhythm between sections, horizontal gap
-  // inside every grid row. Bumping one value here should propagate to
-  // the whole overview so the layout stays balanced.
-  $overview-gap: 12px;
+  // Uniform 8px gap: vertical rhythm between sections, horizontal gap
+  // inside every grid row. Matches the home page's 8px rhythm — with
+  // el-card's 4px radius, a 12px gap looked too breathy.
+  $overview-gap: 8px;
 
   .event-overview {
     display: flex;

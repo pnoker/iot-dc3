@@ -17,7 +17,7 @@
 <template>
   <div class="home">
     <!-- Row 0: greeting + clock + service status -->
-    <el-row :gutter="12" class="home__row">
+    <el-row :gutter="8" class="home__row">
       <el-col :span="24" class="home__col">
         <home-banner />
       </el-col>
@@ -41,7 +41,7 @@
     </div>
 
     <!-- Row 2: 6-tab analytics + live data feed -->
-    <el-row :gutter="12" class="home__row">
+    <el-row :gutter="8" class="home__row">
       <el-col :lg="16" :md="24" :sm="24" :xl="16" :xs="24" class="home__col">
         <analytics-tabs />
       </el-col>
@@ -51,7 +51,7 @@
     </el-row>
 
     <!-- Row 3: trend chart + recent alerts -->
-    <el-row :gutter="12" class="home__row">
+    <el-row :gutter="8" class="home__row">
       <el-col :lg="16" :md="24" :sm="24" :xl="16" :xs="24" class="home__col">
         <trend-chart />
       </el-col>
@@ -61,7 +61,7 @@
     </el-row>
 
     <!-- Row 4: latency histogram + hourly activity heatmap -->
-    <el-row :gutter="12" class="home__row">
+    <el-row :gutter="8" class="home__row">
       <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
         <latency-chart />
       </el-col>
@@ -79,23 +79,23 @@
     padding: 0 4px;
 
     .home__row {
-      margin-bottom: 12px;
+      margin-bottom: 8px;
 
       &:last-child {
         margin-bottom: 0;
       }
     }
 
-    // el-row already carries the 12px vertical rhythm between rows. On wide
+    // el-row already carries the 8px vertical rhythm between rows. On wide
     // screens the cols sit side-by-side so they don't need a bottom margin
     // of their own — adding one stacked with .home__row margin-bottom,
-    // blowing the gap out to 24px. Only the narrow-screen breakpoint where
+    // blowing the gap out to 16px. Only the narrow-screen breakpoint where
     // cols collapse into a single column actually needs the extra spacer.
     .home__col {
       margin-bottom: 0;
 
       @media (max-width: 1024px) {
-        margin-bottom: 12px;
+        margin-bottom: 8px;
 
         &:last-child {
           margin-bottom: 0;
@@ -110,8 +110,8 @@
     .home__stats {
       display: grid;
       grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 8px;
+      margin-bottom: 8px;
 
       @media (max-width: 1280px) {
         grid-template-columns: repeat(3, minmax(0, 1fr));

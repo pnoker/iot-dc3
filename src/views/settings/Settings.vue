@@ -168,6 +168,10 @@
   }
 
   .settings-main {
-    padding: 0;
+    // .settings-container has `gap: 4px` between aside and main, so the
+    // main content already has 4px of breathing room on its left. Add
+    // the same 4px on the right so the content column isn't flush with
+    // the viewport edge on one side and padded on the other.
+    padding: 0 4px 0 0;
   }
 </style>
