@@ -21,6 +21,7 @@ import { Menu as MenuIcon } from '@element-plus/icons-vue';
 
 import { addMenu, deleteMenu, getMenuTree, updateMenu } from '@/api/menu';
 import { resolveIcon } from '@/config/constant/icons';
+import { timestampColumn } from '@/utils/DateUtil';
 import { successMessage } from '@/utils/NotificationUtil';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
@@ -140,6 +141,7 @@ export default defineComponent({
       remove,
       resolveIcon,
       MenuIcon,
+      timestampColumn,
     };
   },
 });
