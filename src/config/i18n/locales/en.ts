@@ -456,7 +456,6 @@ export default {
   },
   settings: {
     about: {
-      platformTitle: 'Platform',
       name: 'Name',
       version: 'Version',
       license: 'License',

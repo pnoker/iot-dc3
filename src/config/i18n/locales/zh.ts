@@ -456,7 +456,6 @@ export default {
   },
   settings: {
     about: {
-      platformTitle: '平台信息',
       name: '名称',
       version: '版本',
       license: '许可协议',

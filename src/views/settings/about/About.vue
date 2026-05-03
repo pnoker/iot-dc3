@@ -23,7 +23,7 @@
          el-descriptions' built-in title prop so we don't need a
          separate card-header slot. -->
     <blank-card>
-      <el-descriptions :title="t('settings.about.platformTitle')" :column="2" border>
+      <el-descriptions :column="2" border>
         <el-descriptions-item :label="t('settings.about.name')">IoT DC3</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.version')">v{{ version }}</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.license')">AGPL-3.0</el-descriptions-item>
