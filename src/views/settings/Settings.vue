@@ -136,8 +136,12 @@
   }
 
   .settings-aside {
-    margin-top: 1px;
-
+    // No margin-top. The previous 1px was meant to line up with the
+    // tool-card's old 1px top margin, but that margin is gone now; any
+    // non-zero value here leaves the aside sitting lower than the main
+    // content so the breadcrumb→aside gap reads as "bigger" than the
+    // breadcrumb→content gap on every settings sub-page (including
+    // About, which has no tool-card at all).
     .settings-aside-card {
       height: 100%;
       border: 0;
