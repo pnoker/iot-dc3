@@ -19,6 +19,7 @@ package io.github.pnoker.common.auth.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
+import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.auth.entity.query.RoleResourceBindQuery;
 import io.github.pnoker.common.base.service.BaseService;
@@ -60,4 +61,15 @@ public interface RoleResourceBindService extends BaseService<RoleResourceBindBO,
      * @return distinct enabled resources, empty list if the user has no roles
      */
     List<ResourceBO> listResourceByUserId(Long userId, Long tenantId);
+
+    /**
+     * Reverse of {@link #listResourceByRoleId} — given a resource, list the
+     * enabled roles that currently grant it. Used by the resource detail
+     * page's "Assigned Roles" tab.
+     *
+     * @param resourceId target resource
+     * @param tenantId   tenant scope (constrains which roles are returned)
+     * @return enabled roles within the tenant; empty list if none
+     */
+    List<RoleBO> listRoleByResourceId(Long resourceId, Long tenantId);
 }
