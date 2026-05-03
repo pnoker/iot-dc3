@@ -19,8 +19,10 @@ package io.github.pnoker.common.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
+import io.github.pnoker.common.auth.entity.bo.RoleTreeBO;
 import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.common.auth.entity.query.RoleQuery;
+import io.github.pnoker.common.auth.entity.vo.RoleTreeVO;
 import io.github.pnoker.common.auth.entity.vo.RoleVO;
 import io.github.pnoker.common.auth.service.RoleService;
 import io.github.pnoker.common.base.BaseController;
@@ -35,6 +37,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -130,6 +134,51 @@ public class RoleController implements BaseController {
                 return Mono.just(R.fail(e.getMessage()));
             }
         });
+    }
+
+    @PostMapping("/tree")
+    public Mono<R<List<RoleTreeVO>>> tree(@RequestBody(required = false) RoleQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                List<RoleTreeBO> entityBOList = roleService.selectTree(query);
+                List<RoleTreeVO> entityVOList = new ArrayList<>(entityBOList.size());
+                for (RoleTreeBO node : entityBOList) {
+                    entityVOList.add(toTreeVO(node));
+                }
+                return Mono.just(R.ok(entityVOList));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    private RoleTreeVO toTreeVO(RoleTreeBO node) {
+        RoleVO flat = roleBuilder.buildVOByBO(node);
+        RoleTreeVO out = new RoleTreeVO();
+        out.setId(flat.getId());
+        out.setParentRoleId(flat.getParentRoleId());
+        out.setRoleName(flat.getRoleName());
+        out.setRoleCode(flat.getRoleCode());
+        out.setRoleExt(flat.getRoleExt());
+        out.setEnableFlag(flat.getEnableFlag());
+        out.setRemark(flat.getRemark());
+        out.setCreatorId(flat.getCreatorId());
+        out.setCreatorName(flat.getCreatorName());
+        out.setCreateTime(flat.getCreateTime());
+        out.setOperatorId(flat.getOperatorId());
+        out.setOperatorName(flat.getOperatorName());
+        out.setOperateTime(flat.getOperateTime());
+        if (node.getChildren() != null) {
+            List<RoleTreeVO> childVOs = new ArrayList<>(node.getChildren().size());
+            for (RoleTreeBO child : node.getChildren()) {
+                childVOs.add(toTreeVO(child));
+            }
+            out.setChildren(childVOs);
+        }
+        return out;
     }
 
 }
