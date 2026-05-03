@@ -30,7 +30,7 @@
       </div>
 
       <div class="assign-dual">
-        <div class="assign-pane">
+        <div class="assign-pane assign-pane--left">
           <div class="assign-pane__header">
             <span class="assign-pane__title">{{ t('settings.role.resourcesAll') }}</span>
             <el-input
@@ -44,17 +44,35 @@
               </template>
             </el-input>
           </div>
-          <div class="assign-pane__tree">
-            <el-tree
-              ref="treeRef"
-              :data="reactiveData.treeData"
-              :props="{ label: 'resourceName', children: 'children' }"
-              node-key="id"
-              show-checkbox
-              check-strictly
-              :filter-node-method="filterNode"
-              @check-change="onCheckChange"
+
+          <el-tabs v-model="activeType" class="assign-pane__tabs">
+            <el-tab-pane
+              v-for="type in availableTypes"
+              :key="type"
+              :name="type"
+              :label="`${type} (${selectedCountByType[type] || 0}/${totalCountByType[type] || 0})`"
             />
+          </el-tabs>
+
+          <div class="assign-pane__tree">
+            <template v-for="type in availableTypes" :key="type">
+              <el-tree
+                v-show="activeType === type"
+                :ref="(el) => registerTree(type, el)"
+                :data="treesByType[type] || []"
+                :props="{ label: 'resourceName', children: 'children' }"
+                node-key="id"
+                show-checkbox
+                check-strictly
+                :filter-node-method="filterNode"
+                @check-change="onCheckChange"
+              />
+              <el-empty
+                v-show="activeType === type && (treesByType[type] || []).length === 0"
+                :description="t('settings.role.empty')"
+                :image-size="60"
+              />
+            </template>
           </div>
         </div>
 
@@ -65,11 +83,16 @@
               <span class="assign-pane__count">({{ assignedList.length }})</span>
             </span>
           </div>
-          <el-table :data="assignedList" height="420" stripe class="assign-pane__table" row-key="id">
+          <el-table :data="assignedList" height="460" stripe class="assign-pane__table" row-key="id">
+            <el-table-column prop="resourceTypeFlag" :label="t('settings.resource.resourceType')" width="88">
+              <template #default="{ row }">
+                <el-tag size="small" :type="typeTagType(row.resourceTypeFlag)">{{ row.resourceTypeFlag }}</el-tag>
+              </template>
+            </el-table-column>
             <el-table-column
               prop="resourceName"
               :label="t('settings.resource.resourceName')"
-              min-width="180"
+              min-width="160"
               show-overflow-tooltip
             />
             <el-table-column
@@ -78,8 +101,7 @@
               min-width="140"
               show-overflow-tooltip
             />
-            <el-table-column prop="resourceTypeFlag" :label="t('settings.resource.resourceType')" width="110" />
-            <el-table-column :label="t('common.operation')" width="88" fixed="right">
+            <el-table-column :label="t('common.operation')" width="78" fixed="right">
               <template #default="{ row }">
                 <el-button link type="danger" @click="removeOne(row.id)">{{ t('common.remove') }}</el-button>
               </template>
@@ -102,7 +124,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, reactive, ref, watch } from 'vue';
+  import { computed, nextTick, reactive, ref, watch } from 'vue';
   import type { ElTree } from 'element-plus';
   import { Search } from '@element-plus/icons-vue';
   import { useI18n } from 'vue-i18n';
@@ -112,46 +134,93 @@
 
   interface ResourceNode {
     id: string;
+    parentResourceId?: string | number;
     resourceName: string;
     resourceCode: string;
-    resourceTypeFlag?: string | number;
+    resourceTypeFlag: string;
     remark?: string;
     children?: ResourceNode[];
   }
+
+  // Tabs are ordered by this list so tenants with all seven types always see
+  // the same layout. Types the tenant has no resources in are filtered out
+  // via `availableTypes`.
+  const TYPE_ORDER = ['MENU', 'API', 'DATA', 'DEVICE', 'POINT', 'PROFILE', 'DRIVER'];
 
   const { t } = useI18n();
   const emit = defineEmits<{
     (e: 'save', roleId: string, addIds: string[], removeBindIds: string[], done: () => void): void;
   }>();
 
-  const treeRef = ref<InstanceType<typeof ElTree>>();
+  // One el-tree per resource type — each keeps its own checked state so
+  // switching tabs doesn't lose selections made in other tabs.
+  const treeRefs = reactive<Record<string, InstanceType<typeof ElTree> | null>>({});
+  const registerTree = (type: string, el: unknown) => {
+    treeRefs[type] = (el as InstanceType<typeof ElTree>) || null;
+  };
+
+  const activeType = ref<string>('');
 
   const reactiveData = reactive({
     visible: false,
     loading: false,
     submitting: false,
     role: {} as any,
-    treeData: [] as ResourceNode[],
-    // id -> flat node (after flattening the tree) used to render the
-    // right-hand "Assigned" table from a list of ids.
+    // trees grouped by resourceTypeFlag; each type's nodes keep their
+    // within-type parent/child links (cross-type links are dropped since the
+    // user is viewing a single type at a time).
+    treesByType: {} as Record<string, ResourceNode[]>,
+    // id -> flat node for quickly rendering the right-hand table and
+    // locating the tree a given id belongs to (via resourceTypeFlag).
     nodeMap: new Map<string, ResourceNode>(),
     bindIdByResourceId: new Map<string, string>(),
     originalResourceIds: [] as string[],
-    // authoritative current-selection list, kept in sync with el-tree
-    // via @check-change. Using a Set inside a reactive breaks deep
-    // reactivity on mutation, so we use an array + helpers.
+    // authoritative current selection; kept in sync with every tree's
+    // checked keys via onCheckChange, and rebuilt on load.
     selectedIds: [] as string[],
     filter: '',
   });
 
-  const flatten = (nodes: ResourceNode[], into: Map<string, ResourceNode>) => {
-    for (const n of nodes || []) {
-      into.set(String(n.id), n);
-      if (n.children && n.children.length) {
-        flatten(n.children, into);
-      }
+  const treesByType = computed(() => reactiveData.treesByType);
+
+  const availableTypes = computed(() => {
+    const present = Object.keys(reactiveData.treesByType);
+    const ordered = TYPE_ORDER.filter((t) => present.includes(t));
+    // catch any type not in TYPE_ORDER so nothing silently disappears
+    for (const t of present) if (!ordered.includes(t)) ordered.push(t);
+    return ordered;
+  });
+
+  const totalCountByType = computed(() => {
+    const map: Record<string, number> = {};
+    for (const type of Object.keys(reactiveData.treesByType)) {
+      let count = 0;
+      const walk = (ns: ResourceNode[]) => {
+        for (const n of ns) {
+          count += 1;
+          if (n.children) walk(n.children);
+        }
+      };
+      walk(reactiveData.treesByType[type] || []);
+      map[type] = count;
     }
-  };
+    return map;
+  });
+
+  const selectedCountByType = computed(() => {
+    const map: Record<string, number> = {};
+    for (const id of reactiveData.selectedIds) {
+      const node = reactiveData.nodeMap.get(id);
+      if (!node) continue;
+      const type = String(node.resourceTypeFlag);
+      map[type] = (map[type] || 0) + 1;
+    }
+    return map;
+  });
+
+  const assignedList = computed(() =>
+    reactiveData.selectedIds.map((id) => reactiveData.nodeMap.get(id)).filter((n): n is ResourceNode => !!n)
+  );
 
   const filterNode = (value: string, data: any) => {
     if (!value) return true;
@@ -159,28 +228,117 @@
     return (data.resourceName || '').toLowerCase().includes(k) || (data.resourceCode || '').toLowerCase().includes(k);
   };
 
+  // Only filter the currently visible tree. Re-apply on tab switch so the
+  // search box "follows" the user as they flip between types.
   watch(
     () => reactiveData.filter,
     (val) => {
-      treeRef.value?.filter(val);
+      treeRefs[activeType.value]?.filter(val);
     }
   );
+  watch(activeType, (type) => {
+    treeRefs[type]?.filter(reactiveData.filter);
+  });
 
-  // el-tree fires check-change per node rather than a batch event. Pull the
-  // current state from the tree instead of mutating manually.
+  // Pull all trees' checked state and merge — keeps selectedIds correct even
+  // when the user flips tabs between picks in different types.
   const onCheckChange = () => {
-    const keys = (treeRef.value?.getCheckedKeys(false) || []) as Array<string | number>;
-    reactiveData.selectedIds = keys.map(String);
+    const all: string[] = [];
+    for (const type of availableTypes.value) {
+      const tree = treeRefs[type];
+      if (!tree) continue;
+      all.push(...((tree.getCheckedKeys(false) || []) as Array<string | number>).map(String));
+    }
+    reactiveData.selectedIds = all;
   };
-
-  const assignedList = computed(() =>
-    reactiveData.selectedIds.map((id) => reactiveData.nodeMap.get(id)).filter((n): n is ResourceNode => !!n)
-  );
 
   const removeOne = (id: string | number) => {
     const key = String(id);
-    treeRef.value?.setChecked(key, false, false);
+    const node = reactiveData.nodeMap.get(key);
+    if (node) {
+      const type = String(node.resourceTypeFlag);
+      treeRefs[type]?.setChecked(key, false, false);
+    }
     reactiveData.selectedIds = reactiveData.selectedIds.filter((v) => v !== key);
+  };
+
+  const typeTagType = (type: string) => {
+    switch (type) {
+      case 'MENU':
+        return 'primary';
+      case 'API':
+        return 'success';
+      case 'DATA':
+        return 'warning';
+      case 'DEVICE':
+      case 'POINT':
+      case 'PROFILE':
+      case 'DRIVER':
+        return 'info';
+      default:
+        return 'info';
+    }
+  };
+
+  // Flatten the backend tree to a node-map and bucket nodes by type, rebuilding
+  // per-type parent/child links (a node parented to a different-typed node in
+  // the source tree becomes a root in its type's bucket).
+  const groupByType = (treeData: ResourceNode[]) => {
+    const flat: ResourceNode[] = [];
+    const collect = (ns: ResourceNode[]) => {
+      for (const n of ns) {
+        flat.push(n);
+        if (n.children) collect(n.children);
+      }
+    };
+    collect(treeData);
+
+    const map = new Map<string, ResourceNode>();
+    for (const n of flat) map.set(String(n.id), n);
+
+    const buckets: Record<string, ResourceNode[]> = {};
+    for (const n of flat) {
+      const type = String(n.resourceTypeFlag || 'OTHER');
+      if (!buckets[type]) buckets[type] = [];
+      buckets[type].push({
+        id: String(n.id),
+        parentResourceId: n.parentResourceId,
+        resourceName: n.resourceName,
+        resourceCode: n.resourceCode,
+        resourceTypeFlag: type,
+        remark: n.remark,
+        children: [],
+      });
+    }
+
+    const trees: Record<string, ResourceNode[]> = {};
+    for (const [type, nodes] of Object.entries(buckets)) {
+      const byId = new Map<string, ResourceNode>();
+      for (const n of nodes) byId.set(n.id, n);
+      const roots: ResourceNode[] = [];
+      for (const n of nodes) {
+        const parentId = n.parentResourceId != null ? String(n.parentResourceId) : null;
+        const parent = parentId && byId.get(parentId);
+        if (parent) parent.children!.push(n);
+        else roots.push(n);
+      }
+      trees[type] = roots;
+    }
+
+    return { flatMap: map, trees };
+  };
+
+  const applyCheckedToTrees = () => {
+    const byType: Record<string, string[]> = {};
+    for (const id of reactiveData.originalResourceIds) {
+      const node = reactiveData.nodeMap.get(id);
+      if (!node) continue;
+      const type = String(node.resourceTypeFlag);
+      (byType[type] ||= []).push(id);
+    }
+    for (const type of availableTypes.value) {
+      treeRefs[type]?.setCheckedKeys(byType[type] || []);
+    }
   };
 
   const load = async () => {
@@ -193,11 +351,9 @@
       ]);
 
       const treeData = (treeRes.data as any[]) || [];
-      reactiveData.treeData = treeData;
-
-      const map = new Map<string, ResourceNode>();
-      flatten(treeData, map);
-      reactiveData.nodeMap = map;
+      const { flatMap, trees } = groupByType(treeData);
+      reactiveData.nodeMap = flatMap;
+      reactiveData.treesByType = trees;
 
       const ownIds = ((ownRes.data as any[]) || []).map((r) => String(r.id));
       reactiveData.originalResourceIds = ownIds;
@@ -209,12 +365,14 @@
       }
       reactiveData.bindIdByResourceId = bindMap;
 
-      // Seed the tree's checked state after render so the right-hand table
-      // matches on open. setCheckedKeys is idempotent and won't fire
-      // check-change, so we set selectedIds first above.
-      setTimeout(() => {
-        treeRef.value?.setCheckedKeys(ownIds);
-      });
+      // Land on the first type that actually has data so the user sees
+      // something on open — default 'MENU' if it exists, else first available.
+      const types = availableTypes.value;
+      activeType.value = types.includes('MENU') ? 'MENU' : types[0] || '';
+
+      // el-tree mounts after v-if/v-show paints; defer seeding so every
+      // tree ref is registered before we push checked keys into them.
+      nextTick(applyCheckedToTrees);
     } catch {
       // handled globally
     } finally {
@@ -224,12 +382,13 @@
 
   const show = (role: any) => {
     reactiveData.role = role;
-    reactiveData.treeData = [];
+    reactiveData.treesByType = {};
     reactiveData.nodeMap = new Map();
     reactiveData.bindIdByResourceId = new Map();
     reactiveData.originalResourceIds = [];
     reactiveData.selectedIds = [];
     reactiveData.filter = '';
+    activeType.value = '';
     reactiveData.visible = true;
     load();
   };
@@ -306,11 +465,16 @@
     background: var(--el-bg-color);
   }
 
+  .assign-pane--left {
+    gap: 0;
+  }
+
   .assign-pane__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+    margin-bottom: 6px;
   }
 
   .assign-pane__title {
@@ -328,6 +492,19 @@
 
   .assign-pane__header .el-input {
     max-width: 200px;
+  }
+
+  .assign-pane__tabs {
+    :deep(.el-tabs__header) {
+      margin-bottom: 0;
+    }
+
+    :deep(.el-tabs__item) {
+      font-size: 12px;
+      padding: 0 10px;
+      height: 32px;
+      line-height: 32px;
+    }
   }
 
   .assign-pane__tree {
