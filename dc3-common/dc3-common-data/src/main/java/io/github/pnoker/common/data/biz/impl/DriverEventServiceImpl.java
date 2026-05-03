@@ -49,7 +49,14 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DriverEventServiceImpl implements DriverEventService {
 
-    private static final int STATUS_TTL_SECONDS = 10;
+    // Driver status TTL must comfortably exceed the heartbeat cadence
+    // (ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON = 15s); otherwise the
+    // cache key expires before the next heartbeat lands, the offline-expiry
+    // listener fires on every healthy cycle, and each following heartbeat is
+    // interpreted as an OFFLINE→ONLINE flip — producing a 2-row/cycle alarm
+    // storm. 45s ≈ 3× the cron interval, which tolerates a couple of missed
+    // beats (network blip, GC pause) without flapping.
+    private static final int STATUS_TTL_SECONDS = 45;
 
     @Resource
     private LocalCacheService localCacheService;

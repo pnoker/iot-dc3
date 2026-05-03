@@ -39,7 +39,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Turns expired online-status cache keys into OFFLINE alarm rows in
@@ -130,10 +129,14 @@ public class OfflineExpiryListener {
         entity.setTenantId(driver.getTenantId() != null ? driver.getTenantId() : 0L);
         driverEventManager.save(entity);
 
-        // Re-seed the cache with OFFLINE so the dashboard reflects the state
-        // immediately. Long TTL — the next real heartbeat will overwrite it
-        // and fire a normal state-flip ALARM.
-        localCacheService.setKey(key, DriverStatusEnum.OFFLINE.getCode(), 1, TimeUnit.DAYS);
+        // Deliberately do NOT re-seed the cache. The previous version wrote
+        // OFFLINE back with a 1-day TTL so the dashboard "saw" the state,
+        // but that made every subsequent heartbeat look like an
+        // OFFLINE→ONLINE flip and fire a state-flip ALARM, producing an
+        // alarm storm every cron cycle. Consumers (DriverStatusServiceImpl,
+        // SystemHealthServiceImpl) already treat a missing key as OFFLINE,
+        // so leaving the key evicted gives the right UI behaviour without
+        // any spurious flip alarms.
     }
 
     private void handleDeviceExpiry(String key, String lastStatus) {
@@ -161,6 +164,8 @@ public class OfflineExpiryListener {
         entity.setTenantId(device.getTenantId() != null ? device.getTenantId() : 0L);
         deviceEventManager.save(entity);
 
-        localCacheService.setKey(key, DeviceStatusEnum.OFFLINE.getCode(), 1, TimeUnit.DAYS);
+        // See handleDriverExpiry — don't re-seed: the previous OFFLINE
+        // re-seed with a 1-day TTL turned every subsequent heartbeat into
+        // a state-flip ALARM. Consumers read a missing key as OFFLINE.
     }
 }
