@@ -17,7 +17,7 @@
 <template>
   <div>
     <blank-card>
-      <el-tabs v-model="reactiveData.active">
+      <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
         <el-tab-pane :label="$t('settings.resource.detailTitle')" name="detail">
           <detail-card>
             <el-descriptions :column="2" border>
@@ -66,6 +66,49 @@
             </el-descriptions>
           </detail-card>
         </el-tab-pane>
+
+        <el-tab-pane :label="$t('settings.resource.rolesOfResource')" name="role">
+          <el-table v-loading="reactiveData.rolesLoading" :data="reactiveData.roles" stripe>
+            <el-table-column prop="roleName" :label="$t('settings.role.roleName')" min-width="180" />
+            <el-table-column prop="roleCode" :label="$t('settings.role.roleCode')" min-width="180" />
+            <el-table-column :label="$t('common.enable')" width="90">
+              <template #default="{ row }">
+                <el-tag :type="Number(row.enableFlag) === 0 ? 'success' : 'info'">
+                  {{ Number(row.enableFlag) === 0 ? $t('common.enable') : $t('common.disable') }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="remark" :label="$t('common.remark')" min-width="220" show-overflow-tooltip />
+            <template #empty>
+              <el-empty :description="$t('settings.resource.empty')" :image-size="60" />
+            </template>
+          </el-table>
+        </el-tab-pane>
+
+        <el-tab-pane :label="$t('settings.resource.childResources')" name="children">
+          <el-table
+            v-loading="reactiveData.childrenLoading"
+            :data="reactiveData.children"
+            row-key="id"
+            :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+            default-expand-all
+            stripe
+          >
+            <el-table-column prop="resourceName" :label="$t('settings.resource.resourceName')" min-width="220" />
+            <el-table-column
+              prop="resourceCode"
+              :label="$t('settings.resource.resourceCode')"
+              min-width="180"
+              show-overflow-tooltip
+            />
+            <el-table-column prop="resourceTypeFlag" :label="$t('settings.resource.resourceType')" min-width="110" />
+            <el-table-column prop="resourceScopeFlag" :label="$t('settings.resource.resourceScope')" min-width="100" />
+            <el-table-column prop="remark" :label="$t('common.remark')" min-width="180" show-overflow-tooltip />
+            <template #empty>
+              <el-empty :description="$t('settings.resource.empty')" :image-size="60" />
+            </template>
+          </el-table>
+        </el-tab-pane>
       </el-tabs>
     </blank-card>
   </div>
@@ -73,20 +116,29 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive } from 'vue';
-  import { useRoute } from 'vue-router';
+  import type { TabsPaneContext } from 'element-plus';
+  import { useRoute, useRouter } from 'vue-router';
 
-  import { getResourceById } from '@/api/resource';
+  import { getResourceById, getResourceTree } from '@/api/resource';
+  import { listRoleByResourceId } from '@/api/roleResourceBind';
   import { timestamp } from '@/utils/DateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';
 
   const route = useRoute();
+  const router = useRouter();
 
   const reactiveData = reactive({
     id: route.query.id as string,
     active: (route.query.active as string) || 'detail',
     data: {} as Record<string, any>,
+    roles: [] as any[],
+    rolesLoaded: false,
+    rolesLoading: false,
+    children: [] as any[],
+    childrenLoaded: false,
+    childrenLoading: false,
   });
 
   const load = () => {
@@ -100,8 +152,65 @@
       });
   };
 
+  const loadRoles = () => {
+    if (!reactiveData.id || reactiveData.rolesLoaded) return;
+    reactiveData.rolesLoading = true;
+    listRoleByResourceId(reactiveData.id)
+      .then((res: any) => {
+        reactiveData.roles = (res.data as any[]) || [];
+        reactiveData.rolesLoaded = true;
+      })
+      .catch(() => {
+        // handled globally
+      })
+      .finally(() => {
+        reactiveData.rolesLoading = false;
+      });
+  };
+
+  // Walk the resource tree to find the current node, then show its children.
+  // Avoids a dedicated "list by parentId" endpoint — the tree is already
+  // shaped correctly on the server side, just relocate our own subtree.
+  const findNode = (nodes: any[], id: string): any => {
+    for (const n of nodes || []) {
+      if (String(n.id) === id) return n;
+      if (n.children) {
+        const hit = findNode(n.children, id);
+        if (hit) return hit;
+      }
+    }
+    return null;
+  };
+
+  const loadChildren = () => {
+    if (!reactiveData.id || reactiveData.childrenLoaded) return;
+    reactiveData.childrenLoading = true;
+    getResourceTree({})
+      .then((res: any) => {
+        const tree = (res.data as any[]) || [];
+        const node = findNode(tree, reactiveData.id);
+        reactiveData.children = node?.children || [];
+        reactiveData.childrenLoaded = true;
+      })
+      .catch(() => {
+        // handled globally
+      })
+      .finally(() => {
+        reactiveData.childrenLoading = false;
+      });
+  };
+
+  const changeActive = (tab: TabsPaneContext) => {
+    const name = String(tab.props.name || '');
+    router.push({ query: { ...route.query, active: name } }).catch(() => {});
+    if (name === 'role') loadRoles();
+    if (name === 'children') loadChildren();
+  };
+
   onMounted(() => {
     load();
+    if (reactiveData.active === 'role') loadRoles();
+    if (reactiveData.active === 'children') loadChildren();
   });
 </script>
 

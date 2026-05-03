@@ -28,3 +28,6 @@ export const listResourceByRoleId = (roleId: string) =>
 
 export const listResourceByUserId = (userId: string) =>
   httpGet(`${API_AUTH_BASE}/role-resource/list-resource-by-user/${userId}`);
+
+export const listRoleByResourceId = (resourceId: string) =>
+  httpGet(`${API_AUTH_BASE}/role-resource/list-role-by-resource/${resourceId}`);

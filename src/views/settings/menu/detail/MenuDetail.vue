@@ -37,7 +37,7 @@
                 {{ reactiveData.data.menuIndex }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('settings.menu.parentMenuId')">
-                {{ reactiveData.data.parentMenuId || '-' }}
+                {{ parentMenuName || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('settings.menu.menuIcon')">
                 {{ reactiveData.data.menuExt?.content?.icon || '-' }}
@@ -78,21 +78,32 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive } from 'vue';
+  import { computed, onMounted, reactive } from 'vue';
   import { useRoute } from 'vue-router';
 
   import { getMenuById } from '@/api/menu';
+  import { useMenuStore } from '@/store';
   import { timestamp } from '@/utils/DateUtil';
 
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';
 
   const route = useRoute();
+  const menuStore = useMenuStore();
 
   const reactiveData = reactive({
     id: route.query.id as string,
     active: (route.query.active as string) || 'detail',
     data: {} as Record<string, any>,
+  });
+
+  // parentMenuId on the wire is a raw id. Resolve it against the cached menu
+  // tree so the descriptions row shows something useful ("Home" vs "1234").
+  const parentMenuName = computed(() => {
+    const pid = reactiveData.data.parentMenuId;
+    if (!pid || String(pid) === '0') return '';
+    const parent = menuStore.findById(pid);
+    return parent?.menuName || String(pid);
   });
 
   const load = () => {
@@ -107,6 +118,10 @@
   };
 
   onMounted(() => {
+    // Ensure the menu tree is primed before parentMenuName runs — Layout
+    // usually loads it on startup, but a direct hit to this URL without
+    // going through Layout first would leave us with a blank parent.
+    menuStore.fetchTree();
     load();
   });
 </script>
