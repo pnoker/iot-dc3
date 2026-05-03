@@ -44,6 +44,13 @@
     </el-aside>
     <el-main class="settings-main">
       <router-view />
+      <!-- Settings sub-pages scroll inside el-main (overflow:auto), so
+           the Layout-level <el-backtop> that listens on
+           .body .el-scrollbar__wrap never triggers here. Add a second
+           backtop scoped to .settings-main so Menu / User / Event
+           Overview / About all get the same "back to top" affordance
+           as the rest of the site. -->
+      <el-backtop :right="40" :bottom="40" target=".settings-main" />
     </el-main>
   </el-container>
 </template>
