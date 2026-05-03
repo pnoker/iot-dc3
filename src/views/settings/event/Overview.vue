@@ -269,7 +269,7 @@
     // the frame so it matches the rest of the page's cards.
     .event-overview__quick {
       :deep(.el-descriptions__body) {
-        border-radius: 10px;
+        border-radius: 4px;
         overflow: hidden;
       }
       :deep(.el-descriptions__label) {

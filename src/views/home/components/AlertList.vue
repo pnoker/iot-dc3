@@ -223,7 +223,6 @@
 
 <style lang="scss" scoped>
   .alert-list {
-    border-radius: 10px;
     height: 100%;
 
     :deep(.el-card__header) {

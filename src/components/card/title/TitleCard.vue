@@ -38,7 +38,6 @@
 
 <style lang="scss" scoped>
   .title-card {
-    border-radius: 10px;
     box-sizing: border-box;
 
     :deep(.el-card) {

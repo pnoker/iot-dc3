@@ -131,7 +131,6 @@
   .stat-card {
     --stat-card-accent: #409eff;
     --stat-card-bg: rgba(64, 158, 255, 0.08);
-    border-radius: 10px;
     cursor: pointer;
     transition: transform 0.15s ease;
     height: 100%;
@@ -196,7 +195,7 @@
     .stat-card__icon {
       width: 48px;
       height: 48px;
-      border-radius: 10px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;

@@ -166,7 +166,6 @@
 
 <style lang="scss" scoped>
   .live-feed {
-    border-radius: 10px;
     min-height: 440px;
     height: 100%;
 
@@ -268,7 +267,7 @@
       font-size: 10px;
       font-weight: 600;
       padding: 1px 5px;
-      border-radius: 10px;
+      border-radius: 4px;
       white-space: nowrap;
 
       &--int,

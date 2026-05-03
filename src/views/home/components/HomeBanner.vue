@@ -162,7 +162,6 @@
 
 <style lang="scss" scoped>
   .home-banner {
-    border-radius: 10px;
     background: linear-gradient(135deg, #409eff 0%, #6a86ff 55%, #9059f6 100%);
     color: #ffffff;
 

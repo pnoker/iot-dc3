@@ -28,44 +28,44 @@
       <stat-card
         v-for="c in cards"
         :key="c.key"
-        :title="c.title"
-        :value="c.value"
-        :subtitle="c.subtitle"
         :icon="c.icon"
+        :on-refresh="c.onRefresh"
+        :sparkline="c.sparkline"
+        :subtitle="c.subtitle"
+        :title="c.title"
         :tone="c.tone"
         :trend="c.trend"
-        :sparkline="c.sparkline"
-        :on-refresh="c.onRefresh"
+        :value="c.value"
         @click="c.onClick"
       />
     </div>
 
     <!-- Row 2: 6-tab analytics + live data feed -->
     <el-row :gutter="12" class="home__row">
-      <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="home__col">
+      <el-col :lg="16" :md="24" :sm="24" :xl="16" :xs="24" class="home__col">
         <analytics-tabs />
       </el-col>
-      <el-col :xl="8" :lg="8" :md="24" :sm="24" :xs="24" class="home__col">
+      <el-col :lg="8" :md="24" :sm="24" :xl="8" :xs="24" class="home__col">
         <live-data-feed :size="20" />
       </el-col>
     </el-row>
 
     <!-- Row 3: trend chart + recent alerts -->
     <el-row :gutter="12" class="home__row">
-      <el-col :xl="16" :lg="16" :md="24" :sm="24" :xs="24" class="home__col">
+      <el-col :lg="16" :md="24" :sm="24" :xl="16" :xs="24" class="home__col">
         <trend-chart />
       </el-col>
-      <el-col :xl="8" :lg="8" :md="24" :sm="24" :xs="24" class="home__col">
+      <el-col :lg="8" :md="24" :sm="24" :xl="8" :xs="24" class="home__col">
         <alert-list :size="10" />
       </el-col>
     </el-row>
 
     <!-- Row 4: latency histogram + hourly activity heatmap -->
     <el-row :gutter="12" class="home__row">
-      <el-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24" class="home__col">
+      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
         <latency-chart />
       </el-col>
-      <el-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24" class="home__col">
+      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
         <activity-heatmap />
       </el-col>
     </el-row>

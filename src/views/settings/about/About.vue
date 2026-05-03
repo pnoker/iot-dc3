@@ -117,10 +117,6 @@
     flex-direction: column;
     gap: 12px;
 
-    .about__card {
-      border-radius: 10px;
-    }
-
     .about__title {
       font-weight: 600;
       color: #303133;

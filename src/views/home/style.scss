@@ -22,8 +22,6 @@
   }
 
   .statistic-card {
-    border-radius: 10px;
-
     .statistic-card-inner {
       display: flex;
       align-items: center;
@@ -33,7 +31,7 @@
     .statistic-icon {
       width: 56px;
       height: 56px;
-      border-radius: 10px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;

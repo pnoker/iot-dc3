@@ -111,8 +111,6 @@
 
 <style lang="scss" scoped>
   .activity-heatmap {
-    border-radius: 10px;
-
     :deep(.el-card__header) {
       padding: 12px 16px;
     }

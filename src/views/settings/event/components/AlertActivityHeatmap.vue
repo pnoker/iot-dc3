@@ -101,8 +101,6 @@
 
 <style lang="scss" scoped>
   .alert-activity {
-    border-radius: 10px;
-
     :deep(.el-card__header) {
       padding: 12px 16px;
     }

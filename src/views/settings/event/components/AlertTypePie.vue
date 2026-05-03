@@ -96,7 +96,6 @@
 
 <style lang="scss" scoped>
   .alert-type-pie {
-    border-radius: 10px;
     height: 100%;
 
     :deep(.el-card__header) {

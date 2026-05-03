@@ -28,7 +28,6 @@
 
 <style lang="scss" scoped>
   .detail-card {
-    border-radius: 10px;
     box-sizing: border-box;
 
     ul {

@@ -248,7 +248,6 @@
 
 <style lang="scss" scoped>
   .analytics-tabs {
-    border-radius: 10px;
     min-height: 440px;
     height: 100%;
 

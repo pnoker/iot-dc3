@@ -84,7 +84,6 @@
 
 <style lang="scss" scoped>
   .event-trend {
-    border-radius: 10px;
     height: 100%;
 
     :deep(.el-card__header) {
