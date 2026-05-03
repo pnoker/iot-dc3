@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref } from 'vue';
+import { defineComponent, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
-import { addApi, deleteApi, getApiList, updateApi } from '@/api/api';
+import { getApiList } from '@/api/api';
 import { timestampColumn } from '@/utils/DateUtil';
-import { successMessage } from '@/utils/NotificationUtil';
 
 import type { Order } from '@/config/entity';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import apiTool from './tool/ApiTool.vue';
-import apiEditForm from './edit/ApiEditForm.vue';
 
+// APIs are auto-registered by each service on startup — editing them from
+// the UI would drift from the real routes in under a minute. This page is
+// read-only by design; add/edit/delete intentionally stay off.
 export default defineComponent({
   name: 'SettingsApi',
   components: {
     BlankCard,
     apiTool,
-    apiEditForm,
   },
   setup() {
     const { t } = useI18n();
     const router = useRouter();
-
-    const editRef = ref<InstanceType<typeof apiEditForm>>();
 
     const reactiveData = reactive({
       loading: false,
@@ -90,47 +88,10 @@ export default defineComponent({
       load();
     };
 
-    const openAdd = () => editRef.value?.show();
-    const openEdit = (row: any) => editRef.value?.showEdit(row);
     const openDetail = (row: any) => {
       router.push({ name: 'settingsApiDetail', query: { id: String(row.id) } }).catch(() => {
         // handled globally
       });
-    };
-
-    const onAdd = (form: any, done: () => void) => {
-      addApi(form)
-        .then(() => {
-          successMessage();
-          load();
-          done();
-        })
-        .catch(() => {
-          // handled globally
-        });
-    };
-
-    const onUpdate = (form: any, done: () => void) => {
-      updateApi(form)
-        .then(() => {
-          successMessage();
-          load();
-          done();
-        })
-        .catch(() => {
-          // handled globally
-        });
-    };
-
-    const remove = (id: string) => {
-      deleteApi(id)
-        .then(() => {
-          successMessage();
-          load();
-        })
-        .catch(() => {
-          // handled globally
-        });
     };
 
     const sizeChange = (size: number) => {
@@ -147,18 +108,12 @@ export default defineComponent({
 
     return {
       t,
-      editRef,
       reactiveData,
       search,
       reset,
       refresh,
       sort,
-      openAdd,
-      openEdit,
       openDetail,
-      onAdd,
-      onUpdate,
-      remove,
       sizeChange,
       currentChange,
       timestampColumn,

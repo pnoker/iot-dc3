@@ -77,17 +77,11 @@
         />
       </el-form-item>
     </template>
-    <template #actions>
-      <el-button :icon="Plus" type="success" @click="$emit('add')">
-        {{ $t('common.add') }}
-      </el-button>
-    </template>
   </tool-card>
 </template>
 
 <script lang="ts" setup>
   import { reactive } from 'vue';
-  import { Plus } from '@element-plus/icons-vue';
   import ToolCard from '@/components/card/tool/ToolCard.vue';
 
   defineProps({
@@ -97,7 +91,7 @@
     },
   });
 
-  const emit = defineEmits(['search', 'reset', 'refresh', 'sort', 'add', 'size-change', 'current-change']);
+  const emit = defineEmits(['search', 'reset', 'refresh', 'sort', 'size-change', 'current-change']);
 
   const formData = reactive<Record<string, any>>({ enableFlag: '' });
 

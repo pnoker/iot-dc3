@@ -22,7 +22,6 @@
       @reset="reset"
       @refresh="refresh"
       @sort="sort"
-      @add="openAdd"
       @size-change="sizeChange"
       @current-change="currentChange"
     />
@@ -53,20 +52,9 @@
           :formatter="timestampColumn"
           width="180"
         />
-        <el-table-column :label="t('common.operation')" width="240" fixed="right">
+        <el-table-column :label="t('common.operation')" width="120" fixed="right">
           <template #default="{ row }">
             <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
-            <el-button link type="primary" @click="openEdit(row)">{{ t('common.edit') }}</el-button>
-            <el-popconfirm
-              :title="t('settings.api.confirmDelete')"
-              :confirm-button-text="t('common.confirm')"
-              :cancel-button-text="t('common.cancel')"
-              @confirm="remove(row.id)"
-            >
-              <template #reference>
-                <el-button link type="danger">{{ t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
           </template>
         </el-table-column>
         <template #empty>
@@ -74,8 +62,6 @@
         </template>
       </el-table>
     </blank-card>
-
-    <api-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate" />
   </div>
 </template>
 
