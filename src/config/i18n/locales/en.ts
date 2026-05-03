@@ -59,7 +59,6 @@ export default {
     profileEdit: 'Profile Edit',
     pointDetail: 'Point Detail',
     pointEdit: 'Point Edit',
-    dashboard: 'Dashboard',
     application: 'Application',
     settings: 'Settings',
     settingsUser: 'User',

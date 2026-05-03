@@ -31,15 +31,6 @@ const routes: Array<RouteRecordRaw> = [
     component: Layout,
     children: [
       {
-        name: 'dashboard',
-        path: '/home/dashboard',
-        meta: {
-          icon: 'el-icon-s-home',
-          title: 'Dashboard',
-        },
-        component: () => import('@/views/dashboard/Dashboard.vue'),
-      },
-      {
         name: 'application',
         path: '/home/application',
         meta: {

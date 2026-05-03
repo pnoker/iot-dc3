@@ -59,7 +59,6 @@ export default {
     profileEdit: '模板编辑',
     pointDetail: '位号详情',
     pointEdit: '位号编辑',
-    dashboard: '仪表盘',
     application: '应用',
     settings: '设置',
     settingsUser: '用户管理',
