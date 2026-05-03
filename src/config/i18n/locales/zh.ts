@@ -207,7 +207,6 @@ export default {
     logout: '退出登录',
     admin: '管理员',
     pending: '待开发',
-    language: '语言',
     settings: '设置',
   },
   driver: {

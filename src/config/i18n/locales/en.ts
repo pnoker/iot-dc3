@@ -207,7 +207,6 @@ export default {
     logout: 'Logout',
     admin: 'Admin',
     pending: 'Coming soon',
-    language: 'Language',
     settings: 'Settings',
   },
   driver: {

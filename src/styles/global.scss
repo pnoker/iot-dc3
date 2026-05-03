@@ -25,7 +25,35 @@ body {
   min-height: 768px;
 }
 
-// el-dropdown-menu 通过 teleport 挂到 body,不在任何组件的 scope 里。
+// el-popconfirm 的 popper 也通过 teleport 挂到 body,作用域外样式必须放在全局。
+// Element Plus 默认 popconfirm 只按文字宽度撑开,文字 + 两个按钮常常挤在一行,
+// 视觉上又窄又紧。这里统一:
+//   1. 给 __main 设置最小宽度,保证标题有充足呼吸空间
+//   2. 标题与操作区之间留出垂直间距
+//   3. 操作区按钮之间补 gap,避免贴在一起
+//   4. 主危险按钮加粗,强调不可逆操作
+.el-popover.el-popper.el-popconfirm {
+  --el-popover-padding: 14px 16px;
+
+  .el-popconfirm__main {
+    min-width: 240px;
+    padding: 2px 0 10px;
+    line-height: 1.5;
+    align-items: flex-start;
+
+    .el-popconfirm__icon {
+      margin-top: 2px;
+      font-size: 16px;
+    }
+  }
+
+  .el-popconfirm__action {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
+
 .el-dropdown-menu {
   // 让 emoji 国旗占一个和 el-icon 同尺寸的方格,与同级走 :icon 属性的
   // 设置 / 关于 / 退出项在同一条基线上。em 单位跟随 dropdown-item 字号,

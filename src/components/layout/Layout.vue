@@ -68,8 +68,7 @@
                    <el-dropdown-item> variants would close the menu on
                    every click. -->
               <li class="user_lang_row" @click.stop>
-                <span class="user_lang_label">{{ t('layout.language') }}</span>
-                <el-segmented v-model="langModel" :options="langOptions" size="small" />
+                <el-segmented v-model="langModel" :options="langOptions" size="small" class="user_lang_seg" />
               </li>
               <el-dropdown-item divided command="settings" :icon="Setting">
                 {{ t('layout.settings') }}
@@ -380,13 +379,11 @@
     list-style: none;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    justify-content: center;
     padding: 6px 16px 8px;
 
-    .user_lang_label {
-      font-size: 13px;
-      color: #606266;
+    .user_lang_seg {
+      width: 100%;
     }
   }
 </style>
