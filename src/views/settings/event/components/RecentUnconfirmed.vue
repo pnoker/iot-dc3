@@ -32,30 +32,34 @@
       </div>
     </template>
 
-    <el-scrollbar :height="scrollHeight">
-      <div v-if="!loading && rows.length === 0" class="recent-unconfirmed__empty">
-        <el-empty :description="$t('settings.event.overview.noUnconfirmed')" :image-size="60" />
-      </div>
-      <el-timeline v-else class="recent-unconfirmed__timeline">
-        <el-timeline-item
-          v-for="row in rows"
-          :key="`${row.source}:${row.id}`"
-          :timestamp="formatTime(row.createTime)"
-          :color="row.source === 'device' ? '#409eff' : '#e6a23c'"
-          placement="top"
-        >
-          <div class="recent-unconfirmed__item">
-            <div class="recent-unconfirmed__line">
-              <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
-                {{ row.source === 'device' ? $t('settings.event.device') : $t('settings.event.driver') }}
-              </el-tag>
-              <span class="recent-unconfirmed__name">{{ nameFor(row) }}</span>
-            </div>
-            <div v-if="row.message" class="recent-unconfirmed__message" :title="row.message">{{ row.message }}</div>
+    <!-- No inner <el-scrollbar> on purpose: a fixed-height overflow:auto
+         container steals wheel events even when its content fits, which
+         made the surrounding Overview page unscrollable while the mouse
+         hovered a card. Let the list flow naturally — size is capped at
+         10 rows by alertPage so height stays bounded — and the outer
+         <el-main> handles scrolling for the whole page. -->
+    <div v-if="!loading && rows.length === 0" class="recent-unconfirmed__empty">
+      <el-empty :description="$t('settings.event.overview.noUnconfirmed')" :image-size="60" />
+    </div>
+    <el-timeline v-else class="recent-unconfirmed__timeline">
+      <el-timeline-item
+        v-for="row in rows"
+        :key="`${row.source}:${row.id}`"
+        :timestamp="formatTime(row.createTime)"
+        :color="row.source === 'device' ? '#409eff' : '#e6a23c'"
+        placement="top"
+      >
+        <div class="recent-unconfirmed__item">
+          <div class="recent-unconfirmed__line">
+            <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
+              {{ row.source === 'device' ? $t('settings.event.device') : $t('settings.event.driver') }}
+            </el-tag>
+            <span class="recent-unconfirmed__name">{{ nameFor(row) }}</span>
           </div>
-        </el-timeline-item>
-      </el-timeline>
-    </el-scrollbar>
+          <div v-if="row.message" class="recent-unconfirmed__message" :title="row.message">{{ row.message }}</div>
+        </div>
+      </el-timeline-item>
+    </el-timeline>
   </el-card>
 </template>
 
@@ -74,10 +78,6 @@
     createTime: string;
     message?: string;
   }
-
-  defineProps({
-    scrollHeight: { type: String, default: '320px' },
-  });
 
   const loading = ref(false);
   const rows = ref<Row[]>([]);
