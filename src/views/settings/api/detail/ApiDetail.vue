@@ -16,7 +16,7 @@
 
 <template>
   <div>
-    <base-card>
+    <blank-card>
       <el-tabs v-model="reactiveData.active">
         <el-tab-pane :label="$t('settings.api.detailTitle')" name="detail">
           <detail-card>
@@ -64,7 +64,7 @@
           </detail-card>
         </el-tab-pane>
       </el-tabs>
-    </base-card>
+    </blank-card>
   </div>
 </template>
 
@@ -75,7 +75,7 @@
   import { getApiById } from '@/api/api';
   import { timestamp } from '@/utils/DateUtil';
 
-  import baseCard from '@/components/card/base/BaseCard.vue';
+  import blankCard from '@/components/card/blank/BlankCard.vue';
   import detailCard from '@/components/card/detail/DetailCard.vue';
 
   const route = useRoute();
