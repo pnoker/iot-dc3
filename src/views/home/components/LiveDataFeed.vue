@@ -43,9 +43,9 @@
         <el-timeline-item
           v-for="row in rows"
           :key="rowKey(row)"
+          :color="typeColor(row.valueType)"
           :timestamp="formatTime(row.createTime)"
           placement="top"
-          :color="typeColor(row.valueType)"
         >
           <div class="live-feed__item">
             <div class="live-feed__line">
@@ -56,7 +56,7 @@
               <span class="live-feed__point">{{ displayPoint(row) }}</span>
             </div>
             <div class="live-feed__value-line">
-              <span class="live-feed__tag" :class="`live-feed__tag--${row.valueType?.toLowerCase() || 'string'}`">
+              <span :class="`live-feed__tag--${row.valueType?.toLowerCase() || 'string'}`" class="live-feed__tag">
                 {{ row.valueType || 'STR' }}
               </span>
               <span class="live-feed__value">{{ row.calValue ?? row.rawValue ?? '-' }}</span>
@@ -143,7 +143,9 @@
     if (t === 'float' || t === 'double') return '#67c23a';
     if (t === 'bool') return '#e6a23c';
     if (t === 'json') return '#9059f6';
-    return '#909399';
+    // STRING / unknown — pick the neutral accent over default gray so the
+    // timeline dot still reads as "live data" instead of a placeholder.
+    return '#409eff';
   };
 
   watch(intervalMs, (ms) => {
@@ -205,13 +207,24 @@
       font-size: 11px;
     }
 
+    // Tint the timeline skeleton: connecting line, default node, and the
+    // ring around coloured nodes get the same cool-blue accent so the
+    // feed reads as one continuous stream instead of disconnected dots
+    // on a gray spine.
+    :deep(.el-timeline-item__tail) {
+      border-left-color: rgba(64, 158, 255, 0.25);
+    }
+
+    :deep(.el-timeline-item__node) {
+      box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.12);
+    }
+
     .live-feed__item {
       padding-bottom: 4px;
     }
 
     .live-feed__line {
       font-size: 13px;
-      color: #303133;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -220,20 +233,28 @@
       gap: 6px;
     }
 
+    // Per-dimension accent colours so the driver / device / point
+    // hierarchy is readable at a glance without falling back to <el-tag>
+    // chrome. Palette reuses the StatCard tones (driver=purple "promotion",
+    // device=blue "management", point=green "data") so the same entity
+    // reads the same colour everywhere on the page.
     .live-feed__driver {
-      color: #606266;
+      color: #9059f6;
+      font-weight: 500;
     }
 
     .live-feed__device {
+      color: #409eff;
       font-weight: 600;
     }
 
-    .live-feed__sep {
-      color: #c0c4cc;
+    .live-feed__point {
+      color: #67c23a;
+      font-weight: 500;
     }
 
-    .live-feed__point {
-      color: #606266;
+    .live-feed__sep {
+      color: #dcdfe6;
     }
 
     .live-feed__value-line {
@@ -247,7 +268,7 @@
       font-size: 10px;
       font-weight: 600;
       padding: 1px 5px;
-      border-radius: 3px;
+      border-radius: 10px;
       white-space: nowrap;
 
       &--int,
