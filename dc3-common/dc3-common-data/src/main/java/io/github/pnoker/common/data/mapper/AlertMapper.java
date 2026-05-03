@@ -119,4 +119,31 @@ public interface AlertMapper {
     List<Map<String, Object>> topSources(@Param("tenantId") Long tenantId,
                                          @Param("from") LocalDateTime from,
                                          @Param("limit") int limit);
+
+    /**
+     * ALARM counts bucketed by (day-of-week 0..6, hour-of-day 0..23) over
+     * the window starting at {@code from}. Used by the event-overview
+     * hourly heatmap. Returns rows with (dow, hour, count).
+     */
+    List<Map<String, Object>> activityHeatmap(@Param("tenantId") Long tenantId,
+                                              @Param("from") LocalDateTime from);
+
+    /**
+     * ALARM counts grouped by the {@code event_ext.type} tag (e.g.
+     * driver-offline / driver-state-flip / driver-alarm / device-offline /
+     * device-alarm) over the window starting at {@code from}. Used by the
+     * event-overview type-distribution pie. Returns rows with (type, count).
+     */
+    List<Map<String, Object>> typeDistribution(@Param("tenantId") Long tenantId,
+                                               @Param("from") LocalDateTime from);
+
+    /**
+     * Sources whose ALARM count within the window reaches {@code minCount},
+     * ordered by count desc. "Storm" sources the operator should look at
+     * first. Returns rows with (source, source_id, count).
+     */
+    List<Map<String, Object>> stormSources(@Param("tenantId") Long tenantId,
+                                           @Param("from") LocalDateTime from,
+                                           @Param("minCount") int minCount,
+                                           @Param("limit") int limit);
 }

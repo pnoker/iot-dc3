@@ -333,4 +333,49 @@ public class DashboardController implements BaseController {
         Integer resolved = TimeRangeUtil.resolveDays(rangeKey, days);
         return resolved != null ? resolved : days;
     }
+
+    @GetMapping("/alert/activity")
+    public Mono<R<List<AlertActivityCellVO>>> alertActivity(
+            @RequestParam(value = "days", defaultValue = "7") int days,
+            @RequestParam(value = "rangeKey", required = false) String rangeKey) {
+        int effectiveDays = resolveEffectiveDays(rangeKey, days);
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertActivity(tenantId, effectiveDays)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/alert/type-distribution")
+    public Mono<R<List<AlertTypeBucketVO>>> alertTypeDistribution(
+            @RequestParam(value = "days", defaultValue = "30") int days,
+            @RequestParam(value = "rangeKey", required = false) String rangeKey) {
+        int effectiveDays = resolveEffectiveDays(rangeKey, days);
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertTypeDistribution(tenantId, effectiveDays)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/alert/storm-sources")
+    public Mono<R<List<AlertTopSourceVO>>> alertStormSources(
+            @RequestParam(value = "hours", defaultValue = "1") int hours,
+            @RequestParam(value = "minCount", defaultValue = "10") int minCount,
+            @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertStormSources(tenantId, hours, minCount, limit)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 }

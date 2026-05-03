@@ -140,4 +140,23 @@ public interface DashboardService {
      * Top N event sources by alarm count in the last {@code days} days.
      */
     List<AlertTopSourceVO> alertTopSources(Long tenantId, int days, int limit);
+
+    /**
+     * ALARM counts in a day-of-week × hour-of-day heatmap over the last
+     * {@code days} days. Always returns 7 × 24 = 168 cells (zero-padded).
+     */
+    List<AlertActivityCellVO> alertActivity(Long tenantId, int days);
+
+    /**
+     * ALARM count per {@code event_ext.type} bucket over the last
+     * {@code days} days, ordered by count DESC.
+     */
+    List<AlertTypeBucketVO> alertTypeDistribution(Long tenantId, int days);
+
+    /**
+     * Sources whose ALARM count in the last {@code hours} hours reaches
+     * {@code minCount} — "alarm-storm" sources worth immediate attention.
+     * Returns at most {@code limit} rows, ordered by count DESC.
+     */
+    List<AlertTopSourceVO> alertStormSources(Long tenantId, int hours, int minCount, int limit);
 }
