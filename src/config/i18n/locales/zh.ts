@@ -565,6 +565,7 @@ export default {
       assignSaved: '角色分配已保存',
       empty: '暂无用户数据!',
       rolesOfUser: '已分配角色',
+      resourcesOfUser: '可访问资源',
       rolesAll: '全部角色',
       rolesAvailable: '候选角色',
       rolesSearchPlaceholder: '按名称或编码搜索',

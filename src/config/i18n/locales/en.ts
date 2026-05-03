@@ -574,6 +574,7 @@ export default {
       assignSaved: 'Role assignment saved',
       empty: 'No user data!',
       rolesOfUser: 'Assigned Roles',
+      resourcesOfUser: 'Accessible Resources',
       rolesAll: 'All Roles',
       rolesAvailable: 'Available Roles',
       rolesSearchPlaceholder: 'Search by name or code',

@@ -25,3 +25,6 @@ export const getRoleResourceList = (query: any) => httpPost(`${API_AUTH_BASE}/ro
 
 export const listResourceByRoleId = (roleId: string) =>
   httpGet(`${API_AUTH_BASE}/role-resource/list-resource-by-role/${roleId}`);
+
+export const listResourceByUserId = (userId: string) =>
+  httpGet(`${API_AUTH_BASE}/role-resource/list-resource-by-user/${userId}`);

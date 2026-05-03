@@ -17,7 +17,7 @@
 <template>
   <div>
     <blank-card>
-      <el-tabs v-model="reactiveData.active">
+      <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
         <el-tab-pane :label="$t('settings.user.detailTitle')" name="detail">
           <detail-card>
             <el-descriptions :column="2" border>
@@ -50,6 +50,37 @@
             </el-descriptions>
           </detail-card>
         </el-tab-pane>
+
+        <el-tab-pane :label="$t('settings.user.rolesOfUser')" name="role">
+          <el-table v-loading="reactiveData.rolesLoading" :data="reactiveData.roles" stripe>
+            <el-table-column prop="roleName" :label="$t('settings.role.roleName')" min-width="180" />
+            <el-table-column prop="roleCode" :label="$t('settings.role.roleCode')" min-width="180" />
+            <el-table-column :label="$t('common.enable')" width="90">
+              <template #default="{ row }">
+                <el-tag :type="Number(row.enableFlag) === 0 ? 'success' : 'info'">
+                  {{ Number(row.enableFlag) === 0 ? $t('common.enable') : $t('common.disable') }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="remark" :label="$t('common.remark')" min-width="220" show-overflow-tooltip />
+            <template #empty>
+              <el-empty :description="$t('settings.user.empty')" :image-size="60" />
+            </template>
+          </el-table>
+        </el-tab-pane>
+
+        <el-tab-pane :label="$t('settings.user.resourcesOfUser')" name="resource">
+          <el-table v-loading="reactiveData.resourcesLoading" :data="reactiveData.resources" stripe>
+            <el-table-column prop="resourceName" :label="$t('settings.resource.resourceName')" min-width="200" />
+            <el-table-column prop="resourceCode" :label="$t('settings.resource.resourceCode')" min-width="180" />
+            <el-table-column prop="resourceTypeFlag" :label="$t('settings.resource.resourceType')" min-width="120" />
+            <el-table-column prop="resourceScopeFlag" :label="$t('settings.resource.resourceScope')" min-width="120" />
+            <el-table-column prop="remark" :label="$t('common.remark')" min-width="180" show-overflow-tooltip />
+            <template #empty>
+              <el-empty :description="$t('settings.user.empty')" :image-size="60" />
+            </template>
+          </el-table>
+        </el-tab-pane>
       </el-tabs>
     </blank-card>
   </div>
@@ -57,8 +88,11 @@
 
 <script lang="ts" setup>
   import { onMounted, reactive } from 'vue';
-  import { useRoute } from 'vue-router';
+  import type { TabsPaneContext } from 'element-plus';
+  import { useRoute, useRouter } from 'vue-router';
 
+  import { listResourceByUserId } from '@/api/roleResourceBind';
+  import { listRoleByUserId } from '@/api/roleUserBind';
   import { getUserById } from '@/api/user';
   import { timestamp } from '@/utils/DateUtil';
 
@@ -66,11 +100,18 @@
   import detailCard from '@/components/card/detail/DetailCard.vue';
 
   const route = useRoute();
+  const router = useRouter();
 
   const reactiveData = reactive({
     id: route.query.id as string,
     active: (route.query.active as string) || 'detail',
     data: {} as Record<string, any>,
+    roles: [] as any[],
+    rolesLoaded: false,
+    rolesLoading: false,
+    resources: [] as any[],
+    resourcesLoaded: false,
+    resourcesLoading: false,
   });
 
   const load = () => {
@@ -84,8 +125,49 @@
       });
   };
 
+  const loadRoles = () => {
+    if (!reactiveData.id || reactiveData.rolesLoaded) return;
+    reactiveData.rolesLoading = true;
+    listRoleByUserId(reactiveData.id)
+      .then((res: any) => {
+        reactiveData.roles = (res.data as any[]) || [];
+        reactiveData.rolesLoaded = true;
+      })
+      .catch(() => {
+        // handled globally
+      })
+      .finally(() => {
+        reactiveData.rolesLoading = false;
+      });
+  };
+
+  const loadResources = () => {
+    if (!reactiveData.id || reactiveData.resourcesLoaded) return;
+    reactiveData.resourcesLoading = true;
+    listResourceByUserId(reactiveData.id)
+      .then((res: any) => {
+        reactiveData.resources = (res.data as any[]) || [];
+        reactiveData.resourcesLoaded = true;
+      })
+      .catch(() => {
+        // handled globally
+      })
+      .finally(() => {
+        reactiveData.resourcesLoading = false;
+      });
+  };
+
+  const changeActive = (tab: TabsPaneContext) => {
+    const name = String(tab.props.name || '');
+    router.push({ query: { ...route.query, active: name } }).catch(() => {});
+    if (name === 'role') loadRoles();
+    if (name === 'resource') loadResources();
+  };
+
   onMounted(() => {
     load();
+    if (reactiveData.active === 'role') loadRoles();
+    if (reactiveData.active === 'resource') loadResources();
   });
 </script>
 
