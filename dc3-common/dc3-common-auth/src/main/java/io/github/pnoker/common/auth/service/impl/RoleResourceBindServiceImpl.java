@@ -25,8 +25,10 @@ import io.github.pnoker.common.auth.dal.RoleManager;
 import io.github.pnoker.common.auth.dal.RoleResourceBindManager;
 import io.github.pnoker.common.auth.dal.RoleUserBindManager;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
+import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.auth.entity.builder.ResourceBuilder;
+import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.common.auth.entity.builder.RoleResourceBindBuilder;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
@@ -60,6 +62,8 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
 
     @Resource
     private ResourceBuilder resourceBuilder;
+    @Resource
+    private RoleBuilder roleBuilder;
     @Resource
     private RoleResourceBindBuilder roleResourceBindBuilder;
 
@@ -167,6 +171,27 @@ public class RoleResourceBindServiceImpl implements RoleResourceBindService {
                 .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag()))
                 .toList();
         return resourceBuilder.buildBOListByDOList(resourceDOList);
+    }
+
+    @Override
+    public List<RoleBO> listRoleByResourceId(Long resourceId, Long tenantId) {
+        if (Objects.isNull(resourceId)) {
+            return Collections.emptyList();
+        }
+        // Step 1: role_ids currently bound to this resource.
+        LambdaQueryWrapper<RoleResourceBindDO> bindWrapper = Wrappers.<RoleResourceBindDO>query().lambda();
+        bindWrapper.eq(RoleResourceBindDO::getResourceId, resourceId);
+        bindWrapper.select(RoleResourceBindDO::getRoleId);
+        List<Long> roleIds = roleResourceBindManager.listObjs(bindWrapper, o -> (Long) o);
+        if (CollectionUtils.isEmpty(roleIds)) {
+            return Collections.emptyList();
+        }
+        // Step 2: fetch roles; filter by tenant (caller-scoped) and enabled flag.
+        List<RoleDO> enabled = roleManager.listByIds(roleIds).stream()
+                .filter(e -> EnableFlagEnum.ENABLE.getIndex().equals(e.getEnableFlag())
+                        && (Objects.isNull(tenantId) || tenantId.equals(e.getTenantId())))
+                .toList();
+        return roleBuilder.buildBOListByDOList(enabled);
     }
 
     @Override
