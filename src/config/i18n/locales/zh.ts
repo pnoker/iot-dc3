@@ -564,8 +564,12 @@ export default {
       confirmDelete: '是否确定删除该用户? 该操作不可恢复!',
       assignSaved: '角色分配已保存',
       empty: '暂无用户数据!',
-      rolesOfUser: '当前用户角色',
+      rolesOfUser: '已分配角色',
       rolesAll: '全部角色',
+      rolesAvailable: '候选角色',
+      rolesSearchPlaceholder: '按名称或编码搜索',
+      rolesMoveRight: '分配',
+      rolesMoveLeft: '取消',
     },
     role: {
       title: '角色管理',

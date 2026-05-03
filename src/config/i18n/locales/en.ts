@@ -573,8 +573,12 @@ export default {
       confirmDelete: 'Are you sure to delete this user? This action cannot be undone!',
       assignSaved: 'Role assignment saved',
       empty: 'No user data!',
-      rolesOfUser: 'User Roles',
+      rolesOfUser: 'Assigned Roles',
       rolesAll: 'All Roles',
+      rolesAvailable: 'Available Roles',
+      rolesSearchPlaceholder: 'Search by name or code',
+      rolesMoveRight: 'Assign',
+      rolesMoveLeft: 'Remove',
     },
     role: {
       title: 'Roles',
