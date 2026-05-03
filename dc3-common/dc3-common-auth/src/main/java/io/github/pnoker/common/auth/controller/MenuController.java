@@ -63,14 +63,20 @@ public class MenuController implements BaseController {
 
     @PostMapping("/add")
     public Mono<R<String>> add(@Validated(Add.class) @RequestBody MenuVO entityVO) {
-        try {
-            MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
-            menuService.save(entityBO);
-            return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getUserHeader().flatMap(header -> {
+            try {
+                MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
+                entityBO.setCreatorId(header.getUserId());
+                entityBO.setCreatorName(header.getNickName());
+                entityBO.setOperatorId(header.getUserId());
+                entityBO.setOperatorName(header.getNickName());
+                menuService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     @PostMapping("/delete/{id}")
@@ -86,14 +92,18 @@ public class MenuController implements BaseController {
 
     @PostMapping("/update")
     public Mono<R<String>> update(@Validated(Update.class) @RequestBody MenuVO entityVO) {
-        try {
-            MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
-            menuService.update(entityBO);
-            return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Mono.just(R.fail(e.getMessage()));
-        }
+        return getUserHeader().flatMap(header -> {
+            try {
+                MenuBO entityBO = menuBuilder.buildBOByVO(entityVO);
+                entityBO.setOperatorId(header.getUserId());
+                entityBO.setOperatorName(header.getNickName());
+                menuService.update(entityBO);
+                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
     }
 
     @GetMapping("/id/{id}")
