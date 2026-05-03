@@ -18,11 +18,13 @@ import { defineComponent, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
+import { getApiList } from '@/api/api';
 import { addResource, deleteResource, getResourceTree, updateResource } from '@/api/resource';
 import { getDriverByIds } from '@/api/driver';
 import { getDeviceByIds } from '@/api/device';
 import { getPointByIds } from '@/api/point';
 import { getProfileByIds } from '@/api/profile';
+import { useMenuStore } from '@/store';
 import { timestampColumn } from '@/utils/DateUtil';
 import { successMessage } from '@/utils/NotificationUtil';
 
@@ -40,6 +42,7 @@ export default defineComponent({
   setup() {
     const { t } = useI18n();
     const router = useRouter();
+    const menuStore = useMenuStore();
 
     const editRef = ref<InstanceType<typeof resourceEditForm>>();
 
@@ -114,6 +117,8 @@ export default defineComponent({
       const deviceIds: string[] = [];
       const pointIds: string[] = [];
       const profileIds: string[] = [];
+      const apiIds: string[] = [];
+      const menuIds: string[] = [];
       for (const r of records) {
         if (isGroupingNode(r)) continue;
         const id = String(r.entityId);
@@ -129,6 +134,12 @@ export default defineComponent({
             break;
           case 'PROFILE':
             profileIds.push(id);
+            break;
+          case 'API':
+            apiIds.push(id);
+            break;
+          case 'MENU':
+            menuIds.push(id);
             break;
         }
       }
@@ -166,24 +177,50 @@ export default defineComponent({
             .then((r) => fill(profileIds, r, 'profileName'))
             .catch(() => {})
         );
+      // APIs have no bulk-lookup endpoint; pull the whole list (capped at
+      // 1000, which is already 10x the realistic API count on a single
+      // tenant) and resolve from that map.
+      if (apiIds.length)
+        promises.push(
+          getApiList({ page: { size: 1000, current: 1 } })
+            .then((r: any) => {
+              const records = (r.data?.records as any[]) || [];
+              const byId = new Map(records.map((a) => [String(a.id), a.apiName]));
+              apiIds.forEach((id) => {
+                const name = byId.get(id);
+                if (name) entityNameMap[id] = name;
+              });
+            })
+            .catch(() => {})
+        );
+      // Menus are already loaded into the pinia store for the top-nav, so
+      // reuse the cached tree instead of hitting the network again.
+      if (menuIds.length) {
+        menuIds.forEach((id) => {
+          const node = menuStore.findById(id);
+          if (node) entityNameMap[id] = node.menuName;
+        });
+      }
       return Promise.all(promises);
     };
 
-    const load = () => {
+    const load = async () => {
       reactiveData.loading = true;
-      getResourceTree(reactiveData.query)
-        .then((res: any) => {
-          const tree = res.data || [];
-          reactiveData.listData = tree;
-          reactiveData.page.total = tree.length;
-          return resolveEntityNames(flatten(tree));
-        })
-        .catch(() => {
-          // handled globally
-        })
-        .finally(() => {
-          reactiveData.loading = false;
-        });
+      try {
+        // Ensure the menu tree is cached before resolving MENU-typed entity
+        // names — fetchTree is idempotent and skips the network if already
+        // loaded (Layout mounts it on startup, so this is usually a no-op).
+        await menuStore.fetchTree();
+        const res: any = await getResourceTree(reactiveData.query);
+        const tree = res.data || [];
+        reactiveData.listData = tree;
+        reactiveData.page.total = tree.length;
+        await resolveEntityNames(flatten(tree));
+      } catch {
+        // handled globally
+      } finally {
+        reactiveData.loading = false;
+      }
     };
 
     const search = (params: any) => {

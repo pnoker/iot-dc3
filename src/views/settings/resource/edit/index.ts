@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, reactive, ref } from 'vue';
+import { computed, defineComponent, reactive, ref } from 'vue';
+import type { PropType } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 
@@ -22,7 +23,7 @@ type FormMode = 'add' | 'edit';
 
 const createEmptyForm = () => ({
   id: '' as string,
-  parentResourceId: '' as string | number,
+  parentResourceId: 0 as number | string,
   resourceName: '',
   resourceCode: '',
   resourceTypeFlag: '' as string,
@@ -33,8 +34,14 @@ const createEmptyForm = () => ({
 
 export default defineComponent({
   name: 'ResourceEditForm',
+  props: {
+    treeData: {
+      type: Array as PropType<any[]>,
+      default: () => [],
+    },
+  },
   emits: ['add-thing', 'update-thing'],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const { t } = useI18n();
 
     const formRef = ref<FormInstance>();
@@ -50,10 +57,16 @@ export default defineComponent({
     const rules: FormRules = {
       resourceName: [{ required: true, message: t('settings.resource.resourceNamePlaceholder'), trigger: 'blur' }],
       parentResourceId: [
-        { required: true, message: t('settings.resource.parentResourceIdPlaceholder'), trigger: 'blur' },
+        { required: true, message: t('settings.resource.parentResourceIdPlaceholder'), trigger: 'change' },
       ],
       entityId: [{ required: true, message: t('settings.resource.entityIdPlaceholder'), trigger: 'blur' }],
     };
+
+    // Synthesize a virtual "Root" so top-level resources remain pickable —
+    // same pattern as MenuEditForm / RoleEditForm.
+    const parentTreeOptions = computed(() => [
+      { id: 0, resourceName: t('settings.resource.rootResource'), children: props.treeData || [] },
+    ]);
 
     const reset = () => {
       reactiveData.form = reactiveData.mode === 'edit' ? { ...reactiveData.originalForm } : createEmptyForm();
@@ -73,6 +86,7 @@ export default defineComponent({
       const initial = {
         ...createEmptyForm(),
         ...row,
+        parentResourceId: row?.parentResourceId ?? 0,
       };
       reactiveData.originalForm = { ...initial };
       reactiveData.form = { ...initial };
@@ -104,6 +118,7 @@ export default defineComponent({
       formRef,
       reactiveData,
       rules,
+      parentTreeOptions,
       reset,
       show,
       showEdit,

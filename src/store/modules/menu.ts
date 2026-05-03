@@ -77,6 +77,28 @@ export const useMenuStore = defineStore('menu', {
         };
         return walk(state.tree);
       },
+
+    /**
+     * Locate a menu by numeric id. Used by Resource list to resolve
+     * entity-id→name for MENU-typed resources, and by MenuDetail to render
+     * the parent-menu name instead of a raw id.
+     */
+    findById:
+      (state) =>
+      (id: number | string): MenuNode | undefined => {
+        const key = String(id);
+        const walk = (nodes: MenuNode[]): MenuNode | undefined => {
+          for (const n of nodes) {
+            if (String(n.id) === key) return n;
+            if (n.children && n.children.length) {
+              const hit = walk(n.children);
+              if (hit) return hit;
+            }
+          }
+          return undefined;
+        };
+        return walk(state.tree);
+      },
   },
   actions: {
     async fetchTree(force = false) {

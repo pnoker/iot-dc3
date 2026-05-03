@@ -46,7 +46,7 @@
         />
         <el-table-column prop="resourceTypeFlag" :label="t('settings.resource.resourceType')" min-width="120" />
         <el-table-column prop="resourceScopeFlag" :label="t('settings.resource.resourceScope')" min-width="100" />
-        <el-table-column :label="t('settings.resource.entityId')" min-width="160">
+        <el-table-column :label="t('settings.resource.entity')" min-width="160">
           <template #default="{ row }">
             <el-button v-if="isEntityLinkable(row)" link type="primary" @click="goEntityDetail(row)">
               {{ formatEntityId(row) }}
@@ -104,7 +104,7 @@
       </el-table>
     </blank-card>
 
-    <resource-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate" />
+    <resource-edit-form ref="editRef" :tree-data="reactiveData.listData" @add-thing="onAdd" @update-thing="onUpdate" />
   </div>
 </template>
 

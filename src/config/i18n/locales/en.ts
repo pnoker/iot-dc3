@@ -612,6 +612,7 @@ export default {
       resourceType: 'Type',
       resourceScope: 'Scope',
       parentResourceId: 'Parent Resource',
+      entity: 'Entity',
       entityId: 'Entity ID',
       addTitle: 'Add Resource',
       editTitle: 'Edit Resource',
@@ -622,6 +623,9 @@ export default {
       entityIdPlaceholder: 'Enter entity id',
       confirmDelete: 'Are you sure to delete this resource? This action cannot be undone!',
       empty: 'No resource data!',
+      rootResource: 'Root (top-level)',
+      rolesOfResource: 'Assigned Roles',
+      childResources: 'Child Resources',
     },
     api: {
       title: 'Api',
