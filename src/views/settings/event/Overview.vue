@@ -122,7 +122,7 @@
   import type { Component } from 'vue';
   import { Bell, Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
 
-  import { alertPage, alertStats } from '@/api/dashboard';
+  import { alertPage, alertStats, alertTrend } from '@/api/dashboard';
   import blankCard from '@/components/card/blank/BlankCard.vue';
   import StatCard from '@/components/card/stat/StatCard.vue';
   import EventTrendChart from './components/EventTrendChart.vue';
@@ -165,7 +165,15 @@
     // Home's today-alert cards — no extra round-trip needed here).
     todayDevice: 0,
     todayDriver: 0,
-    sparkline: [] as number[],
+    // 24h hourly bucket (overall) — used by the Today cards since "today"
+    // is inherently about the current day's hourly activity.
+    sparkline24h: [] as number[],
+    // 7-day daily buckets split by source. Feeds each non-today card's own
+    // sparkline + trend, so driver-total and device-total don't end up
+    // with identical chart shapes. Mirrors how Home uses driverSparkline /
+    // deviceSparkline from dailyGrowth.
+    driverDaily: [] as number[],
+    deviceDaily: [] as number[],
   });
 
   const fetchCount = async (source: 'device' | 'driver', confirmFlag: number | null) => {
@@ -180,12 +188,13 @@
   const load = async () => {
     loading.value = true;
     try {
-      const [dt, du, rt, ru, stats] = await Promise.all([
+      const [dt, du, rt, ru, stats, trend] = await Promise.all([
         fetchCount('device', null),
         fetchCount('device', 0),
         fetchCount('driver', null),
         fetchCount('driver', 0),
         alertStats().catch(() => null),
+        alertTrend(7).catch(() => null),
       ]);
       state.deviceTotal = dt;
       state.deviceUnconfirmed = du;
@@ -196,23 +205,34 @@
           data?: { sparkline24h?: number[]; todayDeviceAlarms?: number; todayDriverAlarms?: number };
         } | null
       )?.data;
-      state.sparkline = statsData?.sparkline24h ?? [];
+      state.sparkline24h = statsData?.sparkline24h ?? [];
       state.todayDevice = Number(statsData?.todayDeviceAlarms ?? 0);
       state.todayDriver = Number(statsData?.todayDriverAlarms ?? 0);
+
+      const trendRows =
+        ((trend as { data?: Array<{ deviceCount?: number; driverCount?: number }> } | null)?.data as Array<{
+          deviceCount?: number;
+          driverCount?: number;
+        }>) || [];
+      state.driverDaily = trendRows.map((r) => Number(r.driverCount || 0));
+      state.deviceDaily = trendRows.map((r) => Number(r.deviceCount || 0));
     } finally {
       loading.value = false;
     }
   };
 
+  // Diff-style trend (latest vs previous bucket) matching the Home page's
+  // stat cards. The earlier percentage version returned null whenever the
+  // previous bucket was 0 which, combined with quiet event streams, left
+  // most cards with no trend indicator at all.
   const sparkTrend = (data: number[]): Trend | null => {
     if (data.length < 2) return null;
     const prev = data[data.length - 2] ?? 0;
     const curr = data[data.length - 1] ?? 0;
-    if (prev === 0 && curr === 0) return null;
-    const pct = prev === 0 ? 100 : Math.round(((curr - prev) / prev) * 100);
-    if (pct > 0) return { direction: 'up', label: `+${pct}%` };
-    if (pct < 0) return { direction: 'down', label: `${pct}%` };
-    return { direction: 'flat', label: '0%' };
+    const diff = curr - prev;
+    if (diff > 0) return { direction: 'up', label: `+${diff}` };
+    if (diff < 0) return { direction: 'down', label: `${diff}` };
+    return { direction: 'flat', label: '0' };
   };
 
   const unconfirmedSubtitle = (unconfirmed: number, total: number) => {
@@ -225,6 +245,10 @@
   // diagnostics off most), then device, split into totals → unconfirmed →
   // today across two logical rows rendered by the CSS grid.
   const cards = computed<Card[]>(() => [
+    // Driver cards share the 7-day driver daily series; device cards share
+    // the device daily series. Today cards use the 24h hourly bucket since
+    // "today" is an intra-day metric. Each card therefore shows its own
+    // shape + its own day-over-day diff, matching Home's per-card trend.
     {
       key: 'driver-total',
       title: t('settings.event.overview.driverTotal'),
@@ -232,8 +256,8 @@
       subtitle: t('settings.event.overview.goToDriver'),
       icon: Promotion,
       tone: 'purple',
-      sparkline: state.sparkline,
-      trend: sparkTrend(state.sparkline),
+      sparkline: state.driverDaily,
+      trend: sparkTrend(state.driverDaily),
       onClick: () => router.push({ name: 'settingsDriverEvent' }),
       onRefresh: load,
     },
@@ -244,8 +268,8 @@
       subtitle: t('settings.event.overview.goToDevice'),
       icon: Management,
       tone: 'blue',
-      sparkline: state.sparkline,
-      trend: sparkTrend(state.sparkline),
+      sparkline: state.deviceDaily,
+      trend: sparkTrend(state.deviceDaily),
       onClick: () => router.push({ name: 'settingsDeviceEvent' }),
       onRefresh: load,
     },
@@ -256,8 +280,8 @@
       subtitle: unconfirmedSubtitle(state.driverUnconfirmed, state.driverTotal),
       icon: WarningFilled,
       tone: 'red',
-      sparkline: state.sparkline,
-      trend: sparkTrend(state.sparkline),
+      sparkline: state.driverDaily,
+      trend: sparkTrend(state.driverDaily),
       onClick: () => router.push({ name: 'settingsDriverEvent', query: { confirmFlag: '0' } }),
       onRefresh: load,
     },
@@ -268,8 +292,8 @@
       subtitle: unconfirmedSubtitle(state.deviceUnconfirmed, state.deviceTotal),
       icon: Warning,
       tone: 'orange',
-      sparkline: state.sparkline,
-      trend: sparkTrend(state.sparkline),
+      sparkline: state.deviceDaily,
+      trend: sparkTrend(state.deviceDaily),
       onClick: () => router.push({ name: 'settingsDeviceEvent', query: { confirmFlag: '0' } }),
       onRefresh: load,
     },
@@ -280,8 +304,8 @@
       subtitle: '',
       icon: Bell,
       tone: 'purple',
-      sparkline: state.sparkline,
-      trend: sparkTrend(state.sparkline),
+      sparkline: state.sparkline24h,
+      trend: sparkTrend(state.sparkline24h),
       onClick: () => router.push({ name: 'settingsDriverEvent', query: { rangeKey: 'today' } }),
       onRefresh: load,
     },
@@ -292,8 +316,8 @@
       subtitle: '',
       icon: Bell,
       tone: 'blue',
-      sparkline: state.sparkline,
-      trend: sparkTrend(state.sparkline),
+      sparkline: state.sparkline24h,
+      trend: sparkTrend(state.sparkline24h),
       onClick: () => router.push({ name: 'settingsDeviceEvent', query: { rangeKey: 'today' } }),
       onRefresh: load,
     },
