@@ -592,6 +592,7 @@ export default {
       resourcesOfRole: '已分配资源',
       resourcesAll: '全部资源',
       resourcesSearchPlaceholder: '按名称或编码搜索',
+      resourcesSelectedSummary: '已选 {count} 项',
       rootRole: '根节点(顶级)',
       usersOfRole: '关联用户',
     },

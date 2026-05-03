@@ -601,6 +601,7 @@ export default {
       resourcesOfRole: 'Assigned Resources',
       resourcesAll: 'All Resources',
       resourcesSearchPlaceholder: 'Search by name or code',
+      resourcesSelectedSummary: '{count} selected',
       rootRole: 'Root (top-level)',
       usersOfRole: 'Assigned Users',
     },

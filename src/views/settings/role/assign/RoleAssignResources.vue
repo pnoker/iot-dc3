@@ -18,7 +18,7 @@
   <el-dialog
     v-model="reactiveData.visible"
     :title="t('settings.role.assignResourcesTitle')"
-    width="960px"
+    width="640px"
     :close-on-click-modal="false"
   >
     <div v-loading="reactiveData.loading" class="assign-body">
@@ -27,89 +27,54 @@
         <span class="assign-value">{{ reactiveData.role.roleName }}</span>
         <span class="assign-sep">/</span>
         <span class="assign-value">{{ reactiveData.role.roleCode }}</span>
+        <span class="assign-summary">
+          {{ t('settings.role.resourcesSelectedSummary', { count: reactiveData.selectedIds.length }) }}
+        </span>
       </div>
 
-      <div class="assign-dual">
-        <div class="assign-pane assign-pane--left">
-          <div class="assign-pane__header">
-            <span class="assign-pane__title">{{ t('settings.role.resourcesAll') }}</span>
-            <el-input
-              v-model="reactiveData.filter"
-              size="small"
-              :placeholder="t('settings.role.resourcesSearchPlaceholder')"
-              clearable
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
-          </div>
-
-          <el-tabs v-model="activeType" class="assign-pane__tabs">
-            <el-tab-pane
-              v-for="type in availableTypes"
-              :key="type"
-              :name="type"
-              :label="`${type} (${selectedCountByType[type] || 0}/${totalCountByType[type] || 0})`"
-            />
-          </el-tabs>
-
-          <div class="assign-pane__tree">
-            <template v-for="type in availableTypes" :key="type">
-              <el-tree
-                v-show="activeType === type"
-                :ref="(el) => registerTree(type, el)"
-                :data="treesByType[type] || []"
-                :props="{ label: 'resourceName', children: 'children' }"
-                node-key="id"
-                show-checkbox
-                check-strictly
-                :filter-node-method="filterNode"
-                @check-change="onCheckChange"
-              />
-              <el-empty
-                v-show="activeType === type && (treesByType[type] || []).length === 0"
-                :description="t('settings.role.empty')"
-                :image-size="60"
-              />
+      <div class="assign-pane">
+        <div class="assign-pane__header">
+          <span class="assign-pane__title">{{ t('settings.role.resourcesAll') }}</span>
+          <el-input
+            v-model="reactiveData.filter"
+            size="small"
+            :placeholder="t('settings.role.resourcesSearchPlaceholder')"
+            clearable
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
             </template>
-          </div>
+          </el-input>
         </div>
 
-        <div class="assign-pane">
-          <div class="assign-pane__header">
-            <span class="assign-pane__title">
-              {{ t('settings.role.resourcesOfRole') }}
-              <span class="assign-pane__count">({{ assignedList.length }})</span>
-            </span>
-          </div>
-          <el-table :data="assignedList" height="460" stripe class="assign-pane__table" row-key="id">
-            <el-table-column prop="resourceTypeFlag" :label="t('settings.resource.resourceType')" width="88">
-              <template #default="{ row }">
-                <el-tag size="small" :type="typeTagType(row.resourceTypeFlag)">{{ row.resourceTypeFlag }}</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="resourceName"
-              :label="t('settings.resource.resourceName')"
-              min-width="160"
-              show-overflow-tooltip
+        <el-tabs v-model="activeType" class="assign-pane__tabs">
+          <el-tab-pane
+            v-for="type in availableTypes"
+            :key="type"
+            :name="type"
+            :label="`${type} (${selectedCountByType[type] || 0}/${totalCountByType[type] || 0})`"
+          />
+        </el-tabs>
+
+        <div class="assign-pane__tree">
+          <template v-for="type in availableTypes" :key="type">
+            <el-tree
+              v-show="activeType === type"
+              :ref="(el) => registerTree(type, el)"
+              :data="treesByType[type] || []"
+              :props="{ label: 'resourceName', children: 'children' }"
+              node-key="id"
+              show-checkbox
+              check-strictly
+              :filter-node-method="filterNode"
+              @check-change="onCheckChange"
             />
-            <el-table-column
-              prop="resourceCode"
-              :label="t('settings.resource.resourceCode')"
-              min-width="140"
-              show-overflow-tooltip
+            <el-empty
+              v-show="activeType === type && (treesByType[type] || []).length === 0"
+              :description="t('settings.role.empty')"
+              :image-size="60"
             />
-            <el-table-column :label="t('common.operation')" width="78" fixed="right">
-              <template #default="{ row }">
-                <el-button link type="danger" @click="removeOne(row.id)">{{ t('common.remove') }}</el-button>
-              </template>
-            </el-table-column>
-            <template #empty>
-              <el-empty :description="t('settings.role.empty')" :image-size="60" />
-            </template>
-          </el-table>
+          </template>
         </div>
       </div>
     </div>
@@ -170,8 +135,8 @@
     // within-type parent/child links (cross-type links are dropped since the
     // user is viewing a single type at a time).
     treesByType: {} as Record<string, ResourceNode[]>,
-    // id -> flat node for quickly rendering the right-hand table and
-    // locating the tree a given id belongs to (via resourceTypeFlag).
+    // id -> flat node; kept around for counting the selection per-type
+    // and for the submit diff against the original bindings.
     nodeMap: new Map<string, ResourceNode>(),
     bindIdByResourceId: new Map<string, string>(),
     originalResourceIds: [] as string[],
@@ -218,10 +183,6 @@
     return map;
   });
 
-  const assignedList = computed(() =>
-    reactiveData.selectedIds.map((id) => reactiveData.nodeMap.get(id)).filter((n): n is ResourceNode => !!n)
-  );
-
   const filterNode = (value: string, data: any) => {
     if (!value) return true;
     const k = value.toLowerCase();
@@ -250,34 +211,6 @@
       all.push(...((tree.getCheckedKeys(false) || []) as Array<string | number>).map(String));
     }
     reactiveData.selectedIds = all;
-  };
-
-  const removeOne = (id: string | number) => {
-    const key = String(id);
-    const node = reactiveData.nodeMap.get(key);
-    if (node) {
-      const type = String(node.resourceTypeFlag);
-      treeRefs[type]?.setChecked(key, false, false);
-    }
-    reactiveData.selectedIds = reactiveData.selectedIds.filter((v) => v !== key);
-  };
-
-  const typeTagType = (type: string) => {
-    switch (type) {
-      case 'MENU':
-        return 'primary';
-      case 'API':
-        return 'success';
-      case 'DATA':
-        return 'warning';
-      case 'DEVICE':
-      case 'POINT':
-      case 'PROFILE':
-      case 'DRIVER':
-        return 'info';
-      default:
-        return 'info';
-    }
   };
 
   // Flatten the backend tree to a node-map and bucket nodes by type, rebuilding
@@ -434,6 +367,10 @@
   .assign-target {
     font-size: 14px;
     color: var(--el-text-color-regular);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
   }
   .assign-label {
     color: var(--el-text-color-secondary);
@@ -446,27 +383,19 @@
     margin: 0 6px;
     color: var(--el-text-color-secondary);
   }
-
-  .assign-dual {
-    display: flex;
-    align-items: stretch;
-    gap: 12px;
+  .assign-summary {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
   }
 
   .assign-pane {
-    flex: 1;
-    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
     border: 1px solid var(--el-border-color-lighter);
     border-radius: 4px;
     padding: 10px;
     background: var(--el-bg-color);
-  }
-
-  .assign-pane--left {
-    gap: 0;
   }
 
   .assign-pane__header {
@@ -484,14 +413,8 @@
     flex-shrink: 0;
   }
 
-  .assign-pane__count {
-    color: var(--el-text-color-secondary);
-    font-weight: 400;
-    margin-left: 4px;
-  }
-
   .assign-pane__header .el-input {
-    max-width: 200px;
+    max-width: 240px;
   }
 
   .assign-pane__tabs {
@@ -508,14 +431,11 @@
   }
 
   .assign-pane__tree {
-    height: 420px;
+    height: 440px;
     overflow: auto;
     border: 1px solid var(--el-border-color-extra-light);
     border-radius: 4px;
     padding: 4px 6px;
-  }
-
-  .assign-pane__table {
-    flex: 1;
+    margin-top: 4px;
   }
 </style>
