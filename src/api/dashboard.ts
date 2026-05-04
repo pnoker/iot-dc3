@@ -133,3 +133,88 @@ export interface TopologyResponse {
 // Phase 0 only wires cardinality. rangeKey is reserved for Phase 2 volume mode.
 export const topology = (params: { mode?: TopologyMode; rangeKey?: string } = {}) =>
   httpGet(`${API_MANAGER_BASE}/dashboard/topology`, { params });
+
+// ==== Phase-2 insights — 9 new cards ===============================
+
+export interface FlappingSource {
+  source: 'device' | 'driver';
+  sourceId: number | string;
+  eventTypeFlag: number;
+  count: number;
+}
+export const alertFlapping = (hours = 6, minCount = 5, limit = 20) =>
+  httpGet(`${API_DATA_BASE}/dashboard/alert/flapping`, { params: { hours, minCount, limit } });
+
+export interface CorrelationPair {
+  aSource: 'device' | 'driver';
+  aSourceId: number | string;
+  aEventType: number;
+  bSource: 'device' | 'driver';
+  bSourceId: number | string;
+  bEventType: number;
+  coCount: number;
+}
+export const alertCorrelation = (hours = 24, windowSec = 30, limit = 15) =>
+  httpGet(`${API_DATA_BASE}/dashboard/alert/correlation`, { params: { hours, windowSec, limit } });
+
+export interface PeerDeviation {
+  profileId: number | string;
+  deviceId: number | string;
+  alarmCount: number;
+  peerMedian: number;
+  ratio: number;
+}
+export const alertPeerDeviation = (days = 7) =>
+  httpGet(`${API_DATA_BASE}/dashboard/alert/peer-deviation`, { params: { days } });
+
+export interface AgingBacklog {
+  under1h: number;
+  h1to6: number;
+  h6to24: number;
+  over24h: number;
+  total: number;
+}
+export const alertAging = () => httpGet(`${API_DATA_BASE}/dashboard/alert/aging`);
+
+export interface MttaTrend {
+  date: string;
+  p50Ms: number;
+  p95Ms: number;
+  confirmedCount: number;
+}
+export const alertMtta = (days = 30) => httpGet(`${API_DATA_BASE}/dashboard/alert/mtta`, { params: { days } });
+
+export interface ProtocolHealth {
+  serviceName: string;
+  driverCount: number;
+  enabledCount: number;
+  deviceCount: number;
+  sampleVolume: number;
+}
+export const protocolHealth = () => httpGet(`${API_DATA_BASE}/dashboard/protocol/health`);
+
+export interface ChangeImpact {
+  kind: 'driver' | 'device' | 'profile';
+  entityId: number | string;
+  operateTime: string;
+}
+export const alertChangeImpact = (days = 30, limit = 30) =>
+  httpGet(`${API_DATA_BASE}/dashboard/alert/change-impact`, { params: { days, limit } });
+
+export interface SilentSource {
+  deviceId: number | string;
+  pointId: number | string;
+  lastSeen: string;
+  silentSeconds: number;
+}
+export const silentSources = (baselineDays = 7, silentMinutes = 15, limit = 50) =>
+  httpGet(`${API_DATA_BASE}/dashboard/silent/sources`, {
+    params: { baselineDays, silentMinutes, limit },
+  });
+
+export interface CoverageGap {
+  totalPoints: number;
+  missingPoints: number;
+  items: Array<{ pointId: number | string; profileId: number | string }>;
+}
+export const coverageGap = (limit = 100) => httpGet(`${API_DATA_BASE}/dashboard/coverage/gap`, { params: { limit } });

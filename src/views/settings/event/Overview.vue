@@ -16,109 +16,143 @@
 
 <template>
   <div class="event-overview">
-    <!-- Quick-actions: device / driver split into a two-column
+    <el-tabs v-model="activeTab" class="event-overview__tabs" @tab-change="onTabChange">
+      <el-tab-pane :label="t('settings.event.overview.tabSituation')" name="situation">
+        <!-- Quick-actions: device / driver split into a two-column
          el-descriptions so the two source lanes read side-by-side
          instead of stacking. Wrapped in BlankCard (border:0) so the
          block sits flush under the breadcrumb like the rest of the
          dashboard, matching About's Platform card treatment. Every
          chip carries real query params that EventTable picks up via
          route.query. -->
-    <blank-card>
-      <el-descriptions class="event-overview__quick" :column="2" border>
-        <el-descriptions-item>
-          <template #label>
-            <span class="event-overview__quick-label">
-              <el-icon><Management /></el-icon>
-              {{ t('settings.event.device') }}
-            </span>
-          </template>
-          <div class="event-overview__quick-actions">
-            <el-button size="small" round @click="goto('device', {})">
-              {{ t('settings.event.overview.quickAll') }}
-            </el-button>
-            <el-button size="small" round type="warning" plain @click="goto('device', { confirmFlag: '0' })">
-              {{ t('settings.event.overview.quickUnconfirmed') }}
-            </el-button>
-            <span class="event-overview__quick-divider" />
-            <el-button size="small" round plain @click="goto('device', { rangeKey: 'today' })">
-              {{ t('settings.event.overview.quickToday') }}
-            </el-button>
-            <el-button size="small" round plain @click="goto('device', { rangeKey: '7d' })">
-              {{ t('settings.event.overview.quick7d') }}
-            </el-button>
-            <el-button size="small" round plain @click="goto('device', { rangeKey: '30d' })">
-              {{ t('settings.event.overview.quick30d') }}
-            </el-button>
-          </div>
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template #label>
-            <span class="event-overview__quick-label">
-              <el-icon><Promotion /></el-icon>
-              {{ t('settings.event.driver') }}
-            </span>
-          </template>
-          <div class="event-overview__quick-actions">
-            <el-button size="small" round @click="goto('driver', {})">
-              {{ t('settings.event.overview.quickAll') }}
-            </el-button>
-            <el-button size="small" round type="warning" plain @click="goto('driver', { confirmFlag: '0' })">
-              {{ t('settings.event.overview.quickUnconfirmed') }}
-            </el-button>
-            <span class="event-overview__quick-divider" />
-            <el-button size="small" round plain @click="goto('driver', { rangeKey: 'today' })">
-              {{ t('settings.event.overview.quickToday') }}
-            </el-button>
-            <el-button size="small" round plain @click="goto('driver', { rangeKey: '7d' })">
-              {{ t('settings.event.overview.quick7d') }}
-            </el-button>
-            <el-button size="small" round plain @click="goto('driver', { rangeKey: '30d' })">
-              {{ t('settings.event.overview.quick30d') }}
-            </el-button>
-          </div>
-        </el-descriptions-item>
-      </el-descriptions>
-    </blank-card>
+        <blank-card>
+          <el-descriptions class="event-overview__quick" :column="2" border>
+            <el-descriptions-item>
+              <template #label>
+                <span class="event-overview__quick-label">
+                  <el-icon><Management /></el-icon>
+                  {{ t('settings.event.device') }}
+                </span>
+              </template>
+              <div class="event-overview__quick-actions">
+                <el-button size="small" round @click="goto('device', {})">
+                  {{ t('settings.event.overview.quickAll') }}
+                </el-button>
+                <el-button size="small" round type="warning" plain @click="goto('device', { confirmFlag: '0' })">
+                  {{ t('settings.event.overview.quickUnconfirmed') }}
+                </el-button>
+                <span class="event-overview__quick-divider" />
+                <el-button size="small" round plain @click="goto('device', { rangeKey: 'today' })">
+                  {{ t('settings.event.overview.quickToday') }}
+                </el-button>
+                <el-button size="small" round plain @click="goto('device', { rangeKey: '7d' })">
+                  {{ t('settings.event.overview.quick7d') }}
+                </el-button>
+                <el-button size="small" round plain @click="goto('device', { rangeKey: '30d' })">
+                  {{ t('settings.event.overview.quick30d') }}
+                </el-button>
+              </div>
+            </el-descriptions-item>
+            <el-descriptions-item>
+              <template #label>
+                <span class="event-overview__quick-label">
+                  <el-icon><Promotion /></el-icon>
+                  {{ t('settings.event.driver') }}
+                </span>
+              </template>
+              <div class="event-overview__quick-actions">
+                <el-button size="small" round @click="goto('driver', {})">
+                  {{ t('settings.event.overview.quickAll') }}
+                </el-button>
+                <el-button size="small" round type="warning" plain @click="goto('driver', { confirmFlag: '0' })">
+                  {{ t('settings.event.overview.quickUnconfirmed') }}
+                </el-button>
+                <span class="event-overview__quick-divider" />
+                <el-button size="small" round plain @click="goto('driver', { rangeKey: 'today' })">
+                  {{ t('settings.event.overview.quickToday') }}
+                </el-button>
+                <el-button size="small" round plain @click="goto('driver', { rangeKey: '7d' })">
+                  {{ t('settings.event.overview.quick7d') }}
+                </el-button>
+                <el-button size="small" round plain @click="goto('driver', { rangeKey: '30d' })">
+                  {{ t('settings.event.overview.quick30d') }}
+                </el-button>
+              </div>
+            </el-descriptions-item>
+          </el-descriptions>
+        </blank-card>
 
-    <div class="event-overview__cards">
-      <stat-card
-        v-for="c in cards"
-        :key="c.key"
-        :title="c.title"
-        :value="c.value"
-        :subtitle="c.subtitle"
-        :icon="c.icon"
-        :tone="c.tone"
-        :sparkline="c.sparkline"
-        :trend="c.trend"
-        :on-refresh="c.onRefresh"
-        @click="c.onClick"
-      />
-    </div>
+        <div class="event-overview__cards">
+          <stat-card
+            v-for="c in cards"
+            :key="c.key"
+            :title="c.title"
+            :value="c.value"
+            :subtitle="c.subtitle"
+            :icon="c.icon"
+            :tone="c.tone"
+            :sparkline="c.sparkline"
+            :trend="c.trend"
+            :on-refresh="c.onRefresh"
+            @click="c.onClick"
+          />
+        </div>
 
-    <div class="event-overview__charts">
-      <event-trend-chart class="event-overview__chart-main" />
-      <top-sources-chart class="event-overview__chart-side" />
-    </div>
+        <div class="event-overview__charts">
+          <event-trend-chart class="event-overview__chart-main" />
+          <top-sources-chart class="event-overview__chart-side" />
+        </div>
 
-    <!-- Diagnostic grid: heatmap (when) + type pie (what) + storm list
+        <!-- Diagnostic grid: heatmap (when) + type pie (what) + storm list
          (who) + recent unconfirmed (what now). Designed to answer "where
          do I look next" without leaving the page. -->
-    <div class="event-overview__diagnostic">
-      <alert-activity-heatmap class="event-overview__diag-heatmap" />
-      <alert-type-pie class="event-overview__diag-pie" />
-    </div>
-    <div class="event-overview__diagnostic">
-      <alert-storm-sources class="event-overview__diag-storm" />
-      <recent-unconfirmed class="event-overview__diag-recent" />
-    </div>
+        <div class="event-overview__diagnostic">
+          <alert-activity-heatmap class="event-overview__diag-heatmap" />
+          <alert-type-pie class="event-overview__diag-pie" />
+        </div>
+        <div class="event-overview__diagnostic">
+          <alert-storm-sources class="event-overview__diag-storm" />
+          <recent-unconfirmed class="event-overview__diag-recent" />
+        </div>
+      </el-tab-pane>
+
+      <el-tab-pane :label="t('settings.event.overview.tabNoise')" name="noise" lazy>
+        <div class="event-overview__grid-2">
+          <flapping-sources />
+          <peer-deviation />
+        </div>
+        <div class="event-overview__grid-1">
+          <alert-correlation />
+        </div>
+      </el-tab-pane>
+
+      <el-tab-pane :label="t('settings.event.overview.tabAvailability')" name="availability" lazy>
+        <div class="event-overview__grid-2">
+          <silent-sources />
+          <point-coverage-gap />
+        </div>
+        <div class="event-overview__grid-1">
+          <protocol-health />
+        </div>
+      </el-tab-pane>
+
+      <el-tab-pane :label="t('settings.event.overview.tabSla')" name="sla" lazy>
+        <div class="event-overview__grid-2">
+          <aging-backlog />
+          <mtta-mttr />
+        </div>
+        <div class="event-overview__grid-1">
+          <change-impact />
+        </div>
+      </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 
 <script lang="ts" setup>
   import { computed, onMounted, reactive, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { useRouter } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import type { Component } from 'vue';
   import { Bell, Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
 
@@ -131,6 +165,15 @@
   import AlertActivityHeatmap from './components/AlertActivityHeatmap.vue';
   import AlertTypePie from './components/AlertTypePie.vue';
   import AlertStormSources from './components/AlertStormSources.vue';
+  import FlappingSources from './components/FlappingSources.vue';
+  import PeerDeviation from './components/PeerDeviation.vue';
+  import AlertCorrelation from './components/AlertCorrelation.vue';
+  import SilentSources from './components/SilentSources.vue';
+  import PointCoverageGap from './components/PointCoverageGap.vue';
+  import ProtocolHealth from './components/ProtocolHealth.vue';
+  import AgingBacklog from './components/AgingBacklog.vue';
+  import MttaMttr from './components/MttaMttr.vue';
+  import ChangeImpact from './components/ChangeImpact.vue';
 
   type Tone = 'blue' | 'purple' | 'orange' | 'red';
 
@@ -154,6 +197,20 @@
 
   const { t } = useI18n();
   const router = useRouter();
+  const route = useRoute();
+
+  // Tab state — synced to URL query so direct links to "?tab=sla" land on
+  // the SLA sub-board. Valid names: situation (default) | noise | availability | sla.
+  const VALID_TABS = ['situation', 'noise', 'availability', 'sla'] as const;
+  type TabName = (typeof VALID_TABS)[number];
+  const initialTab = (VALID_TABS as readonly string[]).includes(String(route.query.tab))
+    ? (route.query.tab as TabName)
+    : 'situation';
+  const activeTab = ref<TabName>(initialTab);
+
+  const onTabChange = (name: string | number) => {
+    router.replace({ query: { ...route.query, tab: String(name) } }).catch(() => {});
+  };
 
   const loading = ref(false);
   const state = reactive({
@@ -372,6 +429,36 @@
     // Other settings sub-pages (User / Role / Api / ...) are form/table
     // views and keep flush-right — only this overview needs the balance.
     padding-right: 4px;
+
+    // Tabs wrap the whole page — each pane renders its own flex-column
+    // stack. Default el-tabs has a long underline that fights the card
+    // border; tighten to a single thin accent.
+    .event-overview__tabs {
+      :deep(.el-tabs__header) {
+        margin: 0 0 12px 0;
+      }
+      :deep(.el-tab-pane) {
+        display: flex;
+        flex-direction: column;
+        gap: $overview-gap;
+      }
+    }
+
+    // 2-col / 1-col helper grids used inside each non-situation tab. Same
+    // 8px gap as the rest of the page.
+    .event-overview__grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: $overview-gap;
+      @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+      }
+    }
+    .event-overview__grid-1 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: $overview-gap;
+    }
 
     .event-overview__quick {
       // Pin label column width so the left and right action groups
