@@ -152,13 +152,19 @@ export default {
       rows: '{n} rows',
     },
     tabs: {
-      deviceStatus: 'Device Status',
-      protocol: 'Protocols',
-      profile: 'Profiles',
-      topDevice: 'TOP Devices',
-      topPoint: 'TOP Points',
-      topDriver: 'TOP Drivers',
+      deviceStatus: 'Device Enable Status',
+      protocol: 'Drivers by Protocol',
+      profile: 'Devices by Profile (TOP 10)',
+      topDevice: 'Most Active Devices',
+      topPoint: 'Most Active Points',
+      topDriver: 'Most Active Drivers',
       dailyVolume: 'Daily Volume',
+      // Per-tab caption shown beneath the tab bar so operators know
+      // exactly what the chart measures and how it's ranked.
+      captionDeviceStatus: 'Bucketed by enableFlag — ratio of enabled vs disabled',
+      captionProtocol: 'Drivers bucketed by driverTypeFlag (Modbus TCP, MQTT, OPC UA, …)',
+      captionProfile: 'Devices grouped by Profile — top 10 profiles by device count',
+      captionTopActive: 'Ranked by write volume over {range} — top 10',
     },
     ranges: {
       today: 'Today',

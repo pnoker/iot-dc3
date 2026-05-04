@@ -19,7 +19,14 @@
     <template #header>
       <div class="analytics-tabs__header">
         <el-tabs v-model="activeTab" class="analytics-tabs__bar" @tab-change="onTabChange">
-          <el-tab-pane v-for="t in tabs" :key="t.key" :label="t.label" :name="t.key" />
+          <el-tab-pane v-for="t in tabs" :key="t.key" :name="t.key">
+            <template #label>
+              <span class="analytics-tabs__label">
+                <el-icon><component :is="t.icon" /></el-icon>
+                {{ t.label }}
+              </span>
+            </template>
+          </el-tab-pane>
         </el-tabs>
         <div class="analytics-tabs__actions">
           <range-segmented v-if="isTopTab" v-model="rangeKey" size="small" @update:model-value="load" />
@@ -27,6 +34,11 @@
         </div>
       </div>
     </template>
+
+    <!-- Caption line — spells out the ranking rule and (for top-N tabs) the
+         active time range, so the chart is never ambiguous about what it's
+         measuring or how it's sorted. -->
+    <div class="analytics-tabs__caption">{{ caption }}</div>
 
     <div v-loading="loading" class="analytics-tabs__body">
       <div v-if="!loading && empty" class="analytics-tabs__empty">
@@ -41,7 +53,8 @@
   import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Chart } from '@antv/g2';
-  import { Refresh } from '@element-plus/icons-vue';
+  import type { Component } from 'vue';
+  import { Collection, Connection, PieChart, Refresh, Trophy } from '@element-plus/icons-vue';
 
   import { deviceStats, driverStats, statsTop } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
@@ -55,13 +68,17 @@
 
   const { t } = useI18n();
 
-  const tabs = computed<{ key: TabKey; label: string }[]>(() => [
-    { key: 'deviceStatus', label: t('home.tabs.deviceStatus') },
-    { key: 'protocol', label: t('home.tabs.protocol') },
-    { key: 'profile', label: t('home.tabs.profile') },
-    { key: 'topDevice', label: t('home.tabs.topDevice') },
-    { key: 'topPoint', label: t('home.tabs.topPoint') },
-    { key: 'topDriver', label: t('home.tabs.topDriver') },
+  // Icon mapping: structural tabs get shape-specific icons (pie / connection /
+  // collection) so the three ways of slicing the fleet read visually distinct.
+  // Top-N tabs all share Trophy — the ranking concept is the same, only the
+  // subject differs, and the tab label already spells out device/point/driver.
+  const tabs = computed<{ key: TabKey; label: string; icon: Component }[]>(() => [
+    { key: 'deviceStatus', label: t('home.tabs.deviceStatus'), icon: PieChart },
+    { key: 'protocol', label: t('home.tabs.protocol'), icon: Connection },
+    { key: 'profile', label: t('home.tabs.profile'), icon: Collection },
+    { key: 'topDevice', label: t('home.tabs.topDevice'), icon: Trophy },
+    { key: 'topPoint', label: t('home.tabs.topPoint'), icon: Trophy },
+    { key: 'topDriver', label: t('home.tabs.topDriver'), icon: Trophy },
   ]);
 
   const activeTab = ref<TabKey>('deviceStatus');
@@ -73,6 +90,30 @@
   const isTopTab = computed(
     () => activeTab.value === 'topDevice' || activeTab.value === 'topPoint' || activeTab.value === 'topDriver'
   );
+
+  // Caption text for the current tab — structural tabs get a fixed phrase,
+  // top-N tabs interpolate the active range so "{range} internal write volume"
+  // stays accurate when the user flips the segmented control.
+  const caption = computed(() => {
+    switch (activeTab.value) {
+      case 'deviceStatus':
+        return t('home.tabs.captionDeviceStatus');
+      case 'protocol':
+        return t('home.tabs.captionProtocol');
+      case 'profile':
+        return t('home.tabs.captionProfile');
+      default: {
+        const rangeMap: Record<RangeKey, string> = {
+          '': t('common.all'),
+          today: t('common.ranges.today'),
+          '24h': t('common.ranges.h24'),
+          '7d': t('common.ranges.d7'),
+          '30d': t('common.ranges.d30'),
+        };
+        return t('home.tabs.captionTopActive', { range: rangeMap[rangeKey.value] });
+      }
+    }
+  });
 
   let chart: Chart | undefined;
 
@@ -286,10 +327,26 @@
       flex-shrink: 0;
     }
 
+    // Icon + text on the tab label, keeps the existing font size/color.
+    .analytics-tabs__label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    // Caption lives between the tab bar and the chart — tight vertical
+    // rhythm (8px below tabs, 4px above chart) so it feels attached to the
+    // tab rather than floating in the card body.
+    .analytics-tabs__caption {
+      font-size: 12px;
+      color: #909399;
+      padding: 10px 16px 4px;
+    }
+
     .analytics-tabs__body {
       position: relative;
-      height: 360px;
-      padding: 12px 16px 16px;
+      height: 340px;
+      padding: 4px 16px 16px;
     }
 
     .analytics-tabs__chart {
