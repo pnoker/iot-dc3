@@ -9,7 +9,7 @@ utility support for all services that use PostgreSQL as their primary storage.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-postgres
-- **Version**: 2026.4.30
+- **Version**: 2026.5.5
 
 ## Key Components
 

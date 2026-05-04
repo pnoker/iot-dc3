@@ -34,7 +34,7 @@ import java.util.*;
  * URL patterns is fanned out to multiple entries.
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 public class ApiEndpointScanner {
 

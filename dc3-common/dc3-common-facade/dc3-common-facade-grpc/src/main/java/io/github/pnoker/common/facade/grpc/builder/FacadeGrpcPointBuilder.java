@@ -50,7 +50,7 @@ import java.util.Optional;
  * {@code GrpcPointBuilder}.
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 @Component
 public class FacadeGrpcPointBuilder {

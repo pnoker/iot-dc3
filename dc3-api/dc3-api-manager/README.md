@@ -9,7 +9,7 @@ driver, device, and point metadata from the Manager Center.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-api-manager
-- **Version**: 2026.4.30
+- **Version**: 2026.5.5
 - **Package**: `io.github.pnoker.api.center.manager`
 
 ## Proto Definitions
@@ -76,7 +76,7 @@ This module depends on common proto definitions:
 <dependency>
     <groupId>io.github.pnoker</groupId>
     <artifactId>dc3-api-manager</artifactId>
-    <version>2026.4.30</version>
+    <version>2026.5.5</version>
 </dependency>
 ```
 

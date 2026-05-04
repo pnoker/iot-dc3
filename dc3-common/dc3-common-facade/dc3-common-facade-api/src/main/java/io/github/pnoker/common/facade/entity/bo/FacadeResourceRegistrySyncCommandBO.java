@@ -25,7 +25,7 @@ import java.util.List;
  * Facade-level command driving a resource-registry sync call.
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 @Getter
 @Setter

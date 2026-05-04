@@ -25,8 +25,8 @@ import java.util.List;
  * Command driving a resource-registry sync call.
  *
  * @author pnoker
- * @version 2026.4.30
- * @since 2026.4.30
+ * @version 2026.5.5
+ * @since 2026.5.5
  */
 @Getter
 @Setter
