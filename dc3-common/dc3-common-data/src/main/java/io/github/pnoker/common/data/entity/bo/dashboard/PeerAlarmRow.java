@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** (profileId, deviceId, alarmCount) for per-profile peer deviation. */
-@Getter @Setter @ToString
+/**
+ * (profileId, deviceId, alarmCount) for per-profile peer deviation.
+ */
+@Getter
+@Setter
+@ToString
 public class PeerAlarmRow {
     private long profileId;
     private long deviceId;

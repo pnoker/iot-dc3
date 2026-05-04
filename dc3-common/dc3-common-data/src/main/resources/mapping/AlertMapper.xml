@@ -401,24 +401,25 @@
     -->
     <select id="typeDistribution" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
         SELECT type AS key, SUM(count) AS count
-        FROM (SELECT event_ext ->> 'type' AS type, COUNT(*) AS count
-              FROM dc3_device_event
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND event_type_flag = 1
-                AND create_time &gt;= #{from}
-              GROUP BY type
-              UNION ALL
-              SELECT event_ext ->> 'type' AS type, COUNT(*) AS count
-              FROM dc3_driver_event
-              WHERE deleted = 0
-                AND tenant_id = #{tenantId}
-                AND event_type_flag = 1
-                AND create_time &gt;= #{from}
-              GROUP BY type) u
+        FROM (SELECT event_ext ->> 'type' AS type, COUNT (*) AS count
+            FROM dc3_device_event
+            WHERE deleted = 0
+            AND tenant_id = #{tenantId}
+            AND event_type_flag = 1
+            AND create_time &gt;= #{from}
+            GROUP BY type
+            UNION ALL
+            SELECT event_ext ->> 'type' AS type, COUNT (*) AS count
+            FROM dc3_driver_event
+            WHERE deleted = 0
+            AND tenant_id = #{tenantId}
+            AND event_type_flag = 1
+            AND create_time &gt;= #{from}
+            GROUP BY type) u
         WHERE type IS NOT NULL
         GROUP BY type
-        ORDER BY count DESC
+        ORDER BY count
+        DESC
     </select>
 
     <!--

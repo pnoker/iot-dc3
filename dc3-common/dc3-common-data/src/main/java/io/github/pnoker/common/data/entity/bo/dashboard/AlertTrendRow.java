@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** One day's split alert count (device vs driver source). */
-@Getter @Setter @ToString
+/**
+ * One day's split alert count (device vs driver source).
+ */
+@Getter
+@Setter
+@ToString
 public class AlertTrendRow {
     private String date;
     private long deviceCount;

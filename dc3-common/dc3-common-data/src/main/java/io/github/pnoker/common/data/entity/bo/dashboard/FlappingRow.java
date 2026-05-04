@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** (source, sourceId, eventTypeFlag, count) — one flapping (source, type) pair. */
-@Getter @Setter @ToString
+/**
+ * (source, sourceId, eventTypeFlag, count) — one flapping (source, type) pair.
+ */
+@Getter
+@Setter
+@ToString
 public class FlappingRow {
     private String source;
     private long sourceId;

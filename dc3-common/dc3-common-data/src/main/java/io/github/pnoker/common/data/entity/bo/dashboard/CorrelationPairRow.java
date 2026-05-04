@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Co-occurring event pair. */
-@Getter @Setter @ToString
+/**
+ * Co-occurring event pair.
+ */
+@Getter
+@Setter
+@ToString
 public class CorrelationPairRow {
     private String aSource;
     private long aSourceId;
