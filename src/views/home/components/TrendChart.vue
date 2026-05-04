@@ -46,7 +46,7 @@
   const ensureChart = () => {
     if (!chartRef.value) return;
     chart?.destroy();
-    chart = new Chart({ container: chartRef.value, autoFit: true, height: 280 });
+    chart = new Chart({ container: chartRef.value, autoFit: true });
   };
 
   const render = (points: { bucket: string; count: number }[]) => {
@@ -107,9 +107,27 @@
 </script>
 
 <style lang="scss" scoped>
+  // Shared row-3 card skeleton: min-height 440 + flex column so the three
+  // widgets (trend + live feed + alerts) align on the same baseline. The
+  // chart canvas fills whatever the body has left after the header.
   .trend-chart {
+    min-height: 440px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
     :deep(.el-card__header) {
       padding: 12px 16px;
+    }
+
+    :deep(.el-card__body) {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      // Without min-height:0 a flex child with overflow wouldn't shrink
+      // past its content size, so the chart would still push the card
+      // taller than 440 on narrow rows.
+      min-height: 0;
     }
 
     .trend-chart__header {
@@ -130,8 +148,9 @@
     }
 
     .trend-chart__canvas {
+      flex: 1;
       width: 100%;
-      height: 280px;
+      min-height: 0;
     }
   }
 </style>

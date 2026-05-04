@@ -35,7 +35,7 @@
       </div>
     </template>
 
-    <el-scrollbar height="360px">
+    <el-scrollbar height="100%">
       <div v-if="!loading && rows.length === 0" class="live-feed__empty">
         <el-empty :description="$t('home.liveFeed.empty')" :image-size="80" />
       </div>
@@ -168,13 +168,19 @@
   .live-feed {
     min-height: 440px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 
     :deep(.el-card__header) {
       padding: 12px 16px;
     }
 
     :deep(.el-card__body) {
+      flex: 1;
       padding: 0;
+      // flex parent + overflow child pattern: scrollbar fills the remaining
+      // space and the chip text inside doesn't push the card taller.
+      min-height: 0;
     }
 
     .live-feed__header {

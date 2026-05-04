@@ -28,7 +28,7 @@
       </div>
     </template>
 
-    <el-scrollbar :height="scrollHeight">
+    <el-scrollbar height="100%">
       <div v-if="!loading && rows.length === 0" class="alert-list__empty">
         <el-empty :description="$t('home.alertList.empty')" :image-size="80" />
       </div>
@@ -87,7 +87,6 @@
 
   const props = defineProps({
     size: { type: Number, default: 10 },
-    scrollHeight: { type: String, default: '320px' },
   });
 
   const { t } = useI18n();
@@ -223,14 +222,19 @@
 
 <style lang="scss" scoped>
   .alert-list {
+    min-height: 440px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 
     :deep(.el-card__header) {
       padding: 12px 16px;
     }
 
     :deep(.el-card__body) {
+      flex: 1;
       padding: 0;
+      min-height: 0;
     }
 
     .alert-list__header {
