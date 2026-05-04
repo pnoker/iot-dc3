@@ -131,6 +131,14 @@
       }
     }
 
+    // SlaBadge is conditionally rendered between the banner row and the
+    // stat grid. Neither neighbour sets a top margin, so by default the
+    // badge sits flush against the stats. Restore the page's 8px rhythm
+    // so it reads as its own strip, not as a banner appendage.
+    .sla-badge {
+      margin-bottom: 8px;
+    }
+
     // Stat indicators: always fit the strip on one line, regardless of how
     // many cards the cards computed property ends up with. Below 1280px
     // (tablet / mobile) fall back to 2 cols so cards don't squeeze below
