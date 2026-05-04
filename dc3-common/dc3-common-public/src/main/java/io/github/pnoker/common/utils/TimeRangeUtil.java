@@ -43,15 +43,14 @@ import java.time.LocalDateTime;
  */
 public final class TimeRangeUtil {
 
-    private TimeRangeUtil() {
-    }
-
     /**
      * Default hour spans for each rolling preset.
      */
     public static final int HOURS_24H = 24;
     public static final int HOURS_7D = 24 * 7;
     public static final int HOURS_30D = 24 * 30;
+    private TimeRangeUtil() {
+    }
 
     /**
      * Resolve the lower-bound timestamp for a range query.
@@ -59,7 +58,7 @@ public final class TimeRangeUtil {
      * @param rangeKey   parsed key enum; {@code null} falls back to {@code rangeHours}
      * @param rangeHours legacy integer fallback; {@code null} or non-positive means "no bound"
      * @return lower-bound {@code LocalDateTime}, or {@code null} when the
-     *         caller should not filter by {@code create_time}
+     * caller should not filter by {@code create_time}
      */
     public static LocalDateTime resolveFrom(TimeRangeKeyEnum rangeKey, Integer rangeHours) {
         if (rangeKey != null) {
