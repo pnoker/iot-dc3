@@ -35,7 +35,7 @@
       </div>
     </template>
 
-    <el-scrollbar height="100%">
+    <el-scrollbar height="100%" class="live-feed__scroll">
       <div v-if="!loading && rows.length === 0" class="live-feed__empty">
         <el-empty :description="$t('home.liveFeed.empty')" :image-size="80" />
       </div>
@@ -178,8 +178,18 @@
     :deep(.el-card__body) {
       flex: 1;
       padding: 0;
-      // flex parent + overflow child pattern: scrollbar fills the remaining
-      // space and the chip text inside doesn't push the card taller.
+      // flex parent + overflow child pattern: body is a flex column so the
+      // scrollbar (flex:1) fills the remaining space with a concrete height,
+      // and content inside the scrollbar doesn't push the card taller.
+      // Without display:flex the el-scrollbar's height="100%" degrades to
+      // auto and 20 timeline items blow the card out to 800+px.
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .live-feed__scroll {
+      flex: 1;
       min-height: 0;
     }
 

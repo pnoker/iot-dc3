@@ -28,7 +28,7 @@
       </div>
     </template>
 
-    <el-scrollbar height="100%">
+    <el-scrollbar height="100%" class="alert-list__scroll">
       <div v-if="!loading && rows.length === 0" class="alert-list__empty">
         <el-empty :description="$t('home.alertList.empty')" :image-size="80" />
       </div>
@@ -234,6 +234,16 @@
     :deep(.el-card__body) {
       flex: 1;
       padding: 0;
+      // Must be flex column so the inner el-scrollbar's height="100%"
+      // resolves to a concrete value; otherwise 10 alarm rows expand the
+      // card well past its min-height.
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .alert-list__scroll {
+      flex: 1;
       min-height: 0;
     }
 
