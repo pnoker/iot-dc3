@@ -49,6 +49,7 @@ public final class TimeRangeUtil {
     public static final int HOURS_24H = 24;
     public static final int HOURS_7D = 24 * 7;
     public static final int HOURS_30D = 24 * 30;
+
     private TimeRangeUtil() {
     }
 
