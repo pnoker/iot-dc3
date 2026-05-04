@@ -11,8 +11,12 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-/** One raw event row from the paged / latest list. */
-@Getter @Setter @ToString
+/**
+ * One raw event row from the paged / latest list.
+ */
+@Getter
+@Setter
+@ToString
 public class AlertItemRow {
     private long id;
     private String source;

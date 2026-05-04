@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Generic (key, count) aggregate row; key is Object to fit JDBC int or varchar. */
-@Getter @Setter @ToString
+/**
+ * Generic (key, count) aggregate row; key is Object to fit JDBC int or varchar.
+ */
+@Getter
+@Setter
+@ToString
 public class BucketRow {
     private Object key;
     private long count;

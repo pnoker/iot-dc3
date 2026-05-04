@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Point declared but without history samples. */
-@Getter @Setter @ToString
+/**
+ * Point declared but without history samples.
+ */
+@Getter
+@Setter
+@ToString
 public class CoverageGapRow {
     private long pointId;
     private long profileId;

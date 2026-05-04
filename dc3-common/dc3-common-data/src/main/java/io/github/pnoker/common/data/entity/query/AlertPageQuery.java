@@ -40,21 +40,31 @@ public class AlertPageQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /** {@code "device"} / {@code "driver"} / {@code null} (both). */
+    /**
+     * {@code "device"} / {@code "driver"} / {@code null} (both).
+     */
     private String source;
 
     private Integer eventTypeFlag;
 
-    /** 0 = unconfirmed, 1 = confirmed, null = both. */
+    /**
+     * 0 = unconfirmed, 1 = confirmed, null = both.
+     */
     private Integer confirmFlag;
 
-    /** Legacy integer window; {@code rangeKey} wins when both set. */
+    /**
+     * Legacy integer window; {@code rangeKey} wins when both set.
+     */
     private Integer rangeHours;
 
-    /** Preset time-range key — resolved server-side via TimeRangeUtil. */
+    /**
+     * Preset time-range key — resolved server-side via TimeRangeUtil.
+     */
     private String rangeKey;
 
-    /** 1-based page index. Defaults to 1 if null or less. */
+    /**
+     * 1-based page index. Defaults to 1 if null or less.
+     */
     private Long current;
 
     private Long size;

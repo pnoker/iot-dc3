@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Per-service driver + device rollup. */
-@Getter @Setter @ToString
+/**
+ * Per-service driver + device rollup.
+ */
+@Getter
+@Setter
+@ToString
 public class ProtocolHealthRow {
     private String serviceName;
     private long driverCount;

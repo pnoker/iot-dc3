@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Four-age-bucket counts + total unconfirmed. */
-@Getter @Setter @ToString
+/**
+ * Four-age-bucket counts + total unconfirmed.
+ */
+@Getter
+@Setter
+@ToString
 public class AgingBucketRow {
     private long under1h;
     private long h1to6;

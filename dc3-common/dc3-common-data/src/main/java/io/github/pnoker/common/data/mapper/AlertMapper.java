@@ -16,21 +16,7 @@
 
 package io.github.pnoker.common.data.mapper;
 
-import io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.BucketRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.CorrelationPairRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.FlappingRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.PeerAlarmRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.ProtocolHealthRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.RecentChangeRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -74,7 +60,7 @@ public interface AlertMapper {
                        @Param("from") LocalDateTime from);
 
     List<SourceStatsRow> todayBySource(@Param("tenantId") Long tenantId,
-                                        @Param("from") LocalDateTime from);
+                                       @Param("from") LocalDateTime from);
 
     int confirmOne(@Param("tenantId") Long tenantId,
                    @Param("source") String source,

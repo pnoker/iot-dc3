@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Per-day ack-latency percentile row. */
-@Getter @Setter @ToString
+/**
+ * Per-day ack-latency percentile row.
+ */
+@Getter
+@Setter
+@ToString
 public class MttaTrendRow {
     private String date;
     private long p50Ms;

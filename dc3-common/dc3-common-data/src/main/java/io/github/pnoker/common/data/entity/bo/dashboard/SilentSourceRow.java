@@ -11,8 +11,12 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-/** A (device, point) pair that's been silent since lastSeen. */
-@Getter @Setter @ToString
+/**
+ * A (device, point) pair that's been silent since lastSeen.
+ */
+@Getter
+@Setter
+@ToString
 public class SilentSourceRow {
     private long deviceId;
     private long pointId;

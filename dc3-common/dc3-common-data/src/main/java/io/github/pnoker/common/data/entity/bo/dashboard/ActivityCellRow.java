@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** (dow, hour, count) heatmap cell. */
-@Getter @Setter @ToString
+/**
+ * (dow, hour, count) heatmap cell.
+ */
+@Getter
+@Setter
+@ToString
 public class ActivityCellRow {
     private int dow;
     private int hour;
