@@ -15,32 +15,19 @@
   -->
 
 <template>
-  <el-card class="recent-unconfirmed" shadow="never">
-    <template #header>
-      <div class="recent-unconfirmed__header">
-        <span class="recent-unconfirmed__title">
-          {{ $t('settings.event.overview.unconfirmedTitle') }}
-          <el-badge
-            v-if="rows.length > 0"
-            :value="rows.length"
-            :max="99"
-            type="danger"
-            class="recent-unconfirmed__badge"
-          />
-        </span>
-        <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
-      </div>
-    </template>
-
-    <!-- Flat list, no inner scrollable. A nested el-scrollbar would swallow
-         wheel events whenever the cursor hovered this card, locking the
-         page-level Layout scrollbar. Paired with a server-side size cap
-         (5) so five timeline items fit comfortably inside the diag-grid
-         min-height of 320px without needing an internal scrollbar. -->
-    <div v-if="!loading && rows.length === 0" class="recent-unconfirmed__empty">
-      <el-empty :description="$t('settings.event.overview.noUnconfirmed')" :image-size="60" />
-    </div>
-    <el-timeline v-else class="recent-unconfirmed__timeline">
+  <dashboard-card
+    class="recent-unconfirmed"
+    :title="$t('settings.event.overview.unconfirmedTitle')"
+    :badge="rows.length || null"
+    :loading="loading"
+    loading-target="button"
+    :empty="!loading && rows.length === 0"
+    :empty-text="$t('settings.event.overview.noUnconfirmed')"
+    :empty-image-size="60"
+    body-mode="scroll"
+    @refresh="load"
+  >
+    <el-timeline class="recent-unconfirmed__timeline">
       <el-timeline-item
         v-for="row in rows"
         :key="`${row.source}:${row.id}`"
@@ -59,16 +46,16 @@
         </div>
       </el-timeline-item>
     </el-timeline>
-  </el-card>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
   import { onMounted, reactive, ref } from 'vue';
-  import { Refresh } from '@element-plus/icons-vue';
 
   import { alertPage } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
   import { getDriverByIds } from '@/api/driver';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
   interface Row {
     id: number | string;
@@ -160,43 +147,6 @@
 
 <style lang="scss" scoped>
   .recent-unconfirmed {
-    min-height: 300px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
-      flex: 1;
-      padding: 0;
-      min-height: 0;
-      overflow: auto;
-    }
-
-    .recent-unconfirmed__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .recent-unconfirmed__title {
-      font-weight: 600;
-      color: #303133;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .recent-unconfirmed__badge {
-      :deep(.el-badge__content) {
-        transform: none;
-        position: static;
-      }
-    }
-
     .recent-unconfirmed__timeline {
       padding: 12px 16px 0;
     }
@@ -244,10 +194,6 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       word-break: break-word;
-    }
-
-    .recent-unconfirmed__empty {
-      padding: 40px 0;
     }
   }
 </style>

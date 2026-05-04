@@ -15,44 +15,47 @@
   -->
 
 <template>
-  <el-card class="analytics-tabs" shadow="never">
-    <template #header>
-      <div class="analytics-tabs__header">
-        <el-tabs v-model="activeTab" class="analytics-tabs__bar" @tab-change="onTabChange">
-          <el-tab-pane v-for="t in tabs" :key="t.key" :label="t.label" :name="t.key" />
-        </el-tabs>
-        <div class="analytics-tabs__actions">
-          <range-segmented v-if="isTopTab" v-model="rangeKey" size="small" @update:model-value="load" />
-          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
-        </div>
-      </div>
+  <dashboard-card
+    class="analytics-tabs"
+    variant="tabs"
+    :loading="loading"
+    :empty="!loading && empty"
+    :empty-text="$t('home.liveFeed.empty')"
+    :empty-image-size="80"
+    body-mode="chart"
+    @refresh="load"
+  >
+    <template #title>
+      <el-tabs v-model="activeTab" class="analytics-tabs__bar" @tab-change="onTabChange">
+        <el-tab-pane v-for="t in tabs" :key="t.key" :label="t.label" :name="t.key" />
+      </el-tabs>
+    </template>
+
+    <template #tools>
+      <range-segmented v-if="isTopTab" v-model="rangeKey" size="small" @update:model-value="load" />
     </template>
 
     <!-- Caption line — spells out the ranking rule and (for top-N tabs) the
          active time range, so the chart is never ambiguous about what it's
          measuring or how it's sorted. -->
     <div class="analytics-tabs__caption">{{ caption }}</div>
-
-    <div v-loading="loading" class="analytics-tabs__body">
-      <div v-if="!loading && empty" class="analytics-tabs__empty">
-        <el-empty :description="$t('home.liveFeed.empty')" :image-size="80" />
-      </div>
-      <div v-show="!empty" ref="chartRef" class="analytics-tabs__chart"></div>
+    <div class="analytics-tabs__chart-wrap">
+      <div ref="chartRef" class="analytics-tabs__chart"></div>
     </div>
-  </el-card>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
   import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Chart } from '@antv/g2';
-  import { Refresh } from '@element-plus/icons-vue';
 
   import { deviceStats, driverStats, statsTop } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
   import { getDriverByIds } from '@/api/driver';
   import { getPointByIds } from '@/api/point';
   import { getProfileByIds } from '@/api/profile';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
 
@@ -125,10 +128,6 @@
   const ensureChart = () => {
     if (!chartRef.value) return;
     if (chart) return;
-    // No hardcoded height — let G2 take the container's clientHeight via
-    // autoFit. The body shrank from 360 → 340 to make room for the caption
-    // row above, so a fixed 360 would paint 20px beyond the visible area
-    // and clip the bottom of each chart.
     chart = new Chart({ container: chartRef.value, autoFit: true });
   };
 
@@ -298,42 +297,16 @@
 
 <style lang="scss" scoped>
   .analytics-tabs {
-    min-height: 300px;
-    height: 100%;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
+    // AnalyticsTabs has its own body stack (caption + chart-wrap), each with
+    // its own padding, so reset the chart-mode default padding to keep the
+    // caption flush with the card edges like the original layout.
+    :deep(.dashboard-card__content) {
       padding: 0;
-    }
-
-    .analytics-tabs__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
     }
 
     .analytics-tabs__bar {
       flex: 1;
       min-width: 0;
-
-      :deep(.el-tabs__nav-wrap::after) {
-        display: none;
-      }
-
-      :deep(.el-tabs__header) {
-        margin-bottom: 0;
-      }
-    }
-
-    .analytics-tabs__actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
     }
 
     // Caption lives between the tab bar and the chart — tight vertical
@@ -345,22 +318,15 @@
       padding: 10px 16px 4px;
     }
 
-    .analytics-tabs__body {
-      position: relative;
-      height: 340px;
+    .analytics-tabs__chart-wrap {
+      flex: 1;
+      min-height: 0;
       padding: 4px 16px 16px;
     }
 
     .analytics-tabs__chart {
       width: 100%;
       height: 100%;
-    }
-
-    .analytics-tabs__empty {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
   }
 </style>

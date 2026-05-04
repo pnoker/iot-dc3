@@ -15,73 +15,58 @@
   -->
 
 <template>
-  <el-card class="live-feed" shadow="never">
-    <template #header>
-      <div class="live-feed__header">
-        <span class="live-feed__title">{{ $t('home.liveFeed.title') }}</span>
-        <div class="live-feed__actions">
-          <el-segmented
-            v-model="intervalMs"
-            :options="[
-              { label: $t('home.liveFeed.intervalOff'), value: 0 },
-              { label: '5s', value: 5000 },
-              { label: '10s', value: 10000 },
-              { label: '30s', value: 30000 },
-            ]"
-            size="small"
-          />
-          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="refresh" />
-        </div>
-      </div>
-    </template>
-
-    <!-- Scroll wrapper: native overflow:auto driven by flex:1 sizing, same
-         pattern as the event-overview RecentUnconfirmed card. Keeps the
-         footer below pinned; only the timeline scrolls. -->
-    <div class="live-feed__scroll">
-      <div v-if="!loading && rows.length === 0" class="live-feed__empty">
-        <el-empty :description="$t('home.liveFeed.empty')" :image-size="80" />
-      </div>
-      <el-timeline v-else>
-        <el-timeline-item
-          v-for="row in rows"
-          :key="rowKey(row)"
-          :color="typeColor(row.valueType)"
-          :timestamp="formatTime(row.createTime)"
-          placement="top"
-        >
-          <div class="live-feed__item">
-            <div class="live-feed__line">
-              <span class="live-feed__driver">{{ displayDriver(row) }}</span>
-              <span class="live-feed__sep">/</span>
-              <span class="live-feed__device">{{ displayDevice(row) }}</span>
-              <span class="live-feed__sep">/</span>
-              <span class="live-feed__point">{{ displayPoint(row) }}</span>
-            </div>
-            <div class="live-feed__value-line">
-              <span :class="`live-feed__tag--${row.valueType?.toLowerCase() || 'string'}`" class="live-feed__tag">
-                {{ row.valueType || 'STR' }}
-              </span>
-              <span class="live-feed__value">{{ row.calValue ?? row.rawValue ?? '-' }}</span>
-            </div>
+  <dashboard-card
+    v-model:interval="intervalMs"
+    class="live-feed"
+    :title="$t('home.liveFeed.title')"
+    :loading="loading"
+    loading-target="none"
+    :empty="!loading && rows.length === 0"
+    :empty-text="$t('home.liveFeed.empty')"
+    body-mode="scroll"
+    :auto-refresh="intervalOptions"
+    @refresh="refresh"
+  >
+    <el-timeline>
+      <el-timeline-item
+        v-for="row in rows"
+        :key="rowKey(row)"
+        :color="typeColor(row.valueType)"
+        :timestamp="formatTime(row.createTime)"
+        placement="top"
+      >
+        <div class="live-feed__item">
+          <div class="live-feed__line">
+            <span class="live-feed__driver">{{ displayDriver(row) }}</span>
+            <span class="live-feed__sep">/</span>
+            <span class="live-feed__device">{{ displayDevice(row) }}</span>
+            <span class="live-feed__sep">/</span>
+            <span class="live-feed__point">{{ displayPoint(row) }}</span>
           </div>
-        </el-timeline-item>
-      </el-timeline>
-    </div>
+          <div class="live-feed__value-line">
+            <span :class="`live-feed__tag--${row.valueType?.toLowerCase() || 'string'}`" class="live-feed__tag">
+              {{ row.valueType || 'STR' }}
+            </span>
+            <span class="live-feed__value">{{ row.calValue ?? row.rawValue ?? '-' }}</span>
+          </div>
+        </div>
+      </el-timeline-item>
+    </el-timeline>
 
-    <div class="live-feed__footer">
+    <template #footer>
       <span v-if="lastRefreshed">{{ $t('home.liveFeed.updatedAt', { time: formatTime(lastRefreshed) }) }}</span>
       <span v-else>-</span>
       <span>{{ $t('home.liveFeed.rows', { n: rows.length }) }}</span>
-    </div>
-  </el-card>
+    </template>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, onUnmounted, ref, watch } from 'vue';
-  import { Refresh } from '@element-plus/icons-vue';
+  import { computed, onMounted, ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
   import { streamLatest } from '@/api/dashboard';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
   interface Row {
     deviceId: number | string;
@@ -103,12 +88,19 @@
     size: { type: Number, default: 20 },
   });
 
+  const { t } = useI18n();
+
   const loading = ref(false);
   const rows = ref<Row[]>([]);
   const lastRefreshed = ref<string>('');
   const intervalMs = ref(0);
 
-  let timer: ReturnType<typeof setInterval> | null = null;
+  const intervalOptions = computed(() => [
+    { label: t('home.liveFeed.intervalOff'), value: 0 },
+    { label: '5s', value: 5000 },
+    { label: '10s', value: 10000 },
+    { label: '30s', value: 30000 },
+  ]);
 
   const refresh = async () => {
     loading.value = true;
@@ -151,69 +143,11 @@
     return '#409eff';
   };
 
-  watch(intervalMs, (ms) => {
-    if (timer) {
-      clearInterval(timer);
-      timer = null;
-    }
-    if (ms > 0) {
-      timer = setInterval(refresh, ms);
-    }
-  });
-
   onMounted(refresh);
-  onUnmounted(() => {
-    if (timer) clearInterval(timer);
-  });
 </script>
 
 <style lang="scss" scoped>
   .live-feed {
-    min-height: 300px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
-      // Body is a flex column so the scroll wrapper (flex:1 + native
-      // overflow:auto) fills the remaining space and footer stays pinned.
-      flex: 1;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    // Native overflow:auto, same pattern as RecentUnconfirmed. el-scrollbar
-    // was silently degrading its height="100%" to auto under flex:1, which
-    // let 20 timeline items stretch the card to 800+px.
-    .live-feed__scroll {
-      flex: 1;
-      min-height: 0;
-      overflow: auto;
-    }
-
-    .live-feed__header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .live-feed__title {
-      font-weight: 600;
-      color: #303133;
-    }
-
-    .live-feed__actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
     :deep(.el-timeline) {
       padding: 8px 16px 0;
     }
@@ -315,20 +249,6 @@
       color: #303133;
       font-weight: 500;
       font-size: 12px;
-    }
-
-    .live-feed__empty {
-      padding: 40px 0;
-    }
-
-    .live-feed__footer {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 16px;
-      font-size: 12px;
-      color: #909399;
-      border-top: 1px solid var(--el-border-color-lighter);
-      background: #fafafa;
     }
   }
 </style>

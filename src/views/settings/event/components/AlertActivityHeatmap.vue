@@ -15,24 +15,23 @@
   -->
 
 <template>
-  <el-card class="alert-activity" shadow="never">
-    <template #header>
-      <div class="alert-activity__header">
-        <span class="alert-activity__title">{{ t('settings.event.overview.activityTitle') }}</span>
-        <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
-      </div>
-    </template>
-    <div ref="chartRef" v-loading="loading" class="alert-activity__canvas"></div>
-  </el-card>
+  <dashboard-card
+    :title="t('settings.event.overview.activityTitle')"
+    :loading="loading"
+    body-mode="chart"
+    @refresh="load"
+  >
+    <div ref="chartRef" class="alert-activity__canvas"></div>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
   import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Chart } from '@antv/g2';
-  import { Refresh } from '@element-plus/icons-vue';
 
   import { alertActivity } from '@/api/dashboard';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
   const { t } = useI18n();
 
@@ -100,38 +99,8 @@
 </script>
 
 <style lang="scss" scoped>
-  .alert-activity {
-    min-height: 300px;
+  .alert-activity__canvas {
+    width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .alert-activity__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .alert-activity__title {
-      font-weight: 600;
-      color: #303133;
-    }
-
-    .alert-activity__canvas {
-      flex: 1;
-      width: 100%;
-      min-height: 0;
-    }
   }
 </style>

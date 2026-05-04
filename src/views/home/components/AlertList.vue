@@ -15,22 +15,17 @@
   -->
 
 <template>
-  <el-card class="alert-list" shadow="never">
-    <template #header>
-      <div class="alert-list__header">
-        <span class="alert-list__title">
-          {{ $t('home.alertList.title') }}
-          <!-- Badge mirrors the actual rendered list length so the badge
-               number and what the user sees below it never drift apart. -->
-          <el-badge v-if="rows.length > 0" :value="rows.length" :max="99" type="danger" class="alert-list__badge" />
-        </span>
-        <el-button :icon="Refresh" :loading="loading" circle size="small" @click="refresh" />
-      </div>
-    </template>
-
-    <div v-if="!loading && rows.length === 0" class="alert-list__empty">
-      <el-empty :description="$t('home.alertList.empty')" :image-size="80" />
-    </div>
+  <dashboard-card
+    class="alert-list"
+    :title="$t('home.alertList.title')"
+    :badge="rows.length || null"
+    :loading="loading"
+    loading-target="button"
+    :empty="!loading && rows.length === 0"
+    :empty-text="$t('home.alertList.empty')"
+    body-mode="scroll"
+    @refresh="refresh"
+  >
     <div v-for="group in groupedRows" :key="group.date" class="alert-list__group">
       <div class="alert-list__date">{{ group.date }}</div>
       <el-timeline>
@@ -60,17 +55,17 @@
         </el-timeline-item>
       </el-timeline>
     </div>
-  </el-card>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
   import { computed, onMounted, reactive, ref } from 'vue';
-  import { Refresh } from '@element-plus/icons-vue';
   import { useI18n } from 'vue-i18n';
 
   import { alertLatest, alertStats } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
   import { getDriverByIds } from '@/api/driver';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
   interface AlertRow {
     id: number | string;
@@ -220,47 +215,6 @@
 
 <style lang="scss" scoped>
   .alert-list {
-    min-height: 300px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
-      // Same pattern as RecentUnconfirmed: body is the scroll container
-      // (native overflow:auto), content flows inside. Native overflow
-      // works reliably with flex:1 sizing where el-scrollbar's height
-      // prop silently degraded to auto and blew the card out.
-      flex: 1;
-      padding: 0;
-      min-height: 0;
-      overflow: auto;
-    }
-
-    .alert-list__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .alert-list__title {
-      font-weight: 600;
-      color: #303133;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .alert-list__badge {
-      :deep(.el-badge__content) {
-        transform: none;
-        position: static;
-      }
-    }
-
     .alert-list__group {
       padding: 10px 20px 0;
 
@@ -315,10 +269,6 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       word-break: break-word;
-    }
-
-    .alert-list__empty {
-      padding: 40px 0;
     }
   }
 </style>

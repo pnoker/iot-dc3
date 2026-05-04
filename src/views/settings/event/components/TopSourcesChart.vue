@@ -15,25 +15,24 @@
   -->
 
 <template>
-  <el-card class="top-sources" shadow="never">
-    <template #header>
-      <div class="top-sources__header">
-        <span class="top-sources__title">{{ $t('settings.event.overview.topSourcesTitle') }}</span>
-        <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
-      </div>
-    </template>
-    <div ref="chartRef" v-loading="loading" class="top-sources__chart"></div>
-  </el-card>
+  <dashboard-card
+    :title="$t('settings.event.overview.topSourcesTitle')"
+    :loading="loading"
+    body-mode="chart"
+    @refresh="load"
+  >
+    <div ref="chartRef" class="top-sources__chart"></div>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
   import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
   import { Chart } from '@antv/g2';
-  import { Refresh } from '@element-plus/icons-vue';
 
   import { alertTopSources } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
   import { getDriverByIds } from '@/api/driver';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
   const props = defineProps<{ days?: number; limit?: number }>();
 
@@ -122,38 +121,8 @@
 </script>
 
 <style lang="scss" scoped>
-  .top-sources {
-    min-height: 300px;
+  .top-sources__chart {
+    width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .top-sources__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .top-sources__title {
-      font-weight: 600;
-      color: #303133;
-    }
-
-    .top-sources__chart {
-      flex: 1;
-      width: 100%;
-      min-height: 0;
-    }
   }
 </style>

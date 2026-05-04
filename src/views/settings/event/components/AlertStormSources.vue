@@ -15,25 +15,23 @@
   -->
 
 <template>
-  <el-card class="alert-storm" shadow="never">
-    <template #header>
-      <div class="alert-storm__header">
-        <span class="alert-storm__title">
-          {{ t('settings.event.overview.stormTitle') }}
-          <span class="alert-storm__subtitle">{{
-            t('settings.event.overview.stormSubtitle', { hours: window.hours, min: window.minCount })
-          }}</span>
-        </span>
-        <div class="alert-storm__actions">
-          <el-segmented v-model="windowKey" :options="windowOptions" size="small" />
-          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
-        </div>
-      </div>
+  <dashboard-card
+    class="alert-storm"
+    :title="t('settings.event.overview.stormTitle')"
+    :subtitle="t('settings.event.overview.stormSubtitle', { hours: window.hours, min: window.minCount })"
+    :loading="loading"
+    loading-target="button"
+    :empty="!loading && rows.length === 0"
+    :empty-text="t('settings.event.overview.stormEmpty')"
+    :empty-image-size="60"
+    body-mode="scroll"
+    @refresh="load"
+  >
+    <template #tools>
+      <el-segmented v-model="windowKey" :options="windowOptions" size="small" />
     </template>
-    <div v-if="!loading && rows.length === 0" class="alert-storm__empty">
-      <el-empty :description="t('settings.event.overview.stormEmpty')" :image-size="60" />
-    </div>
-    <ul v-else class="alert-storm__list">
+
+    <ul class="alert-storm__list">
       <li v-for="row in rows" :key="`${row.source}:${row.sourceId}`" class="alert-storm__item" @click="onDrillIn(row)">
         <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
           {{ row.source === 'device' ? t('settings.event.device') : t('settings.event.driver') }}
@@ -45,18 +43,19 @@
         </span>
       </li>
     </ul>
-  </el-card>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
   import { computed, onMounted, reactive, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
-  import { Refresh, Warning } from '@element-plus/icons-vue';
+  import { Warning } from '@element-plus/icons-vue';
 
   import { alertStormSources } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
   import { getDriverByIds } from '@/api/driver';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
   interface StormRow {
     source: 'device' | 'driver';
@@ -166,50 +165,6 @@
 
 <style lang="scss" scoped>
   .alert-storm {
-    min-height: 300px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
-      flex: 1;
-      padding: 0;
-      min-height: 0;
-      overflow: auto;
-    }
-
-    .alert-storm__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .alert-storm__actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .alert-storm__title {
-      font-weight: 600;
-      color: #303133;
-      display: inline-flex;
-      align-items: baseline;
-      gap: 8px;
-    }
-
-    .alert-storm__subtitle {
-      font-size: 12px;
-      font-weight: normal;
-      color: #909399;
-    }
-
     .alert-storm__list {
       list-style: none;
       margin: 0;
@@ -251,10 +206,6 @@
       color: #f56c6c;
       font-weight: 600;
       font-size: 13px;
-    }
-
-    .alert-storm__empty {
-      padding: 40px 0;
     }
   }
 </style>

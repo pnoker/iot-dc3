@@ -15,27 +15,21 @@
   -->
 
 <template>
-  <el-card class="latency-chart" shadow="never">
-    <template #header>
-      <div class="latency-chart__header">
-        <span class="latency-chart__title">{{ $t('home.latency.title') }}</span>
-        <div class="latency-chart__actions">
-          <range-segmented v-model="rangeKey" size="small" @update:model-value="load" />
-          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
-        </div>
-      </div>
+  <dashboard-card :title="$t('home.latency.title')" :loading="loading" body-mode="chart" @refresh="load">
+    <template #tools>
+      <range-segmented v-model="rangeKey" size="small" @update:model-value="load" />
     </template>
-    <div ref="chartRef" v-loading="loading" class="latency-chart__canvas"></div>
-  </el-card>
+    <div ref="chartRef" class="latency-chart__canvas"></div>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
   import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Chart } from '@antv/g2';
-  import { Refresh } from '@element-plus/icons-vue';
 
   import { statsLatency } from '@/api/dashboard';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
 
@@ -95,47 +89,8 @@
 </script>
 
 <style lang="scss" scoped>
-  // Shared dashboard-card baseline: min-height 440 + flex column so every
-  // home/event-overview card lands at the same height, and the chart canvas
-  // fills whatever the body has left after the header.
-  .latency-chart {
-    min-height: 300px;
+  .latency-chart__canvas {
+    width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .latency-chart__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .latency-chart__title {
-      font-weight: 600;
-      color: #303133;
-    }
-
-    .latency-chart__actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .latency-chart__canvas {
-      flex: 1;
-      width: 100%;
-      min-height: 0;
-    }
   }
 </style>

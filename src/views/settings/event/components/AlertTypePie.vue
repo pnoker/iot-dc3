@@ -15,27 +15,26 @@
   -->
 
 <template>
-  <el-card class="alert-type-pie" shadow="never">
-    <template #header>
-      <div class="alert-type-pie__header">
-        <span class="alert-type-pie__title">{{ t('settings.event.overview.typeDistributionTitle') }}</span>
-        <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
-      </div>
-    </template>
-    <div v-if="!loading && rows.length === 0" class="alert-type-pie__empty">
-      <el-empty :description="t('settings.event.empty')" :image-size="60" />
-    </div>
-    <div v-show="rows.length > 0" ref="chartRef" v-loading="loading" class="alert-type-pie__canvas"></div>
-  </el-card>
+  <dashboard-card
+    :title="t('settings.event.overview.typeDistributionTitle')"
+    :loading="loading"
+    :empty="!loading && rows.length === 0"
+    :empty-text="t('settings.event.empty')"
+    :empty-image-size="60"
+    body-mode="chart"
+    @refresh="load"
+  >
+    <div ref="chartRef" class="alert-type-pie__canvas"></div>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
   import { nextTick, onMounted, onUnmounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Chart } from '@antv/g2';
-  import { Refresh } from '@element-plus/icons-vue';
 
   import { alertTypeDistribution } from '@/api/dashboard';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 
   const { t } = useI18n();
 
@@ -95,45 +94,8 @@
 </script>
 
 <style lang="scss" scoped>
-  .alert-type-pie {
-    min-height: 300px;
+  .alert-type-pie__canvas {
+    width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .alert-type-pie__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .alert-type-pie__title {
-      font-weight: 600;
-      color: #303133;
-    }
-
-    .alert-type-pie__canvas {
-      flex: 1;
-      width: 100%;
-      min-height: 0;
-    }
-
-    .alert-type-pie__empty {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
   }
 </style>

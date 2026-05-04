@@ -15,26 +15,20 @@
   -->
 
 <template>
-  <el-card class="trend-chart" shadow="never">
-    <template #header>
-      <div class="trend-chart__header">
-        <span class="trend-chart__title">{{ $t('home.trendTitle') }}</span>
-        <div class="trend-chart__actions">
-          <range-segmented v-model="rangeKey" size="small" @update:model-value="load" />
-          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
-        </div>
-      </div>
+  <dashboard-card :title="$t('home.trendTitle')" :loading="loading" body-mode="chart" @refresh="load">
+    <template #tools>
+      <range-segmented v-model="rangeKey" size="small" @update:model-value="load" />
     </template>
-    <div ref="chartRef" v-loading="loading" class="trend-chart__canvas"></div>
-  </el-card>
+    <div ref="chartRef" class="trend-chart__canvas"></div>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
   import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
   import { Chart } from '@antv/g2';
-  import { Refresh } from '@element-plus/icons-vue';
 
   import { statsTimeseries } from '@/api/dashboard';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
 
@@ -107,50 +101,8 @@
 </script>
 
 <style lang="scss" scoped>
-  // Shared row-3 card skeleton: min-height 440 + flex column so the three
-  // widgets (trend + live feed + alerts) align on the same baseline. The
-  // chart canvas fills whatever the body has left after the header.
-  .trend-chart {
-    min-height: 300px;
+  .trend-chart__canvas {
+    width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      // Without min-height:0 a flex child with overflow wouldn't shrink
-      // past its content size, so the chart would still push the card
-      // taller than 440 on narrow rows.
-      min-height: 0;
-    }
-
-    .trend-chart__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .trend-chart__title {
-      font-weight: 600;
-      color: #303133;
-    }
-
-    .trend-chart__actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .trend-chart__canvas {
-      flex: 1;
-      width: 100%;
-      min-height: 0;
-    }
   }
 </style>

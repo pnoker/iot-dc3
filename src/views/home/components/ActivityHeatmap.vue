@@ -15,27 +15,21 @@
   -->
 
 <template>
-  <el-card class="activity-heatmap" shadow="never">
-    <template #header>
-      <div class="activity-heatmap__header">
-        <span class="activity-heatmap__title">{{ $t('home.activity.title') }}</span>
-        <div class="activity-heatmap__actions">
-          <range-segmented v-model="rangeKey" size="small" @update:model-value="load" />
-          <el-button :icon="Refresh" :loading="loading" circle size="small" @click="load" />
-        </div>
-      </div>
+  <dashboard-card :title="$t('home.activity.title')" :loading="loading" body-mode="chart" @refresh="load">
+    <template #tools>
+      <range-segmented v-model="rangeKey" size="small" @update:model-value="load" />
     </template>
-    <div ref="chartRef" v-loading="loading" class="activity-heatmap__canvas"></div>
-  </el-card>
+    <div ref="chartRef" class="activity-heatmap__canvas"></div>
+  </dashboard-card>
 </template>
 
 <script lang="ts" setup>
   import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Chart } from '@antv/g2';
-  import { Refresh } from '@element-plus/icons-vue';
 
   import { statsActivity } from '@/api/dashboard';
+  import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
 
@@ -110,44 +104,8 @@
 </script>
 
 <style lang="scss" scoped>
-  .activity-heatmap {
-    min-height: 300px;
+  .activity-heatmap__canvas {
+    width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    :deep(.el-card__header) {
-      padding: 12px 16px;
-    }
-
-    :deep(.el-card__body) {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .activity-heatmap__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .activity-heatmap__title {
-      font-weight: 600;
-      color: #303133;
-    }
-
-    .activity-heatmap__actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .activity-heatmap__canvas {
-      flex: 1;
-      width: 100%;
-      min-height: 0;
-    }
   }
 </style>
