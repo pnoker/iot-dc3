@@ -44,8 +44,4 @@ public class ProtocolHealthVO implements Serializable {
     private long driverCount;
     private long enabledCount;
     private long deviceCount;
-    /**
-     * Sum of pv samples over the default window (24h). 0 if none in window.
-     */
-    private long sampleVolume;
 }
