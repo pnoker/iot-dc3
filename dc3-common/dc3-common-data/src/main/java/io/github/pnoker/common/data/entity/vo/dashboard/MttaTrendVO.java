@@ -1,0 +1,50 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.github.pnoker.common.data.entity.vo.dashboard;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serial;
+import java.io.Serializable;
+
+/**
+ * One day's MTTA (mean time to acknowledge) statistic, computed as
+ * (operate_time - create_time) on confirm_flag=1 events. Event table has
+ * an UPDATE trigger that stamps operate_time on confirm, so the diff is
+ * the ack latency.
+ */
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+public class MttaTrendVO implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+    /**
+     * ISO date.
+     */
+    private String date;
+    private long p50Ms;
+    private long p95Ms;
+    /**
+     * Count of confirmed events used in the percentile calc for this day.
+     */
+    private long confirmedCount;
+}

@@ -159,4 +159,56 @@ public interface DashboardService {
      * Returns at most {@code limit} rows, ordered by count DESC.
      */
     List<AlertTopSourceVO> alertStormSources(Long tenantId, int hours, int minCount, int limit);
+
+    // ===== Phase-2 insights ====================================================
+
+    /**
+     * (source, eventType) pairs that fired repeatedly in the last
+     * {@code hours} hours. Returns rows with count &gt;= {@code minCount}.
+     */
+    List<FlappingSourceVO> alertFlapping(Long tenantId, int hours, int minCount, int limit);
+
+    /**
+     * Co-occurring event pairs within a time proximity window. Heavy
+     * query — callers should expect ~100ms+ on busy tenants.
+     */
+    List<CorrelationPairVO> alertCorrelation(Long tenantId, int hours, int windowSec, int limit);
+
+    /**
+     * Devices whose alarm count is at least 3× their profile-peer median
+     * over the lookback window. Service computes medians per profile.
+     */
+    List<PeerDeviationVO> alertPeerDeviation(Long tenantId, int days);
+
+    /**
+     * Current unconfirmed-alarm backlog bucketed by age.
+     */
+    AgingBacklogVO alertAgingBacklog(Long tenantId);
+
+    /**
+     * Per-day p50/p95 MTTA trend for the last {@code days} days.
+     */
+    List<MttaTrendVO> alertMtta(Long tenantId, int days);
+
+    /**
+     * Driver service_name rollup.
+     */
+    List<ProtocolHealthVO> protocolHealth(Long tenantId);
+
+    /**
+     * Recent config edits for the trend-chart overlay.
+     */
+    List<ChangeImpactVO> changeImpact(Long tenantId, int days, int limit);
+
+    /**
+     * Devices/points that have data in the baseline window but have gone
+     * silent. {@code baselineDays} = lookback for "was active"; {@code
+     * silentMinutes} = silence threshold.
+     */
+    List<SilentSourceVO> silentSources(Long tenantId, int baselineDays, int silentMinutes, int limit);
+
+    /**
+     * Points declared but never reported — config-vs-reality gap.
+     */
+    CoverageGapVO coverageGap(Long tenantId, int limit);
 }

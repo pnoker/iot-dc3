@@ -146,4 +146,58 @@ public interface AlertMapper {
                                            @Param("from") LocalDateTime from,
                                            @Param("minCount") int minCount,
                                            @Param("limit") int limit);
+
+    // ===== Phase-2 insights =====================================================
+
+    /**
+     * (source, source_id, event_type, count) GROUP BY source+sourceId+eventType HAVING count >= minCount.
+     */
+    List<Map<String, Object>> flappingSources(@Param("tenantId") Long tenantId,
+                                              @Param("from") LocalDateTime from,
+                                              @Param("minCount") int minCount,
+                                              @Param("limit") int limit);
+
+    /**
+     * Co-occurring event pairs within a time window. Self-join on time
+     * proximity; returns the TOP {@code limit} pairs ordered by coCount.
+     */
+    List<Map<String, Object>> correlationPairs(@Param("tenantId") Long tenantId,
+                                               @Param("from") LocalDateTime from,
+                                               @Param("windowSec") int windowSec,
+                                               @Param("limit") int limit);
+
+    /**
+     * Per-(profile, device) alarm counts joined via dc3_manager.dc3_profile_bind
+     * (cross-schema). Service layer computes the per-profile median and ratios
+     * to flag outlier devices.
+     */
+    List<Map<String, Object>> peerAlarmCounts(@Param("tenantId") Long tenantId,
+                                              @Param("from") LocalDateTime from);
+
+    /**
+     * Four bucket counts: &lt;1h, 1-6h, 6-24h, &gt;=24h. Uses confirm_flag=0 rows.
+     */
+    Map<String, Object> agingBuckets(@Param("tenantId") Long tenantId);
+
+    /**
+     * Per-day confirmed-event MTTA percentiles over the last {@code days}
+     * days. (operate_time - create_time) in ms; confirm_flag=1 rows only.
+     */
+    List<Map<String, Object>> mttaByDay(@Param("tenantId") Long tenantId,
+                                        @Param("from") LocalDateTime from);
+
+    /**
+     * Driver-service rollup via cross-schema to dc3_manager.dc3_driver and
+     * dc3_manager.dc3_device. Returns (service_name, driver_count, enabled_count, device_count).
+     */
+    List<Map<String, Object>> protocolHealth(@Param("tenantId") Long tenantId);
+
+    /**
+     * Config-change events across driver/device/profile tables in the last
+     * {@code days} days. (operate_time differs from create_time → row was
+     * edited post-creation.)
+     */
+    List<Map<String, Object>> recentChanges(@Param("tenantId") Long tenantId,
+                                            @Param("from") LocalDateTime from,
+                                            @Param("limit") int limit);
 }
