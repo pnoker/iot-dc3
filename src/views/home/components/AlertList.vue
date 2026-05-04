@@ -28,40 +28,38 @@
       </div>
     </template>
 
-    <el-scrollbar height="100%" class="alert-list__scroll">
-      <div v-if="!loading && rows.length === 0" class="alert-list__empty">
-        <el-empty :description="$t('home.alertList.empty')" :image-size="80" />
-      </div>
-      <div v-for="group in groupedRows" :key="group.date" class="alert-list__group">
-        <div class="alert-list__date">{{ group.date }}</div>
-        <el-timeline>
-          <el-timeline-item
-            v-for="row in group.items"
-            :key="row.id"
-            :timestamp="formatClock(row.createTime)"
-            :type="timelineColour(row.eventTypeFlag)"
-            :hollow="row.confirmFlag === 1"
-            placement="top"
-          >
-            <div class="alert-list__body">
-              <div class="alert-list__tags">
-                <el-tag :type="tagType(row.eventTypeFlag)" size="small">
-                  {{ levelLabel(row.eventTypeFlag) }}
-                </el-tag>
-                <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
-                  {{ sourceLabel(row) }}
-                </el-tag>
-                <span class="alert-list__name">{{ nameFor(row) }}</span>
-                <el-tag v-if="row.confirmFlag === 1" type="success" size="small" effect="plain">
-                  {{ $t('common.confirmed') }}
-                </el-tag>
-              </div>
-              <div v-if="row.message" class="alert-list__message" :title="row.message">{{ row.message }}</div>
+    <div v-if="!loading && rows.length === 0" class="alert-list__empty">
+      <el-empty :description="$t('home.alertList.empty')" :image-size="80" />
+    </div>
+    <div v-for="group in groupedRows" :key="group.date" class="alert-list__group">
+      <div class="alert-list__date">{{ group.date }}</div>
+      <el-timeline>
+        <el-timeline-item
+          v-for="row in group.items"
+          :key="row.id"
+          :timestamp="formatClock(row.createTime)"
+          :type="timelineColour(row.eventTypeFlag)"
+          :hollow="row.confirmFlag === 1"
+          placement="top"
+        >
+          <div class="alert-list__body">
+            <div class="alert-list__tags">
+              <el-tag :type="tagType(row.eventTypeFlag)" size="small">
+                {{ levelLabel(row.eventTypeFlag) }}
+              </el-tag>
+              <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
+                {{ sourceLabel(row) }}
+              </el-tag>
+              <span class="alert-list__name">{{ nameFor(row) }}</span>
+              <el-tag v-if="row.confirmFlag === 1" type="success" size="small" effect="plain">
+                {{ $t('common.confirmed') }}
+              </el-tag>
             </div>
-          </el-timeline-item>
-        </el-timeline>
-      </div>
-    </el-scrollbar>
+            <div v-if="row.message" class="alert-list__message" :title="row.message">{{ row.message }}</div>
+          </div>
+        </el-timeline-item>
+      </el-timeline>
+    </div>
   </el-card>
 </template>
 
@@ -232,19 +230,14 @@
     }
 
     :deep(.el-card__body) {
+      // Same pattern as RecentUnconfirmed: body is the scroll container
+      // (native overflow:auto), content flows inside. Native overflow
+      // works reliably with flex:1 sizing where el-scrollbar's height
+      // prop silently degraded to auto and blew the card out.
       flex: 1;
       padding: 0;
-      // Must be flex column so the inner el-scrollbar's height="100%"
-      // resolves to a concrete value; otherwise 10 alarm rows expand the
-      // card well past its min-height.
-      display: flex;
-      flex-direction: column;
       min-height: 0;
-    }
-
-    .alert-list__scroll {
-      flex: 1;
-      min-height: 0;
+      overflow: auto;
     }
 
     .alert-list__header {

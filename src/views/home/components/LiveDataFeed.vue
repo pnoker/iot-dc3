@@ -35,7 +35,10 @@
       </div>
     </template>
 
-    <el-scrollbar height="100%" class="live-feed__scroll">
+    <!-- Scroll wrapper: native overflow:auto driven by flex:1 sizing, same
+         pattern as the event-overview RecentUnconfirmed card. Keeps the
+         footer below pinned; only the timeline scrolls. -->
+    <div class="live-feed__scroll">
       <div v-if="!loading && rows.length === 0" class="live-feed__empty">
         <el-empty :description="$t('home.liveFeed.empty')" :image-size="80" />
       </div>
@@ -64,7 +67,7 @@
           </div>
         </el-timeline-item>
       </el-timeline>
-    </el-scrollbar>
+    </div>
 
     <div class="live-feed__footer">
       <span v-if="lastRefreshed">{{ $t('home.liveFeed.updatedAt', { time: formatTime(lastRefreshed) }) }}</span>
@@ -176,21 +179,22 @@
     }
 
     :deep(.el-card__body) {
+      // Body is a flex column so the scroll wrapper (flex:1 + native
+      // overflow:auto) fills the remaining space and footer stays pinned.
       flex: 1;
       padding: 0;
-      // flex parent + overflow child pattern: body is a flex column so the
-      // scrollbar (flex:1) fills the remaining space with a concrete height,
-      // and content inside the scrollbar doesn't push the card taller.
-      // Without display:flex the el-scrollbar's height="100%" degrades to
-      // auto and 20 timeline items blow the card out to 800+px.
       display: flex;
       flex-direction: column;
       min-height: 0;
     }
 
+    // Native overflow:auto, same pattern as RecentUnconfirmed. el-scrollbar
+    // was silently degrading its height="100%" to auto under flex:1, which
+    // let 20 timeline items stretch the card to 800+px.
     .live-feed__scroll {
       flex: 1;
       min-height: 0;
+      overflow: auto;
     }
 
     .live-feed__header {
