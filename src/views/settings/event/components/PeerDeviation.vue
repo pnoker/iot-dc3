@@ -33,10 +33,10 @@
 
     <el-table :data="rows" size="small" @row-click="onRowClick">
       <el-table-column :label="t('settings.event.overview.colProfile')" min-width="120">
-        <template #default="{ row }">{{ profileName(row) }}</template>
+        <template #default="{ row }">{{ profileName(row.profileId) }}</template>
       </el-table-column>
       <el-table-column :label="t('settings.event.overview.colDevice')" min-width="120">
-        <template #default="{ row }">{{ deviceName(row) }}</template>
+        <template #default="{ row }">{{ deviceName(row.deviceId) }}</template>
       </el-table-column>
       <el-table-column
         :label="t('settings.event.overview.colAlarmCount')"
@@ -62,18 +62,21 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref, watch } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
 
   import { alertPeerDeviation } from '@/api/dashboard';
-  import type { PeerDeviation } from '@/api/dashboard';
-  import { getDeviceByIds } from '@/api/device';
-  import { getProfileByIds } from '@/api/profile';
+  import type { PeerDeviation } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useEntityNames } from '@/composables/useEntityNames';
+  import { jumpToSourceEvents } from '@/utils/jump';
 
   const { t } = useI18n();
   const router = useRouter();
+  const { loading, run } = useAsyncLoader();
+  const { resolveDevices, resolveProfiles, deviceName, profileName } = useEntityNames();
 
   const daysOptions = [
     { label: '1d', value: '1' },
@@ -82,68 +85,29 @@
   ];
   const daysKey = ref<string>('7');
 
-  const loading = ref(false);
   const rows = ref<PeerDeviation[]>([]);
-  const nameMap = reactive<{ devices: Record<string, string>; profiles: Record<string, string> }>({
-    devices: {},
-    profiles: {},
-  });
 
-  const load = async () => {
-    loading.value = true;
-    try {
+  const load = () =>
+    run(async () => {
       const res: { data?: PeerDeviation[] } = await alertPeerDeviation(Number(daysKey.value));
       rows.value = res?.data ?? [];
-      await resolveNames(rows.value);
-    } catch {
-      // handled globally
-    } finally {
-      loading.value = false;
-    }
-  };
+      await Promise.all([
+        resolveDevices(rows.value.map((r) => r.deviceId)),
+        resolveProfiles(rows.value.map((r) => r.profileId)),
+      ]);
+    });
 
   watch(daysKey, load);
   onMounted(load);
 
-  const resolveNames = async (batch: PeerDeviation[]) => {
-    const devIds = Array.from(new Set(batch.map((r) => String(r.deviceId)))).filter((id) => !nameMap.devices[id]);
-    const profIds = Array.from(new Set(batch.map((r) => String(r.profileId)))).filter((id) => !nameMap.profiles[id]);
-    const jobs: Promise<void>[] = [];
-    if (devIds.length) {
-      jobs.push(
-        getDeviceByIds(devIds)
-          .then((r: { data?: Record<string, { deviceName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of devIds) if (d[id]) nameMap.devices[id] = d[id].deviceName || id;
-          })
-          .catch(() => {})
-      );
-    }
-    if (profIds.length) {
-      jobs.push(
-        getProfileByIds(profIds)
-          .then((r: { data?: Record<string, { profileName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of profIds) if (d[id]) nameMap.profiles[id] = d[id].profileName || id;
-          })
-          .catch(() => {})
-      );
-    }
-    await Promise.all(jobs);
-  };
+  const onRowClick = (row: PeerDeviation) => jumpToSourceEvents(router, 'device', row.deviceId);
 
-  const deviceName = (r: PeerDeviation) => nameMap.devices[String(r.deviceId)] || String(r.deviceId);
-  const profileName = (r: PeerDeviation) => nameMap.profiles[String(r.profileId)] || String(r.profileId);
-
-  const onRowClick = (row: PeerDeviation) => {
-    router.push({ name: 'settingsDeviceEvent', query: { sourceId: String(row.deviceId) } }).catch(() => {});
-  };
+  defineExpose({ refresh: load });
 </script>
 
 <style lang="scss" scoped>
+  @use '@/styles/palette.scss' as *;
   .peer-deviation {
-    :deep(.el-table__row) {
-      cursor: pointer;
-    }
+    @include clickable-rows;
   }
 </style>

@@ -36,7 +36,7 @@
         <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
           {{ row.source === 'device' ? t('settings.event.device') : t('settings.event.driver') }}
         </el-tag>
-        <span class="flapping-sources__name">{{ nameFor(row) }}</span>
+        <span class="flapping-sources__name">{{ nameBySource(row.source, row.sourceId) }}</span>
         <el-tag type="info" size="small" effect="plain">
           {{ eventTypeLabel(row.eventTypeFlag) }}
         </el-tag>
@@ -50,19 +50,22 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref, watch } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import { Warning } from '@element-plus/icons-vue';
 
   import { alertFlapping } from '@/api/dashboard';
-  import type { FlappingSource } from '@/api/dashboard';
-  import { getDeviceByIds } from '@/api/device';
-  import { getDriverByIds } from '@/api/driver';
+  import type { FlappingSource } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useEntityNames } from '@/composables/useEntityNames';
+  import { jumpToSourceEvents } from '@/utils/jump';
 
   const { t } = useI18n();
   const router = useRouter();
+  const { loading, run } = useAsyncLoader();
+  const { resolveBySource, nameBySource } = useEntityNames();
 
   // Same window semantics + preset thresholds as Storm — operator learns
   // one model of "how the event page works" instead of two.
@@ -79,63 +82,17 @@
   const windowKey = ref<'1' | '6' | '24'>('6');
   const minCount = computed(() => WINDOW_SPECS[windowKey.value].minCount);
 
-  const loading = ref(false);
   const rows = ref<FlappingSource[]>([]);
-  const nameMap = reactive<Record<string, string>>({});
 
-  const load = async () => {
-    loading.value = true;
-    try {
+  const load = () =>
+    run(async () => {
       const res: { data?: FlappingSource[] } = await alertFlapping(Number(windowKey.value), minCount.value, 30);
       rows.value = res?.data ?? [];
-      await resolveNames(rows.value);
-    } catch {
-      // handled globally
-    } finally {
-      loading.value = false;
-    }
-  };
+      await resolveBySource(rows.value);
+    });
 
   watch(windowKey, load);
   onMounted(load);
-
-  const resolveNames = async (batch: FlappingSource[]) => {
-    const devIds = batch
-      .filter((r) => r.source === 'device')
-      .map((r) => String(r.sourceId))
-      .filter((id) => id && !nameMap[`d:${id}`]);
-    const drvIds = batch
-      .filter((r) => r.source === 'driver')
-      .map((r) => String(r.sourceId))
-      .filter((id) => id && !nameMap[`r:${id}`]);
-    const jobs: Promise<void>[] = [];
-    if (devIds.length) {
-      jobs.push(
-        getDeviceByIds(devIds)
-          .then((r: { data?: Record<string, { deviceName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of devIds) if (d[id]) nameMap[`d:${id}`] = d[id].deviceName || id;
-          })
-          .catch(() => {})
-      );
-    }
-    if (drvIds.length) {
-      jobs.push(
-        getDriverByIds(drvIds)
-          .then((r: { data?: Record<string, { driverName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of drvIds) if (d[id]) nameMap[`r:${id}`] = d[id].driverName || id;
-          })
-          .catch(() => {})
-      );
-    }
-    await Promise.all(jobs);
-  };
-
-  const nameFor = (r: FlappingSource) => {
-    const id = String(r.sourceId);
-    return r.source === 'device' ? nameMap[`d:${id}`] || id : nameMap[`r:${id}`] || id;
-  };
 
   const eventTypeLabel = (flag: number) => {
     if (flag >= 2) return t('common.levelError');
@@ -144,11 +101,9 @@
   };
 
   const rowKey = (r: FlappingSource) => `${r.source}:${r.sourceId}:${r.eventTypeFlag}`;
+  const onJump = (r: FlappingSource) => jumpToSourceEvents(router, r.source, r.sourceId);
 
-  const onJump = (r: FlappingSource) => {
-    const name = r.source === 'device' ? 'settingsDeviceEvent' : 'settingsDriverEvent';
-    router.push({ name, query: { sourceId: String(r.sourceId) } }).catch(() => {});
-  };
+  defineExpose({ refresh: load });
 </script>
 
 <style lang="scss" scoped>

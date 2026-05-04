@@ -39,10 +39,13 @@
   import { Chart } from '@antv/g2';
 
   import { alertMtta } from '@/api/dashboard';
-  import type { MttaTrend } from '@/api/dashboard';
+  import type { MttaTrend } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { formatMs } from '@/utils/time';
 
   const { t } = useI18n();
+  const { loading, run } = useAsyncLoader();
 
   const daysOptions = [
     { label: '7d', value: '7' },
@@ -51,7 +54,6 @@
   ];
   const daysKey = ref<string>('30');
 
-  const loading = ref(false);
   const rows = ref<MttaTrend[]>([]);
   const chartRef = ref<HTMLElement>();
   let chart: Chart | undefined;
@@ -64,16 +66,6 @@
       p95: formatMs(last.p95Ms),
     });
   });
-
-  const formatMs = (ms: number): string => {
-    if (!ms) return '—';
-    if (ms < 1000) return `${Math.round(ms)}ms`;
-    const s = ms / 1000;
-    if (s < 60) return `${s.toFixed(1)}s`;
-    const m = s / 60;
-    if (m < 60) return `${m.toFixed(1)}m`;
-    return `${(m / 60).toFixed(1)}h`;
-  };
 
   const render = () => {
     const el = chartRef.value;
@@ -102,23 +94,19 @@
     chart.render();
   };
 
-  const load = async () => {
-    loading.value = true;
-    try {
+  const load = () =>
+    run(async () => {
       const res: { data?: MttaTrend[] } = await alertMtta(Number(daysKey.value));
       rows.value = res?.data ?? [];
       await nextTick();
       if (rows.value.length > 0) render();
-    } catch {
-      // handled globally
-    } finally {
-      loading.value = false;
-    }
-  };
+    });
 
   watch(daysKey, load);
   onMounted(load);
   onUnmounted(() => chart?.destroy());
+
+  defineExpose({ refresh: load });
 </script>
 
 <style lang="scss" scoped>

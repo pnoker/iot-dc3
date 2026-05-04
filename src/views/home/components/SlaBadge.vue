@@ -43,9 +43,11 @@
   import { Warning } from '@element-plus/icons-vue';
 
   import { alertAging, silentSources } from '@/api/dashboard';
-  import type { AgingBacklog, SilentSource } from '@/api/dashboard';
+  import type { AgingBacklog, SilentSource } from '@/config/entity/dashboard';
+  import { useAsyncLoader } from '@/composables/useAsyncLoader';
 
   const router = useRouter();
+  const { run } = useAsyncLoader();
 
   const backlog = reactive<AgingBacklog>({ under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0 });
   const silentCount = ref(0);
@@ -53,18 +55,15 @@
   const visible = computed(() => backlog.over24h > 0 || silentCount.value > 0);
   const warn = computed(() => backlog.over24h > 0);
 
-  const load = async () => {
-    try {
+  const load = () =>
+    run(async () => {
       const [a, s]: [{ data?: AgingBacklog }, { data?: SilentSource[] }] = await Promise.all([
         alertAging(),
         silentSources(7, 15, 200),
       ]);
       Object.assign(backlog, a?.data ?? { under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0 });
       silentCount.value = (s?.data ?? []).length;
-    } catch {
-      // errors handled globally; badge just stays hidden
-    }
-  };
+    });
 
   const jumpTo = (tab: 'sla' | 'availability') => {
     router.push({ name: 'settingsEvent', query: { tab } }).catch(() => {});

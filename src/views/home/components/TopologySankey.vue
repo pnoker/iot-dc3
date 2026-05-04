@@ -91,7 +91,7 @@
     TopologyNode,
     TopologyResponse,
     TopologyStats,
-  } from '@/api/dashboard';
+  } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
   import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';

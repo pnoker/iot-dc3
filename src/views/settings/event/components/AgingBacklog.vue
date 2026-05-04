@@ -36,12 +36,13 @@
   import { Chart } from '@antv/g2';
 
   import { alertAging } from '@/api/dashboard';
-  import type { AgingBacklog } from '@/api/dashboard';
+  import type { AgingBacklog } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useAsyncLoader } from '@/composables/useAsyncLoader';
 
   const { t } = useI18n();
+  const { loading, run } = useAsyncLoader();
 
-  const loading = ref(false);
   const data = reactive<AgingBacklog>({ under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0 });
   const chartRef = ref<HTMLElement>();
   let chart: Chart | undefined;
@@ -74,22 +75,17 @@
     chart.render();
   };
 
-  const load = async () => {
-    loading.value = true;
-    try {
+  const load = () =>
+    run(async () => {
       const res: { data?: AgingBacklog } = await alertAging();
       Object.assign(data, res?.data ?? { under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0 });
       await nextTick();
       if (data.total > 0) render();
-    } catch {
-      // handled globally
-    } finally {
-      loading.value = false;
-    }
-  };
+    });
 
   onMounted(load);
   onUnmounted(() => chart?.destroy());
+
   defineExpose({ refresh: load });
 </script>
 

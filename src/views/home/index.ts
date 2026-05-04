@@ -128,7 +128,7 @@ export default defineComponent({
 
     const loadSparkline = async () => {
       try {
-        const res: any = await statsTimeseries({ granularity: 'hour', rangeHours: 24 });
+        const res: any = await statsTimeseries({ granularity: 'hour', rangeKey: '24h' });
         const buckets: Array<{ count: number }> = res?.data ?? [];
         state.todaySparkline = buckets.map((b) => Number(b.count) || 0);
       } catch {

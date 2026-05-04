@@ -47,35 +47,33 @@
 
     <el-table v-if="report.items.length" :data="report.items" size="small" @row-click="onRowClick">
       <el-table-column :label="t('settings.event.overview.colPoint')" min-width="130">
-        <template #default="{ row }">{{ pointName(row) }}</template>
+        <template #default="{ row }">{{ pointName(row.pointId) }}</template>
       </el-table-column>
       <el-table-column :label="t('settings.event.overview.colProfile')" min-width="130">
-        <template #default="{ row }">{{ profileName(row) }}</template>
+        <template #default="{ row }">{{ profileName(row.profileId) }}</template>
       </el-table-column>
     </el-table>
   </dashboard-card>
 </template>
 
 <script lang="ts" setup>
-  import { computed, onMounted, reactive, ref } from 'vue';
+  import { computed, onMounted, reactive } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
 
   import { coverageGap } from '@/api/dashboard';
-  import type { CoverageGap } from '@/api/dashboard';
-  import { getPointByIds } from '@/api/point';
-  import { getProfileByIds } from '@/api/profile';
+  import type { CoverageGap, CoverageGapItem } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useEntityNames } from '@/composables/useEntityNames';
+  import { jumpToEntity } from '@/utils/jump';
 
   const { t } = useI18n();
   const router = useRouter();
+  const { loading, run } = useAsyncLoader();
+  const { resolvePoints, resolveProfiles, pointName, profileName } = useEntityNames();
 
-  const loading = ref(false);
   const report = reactive<CoverageGap>({ totalPoints: 0, missingPoints: 0, items: [] });
-  const nameMap = reactive<{ points: Record<string, string>; profiles: Record<string, string> }>({
-    points: {},
-    profiles: {},
-  });
 
   const coveragePercent = computed(() => {
     if (report.totalPoints === 0) return 0;
@@ -96,60 +94,25 @@
     })
   );
 
-  const load = async () => {
-    loading.value = true;
-    try {
+  const load = () =>
+    run(async () => {
       const res: { data?: CoverageGap } = await coverageGap(100);
       Object.assign(report, res?.data ?? { totalPoints: 0, missingPoints: 0, items: [] });
-      await resolveNames();
-    } catch {
-      // handled globally
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  const resolveNames = async () => {
-    const ptIds = Array.from(new Set(report.items.map((r) => String(r.pointId)))).filter((id) => !nameMap.points[id]);
-    const profIds = Array.from(new Set(report.items.map((r) => String(r.profileId)))).filter(
-      (id) => !nameMap.profiles[id]
-    );
-    const jobs: Promise<void>[] = [];
-    if (ptIds.length) {
-      jobs.push(
-        getPointByIds(ptIds)
-          .then((r: { data?: Record<string, { pointName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of ptIds) if (d[id]) nameMap.points[id] = d[id].pointName || id;
-          })
-          .catch(() => {})
-      );
-    }
-    if (profIds.length) {
-      jobs.push(
-        getProfileByIds(profIds)
-          .then((r: { data?: Record<string, { profileName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of profIds) if (d[id]) nameMap.profiles[id] = d[id].profileName || id;
-          })
-          .catch(() => {})
-      );
-    }
-    await Promise.all(jobs);
-  };
-
-  const pointName = (r: { pointId: number | string }) => nameMap.points[String(r.pointId)] || String(r.pointId);
-  const profileName = (r: { profileId: number | string }) =>
-    nameMap.profiles[String(r.profileId)] || String(r.profileId);
-
-  const onRowClick = (row: { pointId: number | string }) => {
-    router.push({ name: 'pointValue', query: { pointId: String(row.pointId) } }).catch(() => {});
-  };
+      await Promise.all([
+        resolvePoints(report.items.map((r) => r.pointId)),
+        resolveProfiles(report.items.map((r) => r.profileId)),
+      ]);
+    });
 
   onMounted(load);
+
+  const onRowClick = (row: CoverageGapItem) => jumpToEntity(router, 'point', row.pointId);
+
+  defineExpose({ refresh: load });
 </script>
 
 <style lang="scss" scoped>
+  @use '@/styles/palette.scss' as *;
   .coverage-gap {
     .coverage-gap__summary {
       display: flex;
@@ -181,8 +144,6 @@
       font-weight: 600;
       font-size: 15px;
     }
-    :deep(.el-table__row) {
-      cursor: pointer;
-    }
+    @include clickable-rows;
   }
 </style>

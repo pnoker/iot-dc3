@@ -35,8 +35,8 @@
       <el-timeline-item
         v-for="row in rows"
         :key="`${row.kind}:${row.entityId}:${row.operateTime}`"
-        :timestamp="formatTime(row.operateTime)"
-        :color="colourFor(row.kind)"
+        :timestamp="formatDateTime(row.operateTime)"
+        :color="resolveDashboardColour(row.kind)"
         placement="top"
       >
         <div class="change-impact__row" @click="onJump(row)">
@@ -49,19 +49,23 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref, watch } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
 
   import { alertChangeImpact } from '@/api/dashboard';
-  import type { ChangeImpact } from '@/api/dashboard';
-  import { getDeviceByIds } from '@/api/device';
-  import { getDriverByIds } from '@/api/driver';
-  import { getProfileByIds } from '@/api/profile';
+  import type { ChangeImpact } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useEntityNames } from '@/composables/useEntityNames';
+  import { resolveDashboardColour } from '@/config/constant/palette';
+  import { jumpToEntity } from '@/utils/jump';
+  import { formatDateTime } from '@/utils/time';
 
   const { t } = useI18n();
   const router = useRouter();
+  const { loading, run } = useAsyncLoader();
+  const { resolveDevices, resolveDrivers, resolveProfiles, deviceName, driverName, profileName } = useEntityNames();
 
   const daysOptions = [
     { label: '1d', value: '1' },
@@ -70,78 +74,27 @@
   ];
   const daysKey = ref<string>('7');
 
-  const loading = ref(false);
   const rows = ref<ChangeImpact[]>([]);
-  const nameMap = reactive<{
-    driver: Record<string, string>;
-    device: Record<string, string>;
-    profile: Record<string, string>;
-  }>({ driver: {}, device: {}, profile: {} });
 
-  const load = async () => {
-    loading.value = true;
-    try {
+  const load = () =>
+    run(async () => {
       const res: { data?: ChangeImpact[] } = await alertChangeImpact(Number(daysKey.value), 30);
       rows.value = res?.data ?? [];
-      await resolveNames(rows.value);
-    } catch {
-      // handled globally
-    } finally {
-      loading.value = false;
-    }
-  };
+      // Each entityId goes through its kind-specific batch endpoint.
+      await Promise.all([
+        resolveDrivers(rows.value.filter((r) => r.kind === 'driver').map((r) => r.entityId)),
+        resolveDevices(rows.value.filter((r) => r.kind === 'device').map((r) => r.entityId)),
+        resolveProfiles(rows.value.filter((r) => r.kind === 'profile').map((r) => r.entityId)),
+      ]);
+    });
 
   watch(daysKey, load);
   onMounted(load);
 
-  const resolveNames = async (batch: ChangeImpact[]) => {
-    const drvIds = new Set<string>();
-    const devIds = new Set<string>();
-    const profIds = new Set<string>();
-    for (const r of batch) {
-      if (r.kind === 'driver') drvIds.add(String(r.entityId));
-      else if (r.kind === 'device') devIds.add(String(r.entityId));
-      else if (r.kind === 'profile') profIds.add(String(r.entityId));
-    }
-    const drvMiss = [...drvIds].filter((id) => !nameMap.driver[id]);
-    const devMiss = [...devIds].filter((id) => !nameMap.device[id]);
-    const profMiss = [...profIds].filter((id) => !nameMap.profile[id]);
-    const jobs: Promise<void>[] = [];
-    if (drvMiss.length)
-      jobs.push(
-        getDriverByIds(drvMiss)
-          .then((r: { data?: Record<string, { driverName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of drvMiss) if (d[id]) nameMap.driver[id] = d[id].driverName || id;
-          })
-          .catch(() => {})
-      );
-    if (devMiss.length)
-      jobs.push(
-        getDeviceByIds(devMiss)
-          .then((r: { data?: Record<string, { deviceName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of devMiss) if (d[id]) nameMap.device[id] = d[id].deviceName || id;
-          })
-          .catch(() => {})
-      );
-    if (profMiss.length)
-      jobs.push(
-        getProfileByIds(profMiss)
-          .then((r: { data?: Record<string, { profileName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of profMiss) if (d[id]) nameMap.profile[id] = d[id].profileName || id;
-          })
-          .catch(() => {})
-      );
-    await Promise.all(jobs);
-  };
-
   const entityName = (r: ChangeImpact) => {
-    const id = String(r.entityId);
-    if (r.kind === 'driver') return nameMap.driver[id] || id;
-    if (r.kind === 'device') return nameMap.device[id] || id;
-    return nameMap.profile[id] || id;
+    if (r.kind === 'driver') return driverName(r.entityId);
+    if (r.kind === 'device') return deviceName(r.entityId);
+    return profileName(r.entityId);
   };
 
   const kindLabel = (k: string) => {
@@ -150,32 +103,15 @@
     return t('settings.event.overview.kindProfile');
   };
 
-  const colourFor = (k: string) => {
-    if (k === 'driver') return '#9059f6';
-    if (k === 'device') return '#409eff';
-    return '#e6a23c';
-  };
-
   const tagTypeFor = (k: string): 'primary' | 'warning' | 'success' | 'info' => {
     if (k === 'driver') return 'info';
     if (k === 'device') return 'primary';
     return 'warning';
   };
 
-  const formatTime = (v: string) => {
-    if (!v) return '';
-    const d = new Date(v);
-    if (Number.isNaN(d.getTime())) return v;
-    return d.toLocaleString('zh-CN', { hour12: false });
-  };
+  const onJump = (r: ChangeImpact) => jumpToEntity(router, r.kind, r.entityId);
 
-  const onJump = (r: ChangeImpact) => {
-    const id = String(r.entityId);
-    if (r.kind === 'driver') router.push({ name: 'driverDetail', query: { id, active: 'detail' } }).catch(() => {});
-    else if (r.kind === 'device')
-      router.push({ name: 'deviceDetail', query: { id, active: 'detail' } }).catch(() => {});
-    else router.push({ name: 'profileDetail', query: { id, active: 'detail' } }).catch(() => {});
-  };
+  defineExpose({ refresh: load });
 </script>
 
 <style lang="scss" scoped>

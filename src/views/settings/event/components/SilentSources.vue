@@ -34,13 +34,13 @@
 
     <el-table :data="rows" size="small" @row-click="onRowClick">
       <el-table-column prop="deviceId" :label="t('settings.event.overview.colDevice')" min-width="110">
-        <template #default="{ row }">{{ deviceName(row) }}</template>
+        <template #default="{ row }">{{ deviceName(row.deviceId) }}</template>
       </el-table-column>
       <el-table-column prop="pointId" :label="t('settings.event.overview.colPoint')" min-width="110">
-        <template #default="{ row }">{{ pointName(row) }}</template>
+        <template #default="{ row }">{{ pointName(row.pointId) }}</template>
       </el-table-column>
       <el-table-column prop="lastSeen" :label="t('settings.event.overview.colLastSeen')" min-width="160">
-        <template #default="{ row }">{{ formatTime(row.lastSeen) }}</template>
+        <template #default="{ row }">{{ formatDateTime(row.lastSeen) }}</template>
       </el-table-column>
       <el-table-column prop="silentSeconds" :label="t('settings.event.overview.colSilentFor')" min-width="110">
         <template #default="{ row }">
@@ -52,18 +52,21 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, reactive, ref, watch } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
 
   import { silentSources as apiSilentSources } from '@/api/dashboard';
-  import type { SilentSource } from '@/api/dashboard';
-  import { getDeviceByIds } from '@/api/device';
-  import { getPointByIds } from '@/api/point';
+  import type { SilentSource } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useAsyncLoader } from '@/composables/useAsyncLoader';
+  import { useEntityNames } from '@/composables/useEntityNames';
+  import { formatDateTime, humanDuration } from '@/utils/time';
 
   const { t } = useI18n();
   const router = useRouter();
+  const { loading, run } = useAsyncLoader();
+  const { resolveDevices, resolvePoints, deviceName, pointName } = useEntityNames();
 
   // silentKey is the threshold (minutes) — "no sample within the last N min
   // for a baseline-active point" becomes flagged.
@@ -74,84 +77,33 @@
   ];
   const silentKey = ref<string>('15');
 
-  const loading = ref(false);
   const rows = ref<SilentSource[]>([]);
-  const nameMap = reactive<{ devices: Record<string, string>; points: Record<string, string> }>({
-    devices: {},
-    points: {},
-  });
 
-  const load = async () => {
-    loading.value = true;
-    try {
+  const load = () =>
+    run(async () => {
       const res: { data?: SilentSource[] } = await apiSilentSources(7, Number(silentKey.value), 100);
       rows.value = res?.data ?? [];
-      await resolveNames(rows.value);
-    } catch {
-      // handled globally
-    } finally {
-      loading.value = false;
-    }
-  };
+      await Promise.all([
+        resolveDevices(rows.value.map((r) => r.deviceId)),
+        resolvePoints(rows.value.map((r) => r.pointId)),
+      ]);
+    });
 
   watch(silentKey, load);
   onMounted(load);
-
-  const resolveNames = async (batch: SilentSource[]) => {
-    const devIds = Array.from(new Set(batch.map((r) => String(r.deviceId)))).filter((id) => !nameMap.devices[id]);
-    const ptIds = Array.from(new Set(batch.map((r) => String(r.pointId)))).filter((id) => !nameMap.points[id]);
-    const jobs: Promise<void>[] = [];
-    if (devIds.length) {
-      jobs.push(
-        getDeviceByIds(devIds)
-          .then((r: { data?: Record<string, { deviceName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of devIds) if (d[id]) nameMap.devices[id] = d[id].deviceName || id;
-          })
-          .catch(() => {})
-      );
-    }
-    if (ptIds.length) {
-      jobs.push(
-        getPointByIds(ptIds)
-          .then((r: { data?: Record<string, { pointName?: string }> }) => {
-            const d = r?.data || {};
-            for (const id of ptIds) if (d[id]) nameMap.points[id] = d[id].pointName || id;
-          })
-          .catch(() => {})
-      );
-    }
-    await Promise.all(jobs);
-  };
-
-  const deviceName = (r: SilentSource) => nameMap.devices[String(r.deviceId)] || String(r.deviceId);
-  const pointName = (r: SilentSource) => nameMap.points[String(r.pointId)] || String(r.pointId);
-
-  const formatTime = (v?: string) => {
-    if (!v) return '';
-    const d = new Date(v);
-    if (Number.isNaN(d.getTime())) return v;
-    return d.toLocaleString('zh-CN', { hour12: false });
-  };
-
-  const humanDuration = (seconds: number) => {
-    if (seconds < 60) return `${seconds}s`;
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
-    return `${Math.floor(seconds / 86400)}d`;
-  };
 
   const onRowClick = (row: SilentSource) => {
     router
       .push({ name: 'pointValue', query: { pointId: String(row.pointId), deviceId: String(row.deviceId) } })
       .catch(() => {});
   };
+
+  defineExpose({ refresh: load });
 </script>
 
 <style lang="scss" scoped>
+  @use '@/styles/palette.scss' as *;
   .silent-sources {
-    :deep(.el-table__row) {
-      cursor: pointer;
-    }
+    @include clickable-rows;
   }
 </style>

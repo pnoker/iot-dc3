@@ -60,25 +60,20 @@
   import { useI18n } from 'vue-i18n';
 
   import { protocolHealth } from '@/api/dashboard';
-  import type { ProtocolHealth } from '@/api/dashboard';
+  import type { ProtocolHealth } from '@/config/entity/dashboard';
   import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+  import { useAsyncLoader } from '@/composables/useAsyncLoader';
 
   const { t } = useI18n();
+  const { loading, run } = useAsyncLoader();
 
-  const loading = ref(false);
   const rows = ref<ProtocolHealth[]>([]);
 
-  const load = async () => {
-    loading.value = true;
-    try {
+  const load = () =>
+    run(async () => {
       const res: { data?: ProtocolHealth[] } = await protocolHealth();
       rows.value = res?.data ?? [];
-    } catch {
-      // handled globally
-    } finally {
-      loading.value = false;
-    }
-  };
+    });
 
   // Backend keeps the raw `dc3-driver-*` service name; strip the prefix
   // here so the table reads "modbus-tcp / mqtt / opcua" — consistent with
@@ -105,6 +100,8 @@
   };
 
   onMounted(load);
+
+  defineExpose({ refresh: load });
 </script>
 
 <style lang="scss" scoped>
