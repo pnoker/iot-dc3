@@ -429,10 +429,8 @@
       }
     }
 
-    .event-overview__chart-main,
-    .event-overview__chart-side {
-      min-height: 340px;
-    }
+    // Chart cards own their own min-height (440, shared family baseline);
+    // the grid item only needs to stretch to row height.
 
     .event-overview__diagnostic {
       display: grid;
@@ -444,11 +442,6 @@
       }
     }
 
-    .event-overview__diag-heatmap,
-    .event-overview__diag-pie,
-    .event-overview__diag-storm,
-    .event-overview__diag-recent {
-      min-height: 320px;
-    }
+    // Diagnostic cards also set their own 440 min-height internally.
   }
 </style>

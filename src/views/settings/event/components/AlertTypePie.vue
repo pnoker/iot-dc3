@@ -61,7 +61,7 @@
   const render = (data: TypeRow[]) => {
     if (!chartRef.value) return;
     chart?.destroy();
-    chart = new Chart({ container: chartRef.value, autoFit: true, height: 240 });
+    chart = new Chart({ container: chartRef.value, autoFit: true });
     const mapped = data.map((r) => ({ type: labelFor(r.type), count: Number(r.count) || 0 }));
     chart
       .interval()
@@ -96,10 +96,20 @@
 
 <style lang="scss" scoped>
   .alert-type-pie {
+    min-height: 440px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 
     :deep(.el-card__header) {
       padding: 12px 16px;
+    }
+
+    :deep(.el-card__body) {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     .alert-type-pie__header {
@@ -114,12 +124,16 @@
     }
 
     .alert-type-pie__canvas {
+      flex: 1;
       width: 100%;
-      height: 240px;
+      min-height: 0;
     }
 
     .alert-type-pie__empty {
-      padding: 40px 0;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 </style>

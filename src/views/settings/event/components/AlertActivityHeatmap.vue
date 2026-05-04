@@ -54,7 +54,7 @@
   const render = (rows: { dow: number; hour: number; count: number }[]) => {
     if (!chartRef.value) return;
     chart?.destroy();
-    chart = new Chart({ container: chartRef.value, autoFit: true, height: 240 });
+    chart = new Chart({ container: chartRef.value, autoFit: true });
     const labels = dayLabels.value;
     const data = rows.map((r) => ({
       dow: labels[r.dow] || `d-${r.dow}`,
@@ -101,8 +101,20 @@
 
 <style lang="scss" scoped>
   .alert-activity {
+    min-height: 440px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
     :deep(.el-card__header) {
       padding: 12px 16px;
+    }
+
+    :deep(.el-card__body) {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     .alert-activity__header {
@@ -117,8 +129,9 @@
     }
 
     .alert-activity__canvas {
+      flex: 1;
       width: 100%;
-      height: 240px;
+      min-height: 0;
     }
   }
 </style>

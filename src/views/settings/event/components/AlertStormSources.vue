@@ -166,14 +166,20 @@
 
 <style lang="scss" scoped>
   .alert-storm {
+    min-height: 440px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 
     :deep(.el-card__header) {
       padding: 12px 16px;
     }
 
     :deep(.el-card__body) {
+      flex: 1;
       padding: 0;
+      min-height: 0;
+      overflow: auto;
     }
 
     .alert-storm__header {

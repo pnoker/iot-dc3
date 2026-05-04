@@ -43,7 +43,7 @@
     const el = chartRef.value;
     if (!el) return;
     chart?.destroy();
-    chart = new Chart({ container: el, autoFit: true, height: 280 });
+    chart = new Chart({ container: el, autoFit: true });
     chart
       .line()
       .data(data)
@@ -86,10 +86,20 @@
 
 <style lang="scss" scoped>
   .event-trend {
+    min-height: 440px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 
     :deep(.el-card__header) {
       padding: 12px 16px;
+    }
+
+    :deep(.el-card__body) {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     .event-trend__header {
@@ -104,7 +114,9 @@
     }
 
     .event-trend__chart {
+      flex: 1;
       width: 100%;
+      min-height: 0;
     }
   }
 </style>

@@ -58,7 +58,7 @@
   const render = (rows: { bin: number; count: number }[]) => {
     if (!chartRef.value) return;
     chart?.destroy();
-    chart = new Chart({ container: chartRef.value, autoFit: true, height: 280 });
+    chart = new Chart({ container: chartRef.value, autoFit: true });
     const labels = binLabels();
     const data = rows.map((r) => ({ label: labels[r.bin] || `bin-${r.bin}`, bin: r.bin, count: Number(r.count) || 0 }));
     chart
@@ -95,9 +95,24 @@
 </script>
 
 <style lang="scss" scoped>
+  // Shared dashboard-card baseline: min-height 440 + flex column so every
+  // home/event-overview card lands at the same height, and the chart canvas
+  // fills whatever the body has left after the header.
   .latency-chart {
+    min-height: 440px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
     :deep(.el-card__header) {
       padding: 12px 16px;
+    }
+
+    :deep(.el-card__body) {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     .latency-chart__header {
@@ -118,8 +133,9 @@
     }
 
     .latency-chart__canvas {
+      flex: 1;
       width: 100%;
-      height: 280px;
+      min-height: 0;
     }
   }
 </style>
