@@ -298,7 +298,7 @@
 
 <style lang="scss" scoped>
   .analytics-tabs {
-    min-height: 440px;
+    min-height: 360px;
     height: 100%;
 
     :deep(.el-card__header) {

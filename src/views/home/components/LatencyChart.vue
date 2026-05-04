@@ -99,7 +99,7 @@
   // home/event-overview card lands at the same height, and the chart canvas
   // fills whatever the body has left after the header.
   .latency-chart {
-    min-height: 440px;
+    min-height: 360px;
     height: 100%;
     display: flex;
     flex-direction: column;

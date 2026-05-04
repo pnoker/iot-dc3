@@ -160,7 +160,7 @@
 
 <style lang="scss" scoped>
   .recent-unconfirmed {
-    min-height: 440px;
+    min-height: 360px;
     height: 100%;
     display: flex;
     flex-direction: column;

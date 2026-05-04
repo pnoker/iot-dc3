@@ -86,7 +86,7 @@
 
 <style lang="scss" scoped>
   .event-trend {
-    min-height: 440px;
+    min-height: 360px;
     height: 100%;
     display: flex;
     flex-direction: column;

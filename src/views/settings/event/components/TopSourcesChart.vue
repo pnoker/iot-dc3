@@ -123,7 +123,7 @@
 
 <style lang="scss" scoped>
   .top-sources {
-    min-height: 440px;
+    min-height: 360px;
     height: 100%;
     display: flex;
     flex-direction: column;
