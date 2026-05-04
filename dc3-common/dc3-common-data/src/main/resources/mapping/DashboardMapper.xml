@@ -202,4 +202,53 @@
         ORDER BY dow ASC, hour ASC
     </select>
 
+    <!-- =========================================================
+         Phase-2 insight queries — still on the history DS.
+         ========================================================= -->
+
+    <!--
+        Silent sources: (device_id, point_id) pairs that had samples in
+        the baseline window ({@code from} .. {@code silentThreshold}) but
+        have had NO sample since {@code silentThreshold}. MAX(create_time)
+        &lt; threshold is the "gone quiet" test. The outer baseline filter
+        keeps fresh-install points (never reported) out — those belong in
+        coverage-gap, not silence.
+    -->
+    <select id="silentSources" resultType="map">
+        SELECT device_id, point_id, MAX(create_time) AS last_seen
+        FROM v_dc3_point_value_all
+        WHERE tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+        GROUP BY device_id, point_id
+        HAVING MAX(create_time) &lt; #{silentThreshold}
+        ORDER BY last_seen DESC
+        LIMIT #{limit}
+    </select>
+
+    <!--
+        Coverage gap: points in dc3_manager.dc3_point with zero pv rows
+        ever. NOT EXISTS is the cheapest anti-join for this shape on PG.
+        Cross-schema qualification is fine because the same user owns
+        both schemas and dynamic datasource only sets search_path.
+    -->
+    <select id="coverageGapItems" resultType="map">
+        SELECT p.id AS point_id, p.profile_id AS profile_id
+        FROM dc3_manager.dc3_point p
+        WHERE p.deleted = 0
+          AND p.tenant_id = #{tenantId}
+          AND NOT EXISTS (SELECT 1
+                          FROM v_dc3_point_value_all pv
+                          WHERE pv.point_id = p.id
+                            AND pv.tenant_id = p.tenant_id)
+        ORDER BY p.id DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="countPointsInTenant" resultType="long">
+        SELECT COUNT(*)
+        FROM dc3_manager.dc3_point
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+    </select>
+
 </mapper>

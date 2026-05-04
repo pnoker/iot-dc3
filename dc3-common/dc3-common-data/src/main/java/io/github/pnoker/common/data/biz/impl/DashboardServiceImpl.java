@@ -35,13 +35,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author pnoker
@@ -528,5 +522,203 @@ public class DashboardServiceImpl implements DashboardService {
             out.add(vo);
         }
         return out;
+    }
+
+    // ================================================================
+    // Phase-2 insights
+    // ================================================================
+
+    @Override
+    public List<FlappingSourceVO> alertFlapping(Long tenantId, int hours, int minCount, int limit) {
+        int h = Math.max(1, Math.min(hours, 24 * 7));
+        int min = Math.max(2, minCount);
+        int lim = Math.max(1, Math.min(limit, 50));
+        LocalDateTime from = LocalDateTime.now().minusHours(h);
+        List<Map<String, Object>> rows = alertMapper.flappingSources(tenantId, from, min, lim);
+        List<FlappingSourceVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> r : rows) {
+            FlappingSourceVO vo = new FlappingSourceVO();
+            vo.setSource(asString(r.get("source")));
+            vo.setSourceId(toLong(r.get("source_id")));
+            vo.setEventTypeFlag(toInt(r.get("event_type_flag")));
+            vo.setCount(toLong(r.get("count")));
+            out.add(vo);
+        }
+        return out;
+    }
+
+    @Override
+    public List<CorrelationPairVO> alertCorrelation(Long tenantId, int hours, int windowSec, int limit) {
+        int h = Math.max(1, Math.min(hours, 24 * 7));
+        int w = Math.max(5, Math.min(windowSec, 300));
+        int lim = Math.max(1, Math.min(limit, 30));
+        LocalDateTime from = LocalDateTime.now().minusHours(h);
+        List<Map<String, Object>> rows = alertMapper.correlationPairs(tenantId, from, w, lim);
+        List<CorrelationPairVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> r : rows) {
+            CorrelationPairVO vo = new CorrelationPairVO();
+            vo.setASource(asString(r.get("a_source")));
+            vo.setASourceId(toLong(r.get("a_source_id")));
+            vo.setAEventType(toInt(r.get("a_event_type")));
+            vo.setBSource(asString(r.get("b_source")));
+            vo.setBSourceId(toLong(r.get("b_source_id")));
+            vo.setBEventType(toInt(r.get("b_event_type")));
+            vo.setCoCount(toLong(r.get("co_count")));
+            out.add(vo);
+        }
+        return out;
+    }
+
+    @Override
+    public List<PeerDeviationVO> alertPeerDeviation(Long tenantId, int days) {
+        int d = Math.max(1, Math.min(days, 30));
+        LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
+        List<Map<String, Object>> rows = alertMapper.peerAlarmCounts(tenantId, from);
+
+        // Group by profile → list of (device, alarmCount); then pick median
+        // and flag devices with count >= 3x median (and a floor of 5 alarms
+        // so a profile with median=1 doesn't emit noise).
+        Map<Long, List<long[]>> byProfile = new HashMap<>();
+        for (Map<String, Object> r : rows) {
+            long prof = toLong(r.get("profile_id"));
+            long dev = toLong(r.get("device_id"));
+            long cnt = toLong(r.get("alarm_count"));
+            byProfile.computeIfAbsent(prof, k -> new ArrayList<>()).add(new long[]{dev, cnt});
+        }
+        List<PeerDeviationVO> out = new ArrayList<>();
+        for (Map.Entry<Long, List<long[]>> e : byProfile.entrySet()) {
+            List<long[]> devs = e.getValue();
+            if (devs.size() < 3) continue; // need enough peers for a peer test
+            long[] sorted = devs.stream().mapToLong(a -> a[1]).sorted().toArray();
+            long median = sorted[sorted.length / 2];
+            for (long[] a : devs) {
+                if (a[1] < 5) continue;
+                if (median > 0 && a[1] < median * 3) continue;
+                if (median == 0 && a[1] < 5) continue;
+                PeerDeviationVO vo = new PeerDeviationVO();
+                vo.setProfileId(e.getKey());
+                vo.setDeviceId(a[0]);
+                vo.setAlarmCount(a[1]);
+                vo.setPeerMedian(median);
+                vo.setRatio(median == 0 ? 0.0 : Math.round((double) a[1] / median * 100.0) / 100.0);
+                out.add(vo);
+            }
+        }
+        out.sort((a, b) -> Long.compare(b.getAlarmCount(), a.getAlarmCount()));
+        // Cap to 50 to keep payload bounded
+        return out.size() > 50 ? out.subList(0, 50) : out;
+    }
+
+    @Override
+    public AgingBacklogVO alertAgingBacklog(Long tenantId) {
+        Map<String, Object> row = alertMapper.agingBuckets(tenantId);
+        AgingBacklogVO vo = new AgingBacklogVO();
+        if (row != null) {
+            vo.setUnder1h(toLong(row.get("under_1h")));
+            vo.setH1to6(toLong(row.get("h1_to_6")));
+            vo.setH6to24(toLong(row.get("h6_to_24")));
+            vo.setOver24h(toLong(row.get("over_24h")));
+            vo.setTotal(toLong(row.get("total")));
+        }
+        return vo;
+    }
+
+    @Override
+    public List<MttaTrendVO> alertMtta(Long tenantId, int days) {
+        int d = Math.max(1, Math.min(days, 90));
+        LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
+        List<Map<String, Object>> rows = alertMapper.mttaByDay(tenantId, from);
+        List<MttaTrendVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> r : rows) {
+            MttaTrendVO vo = new MttaTrendVO();
+            vo.setDate(asString(r.get("date")));
+            vo.setP50Ms(toLong(r.get("p50_ms")));
+            vo.setP95Ms(toLong(r.get("p95_ms")));
+            vo.setConfirmedCount(toLong(r.get("confirmed_count")));
+            out.add(vo);
+        }
+        return out;
+    }
+
+    @Override
+    public List<ProtocolHealthVO> protocolHealth(Long tenantId) {
+        List<Map<String, Object>> rows = alertMapper.protocolHealth(tenantId);
+        List<ProtocolHealthVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> r : rows) {
+            ProtocolHealthVO vo = new ProtocolHealthVO();
+            vo.setServiceName(asString(r.get("service_name")));
+            vo.setDriverCount(toLong(r.get("driver_count")));
+            vo.setEnabledCount(toLong(r.get("enabled_count")));
+            vo.setDeviceCount(toLong(r.get("device_count")));
+            vo.setSampleVolume(0L); // Phase-1: no pv rollup yet
+            out.add(vo);
+        }
+        return out;
+    }
+
+    @Override
+    public List<ChangeImpactVO> changeImpact(Long tenantId, int days, int limit) {
+        int d = Math.max(1, Math.min(days, 90));
+        int lim = Math.max(1, Math.min(limit, 50));
+        LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
+        List<Map<String, Object>> rows = alertMapper.recentChanges(tenantId, from, lim);
+        List<ChangeImpactVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> r : rows) {
+            ChangeImpactVO vo = new ChangeImpactVO();
+            vo.setKind(asString(r.get("kind")));
+            vo.setEntityId(toLong(r.get("entity_id")));
+            Object t = r.get("operate_time");
+            if (t instanceof Timestamp ts) vo.setOperateTime(ts.toLocalDateTime());
+            else if (t instanceof LocalDateTime ldt) vo.setOperateTime(ldt);
+            out.add(vo);
+        }
+        return out;
+    }
+
+    @Override
+    public List<SilentSourceVO> silentSources(Long tenantId, int baselineDays, int silentMinutes, int limit) {
+        int baseline = Math.max(1, Math.min(baselineDays, 30));
+        int silent = Math.max(5, Math.min(silentMinutes, 60 * 24));
+        int lim = Math.max(1, Math.min(limit, 200));
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime from = now.minusDays(baseline);
+        LocalDateTime silentThreshold = now.minusMinutes(silent);
+
+        List<Map<String, Object>> rows = dashboardMapper.silentSources(tenantId, from, silentThreshold, lim);
+        List<SilentSourceVO> out = new ArrayList<>(rows.size());
+        for (Map<String, Object> r : rows) {
+            SilentSourceVO vo = new SilentSourceVO();
+            vo.setDeviceId(toLong(r.get("device_id")));
+            vo.setPointId(toLong(r.get("point_id")));
+            Object t = r.get("last_seen");
+            LocalDateTime last = null;
+            if (t instanceof Timestamp ts) last = ts.toLocalDateTime();
+            else if (t instanceof LocalDateTime ldt) last = ldt;
+            vo.setLastSeen(last);
+            if (last != null) {
+                vo.setSilentSeconds(java.time.Duration.between(last, now).getSeconds());
+            }
+            out.add(vo);
+        }
+        return out;
+    }
+
+    @Override
+    public CoverageGapVO coverageGap(Long tenantId, int limit) {
+        int lim = Math.max(1, Math.min(limit, 200));
+        CoverageGapVO vo = new CoverageGapVO();
+        vo.setTotalPoints(dashboardMapper.countPointsInTenant(tenantId));
+        List<Map<String, Object>> rows = dashboardMapper.coverageGapItems(tenantId, lim);
+        for (Map<String, Object> r : rows) {
+            CoverageGapVO.Item it = new CoverageGapVO.Item();
+            it.setPointId(toLong(r.get("point_id")));
+            it.setProfileId(toLong(r.get("profile_id")));
+            vo.getItems().add(it);
+        }
+        // missingPoints = actual count; items may be capped. Use a second
+        // query only if we hit the cap — otherwise items.size() is authoritative.
+        vo.setMissingPoints(vo.getItems().size());
+        return vo;
     }
 }

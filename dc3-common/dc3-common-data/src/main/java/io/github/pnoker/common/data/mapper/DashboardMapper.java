@@ -104,4 +104,32 @@ public interface DashboardMapper {
     List<Map<String, Object>> hourlyActivity(@Param("tenantId") Long tenantId,
                                              @Param("from") LocalDateTime from,
                                              @Param("to") LocalDateTime to);
+
+    // ===== Phase-2 insights =====================================================
+
+    /**
+     * (device_id, point_id) pairs that had samples within the baseline window
+     * ({@code from}..{@code baselineEnd}) but have been silent since
+     * {@code silentThreshold}. Service enforces from &lt; silentThreshold.
+     * Returns (device_id, point_id, last_seen) ordered by last_seen DESC.
+     */
+    List<Map<String, Object>> silentSources(@Param("tenantId") Long tenantId,
+                                            @Param("from") LocalDateTime from,
+                                            @Param("silentThreshold") LocalDateTime silentThreshold,
+                                            @Param("limit") int limit);
+
+    /**
+     * Points declared in dc3_manager.dc3_point with no pv row ever.
+     * Returns the list of offending ids (capped at {@code limit}) plus the
+     * totals via two separate result columns so the service can compose a
+     * CoverageGapVO in one round-trip. Executed against history DS with
+     * cross-schema qualification of dc3_manager.dc3_point.
+     */
+    List<Map<String, Object>> coverageGapItems(@Param("tenantId") Long tenantId,
+                                               @Param("limit") int limit);
+
+    /**
+     * Tenant-wide total point count (for coverage gap summary).
+     */
+    long countPointsInTenant(@Param("tenantId") Long tenantId);
 }
