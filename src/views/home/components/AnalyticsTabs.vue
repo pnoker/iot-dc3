@@ -60,16 +60,20 @@
 
   const { t } = useI18n();
 
+  // Tab order follows a consistent driver → point → device → profile
+  // precedence, applied twice: structural tabs first (no point dimension
+  // exists for bucketed views), then top-N tabs (no profile top-N yet).
+  // Keeps the two groups readable and puts driver-level insight up front.
   const tabs = computed<{ key: TabKey; label: string }[]>(() => [
-    { key: 'deviceStatus', label: t('home.tabs.deviceStatus') },
     { key: 'protocol', label: t('home.tabs.protocol') },
+    { key: 'deviceStatus', label: t('home.tabs.deviceStatus') },
     { key: 'profile', label: t('home.tabs.profile') },
-    { key: 'topDevice', label: t('home.tabs.topDevice') },
-    { key: 'topPoint', label: t('home.tabs.topPoint') },
     { key: 'topDriver', label: t('home.tabs.topDriver') },
+    { key: 'topPoint', label: t('home.tabs.topPoint') },
+    { key: 'topDevice', label: t('home.tabs.topDevice') },
   ]);
 
-  const activeTab = ref<TabKey>('deviceStatus');
+  const activeTab = ref<TabKey>('protocol');
   const rangeKey = ref<RangeKey>('24h');
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();
