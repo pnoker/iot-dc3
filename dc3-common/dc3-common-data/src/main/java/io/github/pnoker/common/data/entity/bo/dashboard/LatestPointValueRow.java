@@ -11,8 +11,12 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-/** Live-feed pv row — all values coerced to text so the union over 7 typed hypertables stays compatible. */
-@Getter @Setter @ToString
+/**
+ * Live-feed pv row — all values coerced to text so the union over 7 typed hypertables stays compatible.
+ */
+@Getter
+@Setter
+@ToString
 public class LatestPointValueRow {
     private long tenantId;
     private long deviceId;

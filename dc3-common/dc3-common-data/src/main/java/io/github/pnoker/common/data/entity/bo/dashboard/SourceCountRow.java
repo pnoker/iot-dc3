@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** (source, sourceId, count) — one rank entry. */
-@Getter @Setter @ToString
+/**
+ * (source, sourceId, count) — one rank entry.
+ */
+@Getter
+@Setter
+@ToString
 public class SourceCountRow {
     private String source;
     private long sourceId;

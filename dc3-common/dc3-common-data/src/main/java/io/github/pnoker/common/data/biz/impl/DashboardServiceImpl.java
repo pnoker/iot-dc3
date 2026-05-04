@@ -79,7 +79,9 @@ public class DashboardServiceImpl implements DashboardService {
     @Resource
     private DriverFacade driverFacade;
 
-    /** BucketRow.key is Object (shared across SMALLINT / VARCHAR / BIGINT group columns); stringify for the VO. */
+    /**
+     * BucketRow.key is Object (shared across SMALLINT / VARCHAR / BIGINT group columns); stringify for the VO.
+     */
     private static String asString(Object v) {
         return v == null ? null : v.toString();
     }

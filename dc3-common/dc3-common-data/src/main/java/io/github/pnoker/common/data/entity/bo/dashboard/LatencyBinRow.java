@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Latency histogram bin + count. */
-@Getter @Setter @ToString
+/**
+ * Latency histogram bin + count.
+ */
+@Getter
+@Setter
+@ToString
 public class LatencyBinRow {
     private int bin;
     private long count;

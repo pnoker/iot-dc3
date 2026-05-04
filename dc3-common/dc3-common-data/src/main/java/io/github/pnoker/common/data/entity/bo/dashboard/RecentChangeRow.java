@@ -11,8 +11,12 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-/** One config-change edit timestamp. */
-@Getter @Setter @ToString
+/**
+ * One config-change edit timestamp.
+ */
+@Getter
+@Setter
+@ToString
 public class RecentChangeRow {
     private String kind;
     private long entityId;

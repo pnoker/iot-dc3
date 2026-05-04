@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** (entityId, count) for Top-N queries on the pv history. */
-@Getter @Setter @ToString
+/**
+ * (entityId, count) for Top-N queries on the pv history.
+ */
+@Getter
+@Setter
+@ToString
 public class EntityCountRow {
     private long entityId;
     private long count;

@@ -9,8 +9,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** (source, total, unconfirmed) — per-source alert counts. */
-@Getter @Setter @ToString
+/**
+ * (source, total, unconfirmed) — per-source alert counts.
+ */
+@Getter
+@Setter
+@ToString
 public class SourceStatsRow {
     private String source;
     private long total;
