@@ -57,23 +57,29 @@
   import type { RangeKey } from '@/components/segmented/RangeSegmented.vue';
 
   type TabKey = 'deviceStatus' | 'protocol' | 'profile' | 'topDevice' | 'topPoint' | 'topDriver';
+  type Group = 'structural' | 'top';
+
+  const props = withDefaults(
+    defineProps<{
+      /** Which half of the analytics split this card hosts. */
+      group?: Group;
+    }>(),
+    { group: 'structural' }
+  );
 
   const { t } = useI18n();
 
-  // Tab order follows a consistent driver → point → device → profile
-  // precedence, applied twice: structural tabs first (no point dimension
-  // exists for bucketed views), then top-N tabs (no profile top-N yet).
-  // Keeps the two groups readable and puts driver-level insight up front.
-  const tabs = computed<{ key: TabKey; label: string }[]>(() => [
-    { key: 'protocol', label: t('home.tabs.protocol') },
-    { key: 'deviceStatus', label: t('home.tabs.deviceStatus') },
-    { key: 'profile', label: t('home.tabs.profile') },
-    { key: 'topDriver', label: t('home.tabs.topDriver') },
-    { key: 'topPoint', label: t('home.tabs.topPoint') },
-    { key: 'topDevice', label: t('home.tabs.topDevice') },
-  ]);
+  // Each group keeps its own driver → point → device → profile precedence
+  // so both halves read left-to-right the same way.
+  const STRUCTURAL_TABS: TabKey[] = ['protocol', 'deviceStatus', 'profile'];
+  const TOP_TABS: TabKey[] = ['topDriver', 'topPoint', 'topDevice'];
 
-  const activeTab = ref<TabKey>('protocol');
+  const tabs = computed<{ key: TabKey; label: string }[]>(() => {
+    const keys = props.group === 'top' ? TOP_TABS : STRUCTURAL_TABS;
+    return keys.map((k) => ({ key: k, label: t(`home.tabs.${k}`) }));
+  });
+
+  const activeTab = ref<TabKey>(props.group === 'top' ? 'topDriver' : 'protocol');
   const rangeKey = ref<RangeKey>('24h');
   const loading = ref(false);
   const chartRef = ref<HTMLElement>();

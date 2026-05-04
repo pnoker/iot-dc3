@@ -40,27 +40,38 @@
       />
     </div>
 
-    <!-- Row 2: 6-tab analytics + live data feed -->
+    <!-- Row 2: analytics split in half — structural breakdowns left,
+         top-N activity right, mirroring the two intent groups operators
+         use to explore the fleet. -->
     <el-row :gutter="8" class="home__row">
-      <el-col :lg="16" :md="24" :sm="24" :xl="16" :xs="24" class="home__col">
-        <analytics-tabs />
+      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
+        <analytics-tabs group="structural" />
       </el-col>
-      <el-col :lg="8" :md="24" :sm="24" :xl="8" :xs="24" class="home__col">
-        <live-data-feed :size="20" />
+      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
+        <analytics-tabs group="top" />
       </el-col>
     </el-row>
 
-    <!-- Row 3: trend chart + recent alerts -->
+    <!-- Row 3: live streaming data + recent alarms side-by-side — the two
+         "what's happening right now" widgets pair naturally. -->
     <el-row :gutter="8" class="home__row">
-      <el-col :lg="16" :md="24" :sm="24" :xl="16" :xs="24" class="home__col">
-        <trend-chart />
+      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
+        <live-data-feed :size="20" />
       </el-col>
-      <el-col :lg="8" :md="24" :sm="24" :xl="8" :xs="24" class="home__col">
+      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
         <alert-list :size="10" />
       </el-col>
     </el-row>
 
-    <!-- Row 4: latency histogram + hourly activity heatmap -->
+    <!-- Row 4: trend chart on its own row — time series benefits from
+         full width so the x-axis has room to breathe. -->
+    <el-row :gutter="8" class="home__row">
+      <el-col :span="24" class="home__col">
+        <trend-chart />
+      </el-col>
+    </el-row>
+
+    <!-- Row 5: latency histogram + hourly activity heatmap -->
     <el-row :gutter="8" class="home__row">
       <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
         <latency-chart />
