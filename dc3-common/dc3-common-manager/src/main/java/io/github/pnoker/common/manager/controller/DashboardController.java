@@ -22,6 +22,7 @@ import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DeviceStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DriverStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.GrowthVO;
+import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
 import io.github.pnoker.common.manager.service.DashboardService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -90,6 +91,30 @@ public class DashboardController implements BaseController {
         return getTenantId().flatMap(tenantId -> {
             try {
                 return Mono.just(R.ok(dashboardService.dailyGrowth(tenantId, days)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    /**
+     * Four-column Sankey topology (Driver → Device → Profile → Point).
+     * {@code mode=cardinality} is the Phase 0 default and counts
+     * relationships along each edge; future {@code mode=volume} will
+     * weight edges by point_value sample counts over {@code rangeKey}.
+     *
+     * <p>Top-N cropping is server-side — each cropped slice becomes an
+     * {@code others:*} pseudo-node with a {@code hiddenChildren} payload
+     * the frontend pops in a drill-in dialog.</p>
+     */
+    @GetMapping("/topology")
+    public Mono<R<TopologyVO>> topology(
+            @RequestParam(value = "mode", defaultValue = "cardinality") String mode,
+            @RequestParam(value = "rangeKey", required = false) String rangeKey) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.topology(tenantId, mode, rangeKey)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));

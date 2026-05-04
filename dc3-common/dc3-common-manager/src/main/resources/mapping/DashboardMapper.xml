@@ -98,4 +98,105 @@
         ORDER BY day ASC
     </select>
 
+    <!--
+        === Topology (Driver → Device → Profile → Point) ==========================
+
+        Five focused queries the service layer stitches together. We keep the
+        SQL simple (one table or one join per query) and do Top-N / Others
+        aggregation in Java, because MyBatis + PostgreSQL window functions
+        over IN-clause filters get ugly fast, and the four-layer scale after
+        service-side cropping is small enough for in-memory sort.
+    -->
+
+    <select id="topologyDrivers" resultType="map">
+        SELECT d.id          AS id,
+               d.driver_name AS driver_name,
+               COUNT(dev.id) AS device_count
+        FROM dc3_driver d
+                 LEFT JOIN dc3_device dev
+                           ON dev.driver_id = d.id
+                               AND dev.tenant_id = d.tenant_id
+                               AND dev.deleted = 0
+        WHERE d.deleted = 0
+          AND d.tenant_id = #{tenantId}
+        GROUP BY d.id, d.driver_name
+    </select>
+
+    <select id="topologyDevicesByDrivers" resultType="map">
+        SELECT dev.id AS id,
+        dev.device_name AS device_name,
+        dev.driver_id AS driver_id,
+        (SELECT COUNT(*)
+        FROM dc3_profile_bind pb
+        WHERE pb.device_id = dev.id
+        AND pb.tenant_id = dev.tenant_id
+        AND pb.deleted = 0) AS profile_count
+        FROM dc3_device dev
+        WHERE dev.deleted = 0
+        AND dev.tenant_id = #{tenantId}
+        AND dev.driver_id IN
+        <foreach collection="driverIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="topologyProfileBindings" resultType="map">
+        SELECT pb.profile_id AS profile_id,
+        pb.device_id AS device_id
+        FROM dc3_profile_bind pb
+        WHERE pb.deleted = 0
+        AND pb.tenant_id = #{tenantId}
+        AND pb.device_id IN
+        <foreach collection="deviceIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="topologyProfilesByIds" resultType="map">
+        SELECT p.id AS id,
+        p.profile_name AS profile_name
+        FROM dc3_profile p
+        WHERE p.deleted = 0
+        AND p.tenant_id = #{tenantId}
+        AND p.id IN
+        <foreach collection="profileIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="topologyPointsByProfiles" resultType="map">
+        SELECT pt.id AS id,
+        pt.point_name AS point_name,
+        pt.profile_id AS profile_id
+        FROM dc3_point pt
+        WHERE pt.deleted = 0
+        AND pt.tenant_id = #{tenantId}
+        AND pt.profile_id IN
+        <foreach collection="profileIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!--
+        Cross-schema query: view lives in dc3_history (Timescale hypertable
+        union) while this DataSource's currentSchema is dc3_manager. The dc3
+        user owns both schemas so fully-qualifying the view works; this
+        keeps us from having to register a second dynamic datasource just
+        for one aggregate call.
+
+        No GROUP BY (device_id, point_id) index exists on the view, but
+        each typed sibling has (tenant_id, create_time DESC) and a
+        time_bucket hypertable dimension on create_time — so the WHERE
+        clause prunes chunks before aggregation.
+    -->
+    <select id="topologyPointVolumes" resultType="map">
+        SELECT device_id AS device_id,
+               point_id  AS point_id,
+               COUNT(*)  AS cnt
+        FROM dc3_history.v_dc3_point_value_all
+        WHERE tenant_id = #{tenantId}
+          AND create_time &gt;= #{from}
+        GROUP BY device_id, point_id
+    </select>
+
 </mapper>
