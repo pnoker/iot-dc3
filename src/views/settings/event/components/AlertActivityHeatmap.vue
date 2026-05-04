@@ -101,7 +101,7 @@
 
 <style lang="scss" scoped>
   .alert-activity {
-    min-height: 360px;
+    min-height: 300px;
     height: 100%;
     display: flex;
     flex-direction: column;

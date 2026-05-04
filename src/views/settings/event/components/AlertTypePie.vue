@@ -96,7 +96,7 @@
 
 <style lang="scss" scoped>
   .alert-type-pie {
-    min-height: 360px;
+    min-height: 300px;
     height: 100%;
     display: flex;
     flex-direction: column;
