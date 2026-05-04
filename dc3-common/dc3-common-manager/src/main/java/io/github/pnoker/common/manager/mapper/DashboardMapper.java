@@ -21,6 +21,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -84,4 +85,70 @@ public interface DashboardMapper {
                                           @Param("table") String table,
                                           @Param("from") LocalDateTime from,
                                           @Param("to") LocalDateTime to);
+
+    // ---- Topology (GET /dashboard/topology) ----------------------------
+    //
+    // The five helpers below let the service layer compose the four-column
+    // Sankey graph (Driver → Device → Profile → Point). Each method returns
+    // plain Maps so the service can do Top-N / Others aggregation in Java
+    // without widening the VO surface. Empty-collection callers short-
+    // circuit in Java (MyBatis errors on empty IN clauses).
+
+    /**
+     * Every driver in the tenant with its device count. Used to rank
+     * drivers for the "Top-N drivers" crop on the topology Sankey.
+     * Row shape: {@code {id, driver_name, device_count}}.
+     */
+    List<Map<String, Object>> topologyDrivers(@Param("tenantId") Long tenantId);
+
+    /**
+     * Every device belonging to any driver in {@code driverIds}, with its
+     * profile-bind count (used to rank devices for the "Top-N devices" crop).
+     * Row shape: {@code {id, device_name, driver_id, profile_count}}.
+     */
+    List<Map<String, Object>> topologyDevicesByDrivers(@Param("tenantId") Long tenantId,
+                                                       @Param("driverIds") Collection<Long> driverIds);
+
+    /**
+     * All profile-bind rows for the given device set. The Device→Profile
+     * layer of the Sankey is drawn one link per row returned here.
+     * Row shape: {@code {profile_id, device_id}}.
+     */
+    List<Map<String, Object>> topologyProfileBindings(@Param("tenantId") Long tenantId,
+                                                      @Param("deviceIds") Collection<Long> deviceIds);
+
+    /**
+     * Profile names for the given profile id set. Row shape:
+     * {@code {id, profile_name}}. Order is unspecified — the service layer
+     * preserves the Sankey's layer-3 order by zipping with the bindings.
+     */
+    List<Map<String, Object>> topologyProfilesByIds(@Param("tenantId") Long tenantId,
+                                                    @Param("profileIds") Collection<Long> profileIds);
+
+    /**
+     * All points belonging to any profile in {@code profileIds}. Service
+     * groups by {@code profile_id} and keeps Top-N per profile; the rest
+     * collapse into a per-profile {@code others:point:{profileId}} node.
+     * Row shape: {@code {id, point_name, profile_id}}.
+     */
+    List<Map<String, Object>> topologyPointsByProfiles(@Param("tenantId") Long tenantId,
+                                                       @Param("profileIds") Collection<Long> profileIds);
+
+    /**
+     * Volume rollup for the topology's "volume" mode — counts point_value
+     * rows per {@code (device_id, point_id)} over the selected time window.
+     * The query targets {@code dc3_history.v_dc3_point_value_all} (a
+     * UNION-ALL view across the 7 typed hypertables); we cross-schema
+     * qualify so it runs against manager's existing master DS without
+     * needing a second dynamic datasource wired into the manager service.
+     *
+     * <p>Returned row set is bounded by unique active {@code (device,
+     * point)} pairs (hundreds to a few thousand even for a busy tenant),
+     * which the service joins back against the pre-fetched metadata to
+     * roll values up through profile and device to driver.</p>
+     *
+     * <p>Row shape: {@code {device_id, point_id, cnt}}.</p>
+     */
+    List<Map<String, Object>> topologyPointVolumes(@Param("tenantId") Long tenantId,
+                                                   @Param("from") LocalDateTime from);
 }
