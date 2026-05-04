@@ -26,7 +26,7 @@
          chip carries real query params that EventTable picks up via
          route.query. -->
         <blank-card>
-          <el-descriptions class="event-overview__quick" :column="2" border>
+          <el-descriptions :column="2" border class="event-overview__quick">
             <el-descriptions-item>
               <template #label>
                 <span class="event-overview__quick-label">
@@ -35,20 +35,20 @@
                 </span>
               </template>
               <div class="event-overview__quick-actions">
-                <el-button size="small" round @click="goto('device', {})">
+                <el-button round size="small" @click="goto('device', {})">
                   {{ t('settings.event.overview.quickAll') }}
                 </el-button>
-                <el-button size="small" round type="warning" plain @click="goto('device', { confirmFlag: '0' })">
+                <el-button plain round size="small" type="warning" @click="goto('device', { confirmFlag: '0' })">
                   {{ t('settings.event.overview.quickUnconfirmed') }}
                 </el-button>
                 <span class="event-overview__quick-divider" />
-                <el-button size="small" round plain @click="goto('device', { rangeKey: 'today' })">
+                <el-button plain round size="small" @click="goto('device', { rangeKey: 'today' })">
                   {{ t('settings.event.overview.quickToday') }}
                 </el-button>
-                <el-button size="small" round plain @click="goto('device', { rangeKey: '7d' })">
+                <el-button plain round size="small" @click="goto('device', { rangeKey: '7d' })">
                   {{ t('settings.event.overview.quick7d') }}
                 </el-button>
-                <el-button size="small" round plain @click="goto('device', { rangeKey: '30d' })">
+                <el-button plain round size="small" @click="goto('device', { rangeKey: '30d' })">
                   {{ t('settings.event.overview.quick30d') }}
                 </el-button>
               </div>
@@ -61,20 +61,20 @@
                 </span>
               </template>
               <div class="event-overview__quick-actions">
-                <el-button size="small" round @click="goto('driver', {})">
+                <el-button round size="small" @click="goto('driver', {})">
                   {{ t('settings.event.overview.quickAll') }}
                 </el-button>
-                <el-button size="small" round type="warning" plain @click="goto('driver', { confirmFlag: '0' })">
+                <el-button plain round size="small" type="warning" @click="goto('driver', { confirmFlag: '0' })">
                   {{ t('settings.event.overview.quickUnconfirmed') }}
                 </el-button>
                 <span class="event-overview__quick-divider" />
-                <el-button size="small" round plain @click="goto('driver', { rangeKey: 'today' })">
+                <el-button plain round size="small" @click="goto('driver', { rangeKey: 'today' })">
                   {{ t('settings.event.overview.quickToday') }}
                 </el-button>
-                <el-button size="small" round plain @click="goto('driver', { rangeKey: '7d' })">
+                <el-button plain round size="small" @click="goto('driver', { rangeKey: '7d' })">
                   {{ t('settings.event.overview.quick7d') }}
                 </el-button>
-                <el-button size="small" round plain @click="goto('driver', { rangeKey: '30d' })">
+                <el-button plain round size="small" @click="goto('driver', { rangeKey: '30d' })">
                   {{ t('settings.event.overview.quick30d') }}
                 </el-button>
               </div>
@@ -86,14 +86,14 @@
           <stat-card
             v-for="c in cards"
             :key="c.key"
-            :title="c.title"
-            :value="c.value"
-            :subtitle="c.subtitle"
             :icon="c.icon"
-            :tone="c.tone"
-            :sparkline="c.sparkline"
-            :trend="c.trend"
             :on-refresh="c.onRefresh"
+            :sparkline="c.sparkline"
+            :subtitle="c.subtitle"
+            :title="c.title"
+            :tone="c.tone"
+            :trend="c.trend"
+            :value="c.value"
             @click="c.onClick"
           />
         </div>
@@ -116,7 +116,7 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane :label="t('settings.event.overview.tabNoise')" name="noise" lazy>
+      <el-tab-pane :label="t('settings.event.overview.tabNoise')" lazy name="noise">
         <div class="event-overview__grid-2">
           <flapping-sources />
           <peer-deviation />
@@ -126,7 +126,7 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane :label="t('settings.event.overview.tabAvailability')" name="availability" lazy>
+      <el-tab-pane :label="t('settings.event.overview.tabAvailability')" lazy name="availability">
         <div class="event-overview__grid-2">
           <silent-sources />
           <point-coverage-gap />
@@ -136,7 +136,7 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane :label="t('settings.event.overview.tabSla')" name="sla" lazy>
+      <el-tab-pane :label="t('settings.event.overview.tabSla')" lazy name="sla">
         <div class="event-overview__grid-2">
           <aging-backlog />
           <mtta-mttr />
@@ -150,10 +150,10 @@
 </template>
 
 <script lang="ts" setup>
+  import type { Component } from 'vue';
   import { computed, onMounted, reactive, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter } from 'vue-router';
-  import type { Component } from 'vue';
   import { Bell, Management, Promotion, Warning, WarningFilled } from '@element-plus/icons-vue';
 
   import { alertPage, alertStats, alertTrend } from '@/api/dashboard';
@@ -431,11 +431,22 @@
     padding-right: 4px;
 
     // Tabs wrap the whole page — each pane renders its own flex-column
-    // stack. Default el-tabs has a long underline that fights the card
-    // border; tighten to a single thin accent.
+    // stack. el-tabs renders flat by default (expects to live inside a
+    // card); since this page is a board with the tabs at the top level,
+    // give the header its own surface so it reads as a proper tab bar
+    // instead of floating on the page background.
     .event-overview__tabs {
       :deep(.el-tabs__header) {
-        margin: 0 0 12px 0;
+        margin: 0 0 $overview-gap 0;
+        padding: 0 12px;
+        background: var(--el-bg-color);
+        border-radius: 4px;
+      }
+      :deep(.el-tabs__nav-wrap::after) {
+        // Element draws a 1px full-width bottom line under the nav strip;
+        // inside a pilled card it reads as a visual double-border with
+        // the card edge. Drop it — the active-item underline is enough.
+        display: none;
       }
       :deep(.el-tab-pane) {
         display: flex;
