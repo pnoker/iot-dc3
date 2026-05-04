@@ -120,9 +120,14 @@ public class DashboardServiceImpl implements DashboardService {
                 dashboardMapper.countDriverByType(tenantId),
                 "driver_type_flag",
                 DashboardServiceImpl::driverTypeKey);
+        List<BucketVO> byService = buckets(
+                dashboardMapper.countDriverByService(tenantId),
+                "service_name",
+                v -> v == null ? "-" : v.toString());
 
         out.setByEnable(byEnable);
         out.setByType(byType);
+        out.setByService(byService);
         out.setTotal(byEnable.stream().mapToLong(BucketVO::getCount).sum());
         return out;
     }
