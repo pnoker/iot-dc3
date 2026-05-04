@@ -204,7 +204,7 @@
   const loadDriverOrDevice = async () => {
     // deviceStatus / protocol / profile share the same two sources.
     const [drv, dev]: any = await Promise.all([driverStats(), deviceStats(10)]);
-    const driverPayload = drv?.data || { byEnable: [], byType: [] };
+    const driverPayload = drv?.data || { byEnable: [], byType: [], byService: [] };
     const devicePayload = dev?.data || { byEnable: [], byProfile: [], byDriver: [] };
 
     if (activeTab.value === 'deviceStatus') {
@@ -215,7 +215,14 @@
       return;
     }
     if (activeTab.value === 'protocol') {
-      const buckets = (driverPayload.byType || []) as { key: string; count: number }[];
+      // byService keys look like "dc3-driver-modbus-tcp" / "dc3-driver-mqtt";
+      // strip the prefix so the chart axis reads "modbus-tcp / mqtt / opc-ua"
+      // without the noise.
+      const raw = (driverPayload.byService || []) as { key: string; count: number }[];
+      const buckets = raw.map((b) => ({
+        key: (b.key || '-').replace(/^dc3-driver-/, ''),
+        count: b.count,
+      }));
       empty.value = buckets.length === 0;
       await nextTick();
       if (!empty.value) renderBar(buckets);

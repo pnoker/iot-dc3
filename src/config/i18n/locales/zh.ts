@@ -161,7 +161,7 @@ export default {
       // 每个 tab 下方的 caption 行,说明当前图表的统计口径和排序依据,
       // 让用户一眼知道这张图到底在讲什么。
       captionDeviceStatus: '按 enableFlag 分桶,反映启用 vs 禁用的占比',
-      captionProtocol: '驱动按 driverTypeFlag 分桶(Modbus TCP / MQTT / OPC UA 等)',
+      captionProtocol: '驱动按 service_name 聚合(modbus-tcp / mqtt / opc-ua 等)',
       captionProfile: '设备按所属 Profile 聚合,取设备数最多的前 10 个模板',
       captionTopActive: '{range}内按写入数据量聚合,排名前 10',
     },

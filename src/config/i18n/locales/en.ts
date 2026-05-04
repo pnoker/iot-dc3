@@ -162,7 +162,7 @@ export default {
       // Per-tab caption shown beneath the tab bar so operators know
       // exactly what the chart measures and how it's ranked.
       captionDeviceStatus: 'Bucketed by enableFlag — ratio of enabled vs disabled',
-      captionProtocol: 'Drivers bucketed by driverTypeFlag (Modbus TCP, MQTT, OPC UA, …)',
+      captionProtocol: 'Drivers grouped by service_name (modbus-tcp, mqtt, opc-ua, …)',
       captionProfile: 'Devices grouped by Profile — top 10 profiles by device count',
       captionTopActive: 'Ranked by write volume over {range} — top 10',
     },
