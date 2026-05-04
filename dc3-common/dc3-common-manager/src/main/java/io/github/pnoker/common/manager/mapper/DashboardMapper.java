@@ -48,6 +48,13 @@ public interface DashboardMapper {
     List<Map<String, Object>> countDriverByType(@Param("tenantId") Long tenantId);
 
     /**
+     * Driver counts grouped by service_name — the "which protocol drivers
+     * are registered" breakdown. Returns rows like
+     * {@code {service_name: "dc3-driver-modbus-tcp", count: 5}}.
+     */
+    List<Map<String, Object>> countDriverByService(@Param("tenantId") Long tenantId);
+
+    /**
      * Device counts grouped by enable_flag.
      */
     List<Map<String, Object>> countDeviceByEnable(@Param("tenantId") Long tenantId);

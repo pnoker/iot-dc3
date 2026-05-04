@@ -51,4 +51,12 @@ public class DriverStatsVO implements Serializable {
      * DRIVER_SERVER, GATEWAY, CONNECT).
      */
     private List<BucketVO> byType = new ArrayList<>();
+
+    /**
+     * Counts by service_name — the real "protocol breakdown" the home
+     * dashboard exposes. Key is the raw service name (e.g.
+     * {@code dc3-driver-modbus-tcp}, {@code dc3-driver-mqtt}); the frontend
+     * strips the {@code dc3-driver-} prefix before rendering.
+     */
+    private List<BucketVO> byService = new ArrayList<>();
 }
