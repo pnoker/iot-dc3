@@ -29,6 +29,8 @@ import { alertStats, dailyGrowth, statsTimeseries, statsToday } from '@/api/dash
 import StatCard from '@/components/card/stat/StatCard.vue';
 import LiveDataFeed from './components/LiveDataFeed.vue';
 import AnalyticsTabs from './components/AnalyticsTabs.vue';
+import SlaBadge from './components/SlaBadge.vue';
+import TopologySankey from './components/TopologySankey.vue';
 import TrendChart from './components/TrendChart.vue';
 import HomeBanner from './components/HomeBanner.vue';
 import AlertList from './components/AlertList.vue';
@@ -56,6 +58,8 @@ export default defineComponent({
     StatCard,
     LiveDataFeed,
     AnalyticsTabs,
+    SlaBadge,
+    TopologySankey,
     TrendChart,
     HomeBanner,
     AlertList,

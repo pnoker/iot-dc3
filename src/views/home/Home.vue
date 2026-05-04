@@ -23,6 +23,11 @@
       </el-col>
     </el-row>
 
+    <!-- SLA strip: hides itself when nothing is wrong. Only shows when
+         there are alarms unconfirmed > 24h OR devices gone silent. Each
+         chip deep-links into the event-overview tab that owns the signal. -->
+    <sla-badge />
+
     <!-- Row 1: 6 indicator cards, always 6-wide via CSS grid -->
     <div class="home__stats">
       <stat-card
@@ -40,23 +45,13 @@
       />
     </div>
 
-    <!-- Row 2: analytics split in half — structural breakdowns left,
-         top-N activity right, mirroring the two intent groups operators
-         use to explore the fleet. -->
-    <el-row :gutter="8" class="home__row">
-      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
-        <analytics-tabs group="structural" />
-      </el-col>
-      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
-        <analytics-tabs group="top" />
-      </el-col>
-    </el-row>
-
-    <!-- Row 3: trend chart + the two live widgets packed at 3:1.5:1.5 —
+    <!-- Row 2: trend chart + the two live widgets packed at 3:1.5:1.5 —
          TrendChart gets half the row for a readable time series, and
          LiveFeed + Alarms each take a quarter so the rows inside stay
          legible (4/24 was cramping timestamps and message text). Narrow
-         breakpoints stack everything to full width. -->
+         breakpoints stack everything to full width. Lives right below the
+         stat cards so the "what happened just now" trio sits in the
+         operator's eye line. -->
     <el-row :gutter="8" class="home__row">
       <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
         <trend-chart />
@@ -69,6 +64,18 @@
       </el-col>
     </el-row>
 
+    <!-- Row 3: analytics split in half — structural breakdowns left,
+         top-N activity right, mirroring the two intent groups operators
+         use to explore the fleet. -->
+    <el-row :gutter="8" class="home__row">
+      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
+        <analytics-tabs group="structural" />
+      </el-col>
+      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
+        <analytics-tabs group="top" />
+      </el-col>
+    </el-row>
+
     <!-- Row 4: latency histogram + hourly activity heatmap -->
     <el-row :gutter="8" class="home__row">
       <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
@@ -76,6 +83,18 @@
       </el-col>
       <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
         <activity-heatmap />
+      </el-col>
+    </el-row>
+
+    <!-- Row 5 (bottom): tenant-wide topology Sankey (Driver → Device →
+         Profile → Point). Full-width because four columns need the
+         horizontal budget; height 480 instead of the family 440 so each
+         column has enough vertical room for labels. Anchored at the
+         bottom as a "zoom-out" summary after the operator has scanned
+         the realtime / analytics / latency rows above. -->
+    <el-row :gutter="8" class="home__row">
+      <el-col :span="24" class="home__col">
+        <topology-sankey />
       </el-col>
     </el-row>
   </div>

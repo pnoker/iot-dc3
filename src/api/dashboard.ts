@@ -90,3 +90,46 @@ export const alertTypeDistribution = (days = 30) =>
 // Sources that tripped the storm threshold in the last N hours.
 export const alertStormSources = (hours = 1, minCount = 10, limit = 10) =>
   httpGet(`${API_DATA_BASE}/dashboard/alert/storm-sources`, { params: { hours, minCount, limit } });
+
+// ---- Topology (Driver → Device → Profile → Point Sankey) ----
+export type TopologyMode = 'cardinality' | 'volume';
+export type TopologyNodeType = 'driver' | 'device' | 'profile' | 'point' | 'others';
+
+export interface TopologyHiddenChild {
+  id: string;
+  name: string;
+  type: 'driver' | 'device' | 'point';
+}
+
+export interface TopologyNode {
+  id: string;
+  name: string;
+  layer: 1 | 2 | 3 | 4;
+  type: TopologyNodeType;
+  hiddenChildren?: TopologyHiddenChild[];
+}
+
+export interface TopologyLink {
+  source: string;
+  target: string;
+  value: number;
+}
+
+export interface TopologyStats {
+  driverCount: number;
+  deviceCount: number;
+  profileCount: number;
+  pointCount: number;
+  /** Human range label ("24h" / "7d" / …) — present only in volume mode. */
+  rangeLabel?: string | null;
+}
+
+export interface TopologyResponse {
+  nodes: TopologyNode[];
+  links: TopologyLink[];
+  stats: TopologyStats;
+}
+
+// Phase 0 only wires cardinality. rangeKey is reserved for Phase 2 volume mode.
+export const topology = (params: { mode?: TopologyMode; rangeKey?: string } = {}) =>
+  httpGet(`${API_MANAGER_BASE}/dashboard/topology`, { params });
