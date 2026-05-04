@@ -1,0 +1,22 @@
+// Dashboard family palette — SCSS mirror of DASHBOARD_PALETTE in
+// src/config/constant/palette.ts. Keep the two in lockstep when tuning
+// the brand tones. Scoped components @use this file when they need the
+// tokens in template-level styles.
+
+$dashboard-driver: #9059f6;
+$dashboard-device: #409eff;
+$dashboard-profile: #e6a23c;
+$dashboard-point: #67c23a;
+$dashboard-others: #c0c4cc;
+
+// Neutral / utility palette for dashboard rows.
+$dashboard-row-hover: #fafafa;
+$dashboard-border-light: var(--el-border-color-lighter);
+
+// Reusable: clickable table row cursor — removes the duplicated
+// `:deep(.el-table__row) { cursor: pointer }` block across every list card.
+@mixin clickable-rows {
+  :deep(.el-table__row) {
+    cursor: pointer;
+  }
+}
