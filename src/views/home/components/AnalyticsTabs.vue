@@ -19,14 +19,7 @@
     <template #header>
       <div class="analytics-tabs__header">
         <el-tabs v-model="activeTab" class="analytics-tabs__bar" @tab-change="onTabChange">
-          <el-tab-pane v-for="t in tabs" :key="t.key" :name="t.key">
-            <template #label>
-              <span class="analytics-tabs__label">
-                <el-icon><component :is="t.icon" /></el-icon>
-                {{ t.label }}
-              </span>
-            </template>
-          </el-tab-pane>
+          <el-tab-pane v-for="t in tabs" :key="t.key" :label="t.label" :name="t.key" />
         </el-tabs>
         <div class="analytics-tabs__actions">
           <range-segmented v-if="isTopTab" v-model="rangeKey" size="small" @update:model-value="load" />
@@ -53,8 +46,7 @@
   import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Chart } from '@antv/g2';
-  import type { Component } from 'vue';
-  import { Collection, Connection, PieChart, Refresh, Trophy } from '@element-plus/icons-vue';
+  import { Refresh } from '@element-plus/icons-vue';
 
   import { deviceStats, driverStats, statsTop } from '@/api/dashboard';
   import { getDeviceByIds } from '@/api/device';
@@ -68,17 +60,13 @@
 
   const { t } = useI18n();
 
-  // Icon mapping: structural tabs get shape-specific icons (pie / connection /
-  // collection) so the three ways of slicing the fleet read visually distinct.
-  // Top-N tabs all share Trophy — the ranking concept is the same, only the
-  // subject differs, and the tab label already spells out device/point/driver.
-  const tabs = computed<{ key: TabKey; label: string; icon: Component }[]>(() => [
-    { key: 'deviceStatus', label: t('home.tabs.deviceStatus'), icon: PieChart },
-    { key: 'protocol', label: t('home.tabs.protocol'), icon: Connection },
-    { key: 'profile', label: t('home.tabs.profile'), icon: Collection },
-    { key: 'topDevice', label: t('home.tabs.topDevice'), icon: Trophy },
-    { key: 'topPoint', label: t('home.tabs.topPoint'), icon: Trophy },
-    { key: 'topDriver', label: t('home.tabs.topDriver'), icon: Trophy },
+  const tabs = computed<{ key: TabKey; label: string }[]>(() => [
+    { key: 'deviceStatus', label: t('home.tabs.deviceStatus') },
+    { key: 'protocol', label: t('home.tabs.protocol') },
+    { key: 'profile', label: t('home.tabs.profile') },
+    { key: 'topDevice', label: t('home.tabs.topDevice') },
+    { key: 'topPoint', label: t('home.tabs.topPoint') },
+    { key: 'topDriver', label: t('home.tabs.topDriver') },
   ]);
 
   const activeTab = ref<TabKey>('deviceStatus');
@@ -325,13 +313,6 @@
       align-items: center;
       gap: 8px;
       flex-shrink: 0;
-    }
-
-    // Icon + text on the tab label, keeps the existing font size/color.
-    .analytics-tabs__label {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
     }
 
     // Caption lives between the tab bar and the chart — tight vertical
