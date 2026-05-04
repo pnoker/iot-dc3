@@ -52,20 +52,19 @@
       </el-col>
     </el-row>
 
-    <!-- Row 3: trend chart + the two live widgets packed at 4:1:1 —
-         Data Ingestion Trend still gets the bulk of the width for a
-         readable time series, while Live Feed and Recent Alarms share
-         the remaining third as compact side columns. Narrow breakpoints
-         stack everything to full width so the side columns don't squeeze
-         below usability. -->
+    <!-- Row 3: trend chart + the two live widgets packed at 3:1.5:1.5 —
+         TrendChart gets half the row for a readable time series, and
+         LiveFeed + Alarms each take a quarter so the rows inside stay
+         legible (4/24 was cramping timestamps and message text). Narrow
+         breakpoints stack everything to full width. -->
     <el-row :gutter="8" class="home__row">
-      <el-col :lg="16" :md="24" :sm="24" :xl="16" :xs="24" class="home__col">
+      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
         <trend-chart />
       </el-col>
-      <el-col :lg="4" :md="24" :sm="24" :xl="4" :xs="24" class="home__col">
+      <el-col :lg="6" :md="24" :sm="24" :xl="6" :xs="24" class="home__col">
         <live-data-feed :size="20" />
       </el-col>
-      <el-col :lg="4" :md="24" :sm="24" :xl="4" :xs="24" class="home__col">
+      <el-col :lg="6" :md="24" :sm="24" :xl="6" :xs="24" class="home__col">
         <alert-list :size="10" />
       </el-col>
     </el-row>
