@@ -19,16 +19,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.pnoker.common.manager.mapper.DashboardMapper">
 
-    <select id="countDriverByEnable" resultType="map">
-        SELECT enable_flag AS enable_flag, COUNT(*) AS count
+    <!--
+        Every GROUP BY column is aliased to `key` so a single BucketRow
+        (key, count) can serve all five bucket-shaped queries below. Reuse
+        instead of one Row class per group column.
+    -->
+    <select id="countDriverByEnable"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow">
+        SELECT enable_flag AS key, COUNT(*) AS count
         FROM dc3_driver
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
         GROUP BY enable_flag
     </select>
 
-    <select id="countDriverByType" resultType="map">
-        SELECT driver_type_flag AS driver_type_flag, COUNT(*) AS count
+    <select id="countDriverByType"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow">
+        SELECT driver_type_flag AS key, COUNT(*) AS count
         FROM dc3_driver
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
@@ -40,54 +47,61 @@
         lives in service_name (e.g. dc3-driver-modbus-tcp / dc3-driver-mqtt).
         Group by that so the home dashboard can show the actual protocol mix.
     -->
-    <select id="countDriverByService" resultType="map">
-        SELECT service_name AS service_name, COUNT(*) AS count
+    <select id="countDriverByService"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow">
+        SELECT service_name AS key, COUNT(*) AS count
         FROM dc3_driver
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
         GROUP BY service_name
-        ORDER BY count DESC
+        ORDER BY count
+        DESC
     </select>
 
-    <select id="countDeviceByEnable" resultType="map">
-        SELECT enable_flag AS enable_flag, COUNT(*) AS count
+    <select id="countDeviceByEnable"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow">
+        SELECT enable_flag AS key, COUNT(*) AS count
         FROM dc3_device
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
         GROUP BY enable_flag
     </select>
 
-    <select id="countDeviceByDriver" resultType="map">
-        SELECT driver_id AS driver_id, COUNT(*) AS count
+    <select id="countDeviceByDriver"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow">
+        SELECT driver_id AS key, COUNT(*) AS count
         FROM dc3_device
         WHERE deleted = 0
           AND tenant_id = #{tenantId}
         GROUP BY driver_id
-        ORDER BY count DESC
-        LIMIT #{limit}
+        ORDER BY count
+        DESC
+            LIMIT #{limit}
     </select>
 
     <!--
         One device can bind to multiple profiles, so the total here can
         exceed the device count. Only active bindings participate.
     -->
-    <select id="countDeviceByProfile" resultType="map">
-        SELECT b.profile_id AS profile_id, COUNT(*) AS count
+    <select id="countDeviceByProfile"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow">
+        SELECT b.profile_id AS key, COUNT(*) AS count
         FROM dc3_profile_bind b
         WHERE b.deleted = 0
           AND b.tenant_id = #{tenantId}
         GROUP BY b.profile_id
-        ORDER BY count DESC
-        LIMIT #{limit}
+        ORDER BY count
+        DESC
+            LIMIT #{limit}
     </select>
 
     <!--
         Daily new-row count over the given window. ${table} is inlined
         (service layer whitelists to dc3_driver / dc3_device / dc3_point).
-        Missing days are filled with zero on the service side so the
-        frontend sparkline always gets a fixed-length array.
+        Missing days are filled with zero on the service side.
     -->
-    <select id="dailyGrowth" resultType="map">
+    <select id="dailyGrowth"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.DailyGrowthRow">
         SELECT DATE(create_time) AS day, COUNT(*) AS count
         FROM ${table}
         WHERE deleted = 0
@@ -98,17 +112,16 @@
         ORDER BY day ASC
     </select>
 
-    <!--
-        === Topology (Driver → Device → Profile → Point) ==========================
+    <!-- =========================================================
+         Topology (Driver → Device → Profile → Point)
 
-        Five focused queries the service layer stitches together. We keep the
-        SQL simple (one table or one join per query) and do Top-N / Others
-        aggregation in Java, because MyBatis + PostgreSQL window functions
-        over IN-clause filters get ugly fast, and the four-layer scale after
-        service-side cropping is small enough for in-memory sort.
-    -->
+         Five focused queries the service layer stitches together. We keep
+         the SQL simple (one table or one join per query) and do Top-N /
+         Others aggregation in Java.
+         ========================================================= -->
 
-    <select id="topologyDrivers" resultType="map">
+    <select id="topologyDrivers"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDriverRow">
         SELECT d.id          AS id,
                d.driver_name AS driver_name,
                COUNT(dev.id) AS device_count
@@ -122,7 +135,8 @@
         GROUP BY d.id, d.driver_name
     </select>
 
-    <select id="topologyDevicesByDrivers" resultType="map">
+    <select id="topologyDevicesByDrivers"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDeviceRow">
         SELECT dev.id AS id,
         dev.device_name AS device_name,
         dev.driver_id AS driver_id,
@@ -140,7 +154,8 @@
         </foreach>
     </select>
 
-    <select id="topologyProfileBindings" resultType="map">
+    <select id="topologyProfileBindings"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.ProfileBindingRow">
         SELECT pb.profile_id AS profile_id,
         pb.device_id AS device_id
         FROM dc3_profile_bind pb
@@ -152,7 +167,8 @@
         </foreach>
     </select>
 
-    <select id="topologyProfilesByIds" resultType="map">
+    <select id="topologyProfilesByIds"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.TopologyProfileRow">
         SELECT p.id AS id,
         p.profile_name AS profile_name
         FROM dc3_profile p
@@ -164,7 +180,8 @@
         </foreach>
     </select>
 
-    <select id="topologyPointsByProfiles" resultType="map">
+    <select id="topologyPointsByProfiles"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.TopologyPointRow">
         SELECT pt.id AS id,
         pt.point_name AS point_name,
         pt.profile_id AS profile_id
@@ -183,13 +200,9 @@
         user owns both schemas so fully-qualifying the view works; this
         keeps us from having to register a second dynamic datasource just
         for one aggregate call.
-
-        No GROUP BY (device_id, point_id) index exists on the view, but
-        each typed sibling has (tenant_id, create_time DESC) and a
-        time_bucket hypertable dimension on create_time — so the WHERE
-        clause prunes chunks before aggregation.
     -->
-    <select id="topologyPointVolumes" resultType="map">
+    <select id="topologyPointVolumes"
+            resultType="io.github.pnoker.common.manager.entity.bo.dashboard.PointVolumeRow">
         SELECT device_id AS device_id,
                point_id  AS point_id,
                COUNT(*)  AS cnt
