@@ -20,6 +20,7 @@ package io.github.pnoker.common.manager.service;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DeviceStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DriverStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.GrowthVO;
+import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
 
 /**
  * Manager-side dashboard aggregate service — powers the home page's
@@ -41,4 +42,27 @@ public interface DashboardService {
      * missing days, oldest first.
      */
     GrowthVO dailyGrowth(Long tenantId, int days);
+
+    /**
+     * Four-column topology Sankey (Driver → Device → Profile → Point) used
+     * by the home page. Top-N cropped server-side; overflow rolls into
+     * {@code others:*} nodes whose {@code hiddenChildren} carry the
+     * collapsed list for drill-in.
+     *
+     * <p>{@code mode="cardinality"} weights edges by the number of
+     * relationships (1 per device / binding / point). {@code mode="volume"}
+     * weights edges by the number of point_value samples each carried over
+     * the {@code rangeKey} window (today / 24h / 7d / 30d); entity Top-N
+     * cropping at each layer also sorts by those volumes.</p>
+     *
+     * <p>Results are cached for 60s keyed by {@code tenant:mode:rangeKey}
+     * — the graph changes slowly and the volume-mode aggregate touches the
+     * Timescale hypertable view, so repeated refreshes stay cheap.</p>
+     *
+     * @param tenantId caller's tenant id
+     * @param mode     {@code "cardinality"} | {@code "volume"}
+     * @param rangeKey time window key for volume mode; ignored for
+     *                 cardinality. Defaults to {@code "7d"} when blank.
+     */
+    TopologyVO topology(Long tenantId, String mode, String rangeKey);
 }
