@@ -35,7 +35,7 @@ import org.springframework.context.annotation.FilterType;
  * via their interfaces (AssignableTypeFilter matches concrete implementations).
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")

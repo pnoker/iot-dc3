@@ -32,7 +32,7 @@ import java.util.Objects;
  * In-process {@link TenantFacade}.
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 @Slf4j
 @Component

@@ -29,7 +29,7 @@ import org.mapstruct.Mapper;
  * Field sets are aligned by design, so MapStruct auto-maps every property.
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeDeviceBuilder {

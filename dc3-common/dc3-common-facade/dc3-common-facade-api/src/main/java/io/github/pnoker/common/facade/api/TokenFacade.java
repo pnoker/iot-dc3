@@ -25,7 +25,7 @@ package io.github.pnoker.common.facade.api;
  * string that nobody reads from the gateway.
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 public interface TokenFacade {
 

@@ -26,7 +26,7 @@ import lombok.*;
  * wire shape (no tenantExt — that is not exposed through gRPC).
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 @Getter
 @Setter
