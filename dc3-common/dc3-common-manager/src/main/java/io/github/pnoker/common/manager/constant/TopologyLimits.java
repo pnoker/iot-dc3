@@ -60,6 +60,12 @@ public final class TopologyLimits {
      */
     public static final int CACHE_MAX_SIZE = 200;
 
+    // ===== Fallback bucket keys ==================================
+    // Returned when an enum lookup fails (EnableFlagEnum.ofIndex(null) → null,
+    // or unknown driver_type_flag int). Frontend matches this on a localised
+    // label lookup — it's a stable dictionary token, not user-visible copy.
+    public static final String UNKNOWN_BUCKET = "UNKNOWN";
+
     private TopologyLimits() {
         // utility class — never instantiated
     }
