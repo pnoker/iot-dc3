@@ -25,7 +25,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResult
  * {@code api.center.auth.ResourceRegistryApi}.
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 public interface ResourceRegistryFacade {
 

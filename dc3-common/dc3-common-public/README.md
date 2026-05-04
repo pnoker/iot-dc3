@@ -9,7 +9,7 @@ management, HTTP client configuration, and shared utility functions used across 
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-public
-- **Version**: 2026.4.30
+- **Version**: 2026.5.5
 
 ## Key Components
 

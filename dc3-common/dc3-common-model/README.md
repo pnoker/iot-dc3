@@ -9,7 +9,7 @@ objects used across all services and drivers.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-model
-- **Version**: 2026.4.30
+- **Version**: 2026.5.5
 
 ## Key Components
 

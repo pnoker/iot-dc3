@@ -9,7 +9,7 @@ values on a configurable schedule without connecting to real hardware.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-virtual
-- **Version**: 2026.4.30
+- **Version**: 2026.5.5
 - **Driver Name**: 虚拟驱动
 
 ## Driver Attributes

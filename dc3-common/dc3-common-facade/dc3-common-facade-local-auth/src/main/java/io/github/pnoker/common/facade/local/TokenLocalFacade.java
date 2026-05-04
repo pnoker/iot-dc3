@@ -31,7 +31,7 @@ import java.util.Objects;
  * {@code TokenService.checkValid} (null / invalid / valid) into a boolean.
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 @Slf4j
 @Component

@@ -23,7 +23,7 @@ import lombok.*;
  * Facade-level counters summarizing a resource-registry sync run.
  *
  * @author pnoker
- * @since 2026.4.30
+ * @since 2026.5.5
  */
 @Getter
 @Setter

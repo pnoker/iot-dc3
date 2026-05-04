@@ -9,7 +9,7 @@ triggering scheduled jobs across services, primarily used in the Manager Center 
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-quartz
-- **Version**: 2026.4.30
+- **Version**: 2026.5.5
 
 ## Key Components
 
