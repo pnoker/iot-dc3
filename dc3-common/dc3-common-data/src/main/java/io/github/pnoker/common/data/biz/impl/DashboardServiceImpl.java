@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.biz.DashboardService;
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
 import io.github.pnoker.common.data.mapper.AlertMapper;
@@ -31,7 +32,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -79,49 +79,23 @@ public class DashboardServiceImpl implements DashboardService {
     @Resource
     private DriverFacade driverFacade;
 
-    private static int toInt(Object v) {
-        if (v == null) return 0;
-        if (v instanceof Number n) return n.intValue();
-        return Integer.parseInt(v.toString());
-    }
-
-    private static long toLong(Object v) {
-        if (v == null) return 0L;
-        if (v instanceof Number n) return n.longValue();
-        return Long.parseLong(v.toString());
-    }
-
+    /** BucketRow.key is Object (shared across SMALLINT / VARCHAR / BIGINT group columns); stringify for the VO. */
     private static String asString(Object v) {
         return v == null ? null : v.toString();
     }
 
-    private static LocalDateTime toLocalDateTime(Object v) {
-        if (v == null) return null;
-        if (v instanceof LocalDateTime ldt) return ldt;
-        if (v instanceof Timestamp ts) return ts.toLocalDateTime();
-        // Fallback for JDBC drivers that return java.time.OffsetDateTime etc.
-        if (v instanceof java.time.OffsetDateTime odt) return odt.toLocalDateTime();
-        return LocalDateTime.parse(v.toString());
-    }
-
-    // Kept for reference — zero-arg unused reference suppressing unused-import warning.
-    @SuppressWarnings("unused")
-    private static LocalDateTime startOfDay() {
-        return LocalDate.now().atTime(LocalTime.MIN);
-    }
-
     @Override
     public List<LatencyBucketVO> latencyHistogram(Long tenantId, int rangeHours) {
-        int hours = Math.max(1, Math.min(rangeHours, MAX_HOURS_90D));
+        int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
-        List<Map<String, Object>> rows = dashboardMapper.latencyHistogram(tenantId, from, to);
+        var rows = dashboardMapper.latencyHistogram(tenantId, from, to);
         // Pad missing bins with zero so the UI always gets six buckets.
         long[] counts = new long[6];
-        for (Map<String, Object> row : rows) {
-            int bin = toInt(row.get("bin"));
+        for (var row : rows) {
+            int bin = row.getBin();
             if (bin >= 0 && bin < counts.length) {
-                counts[bin] = toLong(row.get("count"));
+                counts[bin] = row.getCount();
             }
         }
         List<LatencyBucketVO> out = new ArrayList<>(counts.length);
@@ -136,16 +110,16 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<ActivityCellVO> hourlyActivity(Long tenantId, int rangeHours) {
-        int hours = Math.max(1, Math.min(rangeHours, MAX_HOURS_90D));
+        int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
-        List<Map<String, Object>> rows = dashboardMapper.hourlyActivity(tenantId, from, to);
+        var rows = dashboardMapper.hourlyActivity(tenantId, from, to);
         long[][] grid = new long[7][24];
-        for (Map<String, Object> row : rows) {
-            int dow = toInt(row.get("dow"));
-            int hour = toInt(row.get("hour"));
+        for (var row : rows) {
+            int dow = row.getDow();
+            int hour = row.getHour();
             if (dow >= 0 && dow < 7 && hour >= 0 && hour < 24) {
-                grid[dow][hour] = toLong(row.get("count"));
+                grid[dow][hour] = row.getCount();
             }
         }
         List<ActivityCellVO> out = new ArrayList<>(7 * 24);
@@ -162,37 +136,35 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public Map<String, Object> alertPage(Long tenantId, String source, Integer eventTypeFlag,
-                                         Integer confirmFlag, LocalDateTime from, long current, long size) {
+    public Page<AlertItemVO> alertPage(Long tenantId, String source, Integer eventTypeFlag,
+                                       Integer confirmFlag, LocalDateTime from, long current, long size) {
         String src = source == null || source.isBlank() ? null
                 : (ALERT_SOURCES.contains(source) ? source : null);
         long clampedCurrent = Math.max(1L, current);
-        long clampedSize = Math.max(1L, Math.min(size, MAX_PAGE_SIZE));
+        long clampedSize = Math.clamp(size, 1L, MAX_PAGE_SIZE);
         long offset = (clampedCurrent - 1L) * clampedSize;
 
         long total = alertMapper.countFiltered(tenantId, src, eventTypeFlag, confirmFlag, from);
-        List<Map<String, Object>> rows = alertMapper.listPaged(
+        var rows = alertMapper.listPaged(
                 tenantId, src, eventTypeFlag, confirmFlag, from, offset, clampedSize);
         List<AlertItemVO> records = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
+        for (var row : rows) {
             AlertItemVO vo = new AlertItemVO();
-            vo.setId(toLong(row.get("id")));
-            vo.setSource(asString(row.get("source")));
-            vo.setSourceId(toLong(row.get("source_id")));
-            vo.setPointId(toLong(row.get("point_id")));
-            vo.setEventTypeFlag(toInt(row.get("event_type_flag")));
-            vo.setConfirmFlag(toInt(row.get("confirm_flag")));
-            vo.setCreateTime(toLocalDateTime(row.get("create_time")));
-            vo.setMessage(asString(row.get("message")));
+            vo.setId(row.getId());
+            vo.setSource(row.getSource());
+            vo.setSourceId(row.getSourceId());
+            vo.setPointId(row.getPointId());
+            vo.setEventTypeFlag(row.getEventTypeFlag());
+            vo.setConfirmFlag(row.getConfirmFlag());
+            vo.setCreateTime(row.getCreateTime());
+            vo.setMessage(row.getMessage());
             records.add(vo);
         }
-        Map<String, Object> out = new java.util.HashMap<>();
-        out.put("current", clampedCurrent);
-        out.put("size", clampedSize);
-        out.put("total", total);
-        out.put("pages", clampedSize == 0 ? 0 : (total + clampedSize - 1) / clampedSize);
-        out.put("records", records);
-        return out;
+        // Use MyBatis-Plus Page so the JSON shape matches every other list
+        // endpoint in the project (current / size / total / pages / records).
+        Page<AlertItemVO> page = new Page<>(clampedCurrent, clampedSize, total);
+        page.setRecords(records);
+        return page;
     }
 
     @Override
@@ -256,17 +228,17 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<TimeseriesPointVO> timeseries(Long tenantId, String granularity, int rangeHours) {
         String g = GRANULARITY.contains(granularity) ? granularity : "hour";
-        int hours = Math.max(1, Math.min(rangeHours, MAX_HOURS_90D));
+        int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
         String bucket = "1 " + g;
 
-        List<Map<String, Object>> rows = dashboardMapper.timeseries(tenantId, from, to, bucket);
+        var rows = dashboardMapper.timeseries(tenantId, from, to, bucket);
         List<TimeseriesPointVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
+        for (var row : rows) {
             TimeseriesPointVO vo = new TimeseriesPointVO();
-            vo.setBucket(toLocalDateTime(row.get("bucket")));
-            vo.setCount(toLong(row.get("count")));
+            vo.setBucket(row.getBucket());
+            vo.setCount(row.getCount());
             out.add(vo);
         }
         return out;
@@ -278,17 +250,17 @@ public class DashboardServiceImpl implements DashboardService {
         if (column == null) {
             throw new IllegalArgumentException("Unsupported dimension: " + dimension);
         }
-        int clampedLimit = Math.max(1, Math.min(limit, MAX_LIMIT));
-        int hours = Math.max(1, Math.min(rangeHours, MAX_HOURS_90D));
+        int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
+        int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
 
-        List<Map<String, Object>> rows = dashboardMapper.top(tenantId, column, from, to, clampedLimit);
+        var rows = dashboardMapper.top(tenantId, column, from, to, clampedLimit);
         List<TopEntityVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
+        for (var row : rows) {
             TopEntityVO vo = new TopEntityVO();
-            vo.setEntityId(toLong(row.get("entity_id")));
-            vo.setCount(toLong(row.get("count")));
+            vo.setEntityId(row.getEntityId());
+            vo.setCount(row.getCount());
             out.add(vo);
         }
         return out;
@@ -296,21 +268,21 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<LatestPointValueVO> latestStream(Long tenantId, int size) {
-        int clamped = Math.max(1, Math.min(size, MAX_LIVE_SIZE));
-        List<Map<String, Object>> rows = dashboardMapper.latestStream(tenantId, clamped);
+        int clamped = Math.clamp(size, 1, MAX_LIVE_SIZE);
+        var rows = dashboardMapper.latestStream(tenantId, clamped);
         List<LatestPointValueVO> out = new ArrayList<>(rows.size());
         Set<Long> deviceIds = new HashSet<>();
         Set<Long> pointIds = new HashSet<>();
         Set<Long> driverIds = new HashSet<>();
-        for (Map<String, Object> row : rows) {
+        for (var row : rows) {
             LatestPointValueVO vo = new LatestPointValueVO();
-            vo.setDeviceId(toLong(row.get("device_id")));
-            vo.setPointId(toLong(row.get("point_id")));
-            vo.setDriverId(toLong(row.get("driver_id")));
-            vo.setRawValue(asString(row.get("raw_value")));
-            vo.setCalValue(asString(row.get("cal_value")));
-            vo.setValueType(asString(row.get("value_type")));
-            vo.setCreateTime(toLocalDateTime(row.get("create_time")));
+            vo.setDeviceId(row.getDeviceId());
+            vo.setPointId(row.getPointId());
+            vo.setDriverId(row.getDriverId());
+            vo.setRawValue(row.getRawValue());
+            vo.setCalValue(row.getCalValue());
+            vo.setValueType(row.getValueType());
+            vo.setCreateTime(row.getCreateTime());
             out.add(vo);
             if (vo.getDeviceId() != null && vo.getDeviceId() > 0) deviceIds.add(vo.getDeviceId());
             if (vo.getPointId() != null && vo.getPointId() > 0) pointIds.add(vo.getPointId());
@@ -352,25 +324,25 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public AlertStatsVO alertStats(Long tenantId) {
         AlertStatsVO vo = new AlertStatsVO();
-        Map<String, Object> totals = alertMapper.countAll(tenantId);
+        var totals = alertMapper.countAll(tenantId);
         if (totals != null) {
-            vo.setTotal(toLong(totals.get("total")));
-            vo.setUnconfirmed(toLong(totals.get("unconfirmed")));
+            vo.setTotal(totals.getTotal());
+            vo.setUnconfirmed(totals.getUnconfirmed());
         }
-        List<Map<String, Object>> rows = alertMapper.countByType(tenantId);
+        var rows = alertMapper.countByType(tenantId);
         List<AlertStatsVO.BucketVO> buckets = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
+        for (var row : rows) {
             AlertStatsVO.BucketVO b = new AlertStatsVO.BucketVO();
-            b.setKey(asString(row.get("key")));
-            b.setCount(toLong(row.get("count")));
+            b.setKey(asString(row.getKey()));
+            b.setCount(row.getCount());
             buckets.add(b);
         }
         vo.setByType(buckets);
 
-        for (Map<String, Object> row : alertMapper.countBySource(tenantId)) {
-            String src = asString(row.get("source"));
-            long srcTotal = toLong(row.get("total"));
-            long srcUnconfirmed = toLong(row.get("unconfirmed"));
+        for (var row : alertMapper.countBySource(tenantId)) {
+            String src = row.getSource();
+            long srcTotal = row.getTotal();
+            long srcUnconfirmed = row.getUnconfirmed();
             if ("device".equals(src)) {
                 vo.setDeviceAlerts(srcTotal);
                 vo.setDeviceUnconfirmed(srcUnconfirmed);
@@ -382,10 +354,10 @@ public class DashboardServiceImpl implements DashboardService {
 
         // Today's ALARM counts per source
         LocalDateTime todayStart = LocalDate.now().atStartOfDay();
-        for (Map<String, Object> row : alertMapper.todayBySource(tenantId, todayStart)) {
-            String src = asString(row.get("source"));
-            long srcTotal = toLong(row.get("total"));
-            long srcUnconfirmed = toLong(row.get("unconfirmed"));
+        for (var row : alertMapper.todayBySource(tenantId, todayStart)) {
+            String src = row.getSource();
+            long srcTotal = row.getTotal();
+            long srcUnconfirmed = row.getUnconfirmed();
             if ("device".equals(src)) {
                 vo.setTodayDeviceAlarms(srcTotal);
                 vo.setTodayDeviceUnconfirmed(srcUnconfirmed);
@@ -398,13 +370,13 @@ public class DashboardServiceImpl implements DashboardService {
         // 24-hour hourly sparkline, anchored to top-of-hour now-23.
         LocalDateTime anchor = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0).minusHours(23);
         long[] series = new long[24];
-        for (Map<String, Object> row : alertMapper.hourlyCounts(tenantId, anchor)) {
-            LocalDateTime bucket = toLocalDateTime(row.get("bucket"));
+        for (var row : alertMapper.hourlyCounts(tenantId, anchor)) {
+            LocalDateTime bucket = row.getBucket();
             if (bucket == null) continue;
             long diffHours = java.time.Duration.between(anchor, bucket).toHours();
             int idx = (int) diffHours;
             if (idx >= 0 && idx < series.length) {
-                series[idx] = toLong(row.get("count"));
+                series[idx] = row.getCount();
             }
         }
         List<Long> sparkline = new ArrayList<>(series.length);
@@ -415,19 +387,19 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertItemVO> alertLatest(Long tenantId, int size) {
-        int clamped = Math.max(1, Math.min(size, MAX_LIMIT));
-        List<Map<String, Object>> rows = alertMapper.latest(tenantId, clamped);
+        int clamped = Math.clamp(size, 1, MAX_LIMIT);
+        var rows = alertMapper.latest(tenantId, clamped);
         List<AlertItemVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
+        for (var row : rows) {
             AlertItemVO vo = new AlertItemVO();
-            vo.setId(toLong(row.get("id")));
-            vo.setSource(asString(row.get("source")));
-            vo.setSourceId(toLong(row.get("source_id")));
-            vo.setPointId(toLong(row.get("point_id")));
-            vo.setEventTypeFlag(toInt(row.get("event_type_flag")));
-            vo.setConfirmFlag(toInt(row.get("confirm_flag")));
-            vo.setCreateTime(toLocalDateTime(row.get("create_time")));
-            vo.setMessage(asString(row.get("message")));
+            vo.setId(row.getId());
+            vo.setSource(row.getSource());
+            vo.setSourceId(row.getSourceId());
+            vo.setPointId(row.getPointId());
+            vo.setEventTypeFlag(row.getEventTypeFlag());
+            vo.setConfirmFlag(row.getConfirmFlag());
+            vo.setCreateTime(row.getCreateTime());
+            vo.setMessage(row.getMessage());
             out.add(vo);
         }
         return out;
@@ -435,15 +407,15 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertTrendVO> alertTrend(Long tenantId, int days) {
-        int clamped = Math.max(1, Math.min(days, MAX_DAYS));
+        int clamped = Math.clamp(days, 1, MAX_DAYS);
         LocalDateTime from = LocalDate.now().minusDays(clamped).atTime(LocalTime.MIN);
-        List<Map<String, Object>> rows = alertMapper.dailyTrend(tenantId, from);
+        var rows = alertMapper.dailyTrend(tenantId, from);
         List<AlertTrendVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
+        for (var row : rows) {
             AlertTrendVO vo = new AlertTrendVO();
-            vo.setDate(asString(row.get("date")));
-            vo.setDeviceCount(toLong(row.get("device_count")));
-            vo.setDriverCount(toLong(row.get("driver_count")));
+            vo.setDate(row.getDate());
+            vo.setDeviceCount(row.getDeviceCount());
+            vo.setDriverCount(row.getDriverCount());
             out.add(vo);
         }
         return out;
@@ -451,16 +423,16 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertTopSourceVO> alertTopSources(Long tenantId, int days, int limit) {
-        int clampedDays = Math.max(1, Math.min(days, MAX_DAYS));
-        int clampedLimit = Math.max(1, Math.min(limit, MAX_LIMIT));
+        int clampedDays = Math.clamp(days, 1, MAX_DAYS);
+        int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
         LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
-        List<Map<String, Object>> rows = alertMapper.topSources(tenantId, from, clampedLimit);
+        var rows = alertMapper.topSources(tenantId, from, clampedLimit);
         List<AlertTopSourceVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
+        for (var row : rows) {
             AlertTopSourceVO vo = new AlertTopSourceVO();
-            vo.setSource(asString(row.get("source")));
-            vo.setSourceId(toLong(row.get("source_id")));
-            vo.setCount(toLong(row.get("count")));
+            vo.setSource(row.getSource());
+            vo.setSourceId(row.getSourceId());
+            vo.setCount(row.getCount());
             out.add(vo);
         }
         return out;
@@ -468,15 +440,15 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertActivityCellVO> alertActivity(Long tenantId, int days) {
-        int clampedDays = Math.max(1, Math.min(days, MAX_DAYS));
+        int clampedDays = Math.clamp(days, 1, MAX_DAYS);
         LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
-        List<Map<String, Object>> rows = alertMapper.activityHeatmap(tenantId, from);
+        var rows = alertMapper.activityHeatmap(tenantId, from);
         long[][] grid = new long[7][24];
-        for (Map<String, Object> row : rows) {
-            int dow = toInt(row.get("dow"));
-            int hour = toInt(row.get("hour"));
+        for (var row : rows) {
+            int dow = row.getDow();
+            int hour = row.getHour();
             if (dow >= 0 && dow < 7 && hour >= 0 && hour < 24) {
-                grid[dow][hour] = toLong(row.get("count"));
+                grid[dow][hour] = row.getCount();
             }
         }
         // Zero-pad every cell so the UI always receives 7 × 24 = 168 rows.
@@ -495,14 +467,14 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertTypeBucketVO> alertTypeDistribution(Long tenantId, int days) {
-        int clampedDays = Math.max(1, Math.min(days, MAX_DAYS));
+        int clampedDays = Math.clamp(days, 1, MAX_DAYS);
         LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
-        List<Map<String, Object>> rows = alertMapper.typeDistribution(tenantId, from);
+        var rows = alertMapper.typeDistribution(tenantId, from);
         List<AlertTypeBucketVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
+        for (var row : rows) {
             AlertTypeBucketVO vo = new AlertTypeBucketVO();
-            vo.setType(asString(row.get("type")));
-            vo.setCount(toLong(row.get("count")));
+            vo.setType(row.getKey() == null ? null : row.getKey().toString());
+            vo.setCount(row.getCount());
             out.add(vo);
         }
         return out;
@@ -510,17 +482,17 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertTopSourceVO> alertStormSources(Long tenantId, int hours, int minCount, int limit) {
-        int clampedHours = Math.max(1, Math.min(hours, MAX_HOURS_30D));
+        int clampedHours = Math.clamp(hours, 1, MAX_HOURS_30D);
         int clampedMin = Math.max(1, minCount);
-        int clampedLimit = Math.max(1, Math.min(limit, MAX_LIMIT));
+        int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
         LocalDateTime from = LocalDateTime.now().minusHours(clampedHours);
-        List<Map<String, Object>> rows = alertMapper.stormSources(tenantId, from, clampedMin, clampedLimit);
+        var rows = alertMapper.stormSources(tenantId, from, clampedMin, clampedLimit);
         List<AlertTopSourceVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> row : rows) {
+        for (var row : rows) {
             AlertTopSourceVO vo = new AlertTopSourceVO();
-            vo.setSource(asString(row.get("source")));
-            vo.setSourceId(toLong(row.get("source_id")));
-            vo.setCount(toLong(row.get("count")));
+            vo.setSource(row.getSource());
+            vo.setSourceId(row.getSourceId());
+            vo.setCount(row.getCount());
             out.add(vo);
         }
         return out;
@@ -532,18 +504,18 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<FlappingSourceVO> alertFlapping(Long tenantId, int hours, int minCount, int limit) {
-        int h = Math.max(1, Math.min(hours, MAX_HOURS_7D));
+        int h = Math.clamp(hours, 1, MAX_HOURS_7D);
         int min = Math.max(MIN_FLAPPING_COUNT, minCount);
-        int lim = Math.max(1, Math.min(limit, MAX_LIMIT));
+        int lim = Math.clamp(limit, 1, MAX_LIMIT);
         LocalDateTime from = LocalDateTime.now().minusHours(h);
-        List<Map<String, Object>> rows = alertMapper.flappingSources(tenantId, from, min, lim);
+        var rows = alertMapper.flappingSources(tenantId, from, min, lim);
         List<FlappingSourceVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> r : rows) {
+        for (var r : rows) {
             FlappingSourceVO vo = new FlappingSourceVO();
-            vo.setSource(asString(r.get("source")));
-            vo.setSourceId(toLong(r.get("source_id")));
-            vo.setEventTypeFlag(toInt(r.get("event_type_flag")));
-            vo.setCount(toLong(r.get("count")));
+            vo.setSource(r.getSource());
+            vo.setSourceId(r.getSourceId());
+            vo.setEventTypeFlag(r.getEventTypeFlag());
+            vo.setCount(r.getCount());
             out.add(vo);
         }
         return out;
@@ -551,21 +523,21 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<CorrelationPairVO> alertCorrelation(Long tenantId, int hours, int windowSec, int limit) {
-        int h = Math.max(1, Math.min(hours, MAX_HOURS_7D));
-        int w = Math.max(MIN_CORRELATION_WINDOW_SEC, Math.min(windowSec, MAX_CORRELATION_WINDOW_SEC));
-        int lim = Math.max(1, Math.min(limit, MAX_CORRELATION_PAIRS));
+        int h = Math.clamp(hours, 1, MAX_HOURS_7D);
+        int w = Math.clamp(windowSec, MIN_CORRELATION_WINDOW_SEC, MAX_CORRELATION_WINDOW_SEC);
+        int lim = Math.clamp(limit, 1, MAX_CORRELATION_PAIRS);
         LocalDateTime from = LocalDateTime.now().minusHours(h);
-        List<Map<String, Object>> rows = alertMapper.correlationPairs(tenantId, from, w, lim);
+        var rows = alertMapper.correlationPairs(tenantId, from, w, lim);
         List<CorrelationPairVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> r : rows) {
+        for (var r : rows) {
             CorrelationPairVO vo = new CorrelationPairVO();
-            vo.setASource(asString(r.get("a_source")));
-            vo.setASourceId(toLong(r.get("a_source_id")));
-            vo.setAEventType(toInt(r.get("a_event_type")));
-            vo.setBSource(asString(r.get("b_source")));
-            vo.setBSourceId(toLong(r.get("b_source_id")));
-            vo.setBEventType(toInt(r.get("b_event_type")));
-            vo.setCoCount(toLong(r.get("co_count")));
+            vo.setASource(r.getASource());
+            vo.setASourceId(r.getASourceId());
+            vo.setAEventType(r.getAEventType());
+            vo.setBSource(r.getBSource());
+            vo.setBSourceId(r.getBSourceId());
+            vo.setBEventType(r.getBEventType());
+            vo.setCoCount(r.getCoCount());
             out.add(vo);
         }
         return out;
@@ -573,18 +545,18 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<PeerDeviationVO> alertPeerDeviation(Long tenantId, int days) {
-        int d = Math.max(1, Math.min(days, MAX_PEER_DAYS));
+        int d = Math.clamp(days, 1, MAX_PEER_DAYS);
         LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
-        List<Map<String, Object>> rows = alertMapper.peerAlarmCounts(tenantId, from);
+        var rows = alertMapper.peerAlarmCounts(tenantId, from);
 
         // Group by profile → list of (device, alarmCount); then pick median
         // and flag devices with count >= 3x median (and a floor of 5 alarms
         // so a profile with median=1 doesn't emit noise).
         Map<Long, List<long[]>> byProfile = new HashMap<>();
-        for (Map<String, Object> r : rows) {
-            long prof = toLong(r.get("profile_id"));
-            long dev = toLong(r.get("device_id"));
-            long cnt = toLong(r.get("alarm_count"));
+        for (var r : rows) {
+            long prof = r.getProfileId();
+            long dev = r.getDeviceId();
+            long cnt = r.getAlarmCount();
             byProfile.computeIfAbsent(prof, k -> new ArrayList<>()).add(new long[]{dev, cnt});
         }
         List<PeerDeviationVO> out = new ArrayList<>();
@@ -613,30 +585,30 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public AgingBacklogVO alertAgingBacklog(Long tenantId) {
-        Map<String, Object> row = alertMapper.agingBuckets(tenantId);
+        var row = alertMapper.agingBuckets(tenantId);
         AgingBacklogVO vo = new AgingBacklogVO();
         if (row != null) {
-            vo.setUnder1h(toLong(row.get("under_1h")));
-            vo.setH1to6(toLong(row.get("h1_to_6")));
-            vo.setH6to24(toLong(row.get("h6_to_24")));
-            vo.setOver24h(toLong(row.get("over_24h")));
-            vo.setTotal(toLong(row.get("total")));
+            vo.setUnder1h(row.getUnder1h());
+            vo.setH1to6(row.getH1to6());
+            vo.setH6to24(row.getH6to24());
+            vo.setOver24h(row.getOver24h());
+            vo.setTotal(row.getTotal());
         }
         return vo;
     }
 
     @Override
     public List<MttaTrendVO> alertMtta(Long tenantId, int days) {
-        int d = Math.max(1, Math.min(days, MAX_DAYS));
+        int d = Math.clamp(days, 1, MAX_DAYS);
         LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
-        List<Map<String, Object>> rows = alertMapper.mttaByDay(tenantId, from);
+        var rows = alertMapper.mttaByDay(tenantId, from);
         List<MttaTrendVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> r : rows) {
+        for (var r : rows) {
             MttaTrendVO vo = new MttaTrendVO();
-            vo.setDate(asString(r.get("date")));
-            vo.setP50Ms(toLong(r.get("p50_ms")));
-            vo.setP95Ms(toLong(r.get("p95_ms")));
-            vo.setConfirmedCount(toLong(r.get("confirmed_count")));
+            vo.setDate(r.getDate());
+            vo.setP50Ms(r.getP50Ms());
+            vo.setP95Ms(r.getP95Ms());
+            vo.setConfirmedCount(r.getConfirmedCount());
             out.add(vo);
         }
         return out;
@@ -644,14 +616,14 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<ProtocolHealthVO> protocolHealth(Long tenantId) {
-        List<Map<String, Object>> rows = alertMapper.protocolHealth(tenantId);
+        var rows = alertMapper.protocolHealth(tenantId);
         List<ProtocolHealthVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> r : rows) {
+        for (var r : rows) {
             ProtocolHealthVO vo = new ProtocolHealthVO();
-            vo.setServiceName(asString(r.get("service_name")));
-            vo.setDriverCount(toLong(r.get("driver_count")));
-            vo.setEnabledCount(toLong(r.get("enabled_count")));
-            vo.setDeviceCount(toLong(r.get("device_count")));
+            vo.setServiceName(r.getServiceName());
+            vo.setDriverCount(r.getDriverCount());
+            vo.setEnabledCount(r.getEnabledCount());
+            vo.setDeviceCount(r.getDeviceCount());
             out.add(vo);
         }
         return out;
@@ -659,18 +631,16 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<ChangeImpactVO> changeImpact(Long tenantId, int days, int limit) {
-        int d = Math.max(1, Math.min(days, MAX_DAYS));
-        int lim = Math.max(1, Math.min(limit, MAX_LIMIT));
+        int d = Math.clamp(days, 1, MAX_DAYS);
+        int lim = Math.clamp(limit, 1, MAX_LIMIT);
         LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
-        List<Map<String, Object>> rows = alertMapper.recentChanges(tenantId, from, lim);
+        var rows = alertMapper.recentChanges(tenantId, from, lim);
         List<ChangeImpactVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> r : rows) {
+        for (var r : rows) {
             ChangeImpactVO vo = new ChangeImpactVO();
-            vo.setKind(asString(r.get("kind")));
-            vo.setEntityId(toLong(r.get("entity_id")));
-            Object t = r.get("operate_time");
-            if (t instanceof Timestamp ts) vo.setOperateTime(ts.toLocalDateTime());
-            else if (t instanceof LocalDateTime ldt) vo.setOperateTime(ldt);
+            vo.setKind(r.getKind());
+            vo.setEntityId(r.getEntityId());
+            vo.setOperateTime(r.getOperateTime());
             out.add(vo);
         }
         return out;
@@ -678,24 +648,21 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<SilentSourceVO> silentSources(Long tenantId, int baselineDays, int silentMinutes, int limit) {
-        int baseline = Math.max(1, Math.min(baselineDays, MAX_BASELINE_DAYS));
-        int silent = Math.max(5, Math.min(silentMinutes, 60 * 24));
-        int lim = Math.max(1, Math.min(limit, MAX_COVERAGE_GAP_LIMIT));
+        int baseline = Math.clamp(baselineDays, 1, MAX_BASELINE_DAYS);
+        int silent = Math.clamp(silentMinutes, 5, 60 * 24);
+        int lim = Math.clamp(limit, 1, MAX_COVERAGE_GAP_LIMIT);
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime from = now.minusDays(baseline);
         LocalDateTime silentThreshold = now.minusMinutes(silent);
 
-        List<Map<String, Object>> rows = dashboardMapper.silentSources(tenantId, from, silentThreshold, lim);
+        var rows = dashboardMapper.silentSources(tenantId, from, silentThreshold, lim);
         List<SilentSourceVO> out = new ArrayList<>(rows.size());
-        for (Map<String, Object> r : rows) {
+        for (var r : rows) {
             SilentSourceVO vo = new SilentSourceVO();
-            vo.setDeviceId(toLong(r.get("device_id")));
-            vo.setPointId(toLong(r.get("point_id")));
-            Object t = r.get("last_seen");
-            LocalDateTime last = null;
-            if (t instanceof Timestamp ts) last = ts.toLocalDateTime();
-            else if (t instanceof LocalDateTime ldt) last = ldt;
+            vo.setDeviceId(r.getDeviceId());
+            vo.setPointId(r.getPointId());
+            LocalDateTime last = r.getLastSeen();
             vo.setLastSeen(last);
             if (last != null) {
                 vo.setSilentSeconds(java.time.Duration.between(last, now).getSeconds());
@@ -707,14 +674,14 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public CoverageGapVO coverageGap(Long tenantId, int limit) {
-        int lim = Math.max(1, Math.min(limit, MAX_COVERAGE_GAP_LIMIT));
+        int lim = Math.clamp(limit, 1, MAX_COVERAGE_GAP_LIMIT);
         CoverageGapVO vo = new CoverageGapVO();
         vo.setTotalPoints(dashboardMapper.countPointsInTenant(tenantId));
-        List<Map<String, Object>> rows = dashboardMapper.coverageGapItems(tenantId, lim);
-        for (Map<String, Object> r : rows) {
+        var rows = dashboardMapper.coverageGapItems(tenantId, lim);
+        for (var r : rows) {
             CoverageGapVO.Item it = new CoverageGapVO.Item();
-            it.setPointId(toLong(r.get("point_id")));
-            it.setProfileId(toLong(r.get("profile_id")));
+            it.setPointId(r.getPointId());
+            it.setProfileId(r.getProfileId());
             vo.getItems().add(it);
         }
         // missingPoints = actual count; items may be capped. Use a second

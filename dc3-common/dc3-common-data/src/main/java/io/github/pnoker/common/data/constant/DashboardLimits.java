@@ -98,6 +98,7 @@ public final class DashboardLimits {
 
     // ===== Whitelist values =================================================
     public static final String SOURCE_DRIVER = "driver";
+
     private DashboardLimits() {
         // utility class — never instantiated
     }
