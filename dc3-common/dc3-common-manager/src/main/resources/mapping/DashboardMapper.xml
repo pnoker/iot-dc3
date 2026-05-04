@@ -35,6 +35,20 @@
         GROUP BY driver_type_flag
     </select>
 
+    <!--
+        driver_type_flag is only client/server — the real "protocol" identity
+        lives in service_name (e.g. dc3-driver-modbus-tcp / dc3-driver-mqtt).
+        Group by that so the home dashboard can show the actual protocol mix.
+    -->
+    <select id="countDriverByService" resultType="map">
+        SELECT service_name AS service_name, COUNT(*) AS count
+        FROM dc3_driver
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+        GROUP BY service_name
+        ORDER BY count DESC
+    </select>
+
     <select id="countDeviceByEnable" resultType="map">
         SELECT enable_flag AS enable_flag, COUNT(*) AS count
         FROM dc3_device
