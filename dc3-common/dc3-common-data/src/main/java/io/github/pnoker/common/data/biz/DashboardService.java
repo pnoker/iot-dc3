@@ -100,16 +100,18 @@ public interface DashboardService {
 
     /**
      * Paged event/alarm list. {@code source} is null (both tables), "device",
-     * or "driver" (service whitelists). Returns a Map with {@code total},
-     * {@code current}, {@code size}, {@code records}.
+     * or "driver" (service whitelists). Returns a MyBatis-Plus
+     * {@link com.baomidou.mybatisplus.extension.plugins.pagination.Page Page}
+     * so the JSON shape matches every other list endpoint in the project
+     * ({@code current / size / total / pages / records}).
      */
-    java.util.Map<String, Object> alertPage(Long tenantId,
-                                            String source,
-                                            Integer eventTypeFlag,
-                                            Integer confirmFlag,
-                                            java.time.LocalDateTime from,
-                                            long current,
-                                            long size);
+    com.baomidou.mybatisplus.extension.plugins.pagination.Page<AlertItemVO> alertPage(Long tenantId,
+                                                                                      String source,
+                                                                                      Integer eventTypeFlag,
+                                                                                      Integer confirmFlag,
+                                                                                      java.time.LocalDateTime from,
+                                                                                      long current,
+                                                                                      long size);
 
     /**
      * Flip confirm_flag = 1 on a single event row. Returns true when the row

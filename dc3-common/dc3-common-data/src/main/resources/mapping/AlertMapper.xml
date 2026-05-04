@@ -25,7 +25,7 @@
         stat cards, sparkline, and badge.
     -->
 
-    <select id="countAll" resultType="map">
+    <select id="countAll" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow">
         SELECT (SELECT COUNT(*)
                 FROM dc3_device_event
                 WHERE deleted = 0
@@ -50,7 +50,7 @@
                         AND confirm_flag = 0)    AS unconfirmed
     </select>
 
-    <select id="countBySource" resultType="map">
+    <select id="countBySource" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow">
         SELECT 'device'                    AS source,
                (SELECT COUNT(*)
                 FROM dc3_device_event
@@ -78,7 +78,7 @@
                   AND confirm_flag = 0)    AS unconfirmed
     </select>
 
-    <select id="countByType" resultType="map">
+    <select id="countByType" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
         SELECT event_type_flag::text AS key, COUNT(*) AS count
         FROM (
             SELECT event_type_flag FROM dc3_device_event
@@ -98,7 +98,7 @@
         have no point_id, so we project literal 0 to line up with the
         device branch's schema.
     -->
-    <select id="latest" resultType="map">
+    <select id="latest" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow">
         SELECT *
         FROM ((SELECT id,
                       'device'                              AS source,
@@ -147,7 +147,7 @@
         at hour boundaries; service layer then spreads rows into a fixed-
         length sparkline array anchored to "now - 24h".
     -->
-    <select id="hourlyCounts" resultType="map">
+    <select id="hourlyCounts" resultType="io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow">
         SELECT date_trunc('hour', create_time) AS bucket, COUNT(*) AS count
         FROM (SELECT create_time
               FROM dc3_device_event
@@ -171,7 +171,7 @@
         table (faster); otherwise UNION ALL across both with consistent
         shape. Inner LIMIT keeps each branch bounded before UNION.
     -->
-    <select id="listPaged" resultType="map">
+    <select id="listPaged" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow">
         SELECT * FROM (
         <choose>
             <when test="source == 'device'">
@@ -254,7 +254,7 @@
     <!--
         Today's ALARM counts per source (event_type_flag = 1, create_time >= start of today).
     -->
-    <select id="todayBySource" resultType="map">
+    <select id="todayBySource" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow">
         SELECT 'device'                          AS source,
                (SELECT COUNT(*)
                 FROM dc3_device_event
@@ -316,7 +316,7 @@
         Daily event trend: per-day counts split by source, over a window
         starting at {from}. Returns (date, device_count, driver_count).
     -->
-    <select id="dailyTrend" resultType="map">
+    <select id="dailyTrend" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow">
         SELECT date ::text AS date, device_count,
                driver_count
         FROM (SELECT d.day                AS date,
@@ -345,7 +345,7 @@
         Top event sources by alarm count, across device + driver tables.
         Returns (source, source_id, count) ordered by count DESC.
     -->
-    <select id="topSources" resultType="map">
+    <select id="topSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow">
         SELECT *
         FROM ((SELECT 'device' AS source, device_id AS source_id, COUNT(*) AS count
                FROM dc3_device_event
@@ -374,7 +374,7 @@
         ALARM counts bucketed by (day-of-week, hour-of-day). Service zero-pads
         missing cells so the UI always gets a fully-filled 7×24 grid.
     -->
-    <select id="activityHeatmap" resultType="map">
+    <select id="activityHeatmap" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow">
         SELECT dow, hour, SUM(count) AS count
         FROM (SELECT EXTRACT(DOW FROM create_time)::int AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS count
               FROM dc3_device_event
@@ -399,8 +399,8 @@
         store their type under the same JSON key (see DriverEventServiceImpl
         and DeviceEventServiceImpl), so we can union them before grouping.
     -->
-    <select id="typeDistribution" resultType="map">
-        SELECT type, SUM(count) AS count
+    <select id="typeDistribution" resultType="io.github.pnoker.common.data.entity.bo.dashboard.BucketRow">
+        SELECT type AS key, SUM(count) AS count
         FROM (SELECT event_ext ->> 'type' AS type, COUNT(*) AS count
               FROM dc3_device_event
               WHERE deleted = 0
@@ -426,7 +426,7 @@
         COUNT(*) >= minCount filters out ordinary sources so the operator
         only sees the ones deserving immediate attention.
     -->
-    <select id="stormSources" resultType="map">
+    <select id="stormSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow">
         SELECT *
         FROM ((SELECT 'device' AS source, device_id AS source_id, COUNT(*) AS count
                FROM dc3_device_event
@@ -461,7 +461,7 @@
         flag itself in case HEARTBEAT(0) / state-change rows are useful
         later — service passes minCount so small real groups are filtered.
     -->
-    <select id="flappingSources" resultType="map">
+    <select id="flappingSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.FlappingRow">
         SELECT *
         FROM ((SELECT 'device' AS source, device_id AS source_id, event_type_flag, COUNT(*) AS count
                FROM dc3_device_event
@@ -489,7 +489,7 @@
         sources (otherwise it's just "this source had 2 events in a row",
         which is already flapping). Expensive query: service should cache.
     -->
-    <select id="correlationPairs" resultType="map">
+    <select id="correlationPairs" resultType="io.github.pnoker.common.data.entity.bo.dashboard.CorrelationPairRow">
         WITH ev AS (SELECT 'device'::text AS source, device_id AS source_id, event_type_flag, create_time, id
                     FROM dc3_device_event
                     WHERE deleted = 0
@@ -525,7 +525,7 @@
         compute per-profile medians in the service layer.
         Only device events matter here (drivers don't bind profiles).
     -->
-    <select id="peerAlarmCounts" resultType="map">
+    <select id="peerAlarmCounts" resultType="io.github.pnoker.common.data.entity.bo.dashboard.PeerAlarmRow">
         SELECT pb.profile_id AS profile_id,
                de.device_id  AS device_id,
                COUNT(*)      AS alarm_count
@@ -545,7 +545,7 @@
         Aging backlog: unconfirmed rows bucketed by how long they've been
         open. Both event tables contribute; return one row with 4 counts.
     -->
-    <select id="agingBuckets" resultType="map">
+    <select id="agingBuckets" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow">
         SELECT COALESCE(SUM(CASE WHEN age &lt; INTERVAL '1 hour' THEN 1 ELSE 0 END), 0)                                    AS under_1h,
                COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '1 hour' AND age &lt; INTERVAL '6 hours' THEN 1 ELSE 0 END), 0)   AS h1_to_6,
                COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '6 hours' AND age &lt; INTERVAL '24 hours' THEN 1 ELSE 0 END), 0) AS h6_to_24,
@@ -571,7 +571,7 @@
         diff is the ack latency (assuming no other updates, which matches
         the current app behaviour).
     -->
-    <select id="mttaByDay" resultType="map">
+    <select id="mttaByDay" resultType="io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow">
         SELECT to_char(DATE(create_time), 'YYYY-MM-DD')                                                              AS date,
                PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000)  AS p50_ms,
                PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000) AS p95_ms,
@@ -598,7 +598,7 @@
         Cross-schema to dc3_manager because the driver/device tables live
         there but the data service is the one exposing the dashboard API.
     -->
-    <select id="protocolHealth" resultType="map">
+    <select id="protocolHealth" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ProtocolHealthRow">
         SELECT d.service_name                                            AS service_name,
                COUNT(DISTINCT d.id)                                      AS driver_count,
                COUNT(DISTINCT CASE WHEN d.enable_flag = 1 THEN d.id END) AS enabled_count,
@@ -619,7 +619,7 @@
         is the "was edited after creation" test — PostgreSQL comparisons on
         timestamptz handle DST / time-zone correctly.
     -->
-    <select id="recentChanges" resultType="map">
+    <select id="recentChanges" resultType="io.github.pnoker.common.data.entity.bo.dashboard.RecentChangeRow">
         SELECT kind, id AS entity_id, operate_time
         FROM (SELECT 'driver'::text AS kind, id, operate_time, create_time
               FROM dc3_manager.dc3_driver

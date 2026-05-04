@@ -47,7 +47,7 @@
         dc3_history. Qualifying the function keeps the session
         search_path single-purpose instead of pulling public in.
     -->
-    <select id="timeseries" resultType="map">
+    <select id="timeseries" resultType="io.github.pnoker.common.data.entity.bo.dashboard.TimeBucketRow">
         SELECT public.time_bucket(INTERVAL '${bucket}', create_time) AS bucket,
                COUNT(*)                                              AS count
         FROM v_dc3_point_value_all
@@ -63,7 +63,7 @@
         against a whitelist (device_id / point_id / driver_id) — never accept
         user input.
     -->
-    <select id="top" resultType="map">
+    <select id="top" resultType="io.github.pnoker.common.data.entity.bo.dashboard.EntityCountRow">
         SELECT ${dimension} AS entity_id,
                COUNT(*)     AS count
         FROM v_dc3_point_value_all
@@ -80,7 +80,7 @@
         wrapped in parentheses to participate in UNION ALL (Postgres rule).
         Inner LIMITs cap per-type reads so we never scan a full hypertable.
     -->
-    <select id="latestStream" resultType="map">
+    <select id="latestStream" resultType="io.github.pnoker.common.data.entity.bo.dashboard.LatestPointValueRow">
         SELECT *
         FROM ((SELECT tenant_id,
                       device_id,
@@ -168,7 +168,7 @@
         latency in milliseconds. Fixed six-bucket layout matches the UI
         labels (&lt;100ms, 100-500ms, 500ms-1s, 1-5s, 5-30s, &gt;=30s).
     -->
-    <select id="latencyHistogram" resultType="map">
+    <select id="latencyHistogram" resultType="io.github.pnoker.common.data.entity.bo.dashboard.LatencyBinRow">
         SELECT bin, COUNT(*) AS count
         FROM (SELECT CASE
                          WHEN diff_ms &lt; 100 THEN 0
@@ -192,7 +192,7 @@
         emitted for (dow, hour) pairs that had data; the frontend fills in
         the missing cells as zero.
     -->
-    <select id="hourlyActivity" resultType="map">
+    <select id="hourlyActivity" resultType="io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow">
         SELECT EXTRACT(DOW FROM create_time)::int AS dow, EXTRACT(HOUR FROM create_time)::int AS hour, COUNT(*) AS count
         FROM v_dc3_point_value_all
         WHERE create_time &gt;= #{from}
@@ -214,7 +214,7 @@
         keeps fresh-install points (never reported) out — those belong in
         coverage-gap, not silence.
     -->
-    <select id="silentSources" resultType="map">
+    <select id="silentSources" resultType="io.github.pnoker.common.data.entity.bo.dashboard.SilentSourceRow">
         SELECT device_id, point_id, MAX(create_time) AS last_seen
         FROM v_dc3_point_value_all
         WHERE tenant_id = #{tenantId}
@@ -231,7 +231,7 @@
         Cross-schema qualification is fine because the same user owns
         both schemas and dynamic datasource only sets search_path.
     -->
-    <select id="coverageGapItems" resultType="map">
+    <select id="coverageGapItems" resultType="io.github.pnoker.common.data.entity.bo.dashboard.CoverageGapRow">
         SELECT p.id AS point_id, p.profile_id AS profile_id
         FROM dc3_manager.dc3_point p
         WHERE p.deleted = 0
