@@ -208,23 +208,17 @@ public class DashboardController implements BaseController {
     }
 
     @org.springframework.web.bind.annotation.PostMapping("/alert/page")
-    public Mono<R<Map<String, Object>>> alertPage(
-            @org.springframework.web.bind.annotation.RequestBody(required = false) Map<String, Object> body) {
+    public Mono<R<com.baomidou.mybatisplus.extension.plugins.pagination.Page<AlertItemVO>>> alertPage(
+            @org.springframework.web.bind.annotation.RequestBody(required = false) io.github.pnoker.common.data.entity.query.AlertPageQuery query) {
         return getTenantId().flatMap(tenantId -> {
             try {
-                Map<String, Object> b = body == null ? new HashMap<>() : body;
-                String source = b.get("source") == null ? null : b.get("source").toString();
-                Integer typeFlag = b.get("eventTypeFlag") == null ? null :
-                        Integer.parseInt(b.get("eventTypeFlag").toString());
-                Integer confirmFlag = b.get("confirmFlag") == null ? null :
-                        Integer.parseInt(b.get("confirmFlag").toString());
-                Integer rangeHours = b.get("rangeHours") == null ? null :
-                        Integer.parseInt(b.get("rangeHours").toString());
-                String rangeKey = b.get("rangeKey") == null ? null : b.get("rangeKey").toString();
-                java.time.LocalDateTime from = TimeRangeUtil.resolveFrom(rangeKey, rangeHours);
-                long current = b.get("current") == null ? 1L : Long.parseLong(b.get("current").toString());
-                long size = b.get("size") == null ? 20L : Long.parseLong(b.get("size").toString());
-                return Mono.just(R.ok(dashboardService.alertPage(tenantId, source, typeFlag, confirmFlag, from, current, size)));
+                io.github.pnoker.common.data.entity.query.AlertPageQuery q =
+                        query == null ? new io.github.pnoker.common.data.entity.query.AlertPageQuery() : query;
+                java.time.LocalDateTime from = TimeRangeUtil.resolveFrom(q.getRangeKey(), q.getRangeHours());
+                long current = q.getCurrent() == null ? 1L : q.getCurrent();
+                long size = q.getSize() == null ? 20L : q.getSize();
+                return Mono.just(R.ok(dashboardService.alertPage(
+                        tenantId, q.getSource(), q.getEventTypeFlag(), q.getConfirmFlag(), from, current, size)));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 return Mono.just(R.fail(e.getMessage()));

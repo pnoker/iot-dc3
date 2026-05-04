@@ -16,20 +16,31 @@
 
 package io.github.pnoker.common.data.mapper;
 
+import io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.BucketRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.CorrelationPairRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.FlappingRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.PeerAlarmRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.ProtocolHealthRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.RecentChangeRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Alert aggregation queries over {@code dc3_device_event} and
- * {@code dc3_driver_event}. Both tables live in the master data source (not
- * Timescale hypertables) and carry a {@code tenant_id} column; all queries
- * are tenant-scoped.
- *
- * <p>SQL lives in {@code resources/mapping/AlertMapper.xml}.</p>
+ * Alert aggregate queries over {@code dc3_device_event} and
+ * {@code dc3_driver_event}. Returns typed Row DTOs — see
+ * {@code entity/bo/dashboard/} — with MyBatis snake→camel mapping.
  *
  * @author pnoker
  * @since 2026.5.2
@@ -37,49 +48,24 @@ import java.util.Map;
 @Mapper
 public interface AlertMapper {
 
-    /**
-     * Overall counters for the alert stat card, scoped to one tenant.
-     */
-    Map<String, Object> countAll(@Param("tenantId") Long tenantId);
+    AlertCountersRow countAll(@Param("tenantId") Long tenantId);
 
-    /**
-     * Per-type breakdown across both event tables. event_type_flag is a
-     * SMALLINT; we group on it and return (key, count) rows.
-     */
-    List<Map<String, Object>> countByType(@Param("tenantId") Long tenantId);
+    List<BucketRow> countByType(@Param("tenantId") Long tenantId);
 
-    /**
-     * Per-source (device / driver) alert counts, scoped to one tenant.
-     * Returns rows with (source, total, unconfirmed).
-     */
-    List<Map<String, Object>> countBySource(@Param("tenantId") Long tenantId);
+    List<SourceStatsRow> countBySource(@Param("tenantId") Long tenantId);
 
-    /**
-     * Most recent N events across device + driver tables, flagged with source.
-     */
-    List<Map<String, Object>> latest(@Param("tenantId") Long tenantId, @Param("limit") int limit);
+    List<AlertItemRow> latest(@Param("tenantId") Long tenantId, @Param("limit") int limit);
 
-    /**
-     * Event counts grouped by the hour bucket they fall into, over a window
-     * starting at {@code from}. Service layer aligns the returned rows to a
-     * fixed-length sparkline array.
-     */
-    List<Map<String, Object>> hourlyCounts(@Param("tenantId") Long tenantId,
-                                           @Param("from") LocalDateTime from);
+    List<HourCountRow> hourlyCounts(@Param("tenantId") Long tenantId,
+                                    @Param("from") LocalDateTime from);
 
-    /**
-     * Paged event list across device + driver event tables, filterable by
-     * source / event type / confirm flag. Backs the settings / events page.
-     * {@code source} is {@code null} (both tables), {@code "device"}, or
-     * {@code "driver"}. Service layer whitelists it before the call.
-     */
-    List<Map<String, Object>> listPaged(@Param("tenantId") Long tenantId,
-                                        @Param("source") String source,
-                                        @Param("eventTypeFlag") Integer eventTypeFlag,
-                                        @Param("confirmFlag") Integer confirmFlag,
-                                        @Param("from") LocalDateTime from,
-                                        @Param("offset") long offset,
-                                        @Param("size") long size);
+    List<AlertItemRow> listPaged(@Param("tenantId") Long tenantId,
+                                 @Param("source") String source,
+                                 @Param("eventTypeFlag") Integer eventTypeFlag,
+                                 @Param("confirmFlag") Integer confirmFlag,
+                                 @Param("from") LocalDateTime from,
+                                 @Param("offset") long offset,
+                                 @Param("size") long size);
 
     long countFiltered(@Param("tenantId") Long tenantId,
                        @Param("source") String source,
@@ -87,117 +73,58 @@ public interface AlertMapper {
                        @Param("confirmFlag") Integer confirmFlag,
                        @Param("from") LocalDateTime from);
 
-    /**
-     * Today's ALARM counts per source (device / driver), scoped to one tenant.
-     * Returns rows with (source, total, unconfirmed).
-     */
-    List<Map<String, Object>> todayBySource(@Param("tenantId") Long tenantId,
-                                            @Param("from") LocalDateTime from);
+    List<SourceStatsRow> todayBySource(@Param("tenantId") Long tenantId,
+                                        @Param("from") LocalDateTime from);
 
     int confirmOne(@Param("tenantId") Long tenantId,
                    @Param("source") String source,
                    @Param("id") Long id);
 
-    /**
-     * Flip confirm_flag back to 0 (undo). Same scoping as {@link #confirmOne}.
-     */
     int unconfirmOne(@Param("tenantId") Long tenantId,
                      @Param("source") String source,
                      @Param("id") Long id);
 
-    /**
-     * Daily event counts split by device/driver source, starting from {@code from}.
-     * Returns rows with (date, device_count, driver_count).
-     */
-    List<Map<String, Object>> dailyTrend(@Param("tenantId") Long tenantId,
-                                         @Param("from") LocalDateTime from);
+    List<AlertTrendRow> dailyTrend(@Param("tenantId") Long tenantId,
+                                   @Param("from") LocalDateTime from);
 
-    /**
-     * Top N event sources by alarm count, starting from {@code from}.
-     * Returns rows with (source, source_id, count).
-     */
-    List<Map<String, Object>> topSources(@Param("tenantId") Long tenantId,
-                                         @Param("from") LocalDateTime from,
-                                         @Param("limit") int limit);
+    List<SourceCountRow> topSources(@Param("tenantId") Long tenantId,
+                                    @Param("from") LocalDateTime from,
+                                    @Param("limit") int limit);
 
-    /**
-     * ALARM counts bucketed by (day-of-week 0..6, hour-of-day 0..23) over
-     * the window starting at {@code from}. Used by the event-overview
-     * hourly heatmap. Returns rows with (dow, hour, count).
-     */
-    List<Map<String, Object>> activityHeatmap(@Param("tenantId") Long tenantId,
-                                              @Param("from") LocalDateTime from);
+    List<ActivityCellRow> activityHeatmap(@Param("tenantId") Long tenantId,
+                                          @Param("from") LocalDateTime from);
 
-    /**
-     * ALARM counts grouped by the {@code event_ext.type} tag (e.g.
-     * driver-offline / driver-state-flip / driver-alarm / device-offline /
-     * device-alarm) over the window starting at {@code from}. Used by the
-     * event-overview type-distribution pie. Returns rows with (type, count).
-     */
-    List<Map<String, Object>> typeDistribution(@Param("tenantId") Long tenantId,
-                                               @Param("from") LocalDateTime from);
+    List<BucketRow> typeDistribution(@Param("tenantId") Long tenantId,
+                                     @Param("from") LocalDateTime from);
 
-    /**
-     * Sources whose ALARM count within the window reaches {@code minCount},
-     * ordered by count desc. "Storm" sources the operator should look at
-     * first. Returns rows with (source, source_id, count).
-     */
-    List<Map<String, Object>> stormSources(@Param("tenantId") Long tenantId,
-                                           @Param("from") LocalDateTime from,
-                                           @Param("minCount") int minCount,
-                                           @Param("limit") int limit);
+    List<SourceCountRow> stormSources(@Param("tenantId") Long tenantId,
+                                      @Param("from") LocalDateTime from,
+                                      @Param("minCount") int minCount,
+                                      @Param("limit") int limit);
 
-    // ===== Phase-2 insights =====================================================
+    // ===== Phase-2 insights ====================================================
 
-    /**
-     * (source, source_id, event_type, count) GROUP BY source+sourceId+eventType HAVING count >= minCount.
-     */
-    List<Map<String, Object>> flappingSources(@Param("tenantId") Long tenantId,
+    List<FlappingRow> flappingSources(@Param("tenantId") Long tenantId,
+                                      @Param("from") LocalDateTime from,
+                                      @Param("minCount") int minCount,
+                                      @Param("limit") int limit);
+
+    List<CorrelationPairRow> correlationPairs(@Param("tenantId") Long tenantId,
                                               @Param("from") LocalDateTime from,
-                                              @Param("minCount") int minCount,
+                                              @Param("windowSec") int windowSec,
                                               @Param("limit") int limit);
 
-    /**
-     * Co-occurring event pairs within a time window. Self-join on time
-     * proximity; returns the TOP {@code limit} pairs ordered by coCount.
-     */
-    List<Map<String, Object>> correlationPairs(@Param("tenantId") Long tenantId,
-                                               @Param("from") LocalDateTime from,
-                                               @Param("windowSec") int windowSec,
-                                               @Param("limit") int limit);
+    List<PeerAlarmRow> peerAlarmCounts(@Param("tenantId") Long tenantId,
+                                       @Param("from") LocalDateTime from);
 
-    /**
-     * Per-(profile, device) alarm counts joined via dc3_manager.dc3_profile_bind
-     * (cross-schema). Service layer computes the per-profile median and ratios
-     * to flag outlier devices.
-     */
-    List<Map<String, Object>> peerAlarmCounts(@Param("tenantId") Long tenantId,
-                                              @Param("from") LocalDateTime from);
+    AgingBucketRow agingBuckets(@Param("tenantId") Long tenantId);
 
-    /**
-     * Four bucket counts: &lt;1h, 1-6h, 6-24h, &gt;=24h. Uses confirm_flag=0 rows.
-     */
-    Map<String, Object> agingBuckets(@Param("tenantId") Long tenantId);
+    List<MttaTrendRow> mttaByDay(@Param("tenantId") Long tenantId,
+                                 @Param("from") LocalDateTime from);
 
-    /**
-     * Per-day confirmed-event MTTA percentiles over the last {@code days}
-     * days. (operate_time - create_time) in ms; confirm_flag=1 rows only.
-     */
-    List<Map<String, Object>> mttaByDay(@Param("tenantId") Long tenantId,
-                                        @Param("from") LocalDateTime from);
+    List<ProtocolHealthRow> protocolHealth(@Param("tenantId") Long tenantId);
 
-    /**
-     * Driver-service rollup via cross-schema to dc3_manager.dc3_driver and
-     * dc3_manager.dc3_device. Returns (service_name, driver_count, enabled_count, device_count).
-     */
-    List<Map<String, Object>> protocolHealth(@Param("tenantId") Long tenantId);
-
-    /**
-     * Config-change events across driver/device/profile tables in the last
-     * {@code days} days. (operate_time differs from create_time → row was
-     * edited post-creation.)
-     */
-    List<Map<String, Object>> recentChanges(@Param("tenantId") Long tenantId,
-                                            @Param("from") LocalDateTime from,
-                                            @Param("limit") int limit);
+    List<RecentChangeRow> recentChanges(@Param("tenantId") Long tenantId,
+                                        @Param("from") LocalDateTime from,
+                                        @Param("limit") int limit);
 }
