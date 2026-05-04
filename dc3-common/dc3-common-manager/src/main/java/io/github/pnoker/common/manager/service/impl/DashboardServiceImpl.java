@@ -21,6 +21,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.enums.DriverTypeFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.manager.constant.TopologyLimits;
 import io.github.pnoker.common.manager.entity.vo.dashboard.*;
 import io.github.pnoker.common.manager.mapper.DashboardMapper;
 import io.github.pnoker.common.manager.service.DashboardService;
@@ -28,7 +29,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,29 +42,12 @@ import java.util.*;
 @Service
 public class DashboardServiceImpl implements DashboardService {
 
-    /**
-     * Server-side Top-N caps. Tightened here so payload + render cost stay
-     * bounded on large tenants. Orders of magnitude:
-     * worst-case nodes ≈ TOP_DRIVERS + TOP_DEVICES + |bound profiles| +
-     * (TOP_POINTS_PER_PROFILE × |bound profiles|) + Others
-     * ≈ 10 + 20 + ~30 + 15×30 + ~20 ≈ 530 (G2 sankey comfortable).
-     */
-    private static final int TOP_DRIVERS = 10;
-    private static final int TOP_DEVICES = 20;
-    private static final int TOP_POINTS_PER_PROFILE = 15;
+    // Top-N caps, mode / range literals and cache sizing all live in
+    // {@link TopologyLimits} — tuning them is a single-line change there.
 
-    // ---- internal helpers -----------------------------------------------
-    private static final String MODE_VOLUME = "volume";
-    private static final String MODE_CARDINALITY = "cardinality";
-    /**
-     * 60s TTL is long enough to hide UI spam refresh bursts but short enough
-     * that edits to drivers / devices / points surface on the next natural
-     * poll. Cap at 200 entries so a busy multi-tenant instance doesn't bloat
-     * heap — each (tenant × mode × rangeKey) triple is one entry.
-     */
     private final Cache<String, TopologyVO> topologyCache = Caffeine.newBuilder()
-            .expireAfterWrite(Duration.ofSeconds(60))
-            .maximumSize(200)
+            .expireAfterWrite(Duration.ofSeconds(TopologyLimits.CACHE_TTL_SECONDS))
+            .maximumSize(TopologyLimits.CACHE_MAX_SIZE)
             .build();
     @Resource
     private DashboardMapper dashboardMapper;
@@ -152,29 +135,30 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private static String normaliseRange(String rangeKey) {
-        if (rangeKey == null || rangeKey.isBlank()) return "7d";
+        if (rangeKey == null || rangeKey.isBlank()) return TopologyLimits.RANGE_DEFAULT;
         return switch (rangeKey) {
-            case "today", "24h", "7d", "30d" -> rangeKey;
-            default -> "7d";
+            case TopologyLimits.RANGE_TODAY, TopologyLimits.RANGE_24H,
+                 TopologyLimits.RANGE_7D, TopologyLimits.RANGE_30D -> rangeKey;
+            default -> TopologyLimits.RANGE_DEFAULT;
         };
     }
 
     private static LocalDateTime fromOfRange(String rangeKey) {
         LocalDateTime now = LocalDateTime.now();
         return switch (rangeKey) {
-            case "today" -> now.toLocalDate().atStartOfDay();
-            case "24h" -> now.minusHours(24);
-            case "30d" -> now.minusDays(30);
+            case TopologyLimits.RANGE_TODAY -> now.toLocalDate().atStartOfDay();
+            case TopologyLimits.RANGE_24H -> now.minusHours(24);
+            case TopologyLimits.RANGE_30D -> now.minusDays(30);
             default -> now.minusDays(7);
         };
     }
 
     private static String rangeLabel(String rangeKey) {
         return switch (rangeKey) {
-            case "today" -> "Today";
-            case "24h" -> "24h";
-            case "30d" -> "30d";
-            default -> "7d";
+            case TopologyLimits.RANGE_TODAY -> "Today";
+            case TopologyLimits.RANGE_24H -> TopologyLimits.RANGE_24H;
+            case TopologyLimits.RANGE_30D -> TopologyLimits.RANGE_30D;
+            default -> TopologyLimits.RANGE_DEFAULT;
         };
     }
 
@@ -271,7 +255,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public TopologyVO topology(Long tenantId, String mode, String rangeKey) {
-        String normMode = MODE_VOLUME.equalsIgnoreCase(mode) ? MODE_VOLUME : MODE_CARDINALITY;
+        String normMode = TopologyLimits.MODE_VOLUME.equalsIgnoreCase(mode) ? TopologyLimits.MODE_VOLUME : TopologyLimits.MODE_CARDINALITY;
         String normRange = normaliseRange(rangeKey);
         String cacheKey = tenantId + ":" + normMode + ":" + normRange;
         TopologyVO hit = topologyCache.getIfPresent(cacheKey);
@@ -284,7 +268,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     private TopologyVO computeTopology(Long tenantId, String mode, String rangeKey) {
         TopologyVO out = new TopologyVO();
-        boolean volumeMode = MODE_VOLUME.equals(mode);
+        boolean volumeMode = TopologyLimits.MODE_VOLUME.equals(mode);
 
         // ---- Fetch metadata (tenant-wide) --------------------------------
         // Pull everything up-front — cardinality over metadata is small, and
@@ -434,8 +418,8 @@ public class DashboardServiceImpl implements DashboardService {
 
         // ---- Crop Top-N drivers ----------------------------------------
         activeDrivers.sort(cmpByMap(driverWeight, v -> toLong(v.get("id"))));
-        List<Map<String, Object>> topDrivers = activeDrivers.size() > TOP_DRIVERS
-                ? activeDrivers.subList(0, TOP_DRIVERS)
+        List<Map<String, Object>> topDrivers = activeDrivers.size() > TopologyLimits.TOP_DRIVERS
+                ? activeDrivers.subList(0, TopologyLimits.TOP_DRIVERS)
                 : activeDrivers;
         Set<Long> topDriverIds = new LinkedHashSet<>();
         for (Map<String, Object> r : topDrivers) topDriverIds.add(toLong(r.get("id")));
@@ -448,8 +432,8 @@ public class DashboardServiceImpl implements DashboardService {
             filteredDevices.add(r);
         }
         filteredDevices.sort(cmpByMap(deviceWeight, v -> toLong(v.get("id"))));
-        List<Map<String, Object>> topDevices = filteredDevices.size() > TOP_DEVICES
-                ? filteredDevices.subList(0, TOP_DEVICES)
+        List<Map<String, Object>> topDevices = filteredDevices.size() > TopologyLimits.TOP_DEVICES
+                ? filteredDevices.subList(0, TopologyLimits.TOP_DEVICES)
                 : filteredDevices;
         Set<Long> topDeviceIdSet = new LinkedHashSet<>();
         for (Map<String, Object> r : topDevices) topDeviceIdSet.add(toLong(r.get("id")));
@@ -579,7 +563,7 @@ public class DashboardServiceImpl implements DashboardService {
                 allPoints.sort(Comparator.comparingLong((Map<String, Object> r) -> toLong(r.get("id"))).reversed());
             }
 
-            int keep = Math.min(TOP_POINTS_PER_PROFILE, allPoints.size());
+            int keep = Math.min(TopologyLimits.TOP_POINTS_PER_PROFILE, allPoints.size());
             for (int i = 0; i < keep; i++) {
                 Map<String, Object> r = allPoints.get(i);
                 Long id = toLong(r.get("id"));
