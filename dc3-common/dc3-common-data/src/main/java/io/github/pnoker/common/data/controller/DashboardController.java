@@ -378,4 +378,128 @@ public class DashboardController implements BaseController {
             }
         });
     }
+
+    // ===== Phase-2 insights =====================================================
+
+    @GetMapping("/alert/flapping")
+    public Mono<R<List<FlappingSourceVO>>> alertFlapping(
+            @RequestParam(value = "hours", defaultValue = "6") int hours,
+            @RequestParam(value = "minCount", defaultValue = "5") int minCount,
+            @RequestParam(value = "limit", defaultValue = "20") int limit) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertFlapping(tenantId, hours, minCount, limit)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/alert/correlation")
+    public Mono<R<List<CorrelationPairVO>>> alertCorrelation(
+            @RequestParam(value = "hours", defaultValue = "24") int hours,
+            @RequestParam(value = "windowSec", defaultValue = "30") int windowSec,
+            @RequestParam(value = "limit", defaultValue = "15") int limit) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertCorrelation(tenantId, hours, windowSec, limit)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/alert/peer-deviation")
+    public Mono<R<List<PeerDeviationVO>>> alertPeerDeviation(
+            @RequestParam(value = "days", defaultValue = "7") int days) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertPeerDeviation(tenantId, days)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/alert/aging")
+    public Mono<R<AgingBacklogVO>> alertAging() {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertAgingBacklog(tenantId)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/alert/mtta")
+    public Mono<R<List<MttaTrendVO>>> alertMtta(
+            @RequestParam(value = "days", defaultValue = "30") int days) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.alertMtta(tenantId, days)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/protocol/health")
+    public Mono<R<List<ProtocolHealthVO>>> protocolHealth() {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.protocolHealth(tenantId)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/alert/change-impact")
+    public Mono<R<List<ChangeImpactVO>>> changeImpact(
+            @RequestParam(value = "days", defaultValue = "30") int days,
+            @RequestParam(value = "limit", defaultValue = "30") int limit) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.changeImpact(tenantId, days, limit)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/silent/sources")
+    public Mono<R<List<SilentSourceVO>>> silentSources(
+            @RequestParam(value = "baselineDays", defaultValue = "7") int baselineDays,
+            @RequestParam(value = "silentMinutes", defaultValue = "15") int silentMinutes,
+            @RequestParam(value = "limit", defaultValue = "50") int limit) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.silentSources(tenantId, baselineDays, silentMinutes, limit)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
+
+    @GetMapping("/coverage/gap")
+    public Mono<R<CoverageGapVO>> coverageGap(
+            @RequestParam(value = "limit", defaultValue = "100") int limit) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.coverageGap(tenantId, limit)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 }
