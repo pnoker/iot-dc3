@@ -119,7 +119,11 @@
   const ensureChart = () => {
     if (!chartRef.value) return;
     if (chart) return;
-    chart = new Chart({ container: chartRef.value, autoFit: true, height: 360 });
+    // No hardcoded height — let G2 take the container's clientHeight via
+    // autoFit. The body shrank from 360 → 340 to make room for the caption
+    // row above, so a fixed 360 would paint 20px beyond the visible area
+    // and clip the bottom of each chart.
+    chart = new Chart({ container: chartRef.value, autoFit: true });
   };
 
   // Entity id → display name caches so top-N charts render labels, not ids.
