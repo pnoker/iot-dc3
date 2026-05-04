@@ -44,13 +44,9 @@
     </el-aside>
     <el-main class="settings-main">
       <router-view />
-      <!-- Settings sub-pages scroll inside el-main (overflow:auto), so
-           the Layout-level <el-backtop> that listens on
-           .body .el-scrollbar__wrap never triggers here. Add a second
-           backtop scoped to .settings-main so Menu / User / Event
-           Overview / About all get the same "back to top" affordance
-           as the rest of the site. -->
-      <el-backtop :right="40" :bottom="40" target=".settings-main" />
+      <!-- No backtop here: .settings-main is no longer a scroll container
+           (see overflow override below), so the Layout-level <el-backtop>
+           on .body .el-scrollbar__wrap handles all settings sub-pages. -->
     </el-main>
   </el-container>
 </template>
@@ -176,5 +172,13 @@
 
   .settings-main {
     padding: 0;
+    // el-main ships with overflow:auto by design (aside-doesn't-scroll,
+    // main-scrolls layout). We don't want that here — the Layout-level
+    // el-scrollbar already owns page scrolling, and an additional auto
+    // overflow on main gave flex-row a 1px rounding window where a ghost
+    // scrollbar would appear, consuming wheel events whenever the cursor
+    // hovered any settings card. Reset to visible so wheel always reaches
+    // the Layout scrollbar above.
+    overflow: visible;
   }
 </style>
