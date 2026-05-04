@@ -52,26 +52,25 @@
       </el-col>
     </el-row>
 
-    <!-- Row 3: live streaming data + recent alarms side-by-side — the two
-         "what's happening right now" widgets pair naturally. -->
+    <!-- Row 3: trend chart + the two live widgets packed at 4:1:1 —
+         Data Ingestion Trend still gets the bulk of the width for a
+         readable time series, while Live Feed and Recent Alarms share
+         the remaining third as compact side columns. Narrow breakpoints
+         stack everything to full width so the side columns don't squeeze
+         below usability. -->
     <el-row :gutter="8" class="home__row">
-      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
+      <el-col :lg="16" :md="24" :sm="24" :xl="16" :xs="24" class="home__col">
+        <trend-chart />
+      </el-col>
+      <el-col :lg="4" :md="24" :sm="24" :xl="4" :xs="24" class="home__col">
         <live-data-feed :size="20" />
       </el-col>
-      <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
+      <el-col :lg="4" :md="24" :sm="24" :xl="4" :xs="24" class="home__col">
         <alert-list :size="10" />
       </el-col>
     </el-row>
 
-    <!-- Row 4: trend chart on its own row — time series benefits from
-         full width so the x-axis has room to breathe. -->
-    <el-row :gutter="8" class="home__row">
-      <el-col :span="24" class="home__col">
-        <trend-chart />
-      </el-col>
-    </el-row>
-
-    <!-- Row 5: latency histogram + hourly activity heatmap -->
+    <!-- Row 4: latency histogram + hourly activity heatmap -->
     <el-row :gutter="8" class="home__row">
       <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="home__col">
         <latency-chart />
