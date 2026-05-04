@@ -37,6 +37,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
+import static io.github.pnoker.common.data.constant.DashboardLimits.*;
+
 /**
  * @author pnoker
  * @since 2026.5.2
@@ -60,7 +62,7 @@ public class DashboardServiceImpl implements DashboardService {
     /**
      * Whitelist for the alert source parameter.
      */
-    private static final Set<String> ALERT_SOURCES = Set.of("device", "driver");
+    private static final Set<String> ALERT_SOURCES = Set.of(SOURCE_DEVICE, SOURCE_DRIVER);
 
     @Resource
     private DashboardMapper dashboardMapper;
@@ -110,7 +112,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<LatencyBucketVO> latencyHistogram(Long tenantId, int rangeHours) {
-        int hours = Math.max(1, Math.min(rangeHours, 24 * 90));
+        int hours = Math.max(1, Math.min(rangeHours, MAX_HOURS_90D));
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
         List<Map<String, Object>> rows = dashboardMapper.latencyHistogram(tenantId, from, to);
@@ -134,7 +136,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<ActivityCellVO> hourlyActivity(Long tenantId, int rangeHours) {
-        int hours = Math.max(1, Math.min(rangeHours, 24 * 90));
+        int hours = Math.max(1, Math.min(rangeHours, MAX_HOURS_90D));
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
         List<Map<String, Object>> rows = dashboardMapper.hourlyActivity(tenantId, from, to);
@@ -165,7 +167,7 @@ public class DashboardServiceImpl implements DashboardService {
         String src = source == null || source.isBlank() ? null
                 : (ALERT_SOURCES.contains(source) ? source : null);
         long clampedCurrent = Math.max(1L, current);
-        long clampedSize = Math.max(1L, Math.min(size, 200L));
+        long clampedSize = Math.max(1L, Math.min(size, MAX_PAGE_SIZE));
         long offset = (clampedCurrent - 1L) * clampedSize;
 
         long total = alertMapper.countFiltered(tenantId, src, eventTypeFlag, confirmFlag, from);
@@ -254,7 +256,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<TimeseriesPointVO> timeseries(Long tenantId, String granularity, int rangeHours) {
         String g = GRANULARITY.contains(granularity) ? granularity : "hour";
-        int hours = Math.max(1, Math.min(rangeHours, 24 * 90));
+        int hours = Math.max(1, Math.min(rangeHours, MAX_HOURS_90D));
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
         String bucket = "1 " + g;
@@ -276,8 +278,8 @@ public class DashboardServiceImpl implements DashboardService {
         if (column == null) {
             throw new IllegalArgumentException("Unsupported dimension: " + dimension);
         }
-        int clampedLimit = Math.max(1, Math.min(limit, 50));
-        int hours = Math.max(1, Math.min(rangeHours, 24 * 90));
+        int clampedLimit = Math.max(1, Math.min(limit, MAX_LIMIT));
+        int hours = Math.max(1, Math.min(rangeHours, MAX_HOURS_90D));
         LocalDateTime to = LocalDateTime.now();
         LocalDateTime from = to.minusHours(hours);
 
@@ -294,7 +296,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<LatestPointValueVO> latestStream(Long tenantId, int size) {
-        int clamped = Math.max(1, Math.min(size, 100));
+        int clamped = Math.max(1, Math.min(size, MAX_LIVE_SIZE));
         List<Map<String, Object>> rows = dashboardMapper.latestStream(tenantId, clamped);
         List<LatestPointValueVO> out = new ArrayList<>(rows.size());
         Set<Long> deviceIds = new HashSet<>();
@@ -413,7 +415,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertItemVO> alertLatest(Long tenantId, int size) {
-        int clamped = Math.max(1, Math.min(size, 50));
+        int clamped = Math.max(1, Math.min(size, MAX_LIMIT));
         List<Map<String, Object>> rows = alertMapper.latest(tenantId, clamped);
         List<AlertItemVO> out = new ArrayList<>(rows.size());
         for (Map<String, Object> row : rows) {
@@ -433,7 +435,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertTrendVO> alertTrend(Long tenantId, int days) {
-        int clamped = Math.max(1, Math.min(days, 90));
+        int clamped = Math.max(1, Math.min(days, MAX_DAYS));
         LocalDateTime from = LocalDate.now().minusDays(clamped).atTime(LocalTime.MIN);
         List<Map<String, Object>> rows = alertMapper.dailyTrend(tenantId, from);
         List<AlertTrendVO> out = new ArrayList<>(rows.size());
@@ -449,8 +451,8 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertTopSourceVO> alertTopSources(Long tenantId, int days, int limit) {
-        int clampedDays = Math.max(1, Math.min(days, 90));
-        int clampedLimit = Math.max(1, Math.min(limit, 50));
+        int clampedDays = Math.max(1, Math.min(days, MAX_DAYS));
+        int clampedLimit = Math.max(1, Math.min(limit, MAX_LIMIT));
         LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
         List<Map<String, Object>> rows = alertMapper.topSources(tenantId, from, clampedLimit);
         List<AlertTopSourceVO> out = new ArrayList<>(rows.size());
@@ -466,7 +468,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertActivityCellVO> alertActivity(Long tenantId, int days) {
-        int clampedDays = Math.max(1, Math.min(days, 90));
+        int clampedDays = Math.max(1, Math.min(days, MAX_DAYS));
         LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
         List<Map<String, Object>> rows = alertMapper.activityHeatmap(tenantId, from);
         long[][] grid = new long[7][24];
@@ -493,7 +495,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertTypeBucketVO> alertTypeDistribution(Long tenantId, int days) {
-        int clampedDays = Math.max(1, Math.min(days, 90));
+        int clampedDays = Math.max(1, Math.min(days, MAX_DAYS));
         LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
         List<Map<String, Object>> rows = alertMapper.typeDistribution(tenantId, from);
         List<AlertTypeBucketVO> out = new ArrayList<>(rows.size());
@@ -508,9 +510,9 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<AlertTopSourceVO> alertStormSources(Long tenantId, int hours, int minCount, int limit) {
-        int clampedHours = Math.max(1, Math.min(hours, 24 * 30));
+        int clampedHours = Math.max(1, Math.min(hours, MAX_HOURS_30D));
         int clampedMin = Math.max(1, minCount);
-        int clampedLimit = Math.max(1, Math.min(limit, 50));
+        int clampedLimit = Math.max(1, Math.min(limit, MAX_LIMIT));
         LocalDateTime from = LocalDateTime.now().minusHours(clampedHours);
         List<Map<String, Object>> rows = alertMapper.stormSources(tenantId, from, clampedMin, clampedLimit);
         List<AlertTopSourceVO> out = new ArrayList<>(rows.size());
@@ -530,9 +532,9 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<FlappingSourceVO> alertFlapping(Long tenantId, int hours, int minCount, int limit) {
-        int h = Math.max(1, Math.min(hours, 24 * 7));
-        int min = Math.max(2, minCount);
-        int lim = Math.max(1, Math.min(limit, 50));
+        int h = Math.max(1, Math.min(hours, MAX_HOURS_7D));
+        int min = Math.max(MIN_FLAPPING_COUNT, minCount);
+        int lim = Math.max(1, Math.min(limit, MAX_LIMIT));
         LocalDateTime from = LocalDateTime.now().minusHours(h);
         List<Map<String, Object>> rows = alertMapper.flappingSources(tenantId, from, min, lim);
         List<FlappingSourceVO> out = new ArrayList<>(rows.size());
@@ -549,9 +551,9 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<CorrelationPairVO> alertCorrelation(Long tenantId, int hours, int windowSec, int limit) {
-        int h = Math.max(1, Math.min(hours, 24 * 7));
-        int w = Math.max(5, Math.min(windowSec, 300));
-        int lim = Math.max(1, Math.min(limit, 30));
+        int h = Math.max(1, Math.min(hours, MAX_HOURS_7D));
+        int w = Math.max(MIN_CORRELATION_WINDOW_SEC, Math.min(windowSec, MAX_CORRELATION_WINDOW_SEC));
+        int lim = Math.max(1, Math.min(limit, MAX_CORRELATION_PAIRS));
         LocalDateTime from = LocalDateTime.now().minusHours(h);
         List<Map<String, Object>> rows = alertMapper.correlationPairs(tenantId, from, w, lim);
         List<CorrelationPairVO> out = new ArrayList<>(rows.size());
@@ -571,7 +573,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<PeerDeviationVO> alertPeerDeviation(Long tenantId, int days) {
-        int d = Math.max(1, Math.min(days, 30));
+        int d = Math.max(1, Math.min(days, MAX_PEER_DAYS));
         LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
         List<Map<String, Object>> rows = alertMapper.peerAlarmCounts(tenantId, from);
 
@@ -625,7 +627,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<MttaTrendVO> alertMtta(Long tenantId, int days) {
-        int d = Math.max(1, Math.min(days, 90));
+        int d = Math.max(1, Math.min(days, MAX_DAYS));
         LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
         List<Map<String, Object>> rows = alertMapper.mttaByDay(tenantId, from);
         List<MttaTrendVO> out = new ArrayList<>(rows.size());
@@ -650,7 +652,6 @@ public class DashboardServiceImpl implements DashboardService {
             vo.setDriverCount(toLong(r.get("driver_count")));
             vo.setEnabledCount(toLong(r.get("enabled_count")));
             vo.setDeviceCount(toLong(r.get("device_count")));
-            vo.setSampleVolume(0L); // Phase-1: no pv rollup yet
             out.add(vo);
         }
         return out;
@@ -658,8 +659,8 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<ChangeImpactVO> changeImpact(Long tenantId, int days, int limit) {
-        int d = Math.max(1, Math.min(days, 90));
-        int lim = Math.max(1, Math.min(limit, 50));
+        int d = Math.max(1, Math.min(days, MAX_DAYS));
+        int lim = Math.max(1, Math.min(limit, MAX_LIMIT));
         LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
         List<Map<String, Object>> rows = alertMapper.recentChanges(tenantId, from, lim);
         List<ChangeImpactVO> out = new ArrayList<>(rows.size());
@@ -677,9 +678,9 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public List<SilentSourceVO> silentSources(Long tenantId, int baselineDays, int silentMinutes, int limit) {
-        int baseline = Math.max(1, Math.min(baselineDays, 30));
+        int baseline = Math.max(1, Math.min(baselineDays, MAX_BASELINE_DAYS));
         int silent = Math.max(5, Math.min(silentMinutes, 60 * 24));
-        int lim = Math.max(1, Math.min(limit, 200));
+        int lim = Math.max(1, Math.min(limit, MAX_COVERAGE_GAP_LIMIT));
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime from = now.minusDays(baseline);
@@ -706,7 +707,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public CoverageGapVO coverageGap(Long tenantId, int limit) {
-        int lim = Math.max(1, Math.min(limit, 200));
+        int lim = Math.max(1, Math.min(limit, MAX_COVERAGE_GAP_LIMIT));
         CoverageGapVO vo = new CoverageGapVO();
         vo.setTotalPoints(dashboardMapper.countPointsInTenant(tenantId));
         List<Map<String, Object>> rows = dashboardMapper.coverageGapItems(tenantId, lim);
