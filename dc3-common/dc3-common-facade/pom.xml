@@ -42,6 +42,7 @@
         <module>dc3-common-facade-api</module>
         <module>dc3-common-facade-grpc</module>
         <module>dc3-common-facade-local-auth</module>
+        <module>dc3-common-facade-local-data</module>
         <module>dc3-common-facade-local-manager</module>
         <module>dc3-common-facade-local</module>
     </modules>
