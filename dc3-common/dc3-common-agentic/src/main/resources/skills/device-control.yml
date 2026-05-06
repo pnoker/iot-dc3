@@ -1,0 +1,14 @@
+name: device-control
+description: "设备读写控制能力"
+enabled: true
+system-prompt-addition: |
+  当用户需要控制设备时，先确认操作意图，再执行读写指令。
+  写入操作前必须向用户确认目标值。
+tools:
+  - readPointValue
+  - writePointValue
+  - lookupDeviceById
+  - lookupPointById
+examples:
+  - user: "读取设备 1 的位号 2 的值"
+    assistant: "正在向设备 1 发送读取指令..."

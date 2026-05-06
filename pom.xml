@@ -73,7 +73,21 @@
 
         <!-- DC3 Version -->
         <dc3.version>2026.5.5</dc3.version>
+
+        <!-- Spring AI -->
+        <spring-ai.version>2.0.0-M5</spring-ai.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <modules>
         <module>dc3-api</module>
@@ -85,6 +99,15 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Spring AI BOM -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- DC3 Api Related -->
             <dependency>
                 <groupId>io.github.pnoker</groupId>
@@ -166,6 +189,11 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-facade-local-data</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-facade-local-manager</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
@@ -232,6 +260,11 @@
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-web</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-agentic</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
         </dependencies>

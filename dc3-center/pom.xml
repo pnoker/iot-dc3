@@ -67,6 +67,7 @@
 
     <modules>
         <module>dc3-center-single</module>
+        <module>dc3-center-agentic</module>
         <module>dc3-center-auth</module>
         <module>dc3-center-manager</module>
         <module>dc3-center-data</module>

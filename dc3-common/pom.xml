@@ -75,6 +75,7 @@
     </properties>
 
     <modules>
+        <module>dc3-common-agentic</module>
         <module>dc3-common-api</module>
         <module>dc3-common-auth</module>
         <module>dc3-common-constant</module>
@@ -237,6 +238,11 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-facade-local-data</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-facade-local-manager</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
@@ -298,6 +304,11 @@
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-web</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-common-agentic</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
         </dependencies>
