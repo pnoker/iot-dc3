@@ -68,3 +68,11 @@ spring:
               filters:
                 - StripPrefix=2
                 - Authentic
+            # Agentic route for AI chat operations (requires authentication)
+            - id: agentic_route
+              uri: ${GATEWAY_ROUTE_AGENTIC_URI:http://${CENTER_AGENTIC_HOST:dc3-center-agentic}:8600}
+              predicates:
+                - Path=/api/v3/agentic/**
+              filters:
+                - StripPrefix=2
+                - Authentic

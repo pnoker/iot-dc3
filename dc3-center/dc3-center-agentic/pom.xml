@@ -15,7 +15,8 @@
   ~ You should have received a copy of the GNU Affero General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,40 +26,35 @@
         <version>2026.5.5</version>
     </parent>
 
-    <artifactId>dc3-center-single</artifactId>
+    <name>${project.artifactId}</name>
+    <artifactId>dc3-center-agentic</artifactId>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 Platform Integrated Service - A comprehensive collection of authorization, data, management,
-        and API services combined into a single module.
+    <description>
+        AI Agentic Center — provides OpenAI-compatible streaming chat with IoT tool-calling capabilities.
     </description>
 
     <dependencies>
 
-        <!-- DC3 Common Related -->
+        <!-- Agentic domain logic (controllers, tools, config) -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-agentic</artifactId>
+            <version>${dc3.version}</version>
         </dependency>
+
+        <!-- gRPC facade implementations for calling auth/manager/data centers -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-auth</artifactId>
+            <artifactId>dc3-common-facade-grpc</artifactId>
+            <version>${dc3.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-data</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-facade-local</artifactId>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-manager</artifactId>
-        </dependency>
+
+        <!-- Resource registrar — syncs discovered endpoints to auth resource tables -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-resource-registrar</artifactId>
+            <version>${dc3.version}</version>
         </dependency>
 
     </dependencies>

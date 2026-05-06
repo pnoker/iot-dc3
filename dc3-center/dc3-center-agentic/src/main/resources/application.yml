@@ -1,0 +1,16 @@
+server:
+  port: ${SERVER_PORT:8600}
+  servlet:
+    context-path: /agentic
+
+spring:
+  application:
+    name: @project.artifactId@
+  profiles:
+    active:
+      - ${NODE_ENV:dev}
+      - agentic
+
+dc3:
+  facade:
+    mode: ${DC3_FACADE_MODE:grpc}
