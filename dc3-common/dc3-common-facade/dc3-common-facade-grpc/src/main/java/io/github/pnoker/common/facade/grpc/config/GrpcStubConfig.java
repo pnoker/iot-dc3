@@ -18,10 +18,12 @@
 package io.github.pnoker.common.facade.grpc.config;
 
 import io.github.pnoker.api.center.auth.*;
+import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.api.center.manager.DeviceApiGrpc;
 import io.github.pnoker.api.center.manager.DriverApiGrpc;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.common.constant.service.AuthConstant;
+import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,5 +70,10 @@ public class GrpcStubConfig {
     @Bean
     public PointApiGrpc.PointApiBlockingStub managerPointApiBlockingStub(GrpcChannelFactory channels) {
         return PointApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    }
+
+    @Bean
+    public PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub(GrpcChannelFactory channels) {
+        return PointValueApiGrpc.newBlockingStub(channels.createChannel(DataConstant.SERVICE_NAME));
     }
 }
