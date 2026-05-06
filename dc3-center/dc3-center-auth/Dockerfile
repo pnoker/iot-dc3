@@ -33,8 +33,8 @@ ENV GRPC_PORT=9300
 # Default JVM and GC environment variables
 ENV JAVA_OPS="-Xms256m \
               -Xmx512m \
-               -XX:+UseG1GC \
-               -XX:+AlwaysPreTouch \
+              -XX:+UseG1GC \
+              -XX:+AlwaysPreTouch \
               -XX:+HeapDumpOnOutOfMemoryError \
               -XX:HeapDumpPath=dc3/logs/center/auth/gc/dump.hprof"
 ENV GC_LOG="-Xlog:gc*:file=dc3/logs/center/auth/gc/gc-%t.log:time,uptime,level,tags:filecount=20,filesize=10M"
