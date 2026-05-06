@@ -1,0 +1,23 @@
+# Agentic module defaults — imported as a Spring profile via AgenticAutoConfiguration.
+# These can be overridden in the center service's own application.yml.
+
+spring:
+  ai:
+    openai:
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      api-key: ${OPENAI_API_KEY:}
+      chat:
+        options:
+          model: ${OPENAI_MODEL:gpt-4o}
+          temperature: ${OPENAI_TEMPERATURE:0.7}
+          max-tokens: ${OPENAI_MAX_TOKENS:2048}
+        memory:
+          repository:
+            jdbc:
+              initialize-schema: ${AGENTIC_MEMORY_SCHEMA_INIT:always}
+
+dc3:
+  agentic:
+    enabled: true
+    memory-max-messages: ${AGENTIC_MEMORY_MAX_MESSAGES:50}
+    session-ttl-hours: ${AGENTIC_SESSION_TTL_HOURS:72}
