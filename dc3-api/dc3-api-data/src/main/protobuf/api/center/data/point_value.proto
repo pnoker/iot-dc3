@@ -31,46 +31,115 @@ option java_multiple_files = true;
 service PointValueApi {
   // Query the latest collected value of a device point
   rpc LastValue (GrpcPointValueQuery) returns (GrpcRPointValueDTO);
+
+  // Query historical values of a device point
+  rpc HistoryValue (GrpcPointValueHistoryQuery) returns (GrpcRPointValueStringList);
+
+  // Send a read command to a device for a specific point
+  rpc ReadCommand (GrpcPointValueCommandQuery) returns (GrpcRBoolean);
+
+  // Send a write command to a device for a specific point
+  rpc WriteCommand (GrpcPointValueWriteCommand) returns (GrpcRBoolean);
 }
 
-// Request structure for querying point values
+// Request structure for querying a single point value
 message GrpcPointValueQuery {
-  // Device ID, identifies the specific device
+  // Device ID
   int64 device_id = 1;
 
-  // Point ID, identifies the specific point
+  // Point ID
   int64 point_id = 2;
 
-  // Identifies the tenant to which the data belongs
+  // Tenant ID
   int64 tenant_id = 3;
 }
 
-// Response wrapper for point value query
+// Response wrapper for single point value query
 message GrpcRPointValueDTO {
-  // Common result wrapper containing status code, message, etc.
+  // Common result wrapper
   GrpcR result = 1;
 
-  // Returned point value data
+  // Point value data
   GrpcPointValueDTO data = 2;
 }
 
-// Point value data structure containing collected data for a point
+// Point value data structure
 message GrpcPointValueDTO {
-  // Point value record ID
+  // Record ID
   int64 id = 1;
 
-  // Device ID, identifies the source device
+  // Device ID
   int64 device_id = 2;
 
-  // Point ID, identifies the specific point
+  // Point ID
   int64 point_id = 3;
 
-  // Processed value, after data conversion and formatting
+  // Processed value
   string value = 4;
 
-  // Raw value, directly collected from the device
+  // Raw value from device
   string raw_value = 5;
 
-  // Storage time, the timestamp when the data is stored in the database
+  // Storage timestamp
   int64 create_time = 6;
+}
+
+// Request structure for querying historical point values
+message GrpcPointValueHistoryQuery {
+  // Device ID
+  int64 device_id = 1;
+
+  // Point ID
+  int64 point_id = 2;
+
+  // Tenant ID
+  int64 tenant_id = 3;
+
+  // Number of records to retrieve
+  int32 count = 4;
+}
+
+// Response wrapper for historical values (list of raw value strings)
+message GrpcRPointValueStringList {
+  // Common result wrapper
+  GrpcR result = 1;
+
+  // List of historical value strings
+  repeated string data = 2;
+}
+
+// Request structure for sending a read command
+message GrpcPointValueCommandQuery {
+  // Device ID
+  int64 device_id = 1;
+
+  // Point ID
+  int64 point_id = 2;
+
+  // Tenant ID
+  int64 tenant_id = 3;
+}
+
+// Request structure for sending a write command
+message GrpcPointValueWriteCommand {
+  // Device ID
+  int64 device_id = 1;
+
+  // Point ID
+  int64 point_id = 2;
+
+  // Value to write
+  string value = 3;
+
+  // Tenant ID
+  int64 tenant_id = 4;
+}
+
+// Generic boolean response wrapper
+message GrpcRBoolean {
+  // Common result wrapper
+  GrpcR result = 1;
+
+  // Response data (true/false)
+  bool data = 2;
 }
