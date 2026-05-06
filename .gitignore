@@ -11,3 +11,4 @@
 .DS_Store
 .env
 .claude/settings.local.json
+.claude/TODO.md
