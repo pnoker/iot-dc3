@@ -29,6 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+/**
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 @Slf4j
 @RestController
 @RequestMapping(AgenticConstant.SESSION_URL_PREFIX)

@@ -40,6 +40,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * Default {@link DriverSenderService} implementation that publishes driver events, device
  * events, heartbeats, and point values to RabbitMQ.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Service

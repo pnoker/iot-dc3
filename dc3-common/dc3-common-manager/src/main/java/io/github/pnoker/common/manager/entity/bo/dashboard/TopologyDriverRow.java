@@ -23,6 +23,10 @@ import lombok.ToString;
 
 /**
  * Driver row for the topology L1 column: id + name + device count.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

@@ -27,6 +27,10 @@ import java.time.LocalDateTime;
  * One time-bucketed count row. Bucket comes from Postgres {@code time_bucket()} which
  * returns TIMESTAMPTZ; JDBC maps it to LocalDateTime directly so no service-side parsing
  * is needed.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

@@ -28,6 +28,12 @@ import org.openscada.opc.dcom.da.ValueData;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class OPCDataCallback extends EventHandlerImpl {
 
     private IOPCDataCallback callback = null;

@@ -31,6 +31,10 @@ import java.util.List;
  * Config-vs-reality coverage report — points declared in dc3_point that never produced
  * any point_value row. {@code missingPoints / totalPoints} is the gap ratio;
  * {@code items} is the (capped) list of offending ids so the UI can drill in.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

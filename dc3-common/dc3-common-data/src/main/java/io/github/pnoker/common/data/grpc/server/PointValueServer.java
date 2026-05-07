@@ -32,6 +32,10 @@ import java.util.List;
 /**
  * gRPC server implementation for the PointValue service. Delegates to
  * {@link PointValueService} and {@link PointValueCommandService}.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Service

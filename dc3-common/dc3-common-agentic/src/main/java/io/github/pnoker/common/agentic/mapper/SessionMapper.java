@@ -19,6 +19,12 @@ package io.github.pnoker.common.agentic.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.pnoker.common.agentic.entity.model.SessionDO;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public interface SessionMapper extends BaseMapper<SessionDO> {
 
 }

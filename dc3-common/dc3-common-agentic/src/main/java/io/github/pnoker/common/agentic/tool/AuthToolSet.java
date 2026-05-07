@@ -34,6 +34,10 @@ import java.util.Objects;
  * <p>
  * These tools allow the model to query tenant, user, and login information by calling the
  * existing facade interfaces (routed via gRPC or local depending on dc3.facade.mode).
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Component

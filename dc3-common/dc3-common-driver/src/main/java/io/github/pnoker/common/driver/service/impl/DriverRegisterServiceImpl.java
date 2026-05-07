@@ -31,6 +31,10 @@ import org.springframework.stereotype.Service;
  * Default {@link DriverRegisterService} implementation that builds the registration
  * payload from {@link io.github.pnoker.common.driver.entity.property.DriverProperties}
  * and submits it to the manager center.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Service

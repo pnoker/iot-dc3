@@ -25,11 +25,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import java.util.Objects;
 
 /**
- * Apache POI Utility Class
- * <p>
- * Utility class for spreadsheet operations using Apache POI. Provides methods for working
- * with Excel files, cells, and various spreadsheet manipulations.
- * </p>
+ * Apache POI Excel cell and merge helpers.
  *
  * @author pnoker
  * @version 2025.9.0

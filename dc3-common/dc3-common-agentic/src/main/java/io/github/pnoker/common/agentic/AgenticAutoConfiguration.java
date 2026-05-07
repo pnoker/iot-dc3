@@ -26,6 +26,10 @@ import org.springframework.context.annotation.ComponentScan;
  * <p>
  * Activated when {@code dc3.agentic.enabled=true} (default). Scans all components under
  * {@code io.github.pnoker.common.agentic}.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.agentic.enabled", havingValue = "true", matchIfMissing = true)

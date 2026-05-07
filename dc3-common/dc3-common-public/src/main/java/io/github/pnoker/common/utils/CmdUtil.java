@@ -26,11 +26,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 /**
- * Command Line Utility Class Collection
- * <p>
- * Utility class for command line operations and process management. Provides methods to
- * safely terminate processes with exit commands.
- * </p>
+ * Process termination via stdin exit command.
  *
  * @author pnoker
  * @version 2025.9.0

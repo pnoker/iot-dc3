@@ -27,6 +27,7 @@ import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
  * breakdown tabs.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.2
  */
 public interface DashboardService {

@@ -30,6 +30,10 @@ import java.time.LocalDateTime;
  * A (device, point) pair that was active within the baseline window but has gone silent
  * for at least {@code silentMinutes}. The absence of data is itself a signal — sensors
  * don't self-report "I'm offline".
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

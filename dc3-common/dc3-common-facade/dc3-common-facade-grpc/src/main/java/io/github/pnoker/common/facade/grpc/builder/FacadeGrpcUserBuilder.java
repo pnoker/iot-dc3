@@ -30,6 +30,7 @@ import java.util.Objects;
  * as opaque JSON strings — keeping the wire representation untouched.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Component

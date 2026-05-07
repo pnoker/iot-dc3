@@ -23,6 +23,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
  * Protocol-neutral user facade. Mirrors {@code api.center.auth.UserApi}.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 public interface UserFacade {

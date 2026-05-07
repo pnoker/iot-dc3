@@ -24,6 +24,11 @@ import org.openscada.opc.lib.common.NotConnectedException;
 import java.net.UnknownHostException;
 import java.util.Map;
 
+/**
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 @Slf4j
 public class SyncAccess extends AccessBase implements Runnable {
 

@@ -20,6 +20,8 @@ package io.github.pnoker.driver.api;
  * Serialization interface for converting between Java types and S7 PLC byte buffers.
  *
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public interface S7Serializable {
 

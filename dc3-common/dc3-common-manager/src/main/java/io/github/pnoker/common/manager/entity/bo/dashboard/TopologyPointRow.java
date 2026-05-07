@@ -23,6 +23,10 @@ import lombok.ToString;
 
 /**
  * Point row for the topology L4 column: id + name + parent profileId.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

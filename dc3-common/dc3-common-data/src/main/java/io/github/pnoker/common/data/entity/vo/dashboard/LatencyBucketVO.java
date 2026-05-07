@@ -31,6 +31,7 @@ import java.io.Serializable;
  * 3=1-5s, 4=5-30s, 5=&gt;=30s.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.2
  */
 @Getter

@@ -34,6 +34,10 @@ import java.util.Map;
  * Scans the classpath for skill definition YAML files ({@code classpath*:skills/*.yml})
  * at application startup, parses each file into a {@link SkillDefinition}, and registers
  * enabled skills into the {@link SkillRegistry}.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Component

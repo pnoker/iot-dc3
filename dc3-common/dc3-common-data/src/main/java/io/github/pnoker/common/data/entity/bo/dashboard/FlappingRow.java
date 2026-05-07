@@ -23,6 +23,10 @@ import lombok.ToString;
 
 /**
  * (source, sourceId, eventTypeFlag, count) — one flapping (source, type) pair.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

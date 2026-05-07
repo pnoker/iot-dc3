@@ -20,6 +20,8 @@ package io.github.pnoker.driver.api.impl.nodave;
  * The Class TCPConnection.
  *
  * @author Thomas Rudin
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public final class TCPConnection extends S7Connection {
 

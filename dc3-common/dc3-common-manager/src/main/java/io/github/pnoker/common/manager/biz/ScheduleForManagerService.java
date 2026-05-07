@@ -18,6 +18,7 @@
 package io.github.pnoker.common.manager.biz;
 
 /**
+ *
  * @author pnoker
  * @version 2025.9.0
  * @since 2022.1.0

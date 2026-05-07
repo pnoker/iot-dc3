@@ -24,12 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Request Header Configuration Class
- * <p>
- * Configuration class for HTTP request headers in IoT DC3 platform. Contains static inner
- * classes for token and user headers with authentication and user identification
- * information.
- * </p>
+ * HTTP request header containers for token and user context.
  *
  * @author pnoker
  * @version 2025.9.0

@@ -22,11 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.function.Consumer;
 
 /**
- * Custom String Optional Class
- * <p>
- * Optional wrapper class for string operations. Provides utility methods for null safety
- * and empty checks with consumer-based conditional operations.
- * </p>
+ * Optional wrapper for {@link String} with null/empty checks.
  *
  * @author pnoker
  * @version 2025.9.0

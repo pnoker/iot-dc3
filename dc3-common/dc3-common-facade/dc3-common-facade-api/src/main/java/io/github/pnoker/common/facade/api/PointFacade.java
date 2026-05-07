@@ -26,6 +26,7 @@ import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
  * {@code api.center.manager.PointApi}.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 public interface PointFacade {

@@ -28,6 +28,10 @@ import org.springframework.grpc.client.GrpcChannelFactory;
 /**
  * Spring configuration that creates the blocking gRPC stubs used by the driver SDK to
  * talk to the manager center.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Configuration
 public class GrpcStubConfig {

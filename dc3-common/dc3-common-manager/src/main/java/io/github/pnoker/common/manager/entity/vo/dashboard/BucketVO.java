@@ -31,6 +31,7 @@ import java.io.Serializable;
  * resolves ids → names via existing batch APIs.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.2
  */
 @Getter

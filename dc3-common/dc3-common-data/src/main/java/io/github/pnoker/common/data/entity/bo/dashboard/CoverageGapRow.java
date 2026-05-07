@@ -23,6 +23,10 @@ import lombok.ToString;
 
 /**
  * Point declared but without history samples.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

@@ -26,12 +26,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * Unified Response Wrapper Class
- * <p>
- * Generic response wrapper class for API responses in IoT DC3 platform. Provides
- * standardized response format with status, code, message, and data fields. Supports both
- * success and failure response scenarios.
- * </p>
+ * Unified API response wrapper.
  *
  * @author pnoker
  * @version 2025.9.0

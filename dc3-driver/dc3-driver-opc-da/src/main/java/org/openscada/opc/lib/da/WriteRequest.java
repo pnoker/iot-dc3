@@ -19,6 +19,12 @@ package org.openscada.opc.lib.da;
 
 import org.jinterop.dcom.core.JIVariant;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class WriteRequest {
 
     private Item _item = null;

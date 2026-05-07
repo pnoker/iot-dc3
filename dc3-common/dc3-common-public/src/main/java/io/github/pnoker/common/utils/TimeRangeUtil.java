@@ -23,21 +23,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Resolve UI-facing time-range inputs into a concrete {@code from} {@link LocalDateTime}
- * that queries can plug into {@code create_time >= ?}.
- * <p>
- * Two parallel inputs are accepted:
- * <ul>
- * <li>{@code rangeKey} — preferred, one of {@link TimeRangeKeyEnum} codes (e.g.
- * {@code today}, {@code 24h}, {@code 7d}, {@code 30d}). {@code TODAY} anchors at local
- * midnight; the rolling presets subtract a fixed number of hours from {@code now}.</li>
- * <li>{@code rangeHours} — legacy integer, still honoured when {@code rangeKey} is
- * absent. Positive values produce {@code now - rangeHours}. Zero or negative values mean
- * "no lower bound".</li>
- * </ul>
- * When both are supplied, {@code rangeKey} wins.
+ * Resolves UI time-range inputs ({@link TimeRangeKeyEnum} or legacy hours) into
+ * concrete {@link LocalDateTime} lower bounds for {@code create_time >= ?} queries.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.3
  */
 public final class TimeRangeUtil {

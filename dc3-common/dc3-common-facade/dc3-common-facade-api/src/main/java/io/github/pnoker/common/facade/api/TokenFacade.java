@@ -25,6 +25,7 @@ package io.github.pnoker.common.facade.api;
  * from the gateway.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 public interface TokenFacade {

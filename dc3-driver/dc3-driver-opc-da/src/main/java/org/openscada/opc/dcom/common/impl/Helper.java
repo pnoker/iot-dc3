@@ -23,6 +23,12 @@ import org.jinterop.dcom.core.JICallBuilder;
 import org.jinterop.dcom.core.JIFlags;
 import org.jinterop.dcom.core.JIVariant;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class Helper {
 
     /**

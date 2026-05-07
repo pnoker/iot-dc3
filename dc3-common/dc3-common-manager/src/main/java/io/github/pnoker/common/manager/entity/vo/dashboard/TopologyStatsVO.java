@@ -30,6 +30,7 @@ import java.io.Serializable;
  * the user can see how much the diagram has been cropped.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.4
  */
 @Getter

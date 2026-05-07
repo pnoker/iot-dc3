@@ -39,6 +39,7 @@ import java.util.List;
  * auto-configuration declaration).
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Slf4j

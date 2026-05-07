@@ -29,6 +29,10 @@ import java.util.List;
  * Each skill provides a scoped set of tools, a system prompt addition, and few-shot
  * examples that guide the LLM behavior for a particular domain (e.g. device queries, data
  * monitoring, device control).
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

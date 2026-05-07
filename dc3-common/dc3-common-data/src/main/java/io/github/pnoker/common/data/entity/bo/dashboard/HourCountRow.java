@@ -26,6 +26,10 @@ import java.time.LocalDateTime;
 /**
  * Hourly bucket from {@code date_trunc('hour', …)} — bucket is the top-of-hour timestamp,
  * count is the number of events in that hour.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

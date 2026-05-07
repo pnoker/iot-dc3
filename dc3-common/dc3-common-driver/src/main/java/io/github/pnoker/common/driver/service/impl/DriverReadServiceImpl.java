@@ -40,6 +40,10 @@ import java.util.Objects;
 /**
  * Default {@link DriverReadService} implementation that resolves metadata, delegates the
  * actual read operation to the custom driver, and publishes the resulting point value.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Service

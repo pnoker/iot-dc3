@@ -25,8 +25,11 @@ import java.util.List;
 /**
  * A single SSE chunk in the OpenAI streaming chat completion response.
  *
+ * @author pnoker
+ * @version 2025.9.0
  * @see <a href="https://platform.openai.com/docs/api-reference/chat/streaming">OpenAI
  * Streaming</a>
+ * @since 2022.1.0
  */
 @Getter
 @Setter

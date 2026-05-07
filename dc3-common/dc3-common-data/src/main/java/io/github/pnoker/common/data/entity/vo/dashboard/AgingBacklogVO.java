@@ -28,6 +28,10 @@ import java.io.Serializable;
 /**
  * Count of still-unconfirmed alarms bucketed by how long they've been sitting. The 24h+
  * bucket is the SLA breach indicator.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

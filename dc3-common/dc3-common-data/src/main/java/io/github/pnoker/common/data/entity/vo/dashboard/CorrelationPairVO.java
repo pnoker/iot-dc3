@@ -29,6 +29,10 @@ import java.io.Serializable;
  * Two events that fired within a small time window of each other, enough times to suggest
  * a cascading-failure relationship. Frontend renders these as a network graph (A—B edge
  * weighted by coCount).
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

@@ -29,6 +29,7 @@ import java.io.Serializable;
  * Top event source by alarm count.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.3
  */
 @Getter

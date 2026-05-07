@@ -23,11 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.UUID;
 
 /**
- * Code Generation Utility Class
- * <p>
- * Utility class for unique code generation. Provides methods to generate unique
- * identifiers and validation codes for various purposes.
- * </p>
+ * UUID-based unique code generation.
  *
  * @author pnoker
  * @version 2025.9.0

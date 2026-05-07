@@ -36,11 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * JSON Utility Class
- * <p>
- * Utility class for JSON serialization and deserialization operations. Based on Jackson
- * implementation for comprehensive JSON processing.
- * </p>
+ * JSON serialization/deserialization utility based on Jackson.
  *
  * @author pnoker
  * @version 2025.9.0

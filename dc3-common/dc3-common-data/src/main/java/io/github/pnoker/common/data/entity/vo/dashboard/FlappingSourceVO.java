@@ -29,6 +29,10 @@ import java.io.Serializable;
  * A (source, eventType) pair that fired repeatedly in the window — i.e. is "flapping".
  * Different from Storm which is pure per-source volume; Flap narrows the signal to one
  * event-type so operators can tell whether the same condition keeps re-tripping.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

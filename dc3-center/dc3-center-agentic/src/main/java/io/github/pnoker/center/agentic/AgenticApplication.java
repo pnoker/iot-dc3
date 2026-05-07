@@ -24,6 +24,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * <p>
  * HTTP port 8600, context path /agentic. No gRPC server — this service is a pure consumer
  * of other center services.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @SpringBootApplication
 public class AgenticApplication {

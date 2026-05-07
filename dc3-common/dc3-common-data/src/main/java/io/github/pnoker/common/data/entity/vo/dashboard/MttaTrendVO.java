@@ -29,6 +29,10 @@ import java.io.Serializable;
  * One day's MTTA (mean time to acknowledge) statistic, computed as (operate_time -
  * create_time) on confirm_flag=1 events. Event table has an UPDATE trigger that stamps
  * operate_time on confirm, so the diff is the ack latency.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

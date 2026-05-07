@@ -26,6 +26,12 @@ import org.openscada.opc.dcom.da.IORequest;
 
 import java.net.UnknownHostException;
 
+/**
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class OPCItemIO extends BaseCOMObject {
 
     public OPCItemIO(final IJIComObject opcItemIO) throws IllegalArgumentException, UnknownHostException, JIException {

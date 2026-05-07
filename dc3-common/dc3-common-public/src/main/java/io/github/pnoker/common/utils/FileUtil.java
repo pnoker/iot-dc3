@@ -28,11 +28,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 /**
- * File Related Utility Class
- * <p>
- * Utility class for file operations including directory creation and random file name
- * generation for temporary files.
- * </p>
+ * Temp directory and random XLSX file name helpers.
  *
  * @author pnoker
  * @version 2025.9.0

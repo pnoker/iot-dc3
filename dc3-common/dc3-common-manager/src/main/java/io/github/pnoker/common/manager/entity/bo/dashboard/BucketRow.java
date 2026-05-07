@@ -33,6 +33,10 @@ import lombok.ToString;
  * identical fields today, but the decoupling lets the API surface evolve independently of
  * the SQL shape.
  * </p>
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

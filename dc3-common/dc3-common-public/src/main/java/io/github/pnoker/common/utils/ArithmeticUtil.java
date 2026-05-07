@@ -23,12 +23,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * Arithmetic Utility Class
- * <p>
- * Utility class for precise floating-point arithmetic operations. Provides accurate
- * addition, subtraction, multiplication, division, and rounding operations using
- * BigDecimal.
- * </p>
+ * Precise BigDecimal arithmetic operations.
  *
  * @author pnoker
  * @version 2025.9.0

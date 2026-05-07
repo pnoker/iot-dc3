@@ -23,11 +23,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * Custom Enable Flag Optional Class
- * <p>
- * Optional wrapper class for enable flag enumeration. Provides utility methods for
- * conditional operations based on EnableFlagEnum values with null safety.
- * </p>
+ * Optional wrapper for enable-flag enumeration values.
  *
  * @author pnoker
  * @version 2025.9.0

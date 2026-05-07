@@ -32,6 +32,10 @@ import java.util.List;
  * Delegates to the facade layer ({@link PointValueFacade} and
  * {@link PointValueCommandFacade}) so that calls follow the project's local/gRPC
  * dual-mode convention.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Slf4j
 @Component

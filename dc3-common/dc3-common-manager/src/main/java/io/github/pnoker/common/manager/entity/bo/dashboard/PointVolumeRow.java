@@ -24,6 +24,10 @@ import lombok.ToString;
 /**
  * Volume aggregate row for topology's volume mode — one (device_id, point_id) pair + its
  * pv sample count over the query window.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter

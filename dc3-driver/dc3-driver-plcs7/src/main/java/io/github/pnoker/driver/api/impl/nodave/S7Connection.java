@@ -25,6 +25,8 @@ import java.util.concurrent.Semaphore;
  * regardless of the type of transport.
  *
  * @author Thomas Hergenhahn
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 public abstract class S7Connection {
 

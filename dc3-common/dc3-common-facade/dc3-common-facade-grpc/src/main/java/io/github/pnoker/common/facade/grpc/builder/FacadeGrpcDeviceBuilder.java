@@ -45,6 +45,7 @@ import java.util.Optional;
  * need an explicit {@code @Mapping(target = "...", ignore = true)}.
  *
  * @author pnoker
+ * @version 2025.9.0
  * @since 2026.5.5
  */
 @Component

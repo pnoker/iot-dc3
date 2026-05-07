@@ -23,6 +23,10 @@ import lombok.ToString;
 
 /**
  * Generic (key, count) aggregate row; key is Object to fit JDBC int or varchar.
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
  */
 @Getter
 @Setter
