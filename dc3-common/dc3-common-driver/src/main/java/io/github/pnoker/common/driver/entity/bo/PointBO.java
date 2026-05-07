@@ -41,74 +41,74 @@ import java.math.BigDecimal;
 @ToString(callSuper = true)
 public class PointBO extends BaseBO {
 
-	/**
-	 * Point display name.
-	 */
-	private String pointName;
+    /**
+     * Point display name.
+     */
+    private String pointName;
 
-	/**
-	 * Point code defined in the platform.
-	 */
-	private String pointCode;
+    /**
+     * Point code defined in the platform.
+     */
+    private String pointCode;
 
-	/**
-	 * Point data type.
-	 */
-	private PointTypeFlagEnum pointTypeFlag;
+    /**
+     * Point data type.
+     */
+    private PointTypeFlagEnum pointTypeFlag;
 
-	/**
-	 * Read/write capability of the point.
-	 */
-	private RwFlagEnum rwFlag;
+    /**
+     * Read/write capability of the point.
+     */
+    private RwFlagEnum rwFlag;
 
-	/**
-	 * Base offset applied during value conversion.
-	 */
-	private BigDecimal baseValue;
+    /**
+     * Base offset applied during value conversion.
+     */
+    private BigDecimal baseValue;
 
-	/**
-	 * Multiplier applied during value conversion.
-	 */
-	private BigDecimal multiple;
+    /**
+     * Multiplier applied during value conversion.
+     */
+    private BigDecimal multiple;
 
-	/**
-	 * Decimal precision used for floating-point rounding.
-	 */
-	private Byte valueDecimal;
+    /**
+     * Decimal precision used for floating-point rounding.
+     */
+    private Byte valueDecimal;
 
-	/**
-	 * Engineering unit of the point value.
-	 */
-	private String unit;
+    /**
+     * Engineering unit of the point value.
+     */
+    private String unit;
 
-	/**
-	 * Associated profile identifier.
-	 */
-	private Long profileId;
+    /**
+     * Associated profile identifier.
+     */
+    private Long profileId;
 
-	/**
-	 * Extended point metadata.
-	 */
-	private PointExt pointExt;
+    /**
+     * Extended point metadata.
+     */
+    private PointExt pointExt;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 * Tenant identifier.
-	 */
-	private Long tenantId;
+    /**
+     * Tenant identifier.
+     */
+    private Long tenantId;
 
-	/**
-	 * Data signature used for optimistic checks or synchronization.
-	 */
-	private String signature;
+    /**
+     * Data signature used for optimistic checks or synchronization.
+     */
+    private String signature;
 
-	/**
-	 * Data version.
-	 */
-	private Integer version;
+    /**
+     * Data version.
+     */
+    private Integer version;
 
 }

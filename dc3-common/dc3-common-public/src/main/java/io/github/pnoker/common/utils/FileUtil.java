@@ -41,34 +41,35 @@ import java.util.UUID;
 @Slf4j
 public class FileUtil {
 
-	private FileUtil() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private FileUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Get temporary upload file directory
-	 * @return Temporary upload file directory path
-	 */
-	public static String getTempPath() {
-		String path = FolderConstant.TEMP_FILE_PATH;
-		Path dir = Paths.get(path);
-		if (Files.notExists(dir) || !Files.isDirectory(dir)) {
-			try {
-				Files.createDirectories(dir);
-			}
-			catch (IOException e) {
-				log.error(e.getMessage(), e);
-			}
-		}
-		return path;
-	}
+    /**
+     * Get temporary upload file directory
+     *
+     * @return Temporary upload file directory path
+     */
+    public static String getTempPath() {
+        String path = FolderConstant.TEMP_FILE_PATH;
+        Path dir = Paths.get(path);
+        if (Files.notExists(dir) || !Files.isDirectory(dir)) {
+            try {
+                Files.createDirectories(dir);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+        return path;
+    }
 
-	/**
-	 * Generate random XLSX file name
-	 * @return Random XLSX file name with UUID
-	 */
-	public static String getRandomXlsxName() {
-		return UUID.randomUUID().toString() + ".xlsx";
-	}
+    /**
+     * Generate random XLSX file name
+     *
+     * @return Random XLSX file name with UUID
+     */
+    public static String getRandomXlsxName() {
+        return UUID.randomUUID().toString() + ".xlsx";
+    }
 
 }

@@ -27,11 +27,11 @@ import java.lang.annotation.*;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Target(value = { ElementType.FIELD })
+@Target(value = {ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Array {
 
-	int size();
+    int size();
 
 }

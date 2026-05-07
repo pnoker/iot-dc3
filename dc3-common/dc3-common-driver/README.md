@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-driver` is the shared driver dependency module of the IoT DC3 platform. It provides the driver SDK shared by all protocol drivers, including auto-registration with the
+`dc3-common-driver` is the shared driver dependency module of the IoT DC3 platform. It provides the driver SDK shared by
+all protocol drivers, including auto-registration with the
 Manager Center, metadata sync, RabbitMQ command handling, and scheduled data collection.
 
 ## Module Information

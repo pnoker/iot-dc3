@@ -42,49 +42,49 @@ import java.time.LocalDateTime;
 @TableName("dc3_point_value_int")
 public class PointValueIntDO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Device ID
-	 */
-	@TableField("device_id")
-	private Long deviceId;
+    /**
+     * Device ID
+     */
+    @TableField("device_id")
+    private Long deviceId;
 
-	/**
-	 * Point ID
-	 */
-	@TableField("point_id")
-	private Long pointId;
+    /**
+     * Point ID
+     */
+    @TableField("point_id")
+    private Long pointId;
 
-	/**
-	 * Raw value
-	 */
-	@TableField("raw_value")
-	private Integer rawValue;
+    /**
+     * Raw value
+     */
+    @TableField("raw_value")
+    private Integer rawValue;
 
-	/**
-	 *
-	 */
-	@TableField("cal_value")
-	private Integer calValue;
+    /**
+     *
+     */
+    @TableField("cal_value")
+    private Integer calValue;
 
-	/**
-	 * Driver ID
-	 */
-	@TableField("driver_id")
-	private Long driverId;
+    /**
+     * Driver ID
+     */
+    @TableField("driver_id")
+    private Long driverId;
 
-	/**
-	 * Create Time
-	 */
-	@TableField("create_time")
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    @TableField("create_time")
+    private LocalDateTime createTime;
 
-	/**
-	 * Operate Time
-	 */
-	@TableField("operate_time")
-	private LocalDateTime operateTime;
+    /**
+     * Operate Time
+     */
+    @TableField("operate_time")
+    private LocalDateTime operateTime;
 
 }

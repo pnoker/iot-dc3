@@ -43,48 +43,48 @@ import java.util.UUID;
 @Slf4j
 public class MessageHeader implements Serializable {
 
-	private UUID id;
+    private UUID id;
 
-	private Integer mqttId;
+    private Integer mqttId;
 
-	private Integer mqttReceivedQos;
+    private Integer mqttReceivedQos;
 
-	private String mqttReceivedTopic;
+    private String mqttReceivedTopic;
 
-	private Boolean mqttDuplicate;
+    private Boolean mqttDuplicate;
 
-	private Boolean mqttReceivedRetained;
+    private Boolean mqttReceivedRetained;
 
-	private Long timestamp;
+    private Long timestamp;
 
-	public MessageHeader(MessageHeaders messageHeaders) {
-		if (Objects.nonNull(messageHeaders)) {
-			this.id = messageHeaders.getId();
-			this.mqttId = getMessageHeader(messageHeaders, "mqtt_id", Integer.class);
-			this.mqttReceivedQos = getMessageHeader(messageHeaders, "mqtt_receivedQos", Integer.class);
-			this.mqttReceivedTopic = getMessageHeader(messageHeaders, "mqtt_receivedTopic", String.class);
-			this.mqttDuplicate = getMessageHeader(messageHeaders, "mqtt_duplicate", Boolean.class);
-			this.mqttReceivedRetained = getMessageHeader(messageHeaders, "mqtt_receivedRetained", Boolean.class);
-			this.timestamp = getMessageHeader(messageHeaders, "timestamp", Long.class);
-		}
-	}
+    public MessageHeader(MessageHeaders messageHeaders) {
+        if (Objects.nonNull(messageHeaders)) {
+            this.id = messageHeaders.getId();
+            this.mqttId = getMessageHeader(messageHeaders, "mqtt_id", Integer.class);
+            this.mqttReceivedQos = getMessageHeader(messageHeaders, "mqtt_receivedQos", Integer.class);
+            this.mqttReceivedTopic = getMessageHeader(messageHeaders, "mqtt_receivedTopic", String.class);
+            this.mqttDuplicate = getMessageHeader(messageHeaders, "mqtt_duplicate", Boolean.class);
+            this.mqttReceivedRetained = getMessageHeader(messageHeaders, "mqtt_receivedRetained", Boolean.class);
+            this.timestamp = getMessageHeader(messageHeaders, "timestamp", Long.class);
+        }
+    }
 
-	/**
-	 * Get message header
-	 * @param messageHeaders MessageHeaders
-	 * @param key Header Key
-	 * @param type Header Key Type
-	 * @param <T> Header Key Type
-	 * @return Header Value
-	 */
-	private <T> T getMessageHeader(MessageHeaders messageHeaders, String key, Class<T> type) {
-		try {
-			return messageHeaders.get(key, type);
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-		return null;
-	}
+    /**
+     * Get message header
+     *
+     * @param messageHeaders MessageHeaders
+     * @param key            Header Key
+     * @param type           Header Key Type
+     * @param <T>            Header Key Type
+     * @return Header Value
+     */
+    private <T> T getMessageHeader(MessageHeaders messageHeaders, String key, Class<T> type) {
+        try {
+            return messageHeaders.get(key, type);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
 
 }

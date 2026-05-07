@@ -36,16 +36,17 @@ import java.util.UUID;
 @Slf4j
 public class CodeUtil {
 
-	private CodeUtil() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private CodeUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Generate a simplified UUID as a unique code.
-	 * @return Simplified UUID string
-	 */
-	public static String getCode() {
-		return UUID.randomUUID().toString();
-	}
+    /**
+     * Generate a simplified UUID as a unique code.
+     *
+     * @return Simplified UUID string
+     */
+    public static String getCode() {
+        return UUID.randomUUID().toString();
+    }
 
 }

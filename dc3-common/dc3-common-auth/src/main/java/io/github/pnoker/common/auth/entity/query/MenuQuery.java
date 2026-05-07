@@ -38,36 +38,36 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class MenuQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	//
+    //
 
-	/**
-	 * Parent menu id filter (optional).
-	 */
-	private Long parentMenuId;
+    /**
+     * Parent menu id filter (optional).
+     */
+    private Long parentMenuId;
 
-	/**
-	 * Type
-	 */
-	private MenuTypeFlagEnum menuTypeFlag;
+    /**
+     * Type
+     */
+    private MenuTypeFlagEnum menuTypeFlag;
 
-	/**
-	 * Name
-	 */
-	private String menuName;
+    /**
+     * Name
+     */
+    private String menuName;
 
-	/**
-	 * Code, URLMD5
-	 */
-	private String menuCode;
+    /**
+     * Code, URLMD5
+     */
+    private String menuCode;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }

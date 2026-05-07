@@ -39,15 +39,15 @@ import org.springframework.context.annotation.FilterType;
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")
 @ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
-		includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
-				PointValueLocalFacade.class, PointValueCommandLocalFacade.class, FacadePointValueBuilder.class, }))
+        includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+                PointValueLocalFacade.class, PointValueCommandLocalFacade.class, FacadePointValueBuilder.class,}))
 public class LocalFacadeDataAutoConfiguration {
 
-	/**
-	 * Referenced only to ensure the {@link PointValueLocalFacade} symbol is linked
-	 * against this module's compiled classes at AutoConfiguration load time.
-	 */
-	@SuppressWarnings("unused")
-	private static final Class<?> CANARY = PointValueLocalFacade.class;
+    /**
+     * Referenced only to ensure the {@link PointValueLocalFacade} symbol is linked
+     * against this module's compiled classes at AutoConfiguration load time.
+     */
+    @SuppressWarnings("unused")
+    private static final Class<?> CANARY = PointValueLocalFacade.class;
 
 }

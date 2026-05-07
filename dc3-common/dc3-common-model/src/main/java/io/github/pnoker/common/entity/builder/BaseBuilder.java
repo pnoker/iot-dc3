@@ -32,63 +32,71 @@ import java.util.List;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface BaseBuilder {
 
-	/**
-	 * VO to BO
-	 * @param entityVO EntityVO
-	 * @return EntityBO
-	 */
-	BaseBO buildBOByVO(BaseVO entityVO);
+    /**
+     * VO to BO
+     *
+     * @param entityVO EntityVO
+     * @return EntityBO
+     */
+    BaseBO buildBOByVO(BaseVO entityVO);
 
-	/**
-	 * VOList to BOList
-	 * @param entityVOList EntityVO collection
-	 * @return EntityBO collection
-	 */
-	List<BaseBO> buildBOListByVOList(List<BaseVO> entityVOList);
+    /**
+     * VOList to BOList
+     *
+     * @param entityVOList EntityVO collection
+     * @return EntityBO collection
+     */
+    List<BaseBO> buildBOListByVOList(List<BaseVO> entityVOList);
 
-	/**
-	 * BO to VO
-	 * @param entityBO EntityBO
-	 * @return EntityVO
-	 */
-	BaseVO buildVOByBO(BaseBO entityBO);
+    /**
+     * BO to VO
+     *
+     * @param entityBO EntityBO
+     * @return EntityVO
+     */
+    BaseVO buildVOByBO(BaseBO entityBO);
 
-	/**
-	 * BOList to VOList
-	 * @param entityBOList EntityBO collection
-	 * @return EntityVO collection
-	 */
-	List<BaseVO> buildVOListByBOList(List<BaseBO> entityBOList);
+    /**
+     * BOList to VOList
+     *
+     * @param entityBOList EntityBO collection
+     * @return EntityVO collection
+     */
+    List<BaseVO> buildVOListByBOList(List<BaseBO> entityBOList);
 
-	/**
-	 * DTO to BO
-	 * @param entityDTO EntityDTO
-	 * @return EntityBO
-	 */
-	BaseBO buildBOByDTO(BaseDTO entityDTO);
+    /**
+     * DTO to BO
+     *
+     * @param entityDTO EntityDTO
+     * @return EntityBO
+     */
+    BaseBO buildBOByDTO(BaseDTO entityDTO);
 
-	/**
-	 * DTOList to BOList
-	 * @param entityDTOList EntityDTO collection
-	 * @return EntityBO collection
-	 */
-	List<BaseBO> buildBOListByDTOList(List<BaseDTO> entityDTOList);
+    /**
+     * DTOList to BOList
+     *
+     * @param entityDTOList EntityDTO collection
+     * @return EntityBO collection
+     */
+    List<BaseBO> buildBOListByDTOList(List<BaseDTO> entityDTOList);
 
-	/**
-	 * BO to DTO
-	 * @param entityBO EntityBO
-	 * @return EntityDTO
-	 */
-	BaseDTO buildDTOByBO(BaseBO entityBO);
+    /**
+     * BO to DTO
+     *
+     * @param entityBO EntityBO
+     * @return EntityDTO
+     */
+    BaseDTO buildDTOByBO(BaseBO entityBO);
 
-	/**
-	 * BOList to DTOList
-	 * @param entityBOList EntityBO collection
-	 * @return EntityDTO collection
-	 */
-	List<BaseDTO> buildDTOListByBOList(List<BaseBO> entityBOList);
+    /**
+     * BOList to DTOList
+     *
+     * @param entityBOList EntityBO collection
+     * @return EntityDTO collection
+     */
+    List<BaseDTO> buildDTOListByBOList(List<BaseBO> entityBOList);
 
 }

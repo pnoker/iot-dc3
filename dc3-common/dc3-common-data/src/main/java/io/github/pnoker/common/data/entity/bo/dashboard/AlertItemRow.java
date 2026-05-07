@@ -31,20 +31,20 @@ import java.time.LocalDateTime;
 @ToString
 public class AlertItemRow {
 
-	private long id;
+    private long id;
 
-	private String source;
+    private String source;
 
-	private long sourceId;
+    private long sourceId;
 
-	private long pointId;
+    private long pointId;
 
-	private int eventTypeFlag;
+    private int eventTypeFlag;
 
-	private int confirmFlag;
+    private int confirmFlag;
 
-	private LocalDateTime createTime;
+    private LocalDateTime createTime;
 
-	private String message;
+    private String message;
 
 }

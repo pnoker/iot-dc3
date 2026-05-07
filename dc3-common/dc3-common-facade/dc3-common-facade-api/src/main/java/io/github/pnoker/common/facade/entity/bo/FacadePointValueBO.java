@@ -37,29 +37,29 @@ import lombok.*;
 @AllArgsConstructor
 public class FacadePointValueBO {
 
-	/**
-	 * Device ID associated with the point value
-	 */
-	private Long deviceId;
+    /**
+     * Device ID associated with the point value
+     */
+    private Long deviceId;
 
-	/**
-	 * Point ID associated with the value
-	 */
-	private Long pointId;
+    /**
+     * Point ID associated with the value
+     */
+    private Long pointId;
 
-	/**
-	 * Processed/calculated value after transformations
-	 */
-	private String value;
+    /**
+     * Processed/calculated value after transformations
+     */
+    private String value;
 
-	/**
-	 * Raw value as received from the device
-	 */
-	private String rawValue;
+    /**
+     * Raw value as received from the device
+     */
+    private String rawValue;
 
-	/**
-	 * Storage timestamp (epoch seconds)
-	 */
-	private long createTime;
+    /**
+     * Storage timestamp (epoch seconds)
+     */
+    private long createTime;
 
 }

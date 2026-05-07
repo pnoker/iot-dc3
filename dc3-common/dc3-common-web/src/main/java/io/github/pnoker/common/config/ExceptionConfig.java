@@ -54,100 +54,103 @@ import java.util.List;
 @RestControllerAdvice
 public class ExceptionConfig {
 
-	/**
-	 * Handle global exceptions
-	 * @param exception Exception to handle
-	 * @param request ServerHttpRequest that triggered the exception
-	 * @return Mono containing error response
-	 */
-	@ExceptionHandler(Exception.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public Mono<R<String>> globalException(Exception exception, ServerHttpRequest request) {
-		log.error("""
-				Global exception
-				Request: {}
-				Exception: {}
-				""", request.getURI().getRawPath(), exception.getMessage(), exception);
-		return Mono.just(R.fail(exception.getMessage()));
-	}
+    /**
+     * Handle global exceptions
+     *
+     * @param exception Exception to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Mono<R<String>> globalException(Exception exception, ServerHttpRequest request) {
+        log.error("""
+                Global exception
+                Request: {}
+                Exception: {}
+                """, request.getURI().getRawPath(), exception.getMessage(), exception);
+        return Mono.just(R.fail(exception.getMessage()));
+    }
 
-	/**
-	 * Handle Spring's framework-level {@link ResponseStatusException} — e.g. 404 from the
-	 * dispatcher when no handler matches a request. These are not application failures,
-	 * so they must not surface as 500 ERROR entries. Preserves the original status on the
-	 * response and logs at a level appropriate to the status class.
-	 * @param exception ResponseStatusException raised by the reactive dispatcher or an
-	 * HTTP client
-	 * @param request ServerHttpRequest that triggered the exception
-	 * @param response ServerHttpResponse to which the original status is applied
-	 * @return Mono containing error response
-	 */
-	@ExceptionHandler(ResponseStatusException.class)
-	public Mono<R<String>> responseStatusException(ResponseStatusException exception, ServerHttpRequest request,
-			ServerHttpResponse response) {
-		HttpStatusCode status = exception.getStatusCode();
-		response.setStatusCode(status);
+    /**
+     * Handle Spring's framework-level {@link ResponseStatusException} — e.g. 404 from the
+     * dispatcher when no handler matches a request. These are not application failures,
+     * so they must not surface as 500 ERROR entries. Preserves the original status on the
+     * response and logs at a level appropriate to the status class.
+     *
+     * @param exception ResponseStatusException raised by the reactive dispatcher or an
+     *                  HTTP client
+     * @param request   ServerHttpRequest that triggered the exception
+     * @param response  ServerHttpResponse to which the original status is applied
+     * @return Mono containing error response
+     */
+    @ExceptionHandler(ResponseStatusException.class)
+    public Mono<R<String>> responseStatusException(ResponseStatusException exception, ServerHttpRequest request,
+                                                   ServerHttpResponse response) {
+        HttpStatusCode status = exception.getStatusCode();
+        response.setStatusCode(status);
 
-		String path = request.getURI().getRawPath();
-		if (status.is5xxServerError()) {
-			log.error("Response status exception {} on {}: {}", status.value(), path, exception.getMessage(),
-					exception);
-		}
-		else if (HttpStatus.NOT_FOUND.value() == status.value()) {
-			log.debug("Not found: {}", path);
-		}
-		else {
-			log.warn("Response status exception {} on {}: {}", status.value(), path, exception.getMessage());
-		}
+        String path = request.getURI().getRawPath();
+        if (status.is5xxServerError()) {
+            log.error("Response status exception {} on {}: {}", status.value(), path, exception.getMessage(),
+                    exception);
+        } else if (HttpStatus.NOT_FOUND.value() == status.value()) {
+            log.debug("Not found: {}", path);
+        } else {
+            log.warn("Response status exception {} on {}: {}", status.value(), path, exception.getMessage());
+        }
 
-		String reason = exception.getReason();
-		return Mono.just(R.fail(reason != null ? reason : status.toString()));
-	}
+        String reason = exception.getReason();
+        return Mono.just(R.fail(reason != null ? reason : status.toString()));
+    }
 
-	/**
-	 * Handle NotFoundException
-	 * @param exception NotFoundException to handle
-	 * @param request ServerHttpRequest that triggered the exception
-	 * @return Mono containing error response
-	 */
-	@ExceptionHandler(NotFoundException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public Mono<R<String>> notFoundException(NotFoundException exception, ServerHttpRequest request) {
-		log.warn("NotFound exception handler: {}", exception.getMessage(), exception);
-		return Mono.just(R.fail(exception.getMessage()));
-	}
+    /**
+     * Handle NotFoundException
+     *
+     * @param exception NotFoundException to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response
+     */
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Mono<R<String>> notFoundException(NotFoundException exception, ServerHttpRequest request) {
+        log.warn("NotFound exception handler: {}", exception.getMessage(), exception);
+        return Mono.just(R.fail(exception.getMessage()));
+    }
 
-	/**
-	 * Handle UnAuthorizedException
-	 * @param exception UnAuthorizedException to handle
-	 * @param request ServerHttpRequest that triggered the exception
-	 * @return Mono containing error response
-	 */
-	@ExceptionHandler(UnAuthorizedException.class)
-	@ResponseStatus(HttpStatus.UNAUTHORIZED)
-	public Mono<R<String>> unAuthorizedException(UnAuthorizedException exception, ServerHttpRequest request) {
-		log.warn("UnAuthorized exception handler: {}", exception.getMessage(), exception);
-		return Mono.just(R.fail(exception.getMessage()));
-	}
+    /**
+     * Handle UnAuthorizedException
+     *
+     * @param exception UnAuthorizedException to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response
+     */
+    @ExceptionHandler(UnAuthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Mono<R<String>> unAuthorizedException(UnAuthorizedException exception, ServerHttpRequest request) {
+        log.warn("UnAuthorized exception handler: {}", exception.getMessage(), exception);
+        return Mono.just(R.fail(exception.getMessage()));
+    }
 
-	/**
-	 * Handle validation exceptions
-	 * @param exception MethodArgumentNotValidException or BindException to handle
-	 * @param request ServerHttpRequest that triggered the exception
-	 * @return Mono containing error response with field validation details
-	 */
-	@ExceptionHandler({ BindException.class, MethodArgumentNotValidException.class })
-	@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-	public Mono<R<String>> methodArgumentNotValidException(MethodArgumentNotValidException exception,
-			ServerHttpRequest request) {
-		HashMap<String, String> map = new HashMap<>(4);
-		List<FieldError> errorList = exception.getBindingResult().getFieldErrors();
-		errorList.forEach(error -> {
-			log.warn("Method argument not valid exception handler: {}: {}", error.getField(),
-					error.getDefaultMessage());
-			map.put(error.getField(), error.getDefaultMessage());
-		});
-		return Mono.just(R.fail(JsonUtil.toJsonString(map)));
-	}
+    /**
+     * Handle validation exceptions
+     *
+     * @param exception MethodArgumentNotValidException or BindException to handle
+     * @param request   ServerHttpRequest that triggered the exception
+     * @return Mono containing error response with field validation details
+     */
+    @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public Mono<R<String>> methodArgumentNotValidException(MethodArgumentNotValidException exception,
+                                                           ServerHttpRequest request) {
+        HashMap<String, String> map = new HashMap<>(4);
+        List<FieldError> errorList = exception.getBindingResult().getFieldErrors();
+        errorList.forEach(error -> {
+            log.warn("Method argument not valid exception handler: {}: {}", error.getField(),
+                    error.getDefaultMessage());
+            map.put(error.getField(), error.getDefaultMessage());
+        });
+        return Mono.just(R.fail(JsonUtil.toJsonString(map)));
+    }
 
 }

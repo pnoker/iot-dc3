@@ -37,39 +37,39 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserIdentityExt extends BaseExt {
 
-	/**
-	 * Extended content.
-	 * <p>
-	 * The content can be distinguished by Type and Version.
-	 */
-	private Content content;
+    /**
+     * Extended content.
+     * <p>
+     * The content can be distinguished by Type and Version.
+     */
+    private Content content;
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Content {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Content {
 
-		/**
-		 * Real name.
-		 */
-		private String realName;
+        /**
+         * Real name.
+         */
+        private String realName;
 
-		/**
-		 * Gender.
-		 */
-		private String gender;
+        /**
+         * Gender.
+         */
+        private String gender;
 
-		/**
-		 * Nationality.
-		 */
-		private String nationality;
+        /**
+         * Nationality.
+         */
+        private String nationality;
 
-		/**
-		 * Identification number.
-		 */
-		private String idNumber;
+        /**
+         * Identification number.
+         */
+        private String idNumber;
 
-	}
+    }
 
 }

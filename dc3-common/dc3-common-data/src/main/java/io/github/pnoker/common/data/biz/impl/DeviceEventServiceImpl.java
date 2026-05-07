@@ -48,78 +48,78 @@ import java.util.Objects;
 @Service
 public class DeviceEventServiceImpl implements DeviceEventService {
 
-	@Resource
-	private LocalCacheService localCacheService;
+    @Resource
+    private LocalCacheService localCacheService;
 
-	@Resource
-	private DeviceEventManager deviceEventManager;
+    @Resource
+    private DeviceEventManager deviceEventManager;
 
-	/**
-	 * Flip between the online family (ONLINE / MAINTAIN) and the unavailable family
-	 * (OFFLINE / FAULT) is a user-visible transition worth a derived ALARM. Within-family
-	 * flips (e.g. ONLINE -> MAINTAIN) are not.
-	 */
-	private static boolean isFlip(String prev, String current) {
-		return online(prev) != online(current);
-	}
+    /**
+     * Flip between the online family (ONLINE / MAINTAIN) and the unavailable family
+     * (OFFLINE / FAULT) is a user-visible transition worth a derived ALARM. Within-family
+     * flips (e.g. ONLINE -> MAINTAIN) are not.
+     */
+    private static boolean isFlip(String prev, String current) {
+        return online(prev) != online(current);
+    }
 
-	private static boolean online(String code) {
-		return DeviceStatusEnum.ONLINE.getCode().equals(code) || DeviceStatusEnum.MAINTAIN.getCode().equals(code);
-	}
+    private static boolean online(String code) {
+        return DeviceStatusEnum.ONLINE.getCode().equals(code) || DeviceStatusEnum.MAINTAIN.getCode().equals(code);
+    }
 
-	@Override
-	public void heartbeatEvent(DeviceEventDTO entityDTO) {
-		DeviceEventDTO.DeviceStatus payload = JsonUtil.parseObject(entityDTO.getContent(),
-				DeviceEventDTO.DeviceStatus.class);
-		if (Objects.isNull(payload) || Objects.isNull(payload.getDeviceId()) || Objects.isNull(payload.getStatus())) {
-			return;
-		}
+    @Override
+    public void heartbeatEvent(DeviceEventDTO entityDTO) {
+        DeviceEventDTO.DeviceStatus payload = JsonUtil.parseObject(entityDTO.getContent(),
+                DeviceEventDTO.DeviceStatus.class);
+        if (Objects.isNull(payload) || Objects.isNull(payload.getDeviceId()) || Objects.isNull(payload.getStatus())) {
+            return;
+        }
 
-		String statusKey = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + payload.getDeviceId();
-		String prev = localCacheService.getKey(statusKey);
-		String current = payload.getStatus().getCode();
+        String statusKey = PrefixConstant.DEVICE_STATUS_KEY_PREFIX + payload.getDeviceId();
+        String prev = localCacheService.getKey(statusKey);
+        String current = payload.getStatus().getCode();
 
-		// Refresh the online-status cache so the dashboard's "online" badge reacts
-		// immediately.
-		// Heartbeats do NOT write to dc3_device_event any more — they'd flood the table
-		// at
-		// the heartbeat rate (potentially per-second per device). The cache entry alone
-		// is
-		// enough to drive the online badge, and an ALARM row is still persisted on a real
-		// state flip below.
-		localCacheService.setKey(statusKey, current, payload.getTimeOut(), payload.getTimeUnit());
+        // Refresh the online-status cache so the dashboard's "online" badge reacts
+        // immediately.
+        // Heartbeats do NOT write to dc3_device_event any more — they'd flood the table
+        // at
+        // the heartbeat rate (potentially per-second per device). The cache entry alone
+        // is
+        // enough to drive the online badge, and an ALARM row is still persisted on a real
+        // state flip below.
+        localCacheService.setKey(statusKey, current, payload.getTimeOut(), payload.getTimeUnit());
 
-		// Derive an ALARM row on state flips so operators see transitions in the alert
-		// list.
-		if (prev != null && !Objects.equals(prev, current) && isFlip(prev, current)) {
-			String message = String.format("Device status changed: %s -> %s", prev, current);
-			persist(payload, DeviceEventTypeEnum.ALARM, "device-state-flip", message);
-		}
-	}
+        // Derive an ALARM row on state flips so operators see transitions in the alert
+        // list.
+        if (prev != null && !Objects.equals(prev, current) && isFlip(prev, current)) {
+            String message = String.format("Device status changed: %s -> %s", prev, current);
+            persist(payload, DeviceEventTypeEnum.ALARM, "device-state-flip", message);
+        }
+    }
 
-	@Override
-	public void alarmEvent(DeviceEventDTO entityDTO) {
-		DeviceEventDTO.DeviceStatus payload = JsonUtil.parseObject(entityDTO.getContent(),
-				DeviceEventDTO.DeviceStatus.class);
-		if (Objects.isNull(payload) || Objects.isNull(payload.getDeviceId())) {
-			log.warn("Drop device alarm without deviceId: {}", entityDTO.getContent());
-			return;
-		}
-		String msg = payload.getMessage() != null ? payload.getMessage() : entityDTO.getContent();
-		persist(payload, DeviceEventTypeEnum.ALARM, "device-alarm", msg);
-	}
+    @Override
+    public void alarmEvent(DeviceEventDTO entityDTO) {
+        DeviceEventDTO.DeviceStatus payload = JsonUtil.parseObject(entityDTO.getContent(),
+                DeviceEventDTO.DeviceStatus.class);
+        if (Objects.isNull(payload) || Objects.isNull(payload.getDeviceId())) {
+            log.warn("Drop device alarm without deviceId: {}", entityDTO.getContent());
+            return;
+        }
+        String msg = payload.getMessage() != null ? payload.getMessage() : entityDTO.getContent();
+        persist(payload, DeviceEventTypeEnum.ALARM, "device-alarm", msg);
+    }
 
-	private void persist(DeviceEventDTO.DeviceStatus payload, DeviceEventTypeEnum type, String extType,
-			String extContent) {
-		DeviceEventDO entity = new DeviceEventDO();
-		entity.setDeviceId(payload.getDeviceId());
-		entity.setPointId(0L);
-		entity.setEventTypeFlag(type.getIndex());
-		entity.setEventExt(JsonExt.builder().type(extType).content(extContent).version(1).build());
-		entity.setExpiredTime(0L);
-		entity.setConfirmFlag((byte) 0);
-		entity.setTenantId(payload.getTenantId() != null ? payload.getTenantId() : 0L);
-		deviceEventManager.save(entity);
-	}
+    private void persist(DeviceEventDTO.DeviceStatus payload, DeviceEventTypeEnum type, String extType,
+                         String extContent) {
+        DeviceEventDO entity = new DeviceEventDO();
+        entity.setDeviceId(payload.getDeviceId());
+        entity.setPointId(0L);
+        entity.setEventTypeFlag(type.getIndex());
+        entity.setEventExt(JsonExt.builder().type(extType).content(extContent).version(1).build());
+        entity.setExpiredTime(0L);
+        entity.setConfirmFlag((byte) 0);
+        entity.setTenantId(payload.getTenantId() != null ? payload.getTenantId() : 0L);
+        deviceEventManager.save(entity);
+    }
 
 }

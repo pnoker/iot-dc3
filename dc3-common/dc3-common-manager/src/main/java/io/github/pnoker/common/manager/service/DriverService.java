@@ -33,40 +33,45 @@ import java.util.Set;
  */
 public interface DriverService extends BaseService<DriverBO, DriverQuery> {
 
-	/**
-	 * ServiceName
-	 * @param serviceName Driver service name
-	 * @param tenantId Tenant ID
-	 * @return Driver
-	 */
-	DriverBO selectByServiceName(String serviceName, Long tenantId);
+    /**
+     * ServiceName
+     *
+     * @param serviceName Driver service name
+     * @param tenantId    Tenant ID
+     * @return Driver
+     */
+    DriverBO selectByServiceName(String serviceName, Long tenantId);
 
-	/**
-	 * ID
-	 * @param profileId ID
-	 * @return Driver
-	 */
-	List<DriverBO> selectByProfileId(Long profileId);
+    /**
+     * ID
+     *
+     * @param profileId ID
+     * @return Driver
+     */
+    List<DriverBO> selectByProfileId(Long profileId);
 
-	/**
-	 * Point ID
-	 * @param pointId Point ID
-	 * @return Driver
-	 */
-	List<DriverBO> selectByPointId(Long pointId);
+    /**
+     * Point ID
+     *
+     * @param pointId Point ID
+     * @return Driver
+     */
+    List<DriverBO> selectByPointId(Long pointId);
 
-	/**
-	 * Driver ID
-	 * @param deviceId Device ID
-	 * @return Driver
-	 */
-	DriverBO selectByDeviceId(Long deviceId);
+    /**
+     * Driver ID
+     *
+     * @param deviceId Device ID
+     * @return Driver
+     */
+    DriverBO selectByDeviceId(Long deviceId);
 
-	/**
-	 * Driver ID
-	 * @param ids Driver ID
-	 * @return Driver
-	 */
-	List<DriverBO> selectByIds(Set<Long> ids);
+    /**
+     * Driver ID
+     *
+     * @param ids Driver ID
+     * @return Driver
+     */
+    List<DriverBO> selectByIds(Set<Long> ids);
 
 }

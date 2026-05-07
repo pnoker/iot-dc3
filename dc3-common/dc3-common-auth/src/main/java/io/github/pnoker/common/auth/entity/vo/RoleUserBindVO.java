@@ -39,16 +39,16 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class RoleUserBindVO extends BaseVO {
 
-	/**
-	 * ID
-	 */
-	@NotNull(message = "Role id can't be empty", groups = { Add.class, Update.class })
-	private Long roleId;
+    /**
+     * ID
+     */
+    @NotNull(message = "Role id can't be empty", groups = {Add.class, Update.class})
+    private Long roleId;
 
-	/**
-	 * ID
-	 */
-	@NotNull(message = "User id can't be empty", groups = { Add.class, Update.class })
-	private Long userId;
+    /**
+     * ID
+     */
+    @NotNull(message = "User id can't be empty", groups = {Add.class, Update.class})
+    private Long userId;
 
 }

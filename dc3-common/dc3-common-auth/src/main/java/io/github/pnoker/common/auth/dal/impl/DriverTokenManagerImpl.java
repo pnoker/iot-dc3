@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DriverTokenManagerImpl extends ServiceImpl<DriverTokenMapper, DriverTokenDO>
-		implements DriverTokenManager {
+        implements DriverTokenManager {
 
 }

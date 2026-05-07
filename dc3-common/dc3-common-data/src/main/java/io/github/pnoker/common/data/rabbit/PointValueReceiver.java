@@ -46,49 +46,46 @@ import java.util.concurrent.ExecutorService;
 @Component
 public class PointValueReceiver {
 
-	@Value("${data.point.batch.speed}")
-	private Integer batchSpeed;
+    @Value("${data.point.batch.speed}")
+    private Integer batchSpeed;
 
-	@Resource
-	private ExecutorService virtualThreadExecutor;
+    @Resource
+    private ExecutorService virtualThreadExecutor;
 
-	@Resource
-	private PointValueService pointValueService;
+    @Resource
+    private PointValueService pointValueService;
 
-	@RabbitHandler
-	@RabbitListener(queues = "#{pointValueQueue.name}")
-	public void pointValueReceive(Channel channel, Message message, PointValueBO pointValueBO) {
-		try {
-			channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
-			if (Objects.isNull(pointValueBO) || Objects.isNull(pointValueBO.getDeviceId())) {
-				log.error("Invalid point value: {}", pointValueBO);
-				return;
-			}
-			PointValueJob.VALUE_COUNT.getAndIncrement();
-			log.debug("Receive point value from: {}, {}", message.getMessageProperties().getReceivedRoutingKey(),
-					JsonUtil.toJsonString(pointValueBO));
+    @RabbitHandler
+    @RabbitListener(queues = "#{pointValueQueue.name}")
+    public void pointValueReceive(Channel channel, Message message, PointValueBO pointValueBO) {
+        try {
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+            if (Objects.isNull(pointValueBO) || Objects.isNull(pointValueBO.getDeviceId())) {
+                log.error("Invalid point value: {}", pointValueBO);
+                return;
+            }
+            PointValueJob.VALUE_COUNT.getAndIncrement();
+            log.debug("Receive point value from: {}, {}", message.getMessageProperties().getReceivedRoutingKey(),
+                    JsonUtil.toJsonString(pointValueBO));
 
-			// Judge whether to process data in batch according to the data transmission
-			// speed
-			if (PointValueJob.VALUE_SPEED.get() < batchSpeed) {
-				virtualThreadExecutor.execute(() ->
-				// Save point value to Redis & PostgreSQL
-				pointValueService.save(pointValueBO));
-			}
-			else {
-				// Save point value to schedule
-				PointValueJob.VALUE_LOCK.writeLock().lock();
-				try {
-					PointValueJob.addPointValues(pointValueBO);
-				}
-				finally {
-					PointValueJob.VALUE_LOCK.writeLock().unlock();
-				}
-			}
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+            // Judge whether to process data in batch according to the data transmission
+            // speed
+            if (PointValueJob.VALUE_SPEED.get() < batchSpeed) {
+                virtualThreadExecutor.execute(() ->
+                        // Save point value to Redis & PostgreSQL
+                        pointValueService.save(pointValueBO));
+            } else {
+                // Save point value to schedule
+                PointValueJob.VALUE_LOCK.writeLock().lock();
+                try {
+                    PointValueJob.addPointValues(pointValueBO);
+                } finally {
+                    PointValueJob.VALUE_LOCK.writeLock().unlock();
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
 }

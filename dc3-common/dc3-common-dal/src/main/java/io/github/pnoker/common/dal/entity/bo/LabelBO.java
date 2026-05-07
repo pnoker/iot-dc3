@@ -36,34 +36,34 @@ import lombok.*;
 @ToString(callSuper = true)
 public class LabelBO extends BaseBO {
 
-	/**
-	 * Label name.
-	 */
-	private String labelName;
+    /**
+     * Label name.
+     */
+    private String labelName;
 
-	/**
-	 * Label code.
-	 */
-	private String labelCode;
+    /**
+     * Label code.
+     */
+    private String labelCode;
 
-	/**
-	 * Label color.
-	 */
-	private String labelColor;
+    /**
+     * Label color.
+     */
+    private String labelColor;
 
-	/**
-	 * Entity type flag.
-	 */
-	private EntityTypeFlagEnum entityTypeFlag;
+    /**
+     * Entity type flag.
+     */
+    private EntityTypeFlagEnum entityTypeFlag;
 
-	/**
-	 * Enable status flag.
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable status flag.
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 * Tenant ID.
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID.
+     */
+    private Long tenantId;
 
 }

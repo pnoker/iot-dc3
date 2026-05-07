@@ -35,98 +35,101 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum PointTypeFlagEnum {
 
-	/**
-	 * String
-	 */
-	STRING((byte) 0, "string", "String"),
+    /**
+     * String
+     */
+    STRING((byte) 0, "string", "String"),
 
-	/**
-	 * Byte
-	 */
-	BYTE((byte) 1, "byte", "Byte"),
+    /**
+     * Byte
+     */
+    BYTE((byte) 1, "byte", "Byte"),
 
-	/**
-	 * Short
-	 */
-	SHORT((byte) 2, "short", "Short"),
+    /**
+     * Short
+     */
+    SHORT((byte) 2, "short", "Short"),
 
-	/**
-	 * Int
-	 */
-	INT((byte) 3, "int", "Int"),
+    /**
+     * Int
+     */
+    INT((byte) 3, "int", "Int"),
 
-	/**
-	 * Long
-	 */
-	LONG((byte) 4, "long", "Long"),
+    /**
+     * Long
+     */
+    LONG((byte) 4, "long", "Long"),
 
-	/**
-	 * Float
-	 */
-	FLOAT((byte) 5, "float", "Float"),
+    /**
+     * Float
+     */
+    FLOAT((byte) 5, "float", "Float"),
 
-	/**
-	 * Double
-	 */
-	DOUBLE((byte) 6, "double", "Double"),
+    /**
+     * Double
+     */
+    DOUBLE((byte) 6, "double", "Double"),
 
-	/**
-	 * Boolean
-	 */
-	BOOLEAN((byte) 7, "boolean", "Boolean"),;
+    /**
+     * Boolean
+     */
+    BOOLEAN((byte) 7, "boolean", "Boolean"),
+    ;
 
-	/**
-	 * Index
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code
-	 */
-	private final String code;
+    /**
+     * Code
+     */
+    private final String code;
 
-	/**
-	 * Remark
-	 */
-	private final String remark;
+    /**
+     * Remark
+     */
+    private final String remark;
 
-	/**
-	 * Get enum by index
-	 * @param index Index
-	 * @return {@link PointTypeFlagEnum}
-	 */
-	public static PointTypeFlagEnum ofIndex(Byte index) {
-		Optional<PointTypeFlagEnum> any = Arrays.stream(PointTypeFlagEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link PointTypeFlagEnum}
+     */
+    public static PointTypeFlagEnum ofIndex(Byte index) {
+        Optional<PointTypeFlagEnum> any = Arrays.stream(PointTypeFlagEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code
-	 * @param code Code
-	 * @return {@link PointTypeFlagEnum}
-	 */
-	public static PointTypeFlagEnum ofCode(String code) {
-		Optional<PointTypeFlagEnum> any = Arrays.stream(PointTypeFlagEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link PointTypeFlagEnum}
+     */
+    public static PointTypeFlagEnum ofCode(String code) {
+        Optional<PointTypeFlagEnum> any = Arrays.stream(PointTypeFlagEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by name
-	 * @param name Name
-	 * @return {@link PointTypeFlagEnum}
-	 */
-	public static PointTypeFlagEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by name
+     *
+     * @param name Name
+     * @return {@link PointTypeFlagEnum}
+     */
+    public static PointTypeFlagEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

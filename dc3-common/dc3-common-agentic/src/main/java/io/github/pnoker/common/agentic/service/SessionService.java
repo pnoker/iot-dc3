@@ -22,34 +22,38 @@ import io.github.pnoker.common.agentic.entity.query.SessionQuery;
 
 public interface SessionService {
 
-	/**
-	 * Create a new session if one does not exist for the given conversation ID. If a
-	 * session already exists, update its operate_time.
-	 * @param conversationId conversation ID
-	 * @param skill active skill name (may be null)
-	 * @return the session BO
-	 */
-	SessionBO touch(String conversationId, String skill);
+    /**
+     * Create a new session if one does not exist for the given conversation ID. If a
+     * session already exists, update its operate_time.
+     *
+     * @param conversationId conversation ID
+     * @param skill          active skill name (may be null)
+     * @return the session BO
+     */
+    SessionBO touch(String conversationId, String skill);
 
-	/**
-	 * Get session by conversation ID.
-	 * @param conversationId conversation ID
-	 * @return session BO or null
-	 */
-	SessionBO getByConversationId(String conversationId);
+    /**
+     * Get session by conversation ID.
+     *
+     * @param conversationId conversation ID
+     * @return session BO or null
+     */
+    SessionBO getByConversationId(String conversationId);
 
-	/**
-	 * Delete session by conversation ID (logical delete) and clear associated chat
-	 * memory.
-	 * @param conversationId conversation ID
-	 */
-	void removeByConversationId(String conversationId);
+    /**
+     * Delete session by conversation ID (logical delete) and clear associated chat
+     * memory.
+     *
+     * @param conversationId conversation ID
+     */
+    void removeByConversationId(String conversationId);
 
-	/**
-	 * Query sessions with pagination.
-	 * @param query query parameters
-	 * @return paginated results
-	 */
-	Page<SessionBO> selectByPage(SessionQuery query);
+    /**
+     * Query sessions with pagination.
+     *
+     * @param query query parameters
+     * @return paginated results
+     */
+    Page<SessionBO> selectByPage(SessionQuery query);
 
 }

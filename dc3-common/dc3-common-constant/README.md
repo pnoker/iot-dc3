@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-constant` is the shared constants and enumerations module of the IoT DC3 platform. It defines all platform-wide constants, routing keys, service names, URL prefixes,
+`dc3-common-constant` is the shared constants and enumerations module of the IoT DC3 platform. It defines all
+platform-wide constants, routing keys, service names, URL prefixes,
 and enumeration types used across services, drivers, and common modules.
 
 ## Module Information
@@ -36,7 +37,8 @@ and enumeration types used across services, drivers, and common modules.
 | `ROUTING_DRIVER_METADATA_PREFIX` | `dc3.r.metadata.driver.` |
 | `ROUTING_POINT_VALUE_PREFIX`     | `dc3.r.value.point.`     |
 
-> **Important**: RabbitMQ routing keys are suffixed with the driver's service name. These constants must not be renamed without updating all consumers.
+> **Important**: RabbitMQ routing keys are suffixed with the driver's service name. These constants must not be renamed
+> without updating all consumers.
 
 ### Common Constants
 

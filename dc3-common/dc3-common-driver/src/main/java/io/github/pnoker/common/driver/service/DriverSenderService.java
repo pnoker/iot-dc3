@@ -34,58 +34,66 @@ import java.util.concurrent.TimeUnit;
  */
 public interface DriverSenderService {
 
-	/**
-	 * Publishes a driver event.
-	 * @param entityDTO driver event payload
-	 */
-	void driverEventSender(DriverEventDTO entityDTO);
+    /**
+     * Publishes a driver event.
+     *
+     * @param entityDTO driver event payload
+     */
+    void driverEventSender(DriverEventDTO entityDTO);
 
-	/**
-	 * Publishes a device event.
-	 * @param entityDTO device event payload
-	 */
-	void deviceEventSender(DeviceEventDTO entityDTO);
+    /**
+     * Publishes a device event.
+     *
+     * @param entityDTO device event payload
+     */
+    void deviceEventSender(DeviceEventDTO entityDTO);
 
-	/**
-	 * Publishes a device status event using the default timeout.
-	 * @param deviceId device identifier
-	 * @param status device status
-	 */
-	void deviceStatusSender(Long deviceId, DeviceStatusEnum status);
+    /**
+     * Publishes a device status event using the default timeout.
+     *
+     * @param deviceId device identifier
+     * @param status   device status
+     */
+    void deviceStatusSender(Long deviceId, DeviceStatusEnum status);
 
-	/**
-	 * Publishes a device status event using the supplied timeout.
-	 * @param deviceId device identifier
-	 * @param status device status
-	 * @param timeOut timeout value
-	 * @param timeUnit timeout unit
-	 */
-	void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit);
+    /**
+     * Publishes a device status event using the supplied timeout.
+     *
+     * @param deviceId device identifier
+     * @param status   device status
+     * @param timeOut  timeout value
+     * @param timeUnit timeout unit
+     */
+    void deviceStatusSender(Long deviceId, DeviceStatusEnum status, int timeOut, TimeUnit timeUnit);
 
-	/**
-	 * Publishes a driver-level ALARM event. Used by protocol drivers when a connection /
-	 * read / write fails or a runtime guard trips.
-	 * @param message human-readable reason, e.g. "OPC UA session dropped"
-	 */
-	void driverAlarmSender(String message);
+    /**
+     * Publishes a driver-level ALARM event. Used by protocol drivers when a connection /
+     * read / write fails or a runtime guard trips.
+     *
+     * @param message human-readable reason, e.g. "OPC UA session dropped"
+     */
+    void driverAlarmSender(String message);
 
-	/**
-	 * Publishes a device-level ALARM event scoped to the given device.
-	 * @param deviceId device identifier
-	 * @param message human-readable reason
-	 */
-	void deviceAlarmSender(Long deviceId, String message);
+    /**
+     * Publishes a device-level ALARM event scoped to the given device.
+     *
+     * @param deviceId device identifier
+     * @param message  human-readable reason
+     */
+    void deviceAlarmSender(Long deviceId, String message);
 
-	/**
-	 * Publishes a single point value.
-	 * @param entityDTO point value payload
-	 */
-	void pointValueSender(PointValue entityDTO);
+    /**
+     * Publishes a single point value.
+     *
+     * @param entityDTO point value payload
+     */
+    void pointValueSender(PointValue entityDTO);
 
-	/**
-	 * Publishes multiple point values.
-	 * @param entityDTOList point value payloads
-	 */
-	void pointValueSender(List<PointValue> entityDTOList);
+    /**
+     * Publishes multiple point values.
+     *
+     * @param entityDTOList point value payloads
+     */
+    void pointValueSender(List<PointValue> entityDTOList);
 
 }

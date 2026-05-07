@@ -37,28 +37,29 @@ import java.util.Objects;
 @Component
 public class FacadeGrpcPointValueBuilder {
 
-	/**
-	 * Convert a gRPC {@link GrpcPointValueDTO} to a facade-level BO.
-	 * @param dto the gRPC DTO (may be {@code null})
-	 * @return the facade BO, or {@code null} when the input is {@code null}
-	 */
-	public FacadePointValueBO toFacadeBO(GrpcPointValueDTO dto) {
-		if (Objects.isNull(dto)) {
-			return null;
-		}
+    /**
+     * Convert a gRPC {@link GrpcPointValueDTO} to a facade-level BO.
+     *
+     * @param dto the gRPC DTO (may be {@code null})
+     * @return the facade BO, or {@code null} when the input is {@code null}
+     */
+    public FacadePointValueBO toFacadeBO(GrpcPointValueDTO dto) {
+        if (Objects.isNull(dto)) {
+            return null;
+        }
 
-		FacadePointValueBO bo = FacadePointValueBO.builder().createTime(dto.getCreateTime()).build();
+        FacadePointValueBO bo = FacadePointValueBO.builder().createTime(dto.getCreateTime()).build();
 
-		if (dto.getDeviceId() > 0) {
-			bo.setDeviceId(dto.getDeviceId());
-		}
-		if (dto.getPointId() > 0) {
-			bo.setPointId(dto.getPointId());
-		}
-		StringOptional.ofNullable(dto.getValue()).ifPresent(bo::setValue);
-		StringOptional.ofNullable(dto.getRawValue()).ifPresent(bo::setRawValue);
+        if (dto.getDeviceId() > 0) {
+            bo.setDeviceId(dto.getDeviceId());
+        }
+        if (dto.getPointId() > 0) {
+            bo.setPointId(dto.getPointId());
+        }
+        StringOptional.ofNullable(dto.getValue()).ifPresent(bo::setValue);
+        StringOptional.ofNullable(dto.getRawValue()).ifPresent(bo::setRawValue);
 
-		return bo;
-	}
+        return bo;
+    }
 
 }

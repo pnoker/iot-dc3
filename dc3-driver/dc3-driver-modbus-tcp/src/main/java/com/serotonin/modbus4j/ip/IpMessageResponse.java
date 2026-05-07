@@ -30,12 +30,13 @@ import com.serotonin.modbus4j.sero.messaging.OutgoingResponseMessage;
  */
 public interface IpMessageResponse extends OutgoingResponseMessage, IncomingResponseMessage {
 
-	/**
-	 * <p>
-	 * getModbusResponse.
-	 * </p>
-	 * @return a {@link ModbusResponse} object.
-	 */
-	ModbusResponse getModbusResponse();
+    /**
+     * <p>
+     * getModbusResponse.
+     * </p>
+     *
+     * @return a {@link ModbusResponse} object.
+     */
+    ModbusResponse getModbusResponse();
 
 }

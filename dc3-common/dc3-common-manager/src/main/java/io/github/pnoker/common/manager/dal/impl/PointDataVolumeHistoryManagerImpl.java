@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PointDataVolumeHistoryManagerImpl extends
-		ServiceImpl<PointDataVolumeHistoryMapper, PointDataVolumeHistoryDO> implements PointDataVolumeHistoryManager {
+        ServiceImpl<PointDataVolumeHistoryMapper, PointDataVolumeHistoryDO> implements PointDataVolumeHistoryManager {
 
 }

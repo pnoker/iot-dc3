@@ -43,17 +43,17 @@ import java.util.List;
 @Setter
 public class Pages implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private long current = 1;
+    private long current = 1;
 
-	private long size = DefaultConstant.PAGE_SIZE;
+    private long size = DefaultConstant.PAGE_SIZE;
 
-	private long startTime;
+    private long startTime;
 
-	private long endTime;
+    private long endTime;
 
-	private List<OrderItem> orders = new ArrayList<>(2);
+    private List<OrderItem> orders = new ArrayList<>(2);
 
 }

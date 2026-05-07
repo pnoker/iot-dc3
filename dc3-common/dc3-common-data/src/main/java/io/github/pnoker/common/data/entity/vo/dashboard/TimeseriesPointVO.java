@@ -38,12 +38,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TimeseriesPointVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime bucket;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime bucket;
 
-	private long count;
+    private long count;
 
 }

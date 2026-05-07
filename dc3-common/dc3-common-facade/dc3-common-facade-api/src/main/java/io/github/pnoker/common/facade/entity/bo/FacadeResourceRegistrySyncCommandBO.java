@@ -35,10 +35,10 @@ import java.util.List;
 @AllArgsConstructor
 public class FacadeResourceRegistrySyncCommandBO {
 
-	private String serviceName;
+    private String serviceName;
 
-	private boolean deleteMissing;
+    private boolean deleteMissing;
 
-	private List<FacadeScannedApiBO> apis;
+    private List<FacadeScannedApiBO> apis;
 
 }

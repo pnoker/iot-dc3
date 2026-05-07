@@ -49,80 +49,76 @@ import reactor.core.publisher.Mono;
 @RequestMapping(ManagerConstant.DASHBOARD_URL_PREFIX)
 public class DashboardController implements BaseController {
 
-	private final DashboardService dashboardService;
+    private final DashboardService dashboardService;
 
-	public DashboardController(DashboardService dashboardService) {
-		this.dashboardService = dashboardService;
-	}
+    public DashboardController(DashboardService dashboardService) {
+        this.dashboardService = dashboardService;
+    }
 
-	@GetMapping("/driver/stats")
-	public Mono<R<DriverStatsVO>> driverStats() {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				return Mono.just(R.ok(dashboardService.driverStats(tenantId)));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    @GetMapping("/driver/stats")
+    public Mono<R<DriverStatsVO>> driverStats() {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.driverStats(tenantId)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
-	@GetMapping("/device/stats")
-	public Mono<R<DeviceStatsVO>> deviceStats(@RequestParam(value = "topN", defaultValue = "10") int topN) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				return Mono.just(R.ok(dashboardService.deviceStats(tenantId, topN)));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    @GetMapping("/device/stats")
+    public Mono<R<DeviceStatsVO>> deviceStats(@RequestParam(value = "topN", defaultValue = "10") int topN) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.deviceStats(tenantId, topN)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
-	/**
-	 * Daily new-row counts for driver / device / point / profile tables over the last
-	 * {@code days} days. Backs the stat-card sparklines. Returns fixed-length zero-padded
-	 * arrays so the frontend never has to reason about missing days.
-	 */
-	@GetMapping("/growth")
-	public Mono<R<GrowthVO>> dailyGrowth(@RequestParam(value = "days", defaultValue = "7") int days) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				return Mono.just(R.ok(dashboardService.dailyGrowth(tenantId, days)));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * Daily new-row counts for driver / device / point / profile tables over the last
+     * {@code days} days. Backs the stat-card sparklines. Returns fixed-length zero-padded
+     * arrays so the frontend never has to reason about missing days.
+     */
+    @GetMapping("/growth")
+    public Mono<R<GrowthVO>> dailyGrowth(@RequestParam(value = "days", defaultValue = "7") int days) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.dailyGrowth(tenantId, days)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
-	/**
-	 * Four-column Sankey topology (Driver → Device → Profile → Point).
-	 * {@code mode=cardinality} is the Phase 0 default and counts relationships along each
-	 * edge; future {@code mode=volume} will weight edges by point_value sample counts
-	 * over {@code rangeKey}.
-	 *
-	 * <p>
-	 * Top-N cropping is server-side — each cropped slice becomes an {@code others:*}
-	 * pseudo-node with a {@code hiddenChildren} payload the frontend pops in a drill-in
-	 * dialog.
-	 * </p>
-	 */
-	@GetMapping("/topology")
-	public Mono<R<TopologyVO>> topology(@RequestParam(value = "mode", defaultValue = "cardinality") String mode,
-			@RequestParam(value = "rangeKey", required = false) String rangeKey) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				return Mono.just(R.ok(dashboardService.topology(tenantId, mode, rangeKey)));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * Four-column Sankey topology (Driver → Device → Profile → Point).
+     * {@code mode=cardinality} is the Phase 0 default and counts relationships along each
+     * edge; future {@code mode=volume} will weight edges by point_value sample counts
+     * over {@code rangeKey}.
+     *
+     * <p>
+     * Top-N cropping is server-side — each cropped slice becomes an {@code others:*}
+     * pseudo-node with a {@code hiddenChildren} payload the frontend pops in a drill-in
+     * dialog.
+     * </p>
+     */
+    @GetMapping("/topology")
+    public Mono<R<TopologyVO>> topology(@RequestParam(value = "mode", defaultValue = "cardinality") String mode,
+                                        @RequestParam(value = "rangeKey", required = false) String rangeKey) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                return Mono.just(R.ok(dashboardService.topology(tenantId, mode, rangeKey)));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
 }

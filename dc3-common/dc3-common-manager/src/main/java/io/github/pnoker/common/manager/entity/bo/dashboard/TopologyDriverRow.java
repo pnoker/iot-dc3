@@ -29,10 +29,10 @@ import lombok.ToString;
 @ToString
 public class TopologyDriverRow {
 
-	private long id;
+    private long id;
 
-	private String driverName;
+    private String driverName;
 
-	private long deviceCount;
+    private long deviceCount;
 
 }

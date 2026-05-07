@@ -28,39 +28,42 @@ import java.io.IOException;
  */
 public interface Transport {
 
-	/**
-	 * <p>
-	 * setConsumer.
-	 * </p>
-	 * @param consumer a {@link DataConsumer} object.
-	 * @throws IOException if any.
-	 */
-	abstract void setConsumer(DataConsumer consumer) throws IOException;
+    /**
+     * <p>
+     * setConsumer.
+     * </p>
+     *
+     * @param consumer a {@link DataConsumer} object.
+     * @throws IOException if any.
+     */
+    abstract void setConsumer(DataConsumer consumer) throws IOException;
 
-	/**
-	 * <p>
-	 * removeConsumer.
-	 * </p>
-	 */
-	abstract void removeConsumer();
+    /**
+     * <p>
+     * removeConsumer.
+     * </p>
+     */
+    abstract void removeConsumer();
 
-	/**
-	 * <p>
-	 * write.
-	 * </p>
-	 * @param data an array of {@link byte} objects.
-	 * @throws IOException if any.
-	 */
-	abstract void write(byte[] data) throws IOException;
+    /**
+     * <p>
+     * write.
+     * </p>
+     *
+     * @param data an array of {@link byte} objects.
+     * @throws IOException if any.
+     */
+    abstract void write(byte[] data) throws IOException;
 
-	/**
-	 * <p>
-	 * write.
-	 * </p>
-	 * @param data an array of {@link byte} objects.
-	 * @param len a int.
-	 * @throws IOException if any.
-	 */
-	abstract void write(byte[] data, int len) throws IOException;
+    /**
+     * <p>
+     * write.
+     * </p>
+     *
+     * @param data an array of {@link byte} objects.
+     * @param len  a int.
+     * @throws IOException if any.
+     */
+    abstract void write(byte[] data, int len) throws IOException;
 
 }

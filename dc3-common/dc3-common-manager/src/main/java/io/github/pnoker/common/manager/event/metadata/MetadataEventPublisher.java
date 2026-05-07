@@ -36,18 +36,18 @@ import org.springframework.stereotype.Component;
 @EnableAsync
 public class MetadataEventPublisher {
 
-	private final ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
-	public MetadataEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-		this.applicationEventPublisher = applicationEventPublisher;
-	}
+    public MetadataEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
-	/**
-	 * @param metadataEvent MetadataEvent
-	 */
-	public void publishEvent(MetadataEvent metadataEvent) {
-		log.info("Metadata event publisher publishEvent: {}", JsonUtil.toJsonString(metadataEvent));
-		applicationEventPublisher.publishEvent(metadataEvent);
-	}
+    /**
+     * @param metadataEvent MetadataEvent
+     */
+    public void publishEvent(MetadataEvent metadataEvent) {
+        log.info("Metadata event publisher publishEvent: {}", JsonUtil.toJsonString(metadataEvent));
+        applicationEventPublisher.publishEvent(metadataEvent);
+    }
 
 }

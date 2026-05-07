@@ -30,14 +30,14 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ChatMessageDTO {
 
-	/**
-	 * Message role: "system", "user", "assistant", or "tool".
-	 */
-	private String role;
+    /**
+     * Message role: "system", "user", "assistant", or "tool".
+     */
+    private String role;
 
-	/**
-	 * Message content text.
-	 */
-	private String content;
+    /**
+     * Message content text.
+     */
+    private String content;
 
 }

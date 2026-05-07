@@ -19,9 +19,9 @@ package org.openscada.opc.lib.da;
 
 public class DuplicateGroupException extends Exception {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
 }

@@ -28,17 +28,18 @@ import io.github.pnoker.driver.api.impl.serializer.S7SerializerImpl;
  */
 public class S7SerializerFactory {
 
-	private S7SerializerFactory() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private S7SerializerFactory() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Builds a new serializer with given connector
-	 * @param connector the connector to use
-	 * @return a serializer instance
-	 */
-	public static S7Serializer buildSerializer(final S7Connector connector) {
-		return new S7SerializerImpl(connector);
-	}
+    /**
+     * Builds a new serializer with given connector
+     *
+     * @param connector the connector to use
+     * @return a serializer instance
+     */
+    public static S7Serializer buildSerializer(final S7Connector connector) {
+        return new S7SerializerImpl(connector);
+    }
 
 }

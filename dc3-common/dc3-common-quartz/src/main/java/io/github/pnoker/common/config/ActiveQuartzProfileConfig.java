@@ -42,14 +42,15 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveQuartzProfileConfig implements EnvironmentPostProcessor {
 
-	/**
-	 * Post-process environment to add the "quartz" active profile
-	 * @param environment ConfigurableEnvironment to modify
-	 * @param application SpringApplication instance
-	 */
-	@Override
-	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		environment.addActiveProfile("quartz");
-	}
+    /**
+     * Post-process environment to add the "quartz" active profile
+     *
+     * @param environment ConfigurableEnvironment to modify
+     * @param application SpringApplication instance
+     */
+    @Override
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        environment.addActiveProfile("quartz");
+    }
 
 }

@@ -31,20 +31,20 @@ import java.text.MessageFormat;
 @Slf4j
 public class ExceptionUtil {
 
-	private ExceptionUtil() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private ExceptionUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * @param service Name
-	 * @param message
-	 * @return
-	 */
-	public static String getNotAvailableServiceMessage(String service, String message) {
-		if (StringUtils.isEmpty(message)) {
-			message = MessageFormat.format("{0}: {1}", ExceptionConstant.NO_AVAILABLE_SERVER, service);
-		}
-		return message;
-	}
+    /**
+     * @param service Name
+     * @param message
+     * @return
+     */
+    public static String getNotAvailableServiceMessage(String service, String message) {
+        if (StringUtils.isEmpty(message)) {
+            message = MessageFormat.format("{0}: {1}", ExceptionConstant.NO_AVAILABLE_SERVER, service);
+        }
+        return message;
+    }
 
 }

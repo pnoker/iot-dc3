@@ -37,163 +37,159 @@ import java.util.List;
 @Service
 public class PointValueServer extends PointValueApiGrpc.PointValueApiImplBase {
 
-	private final PointValueService pointValueService;
+    private final PointValueService pointValueService;
 
-	private final PointValueCommandService pointValueCommandService;
+    private final PointValueCommandService pointValueCommandService;
 
-	public PointValueServer(PointValueService pointValueService, PointValueCommandService pointValueCommandService) {
-		this.pointValueService = pointValueService;
-		this.pointValueCommandService = pointValueCommandService;
-	}
+    public PointValueServer(PointValueService pointValueService, PointValueCommandService pointValueCommandService) {
+        this.pointValueService = pointValueService;
+        this.pointValueCommandService = pointValueCommandService;
+    }
 
-	@Override
-	public void lastValue(GrpcPointValueQuery request, StreamObserver<GrpcRPointValueDTO> responseObserver) {
-		try {
-			// latest() with a page query — simplified: query by device+point, return
-			// first result
-			io.github.pnoker.common.entity.query.PointValueQuery query = new io.github.pnoker.common.entity.query.PointValueQuery();
-			query.setDeviceId(request.getDeviceId());
-			query.setPointId(request.getPointId());
-			query.setTenantId(request.getTenantId());
-			io.github.pnoker.common.entity.common.Pages pages = new io.github.pnoker.common.entity.common.Pages();
-			pages.setCurrent(1);
-			pages.setSize(1);
-			query.setPage(pages);
+    @Override
+    public void lastValue(GrpcPointValueQuery request, StreamObserver<GrpcRPointValueDTO> responseObserver) {
+        try {
+            // latest() with a page query — simplified: query by device+point, return
+            // first result
+            io.github.pnoker.common.entity.query.PointValueQuery query = new io.github.pnoker.common.entity.query.PointValueQuery();
+            query.setDeviceId(request.getDeviceId());
+            query.setPointId(request.getPointId());
+            query.setTenantId(request.getTenantId());
+            io.github.pnoker.common.entity.common.Pages pages = new io.github.pnoker.common.entity.common.Pages();
+            pages.setCurrent(1);
+            pages.setSize(1);
+            query.setPage(pages);
 
-			com.baomidou.mybatisplus.extension.plugins.pagination.Page<io.github.pnoker.common.entity.bo.PointValueBO> page = pointValueService
-				.latest(query);
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<io.github.pnoker.common.entity.bo.PointValueBO> page = pointValueService
+                    .latest(query);
 
-			GrpcRPointValueDTO.Builder response = GrpcRPointValueDTO.newBuilder();
-			response.setResult(GrpcR.newBuilder()
-				.setOk(true)
-				.setCode(ResponseEnum.OK.getCode())
-				.setMessage(ResponseEnum.OK.getText())
-				.build());
+            GrpcRPointValueDTO.Builder response = GrpcRPointValueDTO.newBuilder();
+            response.setResult(GrpcR.newBuilder()
+                    .setOk(true)
+                    .setCode(ResponseEnum.OK.getCode())
+                    .setMessage(ResponseEnum.OK.getText())
+                    .build());
 
-			if (page != null && !page.getRecords().isEmpty()) {
-				io.github.pnoker.common.entity.bo.PointValueBO bo = page.getRecords().getFirst();
-				response.setData(GrpcPointValueDTO.newBuilder()
-					.setId(0)
-					.setDeviceId(bo.getDeviceId() != null ? bo.getDeviceId() : 0)
-					.setPointId(bo.getPointId() != null ? bo.getPointId() : 0)
-					.setValue(bo.getCalValue() != null ? bo.getCalValue() : "")
-					.setRawValue(bo.getRawValue() != null ? bo.getRawValue() : "")
-					.setCreateTime(
-							bo.getCreateTime() != null ? bo.getCreateTime().toEpochSecond(java.time.ZoneOffset.UTC) : 0)
-					.build());
-			}
-			responseObserver.onNext(response.build());
-			responseObserver.onCompleted();
-		}
-		catch (Exception e) {
-			log.error("PointValueServer.lastValue error: {}", e.getMessage(), e);
-			responseObserver.onNext(GrpcRPointValueDTO.newBuilder()
-				.setResult(GrpcR.newBuilder()
-					.setOk(false)
-					.setCode(ResponseEnum.FAILURE.getCode())
-					.setMessage(e.getMessage())
-					.build())
-				.build());
-			responseObserver.onCompleted();
-		}
-	}
+            if (page != null && !page.getRecords().isEmpty()) {
+                io.github.pnoker.common.entity.bo.PointValueBO bo = page.getRecords().getFirst();
+                response.setData(GrpcPointValueDTO.newBuilder()
+                        .setId(0)
+                        .setDeviceId(bo.getDeviceId() != null ? bo.getDeviceId() : 0)
+                        .setPointId(bo.getPointId() != null ? bo.getPointId() : 0)
+                        .setValue(bo.getCalValue() != null ? bo.getCalValue() : "")
+                        .setRawValue(bo.getRawValue() != null ? bo.getRawValue() : "")
+                        .setCreateTime(
+                                bo.getCreateTime() != null ? bo.getCreateTime().toEpochSecond(java.time.ZoneOffset.UTC) : 0)
+                        .build());
+            }
+            responseObserver.onNext(response.build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("PointValueServer.lastValue error: {}", e.getMessage(), e);
+            responseObserver.onNext(GrpcRPointValueDTO.newBuilder()
+                    .setResult(GrpcR.newBuilder()
+                            .setOk(false)
+                            .setCode(ResponseEnum.FAILURE.getCode())
+                            .setMessage(e.getMessage())
+                            .build())
+                    .build());
+            responseObserver.onCompleted();
+        }
+    }
 
-	@Override
-	public void historyValue(GrpcPointValueHistoryQuery request,
-			StreamObserver<GrpcRPointValueStringList> responseObserver) {
-		try {
-			List<String> history = pointValueService.history(request.getTenantId(), request.getDeviceId(),
-					request.getPointId(), request.getCount());
+    @Override
+    public void historyValue(GrpcPointValueHistoryQuery request,
+                             StreamObserver<GrpcRPointValueStringList> responseObserver) {
+        try {
+            List<String> history = pointValueService.history(request.getTenantId(), request.getDeviceId(),
+                    request.getPointId(), request.getCount());
 
-			GrpcRPointValueStringList.Builder response = GrpcRPointValueStringList.newBuilder()
-				.setResult(GrpcR.newBuilder()
-					.setOk(true)
-					.setCode(ResponseEnum.OK.getCode())
-					.setMessage(ResponseEnum.OK.getText())
-					.build());
+            GrpcRPointValueStringList.Builder response = GrpcRPointValueStringList.newBuilder()
+                    .setResult(GrpcR.newBuilder()
+                            .setOk(true)
+                            .setCode(ResponseEnum.OK.getCode())
+                            .setMessage(ResponseEnum.OK.getText())
+                            .build());
 
-			if (history != null) {
-				response.addAllData(history);
-			}
-			responseObserver.onNext(response.build());
-			responseObserver.onCompleted();
-		}
-		catch (Exception e) {
-			log.error("PointValueServer.historyValue error: {}", e.getMessage(), e);
-			responseObserver.onNext(GrpcRPointValueStringList.newBuilder()
-				.setResult(GrpcR.newBuilder()
-					.setOk(false)
-					.setCode(ResponseEnum.FAILURE.getCode())
-					.setMessage(e.getMessage())
-					.build())
-				.build());
-			responseObserver.onCompleted();
-		}
-	}
+            if (history != null) {
+                response.addAllData(history);
+            }
+            responseObserver.onNext(response.build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("PointValueServer.historyValue error: {}", e.getMessage(), e);
+            responseObserver.onNext(GrpcRPointValueStringList.newBuilder()
+                    .setResult(GrpcR.newBuilder()
+                            .setOk(false)
+                            .setCode(ResponseEnum.FAILURE.getCode())
+                            .setMessage(e.getMessage())
+                            .build())
+                    .build());
+            responseObserver.onCompleted();
+        }
+    }
 
-	@Override
-	public void readCommand(GrpcPointValueCommandQuery request, StreamObserver<GrpcRBoolean> responseObserver) {
-		try {
-			PointValueReadVO vo = new PointValueReadVO();
-			vo.setDeviceId(request.getDeviceId());
-			vo.setPointId(request.getPointId());
-			pointValueCommandService.read(vo);
+    @Override
+    public void readCommand(GrpcPointValueCommandQuery request, StreamObserver<GrpcRBoolean> responseObserver) {
+        try {
+            PointValueReadVO vo = new PointValueReadVO();
+            vo.setDeviceId(request.getDeviceId());
+            vo.setPointId(request.getPointId());
+            pointValueCommandService.read(vo);
 
-			responseObserver.onNext(GrpcRBoolean.newBuilder()
-				.setResult(GrpcR.newBuilder()
-					.setOk(true)
-					.setCode(ResponseEnum.OK.getCode())
-					.setMessage(ResponseEnum.OK.getText())
-					.build())
-				.setData(true)
-				.build());
-			responseObserver.onCompleted();
-		}
-		catch (Exception e) {
-			log.error("PointValueServer.readCommand error: {}", e.getMessage(), e);
-			responseObserver.onNext(GrpcRBoolean.newBuilder()
-				.setResult(GrpcR.newBuilder()
-					.setOk(false)
-					.setCode(ResponseEnum.FAILURE.getCode())
-					.setMessage(e.getMessage())
-					.build())
-				.setData(false)
-				.build());
-			responseObserver.onCompleted();
-		}
-	}
+            responseObserver.onNext(GrpcRBoolean.newBuilder()
+                    .setResult(GrpcR.newBuilder()
+                            .setOk(true)
+                            .setCode(ResponseEnum.OK.getCode())
+                            .setMessage(ResponseEnum.OK.getText())
+                            .build())
+                    .setData(true)
+                    .build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("PointValueServer.readCommand error: {}", e.getMessage(), e);
+            responseObserver.onNext(GrpcRBoolean.newBuilder()
+                    .setResult(GrpcR.newBuilder()
+                            .setOk(false)
+                            .setCode(ResponseEnum.FAILURE.getCode())
+                            .setMessage(e.getMessage())
+                            .build())
+                    .setData(false)
+                    .build());
+            responseObserver.onCompleted();
+        }
+    }
 
-	@Override
-	public void writeCommand(GrpcPointValueWriteCommand request, StreamObserver<GrpcRBoolean> responseObserver) {
-		try {
-			PointValueWriteVO vo = new PointValueWriteVO();
-			vo.setDeviceId(request.getDeviceId());
-			vo.setPointId(request.getPointId());
-			vo.setValue(request.getValue());
-			pointValueCommandService.write(vo);
+    @Override
+    public void writeCommand(GrpcPointValueWriteCommand request, StreamObserver<GrpcRBoolean> responseObserver) {
+        try {
+            PointValueWriteVO vo = new PointValueWriteVO();
+            vo.setDeviceId(request.getDeviceId());
+            vo.setPointId(request.getPointId());
+            vo.setValue(request.getValue());
+            pointValueCommandService.write(vo);
 
-			responseObserver.onNext(GrpcRBoolean.newBuilder()
-				.setResult(GrpcR.newBuilder()
-					.setOk(true)
-					.setCode(ResponseEnum.OK.getCode())
-					.setMessage(ResponseEnum.OK.getText())
-					.build())
-				.setData(true)
-				.build());
-			responseObserver.onCompleted();
-		}
-		catch (Exception e) {
-			log.error("PointValueServer.writeCommand error: {}", e.getMessage(), e);
-			responseObserver.onNext(GrpcRBoolean.newBuilder()
-				.setResult(GrpcR.newBuilder()
-					.setOk(false)
-					.setCode(ResponseEnum.FAILURE.getCode())
-					.setMessage(e.getMessage())
-					.build())
-				.setData(false)
-				.build());
-			responseObserver.onCompleted();
-		}
-	}
+            responseObserver.onNext(GrpcRBoolean.newBuilder()
+                    .setResult(GrpcR.newBuilder()
+                            .setOk(true)
+                            .setCode(ResponseEnum.OK.getCode())
+                            .setMessage(ResponseEnum.OK.getText())
+                            .build())
+                    .setData(true)
+                    .build());
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("PointValueServer.writeCommand error: {}", e.getMessage(), e);
+            responseObserver.onNext(GrpcRBoolean.newBuilder()
+                    .setResult(GrpcR.newBuilder()
+                            .setOk(false)
+                            .setCode(ResponseEnum.FAILURE.getCode())
+                            .setMessage(e.getMessage())
+                            .build())
+                    .setData(false)
+                    .build());
+            responseObserver.onCompleted();
+        }
+    }
 
 }

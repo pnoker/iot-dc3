@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-center-data` is the Data Center of the IoT DC3 platform. It integrates common messaging middleware including AMQP, WebSocket, and MQTT for collecting device point values from
+`dc3-center-data` is the Data Center of the IoT DC3 platform. It integrates common messaging middleware including AMQP,
+WebSocket, and MQTT for collecting device point values from
 drivers, storing them in the time-series repository, and exposing data query APIs.
 
 ## Module Information
@@ -21,9 +22,11 @@ drivers, storing them in the time-series repository, and exposing data query API
 
 ## Key Responsibilities
 
-- **Point Value Ingestion**: Receives point values from drivers via RabbitMQ (`dc3.e.value` exchange, `dc3.q.value.point` queue) and persists them to the time-series storage
+- **Point Value Ingestion**: Receives point values from drivers via RabbitMQ (`dc3.e.value` exchange,
+  `dc3.q.value.point` queue) and persists them to the time-series storage
 - **Point Value Query**: Exposes REST and gRPC APIs to query the latest and historical point values
-- **Device Command Dispatch**: Receives read/write commands, resolves the target driver via Manager gRPC (`ManagerConstant.SERVICE_NAME`), and publishes to `dc3.e.command`
+- **Device Command Dispatch**: Receives read/write commands, resolves the target driver via Manager gRPC (
+  `ManagerConstant.SERVICE_NAME`), and publishes to `dc3.e.command`
 - **Driver Status**: Tracks driver online/offline status events
 - **Data Query**: Supports pagination query, real-time telemetry, and historical data retrieval
 

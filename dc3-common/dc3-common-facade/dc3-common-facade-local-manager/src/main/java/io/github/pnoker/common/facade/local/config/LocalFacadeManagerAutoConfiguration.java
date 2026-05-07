@@ -40,18 +40,18 @@ import org.springframework.context.annotation.FilterType;
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")
 @ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
-		includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-				classes = { io.github.pnoker.common.facade.local.DeviceLocalFacade.class,
-						io.github.pnoker.common.facade.local.DriverLocalFacade.class,
-						io.github.pnoker.common.facade.local.PointLocalFacade.class, FacadeDeviceBuilder.class,
-						FacadeDriverBuilder.class, FacadePointBuilder.class, }))
+        includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+                classes = {io.github.pnoker.common.facade.local.DeviceLocalFacade.class,
+                        io.github.pnoker.common.facade.local.DriverLocalFacade.class,
+                        io.github.pnoker.common.facade.local.PointLocalFacade.class, FacadeDeviceBuilder.class,
+                        FacadeDriverBuilder.class, FacadePointBuilder.class,}))
 public class LocalFacadeManagerAutoConfiguration {
 
-	/**
-	 * Referenced only to ensure the {@link DeviceLocalFacade} symbol is linked against
-	 * this module's compiled classes at AutoConfiguration load time.
-	 */
-	@SuppressWarnings("unused")
-	private static final Class<?> CANARY = DeviceLocalFacade.class;
+    /**
+     * Referenced only to ensure the {@link DeviceLocalFacade} symbol is linked against
+     * this module's compiled classes at AutoConfiguration load time.
+     */
+    @SuppressWarnings("unused")
+    private static final Class<?> CANARY = DeviceLocalFacade.class;
 
 }

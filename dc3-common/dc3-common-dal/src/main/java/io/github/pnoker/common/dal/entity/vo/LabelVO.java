@@ -42,32 +42,32 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class LabelVO extends BaseVO {
 
-	/**
-	 * Label name.
-	 */
-	@NotBlank(message = "标签名称不能为空", groups = { Add.class })
-	@Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "标签名称格式无效",
-			groups = { Add.class, Update.class })
-	private String labelName;
+    /**
+     * Label name.
+     */
+    @NotBlank(message = "标签名称不能为空", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "标签名称格式无效",
+            groups = {Add.class, Update.class})
+    private String labelName;
 
-	/**
-	 * Label code.
-	 */
-	private String labelCode;
+    /**
+     * Label code.
+     */
+    private String labelCode;
 
-	/**
-	 * Label color.
-	 */
-	private String labelColor;
+    /**
+     * Label color.
+     */
+    private String labelColor;
 
-	/**
-	 * Entity type flag.
-	 */
-	private EntityTypeFlagEnum entityTypeFlag;
+    /**
+     * Entity type flag.
+     */
+    private EntityTypeFlagEnum entityTypeFlag;
 
-	/**
-	 * Enable status flag.
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable status flag.
+     */
+    private EnableFlagEnum enableFlag;
 
 }

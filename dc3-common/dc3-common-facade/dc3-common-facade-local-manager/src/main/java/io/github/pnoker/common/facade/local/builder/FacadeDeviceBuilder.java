@@ -31,11 +31,11 @@ import org.mapstruct.Mapper;
  * @author pnoker
  * @since 2026.5.5
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeDeviceBuilder {
 
-	DeviceQuery toManagerQuery(FacadeDeviceQuery facadeQuery);
+    DeviceQuery toManagerQuery(FacadeDeviceQuery facadeQuery);
 
-	FacadeDeviceBO toFacadeBO(DeviceBO managerBO);
+    FacadeDeviceBO toFacadeBO(DeviceBO managerBO);
 
 }

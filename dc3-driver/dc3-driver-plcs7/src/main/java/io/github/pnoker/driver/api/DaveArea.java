@@ -28,37 +28,37 @@ package io.github.pnoker.driver.api;
  */
 public enum DaveArea {
 
-	ANALOGINPUTS200(6), // Analog inputs (S7-200 family)
-	ANALOGOUTPUTS200(7), // Analog outputs (S7-200 family)
-	COUNTER(28), // S7 counters
-	COUNTER200(30), // IEC counters (S7-200 family)
-	DB(0x84), // Data blocks
-	DI(0x85), // Instance data blocks
-	FLAGS(0x83), // Merker/flag memory (M area)
-	INPUTS(0x81), // Process image inputs (I area)
-	LOCAL(0x86), // Local data (L stack)
-	OUTPUTS(0x82), // Process image outputs (Q area)
-	P(0x80), // Peripheral I/O (direct access)
-	SYSTEM_INFO(3), // System information
-	SYSTEM_FLAGS(5), // System flags
-	TIMER(29), // S7 timers
-	TIMER200(31), // IEC timers (S7-200 family)
-	V(0x87); // Variable memory (S7-200 V area)
+    ANALOGINPUTS200(6), // Analog inputs (S7-200 family)
+    ANALOGOUTPUTS200(7), // Analog outputs (S7-200 family)
+    COUNTER(28), // S7 counters
+    COUNTER200(30), // IEC counters (S7-200 family)
+    DB(0x84), // Data blocks
+    DI(0x85), // Instance data blocks
+    FLAGS(0x83), // Merker/flag memory (M area)
+    INPUTS(0x81), // Process image inputs (I area)
+    LOCAL(0x86), // Local data (L stack)
+    OUTPUTS(0x82), // Process image outputs (Q area)
+    P(0x80), // Peripheral I/O (direct access)
+    SYSTEM_INFO(3), // System information
+    SYSTEM_FLAGS(5), // System flags
+    TIMER(29), // S7 timers
+    TIMER200(31), // IEC timers (S7-200 family)
+    V(0x87); // Variable memory (S7-200 V area)
 
-	/**
-	 * S7 area function code.
-	 */
-	final int code;
+    /**
+     * S7 area function code.
+     */
+    final int code;
 
-	DaveArea(final int code) {
-		this.code = code;
-	}
+    DaveArea(final int code) {
+        this.code = code;
+    }
 
-	/**
-	 * @return the S7 area code
-	 */
-	public int getCode() {
-		return this.code;
-	}
+    /**
+     * @return the S7 area code
+     */
+    public int getCode() {
+        return this.code;
+    }
 
 }

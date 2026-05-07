@@ -32,24 +32,25 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 public class MetadataEvent extends ApplicationEvent {
 
-	private final Long id;
+    private final Long id;
 
-	private final MetadataTypeEnum metadataType;
+    private final MetadataTypeEnum metadataType;
 
-	private final MetadataOperateTypeEnum operateType;
+    private final MetadataOperateTypeEnum operateType;
 
-	/**
-	 * Constructor.
-	 * @param source Event source object
-	 * @param id Metadata ID
-	 * @param metadataType Metadata type
-	 * @param operateType Metadata operation type
-	 */
-	public MetadataEvent(Object source, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
-		super(source);
-		this.id = id;
-		this.metadataType = metadataType;
-		this.operateType = operateType;
-	}
+    /**
+     * Constructor.
+     *
+     * @param source       Event source object
+     * @param id           Metadata ID
+     * @param metadataType Metadata type
+     * @param operateType  Metadata operation type
+     */
+    public MetadataEvent(Object source, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
+        super(source);
+        this.id = id;
+        this.metadataType = metadataType;
+        this.operateType = operateType;
+    }
 
 }

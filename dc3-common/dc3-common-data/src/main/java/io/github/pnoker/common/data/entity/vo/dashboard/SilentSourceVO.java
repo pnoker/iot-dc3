@@ -37,18 +37,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class SilentSourceVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private long deviceId;
+    private long deviceId;
 
-	private long pointId;
+    private long pointId;
 
-	private LocalDateTime lastSeen;
+    private LocalDateTime lastSeen;
 
-	/**
-	 * How many seconds since the last sample, rounded.
-	 */
-	private long silentSeconds;
+    /**
+     * How many seconds since the last sample, rounded.
+     */
+    private long silentSeconds;
 
 }

@@ -37,31 +37,31 @@ import org.springframework.context.annotation.Configuration;
  * @since 2022.1.0
  */
 @Configuration
-@ComponentScan(basePackages = { "io.github.pnoker.common.driver" })
-@EnableConfigurationProperties({ DriverProperties.class })
+@ComponentScan(basePackages = {"io.github.pnoker.common.driver"})
+@EnableConfigurationProperties({DriverProperties.class})
 public class DriverInitRunner implements ApplicationRunner {
 
-	@Resource
-	private DriverRegisterService driverRegisterService;
+    @Resource
+    private DriverRegisterService driverRegisterService;
 
-	@Resource
-	private DriverCustomService driverCustomService;
+    @Resource
+    private DriverCustomService driverCustomService;
 
-	@Resource
-	private DriverScheduleService driverScheduleService;
+    @Resource
+    private DriverScheduleService driverScheduleService;
 
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		// Initialize driver registration and synchronize basic information with the
-		// platform
-		driverRegisterService.initial();
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        // Initialize driver registration and synchronize basic information with the
+        // platform
+        driverRegisterService.initial();
 
-		// Execute custom initialization functions specific to this driver module
-		driverCustomService.initial();
+        // Execute custom initialization functions specific to this driver module
+        driverCustomService.initial();
 
-		// Initialize driver tasks including status monitoring, reading operations and
-		// custom tasks
-		driverScheduleService.initial();
-	}
+        // Initialize driver tasks including status monitoring, reading operations and
+        // custom tasks
+        driverScheduleService.initial();
+    }
 
 }

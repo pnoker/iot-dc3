@@ -26,26 +26,28 @@ package com.serotonin.modbus4j.exception;
  */
 public class ModbusIdException extends RuntimeException {
 
-	private static final long serialVersionUID = -1;
+    private static final long serialVersionUID = -1;
 
-	/**
-	 * <p>
-	 * Constructor for ModbusIdException.
-	 * </p>
-	 * @param message a {@link String} object.
-	 */
-	public ModbusIdException(String message) {
-		super(message);
-	}
+    /**
+     * <p>
+     * Constructor for ModbusIdException.
+     * </p>
+     *
+     * @param message a {@link String} object.
+     */
+    public ModbusIdException(String message) {
+        super(message);
+    }
 
-	/**
-	 * <p>
-	 * Constructor for ModbusIdException.
-	 * </p>
-	 * @param cause a {@link Throwable} object.
-	 */
-	public ModbusIdException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * <p>
+     * Constructor for ModbusIdException.
+     * </p>
+     *
+     * @param cause a {@link Throwable} object.
+     */
+    public ModbusIdException(Throwable cause) {
+        super(cause);
+    }
 
 }

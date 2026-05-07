@@ -35,10 +35,10 @@ import lombok.*;
 @ToString(callSuper = true)
 public class FacadeTenantBO extends BaseBO {
 
-	private String tenantName;
+    private String tenantName;
 
-	private String tenantCode;
+    private String tenantCode;
 
-	private EnableFlagEnum enableFlag;
+    private EnableFlagEnum enableFlag;
 
 }

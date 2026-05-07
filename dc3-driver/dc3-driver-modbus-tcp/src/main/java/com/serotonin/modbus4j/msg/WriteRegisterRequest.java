@@ -33,60 +33,61 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class WriteRegisterRequest extends ModbusRequest {
 
-	private int writeOffset;
+    private int writeOffset;
 
-	private int writeValue;
+    private int writeValue;
 
-	/**
-	 * <p>
-	 * Constructor for WriteRegisterRequest.
-	 * </p>
-	 * @param slaveId a int.
-	 * @param writeOffset a int.
-	 * @param writeValue a int.
-	 * @throws ModbusTransportException if any.
-	 */
-	public WriteRegisterRequest(int slaveId, int writeOffset, int writeValue) throws ModbusTransportException {
-		super(slaveId);
-		this.writeOffset = writeOffset;
-		this.writeValue = writeValue;
-	}
+    /**
+     * <p>
+     * Constructor for WriteRegisterRequest.
+     * </p>
+     *
+     * @param slaveId     a int.
+     * @param writeOffset a int.
+     * @param writeValue  a int.
+     * @throws ModbusTransportException if any.
+     */
+    public WriteRegisterRequest(int slaveId, int writeOffset, int writeValue) throws ModbusTransportException {
+        super(slaveId);
+        this.writeOffset = writeOffset;
+        this.writeValue = writeValue;
+    }
 
-	WriteRegisterRequest(int slaveId) throws ModbusTransportException {
-		super(slaveId);
-	}
+    WriteRegisterRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
 
-	@Override
-	public void validate(Modbus modbus) throws ModbusTransportException {
-		ModbusUtils.validateOffset(writeOffset);
-	}
+    @Override
+    public void validate(Modbus modbus) throws ModbusTransportException {
+        ModbusUtils.validateOffset(writeOffset);
+    }
 
-	@Override
-	protected void writeRequest(ByteQueue queue) {
-		ModbusUtils.pushShort(queue, writeOffset);
-		ModbusUtils.pushShort(queue, writeValue);
-	}
+    @Override
+    protected void writeRequest(ByteQueue queue) {
+        ModbusUtils.pushShort(queue, writeOffset);
+        ModbusUtils.pushShort(queue, writeValue);
+    }
 
-	@Override
-	ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
-		processImage.writeHoldingRegister(writeOffset, (short) writeValue);
-		return new WriteRegisterResponse(slaveId, writeOffset, writeValue);
-	}
+    @Override
+    ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
+        processImage.writeHoldingRegister(writeOffset, (short) writeValue);
+        return new WriteRegisterResponse(slaveId, writeOffset, writeValue);
+    }
 
-	@Override
-	public byte getFunctionCode() {
-		return FunctionCode.WRITE_REGISTER;
-	}
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_REGISTER;
+    }
 
-	@Override
-	ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
-		return new WriteRegisterResponse(slaveId);
-	}
+    @Override
+    ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
+        return new WriteRegisterResponse(slaveId);
+    }
 
-	@Override
-	protected void readRequest(ByteQueue queue) {
-		writeOffset = ModbusUtils.popUnsignedShort(queue);
-		writeValue = ModbusUtils.popUnsignedShort(queue);
-	}
+    @Override
+    protected void readRequest(ByteQueue queue) {
+        writeOffset = ModbusUtils.popUnsignedShort(queue);
+        writeValue = ModbusUtils.popUnsignedShort(queue);
+    }
 
 }

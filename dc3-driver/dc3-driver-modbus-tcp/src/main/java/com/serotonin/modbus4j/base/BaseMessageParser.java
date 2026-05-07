@@ -29,45 +29,46 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  * @version 2025.9.0
  */
 abstract /**
-			 * Base Message Parser
-			 *
-			 * @author pnoker
-			 * @version 2025.9.0
-			 * @since 2022.1.0
-			 */
+ * Base Message Parser
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class BaseMessageParser implements MessageParser {
 
-	protected final boolean master;
+    protected final boolean master;
 
-	/**
-	 * <p>
-	 * Constructor for BaseMessageParser.
-	 * </p>
-	 * @param master a boolean.
-	 */
-	public BaseMessageParser(boolean master) {
-		this.master = master;
-	}
+    /**
+     * <p>
+     * Constructor for BaseMessageParser.
+     * </p>
+     *
+     * @param master a boolean.
+     */
+    public BaseMessageParser(boolean master) {
+        this.master = master;
+    }
 
-	@Override
-	public IncomingMessage parseMessage(ByteQueue queue) throws Exception {
-		try {
-			return parseMessageImpl(queue);
-		}
-		catch (ArrayIndexOutOfBoundsException e) {
-			// Means that we ran out of data trying to read the message. Just return null.
-			return null;
-		}
-	}
+    @Override
+    public IncomingMessage parseMessage(ByteQueue queue) throws Exception {
+        try {
+            return parseMessageImpl(queue);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Means that we ran out of data trying to read the message. Just return null.
+            return null;
+        }
+    }
 
-	/**
-	 * <p>
-	 * parseMessageImpl.
-	 * </p>
-	 * @param queue a {@link ByteQueue} object.
-	 * @return a {@link IncomingMessage} object.
-	 * @throws Exception if any.
-	 */
-	abstract protected IncomingMessage parseMessageImpl(ByteQueue queue) throws Exception;
+    /**
+     * <p>
+     * parseMessageImpl.
+     * </p>
+     *
+     * @param queue a {@link ByteQueue} object.
+     * @return a {@link IncomingMessage} object.
+     * @throws Exception if any.
+     */
+    abstract protected IncomingMessage parseMessageImpl(ByteQueue queue) throws Exception;
 
 }

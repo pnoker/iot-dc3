@@ -26,9 +26,9 @@ package io.github.pnoker.common.driver.service;
  */
 public interface DriverRegisterService {
 
-	/**
-	 * Performs driver registration during application startup.
-	 */
-	void initial();
+    /**
+     * Performs driver registration during application startup.
+     */
+    void initial();
 
 }

@@ -47,73 +47,73 @@ import java.util.List;
 @Component
 public class DeviceGrpcFacade implements DeviceFacade {
 
-	@Resource
-	private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
+    @Resource
+    private DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub;
 
-	@Resource
-	private FacadeGrpcDeviceBuilder facadeGrpcDeviceBuilder;
+    @Resource
+    private FacadeGrpcDeviceBuilder facadeGrpcDeviceBuilder;
 
-	@Override
-	public FacadeDeviceBO selectById(Long id) {
-		GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(id).build();
-		GrpcRDeviceDTO response = deviceApiBlockingStub.selectByDeviceId(request);
-		if (!response.getResult().getOk()) {
-			guardOrThrow(response.getResult(), "selectById");
-			return null;
-		}
-		return facadeGrpcDeviceBuilder.toFacadeBO(response.getData());
-	}
+    @Override
+    public FacadeDeviceBO selectById(Long id) {
+        GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(id).build();
+        GrpcRDeviceDTO response = deviceApiBlockingStub.selectByDeviceId(request);
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectById");
+            return null;
+        }
+        return facadeGrpcDeviceBuilder.toFacadeBO(response.getData());
+    }
 
-	@Override
-	public FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query) {
-		GrpcPageDeviceQuery request = facadeGrpcDeviceBuilder.toGrpcPageQuery(query);
-		GrpcRPageDeviceDTO response = deviceApiBlockingStub.selectByPage(request);
-		if (!response.getResult().getOk()) {
-			guardOrThrow(response.getResult(), "selectByPage");
-			return FacadePage.empty();
-		}
+    @Override
+    public FacadePage<FacadeDeviceBO> selectByPage(FacadeDeviceQuery query) {
+        GrpcPageDeviceQuery request = facadeGrpcDeviceBuilder.toGrpcPageQuery(query);
+        GrpcRPageDeviceDTO response = deviceApiBlockingStub.selectByPage(request);
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectByPage");
+            return FacadePage.empty();
+        }
 
-		GrpcPageDeviceDTO pageDTO = response.getData();
-		List<FacadeDeviceBO> records = pageDTO.getDataList().stream().map(facadeGrpcDeviceBuilder::toFacadeBO).toList();
+        GrpcPageDeviceDTO pageDTO = response.getData();
+        List<FacadeDeviceBO> records = pageDTO.getDataList().stream().map(facadeGrpcDeviceBuilder::toFacadeBO).toList();
 
-		return new FacadePage<>(pageDTO.getPage().getCurrent(), pageDTO.getPage().getSize(),
-				pageDTO.getPage().getTotal(), pageDTO.getPage().getPages(), records);
-	}
+        return new FacadePage<>(pageDTO.getPage().getCurrent(), pageDTO.getPage().getSize(),
+                pageDTO.getPage().getTotal(), pageDTO.getPage().getPages(), records);
+    }
 
-	@Override
-	public List<FacadeDeviceBO> selectByProfileId(Long profileId) {
-		GrpcProfileQuery request = GrpcProfileQuery.newBuilder().setProfileId(profileId).build();
-		GrpcRDeviceListDTO response = deviceApiBlockingStub.selectByProfileId(request);
-		if (!response.getResult().getOk()) {
-			guardOrThrow(response.getResult(), "selectByProfileId");
-			return Collections.emptyList();
-		}
-		return response.getDataList().stream().map(facadeGrpcDeviceBuilder::toFacadeBO).toList();
-	}
+    @Override
+    public List<FacadeDeviceBO> selectByProfileId(Long profileId) {
+        GrpcProfileQuery request = GrpcProfileQuery.newBuilder().setProfileId(profileId).build();
+        GrpcRDeviceListDTO response = deviceApiBlockingStub.selectByProfileId(request);
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectByProfileId");
+            return Collections.emptyList();
+        }
+        return response.getDataList().stream().map(facadeGrpcDeviceBuilder::toFacadeBO).toList();
+    }
 
-	@Override
-	public List<FacadeDeviceBO> selectByDriverId(Long driverId) {
-		GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(driverId).build();
-		GrpcRDeviceListDTO response = deviceApiBlockingStub.selectByDriverId(request);
-		if (!response.getResult().getOk()) {
-			guardOrThrow(response.getResult(), "selectByDriverId");
-			return Collections.emptyList();
-		}
-		return response.getDataList().stream().map(facadeGrpcDeviceBuilder::toFacadeBO).toList();
-	}
+    @Override
+    public List<FacadeDeviceBO> selectByDriverId(Long driverId) {
+        GrpcDriverQuery request = GrpcDriverQuery.newBuilder().setDriverId(driverId).build();
+        GrpcRDeviceListDTO response = deviceApiBlockingStub.selectByDriverId(request);
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "selectByDriverId");
+            return Collections.emptyList();
+        }
+        return response.getDataList().stream().map(facadeGrpcDeviceBuilder::toFacadeBO).toList();
+    }
 
-	/**
-	 * NO_RESOURCE is a normal "not found" signal — swallow and let the caller see null /
-	 * empty. Any other non-OK code (server error, param error, etc.) escalates to an
-	 * exception.
-	 */
-	private void guardOrThrow(GrpcR result, String op) {
-		String code = result.getCode();
-		if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
-			log.debug("DeviceGrpcFacade.{} => no resource", op);
-			return;
-		}
-		throw new ServiceException("DeviceFacade." + op + " failed: [" + code + "] " + result.getMessage());
-	}
+    /**
+     * NO_RESOURCE is a normal "not found" signal — swallow and let the caller see null /
+     * empty. Any other non-OK code (server error, param error, etc.) escalates to an
+     * exception.
+     */
+    private void guardOrThrow(GrpcR result, String op) {
+        String code = result.getCode();
+        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+            log.debug("DeviceGrpcFacade.{} => no resource", op);
+            return;
+        }
+        throw new ServiceException("DeviceFacade." + op + " failed: [" + code + "] " + result.getMessage());
+    }
 
 }

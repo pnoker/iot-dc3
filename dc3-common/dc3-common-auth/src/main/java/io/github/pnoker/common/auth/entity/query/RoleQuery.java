@@ -37,31 +37,31 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class RoleQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	//
+    //
 
-	/**
-	 * Name
-	 */
-	private String roleName;
+    /**
+     * Name
+     */
+    private String roleName;
 
-	/**
-	 * Code
-	 */
-	private String roleCode;
+    /**
+     * Code
+     */
+    private String roleCode;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }

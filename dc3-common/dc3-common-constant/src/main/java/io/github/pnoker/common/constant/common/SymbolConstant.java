@@ -29,53 +29,53 @@ package io.github.pnoker.common.constant.common;
  */
 public class SymbolConstant {
 
-	/**
-	 * Dot symbol: "."
-	 */
-	public static final String DOT = ".";
+    /**
+     * Dot symbol: "."
+     */
+    public static final String DOT = ".";
 
-	/**
-	 * Underscore symbol: "_"
-	 */
-	public static final String UNDERSCORE = "_";
+    /**
+     * Underscore symbol: "_"
+     */
+    public static final String UNDERSCORE = "_";
 
-	/**
-	 * Hyphen symbol: "-"
-	 */
-	public static final String HYPHEN = "-";
+    /**
+     * Hyphen symbol: "-"
+     */
+    public static final String HYPHEN = "-";
 
-	/**
-	 * Asterisk symbol: "*"
-	 */
-	public static final String ASTERISK = "*";
+    /**
+     * Asterisk symbol: "*"
+     */
+    public static final String ASTERISK = "*";
 
-	/**
-	 * Hashtag symbol: "#"
-	 */
-	public static final String HASHTAG = "#";
+    /**
+     * Hashtag symbol: "#"
+     */
+    public static final String HASHTAG = "#";
 
-	/**
-	 * Colon symbol: ":"
-	 */
-	public static final String COLON = ":";
+    /**
+     * Colon symbol: ":"
+     */
+    public static final String COLON = ":";
 
-	/**
-	 * Double colon symbol: "::"
-	 */
-	public static final String DOUBLE_COLON = "::";
+    /**
+     * Double colon symbol: "::"
+     */
+    public static final String DOUBLE_COLON = "::";
 
-	/**
-	 * Slash symbol: "/"
-	 */
-	public static final String SLASH = "/";
+    /**
+     * Slash symbol: "/"
+     */
+    public static final String SLASH = "/";
 
-	/**
-	 * Double slash symbol: "//"
-	 */
-	public static final String DOUBLE_SLASH = "//";
+    /**
+     * Double slash symbol: "//"
+     */
+    public static final String DOUBLE_SLASH = "//";
 
-	private SymbolConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private SymbolConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
 }

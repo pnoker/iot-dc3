@@ -28,16 +28,16 @@ import java.text.MessageFormat;
  */
 public class TypeException extends RuntimeException {
 
-	public TypeException() {
-		this(null);
-	}
+    public TypeException() {
+        this(null);
+    }
 
-	public TypeException(Throwable cause) {
-		super(cause);
-	}
+    public TypeException(Throwable cause) {
+        super(cause);
+    }
 
-	public TypeException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public TypeException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

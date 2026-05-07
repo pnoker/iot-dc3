@@ -45,40 +45,39 @@ import java.util.Set;
 @Component
 public class DriverReadScheduleJob extends QuartzJobBean {
 
-	@Resource
-	private DriverMetadata driverMetadata;
+    @Resource
+    private DriverMetadata driverMetadata;
 
-	@Resource
-	private DeviceMetadata deviceMetadata;
+    @Resource
+    private DeviceMetadata deviceMetadata;
 
-	@Resource
-	private DriverReadService driverReadService;
+    @Resource
+    private DriverReadService driverReadService;
 
-	@Override
-	protected void executeInternal(JobExecutionContext jobExecutionContext) {
-		Set<Long> deviceIds = driverMetadata.getDeviceIds();
-		if (CollectionUtils.isEmpty(deviceIds)) {
-			return;
-		}
+    @Override
+    protected void executeInternal(JobExecutionContext jobExecutionContext) {
+        Set<Long> deviceIds = driverMetadata.getDeviceIds();
+        if (CollectionUtils.isEmpty(deviceIds)) {
+            return;
+        }
 
-		for (Long deviceId : deviceIds) {
-			DeviceBO entityBO = deviceMetadata.getCache(deviceId);
-			if (Objects.nonNull(entityBO) && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
-					&& CollectionUtils.isNotEmpty(entityBO.getProfileIds())
-					&& CollectionUtils.isNotEmpty(entityBO.getPointIds())
-					&& MapUtils.isNotEmpty(entityBO.getDriverAttributeConfigIdMap())
-					&& MapUtils.isNotEmpty(entityBO.getPointAttributeConfigIdMap())) {
-				Set<Long> pointIds = entityBO.getPointIds();
-				for (Long pointId : pointIds) {
-					try {
-						driverReadService.read(deviceId, pointId);
-					}
-					catch (Exception e) {
-						log.error("Read device[{}], point[{}] error: {}", deviceId, pointId, e.getMessage(), e);
-					}
-				}
-			}
-		}
-	}
+        for (Long deviceId : deviceIds) {
+            DeviceBO entityBO = deviceMetadata.getCache(deviceId);
+            if (Objects.nonNull(entityBO) && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
+                    && CollectionUtils.isNotEmpty(entityBO.getProfileIds())
+                    && CollectionUtils.isNotEmpty(entityBO.getPointIds())
+                    && MapUtils.isNotEmpty(entityBO.getDriverAttributeConfigIdMap())
+                    && MapUtils.isNotEmpty(entityBO.getPointAttributeConfigIdMap())) {
+                Set<Long> pointIds = entityBO.getPointIds();
+                for (Long pointId : pointIds) {
+                    try {
+                        driverReadService.read(deviceId, pointId);
+                    } catch (Exception e) {
+                        log.error("Read device[{}], point[{}] error: {}", deviceId, pointId, e.getMessage(), e);
+                    }
+                }
+            }
+        }
+    }
 
 }

@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-driver-virtual` is the Virtual Driver of the IoT DC3 platform, designed for testing and development purposes. It simulates device communication by generating random point
+`dc3-driver-virtual` is the Virtual Driver of the IoT DC3 platform, designed for testing and development purposes. It
+simulates device communication by generating random point
 values on a configurable schedule without connecting to real hardware.
 
 ## Module Information

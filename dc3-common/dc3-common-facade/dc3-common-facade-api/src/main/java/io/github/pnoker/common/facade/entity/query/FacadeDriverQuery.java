@@ -39,25 +39,25 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class FacadeDriverQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	private Long tenantId;
+    private Long tenantId;
 
-	private String driverName;
+    private String driverName;
 
-	private String driverCode;
+    private String driverCode;
 
-	private String serviceName;
+    private String serviceName;
 
-	private String serviceHost;
+    private String serviceHost;
 
-	private DriverTypeFlagEnum driverTypeFlag;
+    private DriverTypeFlagEnum driverTypeFlag;
 
-	private EnableFlagEnum enableFlag;
+    private EnableFlagEnum enableFlag;
 
-	private Integer version;
+    private Integer version;
 
 }

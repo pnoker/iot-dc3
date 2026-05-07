@@ -35,29 +35,28 @@ import java.util.function.IntConsumer;
  */
 public final class IntegerOptional {
 
-	private final Integer value;
+    private final Integer value;
 
-	private IntegerOptional(Integer value) {
-		this.value = value;
-	}
+    private IntegerOptional(Integer value) {
+        this.value = value;
+    }
 
-	public static IntegerOptional ofNullable(Integer value) {
-		return new IntegerOptional(value);
-	}
+    public static IntegerOptional ofNullable(Integer value) {
+        return new IntegerOptional(value);
+    }
 
-	public void ifPresent(IntConsumer action) {
-		if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
-			action.accept(value);
-		}
-	}
+    public void ifPresent(IntConsumer action) {
+        if (Objects.nonNull(value) && value > DefaultConstant.ZERO) {
+            action.accept(value);
+        }
+    }
 
-	public void ifPresentOrElse(IntConsumer action, Runnable emptyAction) {
-		if (value > DefaultConstant.ZERO) {
-			action.accept(value);
-		}
-		else {
-			emptyAction.run();
-		}
-	}
+    public void ifPresentOrElse(IntConsumer action, Runnable emptyAction) {
+        if (value > DefaultConstant.ZERO) {
+            action.accept(value);
+        } else {
+            emptyAction.run();
+        }
+    }
 
 }

@@ -28,12 +28,13 @@ import com.serotonin.modbus4j.sero.util.ProgressiveTaskListener;
  */
 public interface NodeScanListener extends ProgressiveTaskListener {
 
-	/**
-	 * <p>
-	 * nodeFound.
-	 * </p>
-	 * @param nodeNumber a int.
-	 */
-	void nodeFound(int nodeNumber);
+    /**
+     * <p>
+     * nodeFound.
+     * </p>
+     *
+     * @param nodeNumber a int.
+     */
+    void nodeFound(int nodeNumber);
 
 }

@@ -29,10 +29,10 @@ import lombok.ToString;
 @ToString
 public class TopologyPointRow {
 
-	private long id;
+    private long id;
 
-	private String pointName;
+    private String pointName;
 
-	private long profileId;
+    private long profileId;
 
 }

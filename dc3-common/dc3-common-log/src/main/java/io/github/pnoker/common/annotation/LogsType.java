@@ -30,6 +30,6 @@ package io.github.pnoker.common.annotation;
  */
 public enum LogsType {
 
-	INFO, WARN, DEBUG, ERROR
+    INFO, WARN, DEBUG, ERROR
 
 }

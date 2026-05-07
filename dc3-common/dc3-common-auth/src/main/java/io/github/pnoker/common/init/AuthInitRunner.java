@@ -35,14 +35,14 @@ import org.springframework.context.annotation.Configuration;
  */
 @Slf4j
 @Configuration
-@ComponentScan(basePackages = { "io.github.pnoker.common.auth" })
-@MapperScan(basePackages = { "io.github.pnoker.common.auth.mapper" })
+@ComponentScan(basePackages = {"io.github.pnoker.common.auth"})
+@MapperScan(basePackages = {"io.github.pnoker.common.auth.mapper"})
 public class AuthInitRunner implements ApplicationRunner {
 
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		// Currently no initialization tasks are required
-		// This method can be extended to add future authentication initialization logic
-	}
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        // Currently no initialization tasks are required
+        // This method can be extended to add future authentication initialization logic
+    }
 
 }

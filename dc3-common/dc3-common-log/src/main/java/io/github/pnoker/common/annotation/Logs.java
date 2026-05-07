@@ -17,12 +17,7 @@
 
 package io.github.pnoker.common.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Custom annotation for logging method execution in DC3 IoT Platform. This annotation can
@@ -39,28 +34,32 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Logs {
 
-	/**
-	 * The log message to be recorded
-	 * @return The log message string
-	 */
-	String value() default "";
+    /**
+     * The log message to be recorded
+     *
+     * @return The log message string
+     */
+    String value() default "";
 
-	/**
-	 * The type/level of the log entry
-	 * @return The LogsType enum value
-	 */
-	LogsType type() default LogsType.INFO;
+    /**
+     * The type/level of the log entry
+     *
+     * @return The LogsType enum value
+     */
+    LogsType type() default LogsType.INFO;
 
-	/**
-	 * Custom tag for categorizing or filtering logs
-	 * @return The tag string
-	 */
-	String tag() default "";
+    /**
+     * Custom tag for categorizing or filtering logs
+     *
+     * @return The tag string
+     */
+    String tag() default "";
 
-	/**
-	 * Whether to persist the log entry to storage
-	 * @return True if the log should be saved, false otherwise
-	 */
-	boolean save() default false;
+    /**
+     * Whether to persist the log entry to storage
+     *
+     * @return True if the log should be saved, false otherwise
+     */
+    boolean save() default false;
 
 }

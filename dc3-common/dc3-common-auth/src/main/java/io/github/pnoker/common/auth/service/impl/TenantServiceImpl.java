@@ -49,114 +49,115 @@ import java.util.Objects;
 @Service
 public class TenantServiceImpl implements TenantService {
 
-	@Resource
-	private TenantBuilder tenantBuilder;
+    @Resource
+    private TenantBuilder tenantBuilder;
 
-	@Resource
-	private TenantManager tenantManager;
+    @Resource
+    private TenantManager tenantManager;
 
-	@Override
-	public void save(TenantBO entityBO) {
-		checkDuplicate(entityBO, false, true);
+    @Override
+    public void save(TenantBO entityBO) {
+        checkDuplicate(entityBO, false, true);
 
-		TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
-		if (!tenantManager.save(entityDO)) {
-			throw new AddException("Failed to create tenant: {}", entityBO.getTenantName());
-		}
-	}
+        TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
+        if (!tenantManager.save(entityDO)) {
+            throw new AddException("Failed to create tenant: {}", entityBO.getTenantName());
+        }
+    }
 
-	@Override
-	public void remove(Long id) {
-		getDOById(id, true);
+    @Override
+    public void remove(Long id) {
+        getDOById(id, true);
 
-		if (!tenantManager.removeById(id)) {
-			throw new DeleteException("Failed to remove tenant");
-		}
-	}
+        if (!tenantManager.removeById(id)) {
+            throw new DeleteException("Failed to remove tenant");
+        }
+    }
 
-	@Override
-	public void update(TenantBO entityBO) {
-		getDOById(entityBO.getId(), true);
+    @Override
+    public void update(TenantBO entityBO) {
+        getDOById(entityBO.getId(), true);
 
-		checkDuplicate(entityBO, true, true);
+        checkDuplicate(entityBO, true, true);
 
-		TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
-		entityDO.setOperateTime(null);
-		if (!tenantManager.updateById(entityDO)) {
-			throw new UpdateException("Failed to update tenant");
-		}
-	}
+        TenantDO entityDO = tenantBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!tenantManager.updateById(entityDO)) {
+            throw new UpdateException("Failed to update tenant");
+        }
+    }
 
-	@Override
-	public TenantBO selectById(Long id) {
-		TenantDO entityDO = getDOById(id, true);
-		return tenantBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public TenantBO selectById(Long id) {
+        TenantDO entityDO = getDOById(id, true);
+        return tenantBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public TenantBO selectByCode(String code) {
-		LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
-		wrapper.eq(TenantDO::getTenantCode, code);
-		wrapper.eq(TenantDO::getEnableFlag, EnableFlagEnum.ENABLE);
-		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-		TenantDO entityDO = tenantManager.getOne(wrapper);
-		return tenantBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public TenantBO selectByCode(String code) {
+        LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
+        wrapper.eq(TenantDO::getTenantCode, code);
+        wrapper.eq(TenantDO::getEnableFlag, EnableFlagEnum.ENABLE);
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        TenantDO entityDO = tenantManager.getOne(wrapper);
+        return tenantBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public Page<TenantBO> selectByPage(TenantQuery entityQuery) {
-		if (Objects.isNull(entityQuery.getPage())) {
-			entityQuery.setPage(new Pages());
-		}
-		Page<TenantDO> entityPageDO = tenantManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-		return tenantBuilder.buildBOPageByDOPage(entityPageDO);
-	}
+    @Override
+    public Page<TenantBO> selectByPage(TenantQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<TenantDO> entityPageDO = tenantManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return tenantBuilder.buildBOPageByDOPage(entityPageDO);
+    }
 
-	/**
-	 * @param entityQuery {@link TenantQuery}
-	 * @return {@link LambdaQueryWrapper}
-	 */
-	private LambdaQueryWrapper<TenantDO> fuzzyQuery(TenantQuery entityQuery) {
-		LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
-		wrapper.like(StringUtils.isNotEmpty(entityQuery.getTenantName()), TenantDO::getTenantName,
-				entityQuery.getTenantName());
-		return wrapper;
-	}
+    /**
+     * @param entityQuery {@link TenantQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<TenantDO> fuzzyQuery(TenantQuery entityQuery) {
+        LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getTenantName()), TenantDO::getTenantName,
+                entityQuery.getTenantName());
+        return wrapper;
+    }
 
-	/**
-	 * @param entityBO {@link TenantBO}
-	 * @param isUpdate
-	 * @param throwException
-	 * @return
-	 */
-	private boolean checkDuplicate(TenantBO entityBO, boolean isUpdate, boolean throwException) {
-		LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
-		wrapper.eq(TenantDO::getTenantName, entityBO.getTenantName());
-		wrapper.eq(TenantDO::getTenantCode, entityBO.getTenantCode());
-		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-		TenantDO one = tenantManager.getOne(wrapper);
-		if (Objects.isNull(one)) {
-			return false;
-		}
-		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-		if (throwException && duplicate) {
-			throw new DuplicateException("Tenant has been duplicated");
-		}
-		return duplicate;
-	}
+    /**
+     * @param entityBO       {@link TenantBO}
+     * @param isUpdate
+     * @param throwException
+     * @return
+     */
+    private boolean checkDuplicate(TenantBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
+        wrapper.eq(TenantDO::getTenantName, entityBO.getTenantName());
+        wrapper.eq(TenantDO::getTenantCode, entityBO.getTenantCode());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        TenantDO one = tenantManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("Tenant has been duplicated");
+        }
+        return duplicate;
+    }
 
-	/**
-	 * Primary key ID
-	 * @param id ID
-	 * @param throwException
-	 * @return {@link TenantDO}
-	 */
-	private TenantDO getDOById(Long id, boolean throwException) {
-		TenantDO entityDO = tenantManager.getById(id);
-		if (throwException && Objects.isNull(entityDO)) {
-			throw new NotFoundException("租户");
-		}
-		return entityDO;
-	}
+    /**
+     * Primary key ID
+     *
+     * @param id             ID
+     * @param throwException
+     * @return {@link TenantDO}
+     */
+    private TenantDO getDOById(Long id, boolean throwException) {
+        TenantDO entityDO = tenantManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("租户");
+        }
+        return entityDO;
+    }
 
 }

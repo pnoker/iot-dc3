@@ -50,157 +50,157 @@ import java.util.Objects;
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX)
 public class DriverAttributeConfigController implements BaseController {
 
-	private final DriverAttributeConfigBuilder driverAttributeConfigBuilder;
+    private final DriverAttributeConfigBuilder driverAttributeConfigBuilder;
 
-	private final DriverAttributeConfigService driverAttributeConfigService;
+    private final DriverAttributeConfigService driverAttributeConfigService;
 
-	public DriverAttributeConfigController(DriverAttributeConfigBuilder driverAttributeConfigBuilder,
-			DriverAttributeConfigService driverAttributeConfigService) {
-		this.driverAttributeConfigBuilder = driverAttributeConfigBuilder;
-		this.driverAttributeConfigService = driverAttributeConfigService;
-	}
+    public DriverAttributeConfigController(DriverAttributeConfigBuilder driverAttributeConfigBuilder,
+                                           DriverAttributeConfigService driverAttributeConfigService) {
+        this.driverAttributeConfigBuilder = driverAttributeConfigBuilder;
+        this.driverAttributeConfigService = driverAttributeConfigService;
+    }
 
-	/**
-	 * DriverConfig
-	 * @param entityVO {@link DriverAttributeConfigVO}
-	 * @return R of String
-	 */
-	@PostMapping("/add")
-	public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
-				entityBO.setTenantId(tenantId);
-				driverAttributeConfigService.save(entityBO);
-				return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * DriverConfig
+     *
+     * @param entityVO {@link DriverAttributeConfigVO}
+     * @return R of String
+     */
+    @PostMapping("/add")
+    public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeConfigVO entityVO) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                driverAttributeConfigService.save(entityBO);
+                return Mono.just(R.ok(ResponseEnum.ADD_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
-	/**
-	 * ID DriverConfig
-	 * @param id ID
-	 * @return R of String
-	 */
-	@PostMapping("/delete/{id}")
-	public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
-		try {
-			driverAttributeConfigService.remove(id);
-			return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * ID DriverConfig
+     *
+     * @param id ID
+     * @return R of String
+     */
+    @PostMapping("/delete/{id}")
+    public Mono<R<String>> delete(@NotNull @PathVariable(value = "id") Long id) {
+        try {
+            driverAttributeConfigService.remove(id);
+            return Mono.just(R.ok(ResponseEnum.DELETE_SUCCESS));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	/**
-	 * DriverConfig
-	 * @param entityVO {@link DriverAttributeConfigVO}
-	 * @return R of String
-	 */
-	@PostMapping("/update")
-	public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeConfigVO entityVO) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
-				entityBO.setTenantId(tenantId);
-				driverAttributeConfigService.update(entityBO);
-				return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * DriverConfig
+     *
+     * @param entityVO {@link DriverAttributeConfigVO}
+     * @return R of String
+     */
+    @PostMapping("/update")
+    public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeConfigVO entityVO) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverAttributeConfigBO entityBO = driverAttributeConfigBuilder.buildBOByVO(entityVO);
+                entityBO.setTenantId(tenantId);
+                driverAttributeConfigService.update(entityBO);
+                return Mono.just(R.ok(ResponseEnum.UPDATE_SUCCESS));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
-	/**
-	 * ID DriverConfig
-	 * @param id ID
-	 * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
-	 */
-	@GetMapping("/id/{id}")
-	public Mono<R<DriverAttributeConfigVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
-		try {
-			DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectById(id);
-			DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
-			return Mono.just(R.ok(entityVO));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * ID DriverConfig
+     *
+     * @param id ID
+     * @return DriverAttributeConfigVO {@link DriverAttributeConfigVO}
+     */
+    @GetMapping("/id/{id}")
+    public Mono<R<DriverAttributeConfigVO>> selectById(@NotNull @PathVariable(value = "id") Long id) {
+        try {
+            DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectById(id);
+            DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	/**
-	 * ID Device ID DriverConfig
-	 * @param attributeId Attribute ID
-	 * @param deviceId Device ID
-	 * @return DriverConfig
-	 */
-	@GetMapping("/device_id/{deviceId}/attribute_id/{attributeId}")
-	public Mono<R<DriverAttributeConfigVO>> selectByDeviceIdAndAttributeId(
-			@NotNull @PathVariable(value = "deviceId") Long deviceId,
-			@NotNull @PathVariable(value = "attributeId") Long attributeId) {
-		try {
-			DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectByAttributeIdAndDeviceId(deviceId,
-					attributeId);
-			DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
-			return Mono.just(R.ok(entityVO));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * ID Device ID DriverConfig
+     *
+     * @param attributeId Attribute ID
+     * @param deviceId    Device ID
+     * @return DriverConfig
+     */
+    @GetMapping("/device_id/{deviceId}/attribute_id/{attributeId}")
+    public Mono<R<DriverAttributeConfigVO>> selectByDeviceIdAndAttributeId(
+            @NotNull @PathVariable(value = "deviceId") Long deviceId,
+            @NotNull @PathVariable(value = "attributeId") Long attributeId) {
+        try {
+            DriverAttributeConfigBO entityBO = driverAttributeConfigService.selectByAttributeIdAndDeviceId(deviceId,
+                    attributeId);
+            DriverAttributeConfigVO entityVO = driverAttributeConfigBuilder.buildVOByBO(entityBO);
+            return Mono.just(R.ok(entityVO));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	/**
-	 * Device ID DriverConfig
-	 * @param deviceId Device ID
-	 * @return DriverConfig
-	 */
-	@GetMapping("/device_id/{deviceId}")
-	public Mono<R<List<DriverAttributeConfigVO>>> selectByDeviceId(
-			@NotNull @PathVariable(value = "deviceId") Long deviceId) {
-		try {
-			List<DriverAttributeConfigBO> entityBOList = driverAttributeConfigService.selectByDeviceId(deviceId);
-			List<DriverAttributeConfigVO> entityVOList = driverAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-			return Mono.just(R.ok(entityVOList));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * Device ID DriverConfig
+     *
+     * @param deviceId Device ID
+     * @return DriverConfig
+     */
+    @GetMapping("/device_id/{deviceId}")
+    public Mono<R<List<DriverAttributeConfigVO>>> selectByDeviceId(
+            @NotNull @PathVariable(value = "deviceId") Long deviceId) {
+        try {
+            List<DriverAttributeConfigBO> entityBOList = driverAttributeConfigService.selectByDeviceId(deviceId);
+            List<DriverAttributeConfigVO> entityVOList = driverAttributeConfigBuilder.buildVOListByBOList(entityBOList);
+            return Mono.just(R.ok(entityVOList));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	/**
-	 * DriverConfig
-	 * @param entityQuery DriverConfig Dto
-	 * @return Page Of DriverConfig
-	 */
-	@PostMapping("/list")
-	public Mono<R<Page<DriverAttributeConfigVO>>> list(
-			@RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				DriverAttributeConfigQuery query = Objects.isNull(entityQuery) ? new DriverAttributeConfigQuery()
-						: entityQuery;
-				query.setTenantId(tenantId);
-				Page<DriverAttributeConfigBO> entityPageBO = driverAttributeConfigService.selectByPage(query);
-				Page<DriverAttributeConfigVO> entityPageVO = driverAttributeConfigBuilder
-					.buildVOPageByBOPage(entityPageBO);
-				return Mono.just(R.ok(entityPageVO));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * DriverConfig
+     *
+     * @param entityQuery DriverConfig Dto
+     * @return Page Of DriverConfig
+     */
+    @PostMapping("/list")
+    public Mono<R<Page<DriverAttributeConfigVO>>> list(
+            @RequestBody(required = false) DriverAttributeConfigQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverAttributeConfigQuery query = Objects.isNull(entityQuery) ? new DriverAttributeConfigQuery()
+                        : entityQuery;
+                query.setTenantId(tenantId);
+                Page<DriverAttributeConfigBO> entityPageBO = driverAttributeConfigService.selectByPage(query);
+                Page<DriverAttributeConfigVO> entityPageVO = driverAttributeConfigBuilder
+                        .buildVOPageByBOPage(entityPageBO);
+                return Mono.just(R.ok(entityPageVO));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
 }

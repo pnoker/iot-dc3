@@ -547,11 +547,13 @@
         open. Both event tables contribute; return one row with 4 counts.
     -->
     <select id="agingBuckets" resultType="io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow">
-        SELECT COALESCE(SUM(CASE WHEN age &lt; INTERVAL '1 hour' THEN 1 ELSE 0 END), 0)                                    AS under_1h,
-               COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '1 hour' AND age &lt; INTERVAL '6 hours' THEN 1 ELSE 0 END), 0)   AS h1_to_6,
-               COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '6 hours' AND age &lt; INTERVAL '24 hours' THEN 1 ELSE 0 END), 0) AS h6_to_24,
-               COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '24 hours' THEN 1 ELSE 0 END), 0)                                 AS over_24h,
-               COUNT(*)                                                                                                    AS total
+        SELECT COALESCE(SUM(CASE WHEN age &lt; INTERVAL '1 hour' THEN 1 ELSE 0 END), 0)    AS under_1h,
+               COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '1 hour' AND age &lt; INTERVAL '6 hours' THEN 1 ELSE 0 END),
+                        0)                                                                 AS h1_to_6,
+               COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '6 hours' AND age &lt; INTERVAL '24 hours' THEN 1 ELSE 0 END),
+                        0)                                                                 AS h6_to_24,
+               COALESCE(SUM(CASE WHEN age &gt;= INTERVAL '24 hours' THEN 1 ELSE 0 END), 0) AS over_24h,
+               COUNT(*)                                                                    AS total
         FROM (SELECT NOW() - create_time AS age
               FROM dc3_device_event
               WHERE deleted = 0
@@ -573,10 +575,12 @@
         the current app behaviour).
     -->
     <select id="mttaByDay" resultType="io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow">
-        SELECT to_char(DATE(create_time), 'YYYY-MM-DD')                                                              AS date,
-               PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000)  AS p50_ms,
-               PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000) AS p95_ms,
-               COUNT(*)                                                                                              AS confirmed_count
+        SELECT to_char(DATE(create_time), 'YYYY-MM-DD')                                                        AS date,
+               PERCENTILE_CONT(0.5)
+                               WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000) AS p50_ms,
+               PERCENTILE_CONT(0.95)
+                               WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000) AS p95_ms,
+               COUNT(*)                                                                                        AS confirmed_count
         FROM (SELECT create_time, operate_time
               FROM dc3_device_event
               WHERE deleted = 0

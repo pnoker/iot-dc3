@@ -28,53 +28,53 @@ package io.github.pnoker.common.manager.constant;
  */
 public final class TopologyLimits {
 
-	public static final int TOP_DRIVERS = 10;
+    public static final int TOP_DRIVERS = 10;
 
-	// ===== Top-N caps ==============================================
-	// Orders of magnitude: worst-case nodes ≈
-	// TOP_DRIVERS + TOP_DEVICES + |bound profiles| +
-	// (TOP_POINTS_PER_PROFILE × |bound profiles|) + Others
-	// ≈ 10 + 20 + ~30 + 15×30 + ~20 ≈ 530 (G2 sankey comfortable).
-	public static final int TOP_DEVICES = 20;
+    // ===== Top-N caps ==============================================
+    // Orders of magnitude: worst-case nodes ≈
+    // TOP_DRIVERS + TOP_DEVICES + |bound profiles| +
+    // (TOP_POINTS_PER_PROFILE × |bound profiles|) + Others
+    // ≈ 10 + 20 + ~30 + 15×30 + ~20 ≈ 530 (G2 sankey comfortable).
+    public static final int TOP_DEVICES = 20;
 
-	public static final int TOP_POINTS_PER_PROFILE = 15;
+    public static final int TOP_POINTS_PER_PROFILE = 15;
 
-	public static final String MODE_VOLUME = "volume";
+    public static final String MODE_VOLUME = "volume";
 
-	// ===== Modes ==================================================
-	public static final String MODE_CARDINALITY = "cardinality";
+    // ===== Modes ==================================================
+    public static final String MODE_CARDINALITY = "cardinality";
 
-	public static final String RANGE_TODAY = "today";
+    public static final String RANGE_TODAY = "today";
 
-	// ===== Range keys =============================================
-	public static final String RANGE_24H = "24h";
+    // ===== Range keys =============================================
+    public static final String RANGE_24H = "24h";
 
-	public static final String RANGE_7D = "7d";
+    public static final String RANGE_7D = "7d";
 
-	public static final String RANGE_30D = "30d";
+    public static final String RANGE_30D = "30d";
 
-	public static final String RANGE_DEFAULT = RANGE_7D;
+    public static final String RANGE_DEFAULT = RANGE_7D;
 
-	/**
-	 * Short TTL — wide enough to coalesce refresh bursts, narrow enough that metadata
-	 * edits surface on the next natural poll.
-	 */
-	public static final int CACHE_TTL_SECONDS = 60;
+    /**
+     * Short TTL — wide enough to coalesce refresh bursts, narrow enough that metadata
+     * edits surface on the next natural poll.
+     */
+    public static final int CACHE_TTL_SECONDS = 60;
 
-	// ===== Cache config ===========================================
-	/**
-	 * Cap on cache entries = (tenant × mode × rangeKey) triples held.
-	 */
-	public static final int CACHE_MAX_SIZE = 200;
+    // ===== Cache config ===========================================
+    /**
+     * Cap on cache entries = (tenant × mode × rangeKey) triples held.
+     */
+    public static final int CACHE_MAX_SIZE = 200;
 
-	// ===== Fallback bucket keys ==================================
-	// Returned when an enum lookup fails (EnableFlagEnum.ofIndex(null) → null,
-	// or unknown driver_type_flag int). Frontend matches this on a localised
-	// label lookup — it's a stable dictionary token, not user-visible copy.
-	public static final String UNKNOWN_BUCKET = "UNKNOWN";
+    // ===== Fallback bucket keys ==================================
+    // Returned when an enum lookup fails (EnableFlagEnum.ofIndex(null) → null,
+    // or unknown driver_type_flag int). Frontend matches this on a localised
+    // label lookup — it's a stable dictionary token, not user-visible copy.
+    public static final String UNKNOWN_BUCKET = "UNKNOWN";
 
-	private TopologyLimits() {
-		// utility class — never instantiated
-	}
+    private TopologyLimits() {
+        // utility class — never instantiated
+    }
 
 }

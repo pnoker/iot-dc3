@@ -33,36 +33,41 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 public interface BaseService<B, Q> {
 
-	/**
-	 * Save entity to database
-	 * @param entityBO Business object to save
-	 */
-	void save(B entityBO);
+    /**
+     * Save entity to database
+     *
+     * @param entityBO Business object to save
+     */
+    void save(B entityBO);
 
-	/**
-	 * Remove entity by ID
-	 * @param id Entity ID to remove
-	 */
-	void remove(Long id);
+    /**
+     * Remove entity by ID
+     *
+     * @param id Entity ID to remove
+     */
+    void remove(Long id);
 
-	/**
-	 * Update existing entity
-	 * @param entityBO Business object with updated data
-	 */
-	void update(B entityBO);
+    /**
+     * Update existing entity
+     *
+     * @param entityBO Business object with updated data
+     */
+    void update(B entityBO);
 
-	/**
-	 * Select entity by primary key
-	 * @param id Entity ID to query
-	 * @return Business object of the entity
-	 */
-	B selectById(Long id);
+    /**
+     * Select entity by primary key
+     *
+     * @param id Entity ID to query
+     * @return Business object of the entity
+     */
+    B selectById(Long id);
 
-	/**
-	 * Select entities with pagination
-	 * @param entityQuery Query object with pagination parameters
-	 * @return Paginated result of business objects
-	 */
-	Page<B> selectByPage(Q entityQuery);
+    /**
+     * Select entities with pagination
+     *
+     * @param entityQuery Query object with pagination parameters
+     * @return Paginated result of business objects
+     */
+    Page<B> selectByPage(Q entityQuery);
 
 }

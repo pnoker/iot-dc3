@@ -60,193 +60,194 @@ import java.util.stream.Collectors;
 @Service
 public class PointAttributeConfigServiceImpl implements PointAttributeConfigService {
 
-	@Resource
-	private PointAttributeConfigBuilder pointAttributeConfigBuilder;
+    @Resource
+    private PointAttributeConfigBuilder pointAttributeConfigBuilder;
 
-	@Resource
-	private PointAttributeConfigManager pointAttributeConfigManager;
+    @Resource
+    private PointAttributeConfigManager pointAttributeConfigManager;
 
-	@Resource
-	private MetadataEventPublisher metadataEventPublisher;
+    @Resource
+    private MetadataEventPublisher metadataEventPublisher;
 
-	@Resource
-	private PointService pointService;
+    @Resource
+    private PointService pointService;
 
-	@Override
-	public void save(PointAttributeConfigBO entityBO) {
-		if (checkDuplicate(entityBO, false)) {
-			throw new DuplicateException(
-					"Failed to create point attribute config: point attribute config has been duplicated");
-		}
+    @Override
+    public void save(PointAttributeConfigBO entityBO) {
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException(
+                    "Failed to create point attribute config: point attribute config has been duplicated");
+        }
 
-		PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
-		if (!pointAttributeConfigManager.save(entityDO)) {
-			throw new AddException("Failed to create point attribute config");
-		}
+        PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
+        if (!pointAttributeConfigManager.save(entityDO)) {
+            throw new AddException("Failed to create point attribute config");
+        }
 
-		//
-		MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
-				MetadataOperateTypeEnum.UPDATE);
-		metadataEventPublisher.publishEvent(metadataEvent);
-	}
+        //
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
+                MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
+    }
 
-	@Override
-	public PointAttributeConfigBO innerSave(PointAttributeConfigBO entityBO) {
-		if (checkDuplicate(entityBO, false)) {
-			throw new DuplicateException(
-					"Failed to create point attribute config: point attribute config has been duplicated");
-		}
+    @Override
+    public PointAttributeConfigBO innerSave(PointAttributeConfigBO entityBO) {
+        if (checkDuplicate(entityBO, false)) {
+            throw new DuplicateException(
+                    "Failed to create point attribute config: point attribute config has been duplicated");
+        }
 
-		PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
-		if (!pointAttributeConfigManager.save(entityDO)) {
-			throw new AddException("Failed to create point attribute config");
-		}
+        PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
+        if (!pointAttributeConfigManager.save(entityDO)) {
+            throw new AddException("Failed to create point attribute config");
+        }
 
-		return pointAttributeConfigBuilder.buildBOByDO(entityDO);
-	}
+        return pointAttributeConfigBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public void remove(Long id) {
-		PointAttributeConfigDO entityDO = getDOById(id, true);
+    @Override
+    public void remove(Long id) {
+        PointAttributeConfigDO entityDO = getDOById(id, true);
 
-		if (!pointAttributeConfigManager.removeById(id)) {
-			throw new DeleteException("Failed to remove point attribute config");
-		}
+        if (!pointAttributeConfigManager.removeById(id)) {
+            throw new DeleteException("Failed to remove point attribute config");
+        }
 
-		//
-		MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
-				MetadataOperateTypeEnum.UPDATE);
-		metadataEventPublisher.publishEvent(metadataEvent);
-	}
+        //
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
+                MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
+    }
 
-	@Override
-	public void update(PointAttributeConfigBO entityBO) {
-		getDOById(entityBO.getId(), true);
+    @Override
+    public void update(PointAttributeConfigBO entityBO) {
+        getDOById(entityBO.getId(), true);
 
-		if (checkDuplicate(entityBO, true)) {
-			throw new DuplicateException(
-					"Failed to update point attribute config: point attribute config has been duplicated");
-		}
+        if (checkDuplicate(entityBO, true)) {
+            throw new DuplicateException(
+                    "Failed to update point attribute config: point attribute config has been duplicated");
+        }
 
-		PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
-		entityBO.setOperateTime(null);
-		if (!pointAttributeConfigManager.updateById(entityDO)) {
-			throw new UpdateException("Failed to update point attribute config");
-		}
+        PointAttributeConfigDO entityDO = pointAttributeConfigBuilder.buildDOByBO(entityBO);
+        entityBO.setOperateTime(null);
+        if (!pointAttributeConfigManager.updateById(entityDO)) {
+            throw new UpdateException("Failed to update point attribute config");
+        }
 
-		//
-		MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
-				MetadataOperateTypeEnum.UPDATE);
-		metadataEventPublisher.publishEvent(metadataEvent);
-	}
+        //
+        MetadataEvent metadataEvent = new MetadataEvent(this, entityDO.getDeviceId(), MetadataTypeEnum.DEVICE,
+                MetadataOperateTypeEnum.UPDATE);
+        metadataEventPublisher.publishEvent(metadataEvent);
+    }
 
-	@Override
-	public PointAttributeConfigBO selectById(Long id) {
-		PointAttributeConfigDO entityDO = getDOById(id, true);
-		return pointAttributeConfigBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public PointAttributeConfigBO selectById(Long id) {
+        PointAttributeConfigDO entityDO = getDOById(id, true);
+        return pointAttributeConfigBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId,
-			Long pointId) {
-		LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
-			.eq(PointAttributeConfigDO::getDeviceId, deviceId)
-			.eq(PointAttributeConfigDO::getPointId, pointId)
-			.last(QueryWrapperConstant.LIMIT_ONE);
-		PointAttributeConfigDO entityDO = wrapper.one();
-		return pointAttributeConfigBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public PointAttributeConfigBO selectByAttributeIdAndDeviceIdAndPointId(Long attributeId, Long deviceId,
+                                                                           Long pointId) {
+        LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
+                .eq(PointAttributeConfigDO::getDeviceId, deviceId)
+                .eq(PointAttributeConfigDO::getPointId, pointId)
+                .last(QueryWrapperConstant.LIMIT_ONE);
+        PointAttributeConfigDO entityDO = wrapper.one();
+        return pointAttributeConfigBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public List<PointAttributeConfigBO> selectByAttributeId(Long attributeId) {
-		LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
-			.eq(PointAttributeConfigDO::getAttributeId, attributeId);
-		List<PointAttributeConfigDO> entityDO = wrapper.list();
-		return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
-	}
+    @Override
+    public List<PointAttributeConfigBO> selectByAttributeId(Long attributeId) {
+        LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
+                .eq(PointAttributeConfigDO::getAttributeId, attributeId);
+        List<PointAttributeConfigDO> entityDO = wrapper.list();
+        return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
+    }
 
-	@Override
-	public List<PointAttributeConfigBO> selectByDeviceId(Long deviceId) {
-		List<PointBO> pointBOList = pointService.selectByDeviceId(deviceId);
-		Set<Long> pointIds = pointBOList.stream().map(PointBO::getId).collect(Collectors.toSet());
-		if (CollectionUtils.isEmpty(pointIds)) {
-			return Collections.emptyList();
-		}
+    @Override
+    public List<PointAttributeConfigBO> selectByDeviceId(Long deviceId) {
+        List<PointBO> pointBOList = pointService.selectByDeviceId(deviceId);
+        Set<Long> pointIds = pointBOList.stream().map(PointBO::getId).collect(Collectors.toSet());
+        if (CollectionUtils.isEmpty(pointIds)) {
+            return Collections.emptyList();
+        }
 
-		LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
-			.eq(PointAttributeConfigDO::getDeviceId, deviceId)
-			.in(PointAttributeConfigDO::getPointId, pointIds);
-		List<PointAttributeConfigDO> entityDO = wrapper.list();
-		return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
-	}
+        LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
+                .eq(PointAttributeConfigDO::getDeviceId, deviceId)
+                .in(PointAttributeConfigDO::getPointId, pointIds);
+        List<PointAttributeConfigDO> entityDO = wrapper.list();
+        return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
+    }
 
-	@Override
-	public List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
-		LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
-			.eq(PointAttributeConfigDO::getDeviceId, deviceId)
-			.eq(PointAttributeConfigDO::getPointId, pointId);
-		List<PointAttributeConfigDO> entityDO = wrapper.list();
-		return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
-	}
+    @Override
+    public List<PointAttributeConfigBO> selectByDeviceIdAndPointId(Long deviceId, Long pointId) {
+        LambdaQueryChainWrapper<PointAttributeConfigDO> wrapper = pointAttributeConfigManager.lambdaQuery()
+                .eq(PointAttributeConfigDO::getDeviceId, deviceId)
+                .eq(PointAttributeConfigDO::getPointId, pointId);
+        List<PointAttributeConfigDO> entityDO = wrapper.list();
+        return pointAttributeConfigBuilder.buildBOListByDOList(entityDO);
+    }
 
-	@Override
-	public Page<PointAttributeConfigBO> selectByPage(PointAttributeConfigQuery entityQuery) {
-		if (Objects.isNull(entityQuery.getPage())) {
-			entityQuery.setPage(new Pages());
-		}
-		Page<PointAttributeConfigDO> entityPageDO = pointAttributeConfigManager
-			.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-		return pointAttributeConfigBuilder.buildBOPageByDOPage(entityPageDO);
-	}
+    @Override
+    public Page<PointAttributeConfigBO> selectByPage(PointAttributeConfigQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<PointAttributeConfigDO> entityPageDO = pointAttributeConfigManager
+                .page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
+        return pointAttributeConfigBuilder.buildBOPageByDOPage(entityPageDO);
+    }
 
-	/**
-	 * @param entityQuery {@link PointAttributeConfigQuery}
-	 * @return {@link LambdaQueryWrapper}
-	 */
-	private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery entityQuery) {
-		LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
-		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getAttributeId()), PointAttributeConfigDO::getAttributeId,
-				entityQuery.getAttributeId());
-		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId,
-				entityQuery.getDeviceId());
-		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointId()), PointAttributeConfigDO::getPointId,
-				entityQuery.getPointId());
-		wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointAttributeConfigDO::getTenantId,
-				entityQuery.getTenantId());
-		return wrapper;
-	}
+    /**
+     * @param entityQuery {@link PointAttributeConfigQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<PointAttributeConfigDO> fuzzyQuery(PointAttributeConfigQuery entityQuery) {
+        LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getAttributeId()), PointAttributeConfigDO::getAttributeId,
+                entityQuery.getAttributeId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDeviceId()), PointAttributeConfigDO::getDeviceId,
+                entityQuery.getDeviceId());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getPointId()), PointAttributeConfigDO::getPointId,
+                entityQuery.getPointId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointAttributeConfigDO::getTenantId,
+                entityQuery.getTenantId());
+        return wrapper;
+    }
 
-	/**
-	 * @param entityBO {@link PointAttributeConfigBO}
-	 * @param isUpdate
-	 * @return
-	 */
-	private boolean checkDuplicate(PointAttributeConfigBO entityBO, boolean isUpdate) {
-		LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
-		wrapper.eq(PointAttributeConfigDO::getAttributeId, entityBO.getAttributeId());
-		wrapper.eq(PointAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
-		wrapper.eq(PointAttributeConfigDO::getPointId, entityBO.getPointId());
-		wrapper.eq(PointAttributeConfigDO::getTenantId, entityBO.getTenantId());
-		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-		PointAttributeConfigDO one = pointAttributeConfigManager.getOne(wrapper);
-		if (Objects.isNull(one)) {
-			return false;
-		}
-		return !isUpdate || !one.getId().equals(entityBO.getId());
-	}
+    /**
+     * @param entityBO {@link PointAttributeConfigBO}
+     * @param isUpdate
+     * @return
+     */
+    private boolean checkDuplicate(PointAttributeConfigBO entityBO, boolean isUpdate) {
+        LambdaQueryWrapper<PointAttributeConfigDO> wrapper = Wrappers.<PointAttributeConfigDO>query().lambda();
+        wrapper.eq(PointAttributeConfigDO::getAttributeId, entityBO.getAttributeId());
+        wrapper.eq(PointAttributeConfigDO::getDeviceId, entityBO.getDeviceId());
+        wrapper.eq(PointAttributeConfigDO::getPointId, entityBO.getPointId());
+        wrapper.eq(PointAttributeConfigDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        PointAttributeConfigDO one = pointAttributeConfigManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        return !isUpdate || !one.getId().equals(entityBO.getId());
+    }
 
-	/**
-	 * Primary key ID
-	 * @param id ID
-	 * @param throwException
-	 * @return {@link PointAttributeConfigDO}
-	 */
-	private PointAttributeConfigDO getDOById(Long id, boolean throwException) {
-		PointAttributeConfigDO entityDO = pointAttributeConfigManager.getById(id);
-		if (throwException && Objects.isNull(entityDO)) {
-			throw new NotFoundException("Point attribute config does not exist");
-		}
-		return entityDO;
-	}
+    /**
+     * Primary key ID
+     *
+     * @param id             ID
+     * @param throwException
+     * @return {@link PointAttributeConfigDO}
+     */
+    private PointAttributeConfigDO getDOById(Long id, boolean throwException) {
+        PointAttributeConfigDO entityDO = pointAttributeConfigManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Point attribute config does not exist");
+        }
+        return entityDO;
+    }
 
 }

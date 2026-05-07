@@ -51,67 +51,66 @@ import java.util.List;
 @Service
 public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
-	@Resource
-	private GrpcDriverBuilder grpcDriverBuilder;
+    @Resource
+    private GrpcDriverBuilder grpcDriverBuilder;
 
-	@Resource
-	private GrpcDriverAttributeBuilder grpcDriverAttributeBuilder;
+    @Resource
+    private GrpcDriverAttributeBuilder grpcDriverAttributeBuilder;
 
-	@Resource
-	private GrpcPointAttributeBuilder grpcPointAttributeBuilder;
+    @Resource
+    private GrpcPointAttributeBuilder grpcPointAttributeBuilder;
 
-	@Resource
-	private DriverRegisterService driverRegisterService;
+    @Resource
+    private DriverRegisterService driverRegisterService;
 
-	@Resource
-	private DeviceService deviceService;
+    @Resource
+    private DeviceService deviceService;
 
-	@Override
-	public void driverRegister(GrpcDriverRegisterDTO request, StreamObserver<GrpcRDriverRegisterDTO> responseObserver) {
-		GrpcRDriverRegisterDTO.Builder builder = GrpcRDriverRegisterDTO.newBuilder();
-		GrpcR.Builder rBuilder = GrpcR.newBuilder();
+    @Override
+    public void driverRegister(GrpcDriverRegisterDTO request, StreamObserver<GrpcRDriverRegisterDTO> responseObserver) {
+        GrpcRDriverRegisterDTO.Builder builder = GrpcRDriverRegisterDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-		try {
-			//
-			DriverBO entityBO = driverRegisterService.registerDriver(request);
-			GrpcDriverDTO entityGrpcDTO = grpcDriverBuilder.buildGrpcDTOByBO(entityBO);
-			builder.setDriver(entityGrpcDTO);
+        try {
+            //
+            DriverBO entityBO = driverRegisterService.registerDriver(request);
+            GrpcDriverDTO entityGrpcDTO = grpcDriverBuilder.buildGrpcDTOByBO(entityBO);
+            builder.setDriver(entityGrpcDTO);
 
-			//
-			List<DriverAttributeBO> driverAttributeBOList = driverRegisterService.registerDriverAttribute(request,
-					entityBO);
-			List<GrpcDriverAttributeDTO> grpcDriverAttributeDTOList = driverAttributeBOList.stream()
-				.map(grpcDriverAttributeBuilder::buildGrpcDTOByBO)
-				.toList();
-			builder.addAllDriverAttributes(grpcDriverAttributeDTOList);
+            //
+            List<DriverAttributeBO> driverAttributeBOList = driverRegisterService.registerDriverAttribute(request,
+                    entityBO);
+            List<GrpcDriverAttributeDTO> grpcDriverAttributeDTOList = driverAttributeBOList.stream()
+                    .map(grpcDriverAttributeBuilder::buildGrpcDTOByBO)
+                    .toList();
+            builder.addAllDriverAttributes(grpcDriverAttributeDTOList);
 
-			//
-			List<PointAttributeBO> pointAttributeBOList = driverRegisterService.registerPointAttribute(request,
-					entityBO);
-			List<GrpcPointAttributeDTO> grpcPointAttributeDTOList = pointAttributeBOList.stream()
-				.map(grpcPointAttributeBuilder::buildGrpcDTOByBO)
-				.toList();
-			builder.addAllPointAttributes(grpcPointAttributeDTOList);
+            //
+            List<PointAttributeBO> pointAttributeBOList = driverRegisterService.registerPointAttribute(request,
+                    entityBO);
+            List<GrpcPointAttributeDTO> grpcPointAttributeDTOList = pointAttributeBOList.stream()
+                    .map(grpcPointAttributeBuilder::buildGrpcDTOByBO)
+                    .toList();
+            builder.addAllPointAttributes(grpcPointAttributeDTOList);
 
-			//
-			List<Long> idList = deviceService.selectIdsByDriverId(entityBO.getId());
-			builder.addAllDeviceIds(idList);
+            //
+            List<Long> idList = deviceService.selectIdsByDriverId(entityBO.getId());
+            builder.addAllDeviceIds(idList);
 
-			rBuilder.setOk(true);
-			rBuilder.setCode(ResponseEnum.OK.getCode());
-			rBuilder.setMessage(ResponseEnum.OK.getText());
-		}
-		catch (Exception e) {
-			rBuilder.setOk(false);
-			rBuilder.setCode(ResponseEnum.FAILURE.getCode());
-			rBuilder.setMessage(e.getMessage());
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
+        } catch (Exception e) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.FAILURE.getCode());
+            rBuilder.setMessage(e.getMessage());
 
-			log.error(e.getMessage(), e);
-		}
+            log.error(e.getMessage(), e);
+        }
 
-		builder.setResult(rBuilder);
-		responseObserver.onNext(builder.build());
-		responseObserver.onCompleted();
-	}
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
 
 }

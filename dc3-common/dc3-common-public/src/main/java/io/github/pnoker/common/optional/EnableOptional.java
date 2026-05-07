@@ -35,37 +35,36 @@ import java.util.function.Consumer;
  */
 public final class EnableOptional {
 
-	private final EnableFlagEnum value;
+    private final EnableFlagEnum value;
 
-	private EnableOptional(byte index) {
-		this.value = EnableFlagEnum.ofIndex(index);
-	}
+    private EnableOptional(byte index) {
+        this.value = EnableFlagEnum.ofIndex(index);
+    }
 
-	private EnableOptional(int index) {
-		this.value = EnableFlagEnum.ofIndex((byte) index);
-	}
+    private EnableOptional(int index) {
+        this.value = EnableFlagEnum.ofIndex((byte) index);
+    }
 
-	public static EnableOptional ofNullable(byte index) {
-		return new EnableOptional(index);
-	}
+    public static EnableOptional ofNullable(byte index) {
+        return new EnableOptional(index);
+    }
 
-	public static EnableOptional ofNullable(int index) {
-		return new EnableOptional(index);
-	}
+    public static EnableOptional ofNullable(int index) {
+        return new EnableOptional(index);
+    }
 
-	public void ifPresent(Consumer<EnableFlagEnum> action) {
-		if (Objects.nonNull(value)) {
-			action.accept(value);
-		}
-	}
+    public void ifPresent(Consumer<EnableFlagEnum> action) {
+        if (Objects.nonNull(value)) {
+            action.accept(value);
+        }
+    }
 
-	public void ifPresentOrElse(Consumer<EnableFlagEnum> action, Runnable emptyAction) {
-		if (Objects.nonNull(value)) {
-			action.accept(value);
-		}
-		else {
-			emptyAction.run();
-		}
-	}
+    public void ifPresentOrElse(Consumer<EnableFlagEnum> action, Runnable emptyAction) {
+        if (Objects.nonNull(value)) {
+            action.accept(value);
+        } else {
+            emptyAction.run();
+        }
+    }
 
 }

@@ -34,12 +34,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class AuthApplication {
 
-	/**
-	 * Main entry point for the Authentication Center Service.
-	 * @param args command line arguments
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(AuthApplication.class, args);
-	}
+    /**
+     * Main entry point for the Authentication Center Service.
+     *
+     * @param args command line arguments
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(AuthApplication.class, args);
+    }
 
 }

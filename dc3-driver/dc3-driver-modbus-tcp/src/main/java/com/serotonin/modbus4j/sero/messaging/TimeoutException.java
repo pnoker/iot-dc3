@@ -30,17 +30,18 @@ import java.io.Serial;
  */
 public class TimeoutException extends IOException {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * <p>
-	 * Constructor for TimeoutException.
-	 * </p>
-	 * @param message a {@link String} object.
-	 */
-	public TimeoutException(String message) {
-		super(message);
-	}
+    /**
+     * <p>
+     * Constructor for TimeoutException.
+     * </p>
+     *
+     * @param message a {@link String} object.
+     */
+    public TimeoutException(String message) {
+        super(message);
+    }
 
 }

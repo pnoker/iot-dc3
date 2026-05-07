@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-common-model` is the shared domain model module of the IoT DC3 platform. It defines all base classes, domain entities (BO/VO/DTO/DO), validation group interfaces, and query
+`dc3-common-model` is the shared domain model module of the IoT DC3 platform. It defines all base classes, domain
+entities (BO/VO/DTO/DO), validation group interfaces, and query
 objects used across all services and drivers.
 
 ## Module Information

@@ -26,25 +26,26 @@ package com.serotonin.modbus4j.sero;
  */
 public class NotImplementedException extends RuntimeException {
 
-	private static final long serialVersionUID = -1;
+    private static final long serialVersionUID = -1;
 
-	/**
-	 * <p>
-	 * Constructor for NotImplementedException.
-	 * </p>
-	 */
-	public NotImplementedException() {
-		super();
-	}
+    /**
+     * <p>
+     * Constructor for NotImplementedException.
+     * </p>
+     */
+    public NotImplementedException() {
+        super();
+    }
 
-	/**
-	 * <p>
-	 * Constructor for NotImplementedException.
-	 * </p>
-	 * @param message a {@link String} object.
-	 */
-	public NotImplementedException(String message) {
-		super(message);
-	}
+    /**
+     * <p>
+     * Constructor for NotImplementedException.
+     * </p>
+     *
+     * @param message a {@link String} object.
+     */
+    public NotImplementedException(String message) {
+        super(message);
+    }
 
 }

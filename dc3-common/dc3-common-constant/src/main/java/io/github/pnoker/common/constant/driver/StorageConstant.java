@@ -31,14 +31,14 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
  */
 public class StorageConstant {
 
-	/**
-	 * Point value prefix
-	 */
-	public static final String POINT_VALUE_PREFIX = PrefixConstant.POINT + SuffixConstant.VALUE
-			+ SymbolConstant.UNDERSCORE;
+    /**
+     * Point value prefix
+     */
+    public static final String POINT_VALUE_PREFIX = PrefixConstant.POINT + SuffixConstant.VALUE
+            + SymbolConstant.UNDERSCORE;
 
-	private StorageConstant() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private StorageConstant() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
 }

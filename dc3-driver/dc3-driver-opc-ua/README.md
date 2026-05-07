@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-driver-opc-ua` is the OPC UA (Unified Architecture) protocol driver of the IoT DC3 platform. It connects to OPC UA servers to read and write node values from industrial
+`dc3-driver-opc-ua` is the OPC UA (Unified Architecture) protocol driver of the IoT DC3 platform. It connects to OPC UA
+servers to read and write node values from industrial
 automation systems using the OPC UA binary protocol.
 
 ## Module Information

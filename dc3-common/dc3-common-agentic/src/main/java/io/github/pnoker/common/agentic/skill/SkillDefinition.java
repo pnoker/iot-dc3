@@ -36,55 +36,55 @@ import java.util.List;
 @AllArgsConstructor
 public class SkillDefinition {
 
-	/**
-	 * Unique skill identifier (matches the YAML filename stem by convention).
-	 */
-	private String name;
+    /**
+     * Unique skill identifier (matches the YAML filename stem by convention).
+     */
+    private String name;
 
-	/**
-	 * Human-readable description of what this skill enables.
-	 */
-	private String description;
+    /**
+     * Human-readable description of what this skill enables.
+     */
+    private String description;
 
-	/**
-	 * Whether the skill is active and should be loaded at startup.
-	 */
-	private boolean enabled;
+    /**
+     * Whether the skill is active and should be loaded at startup.
+     */
+    private boolean enabled;
 
-	/**
-	 * Additional system prompt text injected when this skill is activated.
-	 */
-	private String systemPromptAddition;
+    /**
+     * Additional system prompt text injected when this skill is activated.
+     */
+    private String systemPromptAddition;
 
-	/**
-	 * Names of the Spring AI tools this skill is allowed to use.
-	 */
-	private List<String> tools;
+    /**
+     * Names of the Spring AI tools this skill is allowed to use.
+     */
+    private List<String> tools;
 
-	/**
-	 * Few-shot examples illustrating expected user-assistant interactions.
-	 */
-	private List<SkillExample> examples;
+    /**
+     * Few-shot examples illustrating expected user-assistant interactions.
+     */
+    private List<SkillExample> examples;
 
-	/**
-	 * A single user-assistant exchange used as a few-shot example.
-	 */
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class SkillExample {
+    /**
+     * A single user-assistant exchange used as a few-shot example.
+     */
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SkillExample {
 
-		/**
-		 * Example user message.
-		 */
-		private String user;
+        /**
+         * Example user message.
+         */
+        private String user;
 
-		/**
-		 * Example assistant response.
-		 */
-		private String assistant;
+        /**
+         * Example assistant response.
+         */
+        private String assistant;
 
-	}
+    }
 
 }

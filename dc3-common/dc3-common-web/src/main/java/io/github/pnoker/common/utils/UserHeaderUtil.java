@@ -42,78 +42,83 @@ import java.util.Objects;
 @Slf4j
 public class UserHeaderUtil {
 
-	private UserHeaderUtil() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private UserHeaderUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Get user header information from Reactor context
-	 * @return User header information as Mono
-	 */
-	public static Mono<RequestHeader.UserHeader> getUserHeader() {
-		return Mono.deferContextual(context -> {
-			if (!context.hasKey(RequestConstant.Key.USER_HEADER)) {
-				return Mono.error(new UnAuthorizedException("Unable to get user header"));
-			}
-			RequestHeader.UserHeader userHeader = context.get(RequestConstant.Key.USER_HEADER);
-			return Mono.just(userHeader);
-		});
-	}
+    /**
+     * Get user header information from Reactor context
+     *
+     * @return User header information as Mono
+     */
+    public static Mono<RequestHeader.UserHeader> getUserHeader() {
+        return Mono.deferContextual(context -> {
+            if (!context.hasKey(RequestConstant.Key.USER_HEADER)) {
+                return Mono.error(new UnAuthorizedException("Unable to get user header"));
+            }
+            RequestHeader.UserHeader userHeader = context.get(RequestConstant.Key.USER_HEADER);
+            return Mono.just(userHeader);
+        });
+    }
 
-	/**
-	 * Get tenant ID from user header
-	 * @return Tenant ID as Mono
-	 */
-	public static Mono<Long> getTenantId() {
-		return getUserHeader().flatMap(userHeader -> {
-			Long tenantId = userHeader.getTenantId();
-			if (Objects.isNull(tenantId)) {
-				return Mono.error(new UnAuthorizedException("Unable to get tenant id of user header"));
-			}
-			return Mono.just(tenantId);
-		});
-	}
+    /**
+     * Get tenant ID from user header
+     *
+     * @return Tenant ID as Mono
+     */
+    public static Mono<Long> getTenantId() {
+        return getUserHeader().flatMap(userHeader -> {
+            Long tenantId = userHeader.getTenantId();
+            if (Objects.isNull(tenantId)) {
+                return Mono.error(new UnAuthorizedException("Unable to get tenant id of user header"));
+            }
+            return Mono.just(tenantId);
+        });
+    }
 
-	/**
-	 * Get user ID from user header
-	 * @return User ID as Mono
-	 */
-	public static Mono<Long> getUserId() {
-		return getUserHeader().flatMap(userHeader -> {
-			Long userId = userHeader.getUserId();
-			if (Objects.isNull(userId)) {
-				return Mono.error(new UnAuthorizedException("Unable to get user id of user header"));
-			}
-			return Mono.just(userId);
-		});
-	}
+    /**
+     * Get user ID from user header
+     *
+     * @return User ID as Mono
+     */
+    public static Mono<Long> getUserId() {
+        return getUserHeader().flatMap(userHeader -> {
+            Long userId = userHeader.getUserId();
+            if (Objects.isNull(userId)) {
+                return Mono.error(new UnAuthorizedException("Unable to get user id of user header"));
+            }
+            return Mono.just(userId);
+        });
+    }
 
-	/**
-	 * Get user nickname from user header
-	 * @return User nickname as Mono
-	 */
-	public static Mono<String> getNickName() {
-		return getUserHeader().flatMap(userHeader -> {
-			String nickName = userHeader.getNickName();
-			if (StringUtils.isEmpty(nickName)) {
-				return Mono.error(new UnAuthorizedException("Unable to get nick name of user header"));
-			}
-			return Mono.just(nickName);
-		});
-	}
+    /**
+     * Get user nickname from user header
+     *
+     * @return User nickname as Mono
+     */
+    public static Mono<String> getNickName() {
+        return getUserHeader().flatMap(userHeader -> {
+            String nickName = userHeader.getNickName();
+            if (StringUtils.isEmpty(nickName)) {
+                return Mono.error(new UnAuthorizedException("Unable to get nick name of user header"));
+            }
+            return Mono.just(nickName);
+        });
+    }
 
-	/**
-	 * Get username from user header
-	 * @return Username as Mono
-	 */
-	public static Mono<String> getUserName() {
-		return getUserHeader().flatMap(userHeader -> {
-			String userName = userHeader.getUserName();
-			if (StringUtils.isEmpty(userName)) {
-				return Mono.error(new UnAuthorizedException("Unable to get user name of user header"));
-			}
-			return Mono.just(userName);
-		});
-	}
+    /**
+     * Get username from user header
+     *
+     * @return Username as Mono
+     */
+    public static Mono<String> getUserName() {
+        return getUserHeader().flatMap(userHeader -> {
+            String userName = userHeader.getUserName();
+            if (StringUtils.isEmpty(userName)) {
+                return Mono.error(new UnAuthorizedException("Unable to get user name of user header"));
+            }
+            return Mono.just(userName);
+        });
+    }
 
 }

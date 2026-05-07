@@ -2,7 +2,8 @@
 
 ## Overview
 
-`dc3-driver-mqtt` is the MQTT protocol driver of the IoT DC3 platform. It subscribes to configured MQTT topics, parses incoming payloads as device point values, and forwards
+`dc3-driver-mqtt` is the MQTT protocol driver of the IoT DC3 platform. It subscribes to configured MQTT topics, parses
+incoming payloads as device point values, and forwards
 commands to devices via MQTT publish.
 
 ## Module Information

@@ -30,9 +30,9 @@ import io.github.pnoker.common.base.service.BaseService;
  */
 public interface UserPasswordService extends BaseService<UserPasswordBO, UserPasswordQuery> {
 
-	/**
-	 * @param id ID
-	 */
-	void restPassword(Long id);
+    /**
+     * @param id ID
+     */
+    void restPassword(Long id);
 
 }

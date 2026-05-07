@@ -33,32 +33,36 @@ import org.springframework.messaging.handler.annotation.Header;
 @MessagingGateway(defaultRequestChannel = "mqttOutboundChannel")
 public interface MqttSendService {
 
-	/**
-	 * Send data using the default topic and default QoS
-	 * @param data string
-	 */
-	void sendToMqtt(String data);
+    /**
+     * Send data using the default topic and default QoS
+     *
+     * @param data string
+     */
+    void sendToMqtt(String data);
 
-	/**
-	 * Send data using the default topic and a custom QoS
-	 * @param qos Custom QoS
-	 * @param data string
-	 */
-	void sendToMqtt(@Header(MqttHeaders.QOS) Integer qos, String data);
+    /**
+     * Send data using the default topic and a custom QoS
+     *
+     * @param qos  Custom QoS
+     * @param data string
+     */
+    void sendToMqtt(@Header(MqttHeaders.QOS) Integer qos, String data);
 
-	/**
-	 * Send data using a custom topic and the default QoS
-	 * @param topic Custom topic
-	 * @param data string
-	 */
-	void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, String data);
+    /**
+     * Send data using a custom topic and the default QoS
+     *
+     * @param topic Custom topic
+     * @param data  string
+     */
+    void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, String data);
 
-	/**
-	 * Send data using a custom topic and a custom QoS
-	 * @param topic Custom topic
-	 * @param qos Custom QoS
-	 * @param data string
-	 */
-	void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, @Header(MqttHeaders.QOS) Integer qos, String data);
+    /**
+     * Send data using a custom topic and a custom QoS
+     *
+     * @param topic Custom topic
+     * @param qos   Custom QoS
+     * @param data  string
+     */
+    void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, @Header(MqttHeaders.QOS) Integer qos, String data);
 
 }

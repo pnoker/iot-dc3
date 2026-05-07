@@ -33,59 +33,66 @@ import java.util.List;
  */
 public interface RepositoryService {
 
-	/**
-	 * Get repository service name
-	 * @return Repository Name
-	 */
-	String getRepositoryName();
+    /**
+     * Get repository service name
+     *
+     * @return Repository Name
+     */
+    String getRepositoryName();
 
-	/**
-	 * Save PointValue
-	 * @param entityBO PointValue
-	 * @throws IOException IOException
-	 */
-	void savePointValue(PointValueBO entityBO) throws IOException;
+    /**
+     * Save PointValue
+     *
+     * @param entityBO PointValue
+     * @throws IOException IOException
+     */
+    void savePointValue(PointValueBO entityBO) throws IOException;
 
-	/**
-	 * Save PointValue list
-	 * @param entityBOList PointValue Array
-	 * @throws IOException IOException
-	 */
-	void savePointValues(List<PointValueBO> entityBOList) throws IOException;
+    /**
+     * Save PointValue list
+     *
+     * @param entityBOList PointValue Array
+     * @throws IOException IOException
+     */
+    void savePointValues(List<PointValueBO> entityBOList) throws IOException;
 
-	/**
-	 * Get historical PointValue within the tenant scope.
-	 * @param tenantId Tenant ID (required for tenant isolation)
-	 * @param deviceId Device ID
-	 * @param pointId Point ID
-	 * @param count Count
-	 * @return History Value Array
-	 */
-	List<String> selectHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count);
+    /**
+     * Get historical PointValue within the tenant scope.
+     *
+     * @param tenantId Tenant ID (required for tenant isolation)
+     * @param deviceId Device ID
+     * @param pointId  Point ID
+     * @param count    Count
+     * @return History Value Array
+     */
+    List<String> selectHistoryPointValue(Long tenantId, Long deviceId, Long pointId, int count);
 
-	/**
-	 * Query latest PointValue within the tenant scope.
-	 * @param tenantId Tenant ID (required for tenant isolation)
-	 * @param deviceId Device ID
-	 * @param pointId Point ID
-	 * @return PointValueBO
-	 */
-	PointValueBO selectLatestPointValue(Long tenantId, Long deviceId, Long pointId);
+    /**
+     * Query latest PointValue within the tenant scope.
+     *
+     * @param tenantId Tenant ID (required for tenant isolation)
+     * @param deviceId Device ID
+     * @param pointId  Point ID
+     * @return PointValueBO
+     */
+    PointValueBO selectLatestPointValue(Long tenantId, Long deviceId, Long pointId);
 
-	/**
-	 * Query latest PointValue list within the tenant scope.
-	 * @param tenantId Tenant ID (required for tenant isolation)
-	 * @param deviceId Device ID
-	 * @param pointIds Point ID list
-	 * @return PointValueBO Array
-	 */
-	List<PointValueBO> selectLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds);
+    /**
+     * Query latest PointValue list within the tenant scope.
+     *
+     * @param tenantId Tenant ID (required for tenant isolation)
+     * @param deviceId Device ID
+     * @param pointIds Point ID list
+     * @return PointValueBO Array
+     */
+    List<PointValueBO> selectLatestPointValues(Long tenantId, Long deviceId, List<Long> pointIds);
 
-	/**
-	 * Page query PointValue
-	 * @param entityQuery Entry of Query
-	 * @return Entity of BO Page
-	 */
-	Page<PointValueBO> selectPagePointValue(PointValueQuery entityQuery);
+    /**
+     * Page query PointValue
+     *
+     * @param entityQuery Entry of Query
+     * @return Entity of BO Page
+     */
+    Page<PointValueBO> selectPagePointValue(PointValueQuery entityQuery);
 
 }

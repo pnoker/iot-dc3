@@ -50,390 +50,392 @@ import java.util.List;
  */
 public final class JsonUtil {
 
-	private static final ObjectMapper OBJECT_MAPPER = getObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = getObjectMapper();
 
-	private JsonUtil() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private JsonUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Get a JsonMapper object
-	 * @return ObjectMapper configured with proper settings
-	 */
-	public static JsonMapper getJsonMapper() {
-		LocalDateTimeSerializer serializer = new LocalDateTimeSerializer(
-				LocalDateTimeUtil.getCompleteDateTimeFormatter());
-		LocalDateTimeDeserializer deserializer = new LocalDateTimeDeserializer(
-				LocalDateTimeUtil.getCompleteDateTimeFormatter());
-		return JsonMapper.builder()
-			.findAndAddModules()
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, Boolean.FALSE)
-			.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, Boolean.FALSE)
-			.build();
-	}
+    /**
+     * Get a JsonMapper object
+     *
+     * @return ObjectMapper configured with proper settings
+     */
+    public static JsonMapper getJsonMapper() {
+        LocalDateTimeSerializer serializer = new LocalDateTimeSerializer(
+                LocalDateTimeUtil.getCompleteDateTimeFormatter());
+        LocalDateTimeDeserializer deserializer = new LocalDateTimeDeserializer(
+                LocalDateTimeUtil.getCompleteDateTimeFormatter());
+        return JsonMapper.builder()
+                .findAndAddModules()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, Boolean.FALSE)
+                .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, Boolean.FALSE)
+                .build();
+    }
 
-	/**
-	 * Get a ObjectMapper object
-	 * @return ObjectMapper configured with proper settings
-	 */
-	public static ObjectMapper getObjectMapper() {
-		LocalDateTimeSerializer serializer = new LocalDateTimeSerializer(
-				LocalDateTimeUtil.getCompleteDateTimeFormatter());
-		LocalDateTimeDeserializer deserializer = new LocalDateTimeDeserializer(
-				LocalDateTimeUtil.getCompleteDateTimeFormatter());
-		return JsonMapper.builder()
-			.findAndAddModules()
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, Boolean.FALSE)
-			.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, Boolean.FALSE)
-			.build();
-	}
+    /**
+     * Get a ObjectMapper object
+     *
+     * @return ObjectMapper configured with proper settings
+     */
+    public static ObjectMapper getObjectMapper() {
+        LocalDateTimeSerializer serializer = new LocalDateTimeSerializer(
+                LocalDateTimeUtil.getCompleteDateTimeFormatter());
+        LocalDateTimeDeserializer deserializer = new LocalDateTimeDeserializer(
+                LocalDateTimeUtil.getCompleteDateTimeFormatter());
+        return JsonMapper.builder()
+                .findAndAddModules()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, Boolean.FALSE)
+                .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, Boolean.FALSE)
+                .build();
+    }
 
-	/**
-	 * Deserialize JSON string to Java object
-	 * @param text JSON string
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object
-	 */
-	public static <T> T parseObject(String text, Class<T> valueType) {
-		try {
-			if (StringUtils.isEmpty(text)) {
-				return null;
-			}
+    /**
+     * Deserialize JSON string to Java object
+     *
+     * @param text      JSON string
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object
+     */
+    public static <T> T parseObject(String text, Class<T> valueType) {
+        try {
+            if (StringUtils.isEmpty(text)) {
+                return null;
+            }
 
-			return OBJECT_MAPPER.readValue(text, valueType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+            return OBJECT_MAPPER.readValue(text, valueType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON byte array to Java object
-	 * @param bytes JSON byte array
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object
-	 */
-	public static <T> T parseObject(byte[] bytes, Class<T> valueType) {
-		try {
-			return OBJECT_MAPPER.readValue(bytes, valueType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON byte array to Java object
+     *
+     * @param bytes     JSON byte array
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object
+     */
+    public static <T> T parseObject(byte[] bytes, Class<T> valueType) {
+        try {
+            return OBJECT_MAPPER.readValue(bytes, valueType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON string to Java object using JsonParser
-	 * @param jsonParser JsonParser instance for parsing
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object
-	 */
-	public static <T> T parseObject(JsonParser jsonParser, Class<T> valueType) {
-		try {
-			return OBJECT_MAPPER.readValue(jsonParser, valueType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON string to Java object using JsonParser
+     *
+     * @param jsonParser JsonParser instance for parsing
+     * @param valueType  Java object type
+     * @param <T>        Java object type
+     * @return Java object
+     */
+    public static <T> T parseObject(JsonParser jsonParser, Class<T> valueType) {
+        try {
+            return OBJECT_MAPPER.readValue(jsonParser, valueType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON string to Java object using DataInput
-	 * @param dataInput DataInput instance for parsing
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object
-	 */
-	public static <T> T parseObject(DataInput dataInput, Class<T> valueType) {
-		try {
-			return OBJECT_MAPPER.readValue(dataInput, valueType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON string to Java object using DataInput
+     *
+     * @param dataInput DataInput instance for parsing
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object
+     */
+    public static <T> T parseObject(DataInput dataInput, Class<T> valueType) {
+        try {
+            return OBJECT_MAPPER.readValue(dataInput, valueType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON content from an {@link InputStream} into a Java object.
-	 * @param inputStream Json InputStream
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object
-	 */
-	public static <T> T parseObject(InputStream inputStream, Class<T> valueType) {
-		try {
-			return OBJECT_MAPPER.readValue(inputStream, valueType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON content from an {@link InputStream} into a Java object.
+     *
+     * @param inputStream Json InputStream
+     * @param valueType   Java object type
+     * @param <T>         Java object type
+     * @return Java object
+     */
+    public static <T> T parseObject(InputStream inputStream, Class<T> valueType) {
+        try {
+            return OBJECT_MAPPER.readValue(inputStream, valueType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON content from a {@link Reader} into a Java object.
-	 * @param reader Json Reader
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object
-	 */
-	public static <T> T parseObject(Reader reader, Class<T> valueType) {
-		try {
-			return OBJECT_MAPPER.readValue(reader, valueType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON content from a {@link Reader} into a Java object.
+     *
+     * @param reader    Json Reader
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object
+     */
+    public static <T> T parseObject(Reader reader, Class<T> valueType) {
+        try {
+            return OBJECT_MAPPER.readValue(reader, valueType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON content from a {@link File} into a Java object.
-	 * @param file Json file
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object
-	 */
-	public static <T> T parseObject(File file, Class<T> valueType) {
-		try {
-			return OBJECT_MAPPER.readValue(file, valueType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON content from a {@link File} into a Java object.
+     *
+     * @param file      Json file
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object
+     */
+    public static <T> T parseObject(File file, Class<T> valueType) {
+        try {
+            return OBJECT_MAPPER.readValue(file, valueType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON string into a specified generic Java object.
-	 * @param text Json string
-	 * @param typeReference TypeReference, T is the target data type
-	 * @param <T> Java object type
-	 * @return Java object
-	 */
-	public static <T> T parseObject(String text, TypeReference<T> typeReference) {
-		try {
-			return OBJECT_MAPPER.readValue(text, typeReference);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON string into a specified generic Java object.
+     *
+     * @param text          Json string
+     * @param typeReference TypeReference, T is the target data type
+     * @param <T>           Java object type
+     * @return Java object
+     */
+    public static <T> T parseObject(String text, TypeReference<T> typeReference) {
+        try {
+            return OBJECT_MAPPER.readValue(text, typeReference);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON string to Java object collection
-	 * @param text JSON string
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object collection
-	 */
-	public static <T> List<T> parseArray(String text, Class<T> valueType) {
-		try {
-			JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
-			return OBJECT_MAPPER.readValue(text, javaType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON string to Java object collection
+     *
+     * @param text      JSON string
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object collection
+     */
+    public static <T> List<T> parseArray(String text, Class<T> valueType) {
+        try {
+            JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
+            return OBJECT_MAPPER.readValue(text, javaType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON byte array into a collection of Java objects.
-	 * @param bytes Json byte array
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object collection
-	 */
-	public static <T> List<T> parseArray(byte[] bytes, Class<T> valueType) {
-		try {
-			JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
-			return OBJECT_MAPPER.readValue(bytes, javaType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON byte array into a collection of Java objects.
+     *
+     * @param bytes     Json byte array
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object collection
+     */
+    public static <T> List<T> parseArray(byte[] bytes, Class<T> valueType) {
+        try {
+            JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
+            return OBJECT_MAPPER.readValue(bytes, javaType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON content using {@link JsonParser} into a collection of Java
-	 * objects.
-	 * @param jsonParser Json JsonParser
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object collection
-	 */
-	public static <T> List<T> parseArray(JsonParser jsonParser, Class<T> valueType) {
-		try {
-			JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
-			return OBJECT_MAPPER.readValue(jsonParser, javaType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON content using {@link JsonParser} into a collection of Java
+     * objects.
+     *
+     * @param jsonParser Json JsonParser
+     * @param valueType  Java object type
+     * @param <T>        Java object type
+     * @return Java object collection
+     */
+    public static <T> List<T> parseArray(JsonParser jsonParser, Class<T> valueType) {
+        try {
+            JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
+            return OBJECT_MAPPER.readValue(jsonParser, javaType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON content using {@link DataInput} into a collection of Java objects.
-	 * @param dataInput Json DataInput
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object collection
-	 */
-	public static <T> List<T> parseArray(DataInput dataInput, Class<T> valueType) {
-		try {
-			JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
-			return OBJECT_MAPPER.readValue(dataInput, javaType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON content using {@link DataInput} into a collection of Java objects.
+     *
+     * @param dataInput Json DataInput
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object collection
+     */
+    public static <T> List<T> parseArray(DataInput dataInput, Class<T> valueType) {
+        try {
+            JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
+            return OBJECT_MAPPER.readValue(dataInput, javaType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON content from an {@link InputStream} into a collection of Java
-	 * objects.
-	 * @param inputStream Json InputStream
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object collection
-	 */
-	public static <T> List<T> parseArray(InputStream inputStream, Class<T> valueType) {
-		try {
-			JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
-			return OBJECT_MAPPER.readValue(inputStream, javaType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON content from an {@link InputStream} into a collection of Java
+     * objects.
+     *
+     * @param inputStream Json InputStream
+     * @param valueType   Java object type
+     * @param <T>         Java object type
+     * @return Java object collection
+     */
+    public static <T> List<T> parseArray(InputStream inputStream, Class<T> valueType) {
+        try {
+            JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
+            return OBJECT_MAPPER.readValue(inputStream, javaType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON content from a {@link Reader} into a collection of Java objects.
-	 * @param reader Json Reader
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object collection
-	 */
-	public static <T> List<T> parseArray(Reader reader, Class<T> valueType) {
-		try {
-			JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
-			return OBJECT_MAPPER.readValue(reader, javaType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON content from a {@link Reader} into a collection of Java objects.
+     *
+     * @param reader    Json Reader
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object collection
+     */
+    public static <T> List<T> parseArray(Reader reader, Class<T> valueType) {
+        try {
+            JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
+            return OBJECT_MAPPER.readValue(reader, javaType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Deserialize JSON content from a {@link File} into a collection of Java objects.
-	 * @param file Json file
-	 * @param valueType Java object type
-	 * @param <T> Java object type
-	 * @return Java object collection
-	 */
-	public static <T> List<T> parseArray(File file, Class<T> valueType) {
-		try {
-			JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
-			return OBJECT_MAPPER.readValue(file, javaType);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Deserialize JSON content from a {@link File} into a collection of Java objects.
+     *
+     * @param file      Json file
+     * @param valueType Java object type
+     * @param <T>       Java object type
+     * @return Java object collection
+     */
+    public static <T> List<T> parseArray(File file, Class<T> valueType) {
+        try {
+            JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(ArrayList.class, valueType);
+            return OBJECT_MAPPER.readValue(file, javaType);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Serialize Java object or collection to JSON string
-	 * @param type Java object reference
-	 * @param <T> Java object type
-	 * @return JSON string
-	 */
-	public static <T> String toJsonString(T type) {
-		try {
-			return OBJECT_MAPPER.writeValueAsString(type);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Serialize Java object or collection to JSON string
+     *
+     * @param type Java object reference
+     * @param <T>  Java object type
+     * @return JSON string
+     */
+    public static <T> String toJsonString(T type) {
+        try {
+            return OBJECT_MAPPER.writeValueAsString(type);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Serialize Java object to JSON string with custom view
-	 * @param type Java object reference
-	 * @param serializationView Custom view class for JSON content
-	 * @param <T> Java object type
-	 * @return JSON string
-	 */
-	public static <T> String toJsonString(T type, Class<?> serializationView) {
-		try {
-			return OBJECT_MAPPER.writerWithView(serializationView).writeValueAsString(type);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Serialize Java object to JSON string with custom view
+     *
+     * @param type              Java object reference
+     * @param serializationView Custom view class for JSON content
+     * @param <T>               Java object type
+     * @return JSON string
+     */
+    public static <T> String toJsonString(T type, Class<?> serializationView) {
+        try {
+            return OBJECT_MAPPER.writerWithView(serializationView).writeValueAsString(type);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Serialize Java object to pretty JSON string
-	 * @param type Java object reference
-	 * @param <T> Java object type
-	 * @return Pretty formatted JSON string
-	 */
-	public static <T> String toPrettyJsonString(T type) {
-		try {
-			return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(type);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Serialize Java object to pretty JSON string
+     *
+     * @param type Java object reference
+     * @param <T>  Java object type
+     * @return Pretty formatted JSON string
+     */
+    public static <T> String toPrettyJsonString(T type) {
+        try {
+            return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(type);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Serialize Java object to pretty JSON string with custom view
-	 * @param type Java object reference
-	 * @param serializationView Custom view class for JSON content
-	 * @param <T> Java object type
-	 * @return Pretty formatted JSON string with custom view
-	 */
-	public static <T> String toPrettyJsonString(T type, Class<?> serializationView) {
-		try {
-			return OBJECT_MAPPER.writerWithView(serializationView).withDefaultPrettyPrinter().writeValueAsString(type);
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Serialize Java object to pretty JSON string with custom view
+     *
+     * @param type              Java object reference
+     * @param serializationView Custom view class for JSON content
+     * @param <T>               Java object type
+     * @return Pretty formatted JSON string with custom view
+     */
+    public static <T> String toPrettyJsonString(T type, Class<?> serializationView) {
+        try {
+            return OBJECT_MAPPER.writerWithView(serializationView).withDefaultPrettyPrinter().writeValueAsString(type);
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Serialize Java object to JSON byte array
-	 * @param type Java object reference
-	 * @param <T> Java object type
-	 * @return JSON byte array
-	 */
-	public static <T> byte[] toJsonBytes(T type) {
-		try {
-			return DecodeUtil.stringToByte(OBJECT_MAPPER.writeValueAsString(type));
-		}
-		catch (Exception e) {
-			throw new JsonException(e);
-		}
-	}
+    /**
+     * Serialize Java object to JSON byte array
+     *
+     * @param type Java object reference
+     * @param <T>  Java object type
+     * @return JSON byte array
+     */
+    public static <T> byte[] toJsonBytes(T type) {
+        try {
+            return DecodeUtil.stringToByte(OBJECT_MAPPER.writeValueAsString(type));
+        } catch (Exception e) {
+            throw new JsonException(e);
+        }
+    }
 
-	/**
-	 * Check if string is valid JSON format
-	 * @param text JSON string to validate
-	 * @return true if valid JSON, false otherwise
-	 */
-	public static boolean isJson(String text) {
-		if (text == null || text.isEmpty()) {
-			return false;
-		}
-		try {
-			OBJECT_MAPPER.readTree(text);
-			return true;
-		}
-		catch (Exception e) {
-			return false;
-		}
-	}
+    /**
+     * Check if string is valid JSON format
+     *
+     * @param text JSON string to validate
+     * @return true if valid JSON, false otherwise
+     */
+    public static boolean isJson(String text) {
+        if (text == null || text.isEmpty()) {
+            return false;
+        }
+        try {
+            OBJECT_MAPPER.readTree(text);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 }

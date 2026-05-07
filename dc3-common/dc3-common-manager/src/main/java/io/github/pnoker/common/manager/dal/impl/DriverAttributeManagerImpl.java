@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DriverAttributeManagerImpl extends ServiceImpl<DriverAttributeMapper, DriverAttributeDO>
-		implements DriverAttributeManager {
+        implements DriverAttributeManager {
 
 }

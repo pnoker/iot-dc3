@@ -35,68 +35,71 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum MetadataTypeEnum {
 
-	/**
-	 * Device metadata
-	 */
-	DEVICE((byte) 0, "device", "Device metadata"),
+    /**
+     * Device metadata
+     */
+    DEVICE((byte) 0, "device", "Device metadata"),
 
-	/**
-	 * Point metadata
-	 */
-	POINT((byte) 1, "point", "Point metadata"),;
+    /**
+     * Point metadata
+     */
+    POINT((byte) 1, "point", "Point metadata"),
+    ;
 
-	/**
-	 * Index
-	 */
-	@EnumValue
-	private final Byte index;
+    /**
+     * Index
+     */
+    @EnumValue
+    private final Byte index;
 
-	/**
-	 * Code
-	 */
-	private final String code;
+    /**
+     * Code
+     */
+    private final String code;
 
-	/**
-	 * Remark
-	 */
-	private final String remark;
+    /**
+     * Remark
+     */
+    private final String remark;
 
-	/**
-	 * Get enum by index
-	 * @param index Index
-	 * @return {@link MetadataTypeEnum}
-	 */
-	public static MetadataTypeEnum ofIndex(Byte index) {
-		Optional<MetadataTypeEnum> any = Arrays.stream(MetadataTypeEnum.values())
-			.filter(type -> type.getIndex().equals(index))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by index
+     *
+     * @param index Index
+     * @return {@link MetadataTypeEnum}
+     */
+    public static MetadataTypeEnum ofIndex(Byte index) {
+        Optional<MetadataTypeEnum> any = Arrays.stream(MetadataTypeEnum.values())
+                .filter(type -> type.getIndex().equals(index))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by code
-	 * @param code Code
-	 * @return {@link MetadataTypeEnum}
-	 */
-	public static MetadataTypeEnum ofCode(String code) {
-		Optional<MetadataTypeEnum> any = Arrays.stream(MetadataTypeEnum.values())
-			.filter(type -> type.getCode().equals(code))
-			.findFirst();
-		return any.orElse(null);
-	}
+    /**
+     * Get enum by code
+     *
+     * @param code Code
+     * @return {@link MetadataTypeEnum}
+     */
+    public static MetadataTypeEnum ofCode(String code) {
+        Optional<MetadataTypeEnum> any = Arrays.stream(MetadataTypeEnum.values())
+                .filter(type -> type.getCode().equals(code))
+                .findFirst();
+        return any.orElse(null);
+    }
 
-	/**
-	 * Get enum by name
-	 * @param name Name
-	 * @return {@link MetadataTypeEnum}
-	 */
-	public static MetadataTypeEnum ofName(String name) {
-		try {
-			return valueOf(name);
-		}
-		catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    /**
+     * Get enum by name
+     *
+     * @param name Name
+     * @return {@link MetadataTypeEnum}
+     */
+    public static MetadataTypeEnum ofName(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
 }

@@ -38,28 +38,28 @@ import java.util.List;
 @NoArgsConstructor
 public class CoverageGapVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private long totalPoints;
+    private long totalPoints;
 
-	private long missingPoints;
+    private long missingPoints;
 
-	private List<Item> items = new ArrayList<>();
+    private List<Item> items = new ArrayList<>();
 
-	@Getter
-	@Setter
-	@ToString
-	@NoArgsConstructor
-	public static class Item implements Serializable {
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static class Item implements Serializable {
 
-		@Serial
-		private static final long serialVersionUID = 1L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
-		private long pointId;
+        private long pointId;
 
-		private long profileId;
+        private long profileId;
 
-	}
+    }
 
 }

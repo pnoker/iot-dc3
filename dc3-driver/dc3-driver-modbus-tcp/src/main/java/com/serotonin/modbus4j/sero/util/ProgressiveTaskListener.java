@@ -27,23 +27,24 @@ package com.serotonin.modbus4j.sero.util;
  */
 public interface ProgressiveTaskListener {
 
-	/**
-	 * Optionally called occasionally by the task to declare the progress that has been
-	 * made.
-	 * @param progress float between 0 and 1 where 0 is no progress and 1 is completed.
-	 */
-	void progressUpdate(float progress);
+    /**
+     * Optionally called occasionally by the task to declare the progress that has been
+     * made.
+     *
+     * @param progress float between 0 and 1 where 0 is no progress and 1 is completed.
+     */
+    void progressUpdate(float progress);
 
-	/**
-	 * Notification that the task has been cancelled. Should only be called once for the
-	 * task.
-	 */
-	void taskCancelled();
+    /**
+     * Notification that the task has been cancelled. Should only be called once for the
+     * task.
+     */
+    void taskCancelled();
 
-	/**
-	 * Notification that the task has been completed. Should only be called once for the
-	 * task.
-	 */
-	void taskCompleted();
+    /**
+     * Notification that the task has been completed. Should only be called once for the
+     * task.
+     */
+    void taskCompleted();
 
 }

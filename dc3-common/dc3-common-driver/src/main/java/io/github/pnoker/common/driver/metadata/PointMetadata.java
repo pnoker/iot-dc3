@@ -41,60 +41,62 @@ import java.util.concurrent.TimeUnit;
 @Component
 public final class PointMetadata {
 
-	/**
-	 * Asynchronous cache keyed by point identifier.
-	 */
-	private final AsyncLoadingCache<Long, PointBO> cache;
+    /**
+     * Asynchronous cache keyed by point identifier.
+     */
+    private final AsyncLoadingCache<Long, PointBO> cache;
 
-	private final PointClient pointClient;
+    private final PointClient pointClient;
 
-	public PointMetadata(PointClient pointClient) {
-		this.pointClient = pointClient;
-		this.cache = Caffeine.newBuilder()
-			.maximumSize(5000)
-			.expireAfterWrite(24, TimeUnit.HOURS)
-			.removalListener(
-					(key, value, cause) -> log.info("Remove key={}, value={} cache, reason is: {}", key, value, cause))
-			.buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> {
-				log.info("Load point metadata by id: {}", key);
-				PointBO pointBO = this.pointClient.selectById(key);
-				log.info("Cache point metadata: {}", JsonUtil.toJsonString(pointBO));
-				return pointBO;
-			}, executor));
-	}
+    public PointMetadata(PointClient pointClient) {
+        this.pointClient = pointClient;
+        this.cache = Caffeine.newBuilder()
+                .maximumSize(5000)
+                .expireAfterWrite(24, TimeUnit.HOURS)
+                .removalListener(
+                        (key, value, cause) -> log.info("Remove key={}, value={} cache, reason is: {}", key, value, cause))
+                .buildAsync((key, executor) -> CompletableFuture.supplyAsync(() -> {
+                    log.info("Load point metadata by id: {}", key);
+                    PointBO pointBO = this.pointClient.selectById(key);
+                    log.info("Cache point metadata: {}", JsonUtil.toJsonString(pointBO));
+                    return pointBO;
+                }, executor));
+    }
 
-	/**
-	 * Returns the cached point metadata for the specified point identifier.
-	 * @param id point identifier
-	 * @return cached point business object
-	 */
-	public PointBO getCache(long id) {
-		try {
-			CompletableFuture<PointBO> future = cache.get(id);
-			return future.get();
-		}
-		catch (InterruptedException | ExecutionException e) {
-			Thread.currentThread().interrupt();
-			log.error("Failed to get the point cache: {}", e.getMessage(), e);
-			return null;
-		}
-	}
+    /**
+     * Returns the cached point metadata for the specified point identifier.
+     *
+     * @param id point identifier
+     * @return cached point business object
+     */
+    public PointBO getCache(long id) {
+        try {
+            CompletableFuture<PointBO> future = cache.get(id);
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+            log.error("Failed to get the point cache: {}", e.getMessage(), e);
+            return null;
+        }
+    }
 
-	/**
-	 * Reloads the cache entry for the specified point identifier.
-	 * @param id point identifier
-	 */
-	public void loadCache(long id) {
-		CompletableFuture<PointBO> future = CompletableFuture.supplyAsync(() -> pointClient.selectById(id));
-		cache.put(id, future);
-	}
+    /**
+     * Reloads the cache entry for the specified point identifier.
+     *
+     * @param id point identifier
+     */
+    public void loadCache(long id) {
+        CompletableFuture<PointBO> future = CompletableFuture.supplyAsync(() -> pointClient.selectById(id));
+        cache.put(id, future);
+    }
 
-	/**
-	 * Removes the cache entry for the specified point identifier.
-	 * @param id point identifier
-	 */
-	public void removeCache(long id) {
-		cache.put(id, CompletableFuture.completedFuture(null));
-	}
+    /**
+     * Removes the cache entry for the specified point identifier.
+     *
+     * @param id point identifier
+     */
+    public void removeCache(long id) {
+        cache.put(id, CompletableFuture.completedFuture(null));
+    }
 
 }

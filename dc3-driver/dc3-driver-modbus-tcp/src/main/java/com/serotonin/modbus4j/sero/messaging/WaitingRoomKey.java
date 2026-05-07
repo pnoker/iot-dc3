@@ -26,6 +26,6 @@ package com.serotonin.modbus4j.sero.messaging;
  */
 public interface WaitingRoomKey {
 
-	// Implementation needs to have hashcode and equals implementations.
+    // Implementation needs to have hashcode and equals implementations.
 
 }

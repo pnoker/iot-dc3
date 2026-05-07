@@ -40,58 +40,57 @@ import java.util.Objects;
 @Service
 public class DriverScheduleServiceImpl implements DriverScheduleService {
 
-	private final DriverProperties driverProperties;
+    private final DriverProperties driverProperties;
 
-	private final QuartzService quartzService;
+    private final QuartzService quartzService;
 
-	public DriverScheduleServiceImpl(DriverProperties driverProperties, QuartzService quartzService) {
-		this.driverProperties = driverProperties;
-		this.quartzService = quartzService;
-	}
+    public DriverScheduleServiceImpl(DriverProperties driverProperties, QuartzService quartzService) {
+        this.driverProperties = driverProperties;
+        this.quartzService = quartzService;
+    }
 
-	@Override
-	public void initial() {
-		// Get schedule properties from driver configuration
-		DriverProperties.ScheduleProperties property = driverProperties.getSchedule();
-		if (Objects.isNull(property)) {
-			return;
-		}
+    @Override
+    public void initial() {
+        // Get schedule properties from driver configuration
+        DriverProperties.ScheduleProperties property = driverProperties.getSchedule();
+        if (Objects.isNull(property)) {
+            return;
+        }
 
-		try {
-			// Create and schedule the driver status monitoring job
-			quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-					ScheduleConstant.DRIVER_STATUS_SCHEDULE_JOB, ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON,
-					DriverStatusScheduleJob.class);
+        try {
+            // Create and schedule the driver status monitoring job
+            quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                    ScheduleConstant.DRIVER_STATUS_SCHEDULE_JOB, ScheduleConstant.DRIVER_STATUS_SCHEDULE_CRON,
+                    DriverStatusScheduleJob.class);
 
-			// Create and schedule the read job if enabled
-			if (Boolean.TRUE.equals(property.getRead().getEnable())) {
-				// Validate read job cron expression
-				if (!CronExpression.isValidExpression(property.getRead().getCron())) {
-					throw new CronException("Read schedule cron expression is invalid");
-				}
-				quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-						ScheduleConstant.DRIVER_READ_SCHEDULE_JOB, property.getRead().getCron(),
-						DriverReadScheduleJob.class);
-			}
+            // Create and schedule the read job if enabled
+            if (Boolean.TRUE.equals(property.getRead().getEnable())) {
+                // Validate read job cron expression
+                if (!CronExpression.isValidExpression(property.getRead().getCron())) {
+                    throw new CronException("Read schedule cron expression is invalid");
+                }
+                quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                        ScheduleConstant.DRIVER_READ_SCHEDULE_JOB, property.getRead().getCron(),
+                        DriverReadScheduleJob.class);
+            }
 
-			// Create and schedule the custom job if enabled
-			if (Boolean.TRUE.equals(property.getCustom().getEnable())) {
-				// Validate custom job cron expression
-				if (!CronExpression.isValidExpression(property.getCustom().getCron())) {
-					throw new CronException("Custom schedule cron expression is invalid");
-				}
-				quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-						ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB, property.getCustom().getCron(),
-						DriverCustomScheduleJob.class);
-			}
+            // Create and schedule the custom job if enabled
+            if (Boolean.TRUE.equals(property.getCustom().getEnable())) {
+                // Validate custom job cron expression
+                if (!CronExpression.isValidExpression(property.getCustom().getCron())) {
+                    throw new CronException("Custom schedule cron expression is invalid");
+                }
+                quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                        ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB, property.getCustom().getCron(),
+                        DriverCustomScheduleJob.class);
+            }
 
-			// Start the scheduler after all jobs are configured
-			quartzService.startScheduler();
-		}
-		catch (SchedulerException e) {
-			// Log any scheduler initialization errors
-			log.error("Driver schedule initial error: {}", e.getMessage(), e);
-		}
-	}
+            // Start the scheduler after all jobs are configured
+            quartzService.startScheduler();
+        } catch (SchedulerException e) {
+            // Log any scheduler initialization errors
+            log.error("Driver schedule initial error: {}", e.getMessage(), e);
+        }
+    }
 
 }

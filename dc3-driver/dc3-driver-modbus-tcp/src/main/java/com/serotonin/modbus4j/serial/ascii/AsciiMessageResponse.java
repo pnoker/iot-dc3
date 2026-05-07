@@ -33,33 +33,35 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class AsciiMessageResponse extends AsciiMessage implements OutgoingResponseMessage, IncomingResponseMessage {
 
-	/**
-	 * <p>
-	 * Constructor for AsciiMessageResponse.
-	 * </p>
-	 * @param modbusMessage a {@link ModbusMessage} object.
-	 */
-	public AsciiMessageResponse(ModbusMessage modbusMessage) {
-		super(modbusMessage);
-	}
+    /**
+     * <p>
+     * Constructor for AsciiMessageResponse.
+     * </p>
+     *
+     * @param modbusMessage a {@link ModbusMessage} object.
+     */
+    public AsciiMessageResponse(ModbusMessage modbusMessage) {
+        super(modbusMessage);
+    }
 
-	static AsciiMessageResponse createAsciiMessageResponse(ByteQueue queue) throws ModbusTransportException {
-		ByteQueue msgQueue = getUnasciiMessage(queue);
-		ModbusResponse response = ModbusResponse.createModbusResponse(msgQueue);
-		AsciiMessageResponse asciiResponse = new AsciiMessageResponse(response);
+    static AsciiMessageResponse createAsciiMessageResponse(ByteQueue queue) throws ModbusTransportException {
+        ByteQueue msgQueue = getUnasciiMessage(queue);
+        ModbusResponse response = ModbusResponse.createModbusResponse(msgQueue);
+        AsciiMessageResponse asciiResponse = new AsciiMessageResponse(response);
 
-		// Return the data.
-		return asciiResponse;
-	}
+        // Return the data.
+        return asciiResponse;
+    }
 
-	/**
-	 * <p>
-	 * getModbusResponse.
-	 * </p>
-	 * @return a {@link ModbusResponse} object.
-	 */
-	public ModbusResponse getModbusResponse() {
-		return (ModbusResponse) modbusMessage;
-	}
+    /**
+     * <p>
+     * getModbusResponse.
+     * </p>
+     *
+     * @return a {@link ModbusResponse} object.
+     */
+    public ModbusResponse getModbusResponse() {
+        return (ModbusResponse) modbusMessage;
+    }
 
 }

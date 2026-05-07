@@ -42,65 +42,65 @@ import java.util.Objects;
 @RequestMapping(DataConstant.DRIVER_STATUS_URL_PREFIX)
 public class DriverStatusController implements BaseController {
 
-	private final DriverStatusService driverStatusService;
+    private final DriverStatusService driverStatusService;
 
-	public DriverStatusController(DriverStatusService driverStatusService) {
-		this.driverStatusService = driverStatusService;
-	}
+    public DriverStatusController(DriverStatusService driverStatusService) {
+        this.driverStatusService = driverStatusService;
+    }
 
-	/**
-	 * Query driver statuses ONLINE, OFFLINE
-	 * @param entityQuery Driver and pagination parameters
-	 * @return Map String:String
-	 */
-	@PostMapping("/driver")
-	public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
-		return getTenantId().flatMap(tenantId -> {
-			try {
-				DriverQuery query = Objects.isNull(entityQuery) ? new DriverQuery() : entityQuery;
-				query.setTenantId(tenantId);
-				Map<Long, String> statuses = driverStatusService.selectByPage(query);
-				return Mono.just(R.ok(statuses));
-			}
-			catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return Mono.just(R.fail(e.getMessage()));
-			}
-		});
-	}
+    /**
+     * Query driver statuses ONLINE, OFFLINE
+     *
+     * @param entityQuery Driver and pagination parameters
+     * @return Map String:String
+     */
+    @PostMapping("/driver")
+    public Mono<R<Map<Long, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> {
+            try {
+                DriverQuery query = Objects.isNull(entityQuery) ? new DriverQuery() : entityQuery;
+                query.setTenantId(tenantId);
+                Map<Long, String> statuses = driverStatusService.selectByPage(query);
+                return Mono.just(R.ok(statuses));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                return Mono.just(R.fail(e.getMessage()));
+            }
+        });
+    }
 
-	/**
-	 * Query the number of devices currently online under the Driver
-	 * @param driverId Driver ID
-	 * @return Number of devices currently online
-	 */
-	@GetMapping("/getDeviceOnlineByDriverId/{driverId}")
-	public Mono<R<String>> getDeviceOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
-		try {
-			String result = driverStatusService.getDeviceOnlineByDriverId(driverId);
-			return Mono.just(R.ok(result));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * Query the number of devices currently online under the Driver
+     *
+     * @param driverId Driver ID
+     * @return Number of devices currently online
+     */
+    @GetMapping("/getDeviceOnlineByDriverId/{driverId}")
+    public Mono<R<String>> getDeviceOnlineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+        try {
+            String result = driverStatusService.getDeviceOnlineByDriverId(driverId);
+            return Mono.just(R.ok(result));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
-	/**
-	 * Query the number of devices currently offline under the Driver
-	 * @param driverId Driver ID
-	 * @return Number of devices currently offline
-	 */
-	@GetMapping("/getDeviceOfflineByDriverId/{driverId}")
-	public Mono<R<String>> getDeviceOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
-		try {
-			String result = driverStatusService.getDeviceOfflineByDriverId(driverId);
-			return Mono.just(R.ok(result));
-		}
-		catch (Exception e) {
-			log.error(e.getMessage(), e);
-			return Mono.just(R.fail(e.getMessage()));
-		}
-	}
+    /**
+     * Query the number of devices currently offline under the Driver
+     *
+     * @param driverId Driver ID
+     * @return Number of devices currently offline
+     */
+    @GetMapping("/getDeviceOfflineByDriverId/{driverId}")
+    public Mono<R<String>> getDeviceOfflineByDriverId(@NotNull @PathVariable(value = "driverId") Long driverId) {
+        try {
+            String result = driverStatusService.getDeviceOfflineByDriverId(driverId);
+            return Mono.just(R.ok(result));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return Mono.just(R.fail(e.getMessage()));
+        }
+    }
 
 }

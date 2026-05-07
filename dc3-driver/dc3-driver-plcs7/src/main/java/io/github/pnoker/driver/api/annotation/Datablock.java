@@ -27,7 +27,7 @@ import java.lang.annotation.*;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Target(value = { ElementType.TYPE })
+@Target(value = {ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Datablock {

@@ -37,22 +37,22 @@ import java.io.Serializable;
 @ToString
 public class TopologyStatsVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private long driverCount;
+    private long driverCount;
 
-	private long deviceCount;
+    private long deviceCount;
 
-	private long profileCount;
+    private long profileCount;
 
-	private long pointCount;
+    private long pointCount;
 
-	/**
-	 * Short human-readable range label ("24h" / "7d" / ...) — present only when the
-	 * server computed volumes over a time window (volume mode). null for cardinality mode
-	 * so the frontend footer can skip it.
-	 */
-	private String rangeLabel;
+    /**
+     * Short human-readable range label ("24h" / "7d" / ...) — present only when the
+     * server computed volumes over a time window (volume mode). null for cardinality mode
+     * so the frontend footer can skip it.
+     */
+    private String rangeLabel;
 
 }

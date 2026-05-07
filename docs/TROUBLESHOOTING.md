@@ -7,6 +7,7 @@ Common local development and runtime issues in IoT DC3 and how to resolve them.
 **Cause**: Parallelism not enabled / JVM heap too small.
 
 **Resolution**: Already configured in this repo:
+
 - `.mvn/maven.config` contains `-T 1C`
 - `.mvn/jvm.config` contains `-Xms512m -Xmx1024m`
 
@@ -17,10 +18,12 @@ If still slow, increase heap or reduce background CPU load.
 **Cause**: Project requires JDK 21.
 
 **Resolution**:
+
 ```bash
 java -version
 mvn -version
 ```
+
 The build now enforces JDK 21 via `maven-enforcer-plugin`.
 
 ## 3. spring-javaformat:validate fails
@@ -28,9 +31,11 @@ The build now enforces JDK 21 via `maven-enforcer-plugin`.
 **Cause**: Code formatting does not match Spring Java Format rules.
 
 **Resolution**:
+
 ```bash
 mvn -s .mvn/settings.xml io.spring.javaformat:spring-javaformat-maven-plugin:apply
 ```
+
 Then rebuild.
 
 ## 4. Ports already in use
@@ -40,6 +45,7 @@ Then rebuild.
 **Resolution**: Override ports using environment variables or `.env` values.
 
 Common overrides:
+
 - `SERVER_PORT`
 - `GRPC_SERVER_PORT`
 - `DC3_GATEWAY_PORT`
@@ -52,10 +58,12 @@ Common overrides:
 **Cause**: Postgres container not started / custom .env changed published ports.
 
 **Resolution**:
+
 ```bash
 make compose-ps STACK=db
 make compose-file STACK=db
 ```
+
 Confirm the published port matches the application config.
 
 ## 6. RabbitMQ connection failures
@@ -63,6 +71,7 @@ Confirm the published port matches the application config.
 **Cause**: Container not ready / wrong virtual host or credentials.
 
 **Resolution**: Wait until healthcheck passes, then restart dependent services.
+
 ```bash
 make compose-logs STACK=db
 ```
@@ -90,6 +99,7 @@ make compose-logs STACK=db
 **Cause**: `mvn package` failed inside image build.
 
 **Resolution**:
+
 ```bash
 make package
 make build
@@ -100,6 +110,7 @@ make build
 **Cause**: `REGISTRY` was set to `domestic` / `aliyun` / `cn`.
 
 **Resolution**: Use `REGISTRY=global` for Docker Hub images.
+
 ```bash
 make dev-db REGISTRY=global
 ```
@@ -107,6 +118,7 @@ make dev-db REGISTRY=global
 ## 12. Want faster debugging in one JVM
 
 Use `dc3-center-single` to combine Auth/Manager/Data into one process.
+
 ```bash
 java -jar dc3-center/dc3-center-single/target/dc3-center-single.jar
 ```

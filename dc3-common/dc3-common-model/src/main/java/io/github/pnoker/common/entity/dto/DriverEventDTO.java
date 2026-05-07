@@ -41,77 +41,77 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DriverEventDTO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Type
-	 */
-	private DriverEventTypeEnum type;
+    /**
+     * Type
+     */
+    private DriverEventTypeEnum type;
 
-	/**
-	 *
-	 */
-	private String content;
+    /**
+     *
+     */
+    private String content;
 
-	/**
-	 * Create Time
-	 */
-	private LocalDateTime createTime;
+    /**
+     * Create Time
+     */
+    private LocalDateTime createTime;
 
-	public DriverEventDTO(DriverEventTypeEnum type, String content) {
-		this.type = type;
-		this.content = content;
-		this.createTime = LocalDateTimeUtil.now();
-	}
+    public DriverEventDTO(DriverEventTypeEnum type, String content) {
+        this.type = type;
+        this.content = content;
+        this.createTime = LocalDateTimeUtil.now();
+    }
 
-	/**
-	 * Status
-	 *
-	 * @author pnoker
-	 * @version 2025.9.0
-	 * @since 2022.1.0
-	 */
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class DriverStatus implements Serializable {
+    /**
+     * Status
+     *
+     * @author pnoker
+     * @version 2025.9.0
+     * @since 2022.1.0
+     */
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DriverStatus implements Serializable {
 
-		@Serial
-		private static final long serialVersionUID = 1L;
+        @Serial
+        private static final long serialVersionUID = 1L;
 
-		/**
-		 * Driver ID
-		 */
-		private Long driverId;
+        /**
+         * Driver ID
+         */
+        private Long driverId;
 
-		/**
-		 * Tenant ID the driver belongs to. Populated by the sender.
-		 */
-		private Long tenantId;
+        /**
+         * Tenant ID the driver belongs to. Populated by the sender.
+         */
+        private Long tenantId;
 
-		/**
-		 * Status
-		 */
-		private DriverStatusEnum status;
+        /**
+         * Status
+         */
+        private DriverStatusEnum status;
 
-		/**
-		 * Human-readable message. Populated for ALARM events; null for HEARTBEAT.
-		 */
-		private String message;
+        /**
+         * Human-readable message. Populated for ALARM events; null for HEARTBEAT.
+         */
+        private String message;
 
-		/**
-		 * Create Time
-		 */
-		private LocalDateTime createTime;
+        /**
+         * Create Time
+         */
+        private LocalDateTime createTime;
 
-		public DriverStatus(Long driverId, DriverStatusEnum status) {
-			this.driverId = driverId;
-			this.status = status;
-			this.createTime = LocalDateTimeUtil.now();
-		}
+        public DriverStatus(Long driverId, DriverStatusEnum status) {
+            this.driverId = driverId;
+            this.status = status;
+            this.createTime = LocalDateTimeUtil.now();
+        }
 
-	}
+    }
 
 }

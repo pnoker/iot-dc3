@@ -26,24 +26,26 @@ package com.serotonin.modbus4j;
  */
 public interface ProcessImageListener {
 
-	/**
-	 * <p>
-	 * coilWrite.
-	 * </p>
-	 * @param offset a int.
-	 * @param oldValue a boolean.
-	 * @param newValue a boolean.
-	 */
-	public void coilWrite(int offset, boolean oldValue, boolean newValue);
+    /**
+     * <p>
+     * coilWrite.
+     * </p>
+     *
+     * @param offset   a int.
+     * @param oldValue a boolean.
+     * @param newValue a boolean.
+     */
+    public void coilWrite(int offset, boolean oldValue, boolean newValue);
 
-	/**
-	 * <p>
-	 * holdingRegisterWrite.
-	 * </p>
-	 * @param offset a int.
-	 * @param oldValue a short.
-	 * @param newValue a short.
-	 */
-	public void holdingRegisterWrite(int offset, short oldValue, short newValue);
+    /**
+     * <p>
+     * holdingRegisterWrite.
+     * </p>
+     *
+     * @param offset   a int.
+     * @param oldValue a short.
+     * @param newValue a short.
+     */
+    public void holdingRegisterWrite(int offset, short oldValue, short newValue);
 
 }

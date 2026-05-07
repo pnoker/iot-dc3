@@ -4,8 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-IoT DC3 is a distributed IoT platform built on Spring Cloud for industrial device connectivity, data collection, and management. It uses a microservices architecture with gRPC +
-RabbitMQ for inter-service communication and supports multiple industrial protocols (Modbus TCP, OPC DA/UA, MQTT, Siemens S7, virtual listening).
+IoT DC3 is a distributed IoT platform built on Spring Cloud for industrial device connectivity, data collection, and
+management. It uses a microservices architecture with gRPC +
+RabbitMQ for inter-service communication and supports multiple industrial protocols (Modbus TCP, OPC DA/UA, MQTT,
+Siemens S7, virtual listening).
 
 **Architecture Layers:**
 
@@ -18,7 +20,8 @@ RabbitMQ for inter-service communication and supports multiple industrial protoc
 
 - Java 21, Spring Boot 4.0.6, Spring Framework 7.0.7 (project version `2026.5.5`, parent `dc3-parent:2026.5.5`)
 - PostgreSQL (primary DB), RabbitMQ (messaging), EMQX/MQTT (IoT protocol); in-process `LocalCacheService` replaces Redis
-- gRPC/Protobuf for inter-service APIs via `org.springframework.grpc:spring-grpc-spring-boot-starter` — server classes use `@Service` + extend generated `*ImplBase`; clients are
+- gRPC/Protobuf for inter-service APIs via `org.springframework.grpc:spring-grpc-spring-boot-starter` — server classes
+  use `@Service` + extend generated `*ImplBase`; clients are
   registered as beans in a central `GrpcStubConfig` using `GrpcChannelFactory`
 - Docker / Podman Compose for deployment; a top-level `Makefile` wraps the common flows
 
@@ -26,7 +29,8 @@ RabbitMQ for inter-service communication and supports multiple industrial protoc
 
 ### Infrastructure Stacks (docker-compose files under `dc3/`)
 
-The `dc3/` directory ships multiple compose files. Each has an `-aliyun` variant that pulls images from the Aliyun registry (for users in mainland China):
+The `dc3/` directory ships multiple compose files. Each has an `-aliyun` variant that pulls images from the Aliyun
+registry (for users in mainland China):
 
 | Stack           | File                                   | Contents                                          |
 |-----------------|----------------------------------------|---------------------------------------------------|
@@ -37,7 +41,8 @@ The `dc3/` directory ships multiple compose files. Each has an `-aliyun` variant
 | `grafana`       | `dc3/docker-compose-grafana.yml`       | Grafana observability stack                       |
 | `elasticsearch` | `dc3/docker-compose-elasticsearch.yml` | Elasticsearch stack                               |
 
-Note: The project no longer depends on Redis — caching is handled by the in-process `LocalCacheService` (see `dc3-common-public`).
+Note: The project no longer depends on Redis — caching is handled by the in-process `LocalCacheService` (see
+`dc3-common-public`).
 
 ### Starting Dependencies
 
@@ -76,7 +81,8 @@ podman compose -f dc3/docker-compose-optional.yml up -d
 
 ### Building
 
-Maven settings are checked in at `.mvn/settings.xml` — always pass `-s .mvn/settings.xml` so local builds match CI / Dockerfile behavior:
+Maven settings are checked in at `.mvn/settings.xml` — always pass `-s .mvn/settings.xml` so local builds match CI /
+Dockerfile behavior:
 
 ```bash
 # Load local env vars used by application YAMLs
@@ -93,7 +99,8 @@ mvn -s .mvn/settings.xml clean package
 mvn -s .mvn/settings.xml clean package -pl dc3-center/dc3-center-auth -am
 ```
 
-There are no Java test sources under `**/src/test/**/*.java` — rely on compile + targeted runtime smoke checks when refactoring.
+There are no Java test sources under `**/src/test/**/*.java` — rely on compile + targeted runtime smoke checks when
+refactoring.
 
 ### Running Services (manual, JAR mode)
 
@@ -106,10 +113,12 @@ Services must be started in this order:
 2. **Auth Center** — HTTP `8300`, gRPC `9300`
 3. **Data Center** — HTTP `8500`, gRPC `9500`
 4. **Manager Center** — HTTP `8400`, gRPC `9400`
-5. **Drivers** — e.g. `dc3-driver-virtual`, `dc3-driver-listening-virtual` (HTTP `6270`, gRPC `6271`), `dc3-driver-modbus-tcp`, `dc3-driver-mqtt`, `dc3-driver-opc-da`,
+5. **Drivers** — e.g. `dc3-driver-virtual`, `dc3-driver-listening-virtual` (HTTP `6270`, gRPC `6271`),
+   `dc3-driver-modbus-tcp`, `dc3-driver-mqtt`, `dc3-driver-opc-da`,
    `dc3-driver-opc-ua`, `dc3-driver-plcs7`
 
-`dc3/env/dev.env.sh` defines host/port/credentials for local infra and `CENTER_AUTH_HOST` / `CENTER_DATA_HOST` / `CENTER_MANAGER_HOST` gRPC targets. `source dc3/env/dev.env.sh`
+`dc3/env/dev.env.sh` defines host/port/credentials for local infra and `CENTER_AUTH_HOST` / `CENTER_DATA_HOST` /
+`CENTER_MANAGER_HOST` gRPC targets. `source dc3/env/dev.env.sh`
 before running services from the shell or IDE.
 
 ## Module Structure
@@ -174,52 +183,64 @@ Proto files live under `dc3-api/*/src/main/protobuf/api/<layer>/<service>/`:
 
 - **dc3-api-auth** (`api/center/auth/`): `tenant.proto`, `token.proto`, `user.proto`, `user_login.proto`
 - **dc3-api-data** (`api/center/data/`): `point_value.proto`
-- **dc3-api-driver** (`api/common/driver/`): `driver_device.proto`, `driver_driver.proto`, `driver_entity.proto`, `driver_point.proto`, `driver_query.proto`,
+- **dc3-api-driver** (`api/common/driver/`): `driver_device.proto`, `driver_driver.proto`, `driver_entity.proto`,
+  `driver_point.proto`, `driver_query.proto`,
   `driver_query_page.proto`
-- **dc3-api-manager** (`api/center/manager/`): `manager_device.proto`, `manager_driver.proto`, `manager_point.proto`, `manager_query.proto`, `manager_query_page.proto`
+- **dc3-api-manager** (`api/center/manager/`): `manager_device.proto`, `manager_driver.proto`, `manager_point.proto`,
+  `manager_query.proto`, `manager_query_page.proto`
 
 When modifying service APIs:
 
 1. Edit the `.proto` file in the appropriate `dc3-api-*` module
 2. Regenerate Java classes: `mvn -s .mvn/settings.xml clean package` (protobuf-maven-plugin runs at compile phase)
-3. Implement the service interface in the corresponding `dc3-center-*` or driver module — the class extends the generated `*ImplBase` and is annotated with `@Service`. Spring gRPC
+3. Implement the service interface in the corresponding `dc3-center-*` or driver module — the class extends the
+   generated `*ImplBase` and is annotated with `@Service`. Spring gRPC
    auto-registers all `BindableService` beans on the server.
-4. Inter-service calls use gRPC stubs produced by a central `GrpcStubConfig` (`@Bean` methods calling `GrpcChannelFactory.createChannel(<service-name>)`) and injected via
+4. Inter-service calls use gRPC stubs produced by a central `GrpcStubConfig` (`@Bean` methods calling
+   `GrpcChannelFactory.createChannel(<service-name>)`) and injected via
    `@Resource` — **not REST**
 
 ## Service Boundaries & Runtime Data Flow
 
-- HTTP enters via `dc3-gateway` (port 8000). Routes defined in `dc3-gateway/src/main/resources/application-pre.yml` strip the `/api/v3` prefix (`StripPrefix=2`) and optionally
+- HTTP enters via `dc3-gateway` (port 8000). Routes defined in `dc3-gateway/src/main/resources/application-pre.yml`
+  strip the `/api/v3` prefix (`StripPrefix=2`) and optionally
   apply the `Authentic` filter.
 - Manager / Data / Auth each expose both **REST** (for the gateway) and **gRPC** (for inter-service + drivers).
 - Drivers register and fetch device/point config via Manager gRPC:
-    - Server: `@Service`-annotated `*ImplBase` subclasses under `dc3-common-manager/.../grpc/server/driver/` (e.g. `DriverDriverServer`); Spring gRPC registers them automatically
-    - Client stubs: drivers and Data service obtain stubs from `GrpcStubConfig` (channel named `ManagerConstant.SERVICE_NAME`) and inject them with `@Resource`
+    - Server: `@Service`-annotated `*ImplBase` subclasses under `dc3-common-manager/.../grpc/server/driver/` (e.g.
+      `DriverDriverServer`); Spring gRPC registers them automatically
+    - Client stubs: drivers and Data service obtain stubs from `GrpcStubConfig` (channel named
+      `ManagerConstant.SERVICE_NAME`) and inject them with `@Resource`
 - Commands and metadata changes flow asynchronously over **RabbitMQ topic exchanges**:
     - Exchange/routing key constants: `dc3-common-constant/.../RabbitConstant.java`
     - Exchange declarations: `dc3-common-rabbitmq/.../ExchangeConfig.java`
-    - Example command path — Data service resolves the driver by gRPC, then publishes to `dc3.e.command` keyed by driver service name (
+    - Example command path — Data service resolves the driver by gRPC, then publishes to `dc3.e.command` keyed by driver
+      service name (
       `dc3-common-data/.../PointValueCommandServiceImpl.java`).
 
 ## Code Architecture Patterns
 
 **Reactive Web Layer (center services, gateway):**
 
-- Controllers return `Mono<R<T>>` and typically `extends BaseController` to pull tenant/user headers from the reactive context.
+- Controllers return `Mono<R<T>>` and typically `extends BaseController` to pull tenant/user headers from the reactive
+  context.
 - Response envelope is always `R<T>` (`dc3-common-public/.../R.java`) for REST, `GrpcR` for gRPC.
 - Validation uses grouped marker interfaces (`Add`, `Update`, etc.) with `@Validated(...)` on controller methods.
-- URL prefixes/constants go in `*Constant` classes (e.g. `ManagerConstant.DRIVER_URL_PREFIX`), never hardcoded in controllers.
+- URL prefixes/constants go in `*Constant` classes (e.g. `ManagerConstant.DRIVER_URL_PREFIX`), never hardcoded in
+  controllers.
 
 **Models & Mapping:**
 
 - Explicit BO / VO / DTO separation — **never expose entities directly**.
-- Conversions go through `*Builder` classes (e.g. `DriverBuilder`, `GrpcDriverBuilder`) rather than reflection-based mappers.
+- Conversions go through `*Builder` classes (e.g. `DriverBuilder`, `GrpcDriverBuilder`) rather than reflection-based
+  mappers.
 
 **Configuration:**
 
 - All YAML uses `${ENV:default}` placeholders — **never hardcode `localhost` in code paths**.
 - Profile selection via `${NODE_ENV:dev}`; Maven profiles: `dev` (default), `test`, `pre`, `pro`.
-- `pre` / `pro` profiles resolve service discovery/config through Nacos (`spring.cloud.nacos.*` in gateway + center YAMLs).
+- `pre` / `pro` profiles resolve service discovery/config through Nacos (`spring.cloud.nacos.*` in gateway + center
+  YAMLs).
 - gRPC targets overridable via env (`CENTER_AUTH_HOST`, `CENTER_DATA_HOST`, `CENTER_MANAGER_HOST`).
 
 **Driver Services:**
@@ -228,12 +249,14 @@ When modifying service APIs:
 - Extend base classes from `dc3-common-driver`.
 - Implement gRPC service interfaces from `dc3-api-driver`.
 - Register with Manager Center on startup via `DriverApi.DriverRegister()`.
-- **Driver service names are routing-critical** — they become suffixes in RabbitMQ routing keys and gRPC target names. Preserve existing naming constants when refactoring.
+- **Driver service names are routing-critical** — they become suffixes in RabbitMQ routing keys and gRPC target names.
+  Preserve existing naming constants when refactoring.
 
 **Center Services:**
 
 - Implement gRPC service interfaces from the matching `dc3-api-*` module.
-- Use `dc3-common-dal` for data access, `LocalCacheService` from `dc3-common-public` for caching, `dc3-common-rabbitmq` for messaging.
+- Use `dc3-common-dal` for data access, `LocalCacheService` from `dc3-common-public` for caching, `dc3-common-rabbitmq`
+  for messaging.
 
 **Multi-tenancy:**
 
@@ -251,13 +274,15 @@ When modifying service APIs:
 2. Add it to `dc3-driver/pom.xml` `<modules>`.
 3. Depend on `dc3-common-driver`; implement the required protocol adapter.
 4. Keep the driver service name consistent across `application.yml`, RabbitMQ routing, and gRPC registration.
-5. Handle the standard driver responsibilities: connect to devices, acquire data, execute commands, register with Manager, report status/events.
+5. Handle the standard driver responsibilities: connect to devices, acquire data, execute commands, register with
+   Manager, report status/events.
 
 ## Git Commit Identity (for Claude's commits)
 
 **Project-only rule — only applies to commits Claude makes in this repository.**
 
-When committing, Claude must use the `claude[bot]` GitHub App identity so commits show Claude's real avatar on GitHub, consistent with how Copilot's commits already appear in this
+When committing, Claude must use the `claude[bot]` GitHub App identity so commits show Claude's real avatar on GitHub,
+consistent with how Copilot's commits already appear in this
 repo's history. Run every commit as:
 
 ```bash
@@ -271,8 +296,10 @@ EOF
 )"
 ```
 
-- `209825114` is the GitHub user ID of the official `claude[bot]` account; the `<id>+<login>@users.noreply.github.com` form is what GitHub uses to link a commit to a bot avatar.
-- Do **NOT** run `git config --local user.name` / `user.email` — the repo's default git identity must stay as-is so the human author's own commits keep their own identity.
+- `209825114` is the GitHub user ID of the official `claude[bot]` account; the `<id>+<login>@users.noreply.github.com`
+  form is what GitHub uses to link a commit to a bot avatar.
+- Do **NOT** run `git config --local user.name` / `user.email` — the repo's default git identity must stay as-is so the
+  human author's own commits keep their own identity.
 - The `Co-Authored-By` trailer may remain; it is harmless alongside the bot-identity author.
 
 ## Branching and Contribution
@@ -285,7 +312,9 @@ EOF
 
 ## Notes on Existing State
 
-- No Java unit tests (`**/src/test/**/*.java` is empty). Validate changes by compile + targeted runtime smoke (spin up a compose stack, hit gateway, check driver registration /
+- No Java unit tests (`**/src/test/**/*.java` is empty). Validate changes by compile + targeted runtime smoke (spin up a
+  compose stack, hit gateway, check driver registration /
   gRPC calls).
-- READMEs with additional context: root `README.md` (and `.ja.md`, `.vi.md`, `.zh.md`), plus per-API READMEs (`dc3-api/dc3-api-auth/README.md`, `.../dc3-api-data/README.md`,
+- READMEs with additional context: root `README.md` (and `.ja.md`, `.vi.md`, `.zh.md`), plus per-API READMEs (
+  `dc3-api/dc3-api-auth/README.md`, `.../dc3-api-data/README.md`,
   `.../dc3-api-driver/README.md`).

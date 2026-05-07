@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class ReadPointException extends RuntimeException {
 
-	public ReadPointException() {
-		this(null);
-	}
+    public ReadPointException() {
+        this(null);
+    }
 
-	public ReadPointException(Throwable cause) {
-		super(cause);
-	}
+    public ReadPointException(Throwable cause) {
+        super(cause);
+    }
 
-	public ReadPointException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public ReadPointException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

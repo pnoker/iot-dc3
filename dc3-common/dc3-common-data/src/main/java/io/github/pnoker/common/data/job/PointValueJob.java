@@ -42,77 +42,78 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class PointValueJob extends QuartzJobBean {
 
-	public static final ReentrantReadWriteLock VALUE_LOCK = new ReentrantReadWriteLock();
+    public static final ReentrantReadWriteLock VALUE_LOCK = new ReentrantReadWriteLock();
 
-	public static final AtomicLong VALUE_COUNT = new AtomicLong(0);
+    public static final AtomicLong VALUE_COUNT = new AtomicLong(0);
 
-	public static final AtomicLong VALUE_SPEED = new AtomicLong(0);
+    public static final AtomicLong VALUE_SPEED = new AtomicLong(0);
 
-	private static final List<PointValueBO> POINT_VALUE_LIST = new ArrayList<>();
+    private static final List<PointValueBO> POINT_VALUE_LIST = new ArrayList<>();
 
-	@Value("${data.point.batch.speed}")
-	private Integer batchSpeed;
+    @Value("${data.point.batch.speed}")
+    private Integer batchSpeed;
 
-	@Value("${data.point.batch.interval}")
-	private Integer interval;
+    @Value("${data.point.batch.interval}")
+    private Integer interval;
 
-	@Resource
-	private PointValueService pointValueService;
+    @Resource
+    private PointValueService pointValueService;
 
-	@Resource
-	private ExecutorService virtualThreadExecutor;
+    @Resource
+    private ExecutorService virtualThreadExecutor;
 
-	/**
-	 * PointValue
-	 * @return Point Value Size
-	 */
-	public static int getPointValuesSize() {
-		return POINT_VALUE_LIST.size();
-	}
+    /**
+     * PointValue
+     *
+     * @return Point Value Size
+     */
+    public static int getPointValuesSize() {
+        return POINT_VALUE_LIST.size();
+    }
 
-	/**
-	 * PointValue
-	 */
-	public static void clearPointValues() {
-		POINT_VALUE_LIST.clear();
-	}
+    /**
+     * PointValue
+     */
+    public static void clearPointValues() {
+        POINT_VALUE_LIST.clear();
+    }
 
-	/**
-	 * PointValue
-	 * @param pointValueBO PointValue
-	 */
-	public static void addPointValues(PointValueBO pointValueBO) {
-		POINT_VALUE_LIST.add(pointValueBO);
-	}
+    /**
+     * PointValue
+     *
+     * @param pointValueBO PointValue
+     */
+    public static void addPointValues(PointValueBO pointValueBO) {
+        POINT_VALUE_LIST.add(pointValueBO);
+    }
 
-	@Override
-	protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		// Statistical point value receive rate
-		long speed = VALUE_COUNT.getAndSet(0);
-		VALUE_SPEED.set(speed);
-		speed /= interval;
-		if (speed >= batchSpeed) {
-			log.debug("Point value receiver speed: {} /s, value size: {}, interval: {}", speed, getPointValuesSize(),
-					interval);
-		}
+    @Override
+    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        // Statistical point value receive rate
+        long speed = VALUE_COUNT.getAndSet(0);
+        VALUE_SPEED.set(speed);
+        speed /= interval;
+        if (speed >= batchSpeed) {
+            log.debug("Point value receiver speed: {} /s, value size: {}, interval: {}", speed, getPointValuesSize(),
+                    interval);
+        }
 
-		// Swap out the accumulated buffer under the lock; run the save on a private
-		// snapshot outside the lock so concurrent addPointValues callers are not blocked
-		// by DB I/O.
-		List<PointValueBO> snapshot;
-		VALUE_LOCK.writeLock().lock();
-		try {
-			if (POINT_VALUE_LIST.isEmpty()) {
-				return;
-			}
-			snapshot = new ArrayList<>(POINT_VALUE_LIST);
-			POINT_VALUE_LIST.clear();
-		}
-		finally {
-			VALUE_LOCK.writeLock().unlock();
-		}
+        // Swap out the accumulated buffer under the lock; run the save on a private
+        // snapshot outside the lock so concurrent addPointValues callers are not blocked
+        // by DB I/O.
+        List<PointValueBO> snapshot;
+        VALUE_LOCK.writeLock().lock();
+        try {
+            if (POINT_VALUE_LIST.isEmpty()) {
+                return;
+            }
+            snapshot = new ArrayList<>(POINT_VALUE_LIST);
+            POINT_VALUE_LIST.clear();
+        } finally {
+            VALUE_LOCK.writeLock().unlock();
+        }
 
-		virtualThreadExecutor.execute(() -> pointValueService.save(snapshot));
-	}
+        virtualThreadExecutor.execute(() -> pointValueService.save(snapshot));
+    }
 
 }

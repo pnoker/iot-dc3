@@ -37,41 +37,42 @@ import java.util.Optional;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcUserBuilder {
 
-	/**
-	 * BO to Grpc DTO
-	 * @param entityBO UserBO
-	 * @return GrpcUserDTO
-	 */
-	@Mapping(target = "socialExt", ignore = true)
-	@Mapping(target = "identityExt", ignore = true)
-	@Mapping(target = "nickNameBytes", ignore = true)
-	@Mapping(target = "userNameBytes", ignore = true)
-	@Mapping(target = "phoneBytes", ignore = true)
-	@Mapping(target = "emailBytes", ignore = true)
-	@Mapping(target = "socialExtBytes", ignore = true)
-	@Mapping(target = "identityExtBytes", ignore = true)
-	@Mapping(target = "mergeFrom", ignore = true)
-	@Mapping(target = "clearField", ignore = true)
-	@Mapping(target = "clearOneof", ignore = true)
-	@Mapping(target = "base", ignore = true)
-	@Mapping(target = "mergeBase", ignore = true)
-	@Mapping(target = "unknownFields", ignore = true)
-	@Mapping(target = "mergeUnknownFields", ignore = true)
-	@Mapping(target = "allFields", ignore = true)
-	GrpcUserDTO buildGrpcDTOByBO(UserBO entityBO);
+    /**
+     * BO to Grpc DTO
+     *
+     * @param entityBO UserBO
+     * @return GrpcUserDTO
+     */
+    @Mapping(target = "socialExt", ignore = true)
+    @Mapping(target = "identityExt", ignore = true)
+    @Mapping(target = "nickNameBytes", ignore = true)
+    @Mapping(target = "userNameBytes", ignore = true)
+    @Mapping(target = "phoneBytes", ignore = true)
+    @Mapping(target = "emailBytes", ignore = true)
+    @Mapping(target = "socialExtBytes", ignore = true)
+    @Mapping(target = "identityExtBytes", ignore = true)
+    @Mapping(target = "mergeFrom", ignore = true)
+    @Mapping(target = "clearField", ignore = true)
+    @Mapping(target = "clearOneof", ignore = true)
+    @Mapping(target = "base", ignore = true)
+    @Mapping(target = "mergeBase", ignore = true)
+    @Mapping(target = "unknownFields", ignore = true)
+    @Mapping(target = "mergeUnknownFields", ignore = true)
+    @Mapping(target = "allFields", ignore = true)
+    GrpcUserDTO buildGrpcDTOByBO(UserBO entityBO);
 
-	@AfterMapping
-	default void afterProcess(UserBO entityBO, @MappingTarget GrpcUserDTO.Builder entityGrpc) {
-		GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
-		entityGrpc.setBase(grpcBase);
+    @AfterMapping
+    default void afterProcess(UserBO entityBO, @MappingTarget GrpcUserDTO.Builder entityGrpc) {
+        GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
+        entityGrpc.setBase(grpcBase);
 
-		Optional.ofNullable(entityBO.getSocialExt())
-			.ifPresent(value -> entityGrpc.setSocialExt(JsonUtil.toJsonString(value)));
-		Optional.ofNullable(entityBO.getIdentityExt())
-			.ifPresent(value -> entityGrpc.setIdentityExt(JsonUtil.toJsonString(value)));
-	}
+        Optional.ofNullable(entityBO.getSocialExt())
+                .ifPresent(value -> entityGrpc.setSocialExt(JsonUtil.toJsonString(value)));
+        Optional.ofNullable(entityBO.getIdentityExt())
+                .ifPresent(value -> entityGrpc.setIdentityExt(JsonUtil.toJsonString(value)));
+    }
 
 }

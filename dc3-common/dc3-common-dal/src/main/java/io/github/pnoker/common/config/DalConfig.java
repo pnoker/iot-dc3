@@ -35,8 +35,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Slf4j
 @Configuration
-@ComponentScan(basePackages = { "io.github.pnoker.common.dal" })
-@MapperScan(basePackages = { "io.github.pnoker.common.dal.mapper" })
+@ComponentScan(basePackages = {"io.github.pnoker.common.dal"})
+@MapperScan(basePackages = {"io.github.pnoker.common.dal.mapper"})
 public class DalConfig {
 
 }

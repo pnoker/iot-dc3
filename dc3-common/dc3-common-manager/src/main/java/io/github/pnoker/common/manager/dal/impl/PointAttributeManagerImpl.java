@@ -34,6 +34,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class PointAttributeManagerImpl extends ServiceImpl<PointAttributeMapper, PointAttributeDO>
-		implements PointAttributeManager {
+        implements PointAttributeManager {
 
 }

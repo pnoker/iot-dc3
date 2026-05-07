@@ -42,37 +42,40 @@ import java.util.Objects;
 @Slf4j
 public class FieldUtil {
 
-	private FieldUtil() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private FieldUtil() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	/**
-	 * Get the field name mapping from a lambda expression.
-	 * @param column Lambda object to be parsed
-	 * @param <T> Object type
-	 * @return Field name
-	 */
-	public static <T> String getField(SFunction<T, ?> column) {
-		LambdaMeta meta = LambdaUtils.extract(column);
-		return PropertyNamer.methodToProperty(meta.getImplMethodName());
-	}
+    /**
+     * Get the field name mapping from a lambda expression.
+     *
+     * @param column Lambda object to be parsed
+     * @param <T>    Object type
+     * @return Field name
+     */
+    public static <T> String getField(SFunction<T, ?> column) {
+        LambdaMeta meta = LambdaUtils.extract(column);
+        return PropertyNamer.methodToProperty(meta.getImplMethodName());
+    }
 
-	/**
-	 * Determine whether the given ID field is valid.
-	 * @param id ID
-	 * @return Whether the ID is valid
-	 */
-	public static boolean isValidIdField(Long id) {
-		return Objects.nonNull(id) && id > DefaultConstant.ZERO;
-	}
+    /**
+     * Determine whether the given ID field is valid.
+     *
+     * @param id ID
+     * @return Whether the ID is valid
+     */
+    public static boolean isValidIdField(Long id) {
+        return Objects.nonNull(id) && id > DefaultConstant.ZERO;
+    }
 
-	/**
-	 * Determine whether the given enum index field is valid.
-	 * @param id ID
-	 * @return Whether the enum index is valid
-	 */
-	public static boolean isValidEnumIndexField(Byte id) {
-		return Objects.nonNull(id) && id > DefaultConstant.ZERO;
-	}
+    /**
+     * Determine whether the given enum index field is valid.
+     *
+     * @param id ID
+     * @return Whether the enum index is valid
+     */
+    public static boolean isValidEnumIndexField(Byte id) {
+        return Objects.nonNull(id) && id > DefaultConstant.ZERO;
+    }
 
 }

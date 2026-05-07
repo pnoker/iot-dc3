@@ -33,60 +33,61 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class WriteCoilRequest extends ModbusRequest {
 
-	private int writeOffset;
+    private int writeOffset;
 
-	private boolean writeValue;
+    private boolean writeValue;
 
-	/**
-	 * <p>
-	 * Constructor for WriteCoilRequest.
-	 * </p>
-	 * @param slaveId a int.
-	 * @param writeOffset a int.
-	 * @param writeValue a boolean.
-	 * @throws ModbusTransportException if any.
-	 */
-	public WriteCoilRequest(int slaveId, int writeOffset, boolean writeValue) throws ModbusTransportException {
-		super(slaveId);
-		this.writeOffset = writeOffset;
-		this.writeValue = writeValue;
-	}
+    /**
+     * <p>
+     * Constructor for WriteCoilRequest.
+     * </p>
+     *
+     * @param slaveId     a int.
+     * @param writeOffset a int.
+     * @param writeValue  a boolean.
+     * @throws ModbusTransportException if any.
+     */
+    public WriteCoilRequest(int slaveId, int writeOffset, boolean writeValue) throws ModbusTransportException {
+        super(slaveId);
+        this.writeOffset = writeOffset;
+        this.writeValue = writeValue;
+    }
 
-	WriteCoilRequest(int slaveId) throws ModbusTransportException {
-		super(slaveId);
-	}
+    WriteCoilRequest(int slaveId) throws ModbusTransportException {
+        super(slaveId);
+    }
 
-	@Override
-	public void validate(Modbus modbus) throws ModbusTransportException {
-		ModbusUtils.validateOffset(writeOffset);
-	}
+    @Override
+    public void validate(Modbus modbus) throws ModbusTransportException {
+        ModbusUtils.validateOffset(writeOffset);
+    }
 
-	@Override
-	protected void writeRequest(ByteQueue queue) {
-		ModbusUtils.pushShort(queue, writeOffset);
-		ModbusUtils.pushShort(queue, writeValue ? 0xff00 : 0);
-	}
+    @Override
+    protected void writeRequest(ByteQueue queue) {
+        ModbusUtils.pushShort(queue, writeOffset);
+        ModbusUtils.pushShort(queue, writeValue ? 0xff00 : 0);
+    }
 
-	@Override
-	ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
-		processImage.writeCoil(writeOffset, writeValue);
-		return new WriteCoilResponse(slaveId, writeOffset, writeValue);
-	}
+    @Override
+    ModbusResponse handleImpl(ProcessImage processImage) throws ModbusTransportException {
+        processImage.writeCoil(writeOffset, writeValue);
+        return new WriteCoilResponse(slaveId, writeOffset, writeValue);
+    }
 
-	@Override
-	public byte getFunctionCode() {
-		return FunctionCode.WRITE_COIL;
-	}
+    @Override
+    public byte getFunctionCode() {
+        return FunctionCode.WRITE_COIL;
+    }
 
-	@Override
-	ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
-		return new WriteCoilResponse(slaveId);
-	}
+    @Override
+    ModbusResponse getResponseInstance(int slaveId) throws ModbusTransportException {
+        return new WriteCoilResponse(slaveId);
+    }
 
-	@Override
-	protected void readRequest(ByteQueue queue) {
-		writeOffset = ModbusUtils.popUnsignedShort(queue);
-		writeValue = ModbusUtils.popUnsignedShort(queue) == 0xff00;
-	}
+    @Override
+    protected void readRequest(ByteQueue queue) {
+        writeOffset = ModbusUtils.popUnsignedShort(queue);
+        writeValue = ModbusUtils.popUnsignedShort(queue) == 0xff00;
+    }
 
 }

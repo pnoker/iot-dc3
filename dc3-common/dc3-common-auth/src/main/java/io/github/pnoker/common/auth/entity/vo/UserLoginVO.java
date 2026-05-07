@@ -37,24 +37,24 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class UserLoginVO extends BaseVO {
 
-	/**
-	 * Name
-	 */
-	private String loginName;
+    /**
+     * Name
+     */
+    private String loginName;
 
-	/**
-	 * ID
-	 */
-	private Long userId;
+    /**
+     * ID
+     */
+    private Long userId;
 
-	/**
-	 * ID
-	 */
-	private String userPasswordId;
+    /**
+     * ID
+     */
+    private String userPasswordId;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }

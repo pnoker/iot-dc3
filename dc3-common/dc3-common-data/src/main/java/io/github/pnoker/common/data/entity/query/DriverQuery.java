@@ -40,51 +40,51 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class DriverQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	//
+    //
 
-	/**
-	 * Name
-	 */
-	private String driverName;
+    /**
+     * Name
+     */
+    private String driverName;
 
-	/**
-	 * Driver ID
-	 */
-	private String driverCode;
+    /**
+     * Driver ID
+     */
+    private String driverCode;
 
-	/**
-	 * Driver service name
-	 */
-	private String serviceName;
+    /**
+     * Driver service name
+     */
+    private String serviceName;
 
-	/**
-	 *
-	 */
-	private String serviceHost;
+    /**
+     *
+     */
+    private String serviceHost;
 
-	/**
-	 * Type
-	 */
-	private DriverTypeFlagEnum driverTypeFlag;
+    /**
+     * Type
+     */
+    private DriverTypeFlagEnum driverTypeFlag;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 *
-	 */
-	private Integer version;
+    /**
+     *
+     */
+    private Integer version;
 
 }

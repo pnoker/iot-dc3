@@ -36,29 +36,31 @@ import org.springframework.context.annotation.Configuration;
  * @since 2022.1.0
  */
 @Configuration
-@ComponentScan(basePackages = { "io.github.pnoker.common.mqtt" })
-@EnableConfigurationProperties({ MqttProperties.class })
+@ComponentScan(basePackages = {"io.github.pnoker.common.mqtt"})
+@EnableConfigurationProperties({MqttProperties.class})
 public class MqttInitRunner implements ApplicationRunner {
 
-	private final MqttScheduleService mqttScheduleService;
+    private final MqttScheduleService mqttScheduleService;
 
-	/**
-	 * Creates a new MQTT initialization runner with the specified MQTT schedule service.
-	 * @param mqttScheduleService The MQTT schedule service to be initialized
-	 */
-	public MqttInitRunner(MqttScheduleService mqttScheduleService) {
-		this.mqttScheduleService = mqttScheduleService;
-	}
+    /**
+     * Creates a new MQTT initialization runner with the specified MQTT schedule service.
+     *
+     * @param mqttScheduleService The MQTT schedule service to be initialized
+     */
+    public MqttInitRunner(MqttScheduleService mqttScheduleService) {
+        this.mqttScheduleService = mqttScheduleService;
+    }
 
-	/**
-	 * Executes the MQTT initialization process when the application starts. This method
-	 * is called automatically by Spring Boot after the application context is loaded.
-	 * @param args Application arguments passed during startup
-	 * @throws Exception If an error occurs during MQTT initialization
-	 */
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		mqttScheduleService.initial();
-	}
+    /**
+     * Executes the MQTT initialization process when the application starts. This method
+     * is called automatically by Spring Boot after the application context is loaded.
+     *
+     * @param args Application arguments passed during startup
+     * @throws Exception If an error occurs during MQTT initialization
+     */
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        mqttScheduleService.initial();
+    }
 
 }

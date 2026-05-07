@@ -40,21 +40,21 @@ import java.util.List;
 @ToString
 public class FacadePage<T> implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private long current;
+    private long current;
 
-	private long size;
+    private long size;
 
-	private long total;
+    private long total;
 
-	private long pages;
+    private long pages;
 
-	private List<T> records;
+    private List<T> records;
 
-	public static <T> FacadePage<T> empty() {
-		return new FacadePage<>(1L, 0L, 0L, 0L, Collections.emptyList());
-	}
+    public static <T> FacadePage<T> empty() {
+        return new FacadePage<>(1L, 0L, 0L, 0L, Collections.emptyList());
+    }
 
 }

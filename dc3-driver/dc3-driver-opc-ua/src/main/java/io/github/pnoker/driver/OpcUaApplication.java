@@ -35,12 +35,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class OpcUaApplication {
 
-	/**
-	 * Main entry point for the OPC UA driver application.
-	 * @param args command line arguments passed to the application
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(OpcUaApplication.class, args);
-	}
+    /**
+     * Main entry point for the OPC UA driver application.
+     *
+     * @param args command line arguments passed to the application
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(OpcUaApplication.class, args);
+    }
 
 }

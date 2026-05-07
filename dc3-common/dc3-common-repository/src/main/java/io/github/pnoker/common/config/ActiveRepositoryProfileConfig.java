@@ -42,14 +42,15 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveRepositoryProfileConfig implements EnvironmentPostProcessor {
 
-	/**
-	 * Post-process environment to add the "repository" active profile
-	 * @param environment ConfigurableEnvironment to modify
-	 * @param application SpringApplication instance
-	 */
-	@Override
-	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-		environment.addActiveProfile("repository");
-	}
+    /**
+     * Post-process environment to add the "repository" active profile
+     *
+     * @param environment ConfigurableEnvironment to modify
+     * @param application SpringApplication instance
+     */
+    @Override
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        environment.addActiveProfile("repository");
+    }
 
 }

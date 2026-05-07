@@ -42,23 +42,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class MqttScheduleServiceImpl implements MqttScheduleService {
 
-	@Value("${driver.mqtt.batch.interval}")
-	private Integer interval;
+    @Value("${driver.mqtt.batch.interval}")
+    private Integer interval;
 
-	@Resource
-	private QuartzService quartzService;
+    @Resource
+    private QuartzService quartzService;
 
-	@Override
-	public void initial() {
-		try {
-			quartzService.createJobWithInterval("ScheduleGroup", "MqttScheduleJob", interval,
-					DateBuilder.IntervalUnit.SECOND, MqttScheduleJob.class);
+    @Override
+    public void initial() {
+        try {
+            quartzService.createJobWithInterval("ScheduleGroup", "MqttScheduleJob", interval,
+                    DateBuilder.IntervalUnit.SECOND, MqttScheduleJob.class);
 
-			quartzService.startScheduler();
-		}
-		catch (SchedulerException e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+            quartzService.startScheduler();
+        } catch (SchedulerException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 
 }

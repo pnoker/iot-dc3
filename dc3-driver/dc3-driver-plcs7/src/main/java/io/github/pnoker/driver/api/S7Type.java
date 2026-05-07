@@ -26,53 +26,53 @@ import io.github.pnoker.driver.api.impl.serializer.converter.*;
  */
 public enum S7Type {
 
-	BOOL(BitConverter.class, 0, 1), BYTE(ByteConverter.class, 1, 0), INT(ShortConverter.class, 2, 0),
-	DINT(LongConverter.class, 4, 0), WORD(IntegerConverter.class, 2, 0), DWORD(LongConverter.class, 4, 0),
-	REAL(RealConverter.class, 4, 0),
-	/**
-	 * String type; size must be specified manually.
-	 */
-	STRING(StringConverter.class, 2, 0), DATE(DateConverter.class, 2, 0),
-	/**
-	 * Duration in milliseconds, 4 bytes.
-	 */
-	TIME(TimeConverter.class, 4, 0),
-	/**
-	 * Date and time with millisecond precision, 8 bytes.
-	 */
-	DATE_AND_TIME(DateAndTimeConverter.class, 8, 0), STRUCT(StructConverter.class, 0, 0);
+    BOOL(BitConverter.class, 0, 1), BYTE(ByteConverter.class, 1, 0), INT(ShortConverter.class, 2, 0),
+    DINT(LongConverter.class, 4, 0), WORD(IntegerConverter.class, 2, 0), DWORD(LongConverter.class, 4, 0),
+    REAL(RealConverter.class, 4, 0),
+    /**
+     * String type; size must be specified manually.
+     */
+    STRING(StringConverter.class, 2, 0), DATE(DateConverter.class, 2, 0),
+    /**
+     * Duration in milliseconds, 4 bytes.
+     */
+    TIME(TimeConverter.class, 4, 0),
+    /**
+     * Date and time with millisecond precision, 8 bytes.
+     */
+    DATE_AND_TIME(DateAndTimeConverter.class, 8, 0), STRUCT(StructConverter.class, 0, 0);
 
-	private final int byteSize;
+    private final int byteSize;
 
-	private final int bitSize;
+    private final int bitSize;
 
-	private final Class<? extends S7Serializable> serializer;
+    private final Class<? extends S7Serializable> serializer;
 
-	S7Type(final Class<? extends S7Serializable> serializer, final int byteSize, final int bitSize) {
-		this.serializer = serializer;
-		this.bitSize = bitSize;
-		this.byteSize = byteSize;
-	}
+    S7Type(final Class<? extends S7Serializable> serializer, final int byteSize, final int bitSize) {
+        this.serializer = serializer;
+        this.bitSize = bitSize;
+        this.byteSize = byteSize;
+    }
 
-	/**
-	 * @return size of this type in bits
-	 */
-	public int getBitSize() {
-		return this.bitSize;
-	}
+    /**
+     * @return size of this type in bits
+     */
+    public int getBitSize() {
+        return this.bitSize;
+    }
 
-	/**
-	 * @return size of this type in bytes
-	 */
-	public int getByteSize() {
-		return this.byteSize;
-	}
+    /**
+     * @return size of this type in bytes
+     */
+    public int getByteSize() {
+        return this.byteSize;
+    }
 
-	/**
-	 * @return the serializer class for this type
-	 */
-	public Class<? extends S7Serializable> getSerializer() {
-		return this.serializer;
-	}
+    /**
+     * @return the serializer class for this type
+     */
+    public Class<? extends S7Serializable> getSerializer() {
+        return this.serializer;
+    }
 
 }

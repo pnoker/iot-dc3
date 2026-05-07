@@ -26,9 +26,9 @@ package io.github.pnoker.common.driver.service;
  */
 public interface DriverScheduleService {
 
-	/**
-	 * Initializes and schedules all enabled driver jobs.
-	 */
-	void initial();
+    /**
+     * Initializes and schedules all enabled driver jobs.
+     */
+    void initial();
 
 }

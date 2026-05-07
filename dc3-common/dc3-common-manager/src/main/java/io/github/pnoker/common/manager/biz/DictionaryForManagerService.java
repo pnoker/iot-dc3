@@ -30,46 +30,52 @@ import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
  */
 public interface DictionaryForManagerService {
 
-	/**
-	 * Get driver dictionary list with pagination
-	 * @param entityQuery {@link DictionaryQuery}
-	 * @return DictionaryBO Page
-	 */
-	Page<DictionaryBO> driverDictionary(DictionaryQuery entityQuery);
+    /**
+     * Get driver dictionary list with pagination
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
+     */
+    Page<DictionaryBO> driverDictionary(DictionaryQuery entityQuery);
 
-	/**
-	 * Get profile dictionary list with pagination
-	 * @param entityQuery {@link DictionaryQuery}
-	 * @return DictionaryBO Page
-	 */
-	Page<DictionaryBO> profileDictionary(DictionaryQuery entityQuery);
+    /**
+     * Get profile dictionary list with pagination
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
+     */
+    Page<DictionaryBO> profileDictionary(DictionaryQuery entityQuery);
 
-	/**
-	 * Get point dictionary under profile with pagination
-	 * @param entityQuery {@link DictionaryQuery}
-	 * @return DictionaryBO Page
-	 */
-	Page<DictionaryBO> pointDictionaryForProfile(DictionaryQuery entityQuery);
+    /**
+     * Get point dictionary under profile with pagination
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
+     */
+    Page<DictionaryBO> pointDictionaryForProfile(DictionaryQuery entityQuery);
 
-	/**
-	 * Get point dictionary under device with pagination
-	 * @param entityQuery {@link DictionaryQuery}
-	 * @return DictionaryBO Page
-	 */
-	Page<DictionaryBO> pointDictionaryForDevice(DictionaryQuery entityQuery);
+    /**
+     * Get point dictionary under device with pagination
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
+     */
+    Page<DictionaryBO> pointDictionaryForDevice(DictionaryQuery entityQuery);
 
-	/**
-	 * Get device dictionary list with pagination
-	 * @param entityQuery {@link DictionaryQuery}
-	 * @return DictionaryBO Page
-	 */
-	Page<DictionaryBO> deviceDictionary(DictionaryQuery entityQuery);
+    /**
+     * Get device dictionary list with pagination
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
+     */
+    Page<DictionaryBO> deviceDictionary(DictionaryQuery entityQuery);
 
-	/**
-	 * Get device dictionary under driver with pagination
-	 * @param entityQuery {@link DictionaryQuery}
-	 * @return DictionaryBO Page
-	 */
-	Page<DictionaryBO> deviceDictionaryForDriver(DictionaryQuery entityQuery);
+    /**
+     * Get device dictionary under driver with pagination
+     *
+     * @param entityQuery {@link DictionaryQuery}
+     * @return DictionaryBO Page
+     */
+    Page<DictionaryBO> deviceDictionaryForDriver(DictionaryQuery entityQuery);
 
 }

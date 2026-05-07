@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class SecurityException extends RuntimeException {
 
-	public SecurityException() {
-		this(null);
-	}
+    public SecurityException() {
+        this(null);
+    }
 
-	public SecurityException(Throwable cause) {
-		super(cause);
-	}
+    public SecurityException(Throwable cause) {
+        super(cause);
+    }
 
-	public SecurityException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public SecurityException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

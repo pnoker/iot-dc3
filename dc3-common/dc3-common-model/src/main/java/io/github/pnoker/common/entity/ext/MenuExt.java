@@ -39,50 +39,50 @@ import java.util.Map;
 @AllArgsConstructor
 public class MenuExt extends BaseExt {
 
-	/**
-	 * Extended content.
-	 * <p>
-	 * The content can be distinguished by Type and Version.
-	 */
-	private Content content;
+    /**
+     * Extended content.
+     * <p>
+     * The content can be distinguished by Type and Version.
+     */
+    private Content content;
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Content {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Content {
 
-		/**
-		 * Localized titles keyed by locale code (e.g. {@code zh}, {@code en}).
-		 * <p>
-		 * Authoritative source for the menu display name. When rendering, the UI picks
-		 * {@code titles[currentLocale]} with fallback to {@code titles["en"]}.
-		 */
-		private Map<String, String> titles;
+        /**
+         * Localized titles keyed by locale code (e.g. {@code zh}, {@code en}).
+         * <p>
+         * Authoritative source for the menu display name. When rendering, the UI picks
+         * {@code titles[currentLocale]} with fallback to {@code titles["en"]}.
+         */
+        private Map<String, String> titles;
 
-		/**
-		 * Legacy i18n key (e.g. {@code nav.home}) kept only for backward compatibility
-		 * with pre-multilingual menu records. New menus must populate {@link #titles}
-		 * instead; the UI treats this as a final fallback when {@code titles} is empty.
-		 */
-		@Deprecated
-		private String title;
+        /**
+         * Legacy i18n key (e.g. {@code nav.home}) kept only for backward compatibility
+         * with pre-multilingual menu records. New menus must populate {@link #titles}
+         * instead; the UI treats this as a final fallback when {@code titles} is empty.
+         */
+        @Deprecated
+        private String title;
 
-		/**
-		 * Icon.
-		 */
-		private String icon;
+        /**
+         * Icon.
+         */
+        private String icon;
 
-		/**
-		 * URL link.
-		 */
-		private String url;
+        /**
+         * URL link.
+         */
+        private String url;
 
-		/**
-		 * Description.
-		 */
-		private String remark;
+        /**
+         * Description.
+         */
+        private String remark;
 
-	}
+    }
 
 }

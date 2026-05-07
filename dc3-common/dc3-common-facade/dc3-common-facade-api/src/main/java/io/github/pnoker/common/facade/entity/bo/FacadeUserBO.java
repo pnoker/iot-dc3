@@ -35,16 +35,16 @@ import lombok.*;
 @ToString(callSuper = true)
 public class FacadeUserBO extends BaseBO {
 
-	private String nickName;
+    private String nickName;
 
-	private String userName;
+    private String userName;
 
-	private String phone;
+    private String phone;
 
-	private String email;
+    private String email;
 
-	private String socialExt;
+    private String socialExt;
 
-	private String identityExt;
+    private String identityExt;
 
 }

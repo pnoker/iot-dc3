@@ -43,28 +43,28 @@ import java.util.Objects;
 @Component
 public class PointLocalFacade implements PointFacade {
 
-	@Resource
-	private PointService pointService;
+    @Resource
+    private PointService pointService;
 
-	@Resource
-	private FacadePointBuilder facadePointBuilder;
+    @Resource
+    private FacadePointBuilder facadePointBuilder;
 
-	@Override
-	public FacadePointBO selectById(Long id) {
-		PointBO managerBO = pointService.selectById(id);
-		return Objects.isNull(managerBO) ? null : facadePointBuilder.toFacadeBO(managerBO);
-	}
+    @Override
+    public FacadePointBO selectById(Long id) {
+        PointBO managerBO = pointService.selectById(id);
+        return Objects.isNull(managerBO) ? null : facadePointBuilder.toFacadeBO(managerBO);
+    }
 
-	@Override
-	public FacadePage<FacadePointBO> selectByPage(FacadePointQuery query) {
-		PointQuery managerQuery = facadePointBuilder.toManagerQuery(query);
-		Page<PointBO> page = pointService.selectByPage(managerQuery);
-		if (Objects.isNull(page)) {
-			return FacadePage.empty();
-		}
+    @Override
+    public FacadePage<FacadePointBO> selectByPage(FacadePointQuery query) {
+        PointQuery managerQuery = facadePointBuilder.toManagerQuery(query);
+        Page<PointBO> page = pointService.selectByPage(managerQuery);
+        if (Objects.isNull(page)) {
+            return FacadePage.empty();
+        }
 
-		List<FacadePointBO> records = page.getRecords().stream().map(facadePointBuilder::toFacadeBO).toList();
-		return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
-	}
+        List<FacadePointBO> records = page.getRecords().stream().map(facadePointBuilder::toFacadeBO).toList();
+        return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
+    }
 
 }

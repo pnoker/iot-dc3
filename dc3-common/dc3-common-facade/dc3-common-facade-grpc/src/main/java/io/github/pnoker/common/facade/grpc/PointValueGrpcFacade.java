@@ -45,55 +45,55 @@ import java.util.List;
 @Component
 public class PointValueGrpcFacade implements PointValueFacade {
 
-	@Resource
-	private PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
+    @Resource
+    private PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub;
 
-	@Resource
-	private FacadeGrpcPointValueBuilder facadeGrpcPointValueBuilder;
+    @Resource
+    private FacadeGrpcPointValueBuilder facadeGrpcPointValueBuilder;
 
-	@Override
-	public FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId) {
-		GrpcPointValueQuery request = GrpcPointValueQuery.newBuilder()
-			.setDeviceId(deviceId)
-			.setPointId(pointId)
-			.setTenantId(tenantId)
-			.build();
-		GrpcRPointValueDTO response = pointValueApiBlockingStub.lastValue(request);
-		if (!response.getResult().getOk()) {
-			guardOrThrow(response.getResult(), "lastValue");
-			return null;
-		}
-		return facadeGrpcPointValueBuilder.toFacadeBO(response.getData());
-	}
+    @Override
+    public FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId) {
+        GrpcPointValueQuery request = GrpcPointValueQuery.newBuilder()
+                .setDeviceId(deviceId)
+                .setPointId(pointId)
+                .setTenantId(tenantId)
+                .build();
+        GrpcRPointValueDTO response = pointValueApiBlockingStub.lastValue(request);
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "lastValue");
+            return null;
+        }
+        return facadeGrpcPointValueBuilder.toFacadeBO(response.getData());
+    }
 
-	@Override
-	public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
-		GrpcPointValueHistoryQuery request = GrpcPointValueHistoryQuery.newBuilder()
-			.setDeviceId(deviceId)
-			.setPointId(pointId)
-			.setTenantId(tenantId)
-			.setCount(count)
-			.build();
-		GrpcRPointValueStringList response = pointValueApiBlockingStub.historyValue(request);
-		if (!response.getResult().getOk()) {
-			guardOrThrow(response.getResult(), "history");
-			return Collections.emptyList();
-		}
-		return response.getDataList();
-	}
+    @Override
+    public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
+        GrpcPointValueHistoryQuery request = GrpcPointValueHistoryQuery.newBuilder()
+                .setDeviceId(deviceId)
+                .setPointId(pointId)
+                .setTenantId(tenantId)
+                .setCount(count)
+                .build();
+        GrpcRPointValueStringList response = pointValueApiBlockingStub.historyValue(request);
+        if (!response.getResult().getOk()) {
+            guardOrThrow(response.getResult(), "history");
+            return Collections.emptyList();
+        }
+        return response.getDataList();
+    }
 
-	/**
-	 * NO_RESOURCE is a normal "not found" signal — swallow and let the caller see null /
-	 * empty. Any other non-OK code (server error, param error, etc.) escalates to an
-	 * exception.
-	 */
-	private void guardOrThrow(GrpcR result, String op) {
-		String code = result.getCode();
-		if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
-			log.debug("PointValueGrpcFacade.{} => no resource", op);
-			return;
-		}
-		throw new ServiceException("PointValueFacade." + op + " failed: [" + code + "] " + result.getMessage());
-	}
+    /**
+     * NO_RESOURCE is a normal "not found" signal — swallow and let the caller see null /
+     * empty. Any other non-OK code (server error, param error, etc.) escalates to an
+     * exception.
+     */
+    private void guardOrThrow(GrpcR result, String op) {
+        String code = result.getCode();
+        if (ResponseEnum.NO_RESOURCE.getCode().equals(code)) {
+            log.debug("PointValueGrpcFacade.{} => no resource", op);
+            return;
+        }
+        throw new ServiceException("PointValueFacade." + op + " failed: [" + code + "] " + result.getMessage());
+    }
 
 }

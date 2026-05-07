@@ -33,38 +33,40 @@ import com.serotonin.modbus4j.sero.util.queue.ByteQueue;
  */
 public class AsciiMessageRequest extends AsciiMessage implements OutgoingRequestMessage, IncomingRequestMessage {
 
-	/**
-	 * <p>
-	 * Constructor for AsciiMessageRequest.
-	 * </p>
-	 * @param modbusMessage a {@link ModbusMessage} object.
-	 */
-	public AsciiMessageRequest(ModbusMessage modbusMessage) {
-		super(modbusMessage);
-	}
+    /**
+     * <p>
+     * Constructor for AsciiMessageRequest.
+     * </p>
+     *
+     * @param modbusMessage a {@link ModbusMessage} object.
+     */
+    public AsciiMessageRequest(ModbusMessage modbusMessage) {
+        super(modbusMessage);
+    }
 
-	static AsciiMessageRequest createAsciiMessageRequest(ByteQueue queue) throws ModbusTransportException {
-		ByteQueue msgQueue = getUnasciiMessage(queue);
-		ModbusRequest request = ModbusRequest.createModbusRequest(msgQueue);
-		AsciiMessageRequest asciiRequest = new AsciiMessageRequest(request);
+    static AsciiMessageRequest createAsciiMessageRequest(ByteQueue queue) throws ModbusTransportException {
+        ByteQueue msgQueue = getUnasciiMessage(queue);
+        ModbusRequest request = ModbusRequest.createModbusRequest(msgQueue);
+        AsciiMessageRequest asciiRequest = new AsciiMessageRequest(request);
 
-		// Return the data.
-		return asciiRequest;
-	}
+        // Return the data.
+        return asciiRequest;
+    }
 
-	@Override
-	public boolean expectsResponse() {
-		return modbusMessage.getSlaveId() != 0;
-	}
+    @Override
+    public boolean expectsResponse() {
+        return modbusMessage.getSlaveId() != 0;
+    }
 
-	/**
-	 * <p>
-	 * getModbusRequest.
-	 * </p>
-	 * @return a {@link ModbusRequest} object.
-	 */
-	public ModbusRequest getModbusRequest() {
-		return (ModbusRequest) modbusMessage;
-	}
+    /**
+     * <p>
+     * getModbusRequest.
+     * </p>
+     *
+     * @return a {@link ModbusRequest} object.
+     */
+    public ModbusRequest getModbusRequest() {
+        return (ModbusRequest) modbusMessage;
+    }
 
 }

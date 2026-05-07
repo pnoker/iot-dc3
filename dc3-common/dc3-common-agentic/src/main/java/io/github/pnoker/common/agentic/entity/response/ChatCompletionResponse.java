@@ -35,57 +35,57 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatCompletionResponse {
 
-	private String id;
+    private String id;
 
-	private String object;
+    private String object;
 
-	private long created;
+    private long created;
 
-	private String model;
+    private String model;
 
-	private List<Choice> choices;
+    private List<Choice> choices;
 
-	private Usage usage;
+    private Usage usage;
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	@Builder
-	public static class Choice {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class Choice {
 
-		private int index;
+        private int index;
 
-		private Message message;
+        private Message message;
 
-		private String finishReason;
+        private String finishReason;
 
-	}
+    }
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Message {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Message {
 
-		private String role;
+        private String role;
 
-		private String content;
+        private String content;
 
-	}
+    }
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class Usage {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Usage {
 
-		private int promptTokens;
+        private int promptTokens;
 
-		private int completionTokens;
+        private int completionTokens;
 
-		private int totalTokens;
+        private int totalTokens;
 
-	}
+    }
 
 }

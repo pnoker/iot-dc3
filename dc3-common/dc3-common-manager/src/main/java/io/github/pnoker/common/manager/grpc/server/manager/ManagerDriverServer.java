@@ -46,98 +46,95 @@ import java.util.Objects;
 @Service
 public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
-	@Resource
-	private GrpcDriverBuilder grpcDriverBuilder;
+    @Resource
+    private GrpcDriverBuilder grpcDriverBuilder;
 
-	@Resource
-	private DriverService driverService;
+    @Resource
+    private DriverService driverService;
 
-	@Override
-	public void selectByPage(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
-		GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
-		GrpcR.Builder rBuilder = GrpcR.newBuilder();
+    @Override
+    public void selectByPage(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
+        GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-		DriverQuery query = grpcDriverBuilder.buildQueryByGrpcQuery(request);
+        DriverQuery query = grpcDriverBuilder.buildQueryByGrpcQuery(request);
 
-		Page<DriverBO> entityPage = driverService.selectByPage(query);
-		if (Objects.isNull(entityPage)) {
-			rBuilder.setOk(false);
-			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-		}
-		else {
-			rBuilder.setOk(true);
-			rBuilder.setCode(ResponseEnum.OK.getCode());
-			rBuilder.setMessage(ResponseEnum.OK.getText());
+        Page<DriverBO> entityPage = driverService.selectByPage(query);
+        if (Objects.isNull(entityPage)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
 
-			GrpcPageDriverDTO.Builder pageBuilder = GrpcPageDriverDTO.newBuilder();
-			GrpcPage.Builder page = GrpcPage.newBuilder();
-			page.setCurrent(entityPage.getCurrent());
-			page.setSize(entityPage.getSize());
-			page.setPages(entityPage.getPages());
-			page.setTotal(entityPage.getTotal());
-			pageBuilder.setPage(page);
+            GrpcPageDriverDTO.Builder pageBuilder = GrpcPageDriverDTO.newBuilder();
+            GrpcPage.Builder page = GrpcPage.newBuilder();
+            page.setCurrent(entityPage.getCurrent());
+            page.setSize(entityPage.getSize());
+            page.setPages(entityPage.getPages());
+            page.setTotal(entityPage.getTotal());
+            pageBuilder.setPage(page);
 
-			List<GrpcDriverDTO> entityGrpcDTOList = entityPage.getRecords()
-				.stream()
-				.map(grpcDriverBuilder::buildGrpcDTOByBO)
-				.toList();
-			pageBuilder.addAllData(entityGrpcDTOList);
+            List<GrpcDriverDTO> entityGrpcDTOList = entityPage.getRecords()
+                    .stream()
+                    .map(grpcDriverBuilder::buildGrpcDTOByBO)
+                    .toList();
+            pageBuilder.addAllData(entityGrpcDTOList);
 
-			builder.setData(pageBuilder);
-		}
+            builder.setData(pageBuilder);
+        }
 
-		builder.setResult(rBuilder);
-		responseObserver.onNext(builder.build());
-		responseObserver.onCompleted();
-	}
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
 
-	@Override
-	public void selectByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
-		GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
-		GrpcR.Builder rBuilder = GrpcR.newBuilder();
+    @Override
+    public void selectByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
+        GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-		DriverBO entityDO = driverService.selectByDeviceId(request.getDeviceId());
-		if (Objects.isNull(entityDO)) {
-			rBuilder.setOk(false);
-			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-		}
-		else {
-			rBuilder.setOk(true);
-			rBuilder.setCode(ResponseEnum.OK.getCode());
-			rBuilder.setMessage(ResponseEnum.OK.getText());
+        DriverBO entityDO = driverService.selectByDeviceId(request.getDeviceId());
+        if (Objects.isNull(entityDO)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
 
-			builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(entityDO));
-		}
+            builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(entityDO));
+        }
 
-		builder.setResult(rBuilder);
-		responseObserver.onNext(builder.build());
-		responseObserver.onCompleted();
-	}
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
 
-	@Override
-	public void selectByDriverId(GrpcDriverQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
-		GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
-		GrpcR.Builder rBuilder = GrpcR.newBuilder();
+    @Override
+    public void selectByDriverId(GrpcDriverQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
+        GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
+        GrpcR.Builder rBuilder = GrpcR.newBuilder();
 
-		DriverBO driverBO = driverService.selectById(request.getDriverId());
-		if (Objects.isNull(driverBO)) {
-			rBuilder.setOk(false);
-			rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
-			rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
-		}
-		else {
-			rBuilder.setOk(true);
-			rBuilder.setCode(ResponseEnum.OK.getCode());
-			rBuilder.setMessage(ResponseEnum.OK.getText());
+        DriverBO driverBO = driverService.selectById(request.getDriverId());
+        if (Objects.isNull(driverBO)) {
+            rBuilder.setOk(false);
+            rBuilder.setCode(ResponseEnum.NO_RESOURCE.getCode());
+            rBuilder.setMessage(ResponseEnum.NO_RESOURCE.getText());
+        } else {
+            rBuilder.setOk(true);
+            rBuilder.setCode(ResponseEnum.OK.getCode());
+            rBuilder.setMessage(ResponseEnum.OK.getText());
 
-			builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(driverBO));
-		}
+            builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(driverBO));
+        }
 
-		builder.setResult(rBuilder);
-		responseObserver.onNext(builder.build());
-		responseObserver.onCompleted();
-	}
+        builder.setResult(rBuilder);
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+    }
 
 }

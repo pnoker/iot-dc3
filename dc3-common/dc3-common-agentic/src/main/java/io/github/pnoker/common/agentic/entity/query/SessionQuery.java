@@ -30,17 +30,17 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class SessionQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	private Long tenantId;
+    private Long tenantId;
 
-	private Long userId;
+    private Long userId;
 
-	private Byte status;
+    private Byte status;
 
-	private String conversationId;
+    private String conversationId;
 
 }

@@ -32,53 +32,55 @@ import com.serotonin.modbus4j.sero.messaging.RequestHandler;
  * @version 2025.9.0
  */
 abstract /**
-			 * Base Request Handler
-			 *
-			 * @author pnoker
-			 * @version 2025.9.0
-			 * @since 2022.1.0
-			 */
+ * Base Request Handler
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class BaseRequestHandler implements RequestHandler {
 
-	protected ModbusSlaveSet slave;
+    protected ModbusSlaveSet slave;
 
-	/**
-	 * <p>
-	 * Constructor for BaseRequestHandler.
-	 * </p>
-	 * @param slave a {@link ModbusSlaveSet} object.
-	 */
-	public BaseRequestHandler(ModbusSlaveSet slave) {
-		this.slave = slave;
-	}
+    /**
+     * <p>
+     * Constructor for BaseRequestHandler.
+     * </p>
+     *
+     * @param slave a {@link ModbusSlaveSet} object.
+     */
+    public BaseRequestHandler(ModbusSlaveSet slave) {
+        this.slave = slave;
+    }
 
-	/**
-	 * <p>
-	 * handleRequestImpl.
-	 * </p>
-	 * @param request a {@link ModbusRequest} object.
-	 * @return a {@link ModbusResponse} object.
-	 * @throws ModbusTransportException if any.
-	 */
-	protected ModbusResponse handleRequestImpl(ModbusRequest request) throws ModbusTransportException {
-		request.validate(slave);
+    /**
+     * <p>
+     * handleRequestImpl.
+     * </p>
+     *
+     * @param request a {@link ModbusRequest} object.
+     * @return a {@link ModbusResponse} object.
+     * @throws ModbusTransportException if any.
+     */
+    protected ModbusResponse handleRequestImpl(ModbusRequest request) throws ModbusTransportException {
+        request.validate(slave);
 
-		int slaveId = request.getSlaveId();
+        int slaveId = request.getSlaveId();
 
-		// Check the slave id.
-		if (slaveId == 0) {
-			// Broadcast message. Send to all process images.
-			for (ProcessImage processImage : slave.getProcessImages())
-				request.handle(processImage);
-			return null;
-		}
+        // Check the slave id.
+        if (slaveId == 0) {
+            // Broadcast message. Send to all process images.
+            for (ProcessImage processImage : slave.getProcessImages())
+                request.handle(processImage);
+            return null;
+        }
 
-		// Find the process image to which to send.
-		ProcessImage processImage = slave.getProcessImage(slaveId);
-		if (processImage == null)
-			return null;
+        // Find the process image to which to send.
+        ProcessImage processImage = slave.getProcessImage(slaveId);
+        if (processImage == null)
+            return null;
 
-		return request.handle(processImage);
-	}
+        return request.handle(processImage);
+    }
 
 }

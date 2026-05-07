@@ -44,47 +44,47 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ProfileVO extends BaseVO {
 
-	/**
-	 * Name
-	 */
-	@NotBlank(message = "模版名称不能为空", groups = { Add.class })
-	@Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "模版名称格式无效",
-			groups = { Add.class, Update.class })
-	private String profileName;
+    /**
+     * Name
+     */
+    @NotBlank(message = "模版名称不能为空", groups = {Add.class})
+    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "模版名称格式无效",
+            groups = {Add.class, Update.class})
+    private String profileName;
 
-	/**
-	 * Code
-	 */
-	private String profileCode;
+    /**
+     * Code
+     */
+    private String profileCode;
 
-	/**
-	 * Type
-	 */
-	private ProfileShareFlagEnum profileShareFlag;
+    /**
+     * Type
+     */
+    private ProfileShareFlagEnum profileShareFlag;
 
-	/**
-	 * Type
-	 */
-	private ProfileTypeFlagEnum profileTypeFlag;
+    /**
+     * Type
+     */
+    private ProfileTypeFlagEnum profileTypeFlag;
 
-	/**
-	 *
-	 */
-	private ProfileExt profileExt;
+    /**
+     *
+     */
+    private ProfileExt profileExt;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
-	/**
-	 *
-	 */
-	private String signature;
+    /**
+     *
+     */
+    private String signature;
 
-	/**
-	 *
-	 */
-	private Integer version;
+    /**
+     *
+     */
+    private Integer version;
 
 }

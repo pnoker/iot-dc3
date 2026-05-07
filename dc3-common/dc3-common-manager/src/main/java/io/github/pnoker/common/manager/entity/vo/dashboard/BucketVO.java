@@ -39,15 +39,15 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class BucketVO implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Human-readable bucket key (e.g. "ENABLE", "DISABLE", "GATEWAY", or an entity id
-	 * rendered as string).
-	 */
-	private String key;
+    /**
+     * Human-readable bucket key (e.g. "ENABLE", "DISABLE", "GATEWAY", or an entity id
+     * rendered as string).
+     */
+    private String key;
 
-	private long count;
+    private long count;
 
 }

@@ -33,11 +33,12 @@ import java.util.List;
  */
 public interface ResourceService extends BaseService<ResourceBO, ResourceQuery> {
 
-	/**
-	 * Returns all resources matching the filter assembled into a parent/child tree.
-	 * @param entityQuery filter conditions; null disables filtering
-	 * @return tree roots, children nested under each parent
-	 */
-	List<ResourceTreeBO> selectTree(ResourceQuery entityQuery);
+    /**
+     * Returns all resources matching the filter assembled into a parent/child tree.
+     *
+     * @param entityQuery filter conditions; null disables filtering
+     * @return tree roots, children nested under each parent
+     */
+    List<ResourceTreeBO> selectTree(ResourceQuery entityQuery);
 
 }

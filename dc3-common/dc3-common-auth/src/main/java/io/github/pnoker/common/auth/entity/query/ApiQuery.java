@@ -38,41 +38,41 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ApiQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	//
+    //
 
-	/**
-	 * Owning service name, populated by resource registrar
-	 */
-	private String serviceName;
+    /**
+     * Owning service name, populated by resource registrar
+     */
+    private String serviceName;
 
-	/**
-	 * ApiType
-	 */
-	private ApiTypeFlagEnum apiTypeFlag;
+    /**
+     * ApiType
+     */
+    private ApiTypeFlagEnum apiTypeFlag;
 
-	/**
-	 * ApiName
-	 */
-	private String apiName;
+    /**
+     * ApiName
+     */
+    private String apiName;
 
-	/**
-	 * ApiCode, URLMD5
-	 */
-	private String apiCode;
+    /**
+     * ApiCode, URLMD5
+     */
+    private String apiCode;
 
-	/**
-	 * API grouping, usually the owning controller simple class name
-	 */
-	private String apiGroup;
+    /**
+     * API grouping, usually the owning controller simple class name
+     */
+    private String apiGroup;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }

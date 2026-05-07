@@ -37,23 +37,23 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class BaseExt implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Type, used to parse JSON strings.
-	 */
-	private String type;
+    /**
+     * Type, used to parse JSON strings.
+     */
+    private String type;
 
-	/**
-	 * Version, used for optimistic locking.
-	 */
-	@Builder.Default
-	private Integer version = 1;
+    /**
+     * Version, used for optimistic locking.
+     */
+    @Builder.Default
+    private Integer version = 1;
 
-	/**
-	 * Description.
-	 */
-	private String remark;
+    /**
+     * Description.
+     */
+    private String remark;
 
 }

@@ -29,10 +29,10 @@ import lombok.ToString;
 @ToString
 public class PeerAlarmRow {
 
-	private long profileId;
+    private long profileId;
 
-	private long deviceId;
+    private long deviceId;
 
-	private long alarmCount;
+    private long alarmCount;
 
 }

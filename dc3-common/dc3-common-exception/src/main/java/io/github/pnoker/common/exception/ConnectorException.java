@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class ConnectorException extends RuntimeException {
 
-	public ConnectorException() {
-		this(null);
-	}
+    public ConnectorException() {
+        this(null);
+    }
 
-	public ConnectorException(Throwable cause) {
-		super(cause);
-	}
+    public ConnectorException(Throwable cause) {
+        super(cause);
+    }
 
-	public ConnectorException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public ConnectorException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

@@ -35,26 +35,26 @@ import org.mapstruct.MappingTarget;
  * @version 2025.9.0
  * @since 2022.1.0
  */
-@Mapper(componentModel = "spring", uses = { MapStructUtil.class })
+@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcDriverAttributeConfigBuilder {
 
-	@Mapping(target = "id", ignore = true)
-	@Mapping(target = "remark", ignore = true)
-	@Mapping(target = "creatorId", ignore = true)
-	@Mapping(target = "creatorName", ignore = true)
-	@Mapping(target = "createTime", ignore = true)
-	@Mapping(target = "operatorId", ignore = true)
-	@Mapping(target = "operatorName", ignore = true)
-	@Mapping(target = "operateTime", ignore = true)
-	@Mapping(target = "enableFlag", ignore = true)
-	DriverAttributeConfigDTO buildDTOByGrpcDTO(GrpcDriverAttributeConfigDTO entityGrpc);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "remark", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
+    @Mapping(target = "enableFlag", ignore = true)
+    DriverAttributeConfigDTO buildDTOByGrpcDTO(GrpcDriverAttributeConfigDTO entityGrpc);
 
-	@AfterMapping
-	default void afterProcess(GrpcDriverAttributeConfigDTO entityGrpc,
-			@MappingTarget DriverAttributeConfigDTO entityDTO) {
-		GrpcBuilderUtil.buildBaseDTOByGrpcBase(entityGrpc.getBase(), entityDTO);
+    @AfterMapping
+    default void afterProcess(GrpcDriverAttributeConfigDTO entityGrpc,
+                              @MappingTarget DriverAttributeConfigDTO entityDTO) {
+        GrpcBuilderUtil.buildBaseDTOByGrpcBase(entityGrpc.getBase(), entityDTO);
 
-		EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityDTO::setEnableFlag);
-	}
+        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityDTO::setEnableFlag);
+    }
 
 }

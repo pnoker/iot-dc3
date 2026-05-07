@@ -51,132 +51,133 @@ import java.util.Objects;
 @Service
 public class PointAttributeServiceImpl implements PointAttributeService {
 
-	@Resource
-	private PointAttributeBuilder pointAttributeBuilder;
+    @Resource
+    private PointAttributeBuilder pointAttributeBuilder;
 
-	@Resource
-	private PointAttributeManager pointAttributeManager;
+    @Resource
+    private PointAttributeManager pointAttributeManager;
 
-	@Override
-	public void save(PointAttributeBO entityBO) {
-		checkDuplicate(entityBO, false, true);
+    @Override
+    public void save(PointAttributeBO entityBO) {
+        checkDuplicate(entityBO, false, true);
 
-		PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(entityBO);
-		if (!pointAttributeManager.save(entityDO)) {
-			throw new AddException("Failed to create point attribute");
-		}
-	}
+        PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(entityBO);
+        if (!pointAttributeManager.save(entityDO)) {
+            throw new AddException("Failed to create point attribute");
+        }
+    }
 
-	@Override
-	public void remove(Long id) {
-		getDOById(id, true);
+    @Override
+    public void remove(Long id) {
+        getDOById(id, true);
 
-		if (!pointAttributeManager.removeById(id)) {
-			throw new DeleteException("Failed to remove point attribute");
-		}
-	}
+        if (!pointAttributeManager.removeById(id)) {
+            throw new DeleteException("Failed to remove point attribute");
+        }
+    }
 
-	@Override
-	public void update(PointAttributeBO entityBO) {
-		getDOById(entityBO.getId(), true);
+    @Override
+    public void update(PointAttributeBO entityBO) {
+        getDOById(entityBO.getId(), true);
 
-		checkDuplicate(entityBO, true, true);
+        checkDuplicate(entityBO, true, true);
 
-		PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(entityBO);
-		entityDO.setOperateTime(null);
-		if (!pointAttributeManager.updateById(entityDO)) {
-			throw new UpdateException("Failed to update point attribute");
-		}
-	}
+        PointAttributeDO entityDO = pointAttributeBuilder.buildDOByBO(entityBO);
+        entityDO.setOperateTime(null);
+        if (!pointAttributeManager.updateById(entityDO)) {
+            throw new UpdateException("Failed to update point attribute");
+        }
+    }
 
-	@Override
-	public PointAttributeBO selectById(Long id) {
-		PointAttributeDO entityDO = getDOById(id, true);
-		return pointAttributeBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public PointAttributeBO selectById(Long id) {
+        PointAttributeDO entityDO = getDOById(id, true);
+        return pointAttributeBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public PointAttributeBO selectByNameAndDriverId(String name, Long driverId) {
-		LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery()
-			.eq(PointAttributeDO::getAttributeCode, name)
-			.eq(PointAttributeDO::getDriverId, driverId)
-			.last(QueryWrapperConstant.LIMIT_ONE);
-		PointAttributeDO entityDO = wrapper.one();
-		return pointAttributeBuilder.buildBOByDO(entityDO);
-	}
+    @Override
+    public PointAttributeBO selectByNameAndDriverId(String name, Long driverId) {
+        LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery()
+                .eq(PointAttributeDO::getAttributeCode, name)
+                .eq(PointAttributeDO::getDriverId, driverId)
+                .last(QueryWrapperConstant.LIMIT_ONE);
+        PointAttributeDO entityDO = wrapper.one();
+        return pointAttributeBuilder.buildBOByDO(entityDO);
+    }
 
-	@Override
-	public List<PointAttributeBO> selectByDriverId(Long driverId) {
-		LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery()
-			.eq(PointAttributeDO::getDriverId, driverId);
-		List<PointAttributeDO> entityDO = wrapper.list();
-		return pointAttributeBuilder.buildBOListByDOList(entityDO);
-	}
+    @Override
+    public List<PointAttributeBO> selectByDriverId(Long driverId) {
+        LambdaQueryChainWrapper<PointAttributeDO> wrapper = pointAttributeManager.lambdaQuery()
+                .eq(PointAttributeDO::getDriverId, driverId);
+        List<PointAttributeDO> entityDO = wrapper.list();
+        return pointAttributeBuilder.buildBOListByDOList(entityDO);
+    }
 
-	@Override
-	public Page<PointAttributeBO> selectByPage(PointAttributeQuery entityQuery) {
-		if (Objects.isNull(entityQuery.getPage())) {
-			entityQuery.setPage(new Pages());
-		}
-		Page<PointAttributeDO> entityPageDO = pointAttributeManager.page(PageUtil.page(entityQuery.getPage()),
-				fuzzyQuery(entityQuery));
-		return pointAttributeBuilder.buildBOPageByDOPage(entityPageDO);
-	}
+    @Override
+    public Page<PointAttributeBO> selectByPage(PointAttributeQuery entityQuery) {
+        if (Objects.isNull(entityQuery.getPage())) {
+            entityQuery.setPage(new Pages());
+        }
+        Page<PointAttributeDO> entityPageDO = pointAttributeManager.page(PageUtil.page(entityQuery.getPage()),
+                fuzzyQuery(entityQuery));
+        return pointAttributeBuilder.buildBOPageByDOPage(entityPageDO);
+    }
 
-	/**
-	 * @param entityQuery {@link PointAttributeQuery}
-	 * @return {@link LambdaQueryWrapper}
-	 */
-	private LambdaQueryWrapper<PointAttributeDO> fuzzyQuery(PointAttributeQuery entityQuery) {
-		LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
-		wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeCode()), PointAttributeDO::getAttributeCode,
-				entityQuery.getAttributeCode());
-		wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeName,
-				entityQuery.getAttributeName());
-		wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag,
-				entityQuery.getAttributeTypeFlag());
-		wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), PointAttributeDO::getDriverId,
-				entityQuery.getDriverId());
-		wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointAttributeDO::getTenantId,
-				entityQuery.getTenantId());
-		return wrapper;
-	}
+    /**
+     * @param entityQuery {@link PointAttributeQuery}
+     * @return {@link LambdaQueryWrapper}
+     */
+    private LambdaQueryWrapper<PointAttributeDO> fuzzyQuery(PointAttributeQuery entityQuery) {
+        LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeCode()), PointAttributeDO::getAttributeCode,
+                entityQuery.getAttributeCode());
+        wrapper.like(StringUtils.isNotEmpty(entityQuery.getAttributeName()), PointAttributeDO::getAttributeName,
+                entityQuery.getAttributeName());
+        wrapper.eq(Objects.nonNull(entityQuery.getAttributeTypeFlag()), PointAttributeDO::getAttributeTypeFlag,
+                entityQuery.getAttributeTypeFlag());
+        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getDriverId()), PointAttributeDO::getDriverId,
+                entityQuery.getDriverId());
+        wrapper.eq(Objects.nonNull(entityQuery.getTenantId()), PointAttributeDO::getTenantId,
+                entityQuery.getTenantId());
+        return wrapper;
+    }
 
-	/**
-	 * @param entityBO {@link PointAttributeBO}
-	 * @param isUpdate
-	 * @param throwException
-	 * @return
-	 */
-	private boolean checkDuplicate(PointAttributeBO entityBO, boolean isUpdate, boolean throwException) {
-		LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
-		wrapper.eq(PointAttributeDO::getAttributeCode, entityBO.getAttributeCode());
-		wrapper.eq(PointAttributeDO::getDriverId, entityBO.getDriverId());
-		wrapper.eq(PointAttributeDO::getTenantId, entityBO.getTenantId());
-		wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-		PointAttributeDO one = pointAttributeManager.getOne(wrapper);
-		if (Objects.isNull(one)) {
-			return false;
-		}
-		boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-		if (throwException && duplicate) {
-			throw new DuplicateException("Point attribute has been duplicated");
-		}
-		return duplicate;
-	}
+    /**
+     * @param entityBO       {@link PointAttributeBO}
+     * @param isUpdate
+     * @param throwException
+     * @return
+     */
+    private boolean checkDuplicate(PointAttributeBO entityBO, boolean isUpdate, boolean throwException) {
+        LambdaQueryWrapper<PointAttributeDO> wrapper = Wrappers.<PointAttributeDO>query().lambda();
+        wrapper.eq(PointAttributeDO::getAttributeCode, entityBO.getAttributeCode());
+        wrapper.eq(PointAttributeDO::getDriverId, entityBO.getDriverId());
+        wrapper.eq(PointAttributeDO::getTenantId, entityBO.getTenantId());
+        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
+        PointAttributeDO one = pointAttributeManager.getOne(wrapper);
+        if (Objects.isNull(one)) {
+            return false;
+        }
+        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
+        if (throwException && duplicate) {
+            throw new DuplicateException("Point attribute has been duplicated");
+        }
+        return duplicate;
+    }
 
-	/**
-	 * Primary key ID
-	 * @param id ID
-	 * @param throwException
-	 * @return {@link PointAttributeDO}
-	 */
-	private PointAttributeDO getDOById(Long id, boolean throwException) {
-		PointAttributeDO entityDO = pointAttributeManager.getById(id);
-		if (throwException && Objects.isNull(entityDO)) {
-			throw new NotFoundException("Point attribute does not exist");
-		}
-		return entityDO;
-	}
+    /**
+     * Primary key ID
+     *
+     * @param id             ID
+     * @param throwException
+     * @return {@link PointAttributeDO}
+     */
+    private PointAttributeDO getDOById(Long id, boolean throwException) {
+        PointAttributeDO entityDO = pointAttributeManager.getById(id);
+        if (throwException && Objects.isNull(entityDO)) {
+            throw new NotFoundException("Point attribute does not exist");
+        }
+        return entityDO;
+    }
 
 }

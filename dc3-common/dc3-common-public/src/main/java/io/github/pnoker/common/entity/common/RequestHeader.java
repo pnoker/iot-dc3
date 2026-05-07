@@ -39,54 +39,54 @@ import lombok.Setter;
 @Setter
 public class RequestHeader {
 
-	private RequestHeader() {
-		throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-	}
+    private RequestHeader() {
+        throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
+    }
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class TokenHeader {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TokenHeader {
 
-		/**
-		 * Salt value for token encryption
-		 */
-		private String salt;
+        /**
+         * Salt value for token encryption
+         */
+        private String salt;
 
-		/**
-		 * JWT token string
-		 */
-		private String token;
+        /**
+         * JWT token string
+         */
+        private String token;
 
-	}
+    }
 
-	@Getter
-	@Setter
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public static class UserHeader {
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserHeader {
 
-		/**
-		 * User ID for identification
-		 */
-		private Long userId;
+        /**
+         * User ID for identification
+         */
+        private Long userId;
 
-		/**
-		 * User nickname or alias
-		 */
-		private String nickName;
+        /**
+         * User nickname or alias
+         */
+        private String nickName;
 
-		/**
-		 * User account name
-		 */
-		private String userName;
+        /**
+         * User account name
+         */
+        private String userName;
 
-		/**
-		 * Tenant ID for multi-tenant isolation
-		 */
-		private Long tenantId;
+        /**
+         * Tenant ID for multi-tenant isolation
+         */
+        private Long tenantId;
 
-	}
+    }
 
 }

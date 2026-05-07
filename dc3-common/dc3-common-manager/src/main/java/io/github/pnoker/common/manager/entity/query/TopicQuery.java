@@ -38,21 +38,21 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class TopicQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 *
-	 */
+    /**
+     *
+     */
 
-	private String topic;
+    private String topic;
 
-	/**
-	 * Device Name
-	 */
+    /**
+     * Device Name
+     */
 
-	private String deviceName;
+    private String deviceName;
 
 }

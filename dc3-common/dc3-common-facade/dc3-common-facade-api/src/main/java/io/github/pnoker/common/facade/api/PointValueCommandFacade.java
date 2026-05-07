@@ -36,16 +36,18 @@ package io.github.pnoker.common.facade.api;
  */
 public interface PointValueCommandFacade {
 
-	/**
-	 * Send a read command to a device for a specific point.
-	 * @return {@code true} if the command was accepted.
-	 */
-	boolean read(Long deviceId, Long pointId);
+    /**
+     * Send a read command to a device for a specific point.
+     *
+     * @return {@code true} if the command was accepted.
+     */
+    boolean read(Long deviceId, Long pointId);
 
-	/**
-	 * Send a write command to a device for a specific point.
-	 * @return {@code true} if the command was accepted.
-	 */
-	boolean write(Long deviceId, Long pointId, String value);
+    /**
+     * Send a write command to a device for a specific point.
+     *
+     * @return {@code true} if the command was accepted.
+     */
+    boolean write(Long deviceId, Long pointId, String value);
 
 }

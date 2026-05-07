@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class OutRangeException extends RuntimeException {
 
-	public OutRangeException() {
-		this(null);
-	}
+    public OutRangeException() {
+        this(null);
+    }
 
-	public OutRangeException(Throwable cause) {
-		super(cause);
-	}
+    public OutRangeException(Throwable cause) {
+        super(cause);
+    }
 
-	public OutRangeException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public OutRangeException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

@@ -32,50 +32,50 @@ import org.springframework.grpc.client.GrpcChannelFactory;
 @Configuration
 public class GrpcStubConfig {
 
-	@Bean
-	public TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub(GrpcChannelFactory channels) {
-		return TenantApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
-	}
+    @Bean
+    public TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub(GrpcChannelFactory channels) {
+        return TenantApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    }
 
-	@Bean
-	public UserApiGrpc.UserApiBlockingStub userApiBlockingStub(GrpcChannelFactory channels) {
-		return UserApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
-	}
+    @Bean
+    public UserApiGrpc.UserApiBlockingStub userApiBlockingStub(GrpcChannelFactory channels) {
+        return UserApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    }
 
-	@Bean
-	public TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub(GrpcChannelFactory channels) {
-		return TokenApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
-	}
+    @Bean
+    public TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub(GrpcChannelFactory channels) {
+        return TokenApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    }
 
-	@Bean
-	public UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub(GrpcChannelFactory channels) {
-		return UserLoginApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
-	}
+    @Bean
+    public UserLoginApiGrpc.UserLoginApiBlockingStub userLoginApiBlockingStub(GrpcChannelFactory channels) {
+        return UserLoginApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    }
 
-	@Bean
-	public ResourceRegistryApiGrpc.ResourceRegistryApiBlockingStub resourceRegistryApiBlockingStub(
-			GrpcChannelFactory channels) {
-		return ResourceRegistryApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
-	}
+    @Bean
+    public ResourceRegistryApiGrpc.ResourceRegistryApiBlockingStub resourceRegistryApiBlockingStub(
+            GrpcChannelFactory channels) {
+        return ResourceRegistryApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    }
 
-	@Bean
-	public DriverApiGrpc.DriverApiBlockingStub managerDriverApiBlockingStub(GrpcChannelFactory channels) {
-		return DriverApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
-	}
+    @Bean
+    public DriverApiGrpc.DriverApiBlockingStub managerDriverApiBlockingStub(GrpcChannelFactory channels) {
+        return DriverApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    }
 
-	@Bean
-	public DeviceApiGrpc.DeviceApiBlockingStub managerDeviceApiBlockingStub(GrpcChannelFactory channels) {
-		return DeviceApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
-	}
+    @Bean
+    public DeviceApiGrpc.DeviceApiBlockingStub managerDeviceApiBlockingStub(GrpcChannelFactory channels) {
+        return DeviceApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    }
 
-	@Bean
-	public PointApiGrpc.PointApiBlockingStub managerPointApiBlockingStub(GrpcChannelFactory channels) {
-		return PointApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
-	}
+    @Bean
+    public PointApiGrpc.PointApiBlockingStub managerPointApiBlockingStub(GrpcChannelFactory channels) {
+        return PointApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    }
 
-	@Bean
-	public PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub(GrpcChannelFactory channels) {
-		return PointValueApiGrpc.newBlockingStub(channels.createChannel(DataConstant.SERVICE_NAME));
-	}
+    @Bean
+    public PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub(GrpcChannelFactory channels) {
+        return PointValueApiGrpc.newBlockingStub(channels.createChannel(DataConstant.SERVICE_NAME));
+    }
 
 }

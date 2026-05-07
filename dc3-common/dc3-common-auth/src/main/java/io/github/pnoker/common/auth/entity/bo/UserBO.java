@@ -36,39 +36,39 @@ import lombok.*;
 @ToString(callSuper = true)
 public class UserBO extends BaseBO {
 
-	/**
-	 *
-	 */
-	private String nickName;
+    /**
+     *
+     */
+    private String nickName;
 
-	/**
-	 * Name
-	 */
-	private String userName;
+    /**
+     * Name
+     */
+    private String userName;
 
-	/**
-	 *
-	 */
-	private String phone;
+    /**
+     *
+     */
+    private String phone;
 
-	/**
-	 *
-	 */
-	private String email;
+    /**
+     *
+     */
+    private String email;
 
-	/**
-	 *
-	 */
-	private UserSocialExt socialExt;
+    /**
+     *
+     */
+    private UserSocialExt socialExt;
 
-	/**
-	 *
-	 */
-	private UserIdentityExt identityExt;
+    /**
+     *
+     */
+    private UserIdentityExt identityExt;
 
-	/**
-	 * Enable flag, 0:, 1:Disable
-	 */
-	private Byte enableFlag;
+    /**
+     * Enable flag, 0:, 1:Disable
+     */
+    private Byte enableFlag;
 
 }

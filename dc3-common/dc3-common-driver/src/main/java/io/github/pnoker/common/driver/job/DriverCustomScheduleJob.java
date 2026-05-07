@@ -34,20 +34,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class DriverCustomScheduleJob extends QuartzJobBean {
 
-	private final DriverCustomService driverCustomService;
+    private final DriverCustomService driverCustomService;
 
-	public DriverCustomScheduleJob(DriverCustomService driverCustomService) {
-		this.driverCustomService = driverCustomService;
-	}
+    public DriverCustomScheduleJob(DriverCustomService driverCustomService) {
+        this.driverCustomService = driverCustomService;
+    }
 
-	@Override
-	protected void executeInternal(JobExecutionContext jobExecutionContext) {
-		try {
-			driverCustomService.schedule();
-		}
-		catch (Exception e) {
-			log.error("Failed to execute custom schedule job: {}", e.getMessage(), e);
-		}
-	}
+    @Override
+    protected void executeInternal(JobExecutionContext jobExecutionContext) {
+        try {
+            driverCustomService.schedule();
+        } catch (Exception e) {
+            log.error("Failed to execute custom schedule job: {}", e.getMessage(), e);
+        }
+    }
 
 }

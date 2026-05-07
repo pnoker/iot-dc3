@@ -39,17 +39,19 @@ import java.util.List;
  */
 public interface PointValueFacade {
 
-	/**
-	 * Query the latest collected value of a device point.
-	 * @return the point value, or {@code null} when no value exists.
-	 */
-	FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId);
+    /**
+     * Query the latest collected value of a device point.
+     *
+     * @return the point value, or {@code null} when no value exists.
+     */
+    FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId);
 
-	/**
-	 * Query historical values of a device point.
-	 * @return an immutable list of value strings (never {@code null}; empty when nothing
-	 * matches).
-	 */
-	List<String> history(Long tenantId, Long deviceId, Long pointId, int count);
+    /**
+     * Query historical values of a device point.
+     *
+     * @return an immutable list of value strings (never {@code null}; empty when nothing
+     * matches).
+     */
+    List<String> history(Long tenantId, Long deviceId, Long pointId, int count);
 
 }

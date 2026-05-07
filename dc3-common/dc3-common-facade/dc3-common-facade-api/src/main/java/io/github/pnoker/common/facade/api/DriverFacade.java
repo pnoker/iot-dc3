@@ -32,20 +32,21 @@ import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
  */
 public interface DriverFacade {
 
-	/**
-	 * @return the driver, or {@code null} when it does not exist.
-	 */
-	FacadeDriverBO selectById(Long id);
+    /**
+     * @return the driver, or {@code null} when it does not exist.
+     */
+    FacadeDriverBO selectById(Long id);
 
-	/**
-	 * @return a page of drivers (never {@code null}; empty page when nothing matches).
-	 */
-	FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query);
+    /**
+     * @return a page of drivers (never {@code null}; empty page when nothing matches).
+     */
+    FacadePage<FacadeDriverBO> selectByPage(FacadeDriverQuery query);
 
-	/**
-	 * Resolve the driver that owns a given device.
-	 * @return the driver, or {@code null} when the device has no bound driver.
-	 */
-	FacadeDriverBO selectByDeviceId(Long deviceId);
+    /**
+     * Resolve the driver that owns a given device.
+     *
+     * @return the driver, or {@code null} when the device has no bound driver.
+     */
+    FacadeDriverBO selectByDeviceId(Long deviceId);
 
 }

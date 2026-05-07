@@ -32,12 +32,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ModbusTcpDriverApplication {
 
-	/**
-	 * Main method to start the Modbus TCP driver application
-	 * @param args Command line arguments passed to the application
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(ModbusTcpDriverApplication.class, args);
-	}
+    /**
+     * Main method to start the Modbus TCP driver application
+     *
+     * @param args Command line arguments passed to the application
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(ModbusTcpDriverApplication.class, args);
+    }
 
 }

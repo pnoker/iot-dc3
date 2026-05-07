@@ -26,16 +26,16 @@ import java.text.MessageFormat;
  */
 public class DeleteException extends RuntimeException {
 
-	public DeleteException() {
-		this(null);
-	}
+    public DeleteException() {
+        this(null);
+    }
 
-	public DeleteException(Throwable cause) {
-		super(cause);
-	}
+    public DeleteException(Throwable cause) {
+        super(cause);
+    }
 
-	public DeleteException(String template, Object... params) {
-		super(MessageFormat.format(template, params));
-	}
+    public DeleteException(String template, Object... params) {
+        super(MessageFormat.format(template, params));
+    }
 
 }

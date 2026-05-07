@@ -46,189 +46,189 @@ import java.util.stream.Collectors;
 @Component
 public class ManagerToolSet {
 
-	private final DeviceFacade deviceFacade;
+    private final DeviceFacade deviceFacade;
 
-	private final DriverFacade driverFacade;
+    private final DriverFacade driverFacade;
 
-	private final PointFacade pointFacade;
+    private final PointFacade pointFacade;
 
-	public ManagerToolSet(DeviceFacade deviceFacade, DriverFacade driverFacade, PointFacade pointFacade) {
-		this.deviceFacade = deviceFacade;
-		this.driverFacade = driverFacade;
-		this.pointFacade = pointFacade;
-	}
+    public ManagerToolSet(DeviceFacade deviceFacade, DriverFacade driverFacade, PointFacade pointFacade) {
+        this.deviceFacade = deviceFacade;
+        this.driverFacade = driverFacade;
+        this.pointFacade = pointFacade;
+    }
 
-	// ==================== Device Tools ====================
+    // ==================== Device Tools ====================
 
-	@Tool(description = "Look up a device by its numeric ID. Returns device name, code, driver ID, enable status, and profile IDs.")
-	public String lookupDeviceById(@ToolParam(description = "The numeric device ID") Long deviceId) {
-		log.debug("Tool: lookupDeviceById({})", deviceId);
-		FacadeDeviceBO bo = deviceFacade.selectById(deviceId);
-		if (Objects.isNull(bo)) {
-			return "Device not found for ID: " + deviceId;
-		}
-		return formatDevice(bo);
-	}
+    @Tool(description = "Look up a device by its numeric ID. Returns device name, code, driver ID, enable status, and profile IDs.")
+    public String lookupDeviceById(@ToolParam(description = "The numeric device ID") Long deviceId) {
+        log.debug("Tool: lookupDeviceById({})", deviceId);
+        FacadeDeviceBO bo = deviceFacade.selectById(deviceId);
+        if (Objects.isNull(bo)) {
+            return "Device not found for ID: " + deviceId;
+        }
+        return formatDevice(bo);
+    }
 
-	@Tool(description = "Search for devices with optional filters. Supports filtering by device name, code, or driver ID. Returns a paginated list of devices.")
-	public String searchDevices(
-			@ToolParam(description = "Device name filter (partial match), or null to skip") String deviceName,
-			@ToolParam(description = "Device code filter, or null to skip") String deviceCode,
-			@ToolParam(description = "Driver ID filter, or null to skip") Long driverId,
-			@ToolParam(description = "Page number (1-based)") int page,
-			@ToolParam(description = "Page size") int size) {
-		log.debug("Tool: searchDevices(name={}, code={}, driverId={}, page={}, size={})", deviceName, deviceCode,
-				driverId, page, size);
+    @Tool(description = "Search for devices with optional filters. Supports filtering by device name, code, or driver ID. Returns a paginated list of devices.")
+    public String searchDevices(
+            @ToolParam(description = "Device name filter (partial match), or null to skip") String deviceName,
+            @ToolParam(description = "Device code filter, or null to skip") String deviceCode,
+            @ToolParam(description = "Driver ID filter, or null to skip") Long driverId,
+            @ToolParam(description = "Page number (1-based)") int page,
+            @ToolParam(description = "Page size") int size) {
+        log.debug("Tool: searchDevices(name={}, code={}, driverId={}, page={}, size={})", deviceName, deviceCode,
+                driverId, page, size);
 
-		FacadeDeviceQuery query = new FacadeDeviceQuery();
-		query.setDeviceName(deviceName);
-		query.setDeviceCode(deviceCode);
-		query.setDriverId(driverId);
-		Pages p = new Pages();
-		p.setCurrent(page);
-		p.setSize(size);
-		query.setPage(p);
+        FacadeDeviceQuery query = new FacadeDeviceQuery();
+        query.setDeviceName(deviceName);
+        query.setDeviceCode(deviceCode);
+        query.setDriverId(driverId);
+        Pages p = new Pages();
+        p.setCurrent(page);
+        p.setSize(size);
+        query.setPage(p);
 
-		FacadePage<FacadeDeviceBO> result = deviceFacade.selectByPage(query);
-		return formatDevicePage(result);
-	}
+        FacadePage<FacadeDeviceBO> result = deviceFacade.selectByPage(query);
+        return formatDevicePage(result);
+    }
 
-	@Tool(description = "List all devices attached to a given driver ID.")
-	public String listDevicesByDriverId(@ToolParam(description = "The driver ID") Long driverId) {
-		log.debug("Tool: listDevicesByDriverId({})", driverId);
-		List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(driverId);
-		if (devices.isEmpty()) {
-			return "No devices found for driver ID: " + driverId;
-		}
-		return "Devices for driver " + driverId + ":\n"
-				+ devices.stream().map(this::formatDevice).collect(Collectors.joining("\n"));
-	}
+    @Tool(description = "List all devices attached to a given driver ID.")
+    public String listDevicesByDriverId(@ToolParam(description = "The driver ID") Long driverId) {
+        log.debug("Tool: listDevicesByDriverId({})", driverId);
+        List<FacadeDeviceBO> devices = deviceFacade.selectByDriverId(driverId);
+        if (devices.isEmpty()) {
+            return "No devices found for driver ID: " + driverId;
+        }
+        return "Devices for driver " + driverId + ":\n"
+                + devices.stream().map(this::formatDevice).collect(Collectors.joining("\n"));
+    }
 
-	@Tool(description = "List all devices that use a given profile (device template) ID.")
-	public String listDevicesByProfileId(@ToolParam(description = "The profile ID") Long profileId) {
-		log.debug("Tool: listDevicesByProfileId({})", profileId);
-		List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(profileId);
-		if (devices.isEmpty()) {
-			return "No devices found for profile ID: " + profileId;
-		}
-		return "Devices for profile " + profileId + ":\n"
-				+ devices.stream().map(this::formatDevice).collect(Collectors.joining("\n"));
-	}
+    @Tool(description = "List all devices that use a given profile (device template) ID.")
+    public String listDevicesByProfileId(@ToolParam(description = "The profile ID") Long profileId) {
+        log.debug("Tool: listDevicesByProfileId({})", profileId);
+        List<FacadeDeviceBO> devices = deviceFacade.selectByProfileId(profileId);
+        if (devices.isEmpty()) {
+            return "No devices found for profile ID: " + profileId;
+        }
+        return "Devices for profile " + profileId + ":\n"
+                + devices.stream().map(this::formatDevice).collect(Collectors.joining("\n"));
+    }
 
-	// ==================== Driver Tools ====================
+    // ==================== Driver Tools ====================
 
-	@Tool(description = "Look up a driver by its numeric ID. Returns driver name, code, service name, host, type, and enable status.")
-	public String lookupDriverById(@ToolParam(description = "The numeric driver ID") Long driverId) {
-		log.debug("Tool: lookupDriverById({})", driverId);
-		FacadeDriverBO bo = driverFacade.selectById(driverId);
-		if (Objects.isNull(bo)) {
-			return "Driver not found for ID: " + driverId;
-		}
-		return formatDriver(bo);
-	}
+    @Tool(description = "Look up a driver by its numeric ID. Returns driver name, code, service name, host, type, and enable status.")
+    public String lookupDriverById(@ToolParam(description = "The numeric driver ID") Long driverId) {
+        log.debug("Tool: lookupDriverById({})", driverId);
+        FacadeDriverBO bo = driverFacade.selectById(driverId);
+        if (Objects.isNull(bo)) {
+            return "Driver not found for ID: " + driverId;
+        }
+        return formatDriver(bo);
+    }
 
-	@Tool(description = "Resolve the driver that owns a given device. Returns the driver details.")
-	public String lookupDriverByDeviceId(@ToolParam(description = "The device ID") Long deviceId) {
-		log.debug("Tool: lookupDriverByDeviceId({})", deviceId);
-		FacadeDriverBO bo = driverFacade.selectByDeviceId(deviceId);
-		if (Objects.isNull(bo)) {
-			return "No driver found for device ID: " + deviceId;
-		}
-		return formatDriver(bo);
-	}
+    @Tool(description = "Resolve the driver that owns a given device. Returns the driver details.")
+    public String lookupDriverByDeviceId(@ToolParam(description = "The device ID") Long deviceId) {
+        log.debug("Tool: lookupDriverByDeviceId({})", deviceId);
+        FacadeDriverBO bo = driverFacade.selectByDeviceId(deviceId);
+        if (Objects.isNull(bo)) {
+            return "No driver found for device ID: " + deviceId;
+        }
+        return formatDriver(bo);
+    }
 
-	@Tool(description = "Search for drivers with optional name filter. Returns a paginated list.")
-	public String searchDrivers(
-			@ToolParam(description = "Driver name filter (partial match), or null to skip") String driverName,
-			@ToolParam(description = "Page number (1-based)") int page,
-			@ToolParam(description = "Page size") int size) {
-		log.debug("Tool: searchDrivers(name={}, page={}, size={})", driverName, page, size);
+    @Tool(description = "Search for drivers with optional name filter. Returns a paginated list.")
+    public String searchDrivers(
+            @ToolParam(description = "Driver name filter (partial match), or null to skip") String driverName,
+            @ToolParam(description = "Page number (1-based)") int page,
+            @ToolParam(description = "Page size") int size) {
+        log.debug("Tool: searchDrivers(name={}, page={}, size={})", driverName, page, size);
 
-		FacadeDriverQuery query = new FacadeDriverQuery();
-		query.setDriverName(driverName);
-		Pages p = new Pages();
-		p.setCurrent(page);
-		p.setSize(size);
-		query.setPage(p);
+        FacadeDriverQuery query = new FacadeDriverQuery();
+        query.setDriverName(driverName);
+        Pages p = new Pages();
+        p.setCurrent(page);
+        p.setSize(size);
+        query.setPage(p);
 
-		FacadePage<FacadeDriverBO> result = driverFacade.selectByPage(query);
-		return formatDriverPage(result);
-	}
+        FacadePage<FacadeDriverBO> result = driverFacade.selectByPage(query);
+        return formatDriverPage(result);
+    }
 
-	// ==================== Point Tools ====================
+    // ==================== Point Tools ====================
 
-	@Tool(description = "Look up a point (data point / metric) by its numeric ID. Returns point name, code, type, read/write flag, unit, base value, and multiplier.")
-	public String lookupPointById(@ToolParam(description = "The numeric point ID") Long pointId) {
-		log.debug("Tool: lookupPointById({})", pointId);
-		FacadePointBO bo = pointFacade.selectById(pointId);
-		if (Objects.isNull(bo)) {
-			return "Point not found for ID: " + pointId;
-		}
-		return formatPoint(bo);
-	}
+    @Tool(description = "Look up a point (data point / metric) by its numeric ID. Returns point name, code, type, read/write flag, unit, base value, and multiplier.")
+    public String lookupPointById(@ToolParam(description = "The numeric point ID") Long pointId) {
+        log.debug("Tool: lookupPointById({})", pointId);
+        FacadePointBO bo = pointFacade.selectById(pointId);
+        if (Objects.isNull(bo)) {
+            return "Point not found for ID: " + pointId;
+        }
+        return formatPoint(bo);
+    }
 
-	@Tool(description = "Search for points with optional filters. Returns a paginated list.")
-	public String searchPoints(
-			@ToolParam(description = "Point name filter (partial match), or null to skip") String pointName,
-			@ToolParam(description = "Profile ID filter, or null to skip") Long profileId,
-			@ToolParam(description = "Page number (1-based)") int page,
-			@ToolParam(description = "Page size") int size) {
-		log.debug("Tool: searchPoints(name={}, profileId={}, page={}, size={})", pointName, profileId, page, size);
+    @Tool(description = "Search for points with optional filters. Returns a paginated list.")
+    public String searchPoints(
+            @ToolParam(description = "Point name filter (partial match), or null to skip") String pointName,
+            @ToolParam(description = "Profile ID filter, or null to skip") Long profileId,
+            @ToolParam(description = "Page number (1-based)") int page,
+            @ToolParam(description = "Page size") int size) {
+        log.debug("Tool: searchPoints(name={}, profileId={}, page={}, size={})", pointName, profileId, page, size);
 
-		FacadePointQuery query = new FacadePointQuery();
-		query.setPointName(pointName);
-		query.setProfileId(profileId);
-		Pages p = new Pages();
-		p.setCurrent(page);
-		p.setSize(size);
-		query.setPage(p);
+        FacadePointQuery query = new FacadePointQuery();
+        query.setPointName(pointName);
+        query.setProfileId(profileId);
+        Pages p = new Pages();
+        p.setCurrent(page);
+        p.setSize(size);
+        query.setPage(p);
 
-		FacadePage<FacadePointBO> result = pointFacade.selectByPage(query);
-		return formatPointPage(result);
-	}
+        FacadePage<FacadePointBO> result = pointFacade.selectByPage(query);
+        return formatPointPage(result);
+    }
 
-	// ==================== Formatting Helpers ====================
+    // ==================== Formatting Helpers ====================
 
-	private String formatDevice(FacadeDeviceBO d) {
-		return String.format("Device[id=%d, name=%s, code=%s, driverId=%d, enabled=%s, profileIds=%s]", d.getId(),
-				d.getDeviceName(), d.getDeviceCode(), d.getDriverId(), d.getEnableFlag(), d.getProfileIds());
-	}
+    private String formatDevice(FacadeDeviceBO d) {
+        return String.format("Device[id=%d, name=%s, code=%s, driverId=%d, enabled=%s, profileIds=%s]", d.getId(),
+                d.getDeviceName(), d.getDeviceCode(), d.getDriverId(), d.getEnableFlag(), d.getProfileIds());
+    }
 
-	private String formatDevicePage(FacadePage<FacadeDeviceBO> page) {
-		if (Objects.isNull(page) || page.getRecords().isEmpty()) {
-			return "No devices found.";
-		}
-		String items = page.getRecords().stream().map(this::formatDevice).collect(Collectors.joining("\n"));
-		return String.format("Page %d/%d (total %d):\n%s", page.getCurrent(), page.getPages(), page.getTotal(), items);
-	}
+    private String formatDevicePage(FacadePage<FacadeDeviceBO> page) {
+        if (Objects.isNull(page) || page.getRecords().isEmpty()) {
+            return "No devices found.";
+        }
+        String items = page.getRecords().stream().map(this::formatDevice).collect(Collectors.joining("\n"));
+        return String.format("Page %d/%d (total %d):\n%s", page.getCurrent(), page.getPages(), page.getTotal(), items);
+    }
 
-	private String formatDriver(FacadeDriverBO d) {
-		return String.format("Driver[id=%d, name=%s, code=%s, serviceName=%s, host=%s, type=%s, enabled=%s]", d.getId(),
-				d.getDriverName(), d.getDriverCode(), d.getServiceName(), d.getServiceHost(), d.getDriverTypeFlag(),
-				d.getEnableFlag());
-	}
+    private String formatDriver(FacadeDriverBO d) {
+        return String.format("Driver[id=%d, name=%s, code=%s, serviceName=%s, host=%s, type=%s, enabled=%s]", d.getId(),
+                d.getDriverName(), d.getDriverCode(), d.getServiceName(), d.getServiceHost(), d.getDriverTypeFlag(),
+                d.getEnableFlag());
+    }
 
-	private String formatDriverPage(FacadePage<FacadeDriverBO> page) {
-		if (Objects.isNull(page) || page.getRecords().isEmpty()) {
-			return "No drivers found.";
-		}
-		String items = page.getRecords().stream().map(this::formatDriver).collect(Collectors.joining("\n"));
-		return String.format("Page %d/%d (total %d):\n%s", page.getCurrent(), page.getPages(), page.getTotal(), items);
-	}
+    private String formatDriverPage(FacadePage<FacadeDriverBO> page) {
+        if (Objects.isNull(page) || page.getRecords().isEmpty()) {
+            return "No drivers found.";
+        }
+        String items = page.getRecords().stream().map(this::formatDriver).collect(Collectors.joining("\n"));
+        return String.format("Page %d/%d (total %d):\n%s", page.getCurrent(), page.getPages(), page.getTotal(), items);
+    }
 
-	private String formatPoint(FacadePointBO p) {
-		return String.format(
-				"Point[id=%d, name=%s, code=%s, type=%s, rw=%s, unit=%s, base=%s, multiple=%s, profileId=%d]",
-				p.getId(), p.getPointName(), p.getPointCode(), p.getPointTypeFlag(), p.getRwFlag(), p.getUnit(),
-				p.getBaseValue(), p.getMultiple(), p.getProfileId());
-	}
+    private String formatPoint(FacadePointBO p) {
+        return String.format(
+                "Point[id=%d, name=%s, code=%s, type=%s, rw=%s, unit=%s, base=%s, multiple=%s, profileId=%d]",
+                p.getId(), p.getPointName(), p.getPointCode(), p.getPointTypeFlag(), p.getRwFlag(), p.getUnit(),
+                p.getBaseValue(), p.getMultiple(), p.getProfileId());
+    }
 
-	private String formatPointPage(FacadePage<FacadePointBO> page) {
-		if (Objects.isNull(page) || page.getRecords().isEmpty()) {
-			return "No points found.";
-		}
-		String items = page.getRecords().stream().map(this::formatPoint).collect(Collectors.joining("\n"));
-		return String.format("Page %d/%d (total %d):\n%s", page.getCurrent(), page.getPages(), page.getTotal(), items);
-	}
+    private String formatPointPage(FacadePage<FacadePointBO> page) {
+        if (Objects.isNull(page) || page.getRecords().isEmpty()) {
+            return "No points found.";
+        }
+        String items = page.getRecords().stream().map(this::formatPoint).collect(Collectors.joining("\n"));
+        return String.format("Page %d/%d (total %d):\n%s", page.getCurrent(), page.getPages(), page.getTotal(), items);
+    }
 
 }

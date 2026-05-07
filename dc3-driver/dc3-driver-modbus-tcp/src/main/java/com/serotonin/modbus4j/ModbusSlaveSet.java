@@ -33,111 +33,112 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @version 2025.9.0
  */
 abstract /**
-			 * Modbus Slave Set
-			 *
-			 * @author pnoker
-			 * @version 2025.9.0
-			 * @since 2022.1.0
-			 */
+ * Modbus Slave Set
+ *
+ * @author pnoker
+ * @version 2025.9.0
+ * @since 2022.1.0
+ */
 public class ModbusSlaveSet extends Modbus {
 
-	private LinkedHashMap<Integer, ProcessImage> processImages = new LinkedHashMap<>();
+    private LinkedHashMap<Integer, ProcessImage> processImages = new LinkedHashMap<>();
 
-	private ReadWriteLock lock = new ReentrantReadWriteLock();
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
 
-	/**
-	 * <p>
-	 * addProcessImage.
-	 * </p>
-	 * @param processImage a {@link ProcessImage} object.
-	 */
-	public void addProcessImage(ProcessImage processImage) {
-		lock.writeLock().lock();
-		try {
-			processImages.put(processImage.getSlaveId(), processImage);
-		}
-		finally {
-			lock.writeLock().unlock();
-		}
-	}
+    /**
+     * <p>
+     * addProcessImage.
+     * </p>
+     *
+     * @param processImage a {@link ProcessImage} object.
+     */
+    public void addProcessImage(ProcessImage processImage) {
+        lock.writeLock().lock();
+        try {
+            processImages.put(processImage.getSlaveId(), processImage);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
 
-	/**
-	 * <p>
-	 * removeProcessImage.
-	 * </p>
-	 * @param slaveId a int.
-	 * @return a boolean.
-	 */
-	public boolean removeProcessImage(int slaveId) {
-		lock.writeLock().lock();
-		try {
-			return (processImages.remove(slaveId) != null);
-		}
-		finally {
-			lock.writeLock().unlock();
-		}
-	}
+    /**
+     * <p>
+     * removeProcessImage.
+     * </p>
+     *
+     * @param slaveId a int.
+     * @return a boolean.
+     */
+    public boolean removeProcessImage(int slaveId) {
+        lock.writeLock().lock();
+        try {
+            return (processImages.remove(slaveId) != null);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
 
-	/**
-	 * <p>
-	 * removeProcessImage.
-	 * </p>
-	 * @param processImage a {@link ProcessImage} object.
-	 * @return a boolean.
-	 */
-	public boolean removeProcessImage(ProcessImage processImage) {
-		lock.writeLock().lock();
-		try {
-			return (processImages.remove(processImage.getSlaveId()) != null);
-		}
-		finally {
-			lock.writeLock().unlock();
-		}
-	}
+    /**
+     * <p>
+     * removeProcessImage.
+     * </p>
+     *
+     * @param processImage a {@link ProcessImage} object.
+     * @return a boolean.
+     */
+    public boolean removeProcessImage(ProcessImage processImage) {
+        lock.writeLock().lock();
+        try {
+            return (processImages.remove(processImage.getSlaveId()) != null);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
 
-	/**
-	 * <p>
-	 * getProcessImage.
-	 * </p>
-	 * @param slaveId a int.
-	 * @return a {@link ProcessImage} object.
-	 */
-	public ProcessImage getProcessImage(int slaveId) {
-		lock.readLock().lock();
-		try {
-			return processImages.get(slaveId);
-		}
-		finally {
-			lock.readLock().unlock();
-		}
-	}
+    /**
+     * <p>
+     * getProcessImage.
+     * </p>
+     *
+     * @param slaveId a int.
+     * @return a {@link ProcessImage} object.
+     */
+    public ProcessImage getProcessImage(int slaveId) {
+        lock.readLock().lock();
+        try {
+            return processImages.get(slaveId);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
 
-	/**
-	 * Get a copy of the current process images
-	 * @return a {@link Collection} object.
-	 */
-	public Collection<ProcessImage> getProcessImages() {
-		lock.readLock().lock();
-		try {
-			return new HashSet<>(processImages.values());
-		}
-		finally {
-			lock.readLock().unlock();
-		}
-	}
+    /**
+     * Get a copy of the current process images
+     *
+     * @return a {@link Collection} object.
+     */
+    public Collection<ProcessImage> getProcessImages() {
+        lock.readLock().lock();
+        try {
+            return new HashSet<>(processImages.values());
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
 
-	/**
-	 * Starts the slave. If an exception is not thrown, this method doesn't return, but
-	 * uses the thread to execute the listening.
-	 * @throws ModbusInitException if necessary
-	 */
-	abstract public void start() throws ModbusInitException;
+    /**
+     * Starts the slave. If an exception is not thrown, this method doesn't return, but
+     * uses the thread to execute the listening.
+     *
+     * @throws ModbusInitException if necessary
+     */
+    abstract public void start() throws ModbusInitException;
 
-	/**
-	 * <p>
-	 * stop.
-	 * </p>
-	 */
-	abstract public void stop();
+    /**
+     * <p>
+     * stop.
+     * </p>
+     */
+    abstract public void stop();
 
 }

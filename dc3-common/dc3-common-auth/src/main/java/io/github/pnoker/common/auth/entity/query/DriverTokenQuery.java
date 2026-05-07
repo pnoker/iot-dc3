@@ -40,36 +40,36 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class DriverTokenQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 * Tenant ID
-	 */
-	private Long tenantId;
+    /**
+     * Tenant ID
+     */
+    private Long tenantId;
 
-	//
+    //
 
-	/**
-	 * Driver ID
-	 */
-	private String driverCode;
+    /**
+     * Driver ID
+     */
+    private String driverCode;
 
-	/**
-	 * AppID
-	 */
-	private String driverAppId;
+    /**
+     * AppID
+     */
+    private String driverAppId;
 
-	/**
-	 *
-	 */
-	private ExpireFlagEnum expireFlag;
+    /**
+     *
+     */
+    private ExpireFlagEnum expireFlag;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }

@@ -38,40 +38,40 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class UserQuery implements Serializable {
 
-	@Serial
-	private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-	private Pages page;
+    private Pages page;
 
-	/**
-	 * Tenant scope. Populated by the controller from the request context; any value
-	 * supplied by the client is overwritten so a caller cannot reach across tenants.
-	 */
-	private Long tenantId;
+    /**
+     * Tenant scope. Populated by the controller from the request context; any value
+     * supplied by the client is overwritten so a caller cannot reach across tenants.
+     */
+    private Long tenantId;
 
-	/**
-	 *
-	 */
-	private String nickName;
+    /**
+     *
+     */
+    private String nickName;
 
-	/**
-	 * Name
-	 */
-	private String userName;
+    /**
+     * Name
+     */
+    private String userName;
 
-	/**
-	 *
-	 */
-	private String phone;
+    /**
+     *
+     */
+    private String phone;
 
-	/**
-	 *
-	 */
-	private String email;
+    /**
+     *
+     */
+    private String email;
 
-	/**
-	 * Enable flag, 0 enabled, 1 disabled
-	 */
-	private Byte enableFlag;
+    /**
+     * Enable flag, 0 enabled, 1 disabled
+     */
+    private Byte enableFlag;
 
 }

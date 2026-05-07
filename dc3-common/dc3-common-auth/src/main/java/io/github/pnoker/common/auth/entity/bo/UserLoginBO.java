@@ -35,24 +35,24 @@ import lombok.*;
 @ToString(callSuper = true)
 public class UserLoginBO extends BaseBO {
 
-	/**
-	 * Name
-	 */
-	private String loginName;
+    /**
+     * Name
+     */
+    private String loginName;
 
-	/**
-	 * ID
-	 */
-	private Long userId;
+    /**
+     * ID
+     */
+    private Long userId;
 
-	/**
-	 * ID
-	 */
-	private Long userPasswordId;
+    /**
+     * ID
+     */
+    private Long userPasswordId;
 
-	/**
-	 * Enable flag
-	 */
-	private EnableFlagEnum enableFlag;
+    /**
+     * Enable flag
+     */
+    private EnableFlagEnum enableFlag;
 
 }
