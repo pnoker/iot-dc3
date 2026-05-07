@@ -70,9 +70,6 @@
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
 
-        <!-- JDK Version -->
-        <java.version>21</java.version>
-
         <!-- DC3 Version -->
         <dc3.version>2026.5.5</dc3.version>
 
